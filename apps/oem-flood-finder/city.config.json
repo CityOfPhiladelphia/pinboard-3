@@ -1,0 +1,25 @@
+{
+  "appName": "oem-flood-finder",
+  "applicationType": "static-site",
+  "department": "4-oit",
+  "team": "Software Engineering",
+  "contact": "andy.rothwell@phila.gov",
+  "compliance": [],
+  "confidentiality": "low",
+  "cdkPath": "./cdk",
+  "packageManager": "pnpm",
+  "environments": {
+    "dev": {
+      "profile": "OITDevelopers",
+      "vpc": "Test-Citynet"
+    },
+    "test": {
+      "profile": "OITDevelopers",
+      "vpc": "Test-Citynet"
+    },
+    "prod": {
+      "profile": "OITDevelopers",
+      "vpc": "Production-Citynet"
+    }
+  }
+}

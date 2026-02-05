@@ -1,0 +1,11 @@
+{
+  "name": "@pinboard/oem-flood-finder-infra",
+  "version": "0.0.1",
+  "description": "Infrastructure orchestration for oem-flood-finder",
+  "private": true,
+  "scripts": {
+    "synth": "cd cdk && cdk synth",
+    "deploy": "cd cdk && cdk deploy",
+    "diff": "cd cdk && cdk diff"
+  }
+}
