@@ -52,6 +52,7 @@ city ship dev --web
 ## Resources Created
 
 This application creates:
+
 - **S3 Bucket** - Static asset storage
 - **CloudFront Distribution** - Global CDN
 - **Origin Access Control** - Secure S3 access
