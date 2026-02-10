@@ -1,36 +1,57 @@
 <script setup lang="ts">
+import '@phila/phila-ui-core/styles/template-light.css'
+import { AppFooter } from '@phila/phila-ui-app-footer'
+import { AppHeader } from '@phila/phila-ui-app-header'
+import MobileNavPanel from './MobileNavPanel.vue'
+import { h, type FunctionalComponent, type VNode } from 'vue'
+
 defineProps<{
   title: string
 }>()
+
+const slots = defineSlots<{
+  default(): VNode[]
+  'mobile-nav'(): VNode[]
+}>()
+
+const MobileNavContent: FunctionalComponent = () =>
+  h(MobileNavPanel, null, { default: () => slots['mobile-nav']?.() })
 </script>
 
 <template>
   <div class="pinboard">
-    <header class="pinboard-header">
-      <h1>{{ title }}</h1>
-    </header>
+    <AppHeader
+      id="pinboard-nav"
+      :show-trusted-site="false"
+      :mobile-nav="$slots['mobile-nav'] ? MobileNavContent : undefined"
+      :links="[]"
+      :navbar-brand="{
+        brandingImage: { src: '', href: '/', altText: 'City of Philadelphia' },
+        brandingLink: { text: title, href: '/' },
+      }"
+    />
 
     <main class="pinboard-main">
-      <div class="pinboard-locations-panel">
-        <slot name="locations">
-          <p>Locations Panel</p>
-        </slot>
-      </div>
-
-      <div class="pinboard-map-panel">
-        <slot name="map">
-          <p>Map Panel</p>
-        </slot>
-      </div>
+      <slot />
     </main>
 
-    <footer class="pinboard-footer">
-      <slot name="footer">
-        <p>City of Philadelphia</p>
-      </slot>
-    </footer>
+    <AppFooter :sub-footer-only="true" />
   </div>
 </template>
+
+<style>
+.phila-navbar .phila-mobile-nav .nav-flyout {
+  flex: 0 0 25rem;
+  max-width: 25rem;
+  height: calc(100vh - var(--nav-bottom));
+}
+
+.phila-navbar .phila-mobile-nav .nav-flyout .p-4 {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--spacing-m);
+}
+</style>
 
 <style scoped>
 .pinboard {
@@ -39,43 +60,8 @@ defineProps<{
   height: 100vh;
 }
 
-.pinboard-header {
-  padding: 1rem;
-  background: #0f4d90;
-  color: white;
-}
-
-.pinboard-header h1 {
-  margin: 0;
-  font-size: 1.5rem;
-}
-
 .pinboard-main {
-  display: flex;
   flex: 1;
   overflow: hidden;
-}
-
-.pinboard-locations-panel {
-  width: 50%;
-  overflow-y: auto;
-  padding: 1rem;
-  border-right: 1px solid #ccc;
-}
-
-.pinboard-map-panel {
-  width: 50%;
-  overflow: hidden;
-}
-
-.pinboard-footer {
-  padding: 0.5rem 1rem;
-  background: #f0f0f0;
-  border-top: 1px solid #ccc;
-}
-
-.pinboard-footer p {
-  margin: 0;
-  font-size: 0.875rem;
 }
 </style>

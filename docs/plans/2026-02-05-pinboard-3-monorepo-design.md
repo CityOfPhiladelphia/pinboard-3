@@ -1,6 +1,6 @@
 # Pinboard-3 Monorepo Design
 
-*Created: 2026-02-05*
+_Created: 2026-02-05_
 
 ## Overview
 
@@ -53,11 +53,11 @@ pinboard-3/
               └──────┘
 ```
 
-| Package | Contents |
-|---------|----------|
+| Package  | Contents                                                               |
+| -------- | ---------------------------------------------------------------------- |
 | **core** | TypeScript types, shared utilities, API client helpers, config loaders |
-| **ui** | Vue 3 components (search bar, cards, filters, panels, loading states) |
-| **map** | MapLibre integration, layer management, markers, popups, geolocation |
+| **ui**   | Vue 3 components (search bar, cards, filters, panels, loading states)  |
+| **map**  | MapLibre integration, layer management, markers, popups, geolocation   |
 
 ## Configuration
 

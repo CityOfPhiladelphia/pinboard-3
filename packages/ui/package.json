@@ -22,6 +22,11 @@
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.1.0",
+    "@fortawesome/vue-fontawesome": "^3.1.2",
+    "@phila/phila-ui-app-footer": "1.2.1",
+    "@phila/phila-ui-app-header": "^0.2.1",
+    "@phila/phila-ui-core": "2.3.1",
     "@pinboard/core": "workspace:*"
   },
   "peerDependencies": {
