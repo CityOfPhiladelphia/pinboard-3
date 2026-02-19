@@ -22,7 +22,7 @@ const MobileNavContent: FunctionalComponent = () =>
   <div class="pinboard">
     <AppHeader
       id="pinboard-nav"
-      :show-trusted-site="false"
+      :show-trusted-site="true"
       :mobile-nav="$slots['mobile-nav'] ? MobileNavContent : undefined"
       :links="[]"
       :navbar-brand="{
