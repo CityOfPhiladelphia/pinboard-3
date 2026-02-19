@@ -10,16 +10,16 @@
   "packageManager": "pnpm",
   "environments": {
     "dev": {
-      "profile": "OITDevelopers",
-      "vpc": "Test-Citynet"
+      "profile": "oit-flood-monitoring-cc",
+      "vpc": "TestCityNetVpc"
     },
     "test": {
-      "profile": "OITDevelopers",
-      "vpc": "Test-Citynet"
+      "profile": "oit-flood-monitoring-cc",
+      "vpc": "TestCityNetVpc"
     },
     "prod": {
-      "profile": "OITDevelopers",
-      "vpc": "Production-Citynet"
+      "profile": "oit-flood-monitoring-cc",
+      "vpc": "ProdCityNetVpc"
     }
   }
 }
