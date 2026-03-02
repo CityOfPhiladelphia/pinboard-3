@@ -4,15 +4,15 @@ City of Philadelphia monorepo for flood monitoring and related applications.
 
 ## Packages
 
-| Package | Description |
-|---------|-------------|
-| [`@pinboard/core`](packages/core) | Shared utilities and data logic |
-| [`@pinboard/ui`](packages/ui) | Shared Vue component library (PhilaUI wrappers) |
+| Package                           | Description                                     |
+| --------------------------------- | ----------------------------------------------- |
+| [`@pinboard/core`](packages/core) | Shared utilities and data logic                 |
+| [`@pinboard/ui`](packages/ui)     | Shared Vue component library (PhilaUI wrappers) |
 
 ## Apps
 
-| App | Description |
-|-----|-------------|
+| App                                         | Description                  |
+| ------------------------------------------- | ---------------------------- |
 | [`oem-flood-finder`](apps/oem-flood-finder) | OEM flood finder static site |
 
 ## Getting Started
