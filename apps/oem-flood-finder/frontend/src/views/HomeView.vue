@@ -11,7 +11,7 @@ const router = useRouter()
       <h1>Eastwick Flood Mapping</h1>
       <p class="hero-subtitle">
         Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae
-        pellentesque sem placerat. JKHSAKFKJSAHFJKASHFJKHASKFHASJKFHKJSADHFKJSDHFJKSHDFJKHSDJKFHSJKDFHSKJDF
+        pellentesque sem placerat. 
       </p>
       <div class="hero-actions">
         <PhilaButton text="View gauges" @click="router.push('/finder')" />
