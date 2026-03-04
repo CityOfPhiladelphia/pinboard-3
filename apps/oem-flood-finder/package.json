@@ -7,5 +7,8 @@
     "synth": "cd cdk && cdk synth",
     "deploy": "cd cdk && cdk deploy",
     "diff": "cd cdk && cdk diff"
+  },
+  "dependencies": {
+    "@phila/phila-ui-map-core": "^0.0.3"
   }
 }

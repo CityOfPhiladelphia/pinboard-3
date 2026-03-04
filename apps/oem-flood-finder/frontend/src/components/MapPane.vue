@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { Location } from '../types'
+import { Map as PhilaMap } from "@phila/phila-ui-map-core";
+import "@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css";
 
 defineProps<{
   locations: Location[]
@@ -8,7 +10,9 @@ defineProps<{
 
 <template>
   <div class="map-pane">
-    <p>Map</p>
+    <PhilaMap>
+
+    </PhilaMap>
   </div>
 </template>
 
@@ -16,5 +20,6 @@ defineProps<{
 .map-pane {
   width: 100%;
   height: 100%;
+  position: relative;
 }
 </style>
