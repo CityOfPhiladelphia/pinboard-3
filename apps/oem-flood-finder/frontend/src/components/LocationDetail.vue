@@ -1,29 +1,43 @@
 <script setup lang="ts">
-import { ref, toRef } from 'vue'
-import type { Location } from '../types'
+import type { Gauge } from '../types'
 import { useLocationDetail } from '../composables/useLocationDetail'
 
 const props = defineProps<{
-  location: Location | null
+  gauge: Gauge,
   onClose: (event: MouseEvent) => void
 }>()
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { locationDetail, isLoading, error } = useLocationDetail(toRef(props, 'location'))
+const readingState = useLocationDetail(props.gauge.gaugeId, 5);
 
-const closeBtn = ref<HTMLButtonElement | null>(null)
-defineExpose({ focus: () => closeBtn.value?.focus() })
+// const closeBtn = ref<HTMLButtonElement>(null)
+
+// defineExpose({ focus: () => closeBtn.value?.focus() })
+
 </script>
 
 <template>
   <div class="location-detail content">
+
     <div class="location-detail__header">
       <button ref="closeBtn" class="close-btn" aria-label="Close panel" @click="onClose">✕</button>
     </div>
-    <div v-if="location" class="location-detail__body">
-      <h2>{{ location.name }}</h2>
-      <p>{{ location.address }}</p>
+
+    <div class="location-detail__body">
+      <h2>{{ gauge.name }}</h2>
+      
+      <progress v-if="readingState.kind==='Loading'"/>
+
+      <p v-else-if="readingState.kind==='Loaded'">
+        {{ readingState.data }}
+      </p>
+
+      <p v-else-if="readingState.kind==='Error'">
+        {{ readingState.message }}
+      </p>
+      
     </div>
+
   </div>
 </template>
 

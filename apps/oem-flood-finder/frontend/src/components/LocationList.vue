@@ -1,81 +1,63 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { BaseCard, CardContent } from '@phila/phila-ui-cards'
-import type { AwareGauge, Location } from '../types'
-import { B, d } from 'vue-router/dist/index-Cu9B0wDz.mjs';
+import type { Gauge } from '../types'
 
-defineProps<{
-  locations: Location[]
+const props = defineProps<{
+  gauges: Gauge[]
 }>()
 
 const emit = defineEmits<{
-  'card-click': [location: Location]
+  'card-click': [gauge: Gauge]
 }>()
 
 const pendingKeydown = ref(false)
 
-function onCardKeyup(location: Location) {
+const gauges = ref(props.gauges);
+
+function onCardKeyup(gauge: Gauge) {
   if (pendingKeydown.value) {
-    emit('card-click', location)
+    emit('card-click', gauge)
     pendingKeydown.value = false
   }
 }
-
-type Brett = { kind: 'Loading' } | { kind: 'Loaded', data: AwareGauge[] } | { kind: 'Error', message: string }
-
-const locations = ref<Brett>({ kind: 'Loading' });
-
-onMounted(async () => {
-  const myHeaders = new Headers();
-  myHeaders.append("x-api-key", "gTQdOHPUJU7m3C4iz7hm849lJhoOwqAh1ICxygsD");
-
-  const response = await fetch("https://flood-monitoring-test-api.phila.gov/aware/gauge/all", {
-    method: "GET",
-    headers: myHeaders,
-    redirect: "follow"
-  });
-
-  if (!response.ok) {
-    locations.value = { kind: 'Error', message: "Brett error" };
-    return;
-  }
-
-  const data = await response.json();
-
-  locations.value = { kind: 'Loaded', data: data };
-
-});
 
 </script>
 
 <template>
   <div class="location-list">
-    <!-- {{ JSON.stringify(locations) }} -->
 
-    <div v-if="locations.kind === 'Error'">
-      {{ locations.message }}      
-    </div>
+    <BaseCard
+      v-for="gauge in gauges"
+      :key="gauge.gaugeId"
+      layout="vertical"
+      class="location-card"
+      tabindex="0"
+      @click="emit('card-click', gauge)"
+      @keydown.enter="pendingKeydown = true"
+      @keyup.enter="onCardKeyup(gauge)"
+    >
+      <CardContent>{{ gauge.name }}</CardContent>
+    </BaseCard>
 
-    <div v-if="locations.kind === 'Loading'">
-      <progress></progress>
-    </div>
 
-    <div v-if="locations.kind === 'Loaded'">
-      <BaseCard
-        v-for="location in locations.data"
-        :key="location.gaugeId"
-        layout="vertical"
-        class="location-card"
-        tabindex="0"
+    <!-- <div v-if="gauges.kind === 'Loaded'">
+      <div v-for="gauge in gauges.data">
+        <input :id="gauge.gaugeId" type="radio" name="brett" :value="gauge.gaugeId" v-model="picked">
+        <label :for="gauge.gaugeId">{{ gauge.name }}</label>
+      </div>
+    </div> -->
 
-      >
-        <CardContent>{{ location.name }}</CardContent>
-      </BaseCard>
-    </div>
+    <!-- <button @click="picked=null">
+      Clear Brett
+    </button> -->
 
-            <!-- @click="emit('card-click', location)"
-        @keydown.enter="pendingKeydown = true"
-        @keyup.enter="onCardKeyup(location)" -->
+    <!-- <p> -->
+      <!-- Selected: {{ picked }} -->
+      <!-- <Brett v-if="picked" :gaugeId="picked" :limit="5">
+        
+      </Brett>
+    </p> -->
 
   </div>
 </template>

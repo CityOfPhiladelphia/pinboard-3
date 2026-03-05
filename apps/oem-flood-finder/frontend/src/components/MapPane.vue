@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Location } from '../types'
+import type { Gauge } from '../types'
 
 defineProps<{
-  locations: Location[]
+  locations: Gauge[]
 }>()
 </script>
 

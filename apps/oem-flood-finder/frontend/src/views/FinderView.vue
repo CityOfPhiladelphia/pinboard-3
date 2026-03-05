@@ -1,23 +1,24 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
-import type { Location } from '../types'
+import type { Gauge } from '../types'
 import SearchFilterPane from '../components/SearchFilterPane.vue'
 import LocationList from '../components/LocationList.vue'
 import MapPane from '../components/MapPane.vue'
 import { CollapsePanel } from '@phila/phila-ui-collapse-panel'
 import LocationDetail from '../components/LocationDetail.vue'
-import { useLocations } from '../composables/useLocations'
+import { useFetchGauges } from '../composables/useLocations'
 
-const { locations, isLoading, error } = useLocations()
-const selectedLocation = ref<Location | null>(null)
+const state = useFetchGauges()
+
+const selectedLocation = ref<Gauge | null>(null)
 const locationDetail = ref<InstanceType<typeof LocationDetail> | null>(null)
 const returnFocusTarget = ref<HTMLElement | null>(null)
 
-function openDetail(loc: Location, onClickOpen: () => void) {
+function openDetail(loc: Gauge, onClickOpen: () => void) {
   returnFocusTarget.value = document.activeElement as HTMLElement
   selectedLocation.value = loc
   onClickOpen()
-  nextTick(() => locationDetail.value?.focus())
+  // nextTick(() => locationDetail.value?.focus())
 }
 
 function closeDetail(onClickToggle: (e: Event) => void) {
@@ -26,35 +27,44 @@ function closeDetail(onClickToggle: (e: Event) => void) {
     nextTick(() => returnFocusTarget.value?.focus())
   }
 }
+
 </script>
 
 <template>
   <CollapsePanel id="detail-panel" class="detail-panel-wrapper">
     <template #toggle="{ onClickOpen }">
       <div class="finder-panel">
+
         <div class="finder-panel-locations">
-          <SearchFilterPane :locations="locations" />
-          <div v-if="isLoading" class="status-message">Loading...</div>
-          <div v-else-if="error" class="status-message status-message--error">
-            {{ error.message }}
+          <SearchFilterPane v-if="state.kind==='Loaded'" :gauges="state.data" />
+
+          <div v-if="state.kind==='Loading'" class="status-message">
+            Loading...
           </div>
+
+          <div v-else-if="state.kind==='Error'" class="status-message status-message--error">
+            {{ state.message }}
+          </div>
+
           <LocationList
             v-else
-            :locations="locations"
+            :gauges="state.data"
             @card-click="(loc) => openDetail(loc, onClickOpen)"
           />
         </div>
+
         <div class="finder-panel-map">
-          <MapPane :locations="locations" />
+          <MapPane v-if="state.kind==='Loaded'" :locations="state.data" />
         </div>
+
       </div>
     </template>
 
     <template #default="{ hidden, onClickToggle }">
       <div v-show="!hidden" id="detail-panel" class="detail-overlay">
         <LocationDetail
-          ref="locationDetail"
-          :location="selectedLocation"
+          v-if="selectedLocation !== null"
+          :gauge="selectedLocation"
           :on-close="closeDetail(onClickToggle)"
         />
       </div>
