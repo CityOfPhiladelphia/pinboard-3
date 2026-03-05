@@ -1,7 +1,22 @@
 /** Shared types for OEM Flood Finder */
 
-// TODO: Add fields as the data model is defined
-/* eslint-disable @typescript-eslint/no-empty-object-type*/
-export interface Location {}
+export interface Location {
+  name: string
+  address: string
+}
 
 export type ApiResponse = Location[]
+
+// TODO: fill in fields from the location detail API response
+export interface LocationDetail {
+  name: string
+  address: string
+}
+
+export type AwareGauge = {
+  gaugeId: string,
+  name: string,
+  latitude: number,
+  longitude: number,
+  lastUpdated: Date | null
+}
