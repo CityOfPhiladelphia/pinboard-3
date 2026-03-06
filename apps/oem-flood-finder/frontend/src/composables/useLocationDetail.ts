@@ -1,22 +1,17 @@
-import { ref, watch, toValue, type Ref, type MaybeRefOrGetter, onWatcherCleanup } from 'vue'
+import { ref, toValue, watchEffect, type MaybeRefOrGetter, type Ref } from 'vue'
 import type { Reading } from '../types'
 
 type ReadingState = { kind: 'Loading' } | { kind: 'Loaded', data: Reading[] } | { kind: 'Error', message: string }
 
 export function useLocationDetail(
   gaugeId: MaybeRefOrGetter<string>,
-  // limit: Ref<number>
-) : Ref<ReadingState> {
+  limit: MaybeRefOrGetter<number>
+): Ref<ReadingState> {
 
   const readingState = ref<ReadingState>({ kind: 'Loading' })
 
-  watch(
-    // this lambda turns the MaybeRefOrGetter into a getter
-    () => toValue(gaugeId),
-    
-    // callback
-    async (gaugeId, _, onCleanup) => {
-      console.log(gaugeId);
+  watchEffect(
+    async (onCleanup) => {
       let abortController = new AbortController();
 
       onCleanup(() =>
@@ -26,9 +21,9 @@ export function useLocationDetail(
       readingState.value = { kind: 'Loading' };
 
       const myHeaders = new Headers();
-      myHeaders.append("x-api-key", "");
+      myHeaders.append("x-api-key", import.meta.env.VITE_FLOOD_API_KEY || "");
 
-      const response = await fetch(`https://flood-monitoring-test-api.phila.gov/aware/reading/${toValue(gaugeId)}?limit=5`, {
+      const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/aware/reading/${toValue(gaugeId)}?limit=${toValue(limit)}`, {
         method: "GET",
         headers: myHeaders,
         redirect: "follow",
@@ -43,8 +38,7 @@ export function useLocationDetail(
       const data = await response.json();
 
       readingState.value = { kind: 'Loaded', data: data };
-  },
-  { immediate: true }
+    }
   )
 
   return readingState

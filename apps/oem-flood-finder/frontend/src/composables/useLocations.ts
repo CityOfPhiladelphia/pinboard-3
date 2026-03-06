@@ -11,9 +11,9 @@ export function useFetchGauges(): Ref<State> {
   async function fetchGauges() {
 
     const myHeaders = new Headers();
-    myHeaders.append("x-api-key", "");
+    myHeaders.append("x-api-key", import.meta.env.VITE_FLOOD_API_KEY || "");
 
-    const response = await fetch("https://flood-monitoring-test-api.phila.gov/aware/gauge/all", {
+    const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/aware/gauge/all`, {
       method: "GET",
       headers: myHeaders,
       redirect: "follow"

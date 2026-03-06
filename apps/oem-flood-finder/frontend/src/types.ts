@@ -1,17 +1,12 @@
 /** Shared types for OEM Flood Finder */
 
-// export interface Location {
-//   name: string
-//   address: string
-// }
-
-// export type ApiResponse = Location[]
-
-// // TODO: fill in fields from the location detail API response
-// export interface LocationDetail {
-//   name: string
-//   address: string
-// }
+export type Location = {
+  id: string,
+  name: string,
+  latitude: number,
+  longitude: number,
+  type: Gauge | Reading | Camera
+}
 
 export type Gauge = {
   gaugeId: string,
@@ -22,7 +17,6 @@ export type Gauge = {
 }
 
 export type Reading = {
-  
   readingId: string,
   createdOn: Date,
   validTimeUTC: Date,
@@ -45,4 +39,15 @@ export type Reading = {
   dropRateIndicator: boolean,
   dropRateThreshold: number,
   deviceDropCount: number
+}
+
+export type Camera = {
+  cameraId: string,
+  name: string,
+  latitude: number,
+  longitude: number,
+  lastUpdated: Date,
+  createdOn: Date,
+  locationDescription?: string,
+  pageUrl: string
 }

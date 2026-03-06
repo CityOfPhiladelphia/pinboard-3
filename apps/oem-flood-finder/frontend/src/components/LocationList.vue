@@ -40,25 +40,6 @@ function onCardKeyup(gauge: Gauge) {
       <CardContent>{{ gauge.name }}</CardContent>
     </BaseCard>
 
-
-    <!-- <div v-if="gauges.kind === 'Loaded'">
-      <div v-for="gauge in gauges.data">
-        <input :id="gauge.gaugeId" type="radio" name="brett" :value="gauge.gaugeId" v-model="picked">
-        <label :for="gauge.gaugeId">{{ gauge.name }}</label>
-      </div>
-    </div> -->
-
-    <!-- <button @click="picked=null">
-      Clear Brett
-    </button> -->
-
-    <!-- <p> -->
-      <!-- Selected: {{ picked }} -->
-      <!-- <Brett v-if="picked" :gaugeId="picked" :limit="5">
-        
-      </Brett>
-    </p> -->
-
   </div>
 </template>
 

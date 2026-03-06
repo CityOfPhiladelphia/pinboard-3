@@ -8,12 +8,11 @@ const props = defineProps<{
   onClose: (event: MouseEvent) => void
 }>()
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const readingState = useLocationDetail(props.gauge.gaugeId);
+const readingState = useLocationDetail(() => props.gauge.gaugeId, 5);
 
-// const closeBtn = ref<HTMLButtonElement>(null)
+const closeBtn = ref<HTMLButtonElement>()
 
-// defineExpose({ focus: () => closeBtn.value?.focus() })
+defineExpose({ focus: () => closeBtn.value?.focus() })
 
 </script>
 
@@ -30,7 +29,13 @@ const readingState = useLocationDetail(props.gauge.gaugeId);
       <progress v-if="readingState.kind==='Loading'"/>
 
       <p v-else-if="readingState.kind==='Loaded'">
-        {{ readingState.data }}
+        <table>
+          <tr><th>Created On</th><th>Height</th></tr>
+          <tr v-for="reading in readingState.data">
+            <td>{{ reading.createdOn }}</td>
+            <td>{{ reading.gaugeHeight }}</td>
+          </tr>
+        </table>
       </p>
 
       <p v-else-if="readingState.kind==='Error'">
