@@ -17,6 +17,7 @@ const returnFocusTarget = ref<HTMLElement | null>(null)
 function openDetail(loc: Gauge, onClickOpen: () => void) {
   returnFocusTarget.value = document.activeElement as HTMLElement
   selectedLocation.value = loc
+  console.log(state)
   onClickOpen()
   // nextTick(() => locationDetail.value?.focus())
 }

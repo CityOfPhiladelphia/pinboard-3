@@ -5,18 +5,18 @@ type ReadingState = { kind: 'Loading' } | { kind: 'Loaded', data: Reading[] } | 
 
 export function useLocationDetail(
   gaugeId: MaybeRefOrGetter<string>,
-  limit: MaybeRefOrGetter<number>
+  // limit: Ref<number>
 ) : Ref<ReadingState> {
 
   const readingState = ref<ReadingState>({ kind: 'Loading' })
 
   watch(
     // this lambda turns the MaybeRefOrGetter into a getter
-    () => [toValue(gaugeId), toValue(limit)] as const,
+    () => toValue(gaugeId),
     
     // callback
-    async ([gaugeId, limit], _, onCleanup) => {
-
+    async (gaugeId, _, onCleanup) => {
+      console.log(gaugeId);
       let abortController = new AbortController();
 
       onCleanup(() =>
@@ -28,7 +28,7 @@ export function useLocationDetail(
       const myHeaders = new Headers();
       myHeaders.append("x-api-key", "");
 
-      const response = await fetch(`https://flood-monitoring-test-api.phila.gov/aware/reading/${toValue(gaugeId)}?limit=${toValue(limit)}`, {
+      const response = await fetch(`https://flood-monitoring-test-api.phila.gov/aware/reading/${toValue(gaugeId)}?limit=5`, {
         method: "GET",
         headers: myHeaders,
         redirect: "follow",
@@ -36,7 +36,7 @@ export function useLocationDetail(
       });
 
       if (!response.ok) {
-        readingState.value = { kind: 'Error', message: "Readings API resposne error" };
+        readingState.value = { kind: 'Error', message: "Readings API response error" };
         return;
       }
 

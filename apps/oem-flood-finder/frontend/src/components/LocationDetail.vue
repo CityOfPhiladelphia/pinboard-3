@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Gauge } from '../types'
 import { useLocationDetail } from '../composables/useLocationDetail'
+import { ref } from 'vue';
 
 const props = defineProps<{
   gauge: Gauge,
@@ -8,7 +9,7 @@ const props = defineProps<{
 }>()
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const readingState = useLocationDetail(props.gauge.gaugeId, 5);
+const readingState = useLocationDetail(props.gauge.gaugeId);
 
 // const closeBtn = ref<HTMLButtonElement>(null)
 
