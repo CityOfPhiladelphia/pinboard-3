@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
-import type { Gauge } from '../types'
+import type { Location } from '../types'
 import SearchFilterPane from '../components/SearchFilterPane.vue'
 import LocationList from '../components/LocationList.vue'
 import MapPane from '../components/MapPane.vue'
 import { CollapsePanel } from '@phila/phila-ui-collapse-panel'
 import LocationDetail from '../components/LocationDetail.vue'
-import { useFetchGauges } from '../composables/useLocations'
+import { useLocations } from '../composables/useLocations'
 
-const state = useFetchGauges()
+const state = useLocations()
 
-const selectedLocation = ref<Gauge | null>(null)
+const selectedLocation = ref<Location | null>(null)
 const locationDetail = ref<InstanceType<typeof LocationDetail> | null>(null)
 const returnFocusTarget = ref<HTMLElement | null>(null)
 
-function openDetail(loc: Gauge, onClickOpen: () => void) {
+function openDetail(loc: Location, onClickOpen: () => void) {
   returnFocusTarget.value = document.activeElement as HTMLElement
   selectedLocation.value = loc
   console.log(state)
@@ -37,7 +37,7 @@ function closeDetail(onClickToggle: (e: Event) => void) {
       <div class="finder-panel">
 
         <div class="finder-panel-locations">
-          <SearchFilterPane v-if="state.kind==='Loaded'" :gauges="state.data" />
+          <SearchFilterPane v-if="state.kind==='Loaded'" :locations="state.data" />
 
           <div v-if="state.kind==='Loading'" class="status-message">
             Loading...
@@ -49,7 +49,7 @@ function closeDetail(onClickToggle: (e: Event) => void) {
 
           <LocationList
             v-else
-            :gauges="state.data"
+            :locations="state.data"
             @card-click="(loc) => openDetail(loc, onClickOpen)"
           />
         </div>
@@ -65,7 +65,7 @@ function closeDetail(onClickToggle: (e: Event) => void) {
       <div v-show="!hidden" id="detail-panel" class="detail-overlay">
         <LocationDetail
           v-if="selectedLocation !== null"
-          :gauge="selectedLocation"
+          :location="selectedLocation"
           :on-close="closeDetail(onClickToggle)"
         />
       </div>

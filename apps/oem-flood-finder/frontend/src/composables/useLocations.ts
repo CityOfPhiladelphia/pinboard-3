@@ -1,19 +1,19 @@
-import type { Gauge } from '@/types'
+import type { LocationDTO } from '@/types'
 import { ref, onMounted, type Ref } from 'vue'
 
-type State = { kind: 'Loading' } | { kind: 'Loaded', data: Gauge[] } | { kind: 'Error', message: string }
+type State = { kind: 'Loading' } | { kind: 'Loaded', data: LocationDTO } | { kind: 'Error', message: string }
 
-export function useFetchGauges(): Ref<State> {
+export function useLocations(): Ref<State> {
 
   // set to Loading initially
   const state = ref<State>({ kind: 'Loading' })
 
-  async function fetchGauges() {
+  async function fetchLocations() {
 
     const myHeaders = new Headers();
     myHeaders.append("x-api-key", import.meta.env.VITE_FLOOD_API_KEY || "");
 
-    const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/aware/gauge/all`, {
+    const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/location/all`, {
       method: "GET",
       headers: myHeaders,
       redirect: "follow"
@@ -30,7 +30,7 @@ export function useFetchGauges(): Ref<State> {
 
   }
 
-  onMounted(fetchGauges)
+  onMounted(fetchLocations)
 
   return state
 }

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { Gauge } from '../types'
+import type { Location } from '../types'
 import { useLocationDetail } from '../composables/useLocationDetail'
 import { ref } from 'vue';
 
 const props = defineProps<{
-  gauge: Gauge,
+  location: Location,
   onClose: (event: MouseEvent) => void
 }>()
 
-const readingState = useLocationDetail(() => props.gauge.gaugeId, 5);
+const readingState = useLocationDetail(() => props.location.id, 5);
 
 const closeBtn = ref<HTMLButtonElement>()
 
@@ -24,7 +24,7 @@ defineExpose({ focus: () => closeBtn.value?.focus() })
     </div>
 
     <div class="location-detail__body">
-      <h2>{{ gauge.name }}</h2>
+      <h2>{{ location.name }}</h2>
       
       <progress v-if="readingState.kind==='Loading'"/>
 

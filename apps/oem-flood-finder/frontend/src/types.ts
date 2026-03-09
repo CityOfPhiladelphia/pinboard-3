@@ -1,11 +1,21 @@
 /** Shared types for OEM Flood Finder */
 
+export type LocationDTO = {
+  awareGauges: Gauge[],
+  usgsGauges: Gauge[],
+  cameras: Camera[]
+}
+
 export type Location = {
   id: string,
   name: string,
   latitude: number,
   longitude: number,
-  type: Gauge | Reading | Camera
+  lastUpdated: Date | null,
+  other:
+    { kind: 'AwareGauge', data: Gauge } |
+    { kind: 'UsgsGauge', data: Gauge } |
+    { kind: 'Camera', data: Camera }
 }
 
 export type Gauge = {
@@ -13,7 +23,12 @@ export type Gauge = {
   name: string,
   latitude: number,
   longitude: number,
-  lastUpdated: Date | null
+  lastUpdated: Date | null,
+  actionStage: number,
+  minorStage: number,
+  moderateStage: number,
+  stageUnits: string,
+  floodImpacts: object[]
 }
 
 export type Reading = {
