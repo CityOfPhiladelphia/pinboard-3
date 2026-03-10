@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { BaseCard, CardContent } from '@phila/phila-ui-cards'
-import type { Gauge, LocationDTO, Location } from '../types'
+import type { Gauge, LocationDTO, Location } from '../../../../apps/oem-flood-finder/frontend/src/types'
 
 const props = defineProps<{
   locations: LocationDTO
