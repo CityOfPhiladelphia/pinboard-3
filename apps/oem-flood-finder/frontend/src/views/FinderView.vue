@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
 import type { Location } from '../types'
-import SearchFilterPane from '../../../../../packages/ui/src/components/SearchFilterPane.vue'
-import LocationList from '../../../../../packages/ui/src/components/LocationList.vue'
-import MapPane from '../../../../../packages/ui/src/components/MapPane.vue'
+import SearchFilterPane from '../../../../../packages/ui/src/components/SearchFilterPanel.vue'
+import LocationList from '../components/LocationList.vue'
+import MapPane from '../../../../../packages/ui/src/components/MapPanel.vue'
 import { CollapsePanel } from '@phila/phila-ui-collapse-panel'
 import LocationDetail from '../components/LocationDetail.vue'
 import { useLocations } from '../composables/useLocations'
