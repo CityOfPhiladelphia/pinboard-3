@@ -6,7 +6,12 @@ import type { MapConfig } from '../types'
 const props = defineProps<{
   config?: MapConfig
   locations?: unknown
-  mapContentSlot?: (props: { locations: unknown; map: unknown }) => unknown
+  hoveredId?: string | null
+  selectedId?: string | null
+  onHover?: (id: string) => void
+  onHoverEnd?: () => void
+  onSelect?: (loc: unknown) => void
+  mapContentSlot?: (props: { locations: unknown; map: unknown; hoveredId: string | null; selectedId: string | null; onHover: (id: string) => void; onHoverEnd: () => void; onSelect: (loc: unknown) => void }) => unknown
 }>()
 </script>
 
@@ -17,7 +22,7 @@ const props = defineProps<{
     >
       <component
         v-if="mapContentSlot"
-        :is="() => mapContentSlot!({ locations, map: null })"
+        :is="() => mapContentSlot!({ locations, map: null, hoveredId: hoveredId ?? null, selectedId: selectedId ?? null, onHover: onHover ?? (() => {}), onHoverEnd: onHoverEnd ?? (() => {}), onSelect: onSelect ?? (() => {}) })"
       />
     </PhilaMap>
   </div>

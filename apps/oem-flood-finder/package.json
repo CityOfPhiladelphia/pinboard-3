@@ -9,6 +9,6 @@
     "diff": "cd cdk && cdk diff"
   },
   "dependencies": {
-    "@phila/phila-ui-map-core": "^0.0.3"
+    "@phila/phila-ui-map-core": "0.0.3-beta.14"
   }
 }

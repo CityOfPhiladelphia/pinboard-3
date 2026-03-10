@@ -13,6 +13,19 @@ const loadedData = computed(() => state.value.kind === 'Loaded' ? state.value.da
 
 const selectedLocation = ref<unknown | null>(null)
 const returnFocusTarget = ref<HTMLElement | null>(null)
+const hoveredId = ref<string | null>(null)
+const selectedId = computed(() => {
+  const loc = selectedLocation.value as Record<string, unknown> | null
+  return (loc?.id as string) ?? null
+})
+
+function onHover(id: string) {
+  hoveredId.value = id
+}
+
+function onHoverEnd() {
+  hoveredId.value = null
+}
 
 function onSelect(location: unknown, onClickOpen: () => void) {
   returnFocusTarget.value = document.activeElement as HTMLElement
@@ -50,6 +63,10 @@ function onClose(onClickToggle: (e: Event) => void) {
             :is="() => slots['location-list']!({
               locations: loadedData,
               onSelect: (loc: unknown) => onSelect(loc, onClickOpen),
+              selectedId: selectedId,
+              hoveredId: hoveredId,
+              onHover,
+              onHoverEnd,
             })"
           />
         </div>
@@ -59,6 +76,11 @@ function onClose(onClickToggle: (e: Event) => void) {
             v-if="loadedData"
             :config="config.map"
             :locations="loadedData"
+            :hovered-id="hoveredId"
+            :selected-id="selectedId"
+            :on-hover="onHover"
+            :on-hover-end="onHoverEnd"
+            :on-select="(loc: unknown) => onSelect(loc, onClickOpen)"
             :map-content-slot="slots['map-content']"
           />
         </div>

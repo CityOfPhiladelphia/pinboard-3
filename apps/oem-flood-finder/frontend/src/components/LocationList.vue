@@ -5,10 +5,13 @@ import type { Gauge, LocationDTO, Location } from '../types'
 
 const props = defineProps<{
   locations: LocationDTO
+  hoveredId?: string | null
 }>()
 
 const emit = defineEmits<{
   'card-click': [device: Location]
+  'card-hover': [id: string]
+  'card-hover-end': []
 }>()
 
 const pendingKeydown = ref(false)
@@ -79,9 +82,11 @@ function transformLocationDTO(locationDto: LocationDTO) : Location[]  {
     v-for="device in transformLocationDTO(locations)"
     :key="device.id"
     layout="vertical"
-    class="location-card"
+    :class="['location-card', { 'location-card--hovered': hoveredId === device.id }]"
     tabindex="0"
     @click="emit('card-click', device)"
+    @mouseenter="emit('card-hover', device.id)"
+    @mouseleave="emit('card-hover-end')"
     @keydown.enter="pendingKeydown = true"
     @keyup.enter="onCardKeyup(device)"
   >
@@ -101,5 +106,10 @@ function transformLocationDTO(locationDto: LocationDTO) : Location[]  {
 
 .location-card {
   cursor: pointer;
+}
+
+.location-card--hovered {
+  background-color: var(--Schemes-Surface-Container-Low, #f5f5f5);
+  outline: 2px solid var(--Schemes-Primary, #1976d2);
 }
 </style>
