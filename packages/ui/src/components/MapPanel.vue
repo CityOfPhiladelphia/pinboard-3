@@ -1,18 +1,24 @@
 <script setup lang="ts">
-// import type { LocationDTO } from '../../../../apps/oem-flood-finder/frontend/src/types'
-// import type { Location } from '../types'
-import { Map as PhilaMap } from "@phila/phila-ui-map-core";
-import "@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css";
+import { Map as PhilaMap } from '@phila/phila-ui-map-core'
+import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css'
+import type { MapConfig } from '../types'
 
-// defineProps<{
-//   locations: LocationDTO
-// }>()
+const props = defineProps<{
+  config?: MapConfig
+  locations?: unknown
+  mapContentSlot?: (props: { locations: unknown; map: unknown }) => unknown
+}>()
 </script>
 
 <template>
   <div class="map-pane">
-    <PhilaMap>
-
+    <PhilaMap
+      v-bind="config"
+    >
+      <component
+        v-if="mapContentSlot"
+        :is="() => mapContentSlot!({ locations, map: null })"
+      />
     </PhilaMap>
   </div>
 </template>
