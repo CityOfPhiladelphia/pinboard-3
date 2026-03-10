@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick, inject, type Ref } from 'vue'
+import { ref, computed, nextTick, inject, type Ref } from 'vue'
 import { CollapsePanel } from '@phila/phila-ui-collapse-panel'
 import { PINBOARD_CONFIG_KEY, PINBOARD_SLOTS_KEY, type State } from '../types'
 import SearchFilterPanel from '../components/SearchFilterPanel.vue'
@@ -9,6 +9,7 @@ const config = inject(PINBOARD_CONFIG_KEY)!
 const slots = inject(PINBOARD_SLOTS_KEY)!
 
 const state: Ref<State> = config.useLocations()
+const loadedData = computed(() => state.value.kind === 'Loaded' ? state.value.data : undefined)
 
 const selectedLocation = ref<unknown | null>(null)
 const returnFocusTarget = ref<HTMLElement | null>(null)
@@ -34,7 +35,7 @@ function onClose(onClickToggle: (e: Event) => void) {
       <div class="finder-panel">
 
         <div class="finder-panel-locations">
-          <SearchFilterPanel v-if="state.kind === 'Loaded'" :locations="state.data" />
+          <SearchFilterPanel v-if="loadedData" :locations="loadedData" />
 
           <div v-if="state.kind === 'Loading'" class="status-message">
             Loading...
@@ -45,9 +46,9 @@ function onClose(onClickToggle: (e: Event) => void) {
           </div>
 
           <component
-            v-else-if="state.kind === 'Loaded' && slots['location-list']"
+            v-else-if="loadedData && slots['location-list']"
             :is="() => slots['location-list']!({
-              locations: state.data,
+              locations: loadedData,
               onSelect: (loc: unknown) => onSelect(loc, onClickOpen),
             })"
           />
@@ -55,9 +56,9 @@ function onClose(onClickToggle: (e: Event) => void) {
 
         <div class="finder-panel-map">
           <MapPanel
-            v-if="state.kind === 'Loaded'"
+            v-if="loadedData"
             :config="config.map"
-            :locations="state.data"
+            :locations="loadedData"
             :map-content-slot="slots['map-content']"
           />
         </div>
