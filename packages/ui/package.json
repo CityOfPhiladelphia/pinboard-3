@@ -28,7 +28,7 @@
     "@phila/phila-ui-app-header": "^0.2.1",
     "@phila/phila-ui-core": "2.3.1",
     "@phila/phila-ui-collapse-panel": "^0.0.3",
-    "@phila/phila-ui-map-core": "^0.0.3",
+    "@phila/phila-ui-map-core": "0.0.3-beta.13",
     "@pinboard/core": "workspace:*"
   },
   "peerDependencies": {

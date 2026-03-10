@@ -2,9 +2,16 @@
 import { Pinboard } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import { PhilaButton } from '@phila/phila-ui-button'
+import { MapMarker, MapIconTextPin } from '@phila/phila-ui-map-core/components'
 import { useRouter } from 'vue-router'
 import LocationList from './components/LocationList.vue'
 import LocationDetail from './components/LocationDetail.vue'
+import type { LocationDTO, Gauge } from './types'
+
+function allGauges(locations: unknown): Gauge[] {
+  const dto = locations as LocationDTO
+  return [...dto.awareGauges, ...dto.usgsGauges]
+}
 
 const router = useRouter()
 </script>
@@ -48,6 +55,20 @@ const router = useRouter()
         :location="location"
         :on-close="onClose"
       />
+    </template>
+
+    <template #map-content="{ locations }">
+      <MapMarker
+        v-for="gauge in allGauges(locations)"
+        :key="gauge.gaugeId"
+        :lng-lat="[gauge.longitude, gauge.latitude]"
+      >
+        <MapIconTextPin
+          icon="fa-solid fa-gauge-circle-bolt"
+          :text="gauge.name"
+          color-theme="dark-primary"
+        />
+      </MapMarker>
     </template>
   </Pinboard>
 </template>

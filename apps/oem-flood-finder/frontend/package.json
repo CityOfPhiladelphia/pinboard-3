@@ -18,6 +18,7 @@
     "@phila/phila-ui-button": "^2.2.1",
     "@phila/phila-ui-cards": "^0.1.1",
     "@phila/phila-ui-collapse-panel": "^0.0.3",
+    "@phila/phila-ui-map-core": "0.0.3-beta.13",
     "@pinboard/ui": "workspace:*",
     "vue": "^3.5.27",
     "vue-router": "^5.0.1"
