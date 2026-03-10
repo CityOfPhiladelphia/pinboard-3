@@ -1,9 +1,17 @@
 import { createApp } from 'vue'
+import { createPinboard } from '@pinboard/ui'
 import App from './App.vue'
-import router from './router'
+import { useLocations } from './composables/useLocations'
 
 const app = createApp(App)
 
-app.use(router)
+app.use(createPinboard({
+  title: 'OEM Flood Finder',
+  useLocations: () => useLocations(),
+  map: {
+    center: [-75.16, 39.95],
+    zoom: 11,
+  },
+}))
 
 app.mount('#app')
