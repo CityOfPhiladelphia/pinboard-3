@@ -19,11 +19,12 @@ export default defineConfig({
       fileName: (format) => `index.${format === 'es' ? 'js' : 'cjs'}`,
     },
     rollupOptions: {
-      external: ['vue', '@pinboard/core'],
+      external: ['vue', '@pinboard/core', 'vue-router', '@phila/phila-ui-collapse-panel'],
       output: {
         globals: {
           vue: 'Vue',
           '@pinboard/core': 'PinboardCore',
+          'vue-router': 'VueRouter',
         },
       },
     },
