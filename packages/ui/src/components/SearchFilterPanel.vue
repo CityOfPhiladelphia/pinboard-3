@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import type { LocationDTO } from '../../../../apps/oem-flood-finder/frontend/src/types'
-
 defineProps<{
-  locations: LocationDTO
+  locations: unknown
 }>()
 </script>
 
