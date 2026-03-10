@@ -3,19 +3,22 @@ import '@phila/phila-ui-core/styles/template-light.css'
 import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader } from '@phila/phila-ui-app-header'
 import MobileNavPanel from './MobileNavPanel.vue'
-import { h, type FunctionalComponent, type VNode } from 'vue'
+import { h, inject, provide, useSlots, type FunctionalComponent } from 'vue'
+import { RouterLink, RouterView } from 'vue-router'
+import { PINBOARD_CONFIG_KEY, PINBOARD_SLOTS_KEY } from '../types'
 
-defineProps<{
-  title: string
-}>()
+const config = inject(PINBOARD_CONFIG_KEY)!
+const slots = useSlots()
 
-const slots = defineSlots<{
-  default(): VNode[]
-  'mobile-nav'(): VNode[]
-}>()
+provide(PINBOARD_SLOTS_KEY, slots)
 
 const MobileNavContent: FunctionalComponent = () =>
-  h(MobileNavPanel, null, { default: () => slots['mobile-nav']?.() })
+  h(MobileNavPanel, null, {
+    default: () => [
+      h('h4', null, h(RouterLink, { to: '/' }, () => 'Home')),
+      h('h4', null, h(RouterLink, { to: '/finder' }, () => 'Finder')),
+    ],
+  })
 </script>
 
 <template>
@@ -23,16 +26,16 @@ const MobileNavContent: FunctionalComponent = () =>
     <AppHeader
       id="pinboard-nav"
       :show-trusted-site="true"
-      :mobile-nav="$slots['mobile-nav'] ? MobileNavContent : undefined"
+      :mobile-nav="MobileNavContent"
       :links="[]"
       :navbar-brand="{
         brandingImage: { src: '', href: '/', altText: 'City of Philadelphia' },
-        brandingLink: { text: title, href: '/' },
+        brandingLink: { text: config.title, href: '/' },
       }"
     />
 
     <main class="pinboard-main">
-      <slot />
+      <RouterView />
     </main>
 
     <AppFooter :sub-footer-only="true" />
