@@ -2,7 +2,9 @@ export default {
   "app": {
     "title": "Primary care finder",
     "subtitle": "Free and low-cost medical care in Philadelphia",
-    "noResults": "No health centers found. Please check your spelling or remove some of your filters, and try again."
+    "noResults": "No health centers found. Please check your spelling or remove some of your filters, and try again.",
+    "viewList": "View list",
+    "viewMap": "View map"
   },
   "introPage": {
     "section1Title": "Find free or low-cost primary care",
@@ -199,6 +201,19 @@ export default {
     "On 2nd Saturday of the month, clinic is open from 10 a.m. - 2 p.m.": "On 2nd Saturday of the month, clinic is open from 10 a.m. - 2 p.m.",
     "Telehealth visits only from 9 a.m. - 3 p.m.": "Telehealth visits only from 9 a.m. - 3 p.m."
   },
+  "hours": "Hours",
+  "daysOfTheWeek": "Day",
+  "schedule": "Schedule",
+  "languagesSpoken": "Languages spoken",
+  "english": "English",
+  "noInfo": "No information available",
+  "Monday": "Monday",
+  "Tuesday": "Tuesday",
+  "Wednesday": "Wednesday",
+  "Thursday": "Thursday",
+  "Friday": "Friday",
+  "Saturday": "Saturday",
+  "Sunday": "Sunday",
   "closed": "Closed",
   "closed*": "Closed*",
   "slidingScaleExplanation": "This is what you can expect to pay for a regular medical visit. Your cost will depend on your income and family size.",
