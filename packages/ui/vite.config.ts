@@ -19,7 +19,7 @@ export default defineConfig({
       fileName: (format) => `index.${format === 'es' ? 'js' : 'cjs'}`,
     },
     rollupOptions: {
-      external: ['vue', '@pinboard/core', 'vue-router', '@phila/phila-ui-collapse-panel'],
+      external: ['vue', '@pinboard/core', 'vue-router', '@phila/phila-ui-collapse-panel', '@phila/phila-ui-map-core'],
       output: {
         globals: {
           vue: 'Vue',
