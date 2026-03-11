@@ -3,10 +3,11 @@ import { ref } from 'vue'
 import { BaseCard, CardContent } from '@phila/phila-ui-cards'
 import type { Location } from '../types'
 
-defineProps<{
+const props = defineProps<{
   locations: Location[]
   hoveredId?: string | null
   selectedId?: string | null
+  locationCardSlot?: (props: { location: Location; isHovered: boolean; isSelected: boolean }) => unknown
 }>()
 
 const emit = defineEmits<{
@@ -43,7 +44,11 @@ function onCardKeyup(location: Location) {
       @keyup.enter="onCardKeyup(location)"
     >
       <CardContent>
-        <slot name="location-card" :location="location" :is-hovered="hoveredId === location.id" :is-selected="selectedId === location.id" />
+        <component
+          v-if="props.locationCardSlot"
+          :is="() => props.locationCardSlot!({ location, isHovered: hoveredId === location.id, isSelected: selectedId === location.id })"
+        />
+        <template v-else>{{ location.id }}</template>
       </CardContent>
     </BaseCard>
   </div>
@@ -59,6 +64,7 @@ function onCardKeyup(location: Location) {
 
 .location-card {
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .location-card--hovered {
@@ -71,3 +77,4 @@ function onCardKeyup(location: Location) {
   outline: 2px solid var(--Schemes-Primary, #1976d2);
 }
 </style>
+

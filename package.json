@@ -12,6 +12,7 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "dev:oem": "pnpm --filter @pinboard/oem-flood-finder dev",
+    "dev:pc": "pnpm --filter @pinboard/primary-care-finder dev",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
     "format": "prettier --write .",
