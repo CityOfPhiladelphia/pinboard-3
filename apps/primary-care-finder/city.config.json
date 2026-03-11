@@ -1,0 +1,34 @@
+{
+  "appName": "primary-care-finder",
+  "applicationType": "static-site",
+  "department": "4-oit",
+  "team": "Software Engineering",
+  "contact": "andy.rothwell@phila.gov",
+  "compliance": [],
+  "confidentiality": "low",
+  "cdkPath": "./cdk",
+  "packageManager": "pnpm",
+  "environments": {
+    "dev": {
+      "profile": "OITDevelopers",
+      "vpc": "Development-AWS",
+      "certificateARN": "",
+      "apiDomain": "",
+      "frontendDomain": ""
+    },
+    "test": {
+      "profile": "OITDevelopers",
+      "vpc": "Development-AWS",
+      "certificateARN": "",
+      "apiDomain": "",
+      "frontendDomain": ""
+    },
+    "prod": {
+      "profile": "OITDevelopers",
+      "vpc": "Default - Dont delete",
+      "certificateARN": "",
+      "apiDomain": "",
+      "frontendDomain": ""
+    }
+  }
+}
