@@ -6,7 +6,7 @@ export interface PrimaryCareLocation extends Location {
 }
 
 export interface PrimaryCareProperties {
-  OBJECTID: number
+  objectid: number
   record: string
   address: string
   address_2: string | null

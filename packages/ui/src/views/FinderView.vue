@@ -11,6 +11,7 @@ const slots = inject(PINBOARD_SLOTS_KEY)!
 
 const state: Ref<State> = config.useLocations()
 const loadedData = computed(() => state.value.kind === 'Loaded' ? state.value.data : undefined)
+const loadedGeojson = computed(() => state.value.kind === 'Loaded' ? state.value.geojson : undefined)
 
 const selectedLocation = ref<Location | null>(null)
 const returnFocusTarget = ref<HTMLElement | null>(null)
@@ -61,17 +62,11 @@ function onClose(onClickToggle: (e: Event) => void) {
             :locations="loadedData"
             :hovered-id="hoveredId"
             :selected-id="selectedId"
+            :location-card-slot="slots['location-card']"
             @select="(loc) => onSelect(loc, onClickOpen)"
             @hover="onHover"
             @hover-end="onHoverEnd"
-          >
-            <template #location-card="cardProps">
-              <component
-                v-if="slots['location-card']"
-                :is="() => slots['location-card']!(cardProps)"
-              />
-            </template>
-          </LocationsPanel>
+          />
         </div>
 
         <div class="finder-panel-map">
@@ -79,6 +74,7 @@ function onClose(onClickToggle: (e: Event) => void) {
             v-if="loadedData"
             :config="config.map"
             :locations="loadedData"
+            :geojson="loadedGeojson"
             :hovered-id="hoveredId"
             :selected-id="selectedId"
             :on-hover="onHover"

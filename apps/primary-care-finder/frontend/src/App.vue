@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Pinboard } from '@pinboard/ui'
+import { toRaw } from 'vue'
+import { Pinboard, CircleLayer } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css'
-import { MapMarker } from '@phila/phila-ui-map-core'
 import HomeContent from './components/HomeContent.vue'
 import LocationCard from './components/LocationCard.vue'
 import LocationDetail from './components/LocationDetail.vue'
@@ -26,24 +26,40 @@ import type { PrimaryCareLocation } from './types'
       />
     </template>
 
-    <template #map-content="{ locations, hoveredId, selectedId, onHover, onHoverEnd, onSelect }">
-      <MapMarker
-        v-for="loc in (locations as PrimaryCareLocation[])"
-        :key="loc.id"
-        :lng-lat="[loc.geometry.coordinates[0], loc.geometry.coordinates[1]]"
-        :z-index="hoveredId === loc.id || selectedId === loc.id ? 10 : undefined"
-      >
-        <div
-          class="map-pin"
-          :class="{
-            'map-pin--hovered': hoveredId === loc.id,
-            'map-pin--selected': selectedId === loc.id,
-          }"
-          @mouseenter="onHover(loc.id)"
-          @mouseleave="onHoverEnd()"
-          @click="onSelect(loc)"
-        />
-      </MapMarker>
+    <template #map-content="{ geojson, hoveredId, selectedId, onHover, onHoverEnd, onSelect }">
+      <CircleLayer
+        v-if="geojson"
+        id="locations"
+        :source="{ type: 'geojson', data: toRaw(geojson) }"
+        :paint="{
+          'circle-radius': [
+            'case',
+            ['==', ['get', 'id'], selectedId ?? ''],
+            12,
+            ['==', ['get', 'id'], hoveredId ?? ''],
+            10,
+            7,
+          ],
+          'circle-color': [
+            'case',
+            ['==', ['get', 'id'], selectedId ?? ''],
+            '#0D47A1',
+            ['==', ['get', 'id'], hoveredId ?? ''],
+            '#1976D2',
+            '#1976D2',
+          ],
+          'circle-stroke-color': '#ffffff',
+          'circle-stroke-width': 2,
+        }"
+        @mouseenter="(e: any) => onHover(e.features?.[0]?.properties?.id)"
+        @mouseleave="onHoverEnd"
+        @click="(e: any) => {
+          const feature = e.features?.[0]
+          if (!feature) return
+          const id = feature.properties?.id
+          onSelect({ id, properties: feature.properties, geometry: feature.geometry })
+        }"
+      />
     </template>
   </Pinboard>
 </template>
@@ -53,25 +69,5 @@ import type { PrimaryCareLocation } from './types'
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-.map-pin {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background-color: #2176d2;
-  border: 1px solid white;
-  cursor: pointer;
-}
-
-.map-pin--hovered {
-  background-color: #0d47a1;
-  transform: scale(1.3);
-}
-
-.map-pin--selected {
-  background-color: #0d47a1;
-  border: 2px solid white;
-  transform: scale(1.5);
 }
 </style>

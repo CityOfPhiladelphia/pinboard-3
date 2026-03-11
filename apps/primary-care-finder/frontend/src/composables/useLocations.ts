@@ -4,7 +4,7 @@ import type { PrimaryCareLocation } from '@/types'
 
 const ARCGIS_URL = 'https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/red_PrimaryCare/FeatureServer/0/query'
 
-function isVisible(feature: PrimaryCareLocation): boolean {
+function isVisible(feature: any): boolean {
   const props = feature.properties
 
   // Exclude incomplete records
@@ -37,16 +37,24 @@ export function useLocations(): Ref<State> {
         return
       }
 
-      const geojson = await response.json()
-      const locations: PrimaryCareLocation[] = geojson.features
-        .map((feature: any) => ({
-          id: String(feature.properties.OBJECTID),
-          properties: feature.properties,
-          geometry: feature.geometry,
-        }))
-        .filter(isVisible)
+      const rawGeojson = await response.json()
+      const filteredFeatures = rawGeojson.features.filter(isVisible)
 
-      state.value = { kind: 'Loaded', data: locations }
+      const locations: PrimaryCareLocation[] = filteredFeatures.map((feature: any) => ({
+        id: String(feature.properties.objectid),
+        properties: feature.properties,
+        geometry: feature.geometry,
+      }))
+
+      const geojson = {
+        type: 'FeatureCollection' as const,
+        features: filteredFeatures.map((f: any) => ({
+          ...f,
+          properties: { ...f.properties, id: String(f.properties.objectid) },
+        })),
+      }
+
+      state.value = { kind: 'Loaded', data: locations, geojson }
     } catch {
       state.value = { kind: 'Error', message: 'Error retrieving primary care sites' }
     }

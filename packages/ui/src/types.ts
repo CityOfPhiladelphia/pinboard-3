@@ -24,7 +24,7 @@ export interface Location {
 
 export type State =
   | { kind: 'Loading' }
-  | { kind: 'Loaded'; data: Location[] }
+  | { kind: 'Loaded'; data: Location[]; geojson?: unknown }
   | { kind: 'Error'; message: string }
 
 export interface PinboardConfig {
