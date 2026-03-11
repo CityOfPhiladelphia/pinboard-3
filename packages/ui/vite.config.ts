@@ -19,12 +19,15 @@ export default defineConfig({
       fileName: (format) => `index.${format === 'es' ? 'js' : 'cjs'}`,
     },
     rollupOptions: {
-      external: ['vue', '@pinboard/core', 'vue-router', '@phila/phila-ui-collapse-panel', '@phila/phila-ui-map-core'],
+      external: (id) => {
+        // Allow map-core CSS to be bundled into our output
+        if (id.includes('@phila/phila-ui-map-core') && id.endsWith('.css')) return false
+        return ['vue', 'vue-router', '@pinboard/core', '@phila/phila-ui-collapse-panel', '@phila/phila-ui-map-core'].some(dep => id === dep || id.startsWith(dep + '/'))
+      },
       output: {
         globals: {
           vue: 'Vue',
           '@pinboard/core': 'PinboardCore',
-          'vue-router': 'VueRouter',
         },
       },
     },

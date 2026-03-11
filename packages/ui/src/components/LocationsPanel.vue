@@ -27,7 +27,7 @@ function onCardKeyup(location: Location) {
 </script>
 
 <template>
-  <div class="location-list">
+  <div class="location-list content">
     <BaseCard
       v-for="location in locations"
       :key="location.id"

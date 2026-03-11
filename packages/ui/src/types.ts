@@ -1,5 +1,5 @@
 // packages/ui/src/types.ts
-import type { InjectionKey, Ref, Slots } from 'vue'
+import type { InjectionKey, Ref } from 'vue'
 
 export type MapControlPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
@@ -34,4 +34,3 @@ export interface PinboardConfig {
 }
 
 export const PINBOARD_CONFIG_KEY: InjectionKey<PinboardConfig> = Symbol('pinboard-config')
-export const PINBOARD_SLOTS_KEY: InjectionKey<Slots> = Symbol('pinboard-slots')

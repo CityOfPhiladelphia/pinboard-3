@@ -2,7 +2,6 @@
 import { toRaw } from 'vue'
 import { Pinboard, CircleLayer } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
-import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css'
 import HomeContent from './components/HomeContent.vue'
 import LocationCard from './components/LocationCard.vue'
 import LocationDetail from './components/LocationDetail.vue'
@@ -11,8 +10,8 @@ import type { PrimaryCareLocation } from './types'
 
 <template>
   <Pinboard>
-    <template #home>
-      <HomeContent />
+    <template #home="{ activateFinder }">
+      <HomeContent :activate-finder="activateFinder" />
     </template>
 
     <template #location-card="{ location }">
@@ -30,7 +29,7 @@ import type { PrimaryCareLocation } from './types'
       <CircleLayer
         v-if="geojson"
         id="locations"
-        :source="{ type: 'geojson', data: toRaw(geojson) }"
+        :source="{ type: 'geojson', data: toRaw(geojson) as any }"
         :paint="{
           'circle-radius': [
             'case',

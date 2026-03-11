@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { PhilaButton } from '@phila/phila-ui-button'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
+const props = defineProps<{
+  activateFinder: () => void
+}>()
 </script>
 
 <template>
@@ -12,7 +13,7 @@ const router = useRouter()
       <p v-html="$t('introPage.p0')" />
 
       <div class="intro-actions">
-        <PhilaButton :text="$t('app.viewList')" @click="router.push('/finder')" />
+        <PhilaButton :text="$t('app.viewList')" @click="activateFinder" />
       </div>
 
       <p v-html="$t('introPage.p05')" />

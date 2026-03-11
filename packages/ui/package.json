@@ -24,12 +24,12 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
     "@fortawesome/vue-fontawesome": "^3.1.2",
-    "@phila/phila-ui-app-footer": "1.2.1",
-    "@phila/phila-ui-app-header": "^0.2.1",
-    "@phila/phila-ui-core": "2.3.1",
-    "@phila/phila-ui-cards": "^0.1.1",
-    "@phila/phila-ui-collapse-panel": "^0.0.3",
-    "@phila/phila-ui-map-core": "0.0.3-beta.14",
+    "@phila/phila-ui-app-footer": "1.2.1-beta.0",
+    "@phila/phila-ui-app-header": "^0.2.1-beta.0",
+    "@phila/phila-ui-core": "2.3.1-beta.0",
+    "@phila/phila-ui-cards": "^0.1.1-beta.0",
+    "@phila/phila-ui-collapse-panel": "^0.0.3-beta.0",
+    "@phila/phila-ui-map-core": "0.0.3-beta.15",
     "@pinboard/core": "workspace:*"
   },
   "peerDependencies": {

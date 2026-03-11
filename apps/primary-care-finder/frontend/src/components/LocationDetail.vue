@@ -182,7 +182,7 @@ function translateTransitList(raw: string | null, category: string): string {
 </script>
 
 <template>
-  <div class="location-detail">
+  <div class="location-detail content">
     <div class="detail-header">
       <h2>{{ siteName() }}</h2>
       <button class="close-button" @click="onClose">&#x2715;</button>
