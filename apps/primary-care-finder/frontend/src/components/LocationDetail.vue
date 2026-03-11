@@ -92,7 +92,7 @@ const otherServices = computed<OtherServiceRow[]>(() => {
 
 // --- Hours ---
 const DAYS = ['mon', 'tues', 'wed', 'thurs', 'fri', 'sat', 'sun'] as const
-const DAY_I18N_KEYS: Record<string, string> = {
+const DAY_I18N_KEYS: Record<typeof DAYS[number], string> = {
   mon: 'Monday', tues: 'Tuesday', wed: 'Wednesday', thurs: 'Thursday',
   fri: 'Friday', sat: 'Saturday', sun: 'Sunday',
 }
