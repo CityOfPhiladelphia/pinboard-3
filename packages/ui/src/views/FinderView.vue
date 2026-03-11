@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, inject, type Ref } from 'vue'
 import { CollapsePanel } from '@phila/phila-ui-collapse-panel'
-import { PINBOARD_CONFIG_KEY, PINBOARD_SLOTS_KEY, type State } from '../types'
+import { PINBOARD_CONFIG_KEY, PINBOARD_SLOTS_KEY, type State, type Location } from '../types'
 import SearchFilterPanel from '../components/SearchFilterPanel.vue'
 import MapPanel from '../components/MapPanel.vue'
+import LocationsPanel from '../components/LocationsPanel.vue'
 
 const config = inject(PINBOARD_CONFIG_KEY)!
 const slots = inject(PINBOARD_SLOTS_KEY)!
@@ -11,13 +12,10 @@ const slots = inject(PINBOARD_SLOTS_KEY)!
 const state: Ref<State> = config.useLocations()
 const loadedData = computed(() => state.value.kind === 'Loaded' ? state.value.data : undefined)
 
-const selectedLocation = ref<unknown | null>(null)
+const selectedLocation = ref<Location | null>(null)
 const returnFocusTarget = ref<HTMLElement | null>(null)
 const hoveredId = ref<string | null>(null)
-const selectedId = computed(() => {
-  const loc = selectedLocation.value as Record<string, unknown> | null
-  return (loc?.id as string) ?? null
-})
+const selectedId = computed(() => selectedLocation.value?.id ?? null)
 
 function onHover(id: string) {
   hoveredId.value = id
@@ -27,7 +25,7 @@ function onHoverEnd() {
   hoveredId.value = null
 }
 
-function onSelect(location: unknown, onClickOpen: () => void) {
+function onSelect(location: Location, onClickOpen: () => void) {
   returnFocusTarget.value = document.activeElement as HTMLElement
   selectedLocation.value = location
   onClickOpen()
@@ -58,17 +56,22 @@ function onClose(onClickToggle: (e: Event) => void) {
             {{ state.message }}
           </div>
 
-          <component
-            v-else-if="loadedData && slots['location-list']"
-            :is="() => slots['location-list']!({
-              locations: loadedData,
-              onSelect: (loc: unknown) => onSelect(loc, onClickOpen),
-              selectedId: selectedId,
-              hoveredId: hoveredId,
-              onHover,
-              onHoverEnd,
-            })"
-          />
+          <LocationsPanel
+            v-else-if="loadedData"
+            :locations="loadedData"
+            :hovered-id="hoveredId"
+            :selected-id="selectedId"
+            @select="(loc) => onSelect(loc, onClickOpen)"
+            @hover="onHover"
+            @hover-end="onHoverEnd"
+          >
+            <template #location-card="cardProps">
+              <component
+                v-if="slots['location-card']"
+                :is="() => slots['location-card']!(cardProps)"
+              />
+            </template>
+          </LocationsPanel>
         </div>
 
         <div class="finder-panel-map">
@@ -80,7 +83,7 @@ function onClose(onClickToggle: (e: Event) => void) {
             :selected-id="selectedId"
             :on-hover="onHover"
             :on-hover-end="onHoverEnd"
-            :on-select="(loc: unknown) => onSelect(loc, onClickOpen)"
+            :on-select="(loc: unknown) => onSelect(loc as Location, onClickOpen)"
             :map-content-slot="slots['map-content']"
           />
         </div>
