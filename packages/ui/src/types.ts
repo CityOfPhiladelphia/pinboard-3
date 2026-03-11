@@ -17,9 +17,14 @@ export interface MapConfig {
   ariaLabel?: string
 }
 
+export interface Location {
+  id: string
+  [key: string]: unknown
+}
+
 export type State =
   | { kind: 'Loading' }
-  | { kind: 'Loaded'; data: unknown }
+  | { kind: 'Loaded'; data: Location[] }
   | { kind: 'Error'; message: string }
 
 export interface PinboardConfig {
