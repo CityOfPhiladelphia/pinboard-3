@@ -5,30 +5,7 @@ import { PhilaButton } from '@phila/phila-ui-button'
 import { MapMarker, MapIconTextPin } from '@phila/phila-ui-map-core'
 import { faGauge } from '@fortawesome/free-solid-svg-icons'
 import { useRouter } from 'vue-router'
-import LocationList from './components/LocationList.vue'
 import LocationDetail from './components/LocationDetail.vue'
-import type { LocationDTO, Gauge, Location } from './types'
-
-function allGauges(locations: unknown): Gauge[] {
-  const dto = locations as LocationDTO
-  return [...dto.awareGauges, ...dto.usgsGauges]
-}
-
-function pinLabel(gauge: Gauge): string {
-  return gauge.gaugeId.slice(0, 8)
-}
-
-function gaugeToLocation(gauge: Gauge, dto: LocationDTO): Location {
-  const kind = dto.awareGauges.includes(gauge) ? 'AwareGauge' as const : 'UsgsGauge' as const
-  return {
-    id: gauge.gaugeId,
-    name: gauge.name,
-    latitude: gauge.latitude,
-    longitude: gauge.longitude,
-    lastUpdated: gauge.lastUpdated,
-    other: { kind, data: gauge },
-  }
-}
 
 const router = useRouter()
 </script>
@@ -60,14 +37,8 @@ const router = useRouter()
       </section>
     </template>
 
-    <template #location-list="{ locations, onSelect, hoveredId, onHover, onHoverEnd }">
-      <LocationList
-        :locations="locations"
-        :hovered-id="hoveredId"
-        @card-click="(loc) => onSelect(loc)"
-        @card-hover="(id: string) => onHover(id)"
-        @card-hover-end="onHoverEnd"
-      />
+    <template #location-card="{ location }">
+      {{ location.name }}
     </template>
 
     <template #location-detail="{ location, onClose }">
@@ -79,20 +50,20 @@ const router = useRouter()
 
     <template #map-content="{ locations, hoveredId, selectedId, onHover, onHoverEnd, onSelect }">
       <MapMarker
-        v-for="gauge in allGauges(locations)"
-        :key="gauge.gaugeId"
-        :lng-lat="[gauge.longitude, gauge.latitude]"
-        :z-index="hoveredId === gauge.gaugeId || selectedId === gauge.gaugeId ? 10 : undefined"
+        v-for="loc in locations"
+        :key="loc.id"
+        :lng-lat="[loc.longitude, loc.latitude]"
+        :z-index="hoveredId === loc.id || selectedId === loc.id ? 10 : undefined"
       >
         <MapIconTextPin
           :icon="faGauge"
-          :text="pinLabel(gauge)"
+          :text="loc.id.slice(0, 8)"
           color-theme="dark-primary"
-          :hovered="hoveredId === gauge.gaugeId"
-          :selected="selectedId === gauge.gaugeId"
-          @mouseenter="onHover(gauge.gaugeId)"
+          :hovered="hoveredId === loc.id"
+          :selected="selectedId === loc.id"
+          @mouseenter="onHover(loc.id)"
           @mouseleave="onHoverEnd()"
-          @click="onSelect(gaugeToLocation(gauge, locations))"
+          @click="onSelect(loc)"
         />
       </MapMarker>
     </template>
