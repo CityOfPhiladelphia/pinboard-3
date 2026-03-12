@@ -1,24 +1,16 @@
 <script setup lang="ts">
 import type { Location } from '../types'
-<<<<<<< HEAD
 import { ref } from 'vue'
 import GaugeReadings from './GaugeReadings.vue'
-=======
 import { useLocationDetail, type ReadingState } from '../composables/useLocationDetail'
-import { ref } from 'vue';
->>>>>>> task/load-data
 
 const props = defineProps<{
   location: Location,
   onClose: (event: MouseEvent) => void
 }>()
 
-<<<<<<< HEAD
-=======
 const readingState = useLocationDetail(() => props.location.id, () => props.location.other.kind, 5);
 
-
->>>>>>> task/load-data
 const closeBtn = ref<HTMLButtonElement>()
 
 defineExpose({ focus: () => closeBtn.value?.focus() })
@@ -34,13 +26,11 @@ defineExpose({ focus: () => closeBtn.value?.focus() })
     <div class="location-detail__body">
       <h2>{{ location.name }}</h2>
 
-<<<<<<< HEAD
       <!-- Gauge detail -->
       <GaugeReadings
         v-if="location.other.kind === 'AwareGauge' || location.other.kind === 'UsgsGauge'"
         :gauge-id="location.id"
       />
-=======
       <p v-else-if="readingState.kind==='No Call Needed'">
         {{ props.location.other.kind }}: {{ location.name }}
       </p>
@@ -54,7 +44,6 @@ defineExpose({ focus: () => closeBtn.value?.focus() })
           </tr>
         </table>
       </p>
->>>>>>> task/load-data
 
       <!-- Camera detail -->
       <template v-else-if="location.other.kind === 'Camera'">
