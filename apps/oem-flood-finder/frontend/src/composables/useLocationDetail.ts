@@ -1,14 +1,15 @@
 import { ref, toValue, watchEffect, type MaybeRefOrGetter, type Ref } from 'vue'
 import type { Reading } from '../types'
 
-type ReadingState = { kind: 'Loading' } | { kind: 'Loaded', data: Reading[] } | { kind: 'Error', message: string }
+export type ReadingState = { kind: 'Loading' } | { kind: 'Loaded', data: Reading[] } | { kind: 'Error', message: string } | { kind: 'No Call Needed' }
 
 export function useLocationDetail(
   gaugeId: MaybeRefOrGetter<string>,
+  kind: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
   limit: MaybeRefOrGetter<number>
 ): Ref<ReadingState> {
 
-  const readingState = ref<ReadingState>({ kind: 'Loading' })
+  const readingState = ref<ReadingState>({ kind: 'Loading' });
 
   watchEffect(
     async (onCleanup) => {
@@ -18,12 +19,17 @@ export function useLocationDetail(
         abortController.abort()
       );
 
+      if (toValue(kind) === 'Camera') {
+        readingState.value = { kind: 'No Call Needed' }
+        return
+      }
+
       readingState.value = { kind: 'Loading' };
 
       const myHeaders = new Headers();
       myHeaders.append("x-api-key", import.meta.env.VITE_FLOOD_API_KEY || "");
 
-      const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/aware/reading/${toValue(gaugeId)}?limit=${toValue(limit)}`, {
+      const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/${toValue(kind)}/reading/${toValue(gaugeId)}?limit=${toValue(limit)}`, {
         method: "GET",
         headers: myHeaders,
         redirect: "follow",
