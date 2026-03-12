@@ -3,7 +3,7 @@ import '@phila/phila-ui-core/styles/template-light.css'
 import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader } from '@phila/phila-ui-app-header'
 import { CollapsePanel } from '@phila/phila-ui-collapse-panel'
-import { h, ref, computed, nextTick, useSlots, inject, type FunctionalComponent, type Ref } from 'vue'
+import { h, ref, computed, watch, nextTick, useSlots, inject, type FunctionalComponent, type Ref } from 'vue'
 import { PINBOARD_CONFIG_KEY, type State, type Location } from '../types'
 import SearchFilterPanel from './SearchFilterPanel.vue'
 import MapPanel from './MapPanel.vue'
@@ -11,6 +11,7 @@ import LocationsPanel from './LocationsPanel.vue'
 
 defineSlots<{
   home?(props: { activateFinder: () => void }): unknown
+  'locations-header'?(props: {}): unknown
   'location-card'?(props: { location: Location }): unknown
   'location-detail'?(props: { location: Location; onClose: (e: MouseEvent) => void }): unknown
   'map-content'?(props: {
@@ -37,6 +38,12 @@ const selectedLocation = ref<Location | null>(null)
 const returnFocusTarget = ref<HTMLElement | null>(null)
 const hoveredId = ref<string | null>(null)
 const selectedId = computed(() => selectedLocation.value?.id ?? null)
+
+watch(loadedData, (data) => {
+  if (selectedLocation.value && data && !data.some(loc => loc.id === selectedLocation.value!.id)) {
+    selectedLocation.value = null
+  }
+})
 
 function activateFinder() {
   finderActive.value = true
@@ -97,6 +104,7 @@ function onClose(onClickToggle: (e: Event) => void) {
 
             <div class="finder-panel-locations">
               <template v-if="finderActive">
+                <slot name="locations-header" />
                 <SearchFilterPanel v-if="loadedData" :locations="loadedData" />
 
                 <div v-if="state.kind === 'Loading'" class="status-message">
