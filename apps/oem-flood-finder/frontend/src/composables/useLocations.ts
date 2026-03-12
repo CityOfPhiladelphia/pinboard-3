@@ -1,6 +1,8 @@
 import type { LocationDTO, Location } from '@/types'
-import { ref, onMounted, type Ref } from 'vue'
+import { ref, computed, onMounted, type Ref } from 'vue'
 import type { State } from '@pinboard/ui'
+
+export const locationMode = ref<'gauges' | 'cameras'>('gauges')
 
 function transformLocationDTO(dto: LocationDTO): Location[] {
   const locations: Location[] = []
@@ -41,8 +43,23 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
   return locations
 }
 
+function filterByMode(locations: Location[], mode: 'gauges' | 'cameras'): Location[] {
+  if (mode === 'gauges') {
+    return locations.filter(loc => loc.other.kind === 'AwareGauge' || loc.other.kind === 'UsgsGauge')
+  }
+  return locations.filter(loc => loc.other.kind === 'Camera')
+}
+
 export function useLocations(): Ref<State> {
-  const state = ref<State>({ kind: 'Loading' })
+  const allLocations = ref<Location[]>([])
+  const fetchState = ref<'loading' | 'loaded' | 'error'>('loading')
+  const errorMessage = ref('')
+
+  const state = computed<State>(() => {
+    if (fetchState.value === 'loading') return { kind: 'Loading' }
+    if (fetchState.value === 'error') return { kind: 'Error', message: errorMessage.value }
+    return { kind: 'Loaded', data: filterByMode(allLocations.value, locationMode.value) }
+  })
 
   async function fetchLocations() {
     const myHeaders = new Headers()
@@ -55,12 +72,14 @@ export function useLocations(): Ref<State> {
     })
 
     if (!response.ok) {
-      state.value = { kind: 'Error', message: 'Error retrieving gauges' }
+      fetchState.value = 'error'
+      errorMessage.value = 'Error retrieving gauges'
       return
     }
 
     const data: LocationDTO = await response.json()
-    state.value = { kind: 'Loaded', data: transformLocationDTO(data) }
+    allLocations.value = transformLocationDTO(data)
+    fetchState.value = 'loaded'
   }
 
   onMounted(fetchLocations)
