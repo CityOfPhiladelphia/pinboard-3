@@ -2,7 +2,8 @@ import type { LocationDTO, Location } from '@/types'
 import { ref, computed, onMounted, type Ref } from 'vue'
 import type { State } from '@pinboard/ui'
 
-export const locationMode = ref<'gauges' | 'cameras'>('gauges')
+export const locationMode = ref<'all' | 'gauges' | 'cameras'>('all')
+export const allLocations = ref<Location[]>([])
 
 function transformLocationDTO(dto: LocationDTO): Location[] {
   const locations: Location[] = []
@@ -43,7 +44,8 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
   return locations
 }
 
-function filterByMode(locations: Location[], mode: 'gauges' | 'cameras'): Location[] {
+function filterByMode(locations: Location[], mode: 'all' | 'gauges' | 'cameras'): Location[] {
+  if (mode === 'all') return locations
   if (mode === 'gauges') {
     return locations.filter(loc => loc.other.kind === 'AwareGauge' || loc.other.kind === 'UsgsGauge')
   }
@@ -51,7 +53,6 @@ function filterByMode(locations: Location[], mode: 'gauges' | 'cameras'): Locati
 }
 
 export function useLocations(): Ref<State> {
-  const allLocations = ref<Location[]>([])
   const fetchState = ref<'loading' | 'loaded' | 'error'>('loading')
   const errorMessage = ref('')
 

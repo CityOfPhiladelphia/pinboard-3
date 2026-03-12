@@ -34,6 +34,11 @@ const loadedData = computed(() => state.value.kind === 'Loaded' ? state.value.da
 const loadedGeojson = computed(() => state.value.kind === 'Loaded' ? state.value.geojson : undefined)
 
 const finderActive = ref(false)
+const activePanel = ref<'locations' | 'map'>('locations')
+
+function togglePanel() {
+  activePanel.value = activePanel.value === 'locations' ? 'map' : 'locations'
+}
 const selectedLocation = ref<Location | null>(null)
 const returnFocusTarget = ref<HTMLElement | null>(null)
 const hoveredId = ref<string | null>(null)
@@ -69,9 +74,15 @@ function onHoverEnd() {
   hoveredId.value = null
 }
 
-function onSelect(location: Location, onClickOpen: () => void) {
+function onSelect(location: Location, onClickOpen: () => void, onClickToggle: (e: Event) => void) {
+  if (selectedLocation.value?.id === location.id) {
+    selectedLocation.value = null
+    onClickToggle(new Event('click'))
+    return
+  }
   returnFocusTarget.value = document.activeElement as HTMLElement
   selectedLocation.value = location
+  finderActive.value = true
   onClickOpen()
 }
 
@@ -99,10 +110,10 @@ function onClose(onClickToggle: (e: Event) => void) {
 
     <main class="pinboard-main">
       <CollapsePanel id="detail-panel" class="detail-panel-wrapper">
-        <template #toggle="{ onClickOpen }">
+        <template #toggle="{ onClickOpen, onClickToggle }">
           <div class="finder-panel">
 
-            <div class="finder-panel-locations">
+            <div class="finder-panel-locations" :class="{ 'is-active': activePanel === 'locations' }">
               <template v-if="finderActive">
                 <slot name="locations-header" />
                 <SearchFilterPanel v-if="loadedData" :locations="loadedData" />
@@ -121,7 +132,7 @@ function onClose(onClickToggle: (e: Event) => void) {
                   :hovered-id="hoveredId"
                   :selected-id="selectedId"
                   :location-card-slot="slots['location-card']"
-                  @select="(loc) => onSelect(loc, onClickOpen)"
+                  @select="(loc) => onSelect(loc, onClickOpen, onClickToggle)"
                   @hover="onHover"
                   @hover-end="onHoverEnd"
                 />
@@ -132,7 +143,7 @@ function onClose(onClickToggle: (e: Event) => void) {
               </div>
             </div>
 
-            <div class="finder-panel-map">
+            <div class="finder-panel-map" :class="{ 'is-active': activePanel === 'map' }">
               <MapPanel
                 v-if="loadedData"
                 :config="config.map"
@@ -142,12 +153,15 @@ function onClose(onClickToggle: (e: Event) => void) {
                 :selected-id="selectedId"
                 :on-hover="onHover"
                 :on-hover-end="onHoverEnd"
-                :on-select="(loc: unknown) => onSelect(loc as Location, onClickOpen)"
+                :on-select="(loc: unknown) => onSelect(loc as Location, onClickOpen, onClickToggle)"
                 :map-content-slot="slots['map-content']"
               />
             </div>
 
           </div>
+          <button class="mobile-panel-toggle" @click="togglePanel">
+            {{ activePanel === 'locations' ? 'Map view' : 'List view' }}
+          </button>
         </template>
 
         <template #default="{ hidden, onClickToggle }">
@@ -239,6 +253,24 @@ function onClose(onClickToggle: (e: Event) => void) {
   overflow: hidden;
 }
 
+.mobile-panel-toggle {
+  display: none;
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background: var(--Schemes-Primary, #2176d2);
+  border: none;
+  border-radius: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+
 .detail-overlay {
   position: absolute;
   top: 0;
@@ -251,5 +283,50 @@ function onClose(onClickToggle: (e: Event) => void) {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .finder-panel-locations {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-right: none;
+    display: none;
+  }
+
+  .finder-panel-locations.is-active {
+    display: flex;
+  }
+
+  .finder-panel-map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+  }
+
+  .finder-panel-map.is-active {
+    display: block;
+  }
+
+  .finder-panel {
+    position: relative;
+  }
+
+  .mobile-panel-toggle {
+    display: block;
+  }
+
+  .detail-overlay {
+    width: 100%;
+  }
+
+  .pinboard > :deep(footer) {
+    display: none;
+  }
 }
 </style>

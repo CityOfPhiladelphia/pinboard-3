@@ -4,7 +4,23 @@ import '@pinboard/ui/style.css'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { MapMarker, MapIconTextPin } from '@phila/phila-ui-map-core'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
-import { locationMode } from './composables/useLocations'
+import { locationMode, allLocations } from './composables/useLocations'
+import type { Location } from './types'
+
+function isGauge(loc: Location): boolean {
+  return loc.other.kind === 'AwareGauge' || loc.other.kind === 'UsgsGauge'
+}
+
+function isVisible(loc: Location): boolean {
+  if (locationMode.value === 'all') return true
+  return locationMode.value === 'gauges' ? isGauge(loc) : loc.other.kind === 'Camera'
+}
+
+const filterOptions = [
+  { value: 'all' as const, label: 'All' },
+  { value: 'gauges' as const, label: 'Gauge' },
+  { value: 'cameras' as const, label: 'Camera' },
+]
 import LocationDetail from './components/LocationDetail.vue'
 </script>
 
@@ -27,22 +43,14 @@ import LocationDetail from './components/LocationDetail.vue'
     </template>
 
     <template #locations-header>
-      <div class="location-tabs" role="tablist">
+      <div class="location-filters">
         <button
-          role="tab"
-          :aria-selected="locationMode === 'gauges'"
-          :class="{ active: locationMode === 'gauges' }"
-          @click="locationMode = 'gauges'"
+          v-for="opt in filterOptions"
+          :key="opt.value"
+          :class="['filter-pill', { active: locationMode === opt.value }]"
+          @click="locationMode = opt.value"
         >
-          Gauges
-        </button>
-        <button
-          role="tab"
-          :aria-selected="locationMode === 'cameras'"
-          :class="{ active: locationMode === 'cameras' }"
-          @click="locationMode = 'cameras'"
-        >
-          Cameras
+          {{ opt.label }}
         </button>
       </div>
     </template>
@@ -58,19 +66,20 @@ import LocationDetail from './components/LocationDetail.vue'
       />
     </template>
 
-    <template #map-content="{ locations, hoveredId, selectedId, onHover, onHoverEnd, onSelect }">
+    <template #map-content="{ hoveredId, selectedId, onHover, onHoverEnd, onSelect }">
       <MapMarker
-        v-for="loc in locations"
+        v-for="loc in allLocations"
         :key="loc.id"
         :lng-lat="[loc.longitude, loc.latitude]"
         :z-index="hoveredId === loc.id || selectedId === loc.id ? 10 : undefined"
       >
         <MapIconTextPin
-          :icon="locationMode === 'gauges' ? faGauge : faCamera"
-          :text="locationMode === 'gauges' ? loc.id.slice(0, 8) : undefined"
-          :color-theme="locationMode === 'gauges' ? 'dark-primary' : 'dark-error'"
+          :icon="isGauge(loc) ? faGauge : faCamera"
+          :text="isGauge(loc) ? loc.id.slice(0, 8) : undefined"
+          :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'"
           :hovered="hoveredId === loc.id"
           :selected="selectedId === loc.id"
+          :style="isVisible(loc) ? undefined : { visibility: 'hidden', pointerEvents: 'none' }"
           @mouseenter="onHover(loc.id)"
           @mouseleave="onHoverEnd()"
           @click="onSelect(loc)"
@@ -89,25 +98,25 @@ import LocationDetail from './components/LocationDetail.vue'
 </style>
 
 <style scoped>
-.location-tabs {
+.location-filters {
   display: flex;
-  border-bottom: 1px solid #ccc;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
   flex-shrink: 0;
 }
 
-.location-tabs button {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  border: none;
-  border-bottom: 2px solid transparent;
-  background: none;
+.filter-pill {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 1rem;
+  background: #fff;
   cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: normal;
+  font-size: 0.8125rem;
 }
 
-.location-tabs button.active {
-  font-weight: bold;
-  border-bottom-color: var(--Schemes-Primary, #2176d2);
+.filter-pill.active {
+  background: var(--Schemes-Primary, #2176d2);
+  border-color: var(--Schemes-Primary, #2176d2);
+  color: #fff;
 }
 </style>
