@@ -66,20 +66,9 @@ import LocationDetail from './components/LocationDetail.vue'
         :z-index="hoveredId === loc.id || selectedId === loc.id ? 10 : undefined"
       >
         <MapIconTextPin
-          v-if="locationMode === 'gauges'"
-          :icon="faGauge"
-          :text="loc.id.slice(0, 8)"
-          color-theme="dark-primary"
-          :hovered="hoveredId === loc.id"
-          :selected="selectedId === loc.id"
-          @mouseenter="onHover(loc.id)"
-          @mouseleave="onHoverEnd()"
-          @click="onSelect(loc)"
-        />
-        <MapIconTextPin
-          v-else
-          :icon="faCamera"
-          color-theme="dark-error"
+          :icon="locationMode === 'gauges' ? faGauge : faCamera"
+          :text="locationMode === 'gauges' ? loc.id.slice(0, 8) : undefined"
+          :color-theme="locationMode === 'gauges' ? 'dark-primary' : 'dark-error'"
           :hovered="hoveredId === loc.id"
           :selected="selectedId === loc.id"
           @mouseenter="onHover(loc.id)"
