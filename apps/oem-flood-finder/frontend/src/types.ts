@@ -13,8 +13,8 @@ export type Location = {
   longitude: number,
   lastUpdated: Date | null,
   other:
-    { kind: 'AwareGauge', data: Gauge } |
-    { kind: 'UsgsGauge', data: Gauge } |
+    { kind: 'Aware', data: Gauge } |
+    { kind: 'Usgs', data: Gauge } |
     { kind: 'Camera', data: Camera }
 }
 

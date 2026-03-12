@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Location } from '../types'
-import { useLocationDetail } from '../composables/useLocationDetail'
+import { useLocationDetail, type ReadingState } from '../composables/useLocationDetail'
 import { ref } from 'vue';
 
 const props = defineProps<{
@@ -8,7 +8,8 @@ const props = defineProps<{
   onClose: (event: MouseEvent) => void
 }>()
 
-const readingState = useLocationDetail(() => props.location.id, 5);
+const readingState = useLocationDetail(() => props.location.id, () => props.location.other.kind, 5);
+
 
 const closeBtn = ref<HTMLButtonElement>()
 
@@ -27,6 +28,10 @@ defineExpose({ focus: () => closeBtn.value?.focus() })
       <h2>{{ location.name }}</h2>
       
       <progress v-if="readingState.kind==='Loading'"/>
+
+      <p v-else-if="readingState.kind==='No Call Needed'">
+        {{ props.location.other.kind }}: {{ location.name }}
+      </p>
 
       <p v-else-if="readingState.kind==='Loaded'">
         <table>

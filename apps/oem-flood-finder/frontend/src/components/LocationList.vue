@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { BaseCard, CardContent } from '@phila/phila-ui-cards'
-import type { Gauge, LocationDTO, Location } from '../types'
+import type { LocationDTO, Location } from '../types'
 
 const props = defineProps<{
   locations: LocationDTO
@@ -33,7 +33,7 @@ function transformLocationDTO(locationDto: LocationDTO) : Location[]  {
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
       other: {
-        kind: 'AwareGauge',
+        kind: 'Aware',
         data: gauge
       }
     })
@@ -47,7 +47,7 @@ function transformLocationDTO(locationDto: LocationDTO) : Location[]  {
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
       other: {
-        kind: 'UsgsGauge',
+        kind: 'Usgs',
         data: gauge
       }
     })
