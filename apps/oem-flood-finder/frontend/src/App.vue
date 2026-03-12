@@ -3,7 +3,8 @@ import { Pinboard } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { MapMarker, MapIconTextPin } from '@phila/phila-ui-map-core'
-import { faGauge } from '@fortawesome/free-solid-svg-icons'
+import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
+import { locationMode } from './composables/useLocations'
 import LocationDetail from './components/LocationDetail.vue'
 </script>
 
@@ -25,6 +26,27 @@ import LocationDetail from './components/LocationDetail.vue'
       <PhilaButton text="View List" @click="activateFinder" />
     </template>
 
+    <template #locations-header>
+      <div class="location-tabs" role="tablist">
+        <button
+          role="tab"
+          :aria-selected="locationMode === 'gauges'"
+          :class="{ active: locationMode === 'gauges' }"
+          @click="locationMode = 'gauges'"
+        >
+          Gauges
+        </button>
+        <button
+          role="tab"
+          :aria-selected="locationMode === 'cameras'"
+          :class="{ active: locationMode === 'cameras' }"
+          @click="locationMode = 'cameras'"
+        >
+          Cameras
+        </button>
+      </div>
+    </template>
+
     <template #location-card="{ location }">
       {{ location.name }}
     </template>
@@ -44,9 +66,20 @@ import LocationDetail from './components/LocationDetail.vue'
         :z-index="hoveredId === loc.id || selectedId === loc.id ? 10 : undefined"
       >
         <MapIconTextPin
+          v-if="locationMode === 'gauges'"
           :icon="faGauge"
           :text="loc.id.slice(0, 8)"
           color-theme="dark-primary"
+          :hovered="hoveredId === loc.id"
+          :selected="selectedId === loc.id"
+          @mouseenter="onHover(loc.id)"
+          @mouseleave="onHoverEnd()"
+          @click="onSelect(loc)"
+        />
+        <MapIconTextPin
+          v-else
+          :icon="faCamera"
+          color-theme="dark-error"
           :hovered="hoveredId === loc.id"
           :selected="selectedId === loc.id"
           @mouseenter="onHover(loc.id)"
@@ -63,5 +96,29 @@ import LocationDetail from './components/LocationDetail.vue'
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+</style>
+
+<style scoped>
+.location-tabs {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+  flex-shrink: 0;
+}
+
+.location-tabs button {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: normal;
+}
+
+.location-tabs button.active {
+  font-weight: bold;
+  border-bottom-color: var(--Schemes-Primary, #2176d2);
 }
 </style>
