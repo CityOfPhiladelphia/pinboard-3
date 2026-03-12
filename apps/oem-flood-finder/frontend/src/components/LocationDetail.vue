@@ -1,29 +1,46 @@
 <script setup lang="ts">
-import { ref, toRef } from 'vue'
 import type { Location } from '../types'
-import { useLocationDetail } from '../composables/useLocationDetail'
+import { ref } from 'vue'
+import GaugeReadings from './GaugeReadings.vue'
 
 const props = defineProps<{
-  location: Location | null
+  location: Location,
   onClose: (event: MouseEvent) => void
 }>()
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { locationDetail, isLoading, error } = useLocationDetail(toRef(props, 'location'))
+const closeBtn = ref<HTMLButtonElement>()
 
-const closeBtn = ref<HTMLButtonElement | null>(null)
 defineExpose({ focus: () => closeBtn.value?.focus() })
 </script>
 
 <template>
   <div class="location-detail content">
+
     <div class="location-detail__header">
       <button ref="closeBtn" class="close-btn" aria-label="Close panel" @click="onClose">✕</button>
     </div>
-    <div v-if="location" class="location-detail__body">
+
+    <div class="location-detail__body">
       <h2>{{ location.name }}</h2>
-      <p>{{ location.address }}</p>
+
+      <!-- Gauge detail -->
+      <GaugeReadings
+        v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'"
+        :gauge-id="location.id"
+        :kind="location.other.kind"
+      />
+
+      <!-- Camera detail -->
+      <template v-else-if="location.other.kind === 'Camera'">
+        <p v-if="location.other.data.locationDescription">
+          {{ location.other.data.locationDescription }}
+        </p>
+        <a :href="location.other.data.pageUrl" target="_blank" rel="noopener noreferrer">
+          View camera feed
+        </a>
+      </template>
     </div>
+
   </div>
 </template>
 

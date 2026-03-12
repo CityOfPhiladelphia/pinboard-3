@@ -1,34 +1,51 @@
-import { ref, watch } from 'vue'
-import type { Ref } from 'vue'
-import type { Location, LocationDetail } from '../types'
+import { ref, toValue, watchEffect, type MaybeRefOrGetter, type Ref } from 'vue'
+import type { Reading } from '../types'
 
-export function useLocationDetail(location: Ref<Location | null>) {
-  const locationDetail = ref<LocationDetail | null>(null)
-  const isLoading = ref(false)
-  const error = ref<Error | null>(null)
-  let abortController: AbortController | null = null
+export type ReadingState = { kind: 'Loading' } | { kind: 'Loaded', data: Reading[] } | { kind: 'Error', message: string } | { kind: 'No Call Needed' }
 
-  async function fetchLocationDetail(loc: Location, signal: AbortSignal) {
-    locationDetail.value = null
-    isLoading.value = true
-    error.value = null
-    try {
-      // TODO: replace with API call, passing signal to fetch()
-      // locationDetail.value = await fetchFromApi(loc, signal)
-    } catch (e) {
-      if ((e as DOMException).name === 'AbortError') return
-      error.value = e instanceof Error ? e : new Error(String(e))
-    } finally {
-      if (!signal.aborted) isLoading.value = false
+export function useLocationDetail(
+  gaugeId: MaybeRefOrGetter<string>,
+  kind: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
+  limit: MaybeRefOrGetter<number>
+): Ref<ReadingState> {
+
+  const readingState = ref<ReadingState>({ kind: 'Loading' });
+
+  watchEffect(
+    async (onCleanup) => {
+      let abortController = new AbortController();
+
+      onCleanup(() =>
+        abortController.abort()
+      );
+
+      if (toValue(kind) === 'Camera') {
+        readingState.value = { kind: 'No Call Needed' }
+        return
+      }
+
+      readingState.value = { kind: 'Loading' };
+
+      const myHeaders = new Headers();
+      myHeaders.append("x-api-key", import.meta.env.VITE_FLOOD_API_KEY || "");
+
+      const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/${toValue(kind).toLowerCase()}/reading/${toValue(gaugeId)}?limit=${toValue(limit)}`, {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+        signal: abortController.signal
+      });
+
+      if (!response.ok) {
+        readingState.value = { kind: 'Error', message: "Readings API response error" };
+        return;
+      }
+
+      const data = await response.json();
+
+      readingState.value = { kind: 'Loaded', data: data };
     }
-  }
+  )
 
-  watch(location, (loc) => {
-    abortController?.abort()
-    if (!loc) return
-    abortController = new AbortController()
-    fetchLocationDetail(loc, abortController.signal)
-  })
-
-  return { locationDetail, isLoading, error }
+  return readingState
 }

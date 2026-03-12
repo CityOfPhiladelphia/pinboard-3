@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import type { Location } from '../types'
-
 defineProps<{
-  locations: Location[]
+  locations: unknown
 }>()
 </script>
 

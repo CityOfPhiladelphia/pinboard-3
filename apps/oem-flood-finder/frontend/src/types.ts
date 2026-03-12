@@ -1,14 +1,68 @@
 /** Shared types for OEM Flood Finder */
 
-export interface Location {
-  name: string
-  address: string
+export type LocationDTO = {
+  awareGauges: Gauge[],
+  usgsGauges: Gauge[],
+  cameras: Camera[]
 }
 
-export type ApiResponse = Location[]
+export type Location = {
+  id: string,
+  name: string,
+  latitude: number,
+  longitude: number,
+  lastUpdated: Date | null,
+  other:
+    { kind: 'Aware', data: Gauge } |
+    { kind: 'Usgs', data: Gauge } |
+    { kind: 'Camera', data: Camera }
+}
 
-// TODO: fill in fields from the location detail API response
-export interface LocationDetail {
-  name: string
-  address: string
+export type Gauge = {
+  gaugeId: string,
+  name: string,
+  latitude: number,
+  longitude: number,
+  lastUpdated: Date | null,
+  actionStage: number,
+  minorStage: number,
+  moderateStage: number,
+  stageUnits: string,
+  floodImpacts: object[]
+}
+
+export type Reading = {
+  readingId: string,
+  createdOn: Date,
+  validTimeUTC: Date,
+  gaugeId: string,
+  flashFloodIndicator: boolean,
+  flashFloodThreshold: number,
+  flashFloodDetectionImagingEnabled: boolean,
+  gaugeHeight: number,
+  gaugeHeightUnit: string,
+  isFlooding: boolean,
+  depthHoldHours: number,
+  depthDetectionImagingEnabled: boolean,
+  rainfall: number,
+  rainIntensity: number,
+  tips: number,
+  barometricPressure: number,
+  airTemperature: number,
+  waterTemperature: number,
+  saltWater: boolean,
+  dropRateIndicator: boolean,
+  dropRateThreshold: number,
+  deviceDropCount: number
+}
+
+export type Camera = {
+  cameraId: string,
+  name: string,
+  latitude: number,
+  longitude: number,
+  lastUpdated: Date,
+  createdOn: Date,
+  locationDescription?: string,
+  pageUrl: string
 }

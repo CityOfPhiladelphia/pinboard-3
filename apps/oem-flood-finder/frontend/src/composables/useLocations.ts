@@ -1,43 +1,88 @@
-import { ref, onMounted } from 'vue'
-import type { Location } from '../types'
+import type { LocationDTO, Location } from '@/types'
+import { ref, computed, onMounted, type Ref } from 'vue'
+import type { State } from '@pinboard/ui'
 
-export function useLocations() {
-  const locations = ref<Location[]>([])
-  const isLoading = ref(false)
-  const error = ref<Error | null>(null)
+export const locationMode = ref<'all' | 'gauges' | 'cameras'>('all')
+export const allLocations = ref<Location[]>([])
+
+function transformLocationDTO(dto: LocationDTO): Location[] {
+  const locations: Location[] = []
+
+  for (const gauge of dto.awareGauges) {
+    locations.push({
+      id: gauge.gaugeId,
+      name: gauge.name,
+      latitude: gauge.latitude,
+      longitude: gauge.longitude,
+      lastUpdated: gauge.lastUpdated,
+      other: { kind: 'Aware', data: gauge },
+    })
+  }
+
+  for (const gauge of dto.usgsGauges) {
+    locations.push({
+      id: gauge.gaugeId,
+      name: gauge.name,
+      latitude: gauge.latitude,
+      longitude: gauge.longitude,
+      lastUpdated: gauge.lastUpdated,
+      other: { kind: 'Usgs', data: gauge },
+    })
+  }
+
+  for (const camera of dto.cameras) {
+    locations.push({
+      id: camera.cameraId,
+      name: camera.name,
+      latitude: camera.latitude,
+      longitude: camera.longitude,
+      lastUpdated: camera.lastUpdated,
+      other: { kind: 'Camera', data: camera },
+    })
+  }
+
+  return locations
+}
+
+function filterByMode(locations: Location[], mode: 'all' | 'gauges' | 'cameras'): Location[] {
+  if (mode === 'all') return locations
+  if (mode === 'gauges') {
+    return locations.filter(loc => loc.other.kind === 'Aware' || loc.other.kind === 'Usgs')
+  }
+  return locations.filter(loc => loc.other.kind === 'Camera')
+}
+
+export function useLocations(): Ref<State> {
+  const fetchState = ref<'loading' | 'loaded' | 'error'>('loading')
+  const errorMessage = ref('')
+
+  const state = computed<State>(() => {
+    if (fetchState.value === 'loading') return { kind: 'Loading' }
+    if (fetchState.value === 'error') return { kind: 'Error', message: errorMessage.value }
+    return { kind: 'Loaded', data: filterByMode(allLocations.value, locationMode.value) }
+  })
 
   async function fetchLocations() {
-    isLoading.value = true
-    error.value = null
-    try {
-      // TODO: replace with API call
-      locations.value = [
-        { name: 'Pennypack Creek at Holmesburg', address: '7000 State Rd, Philadelphia, PA 19135' },
-        {
-          name: 'Tacony Creek at Cheltenham Ave',
-          address: '900 Cheltenham Ave, Philadelphia, PA 19111',
-        },
-        {
-          name: 'Cobbs Creek at Baltimore Ave',
-          address: '6200 Baltimore Ave, Philadelphia, PA 19143',
-        },
-        {
-          name: 'Wissahickon Creek at Bells Mill Rd',
-          address: '300 Bells Mill Rd, Philadelphia, PA 19118',
-        },
-        {
-          name: 'Darby Creek at Lansdowne Ave',
-          address: '5800 Lansdowne Ave, Philadelphia, PA 19131',
-        },
-      ]
-    } catch (e) {
-      error.value = e instanceof Error ? e : new Error(String(e))
-    } finally {
-      isLoading.value = false
+    const myHeaders = new Headers()
+    myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
+
+    const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/location/all`, {
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow',
+    })
+
+    if (!response.ok) {
+      fetchState.value = 'error'
+      errorMessage.value = 'Error retrieving gauges'
+      return
     }
+
+    const data: LocationDTO = await response.json()
+    allLocations.value = transformLocationDTO(data)
+    fetchState.value = 'loaded'
   }
 
   onMounted(fetchLocations)
-
-  return { locations, isLoading, error }
+  return state
 }
