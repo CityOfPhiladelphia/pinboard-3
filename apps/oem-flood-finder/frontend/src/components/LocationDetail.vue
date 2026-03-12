@@ -1,19 +1,16 @@
 <script setup lang="ts">
 import type { Location } from '../types'
-import { useLocationDetail } from '../composables/useLocationDetail'
-import { ref } from 'vue';
+import { ref } from 'vue'
+import GaugeReadings from './GaugeReadings.vue'
 
 const props = defineProps<{
   location: Location,
   onClose: (event: MouseEvent) => void
 }>()
 
-const readingState = useLocationDetail(() => props.location.id, 5);
-
 const closeBtn = ref<HTMLButtonElement>()
 
 defineExpose({ focus: () => closeBtn.value?.focus() })
-
 </script>
 
 <template>
@@ -25,23 +22,22 @@ defineExpose({ focus: () => closeBtn.value?.focus() })
 
     <div class="location-detail__body">
       <h2>{{ location.name }}</h2>
-      
-      <progress v-if="readingState.kind==='Loading'"/>
 
-      <p v-else-if="readingState.kind==='Loaded'">
-        <table>
-          <tr><th>Created On</th><th>Height</th></tr>
-          <tr v-for="reading in readingState.data">
-            <td>{{ reading.createdOn }}</td>
-            <td>{{ reading.gaugeHeight }}</td>
-          </tr>
-        </table>
-      </p>
+      <!-- Gauge detail -->
+      <GaugeReadings
+        v-if="location.other.kind === 'AwareGauge' || location.other.kind === 'UsgsGauge'"
+        :gauge-id="location.id"
+      />
 
-      <p v-else-if="readingState.kind==='Error'">
-        {{ readingState.message }}
-      </p>
-      
+      <!-- Camera detail -->
+      <template v-else-if="location.other.kind === 'Camera'">
+        <p v-if="location.other.data.locationDescription">
+          {{ location.other.data.locationDescription }}
+        </p>
+        <a :href="location.other.data.pageUrl" target="_blank" rel="noopener noreferrer">
+          View camera feed
+        </a>
+      </template>
     </div>
 
   </div>
