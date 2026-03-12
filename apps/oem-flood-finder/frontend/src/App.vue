@@ -8,7 +8,7 @@ import { locationMode, allLocations } from './composables/useLocations'
 import type { Location } from './types'
 
 function isGauge(loc: Location): boolean {
-  return loc.other.kind === 'AwareGauge' || loc.other.kind === 'UsgsGauge'
+  return loc.other.kind === 'Aware' || loc.other.kind === 'Usgs'
 }
 
 function isVisible(loc: Location): boolean {

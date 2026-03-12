@@ -15,7 +15,7 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
       latitude: gauge.latitude,
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
-      other: { kind: 'AwareGauge', data: gauge },
+      other: { kind: 'Aware', data: gauge },
     })
   }
 
@@ -26,7 +26,7 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
       latitude: gauge.latitude,
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
-      other: { kind: 'UsgsGauge', data: gauge },
+      other: { kind: 'Usgs', data: gauge },
     })
   }
 
@@ -47,7 +47,7 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
 function filterByMode(locations: Location[], mode: 'all' | 'gauges' | 'cameras'): Location[] {
   if (mode === 'all') return locations
   if (mode === 'gauges') {
-    return locations.filter(loc => loc.other.kind === 'AwareGauge' || loc.other.kind === 'UsgsGauge')
+    return locations.filter(loc => loc.other.kind === 'Aware' || loc.other.kind === 'Usgs')
   }
   return locations.filter(loc => loc.other.kind === 'Camera')
 }

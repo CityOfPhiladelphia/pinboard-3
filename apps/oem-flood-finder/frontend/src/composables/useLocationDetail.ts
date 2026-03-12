@@ -29,7 +29,7 @@ export function useLocationDetail(
       const myHeaders = new Headers();
       myHeaders.append("x-api-key", import.meta.env.VITE_FLOOD_API_KEY || "");
 
-      const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/${toValue(kind)}/reading/${toValue(gaugeId)}?limit=${toValue(limit)}`, {
+      const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/${toValue(kind).toLowerCase()}/reading/${toValue(gaugeId)}?limit=${toValue(limit)}`, {
         method: "GET",
         headers: myHeaders,
         redirect: "follow",
