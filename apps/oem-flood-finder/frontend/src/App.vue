@@ -73,19 +73,10 @@ import LocationDetail from './components/LocationDetail.vue'
         :lng-lat="[loc.longitude, loc.latitude]"
         :z-index="hoveredId === loc.id || selectedId === loc.id ? 10 : undefined"
       >
-        <div
-          v-if="zoom < 12"
-          :class="['marker-dot', isGauge(loc) ? 'marker-dot--gauge' : 'marker-dot--camera']"
-          :style="isVisible(loc) ? undefined : { visibility: 'hidden', pointerEvents: 'none' }"
-          @mouseenter="onHover(loc.id)"
-          @mouseleave="onHoverEnd()"
-          @click="onSelect(loc)"
-        />
         <MapIconTextPin
-          v-else
+          :zoom="zoom"
           :icon="isGauge(loc) ? faGauge : faCamera"
           :text="isGauge(loc) ? gaugeHeights.get(loc.id) : undefined"
-          :size="zoom >= 14 ? 'large' : 'small'"
           :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'"
           :hovered="hoveredId === loc.id"
           :selected="selectedId === loc.id"
@@ -130,20 +121,4 @@ import LocationDetail from './components/LocationDetail.vue'
   color: #fff;
 }
 
-.marker-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid white;
-  cursor: pointer;
-  transform: translate(-50%, -50%);
-}
-
-.marker-dot--gauge {
-  background: var(--Schemes-Primary, #2176d2);
-}
-
-.marker-dot--camera {
-  background: var(--Schemes-Error, #b3261e);
-}
 </style>
