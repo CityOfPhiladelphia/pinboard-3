@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { Pinboard } from '@pinboard/ui'
+import { Pinboard, MapMarker, MapIconTextPin } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import { PhilaButton } from '@phila/phila-ui-button'
-import { MapMarker, MapIconTextPin } from '@phila/phila-ui-map-core'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { locationMode, allLocations, gaugeHeights } from './composables/useLocations'
 import type { Location } from './types'
