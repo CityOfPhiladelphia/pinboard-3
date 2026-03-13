@@ -18,6 +18,7 @@ defineSlots<{
     locations: unknown
     geojson: unknown
     map: unknown
+    zoom: number
     hoveredId: string | null
     selectedId: string | null
     onHover: (id: string) => void

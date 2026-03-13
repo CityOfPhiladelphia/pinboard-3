@@ -4,7 +4,7 @@ import '@pinboard/ui/style.css'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { MapMarker, MapIconTextPin } from '@phila/phila-ui-map-core'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
-import { locationMode, allLocations } from './composables/useLocations'
+import { locationMode, allLocations, gaugeHeights } from './composables/useLocations'
 import type { Location } from './types'
 
 function isGauge(loc: Location): boolean {
@@ -66,7 +66,7 @@ import LocationDetail from './components/LocationDetail.vue'
       />
     </template>
 
-    <template #map-content="{ hoveredId, selectedId, onHover, onHoverEnd, onSelect }">
+    <template #map-content="{ hoveredId, selectedId, zoom, onHover, onHoverEnd, onSelect }">
       <MapMarker
         v-for="loc in allLocations"
         :key="loc.id"
@@ -75,7 +75,8 @@ import LocationDetail from './components/LocationDetail.vue'
       >
         <MapIconTextPin
           :icon="isGauge(loc) ? faGauge : faCamera"
-          :text="isGauge(loc) ? loc.id.slice(0, 8) : undefined"
+          :text="isGauge(loc) ? gaugeHeights.get(loc.id) : undefined"
+          :size="zoom >= 14 ? 'large' : 'small'"
           :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'"
           :hovered="hoveredId === loc.id"
           :selected="selectedId === loc.id"
