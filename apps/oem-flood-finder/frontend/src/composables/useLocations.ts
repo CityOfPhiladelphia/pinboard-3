@@ -100,7 +100,7 @@ export function useLocations(): Ref<State> {
       if (!readings.length) return
 
       const reading = readings[0]
-      if (reading.gaugeHeight < 0) return
+      if (reading.gaugeHeight < -100) return
 
       const heightInInches = reading.gaugeHeightUnit === 'ft'
         ? Math.round(reading.gaugeHeight * 12 * 100) / 100
