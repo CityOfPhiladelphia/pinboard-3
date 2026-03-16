@@ -45,6 +45,13 @@ defineExpose({ focus: () => closeBtn.value?.focus() })
         </template>
 
         <h4>Gauge Information</h4>
+          <table>
+            <tr><th>Last Updated</th><th>Coordinates</th></tr>
+            <tr>
+              <td>{{ location.lastUpdated }}</td>
+              <td>{{ location.latitude }}, {{ location.longitude }}</td>
+            </tr>
+          </table>
 
       </template>
 
