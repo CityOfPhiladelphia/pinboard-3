@@ -23,12 +23,14 @@ Requires Node.js 20+ and pnpm.
 # Install dependencies
 pnpm install
 
-# Build all packages and apps
-pnpm build
+# Build shared packages (required before running any app)
+cd packages/ui && pnpm build && cd ../..
 
 # Run oem-flood-finder dev server
 pnpm dev:oem
 ```
+
+> **Important:** Apps depend on the built output of `packages/ui`. You must run `pnpm build` inside `packages/ui` before running any app for the first time, and again whenever you change `packages/ui` source code.
 
 ## Tooling
 
