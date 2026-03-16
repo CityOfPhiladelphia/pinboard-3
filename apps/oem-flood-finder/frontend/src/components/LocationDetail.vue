@@ -2,6 +2,7 @@
 import type { Location } from '../types'
 import { ref } from 'vue'
 import GaugeReadings from './GaugeReadings.vue'
+import CameraVideoPlayer from './CameraVideoPlayer.vue'
 
 const props = defineProps<{
   location: Location,
@@ -21,23 +22,48 @@ defineExpose({ focus: () => closeBtn.value?.focus() })
     </div>
 
     <div class="location-detail__body">
-      <h2>{{ location.name }}</h2>
 
-      <!-- Gauge detail -->
-      <GaugeReadings
-        v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'"
-        :gauge-id="location.id"
-        :kind="location.other.kind"
-      />
+      <template v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'"> 
+        <h2>{{ location.name }}</h2>
+        <p >
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
+          labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco 
+          laboris nisi ut aliquip ex ea commodo consequat.
+        </p>
+
+        <h4>Gauge Reading</h4>
+
+        <!-- Gauge detail -->
+        <GaugeReadings
+          :gauge-id="location.id"
+          :kind="location.other.kind"
+        />
+
+        <template v-if="location.other.kind === 'Aware'">
+          <h4>Current Snapshot</h4>
+          <img :src="'https://images.flashflood.info:8282/' + location.other.data.modemNumber + '/' + location.other.data.pictureFilenameOnServer"/>
+        </template>
+
+        <h4>Gauge Information</h4>
+
+      </template>
 
       <!-- Camera detail -->
       <template v-else-if="location.other.kind === 'Camera'">
+        <h2>{{ location.name }}</h2>
+        
         <p v-if="location.other.data.locationDescription">
           {{ location.other.data.locationDescription }}
         </p>
+        
         <a :href="location.other.data.pageUrl" target="_blank" rel="noopener noreferrer">
           View camera feed
         </a>
+
+        <CameraVideoPlayer :video-url="location.other.data.pageUrl" />
+
+        <!-- <video id="camera-video" controls="" autoplay="" muted="" playsinline="" src="blob:https://oemstream.online/7d85b03c-8517-4351-a68a-069ee7affeed"></video> -->
+
       </template>
     </div>
 
@@ -49,7 +75,7 @@ defineExpose({ focus: () => closeBtn.value?.focus() })
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden;
+  overflow-y: scroll;
 }
 
 .location-detail__header {

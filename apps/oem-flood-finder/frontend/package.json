@@ -17,8 +17,9 @@
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
     "@phila/phila-ui-button": "^2.2.1",
-"@phila/phila-ui-collapse-panel": "^0.0.3",
+    "@phila/phila-ui-collapse-panel": "^0.0.3",
     "@pinboard/ui": "workspace:*",
+    "hls.js": "^1.6.15",
     "vue": "^3.5.27",
     "vue-router": "^5.0.1"
   },

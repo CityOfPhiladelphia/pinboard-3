@@ -80,14 +80,17 @@ import LocationDetail from './components/LocationDetail.vue'
           :hovered="hoveredId === loc.id"
           :selected="selectedId === loc.id"
           :style="isVisible(loc) ? undefined : { visibility: 'hidden', pointerEvents: 'none' }"
-          @mouseenter="onHover(loc.id)"
-          @mouseleave="onHoverEnd()"
+
           @click="onSelect(loc)"
         />
       </MapMarker>
     </template>
   </Pinboard>
 </template>
+
+
+          <!-- @mouseenter="onHover(loc.id)"
+          @mouseleave="onHoverEnd()" -->
 
 <style>
 * {

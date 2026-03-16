@@ -1,8 +1,8 @@
 /** Shared types for OEM Flood Finder */
 
 export type LocationDTO = {
-  awareGauges: Gauge[],
-  usgsGauges: Gauge[],
+  awareGauges: AwareGauge[],
+  usgsGauges: UsgsGauge[],
   cameras: Camera[]
 }
 
@@ -13,17 +13,32 @@ export type Location = {
   longitude: number,
   lastUpdated: Date | null,
   other:
-    { kind: 'Aware', data: Gauge } |
-    { kind: 'Usgs', data: Gauge } |
+    { kind: 'Aware', data: AwareGauge } |
+    { kind: 'Usgs', data: UsgsGauge } |
     { kind: 'Camera', data: Camera }
 }
 
-export type Gauge = {
+export type UsgsGauge = {
   gaugeId: string,
   name: string,
   latitude: number,
   longitude: number,
   lastUpdated: Date | null,
+  actionStage: number,
+  minorStage: number,
+  moderateStage: number,
+  stageUnits: string,
+  floodImpacts: object[]
+}
+
+export type AwareGauge = {
+  gaugeId: string,
+  name: string,
+  latitude: number,
+  longitude: number,
+  lastUpdated: Date | null,
+  modemNumber: string,
+  pictureFilenameOnServer: string,
   actionStage: number,
   minorStage: number,
   moderateStage: number,
