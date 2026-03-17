@@ -21,5 +21,6 @@
       "profile": "oit-flood-monitoring-cc",
       "vpc": "ProdCityNetVpc"
     }
-  }
+  },
+  "frontendBuildCommand": "build-only"
 }
