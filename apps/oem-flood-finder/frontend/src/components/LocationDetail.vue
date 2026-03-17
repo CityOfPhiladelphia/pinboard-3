@@ -3,11 +3,18 @@ import type { Location } from '../types'
 import { ref } from 'vue'
 import GaugeReadings from './GaugeReadings.vue'
 import CameraVideoPlayer from './CameraVideoPlayer.vue'
+import { useLocationDetail } from '../composables/useLocationDetail'
 
 const props = defineProps<{
   location: Location,
   onClose: (event: MouseEvent) => void
 }>()
+
+const readingState = useLocationDetail(
+  () => props.location.id,
+  () => props.location.other.kind,
+  5
+)
 
 const closeBtn = ref<HTMLButtonElement>()
 
@@ -34,10 +41,7 @@ defineExpose({ focus: () => closeBtn.value?.focus() })
         <h4>Gauge Reading</h4>
 
         <!-- Gauge detail -->
-        <GaugeReadings
-          :gauge-id="location.id"
-          :kind="location.other.kind"
-        />
+        <GaugeReadings :reading-state="readingState" />
 
         <template v-if="location.other.kind === 'Aware'">
           <h4>Current Snapshot</h4>

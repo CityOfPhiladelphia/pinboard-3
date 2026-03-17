@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { useLocationDetail } from '../composables/useLocationDetail'
+import type { ReadingState } from '../composables/useLocationDetail'
 
-const props = defineProps<{ gaugeId: string, kind: 'Aware' | 'Usgs' }>()
-
-const readingState = useLocationDetail(() => props.gaugeId, () => props.kind, 5)
+defineProps<{ readingState: ReadingState }>()
 </script>
 
 <template>
