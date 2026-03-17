@@ -4,3 +4,4 @@ dist
 *.local
 cdk.out
 .claude/
+docs/superpowers/

@@ -2,8 +2,9 @@
 import '@phila/phila-ui-core/styles/template-light.css'
 import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader } from '@phila/phila-ui-app-header'
-import { h, ref, computed, watch, nextTick, useSlots, inject, type FunctionalComponent, type Ref } from 'vue'
-import { PINBOARD_CONFIG_KEY, type State, type Location } from '../types'
+import { h, ref, computed, watch, nextTick, useSlots, inject, type FunctionalComponent } from 'vue'
+import { PINBOARD_CONFIG_KEY, type Location } from '../types'
+import { usePinboardStore } from '../stores/pinboard'
 import SearchFilterPanel from './SearchFilterPanel.vue'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
@@ -26,67 +27,47 @@ defineSlots<{
   }): unknown
 }>()
 
+const props = defineProps<{
+  locations?: Location[]
+}>()
+
 const config = inject(PINBOARD_CONFIG_KEY)!
 const slots = useSlots()
+const store = usePinboardStore()
 
-const state: Ref<State> = config.useLocations()
-const loadedData = computed(() => state.value.kind === 'Loaded' ? state.value.data : undefined)
-const loadedGeojson = computed(() => state.value.kind === 'Loaded' ? state.value.geojson : undefined)
+// Feed data from the injected composable into the store
+const composableState = config.useLocations()
+watch(composableState, (newState) => store.setAppData(newState), { immediate: true })
 
-const finderActive = ref(false)
-const activePanel = ref<'locations' | 'map'>('locations')
+// Use prop-provided locations (filtered by app) or fall back to all locations
+const displayLocations = computed(() => props.locations ?? store.allLocations)
 
-function togglePanel() {
-  activePanel.value = activePanel.value === 'locations' ? 'map' : 'locations'
-}
-const selectedLocation = ref<Location | null>(null)
+// Focus management — stays local (DOM concern, not shared state)
 const returnFocusTarget = ref<HTMLElement | null>(null)
-const hoveredId = ref<string | null>(null)
-const selectedId = computed(() => selectedLocation.value?.id ?? null)
-const detailOpen = computed(() => selectedLocation.value !== null)
-
-watch(loadedData, (data) => {
-  if (selectedLocation.value && data && !data.some(loc => loc.id === selectedLocation.value!.id)) {
-    selectedLocation.value = null
-  }
-})
-
-function activateFinder() {
-  finderActive.value = true
-}
-
-function deactivateFinder() {
-  finderActive.value = false
-}
 
 const MobileNavContent: FunctionalComponent = () =>
   h('div', { class: 'content nav-flyout has-background-ghost-gray is-flex is-12 is-12-mobile', tabindex: -1 }, [
     h('div', { class: 'p-4' }, [
-      h('h4', null, h('a', { href: '#', onClick: (e: Event) => { e.preventDefault(); deactivateFinder() } }, 'Home')),
-      h('h4', null, h('a', { href: '#', onClick: (e: Event) => { e.preventDefault(); activateFinder() } }, 'Finder')),
+      h('h4', null, h('a', { href: '#', onClick: (e: Event) => { e.preventDefault(); store.deactivateFinder() } }, 'Home')),
+      h('h4', null, h('a', { href: '#', onClick: (e: Event) => { e.preventDefault(); store.activateFinder() } }, 'Finder')),
     ]),
   ])
 
 function onHover(id: string) {
-  hoveredId.value = id
+  store.hoverLocation(id)
 }
 
 function onHoverEnd() {
-  hoveredId.value = null
+  store.hoverLocation(null)
 }
 
 function onSelect(location: Location) {
-  if (selectedLocation.value?.id === location.id) {
-    selectedLocation.value = null
-    return
-  }
   returnFocusTarget.value = document.activeElement as HTMLElement
-  selectedLocation.value = location
-  finderActive.value = true
+  store.selectLocation(location)
 }
 
 function onClose(e: MouseEvent) {
-  selectedLocation.value = null
+  store.clearSelection()
   nextTick(() => returnFocusTarget.value?.focus())
 }
 </script>
@@ -107,24 +88,24 @@ function onClose(e: MouseEvent) {
     <main class="pinboard-main">
       <div class="finder-panel">
 
-        <div class="finder-panel-locations" :class="{ 'is-active': activePanel === 'locations' }">
-          <template v-if="finderActive">
+        <div class="finder-panel-locations" :class="{ 'is-active': store.activePanel === 'locations' }">
+          <template v-if="store.finderActive">
             <slot name="locations-header" />
-            <SearchFilterPanel v-if="loadedData" :locations="loadedData" />
+            <SearchFilterPanel v-if="store.isLoaded" :locations="displayLocations" />
 
-            <div v-if="state.kind === 'Loading'" class="status-message">
+            <div v-if="store.isLoading" class="status-message">
               Loading...
             </div>
 
-            <div v-else-if="state.kind === 'Error'" class="status-message status-message--error">
-              {{ state.message }}
+            <div v-else-if="store.errorMessage" class="status-message status-message--error">
+              {{ store.errorMessage }}
             </div>
 
             <LocationsPanel
-              v-else-if="loadedData"
-              :locations="loadedData"
-              :hovered-id="hoveredId"
-              :selected-id="selectedId"
+              v-else-if="store.isLoaded"
+              :locations="displayLocations"
+              :hovered-id="store.hoveredId"
+              :selected-id="store.selectedLocationId"
               :location-card-slot="slots['location-card']"
               @select="onSelect"
               @hover="onHover"
@@ -133,18 +114,18 @@ function onClose(e: MouseEvent) {
           </template>
 
           <div v-else class="home-content content">
-            <slot name="home" :activate-finder="activateFinder" />
+            <slot name="home" :activate-finder="store.activateFinder" />
           </div>
         </div>
 
-        <div class="finder-panel-map" :class="{ 'is-active': activePanel === 'map' }">
+        <div class="finder-panel-map" :class="{ 'is-active': store.activePanel === 'map' }">
           <MapPanel
-            v-if="loadedData"
+            v-if="store.isLoaded"
             :config="config.map"
-            :locations="loadedData"
-            :geojson="loadedGeojson"
-            :hovered-id="hoveredId"
-            :selected-id="selectedId"
+            :locations="displayLocations"
+            :geojson="store.geojson"
+            :hovered-id="store.hoveredId"
+            :selected-id="store.selectedLocationId"
             :on-hover="onHover"
             :on-hover-end="onHoverEnd"
             :on-select="(loc: unknown) => onSelect(loc as Location)"
@@ -153,15 +134,15 @@ function onClose(e: MouseEvent) {
         </div>
 
       </div>
-      <button class="mobile-panel-toggle" @click="togglePanel">
-        {{ activePanel === 'locations' ? 'Map view' : 'List view' }}
+      <button class="mobile-panel-toggle" @click="store.togglePanel">
+        {{ store.activePanel === 'locations' ? 'Map view' : 'List view' }}
       </button>
 
-      <div v-show="detailOpen" class="detail-overlay">
+      <div v-show="store.detailOpen" class="detail-overlay">
         <component
-          v-if="selectedLocation !== null && slots['location-detail']"
+          v-if="store.selectedLocation !== null && slots['location-detail']"
           :is="() => slots['location-detail']!({
-            location: selectedLocation!,
+            location: store.selectedLocation!,
             onClose,
           })"
         />
