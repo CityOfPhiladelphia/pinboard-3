@@ -3,12 +3,19 @@ import { defineStore } from 'pinia'
 import type { State, Location } from '../types'
 
 export const usePinboardStore = defineStore('pinboard', () => {
-  const appData = ref<State>({ kind: 'Loading' })
+  // Internal — not exposed. Consumers use the derived computeds below.
+  const _appData = ref<State>({ kind: 'Loading' })
+
+  const isLoading = computed(() => _appData.value.kind === 'Loading')
+  const isLoaded = computed(() => _appData.value.kind === 'Loaded')
+  const errorMessage = computed(() =>
+    _appData.value.kind === 'Error' ? _appData.value.message : null
+  )
   const allLocations = computed(() =>
-    appData.value.kind === 'Loaded' ? appData.value.data : []
+    _appData.value.kind === 'Loaded' ? _appData.value.data : []
   )
   const geojson = computed(() =>
-    appData.value.kind === 'Loaded' ? appData.value.geojson : undefined
+    _appData.value.kind === 'Loaded' ? _appData.value.geojson : undefined
   )
 
   // UI state
@@ -31,7 +38,7 @@ export const usePinboardStore = defineStore('pinboard', () => {
 
   // Actions
   function setAppData(newState: State) {
-    appData.value = newState
+    _appData.value = newState
   }
 
   function selectLocation(location: Location) {
@@ -64,7 +71,9 @@ export const usePinboardStore = defineStore('pinboard', () => {
   }
 
   return {
-    appData,
+    isLoading,
+    isLoaded,
+    errorMessage,
     allLocations,
     geojson,
     finderActive,

@@ -41,7 +41,6 @@ watch(composableState, (newState) => store.setAppData(newState), { immediate: tr
 
 // Use prop-provided locations (filtered by app) or fall back to all locations
 const displayLocations = computed(() => props.locations ?? store.allLocations)
-const isLoaded = computed(() => store.appData.kind === 'Loaded')
 
 // Focus management — stays local (DOM concern, not shared state)
 const returnFocusTarget = ref<HTMLElement | null>(null)
@@ -92,18 +91,18 @@ function onClose(e: MouseEvent) {
         <div class="finder-panel-locations" :class="{ 'is-active': store.activePanel === 'locations' }">
           <template v-if="store.finderActive">
             <slot name="locations-header" />
-            <SearchFilterPanel v-if="isLoaded" :locations="displayLocations" />
+            <SearchFilterPanel v-if="store.isLoaded" :locations="displayLocations" />
 
-            <div v-if="store.appData.kind === 'Loading'" class="status-message">
+            <div v-if="store.isLoading" class="status-message">
               Loading...
             </div>
 
-            <div v-else-if="store.appData.kind === 'Error'" class="status-message status-message--error">
-              {{ store.appData.kind === 'Error' ? store.appData.message : '' }}
+            <div v-else-if="store.errorMessage" class="status-message status-message--error">
+              {{ store.errorMessage }}
             </div>
 
             <LocationsPanel
-              v-else-if="isLoaded"
+              v-else-if="store.isLoaded"
               :locations="displayLocations"
               :hovered-id="store.hoveredId"
               :selected-id="store.selectedLocationId"
@@ -121,7 +120,7 @@ function onClose(e: MouseEvent) {
 
         <div class="finder-panel-map" :class="{ 'is-active': store.activePanel === 'map' }">
           <MapPanel
-            v-if="isLoaded"
+            v-if="store.isLoaded"
             :config="config.map"
             :locations="displayLocations"
             :geojson="store.geojson"
