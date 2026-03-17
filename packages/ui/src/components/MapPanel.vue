@@ -43,7 +43,7 @@ const SlotRenderer = defineComponent({
 </script>
 
 <template>
-  <div class="map-pane">
+  <div class="map-panel">
     <PhilaMap
       ref="mapRef"
       v-bind="config"
@@ -59,7 +59,7 @@ const SlotRenderer = defineComponent({
 </template>
 
 <style scoped>
-.map-pane {
+.map-panel {
   width: 100%;
   height: 100%;
   position: relative;

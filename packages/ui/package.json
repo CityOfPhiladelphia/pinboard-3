@@ -28,7 +28,6 @@
     "@phila/phila-ui-app-header": "^0.2.1-beta.0",
     "@phila/phila-ui-core": "2.3.1-beta.0",
     "@phila/phila-ui-cards": "^0.1.1-beta.0",
-    "@phila/phila-ui-collapse-panel": "^0.0.3-beta.0",
     "@phila/phila-ui-map-core": "0.0.3-beta.16",
     "@pinboard/core": "workspace:*"
   },

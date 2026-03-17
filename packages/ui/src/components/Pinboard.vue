@@ -2,7 +2,6 @@
 import '@phila/phila-ui-core/styles/template-light.css'
 import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader } from '@phila/phila-ui-app-header'
-import { CollapsePanel } from '@phila/phila-ui-collapse-panel'
 import { h, ref, computed, watch, nextTick, useSlots, inject, type FunctionalComponent, type Ref } from 'vue'
 import { PINBOARD_CONFIG_KEY, type State, type Location } from '../types'
 import SearchFilterPanel from './SearchFilterPanel.vue'
@@ -44,6 +43,7 @@ const selectedLocation = ref<Location | null>(null)
 const returnFocusTarget = ref<HTMLElement | null>(null)
 const hoveredId = ref<string | null>(null)
 const selectedId = computed(() => selectedLocation.value?.id ?? null)
+const detailOpen = computed(() => selectedLocation.value !== null)
 
 watch(loadedData, (data) => {
   if (selectedLocation.value && data && !data.some(loc => loc.id === selectedLocation.value!.id)) {
@@ -75,24 +75,19 @@ function onHoverEnd() {
   hoveredId.value = null
 }
 
-function onSelect(location: Location, onClickOpen: () => void, onClickToggle: (e: Event) => void) {
+function onSelect(location: Location) {
   if (selectedLocation.value?.id === location.id) {
     selectedLocation.value = null
-    onClickToggle(new Event('click'))
     return
   }
   returnFocusTarget.value = document.activeElement as HTMLElement
   selectedLocation.value = location
   finderActive.value = true
-  onClickOpen()
 }
 
-function onClose(onClickToggle: (e: Event) => void) {
-  return (e: MouseEvent) => {
-    onClickToggle(e)
-    selectedLocation.value = null
-    nextTick(() => returnFocusTarget.value?.focus())
-  }
+function onClose(e: MouseEvent) {
+  selectedLocation.value = null
+  nextTick(() => returnFocusTarget.value?.focus())
 }
 </script>
 
@@ -110,73 +105,67 @@ function onClose(onClickToggle: (e: Event) => void) {
     />
 
     <main class="pinboard-main">
-      <CollapsePanel id="detail-panel" class="detail-panel-wrapper">
-        <template #toggle="{ onClickOpen, onClickToggle }">
-          <div class="finder-panel">
+      <div class="finder-panel">
 
-            <div class="finder-panel-locations" :class="{ 'is-active': activePanel === 'locations' }">
-              <template v-if="finderActive">
-                <slot name="locations-header" />
-                <SearchFilterPanel v-if="loadedData" :locations="loadedData" />
+        <div class="finder-panel-locations" :class="{ 'is-active': activePanel === 'locations' }">
+          <template v-if="finderActive">
+            <slot name="locations-header" />
+            <SearchFilterPanel v-if="loadedData" :locations="loadedData" />
 
-                <div v-if="state.kind === 'Loading'" class="status-message">
-                  Loading...
-                </div>
-
-                <div v-else-if="state.kind === 'Error'" class="status-message status-message--error">
-                  {{ state.message }}
-                </div>
-
-                <LocationsPanel
-                  v-else-if="loadedData"
-                  :locations="loadedData"
-                  :hovered-id="hoveredId"
-                  :selected-id="selectedId"
-                  :location-card-slot="slots['location-card']"
-                  @select="(loc) => onSelect(loc, onClickOpen, onClickToggle)"
-                  @hover="onHover"
-                  @hover-end="onHoverEnd"
-                />
-              </template>
-
-              <div v-else class="home-content content">
-                <slot name="home" :activate-finder="activateFinder" />
-              </div>
+            <div v-if="state.kind === 'Loading'" class="status-message">
+              Loading...
             </div>
 
-            <div class="finder-panel-map" :class="{ 'is-active': activePanel === 'map' }">
-              <MapPanel
-                v-if="loadedData"
-                :config="config.map"
-                :locations="loadedData"
-                :geojson="loadedGeojson"
-                :hovered-id="hoveredId"
-                :selected-id="selectedId"
-                :on-hover="onHover"
-                :on-hover-end="onHoverEnd"
-                :on-select="(loc: unknown) => onSelect(loc as Location, onClickOpen, onClickToggle)"
-                :map-content-slot="slots['map-content']"
-              />
+            <div v-else-if="state.kind === 'Error'" class="status-message status-message--error">
+              {{ state.message }}
             </div>
 
-          </div>
-          <button class="mobile-panel-toggle" @click="togglePanel">
-            {{ activePanel === 'locations' ? 'Map view' : 'List view' }}
-          </button>
-        </template>
-
-        <template #default="{ hidden, onClickToggle }">
-          <div v-show="!hidden" id="detail-panel" class="detail-overlay">
-            <component
-              v-if="selectedLocation !== null && slots['location-detail']"
-              :is="() => slots['location-detail']!({
-                location: selectedLocation!,
-                onClose: onClose(onClickToggle),
-              })"
+            <LocationsPanel
+              v-else-if="loadedData"
+              :locations="loadedData"
+              :hovered-id="hoveredId"
+              :selected-id="selectedId"
+              :location-card-slot="slots['location-card']"
+              @select="onSelect"
+              @hover="onHover"
+              @hover-end="onHoverEnd"
             />
+          </template>
+
+          <div v-else class="home-content content">
+            <slot name="home" :activate-finder="activateFinder" />
           </div>
-        </template>
-      </CollapsePanel>
+        </div>
+
+        <div class="finder-panel-map" :class="{ 'is-active': activePanel === 'map' }">
+          <MapPanel
+            v-if="loadedData"
+            :config="config.map"
+            :locations="loadedData"
+            :geojson="loadedGeojson"
+            :hovered-id="hoveredId"
+            :selected-id="selectedId"
+            :on-hover="onHover"
+            :on-hover-end="onHoverEnd"
+            :on-select="(loc: unknown) => onSelect(loc as Location)"
+            :map-content-slot="slots['map-content']"
+          />
+        </div>
+
+      </div>
+      <button class="mobile-panel-toggle" @click="togglePanel">
+        {{ activePanel === 'locations' ? 'Map view' : 'List view' }}
+      </button>
+
+      <div v-show="detailOpen" class="detail-overlay">
+        <component
+          v-if="selectedLocation !== null && slots['location-detail']"
+          :is="() => slots['location-detail']!({
+            location: selectedLocation!,
+            onClose,
+          })"
+        />
+      </div>
     </main>
 
     <AppFooter :sub-footer-only="true" />
@@ -205,14 +194,9 @@ function onClose(onClickToggle: (e: Event) => void) {
 }
 
 .pinboard-main {
+  position: relative;
   flex: 1;
   overflow: hidden;
-}
-
-.detail-panel-wrapper {
-  position: relative;
-  width: 100%;
-  height: 100%;
 }
 
 .finder-panel {
