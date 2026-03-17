@@ -79,6 +79,8 @@ const filterOptions = [
           :hovered="hoveredId === loc.id"
           :selected="selectedId === loc.id"
           :style="floodFinder.filteredLocations.some((f: any) => f.id === loc.id) ? undefined : { visibility: 'hidden', pointerEvents: 'none' }"
+          @mouseenter="onHover(loc.id)"
+          @mouseleave="onHoverEnd()"
           @click="onSelect(loc)"
         />
       </MapMarker>
