@@ -1,5 +1,10 @@
 /** Shared types for OEM Flood Finder */
 
+export type FloodImpact = {
+  stage: number,
+  statement: string
+}
+
 export type LocationDTO = {
   awareGauges: AwareGauge[],
   usgsGauges: UsgsGauge[],
@@ -27,8 +32,11 @@ export type UsgsGauge = {
   actionStage: number,
   minorStage: number,
   moderateStage: number,
+  majorStage: number,
+  hydrographURL: string,
+  hydrographWithFloodCategoriesURL: string,
   stageUnits: string,
-  floodImpacts: object[]
+  floodImpacts: FloodImpact[]
 }
 
 export type AwareGauge = {
@@ -43,7 +51,7 @@ export type AwareGauge = {
   minorStage: number,
   moderateStage: number,
   stageUnits: string,
-  floodImpacts: object[]
+  floodImpacts: FloodImpact[]
 }
 
 export type Reading = {
