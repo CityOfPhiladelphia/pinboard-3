@@ -1,6 +1,6 @@
 import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
-import type { State, Location } from '../types'
+import type { State } from '../types'
 
 export const usePinboardStore = defineStore('pinboard', () => {
   // Internal — not exposed. Consumers use the derived computeds below.

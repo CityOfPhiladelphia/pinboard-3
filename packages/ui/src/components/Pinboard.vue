@@ -1,9 +1,9 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
 import '@phila/phila-ui-core/styles/template-light.css'
 import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader } from '@phila/phila-ui-app-header'
 import { h, ref, computed, watch, nextTick, useSlots, inject, type FunctionalComponent } from 'vue'
-import { PINBOARD_CONFIG_KEY, type Location } from '../types'
+import { PINBOARD_CONFIG_KEY } from '../types'
 import { usePinboardStore } from '../stores/pinboard'
 import SearchFilterPanel from './SearchFilterPanel.vue'
 import MapPanel from './MapPanel.vue'
@@ -12,10 +12,10 @@ import LocationsPanel from './LocationsPanel.vue'
 defineSlots<{
   home?(props: { activateFinder: () => void }): unknown
   'locations-header'?(props: {}): unknown
-  'location-card'?(props: { location: Location }): unknown
-  'location-detail'?(props: { location: Location; onClose: (e: MouseEvent) => void }): unknown
+  'location-card'?(props: { location: T }): unknown
+  'location-detail'?(props: { location: T; onClose: (e: MouseEvent) => void }): unknown
   'map-content'?(props: {
-    locations: unknown
+    locations: T[]
     geojson: unknown
     map: unknown
     zoom: number
@@ -23,12 +23,13 @@ defineSlots<{
     selectedId: string | null
     onHover: (id: string) => void
     onHoverEnd: () => void
-    onSelect: (loc: unknown) => void
+    onSelect: (loc: T) => void
   }): unknown
 }>()
 
 const props = defineProps<{
-  locations?: Location[]
+  locations: T[],
+  getId: (loc: T) => string  
 }>()
 
 const config = inject(PINBOARD_CONFIG_KEY)!
@@ -40,7 +41,7 @@ const composableState = config.useLocations()
 watch(composableState, (newState) => store.setAppData(newState), { immediate: true })
 
 // Use prop-provided locations (filtered by app) or fall back to all locations
-const displayLocations = computed(() => props.locations ?? store.allLocations)
+const displayLocations = computed(() => props.locations)
 
 // Focus management — stays local (DOM concern, not shared state)
 const returnFocusTarget = ref<HTMLElement | null>(null)
@@ -61,7 +62,7 @@ function onHoverEnd() {
   store.hoverLocation(null)
 }
 
-function onSelect(location: Location) {
+function onSelect(location: T) {
   returnFocusTarget.value = document.activeElement as HTMLElement
   store.selectLocation(location)
 }
@@ -107,6 +108,7 @@ function onClose(e: MouseEvent) {
               :hovered-id="store.hoveredId"
               :selected-id="store.selectedLocationId"
               :location-card-slot="slots['location-card']"
+              :get-id="getId"
               @select="onSelect"
               @hover="onHover"
               @hover-end="onHoverEnd"
@@ -128,7 +130,7 @@ function onClose(e: MouseEvent) {
             :selected-id="store.selectedLocationId"
             :on-hover="onHover"
             :on-hover-end="onHoverEnd"
-            :on-select="(loc: unknown) => onSelect(loc as Location)"
+            :on-select="onSelect"
             :map-content-slot="slots['map-content']"
           />
         </div>

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
 import { ref, computed, defineComponent, h, type ComponentPublicInstance } from 'vue'
 import { Map as PhilaMap } from '@phila/phila-ui-map-core'
 import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css'
@@ -6,14 +6,14 @@ import type { MapConfig } from '../types'
 
 const props = defineProps<{
   config?: MapConfig
-  locations?: unknown
+  locations?: T[]
   geojson?: unknown
   hoveredId?: string | null
   selectedId?: string | null
   onHover?: (id: string) => void
   onHoverEnd?: () => void
-  onSelect?: (loc: unknown) => void
-  mapContentSlot?: (props: { locations: unknown; geojson: unknown; map: unknown; zoom: number; hoveredId: string | null; selectedId: string | null; onHover: (id: string) => void; onHoverEnd: () => void; onSelect: (loc: unknown) => void }) => unknown
+  onSelect?: (loc: T) => void
+  mapContentSlot?: (props: { locations: T[]; geojson: unknown; map: unknown; zoom: number; hoveredId: string | null; selectedId: string | null; onHover: (id: string) => void; onHoverEnd: () => void; onSelect: (loc: unknown) => void }) => unknown
 }>()
 
 const mapRef = ref<ComponentPublicInstance | null>(null)
