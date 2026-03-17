@@ -3,6 +3,7 @@ import type { Location } from '../types'
 import { ref } from 'vue'
 import GaugeReadings from './GaugeReadings.vue'
 import CameraVideoPlayer from './CameraVideoPlayer.vue'
+import FloodStatus from './FloodStatus.vue'
 import { useLocationDetail } from '../composables/useLocationDetail'
 
 const props = defineProps<{
@@ -33,10 +34,16 @@ defineExpose({ focus: () => closeBtn.value?.focus() })
       <template v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'"> 
         <h2>{{ location.name }}</h2>
         <p >
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
-          labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco 
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+          labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
           laboris nisi ut aliquip ex ea commodo consequat.
         </p>
+
+        <FloodStatus
+          v-if="location.other.kind === 'Usgs'"
+          :location="location"
+          :reading-state="readingState"
+        />
 
         <h4>Gauge Reading</h4>
 
