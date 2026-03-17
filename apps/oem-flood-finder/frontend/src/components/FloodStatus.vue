@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Location, UsgsGauge } from '../types'
+import type { Location } from '../types'
 import type { ReadingState } from '../composables/useLocationDetail'
 
 const props = defineProps<{
@@ -8,7 +8,10 @@ const props = defineProps<{
   readingState: ReadingState
 }>()
 
-const gaugeData = computed(() => props.location.other.data as UsgsGauge)
+const gaugeData = computed(() => {
+  if (props.location.other.kind !== 'Usgs') throw new Error('FloodStatus requires a Usgs location')
+  return props.location.other.data
+})
 const units = computed(() => gaugeData.value.stageUnits)
 
 const latestReading = computed(() => {
@@ -22,10 +25,10 @@ const floodLevel = computed(() => {
   if (currentHeight.value === null) return null
   const h = currentHeight.value
   const g = gaugeData.value
-  if (h >= g.majorStage) return 'Major'
-  if (h >= g.moderateStage) return 'Moderate'
-  if (h >= g.minorStage) return 'Minor'
-  if (h >= g.actionStage) return 'Action'
+  if (h >= g.majorStage) return 'Major flooding'
+  if (h >= g.moderateStage) return 'Moderate flooding'
+  if (h >= g.minorStage) return 'Minor flooding'
+  if (h >= g.actionStage) return 'Action stage reached'
   return null
 })
 
@@ -60,7 +63,7 @@ const stages = computed(() => [
     <template v-else-if="currentHeight !== null">
       <!-- Current status line -->
       <p v-if="floodLevel" class="flood-status__level flood-status__level--active">
-        Current: {{ currentHeight }} {{ units }} — {{ floodLevel }} flooding
+        Current: {{ currentHeight }} {{ units }} — {{ floodLevel }}
       </p>
       <p v-else class="flood-status__level">
         Current: {{ currentHeight }} {{ units }} — {{ distanceBelowAction }} {{ units }} below action stage
