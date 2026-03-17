@@ -68,9 +68,7 @@ defineExpose({ focus: () => closeBtn.value?.focus() })
         </a>
 
         <CameraVideoPlayer :video-url="location.other.data.pageUrl" />
-
-        <!-- <video id="camera-video" controls="" autoplay="" muted="" playsinline="" src="blob:https://oemstream.online/7d85b03c-8517-4351-a68a-069ee7affeed"></video> -->
-
+        
       </template>
     </div>
 

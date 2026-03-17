@@ -1,9 +1,9 @@
 {
-  "appName": "oem-flood-finder",
+  "appName": "flood-monitoring",
   "applicationType": "static-site",
   "department": "4-oit",
   "team": "Software Engineering",
-  "contact": "andy.rothwell@phila.gov",
+  "contact": "jake.rosenberg@phila.gov",
   "compliance": [],
   "confidentiality": "low",
   "cdkPath": "./cdk",

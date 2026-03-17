@@ -23,8 +23,8 @@ importers:
   apps/oem-flood-finder/cdk:
     dependencies:
       '@phila/constructs':
-        specifier: ^0.0.7
-        version: 0.0.7(aws-cdk-lib@2.237.1(constructs@10.4.5))(constructs@10.4.5)
+        specifier: ^0.2.0
+        version: 0.2.0(aws-cdk-lib@2.237.1(constructs@10.4.5))(cdk-nag@2.37.55(aws-cdk-lib@2.237.1(constructs@10.4.5))(constructs@10.4.5))(constructs@10.4.5)
       aws-cdk-lib:
         specifier: ^2.236.0
         version: 2.237.1(constructs@10.4.5)
@@ -979,12 +979,6 @@ packages:
     resolution: {integrity: sha512-3/KmyUOHNriL6rLpaFfm9RJxdhpXY2/Ehx9UuorJr2pUA+lrZL15FAEx/DOszYm5r10hfzj40+efAHcCilNvSQ==}
     cpu: [x64]
     os: [win32]
-
-  '@phila/constructs@0.0.7':
-    resolution: {integrity: sha512-UY67E13YLTYle/Vqcf1hBH69ewZkUqFb+s94QMSv5m0//eKvGE/dBaAniFKSjj8aXe/sVvhcOBh7XcZ1E+L1qg==}
-    peerDependencies:
-      aws-cdk-lib: ^2.236.0
-      constructs: ^10.4.4
 
   '@phila/constructs@0.2.0':
     resolution: {integrity: sha512-BnQ+99WUUVUFVrxxXJXdmfZprSa6Hf95gx9PW+yWuWHmcyij3wYALk6MEXctTCxckRRgtCYNRNnpDImbJgToCw==}
@@ -3413,12 +3407,6 @@ snapshots:
 
   '@oxlint/win32-x64@1.42.0':
     optional: true
-
-  '@phila/constructs@0.0.7(aws-cdk-lib@2.237.1(constructs@10.4.5))(constructs@10.4.5)':
-    dependencies:
-      aws-cdk-lib: 2.237.1(constructs@10.4.5)
-      cdk-nag: 2.37.55(aws-cdk-lib@2.237.1(constructs@10.4.5))(constructs@10.4.5)
-      constructs: 10.4.5
 
   '@phila/constructs@0.2.0(aws-cdk-lib@2.237.1(constructs@10.4.5))(cdk-nag@2.37.55(aws-cdk-lib@2.237.1(constructs@10.4.5))(constructs@10.4.5))(constructs@10.4.5)':
     dependencies:

@@ -3,7 +3,8 @@ import 'source-map-support/register'
 import { App, Aspects, Stack } from 'aws-cdk-lib'
 import { AwsSolutionsChecks, NIST80053R5Checks } from 'cdk-nag'
 import { StaticSite, Confidentiality, Environment } from '@phila/constructs'
-
+import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
+import { HostedZone } from 'aws-cdk-lib/aws-route53';
 const app = new App()
 
 // Environment is determined by CDK context
@@ -11,7 +12,13 @@ const environment = app.node.tryGetContext('environment') as Environment
 
 if (!environment) {
   throw new Error(
-    'Environment must be specified via context. Use: cdk deploy -c environment=dev'
+    'Environment must be specified via context. Use: cdk deploy -c environment=test'
+  )
+}
+
+if (environment === "dev") {
+  throw new Error(
+    'Environment must be test or prod. Dev is not on the cloud.'
   )
 }
 
@@ -21,28 +28,46 @@ const complianceFrameworks = compliance ? compliance.split(',') : []
 
 // Application context with governance metadata
 const context = {
-  appName: 'oem-flood-finder',
+  appName: 'flood-monitoring',
   environment,
   department: '4-oit',
   team: 'Software Engineering',
-  contact: 'andy.rothwell@phila.gov',
+  contact: 'jake.rosenberg@phila.gov',
   compliance: complianceFrameworks,
   confidentiality: Confidentiality.LOW,
 }
 
-// Stack name follows pattern: {appName}-{environment}
-const stack = new Stack(app, 'oem-flood-finder-' + environment, {
+const stack = new Stack(app, `cloudfront-stack-${environment}`, {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION || 'us-east-1',
   },
-  stackName: 'oem-flood-finder-' + environment,
+  stackName: `cloudfront-stack-${environment}`,
 })
 
+const domainName = environment === 'prod'
+  ? `${context.appName}.phila.gov`
+  : `${context.appName}-${environment}.phila.gov`;
+
+
+const hostedZone = HostedZone.fromLookup(stack as any, 'HostedZone', {
+  domainName,
+});
+
+const dnsValidatedCertificate = new Certificate(stack as any, 'Certificate', {
+  domainName,
+  certificateName: `phila-gov-dns-cert-frontend-${environment}`, // is this right?
+  validation:
+    CertificateValidation.fromDns(hostedZone),
+});
+
+
 // Scope as any so linked @phila/constructs resolves to a single Construct type at runtime.
-new StaticSite(stack as any, 'oem-flood-finderSite', {
+new StaticSite(stack as any, 'StaticSite', {
   ...context,
   assetDir: '../frontend/dist',
+  certificate: dnsValidatedCertificate,
+  hostedZone
 })
 
 // Apply compliance checks
