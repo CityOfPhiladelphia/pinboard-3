@@ -2,8 +2,7 @@ import type { LocationDTO, Location } from '@/types'
 import { reactive, ref, computed, onMounted, type Ref } from 'vue'
 import type { State } from '@pinboard/ui'
 
-export const locationMode = ref<'all' | 'gauges' | 'cameras'>('all')
-export const allLocations = ref<Location[]>([])
+const allLocations = ref<Location[]>([])
 export const gaugeHeights = reactive(new Map<string, string>())
 
 function transformLocationDTO(dto: LocationDTO): Location[] {
@@ -45,14 +44,6 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
   return locations
 }
 
-function filterByMode(locations: Location[], mode: 'all' | 'gauges' | 'cameras'): Location[] {
-  if (mode === 'all') return locations
-  if (mode === 'gauges') {
-    return locations.filter(loc => loc.other.kind === 'Aware' || loc.other.kind === 'Usgs')
-  }
-  return locations.filter(loc => loc.other.kind === 'Camera')
-}
-
 export function useLocations(): Ref<State> {
   const fetchState = ref<'loading' | 'loaded' | 'error'>('loading')
   const errorMessage = ref('')
@@ -60,7 +51,7 @@ export function useLocations(): Ref<State> {
   const state = computed<State>(() => {
     if (fetchState.value === 'loading') return { kind: 'Loading' }
     if (fetchState.value === 'error') return { kind: 'Error', message: errorMessage.value }
-    return { kind: 'Loaded', data: filterByMode(allLocations.value, locationMode.value) }
+    return { kind: 'Loaded', data: allLocations.value }
   })
 
   async function fetchLocations() {
