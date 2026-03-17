@@ -22,7 +22,7 @@ export default defineConfig({
       external: (id) => {
         // Allow map-core CSS to be bundled into our output
         if (id.includes('@phila/phila-ui-map-core') && id.endsWith('.css')) return false
-        return ['vue', 'vue-router', '@pinboard/core', '@phila/phila-ui-collapse-panel', '@phila/phila-ui-map-core'].some(dep => id === dep || id.startsWith(dep + '/'))
+        return ['vue', 'vue-router', '@pinboard/core', '@phila/phila-ui-map-core'].some(dep => id === dep || id.startsWith(dep + '/'))
       },
       output: {
         globals: {
