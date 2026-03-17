@@ -37,11 +37,11 @@ const store = usePinboardStore()
 
 // Feed data from the injected composable into the store
 const composableState = config.useLocations()
-watch(composableState, (newState) => store.setState(newState), { immediate: true })
+watch(composableState, (newState) => store.setAppData(newState), { immediate: true })
 
 // Use prop-provided locations (filtered by app) or fall back to all locations
 const displayLocations = computed(() => props.locations ?? store.allLocations)
-const isLoaded = computed(() => store.state.kind === 'Loaded')
+const isLoaded = computed(() => store.appData.kind === 'Loaded')
 
 // Focus management — stays local (DOM concern, not shared state)
 const returnFocusTarget = ref<HTMLElement | null>(null)
@@ -94,12 +94,12 @@ function onClose(e: MouseEvent) {
             <slot name="locations-header" />
             <SearchFilterPanel v-if="isLoaded" :locations="displayLocations" />
 
-            <div v-if="store.state.kind === 'Loading'" class="status-message">
+            <div v-if="store.appData.kind === 'Loading'" class="status-message">
               Loading...
             </div>
 
-            <div v-else-if="store.state.kind === 'Error'" class="status-message status-message--error">
-              {{ store.state.kind === 'Error' ? store.state.message : '' }}
+            <div v-else-if="store.appData.kind === 'Error'" class="status-message status-message--error">
+              {{ store.appData.kind === 'Error' ? store.appData.message : '' }}
             </div>
 
             <LocationsPanel
