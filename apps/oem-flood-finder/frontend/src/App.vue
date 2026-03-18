@@ -59,7 +59,7 @@ const filterOptions = [
 
     <template #location-detail="{ location, onClose }">
       <LocationDetail
-        :location="location"
+        :location="location as Location"
         :on-close="onClose"
       />
     </template>
@@ -79,8 +79,6 @@ const filterOptions = [
           :hovered="hoveredId === loc.id"
           :selected="selectedId === loc.id"
           :style="floodFinder.filteredLocations.some((f: any) => f.id === loc.id) ? undefined : { visibility: 'hidden', pointerEvents: 'none' }"
-          @mouseenter="onHover(loc.id)"
-          @mouseleave="onHoverEnd()"
           @click="onSelect(loc)"
         />
       </MapMarker>
