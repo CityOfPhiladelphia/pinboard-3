@@ -17,14 +17,8 @@ export interface MapConfig {
   ariaLabel?: string
 }
 
-export type State =
-  | { kind: 'Loading' }
-  | { kind: 'Loaded'; data: Location[]; geojson?: unknown }
-  | { kind: 'Error'; message: string }
-
 export interface PinboardConfig {
   title: string
-  useLocations: () => Ref<State>
   map?: MapConfig
 }
 

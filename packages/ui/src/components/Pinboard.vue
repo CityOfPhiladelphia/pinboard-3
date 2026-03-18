@@ -2,9 +2,8 @@
 import '@phila/phila-ui-core/styles/template-light.css'
 import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader } from '@phila/phila-ui-app-header'
-import { h, ref, computed, watch, nextTick, useSlots, inject, type FunctionalComponent } from 'vue'
+import { useSlots, inject, ref } from 'vue'
 import { PINBOARD_CONFIG_KEY } from '../types'
-import { usePinboardStore } from '../stores/pinboard'
 import SearchFilterPanel from './SearchFilterPanel.vue'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
@@ -13,7 +12,7 @@ defineSlots<{
   home?(props: { activateFinder: () => void }): unknown
   'locations-header'?(props: {}): unknown
   'location-card'?(props: { location: T }): unknown
-  'location-detail'?(props: { location: T; onClose: (e: MouseEvent) => void }): unknown
+  'location-detail' ? (props: { locationId: string }): unknown
   'map-content'?(props: {
     locations: T[]
     geojson: unknown
@@ -29,48 +28,20 @@ defineSlots<{
 
 const props = defineProps<{
   locations: T[],
-  getId: (loc: T) => string  
+  getId: (loc: T) => string,
+  isLoading: boolean,
+  errorMessage: string | null,
+  geojson?: unknown
 }>()
 
 const config = inject(PINBOARD_CONFIG_KEY)!
 const slots = useSlots()
-const store = usePinboardStore()
+// const store = usePinboardStore()
 
-// Feed data from the injected composable into the store
-const composableState = config.useLocations()
-watch(composableState, (newState) => store.setAppData(newState), { immediate: true })
+const hoveredLocationId = ref<string | null>(null);
+const selectedLocationId = ref<string | null>(null);
+const activeMobilePanel = ref<'list' | 'map'>('list');
 
-// Use prop-provided locations (filtered by app) or fall back to all locations
-const displayLocations = computed(() => props.locations)
-
-// Focus management — stays local (DOM concern, not shared state)
-const returnFocusTarget = ref<HTMLElement | null>(null)
-
-const MobileNavContent: FunctionalComponent = () =>
-  h('div', { class: 'content nav-flyout has-background-ghost-gray is-flex is-12 is-12-mobile', tabindex: -1 }, [
-    h('div', { class: 'p-4' }, [
-      h('h4', null, h('a', { href: '#', onClick: (e: Event) => { e.preventDefault(); store.deactivateFinder() } }, 'Home')),
-      h('h4', null, h('a', { href: '#', onClick: (e: Event) => { e.preventDefault(); store.activateFinder() } }, 'Finder')),
-    ]),
-  ])
-
-function onHover(id: string) {
-  store.hoverLocation(id)
-}
-
-function onHoverEnd() {
-  store.hoverLocation(null)
-}
-
-function onSelect(location: T) {
-  returnFocusTarget.value = document.activeElement as HTMLElement
-  store.selectLocation(location)
-}
-
-function onClose(e: MouseEvent) {
-  store.clearSelection()
-  nextTick(() => returnFocusTarget.value?.focus())
-}
 </script>
 
 <template>
@@ -78,7 +49,6 @@ function onClose(e: MouseEvent) {
     <AppHeader
       id="pinboard-nav"
       :show-trusted-site="true"
-      :mobile-nav="MobileNavContent"
       :links="[]"
       :navbar-brand="{
         brandingImage: { src: '', href: '/', altText: 'City of Philadelphia' },
@@ -89,66 +59,53 @@ function onClose(e: MouseEvent) {
     <main class="pinboard-main">
       <div class="finder-panel">
 
-        <div class="finder-panel-locations" :class="{ 'is-active': store.activePanel === 'locations' }">
-          <template v-if="store.finderActive">
+        <div v-if="activeMobilePanel === 'list'" class="finder-panel-locations">
+          <template>
             <slot name="locations-header" />
-            <SearchFilterPanel v-if="store.isLoaded" :locations="displayLocations" />
+            <SearchFilterPanel :locations="locations" />
 
-            <div v-if="store.isLoading" class="status-message">
+            <div v-if="isLoading" class="status-message">
               Loading...
             </div>
 
-            <div v-else-if="store.errorMessage" class="status-message status-message--error">
-              {{ store.errorMessage }}
+            <div v-else-if="errorMessage" class="status-message status-message--error">
+              {{ errorMessage }}
             </div>
 
             <LocationsPanel
-              v-else-if="store.isLoaded"
-              :locations="displayLocations"
-              :hovered-id="store.hoveredId"
-              :selected-id="store.selectedLocationId"
+              v-else-if="!isLoading"
+              :locations="locations"
+              :hovered-id="hoveredLocationId"
+              :selected-id="selectedLocationId"
               :location-card-slot="slots['location-card']"
               :get-id="getId"
-              @select="onSelect"
-              @hover="onHover"
-              @hover-end="onHoverEnd"
             />
           </template>
 
-          <div v-else class="home-content content">
-            <slot name="home" :activate-finder="store.activateFinder" />
-          </div>
         </div>
 
-        <div class="finder-panel-map" :class="{ 'is-active': store.activePanel === 'map' }">
+        <div v-if="activeMobilePanel === 'map'" class="finder-panel-map">
           <MapPanel
-            v-if="store.isLoaded"
+            v-if="!isLoading"
             :config="config.map"
-            :locations="displayLocations"
-            :geojson="store.geojson"
-            :hovered-id="store.hoveredId"
-            :selected-id="store.selectedLocationId"
-            :on-hover="onHover"
-            :on-hover-end="onHoverEnd"
-            :on-select="onSelect"
+            :locations="locations"
+            :geojson="geojson"
+            :hovered-id="hoveredLocationId"
+            :selected-id="selectedLocationId"
             :map-content-slot="slots['map-content']"
           />
         </div>
 
       </div>
-      <button class="mobile-panel-toggle" @click="store.togglePanel">
-        {{ store.activePanel === 'locations' ? 'Map view' : 'List view' }}
+      <button class="mobile-panel-toggle" @click="activeMobilePanel=activeMobilePanel==='list' ? 'map' : 'list'">
+        {{ activeMobilePanel === 'list' ? 'Map view' : 'List view' }}
       </button>
 
-      <div v-show="store.detailOpen" class="detail-overlay">
-        <component
-          v-if="store.selectedLocation !== null && slots['location-detail']"
-          :is="() => slots['location-detail']!({
-            location: store.selectedLocation!,
-            onClose,
-          })"
-        />
+      <div v-if="selectedLocationId !== null" class="detail-overlay">
+        <slot name="location-detail" :locationId="selectedLocationId" />
       </div>
+
+
     </main>
 
     <AppFooter :sub-footer-only="true" />

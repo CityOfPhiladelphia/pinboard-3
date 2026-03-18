@@ -1,15 +1,33 @@
 <script setup lang="ts">
-import { Pinboard, MapMarker, MapIconTextPin, usePinboardStore } from '@pinboard/ui'
+import { Pinboard, MapMarker, MapIconTextPin } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
-import { useFloodFinderStore } from './stores/floodFinder'
-import { gaugeHeights } from './composables/useLocations'
+import { useLocations } from './composables/useLocations'
 import type { Location } from './types'
 import LocationDetail from './components/LocationDetail.vue'
+import { computed, ref } from 'vue'
 
-const pinboard = usePinboardStore()
-const floodFinder = useFloodFinderStore()
+const locationsState = useLocations();
+
+const locationMode = ref<'all' | 'gauges' | 'cameras'>('all')
+
+const filteredLocations = computed(() => {
+  if (locationMode.value === 'all' && locationsState.value.kind === 'Loaded') {
+    return locationsState.value.data
+  }
+
+  if (locationMode.value === 'gauges' && locationsState.value.kind === 'Loaded') {
+    return locationsState.value.data.filter((loc) => loc.other.kind==='Aware' || loc.other.kind==='Usgs')
+  }
+
+  if (locationMode.value === 'cameras' && locationsState.value.kind === 'Loaded') {
+    return locationsState.value.data.filter((loc) => loc.other.kind==='Camera')
+  }
+
+  return []
+})
+
 
 function isGauge(loc: Location): boolean {
   return loc.other.kind === 'Aware' || loc.other.kind === 'Usgs'
@@ -23,7 +41,7 @@ const filterOptions = [
 </script>
 
 <template>
-  <Pinboard :locations="floodFinder.filteredLocations">
+  <Pinboard :locations="filteredLocations">
     <template #home="{ activateFinder }">
       <h3>Eastwick Flood Mapping</h3>
       <p>
@@ -45,8 +63,8 @@ const filterOptions = [
         <button
           v-for="opt in filterOptions"
           :key="opt.value"
-          :class="['filter-pill', { active: floodFinder.locationMode === opt.value }]"
-          @click="floodFinder.locationMode = opt.value"
+          :class="['filter-pill', { active: locationMode === opt.value }]"
+          @click="locationMode = opt.value"
         >
           {{ opt.label }}
         </button>
@@ -66,19 +84,19 @@ const filterOptions = [
 
     <template #map-content="{ hoveredId, selectedId, zoom, onHover, onHoverEnd, onSelect }">
       <MapMarker
-        v-for="loc in pinboard.allLocations"
+        v-if="locationsState.kind==='Loaded'"
+        v-for="loc in locationsState.data"
         :key="loc.id"
-        :lng-lat="[(loc as any).longitude, (loc as any).latitude]"
+        :lng-lat="[(loc).longitude, (loc).latitude]"
         :z-index="hoveredId === loc.id || selectedId === loc.id ? 10 : undefined"
       >
         <MapIconTextPin
           :zoom="zoom"
-          :icon="isGauge(loc as any) ? faGauge : faCamera"
-          :text="isGauge(loc as any) ? gaugeHeights.get(loc.id) : undefined"
-          :color-theme="isGauge(loc as any) ? 'dark-primary' : 'dark-error'"
+          :icon="isGauge(loc) ? faGauge : faCamera"
+          :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'"
           :hovered="hoveredId === loc.id"
           :selected="selectedId === loc.id"
-          :style="floodFinder.filteredLocations.some((f: any) => f.id === loc.id) ? undefined : { visibility: 'hidden', pointerEvents: 'none' }"
+          :style="filteredLocations.some((f) => f.id === loc.id) ? undefined : { visibility: 'hidden', pointerEvents: 'none' }"
           @mouseenter="onHover(loc.id)"
           @mouseleave="onHoverEnd()"
           @click="onSelect(loc)"

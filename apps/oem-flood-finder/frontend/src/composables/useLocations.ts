@@ -1,9 +1,7 @@
 import type { LocationDTO, Location } from '@/types'
-import { reactive, ref, computed, onMounted, type Ref } from 'vue'
-import type { State } from '@pinboard/ui'
+import { ref, onMounted, type Ref } from 'vue'
 
-const allLocations = ref<Location[]>([])
-export const gaugeHeights = reactive(new Map<string, string>())
+type State = { kind: 'Loading' } | { kind: 'Loaded', data: Location[] } | { kind: 'Error', message: string }
 
 function transformLocationDTO(dto: LocationDTO): Location[] {
   const locations: Location[] = []
@@ -45,61 +43,35 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
 }
 
 export function useLocations(): Ref<State> {
-  const fetchState = ref<'loading' | 'loaded' | 'error'>('loading')
-  const errorMessage = ref('')
 
-  const state = computed<State>(() => {
-    if (fetchState.value === 'loading') return { kind: 'Loading' }
-    if (fetchState.value === 'error') return { kind: 'Error', message: errorMessage.value }
-    return { kind: 'Loaded', data: allLocations.value }
-  })
+  // set to Loading initially
+  const state = ref<State>({ kind: 'Loading' })
 
   async function fetchLocations() {
-    const myHeaders = new Headers()
-    myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
+
+    const myHeaders = new Headers();
+    myHeaders.append("x-api-key", import.meta.env.VITE_FLOOD_API_KEY || "");
 
     const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/location/all`, {
-      method: 'GET',
+      method: "GET",
       headers: myHeaders,
-      redirect: 'follow',
-    })
+      redirect: "follow"
+    });
 
     if (!response.ok) {
-      fetchState.value = 'error'
-      errorMessage.value = 'Error retrieving gauges'
-      return
+      state.value = { kind: 'Error', message: "Error retrieving gauges" };
+      return;
     }
 
-    const data: LocationDTO = await response.json()
-    allLocations.value = transformLocationDTO(data)
-    fetchState.value = 'loaded'
-    fetchGaugeHeights(allLocations.value, myHeaders)
-  }
+    const data = await response.json();
 
-  async function fetchGaugeHeights(locations: Location[], headers: Headers) {
-    const gauges = locations.filter(loc => loc.other.kind === 'Aware' || loc.other.kind === 'Usgs')
+    const transformedLocations = transformLocationDTO(data)
 
-    await Promise.allSettled(gauges.map(async (loc) => {
-      const kind = loc.other.kind.toLowerCase()
-      const response = await fetch(
-        `${import.meta.env.VITE_FLOOD_API_BASE_URL}/${kind}/reading/${loc.id}?limit=1`,
-        { method: 'GET', headers, redirect: 'follow' },
-      )
-      if (!response.ok) return
+    state.value = { kind: 'Loaded', data: transformedLocations };
 
-      const readings = await response.json()
-      if (!readings.length) return
-
-      const reading = readings[0]
-      if (reading.gaugeHeight < -100) return
-
-      const heightInInches = reading.gaugeHeightUnit === 'ft'
-        ? Math.round(reading.gaugeHeight * 12 * 100) / 100
-        : reading.gaugeHeight
-      gaugeHeights.set(loc.id, `${heightInInches} in`)
-    }))
   }
 
   onMounted(fetchLocations)
+
   return state
 }
