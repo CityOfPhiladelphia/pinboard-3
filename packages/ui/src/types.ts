@@ -1,5 +1,5 @@
 // packages/ui/src/types.ts
-import type { InjectionKey, Ref } from 'vue'
+import type { InjectionKey } from 'vue'
 
 export type MapControlPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 

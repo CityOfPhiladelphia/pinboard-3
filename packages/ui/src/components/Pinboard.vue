@@ -64,32 +64,31 @@ const selectedLocationUnsafe = computed<T>(() => selectedLocation.value!)
     <main class="pinboard-main">
       <div class="finder-panel">
 
-        <div v-if="activeMobilePanel === 'list'" class="finder-panel-locations">
-          <template>
-            <slot name="locations-header" />
-            <SearchFilterPanel :locations="locations" />
+        <div class="finder-panel-locations" :class="{ 'is-active': activeMobilePanel === 'list' }">
+          <slot name="locations-header" />
 
-            <div v-if="isLoading" class="status-message">
-              Loading...
-            </div>
+          <SearchFilterPanel :locations="locations" />
 
-            <div v-else-if="errorMessage" class="status-message status-message--error">
-              {{ errorMessage }}
-            </div>
+          <div v-if="isLoading" class="status-message">
+            Loading...
+          </div>
 
-            <LocationsPanel
-              v-else-if="!isLoading"
-              :locations="locations"
-              :hovered-id="hoveredLocationId"
-              :selected-id="selectedLocationId"
-              :location-card-slot="slots['location-card']"
-              :get-id="getId"
-            />
-          </template>
+          <div v-else-if="errorMessage" class="status-message status-message--error">
+            {{ errorMessage }}
+          </div>
+
+          <LocationsPanel
+            v-else-if="!isLoading"
+            :locations="locations"
+            :hovered-id="hoveredLocationId"
+            :selected-id="selectedLocationId"
+            :location-card-slot="slots['location-card']"
+            :get-id="getId"
+          />
 
         </div>
 
-        <div v-if="activeMobilePanel === 'map'" class="finder-panel-map">
+        <div class="finder-panel-map" :class="{ 'is-active': activeMobilePanel === 'map' }">
           <MapPanel
             v-if="!isLoading"
             :config="config.map"
