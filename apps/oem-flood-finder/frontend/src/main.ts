@@ -6,10 +6,10 @@ import { useLocations } from './composables/useLocations'
 
 const app = createApp(App)
 
-app.use(createPinia())
+// app.use(createPinia())
 app.use(createPinboard({
   title: '',
-  useLocations: () => useLocations(),
+  // useLocations: useLocations,
   map: {
     center: [-75.16, 39.95],
     zoom: 11,

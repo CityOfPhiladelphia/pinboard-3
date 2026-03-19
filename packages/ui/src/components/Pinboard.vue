@@ -2,7 +2,7 @@
 import '@phila/phila-ui-core/styles/template-light.css'
 import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader } from '@phila/phila-ui-app-header'
-import { useSlots, inject, ref } from 'vue'
+import { useSlots, inject, ref, computed } from 'vue'
 import { PINBOARD_CONFIG_KEY } from '../types'
 import SearchFilterPanel from './SearchFilterPanel.vue'
 import MapPanel from './MapPanel.vue'
@@ -12,7 +12,7 @@ defineSlots<{
   home?(props: { activateFinder: () => void }): unknown
   'locations-header'?(props: {}): unknown
   'location-card'?(props: { location: T }): unknown
-  'location-detail' ? (props: { locationId: string }): unknown
+  'location-detail' ? (props: { location: T }): unknown
   'map-content'?(props: {
     locations: T[]
     geojson: unknown
@@ -39,8 +39,13 @@ const slots = useSlots()
 // const store = usePinboardStore()
 
 const hoveredLocationId = ref<string | null>(null);
-const selectedLocationId = ref<string | null>(null);
+const selectedLocation = ref<T | null>(null);
 const activeMobilePanel = ref<'list' | 'map'>('list');
+
+const selectedLocationId = computed(() => selectedLocation.value === null ? null : props.getId(selectedLocation.value))
+
+// Only access thhis when a location is actually selected
+const selectedLocationUnsafe = computed<T>(() => selectedLocation.value!)
 
 </script>
 
@@ -101,8 +106,8 @@ const activeMobilePanel = ref<'list' | 'map'>('list');
         {{ activeMobilePanel === 'list' ? 'Map view' : 'List view' }}
       </button>
 
-      <div v-if="selectedLocationId !== null" class="detail-overlay">
-        <slot name="location-detail" :locationId="selectedLocationId" />
+      <div v-if="selectedLocation !== null" class="detail-overlay">
+        <slot name="location-detail" :location="selectedLocationUnsafe" />
       </div>
 
 

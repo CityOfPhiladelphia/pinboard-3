@@ -3,12 +3,10 @@ import type { Location } from '../types'
 import { ref } from 'vue'
 import GaugeReadings from './GaugeReadings.vue'
 import CameraVideoPlayer from './CameraVideoPlayer.vue'
-import FloodStatus from './FloodStatus.vue'
 import { useLocationDetail } from '../composables/useLocationDetail'
 
 const props = defineProps<{
-  location: Location,
-  onClose: (event: MouseEvent) => void
+  location: Location
 }>()
 
 const readingState = useLocationDetail(
@@ -26,7 +24,7 @@ defineExpose({ focus: () => closeBtn.value?.focus() })
   <div class="location-detail content">
 
     <div class="location-detail__header">
-      <button ref="closeBtn" class="close-btn" aria-label="Close panel" @click="onClose">✕</button>
+      <button ref="closeBtn" class="close-btn" aria-label="Close panel">✕</button>
     </div>
 
     <div class="location-detail__body">
@@ -38,12 +36,6 @@ defineExpose({ focus: () => closeBtn.value?.focus() })
           labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
           laboris nisi ut aliquip ex ea commodo consequat.
         </p>
-
-        <FloodStatus
-          v-if="location.other.kind === 'Usgs'"
-          :location="location"
-          :reading-state="readingState"
-        />
 
         <h4>Gauge Reading</h4>
 

@@ -8,24 +8,27 @@ import type { Location } from './types'
 import LocationDetail from './components/LocationDetail.vue'
 import { computed, ref } from 'vue'
 
-const locationsState = useLocations();
+const { locations, isLoading, errorMessage } = useLocations();
 
 const locationMode = ref<'all' | 'gauges' | 'cameras'>('all')
 
 const filteredLocations = computed(() => {
-  if (locationMode.value === 'all' && locationsState.value.kind === 'Loaded') {
-    return locationsState.value.data
-  }
 
-  if (locationMode.value === 'gauges' && locationsState.value.kind === 'Loaded') {
-    return locationsState.value.data.filter((loc) => loc.other.kind==='Aware' || loc.other.kind==='Usgs')
-  }
+  if (!isLoading.value && errorMessage.value === null) {
 
-  if (locationMode.value === 'cameras' && locationsState.value.kind === 'Loaded') {
-    return locationsState.value.data.filter((loc) => loc.other.kind==='Camera')
-  }
+    if (locationMode.value === 'all') {
+      return locations.value
+    }
 
-  return []
+    if (locationMode.value === 'gauges') {
+      return locations.value.filter((loc) => loc.other.kind==='Aware' || loc.other.kind==='Usgs')
+    }
+
+    if (locationMode.value === 'cameras') {
+      return locations.value.filter((loc) => loc.other.kind==='Camera')
+    }
+  } 
+    return []
 })
 
 
@@ -41,7 +44,12 @@ const filterOptions = [
 </script>
 
 <template>
-  <Pinboard :locations="filteredLocations">
+  <Pinboard 
+    :locations="filteredLocations" 
+    :get-id="(loc: Location) => loc.id"
+    :is-loading="isLoading"
+    :error-message="errorMessage"
+  >
     <template #home="{ activateFinder }">
       <h3>Eastwick Flood Mapping</h3>
       <p>
@@ -75,17 +83,16 @@ const filterOptions = [
       {{ location.name }}
     </template>
 
-    <template #location-detail="{ location, onClose }">
+    <template #location-detail="{ location }">
       <LocationDetail
         :location="location"
-        :on-close="onClose"
       />
     </template>
 
     <template #map-content="{ hoveredId, selectedId, zoom, onHover, onHoverEnd, onSelect }">
       <MapMarker
-        v-if="locationsState.kind==='Loaded'"
-        v-for="loc in locationsState.data"
+        v-if="!isLoading"
+        v-for="loc in locations"
         :key="loc.id"
         :lng-lat="[(loc).longitude, (loc).latitude]"
         :z-index="hoveredId === loc.id || selectedId === loc.id ? 10 : undefined"

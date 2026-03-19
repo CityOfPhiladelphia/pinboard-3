@@ -1,7 +1,5 @@
 import type { LocationDTO, Location } from '@/types'
-import { ref, onMounted, type Ref } from 'vue'
-
-type State = { kind: 'Loading' } | { kind: 'Loaded', data: Location[] } | { kind: 'Error', message: string }
+import { ref, onMounted  } from 'vue'
 
 function transformLocationDTO(dto: LocationDTO): Location[] {
   const locations: Location[] = []
@@ -42,10 +40,12 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
   return locations
 }
 
-export function useLocations(): Ref<State> {
+export function useLocations() {
 
   // set to Loading initially
-  const state = ref<State>({ kind: 'Loading' })
+  let isLoading = ref(true);
+  let errorMessage = ref<string | null>(null);
+  let locations = ref<Location[]>([]);
 
   async function fetchLocations() {
 
@@ -59,19 +59,16 @@ export function useLocations(): Ref<State> {
     });
 
     if (!response.ok) {
-      state.value = { kind: 'Error', message: "Error retrieving gauges" };
+      errorMessage.value = "Error retrieving gauges";
       return;
     }
 
-    const data = await response.json();
 
-    const transformedLocations = transformLocationDTO(data)
-
-    state.value = { kind: 'Loaded', data: transformedLocations };
-
+    locations.value =  transformLocationDTO(await response.json());
+    isLoading.value = false;
   }
 
-  onMounted(fetchLocations)
+  onMounted(fetchLocations);
 
-  return state
+  return { locations, isLoading, errorMessage };
 }

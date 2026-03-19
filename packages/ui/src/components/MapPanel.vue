@@ -45,7 +45,7 @@ const SlotRenderer = defineComponent({
 <template>
   <div class="map-panel">
     <PhilaMap
-      ref="mapRef"
+      :ref="mapRef"
       v-bind="config"
       @zoom="zoom = $event"
     >
