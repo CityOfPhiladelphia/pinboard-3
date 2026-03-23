@@ -6,11 +6,13 @@ import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { useLocations } from './composables/useLocations'
 import type { Location } from './types'
 import LocationDetail from './components/LocationDetail.vue'
-import { computed, ref } from 'vue'
+import { computed, h, ref, type FunctionalComponent } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations();
 
 const locationMode = ref<'all' | 'gauges' | 'cameras'>('all')
+
+const view = ref<'home' | 'finder' | 'glossary'>('home')
 
 const filteredLocations = computed(() => {
 
@@ -41,29 +43,58 @@ const filterOptions = [
   { value: 'gauges' as const, label: 'Gauge' },
   { value: 'cameras' as const, label: 'Camera' },
 ]
+
+const mobileNavContent: FunctionalComponent = () =>
+  h('div', { class: 'content nav-flyout has-background-ghost-gray is-flex is-12 is-12-mobile', tabindex: -1 }, [
+    h('div', { class: 'p-4' }, [
+      h('h4', null, h('a', { href: '#', onClick: (e: Event) => { e.preventDefault(); } }, 'Home' )),
+      h('h4', null, h('a', { href: '#', onClick: (e: Event) => { e.preventDefault(); } }, 'Finder' )),
+      h('h4', null, h('a', { href: '#', onClick: (e: Event) => { e.preventDefault(); } }, 'Glossary'))
+    ]),
+  ])
+
+
 </script>
 
 <template>
+  <h1>{{ view }}</h1>
   <Pinboard 
     :locations="filteredLocations" 
     :get-id="(loc: Location) => loc.id"
     :is-loading="isLoading"
     :error-message="errorMessage"
+    :nav-component="mobileNavContent"
+    :override="view === 'home' || view === 'glossary'"
   >
-    <template #home="{ activateFinder }">
-      <h3>Eastwick Flood Mapping</h3>
-      <p>
-        The Eastwick flood mapping application provides real-time data from water gauges and cameras
-        in the Eastwick neighborhood. Residents can use this tool to monitor current flood conditions.
-        The data can help residents make informed decisions to protect their homes and families. The
-        app also provides historical flood data, which can help residents understand long-term trends.
-        The City of Philadelphia is committed to providing residents with the resources they need to
-        stay safe during flooding events. The Eastwick flood mapping application provides real-time
-        data from water gauges and cameras in the Eastwick neighborhood. Residents can use this tool
-        to monitor current flood conditions. The data can help residents make informed decisions to
-        protect their homes and families.
-      </p>
-      <PhilaButton text="View List" @click="activateFinder" />
+    <template #location-override>
+
+      <div v-if="view === 'home'">
+        <h3>Eastwick Flood Mapping</h3>
+        <p>
+          The Eastwick flood mapping application provides real-time data from water gauges and cameras
+          in the Eastwick neighborhood. Residents can use this tool to monitor current flood conditions.
+          The data can help residents make informed decisions to protect their homes and families. The
+          app also provides historical flood data, which can help residents understand long-term trends.
+          The City of Philadelphia is committed to providing residents with the resources they need to
+          stay safe during flooding events. The Eastwick flood mapping application provides real-time
+          data from water gauges and cameras in the Eastwick neighborhood. Residents can use this tool
+          to monitor current flood conditions. The data can help residents make informed decisions to
+          protect their homes and families.
+        </p>
+        <PhilaButton text="View List" @click="() => view = 'finder'" />
+      </div>
+
+      <div v-if="view === 'glossary'">
+        Brett: a guy who preaches.
+      </div>
+    </template>
+
+    <template #nav>
+      <ul>
+        <li> <button @click="() => view = 'home'"> Home </button> </li>
+        <li> <button @click="() => view = 'finder'"> Finder </button> </li>
+        <li> <button @click="() => view = 'glossary'"> Glossary </button> </li>
+      </ul>
     </template>
 
     <template #locations-header>
