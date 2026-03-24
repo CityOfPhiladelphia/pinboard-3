@@ -8,6 +8,17 @@ import SearchFilterPanel from './SearchFilterPanel.vue'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import { Logo } from "@phila/phila-ui-logo";
+import {
+  faTimes, 
+  faBars,   
+  faCaretDown,
+  faCaretUp,
+  faLock,
+  faBuildingColumns,
+  faClose,
+  faInfoCircle, 
+} from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 defineSlots<{
   home?(props: { activateFinder: () => void }): unknown
@@ -76,33 +87,92 @@ function closeLocationDetail() {
 <template>
   <div class="pinboard">
 
-    <div>
-      <!-- American flag -->
-      <svg width="16" height="11" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"
-        xmlns:xlink="http://www.w3.org/1999/xlink">
-        <rect width="16" height="11" fill="url(#pattern0_61022_1867)" />
-        <defs>
-          <pattern id="pattern0_61022_1867" patternContentUnits="objectBoundingBox" width="1" height="1">
-            <use xlink:href="#image0_61022_1867" transform="scale(0.0625 0.0909091)" />
-          </pattern>
-          <image id="image0_61022_1867" width="16" height="11" preserveAspectRatio="none"
-            xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAMAAABBPP0LAAAAG1BMVEUdM7EeNLIeM7HgQCDaPh/bPh/bPx/////bPyBEby41AAAAUElEQVQI123MNw4CABDEwD3jC/9/MQ1BQrgeOSkIqYe2o2FZtthXgQLgbHVMZdlsfUQFQnHtjP1+8BUhBDKOqtmfot6ojqPzR7TjdU+f6vkED+IDPhTBcMAAAAAASUVORK5CYII=" />
-        </defs>
-      </svg>
+    <div class="trusted-banner-and-translations">
 
-      An official website of the City of Philadelphia government
-      <button @click="() => howYouKnow = !howYouKnow">Here's how you know {{ howYouKnow ? '▴' : '▾' }}</button>
+      <div class="banner-content">
+
+        <!-- American flag -->
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink">
+          <rect width="16" height="11" fill="url(#pattern0_61022_1867)" />
+          <defs>
+            <pattern id="pattern0_61022_1867" patternContentUnits="objectBoundingBox" width="1" height="1">
+              <use xlink:href="#image0_61022_1867" transform="scale(0.0625 0.0909091)" />
+            </pattern>
+            <image id="image0_61022_1867" width="16" height="11" preserveAspectRatio="none"
+              xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAMAAABBPP0LAAAAG1BMVEUdM7EeNLIeM7HgQCDaPh/bPh/bPx/////bPyBEby41AAAAUElEQVQI123MNw4CABDEwD3jC/9/MQ1BQrgeOSkIqYe2o2FZtthXgQLgbHVMZdlsfUQFQnHtjP1+8BUhBDKOqtmfot6ojqPzR7TjdU+f6vkED+IDPhTBcMAAAAAASUVORK5CYII=" />
+          </defs>
+        </svg>
+        <!-- Text -->
+        <div class="official-text">An official website of the City of Philadelphia government</div>
+
+        <!-- Button -->
+        <div class="dropdown-icon">
+          <button class="how-you-know-button" @click="() => howYouKnow = !howYouKnow">
+            Here's how you know
+            <FontAwesomeIcon class="dropdown-arrow" :icon="howYouKnow ? faCaretUp : faCaretDown" />
+          </button>
+        </div>
+
+      </div>
+
     </div>
 
-    <div v-if="howYouKnow">
-      🔒 The https:// in the address bar means your information is encrypted and can not be accessed by anyone else
-      🏛️ Only government entities in the U.S. can end in .gov
-      <button @click="() => howYouKnow = false">✕</button>
+    <div v-if="howYouKnow" class="how-you-know-details">
+      <div class="details-container">
+        <div class="official-details">
+          <div class="official-details-icon-group">
+
+            <span class="icon circle-icon p-3 mb-2">
+              <FontAwesomeIcon :icon="faLock" />
+            </span>
+
+            <div class="official-details-icon-text">
+              https://
+            </div>
+          </div>
+
+          <div class="official-details-text">
+            <p class="official-details-text-description">
+              The https:// in the address bar means your information is encrypted and can not be accessed by anyone else
+            </p>
+          </div>
+
+        </div>
+
+        <div class="official-details">
+          <div class="official-details-icon-group">
+
+            <span class="icon circle-icon p-3 mb-2">
+              <FontAwesomeIcon :icon="faBuildingColumns" />
+            </span>
+
+            <div class="official-details-icon-text">
+              .gov
+            </div>
+
+          </div>
+
+          <div class="official-details-text">
+            <p class="official-details-text-description">
+              Only government entities in the U.S. can end in .gov
+            </p>
+          </div>
+
+        </div>
+      </div>
+      <button class="official-close-button" @click="() => howYouKnow = false">
+        <FontAwesomeIcon :icon="faClose" />
+      </button>
     </div>
 
-    <div>
-      <button @click="() => navOpen = !navOpen"> {{ navOpen ? '✕' : '≡' }} </button>
-      <Logo variant="city" layout="stacked" color-scheme="on-primary" class="phila-navbar-logo" />
+    <div class="navbar-content">
+      <button id="nav-button" @click="() => navOpen = !navOpen"> 
+        <FontAwesomeIcon class="nav-burger" :icon="navOpen ? faTimes : faBars" />
+      </button>
+      <div class="phila-navbar-brand">
+        <Logo variant="city" layout="stacked" color-scheme="on-primary" class="phila-navbar-logo" />
+      </div>
     </div>
 
     <div v-if="navOpen">
@@ -110,10 +180,10 @@ function closeLocationDetail() {
     </div>
 
 
-    <AppHeader id="pinboard-nav" :show-trusted-site="true" :mobile-nav="navComponent" :links="[]" :navbar-brand="{
+    <!-- <AppHeader id="pinboard-nav" :show-trusted-site="true" :mobile-nav="navComponent" :links="[]" :navbar-brand="{
       brandingImage: { src: '', href: '/', altText: 'City of Philadelphia' },
       brandingLink: { text: config.title, href: '/' },
-    }" />
+    }" /> -->
 
     <main class="pinboard-main">
       <div class="finder-panel">
@@ -178,6 +248,189 @@ function closeLocationDetail() {
 </style>
 
 <style scoped>
+
+.official-close-button {
+  border: none;
+  display: flex;
+  width: var(--scale-400, 2rem);
+  height: var(--scale-400, 2rem);
+  max-width: 18.75rem;
+  padding: var(--spacing-xs, 0.5rem);
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-xs, 0.5rem);
+  flex-shrink: 0;
+}
+
+.circle-icon {
+  border: solid 1px;
+  border-radius: 100%;
+  width: 2.5rem;
+  height: 2.5rem;
+  aspect-ratio: 1/1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.official-details-text-description {
+  font-family: var(--Body-Small-font-body-small-family, Montserrat);
+  font-size: var(--Body-Small-font-body-small-size, 0.875rem);
+  font-style: normal;
+  font-weight: 400;
+  line-height: var(--Body-Small-font-body-small-lineheight, 1.25rem);
+}
+
+.official-details-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-2xs, 0.25rem);
+  flex: 1 0 0;
+  align-self: stretch;
+}
+
+.official-details-icon-text {
+  font-family: var(--Label-Default-font-label-default-family, Montserrat);
+  font-size: var(--Label-Default-font-label-default-size, 1rem);
+  font-style: normal;
+  font-weight: 600;
+  line-height: var(--Label-Default-font-label-default-lineheight, 1.5rem); /* 150% */
+}
+
+.official-details-icon-group {
+  display: flex;
+  width: 3.75rem;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs, 0.5rem);
+}
+
+.official-details {
+  display: flex;
+  min-width: 12.4375rem;
+  max-width: 31.25rem;
+  align-items: flex-start;
+  gap: var(--spacing-m, 1rem);
+  flex: 1 0 0;
+}
+
+.details-container {
+  display: flex;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: 3rem var(--spacing-3xl, 3rem);
+  flex: 1 0 0;
+  flex-wrap: wrap;
+  color: #00008D;
+}
+
+.how-you-know-details {
+  display: flex;
+  padding: var(--spacing-m, 1rem) var(--spacing-l, 1.5rem) var(--spacing-m, 1rem) var(--spacing-xl, 2rem);
+  justify-content: space-between;
+  align-items: flex-start;
+  align-self: stretch;
+  background: #EEE7FF;
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 0.5rem);
+  flex: 1 0 0;
+  align-self: stretch;
+}
+
+.official-text {
+  color: var(--Schemes-On-Surface-High, #000);
+
+  /* Body/XSmall */
+  font-family: var(--Body-ExtraSmall-font-body-xs-family, Montserrat);
+  font-size: var(--Body-ExtraSmall-font-body-xs-size, 0.75rem);
+  font-style: normal;
+  font-weight: 400;
+  line-height: var(--Body-ExtraSmall-font-body-xs-lineheight, 1rem); /* 133.333% */
+}
+
+.trusted-banner-and-translations {
+  display: flex;
+  height: 3rem;
+  padding: 0 var(--spacing-m, 1rem);
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  background: var(--ghost-grey-700-ghost-grey, #F0F0F0);
+}
+
+.dropdown-icon {
+  display: flex;
+  padding-top: var(--spacing-3xs, 0.125rem);
+  align-items: center;
+  gap: var(--spacing-3xs, 0.125rem);
+}
+
+.dropdown-arrow {
+  color: var(--Extended-Colors-link-default, #1034F4);
+
+  /* Icons/Solid/XSmall */
+  font-family: var(--Base-font-variables-Family-font-family-icon, "Font Awesome 7 Pro");
+  font-size: var(--Icon-Solid-ExtraSmall-font-icon-solid-xs-size, 1rem);
+  font-style: normal;
+  font-weight: 900;
+  line-height: normal;
+}
+
+.how-you-know-button {
+  overflow: hidden;
+  color: var(--Schemes-Primary, #1034F4);
+  text-align: center;
+  text-overflow: ellipsis;
+  border: none;
+
+  /* Label/XSmall */
+  font-family: var(--Label-ExtraSmall-font-label-xs-family, Montserrat);
+  font-size: var(--Label-ExtraSmall-font-label-xs-size, 0.75rem);
+  font-style: normal;
+  font-weight: 600;
+  line-height: var(--Label-ExtraSmall-font-label-xs-lineheight, 1rem); /* 133.333% */
+}
+
+.phila-navbar-logo {
+  padding-left: var(--spacing-xl, 2rem);
+  font-size: 1.2rem;
+}
+
+.phila-navbar-brand {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.navbar-content {
+  display: flex;
+  flex-direction: row;
+  background: var(--union-blue-200-union-blue, #162B9A);
+}
+
+.nav-burger {
+  width: 2rem;
+  height: 2rem;
+}
+
+#nav-button {
+  color: var(--Schemes-On-Surface);
+  background: var(--flyers-orange-450-flyers-orange, #EC6738);
+  width: var(--scale-1000, 5rem);
+  height: var(--scale-1000, 5rem);
+  border: none;
+}
+
+#nav-button:hover {
+  background: var(--Schemes-Inverse-Surface, #333);
+  color: white
+}
+
 .pinboard {
   display: flex;
   flex-direction: column;

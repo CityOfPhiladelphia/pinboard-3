@@ -57,7 +57,7 @@ const mobileNavContent: FunctionalComponent = () =>
 </script>
 
 <template>
-  <h1>{{ view }}</h1>
+  <!-- <h1>{{ view }}</h1> -->
   <Pinboard 
     :locations="filteredLocations" 
     :get-id="(loc: Location) => loc.id"
@@ -85,7 +85,7 @@ const mobileNavContent: FunctionalComponent = () =>
       </div>
 
       <div v-if="view === 'glossary'">
-        Brett: a guy who preaches.
+        Flood: when gauge height passes flood threshold.
       </div>
     </template>
 
