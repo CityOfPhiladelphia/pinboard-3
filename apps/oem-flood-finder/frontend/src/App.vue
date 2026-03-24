@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Pinboard, MapMarker, MapIconTextPin, usePinboardStore } from '@pinboard/ui'
+import { Pinboard, MapMarker, MapIconTextPin, MapNavigationControl, GeolocationButton, BasemapToggle, usePinboardStore } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
@@ -70,6 +70,9 @@ const filterOptions = [
     </template>
 
     <template #map-content="{ hoveredId, selectedId, zoom, onHover, onHoverEnd, onSelect }">
+      <MapNavigationControl position="bottom-left" />
+      <GeolocationButton position="bottom-left" />
+      <BasemapToggle position="top-right" />
       <MapMarker
         v-for="loc in sortedLocations"
         :key="loc.id"
