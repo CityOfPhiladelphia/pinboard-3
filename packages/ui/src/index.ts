@@ -1,4 +1,5 @@
-export { default as Pinboard } from './components/Pinboard.vue'
+import PinboardShell from './components/PinboardShell.vue'
+import Pinboard from './components/Pinboard.vue'
 export { createPinboard } from './plugin'
 export type { PinboardConfig, MapConfig } from './types'
 
@@ -12,3 +13,5 @@ export {
   MapMarker,
   MapIconTextPin,
 } from '@phila/phila-ui-map-core'
+
+export { PinboardShell, Pinboard }

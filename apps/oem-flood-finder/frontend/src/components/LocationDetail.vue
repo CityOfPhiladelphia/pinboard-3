@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Location } from '../types'
-import { ref } from 'vue'
 import GaugeReadings from './GaugeReadings.vue'
 import CameraVideoPlayer from './CameraVideoPlayer.vue'
 import { useLocationDetail } from '../composables/useLocationDetail'
@@ -15,17 +14,10 @@ const readingState = useLocationDetail(
   5
 )
 
-const closeBtn = ref<HTMLButtonElement>()
-
-defineExpose({ focus: () => closeBtn.value?.focus() })
 </script>
 
 <template>
   <div class="location-detail content">
-
-    <div class="location-detail__header">
-      <button ref="closeBtn" class="close-btn" aria-label="Close panel">✕</button>
-    </div>
 
     <div class="location-detail__body">
 
