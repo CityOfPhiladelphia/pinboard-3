@@ -4,13 +4,11 @@ import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { useLocations } from '../composables/useLocations'
 import type { Location } from '../types'
 import LocationDetail from '../components/LocationDetail.vue'
-import { computed, h, ref, type FunctionalComponent } from 'vue'
+import { computed, ref } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations()
 
 const locationMode = ref<'all' | 'gauges' | 'cameras'>('all')
-
-const view = ref<'home' | 'finder' | 'glossary'>('home')
 
 const filteredLocations = computed(() => {
   if (!isLoading.value && errorMessage.value === null) {
@@ -50,7 +48,6 @@ const filterOptions = [
     :get-id="(loc: Location) => loc.id"
     :is-loading="isLoading"
     :error-message="errorMessage"
-    :override="view === 'home' || view === 'glossary'"
   >
     <template #locations-header>
       <div class="location-filters">
