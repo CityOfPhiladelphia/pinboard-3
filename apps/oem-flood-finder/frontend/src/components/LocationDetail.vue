@@ -62,7 +62,10 @@ const readingState = useLocationDetail(
           View camera feed
         </a>
 
-        <CameraVideoPlayer :video-url="location.other.data.pageUrl" />
+        <CameraVideoPlayer 
+          :video-url="location.other.data.pageUrl"
+          :autoplay="true"
+        />
         
       </template>
     </div>
@@ -75,23 +78,7 @@ const readingState = useLocationDetail(
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow-y: scroll;
-}
-
-.location-detail__header {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0.5rem;
-  flex-shrink: 0;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 1.25rem;
-  line-height: 1;
-  padding: 0.25rem 0.5rem;
-  cursor: pointer;
+  overflow-y: auto;
 }
 
 .location-detail__body {

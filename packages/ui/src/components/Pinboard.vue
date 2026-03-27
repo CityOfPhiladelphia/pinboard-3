@@ -181,12 +181,6 @@ function closeLocationDetail() {
   overflow: hidden;
 }
 
-.home-content {
-  height: 100%;
-  overflow-y: auto;
-  padding: 2rem;
-}
-
 .status-message {
   padding: 1rem;
   color: var(--Schemes-On-Surface, #333);
