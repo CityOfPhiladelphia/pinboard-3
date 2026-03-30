@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { Pinboard, MapMarker, MapIconTextPin } from '@pinboard/ui'
+import { 
+  Pinboard, 
+  MapMarker, 
+  MapIconTextPin, 
+  MapNavigationControl, 
+  GeolocationButton, 
+  BasemapToggle 
+} from '@pinboard/ui'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { useLocations } from '../composables/useLocations'
 import type { Location } from '../types'
@@ -12,18 +19,23 @@ const locationMode = ref<'all' | 'gauges' | 'cameras'>('all')
 
 const filteredLocations = computed(() => {
   if (!isLoading.value && errorMessage.value === null) {
+    const sortedLocations: Location[] = [...locations.value].sort((a, b) => b.latitude - a.latitude)
+
     if (locationMode.value === 'all') {
-      return locations.value
+      return sortedLocations
     }
 
     if (locationMode.value === 'gauges') {
-      return locations.value.filter(
-        (loc) => loc.other.kind === 'Aware' || loc.other.kind === 'Usgs',
+      return sortedLocations.filter(loc =>
+        loc.other.kind === 'Aware' ||
+        loc.other.kind === 'Usgs'
       )
     }
 
     if (locationMode.value === 'cameras') {
-      return locations.value.filter((loc) => loc.other.kind === 'Camera')
+      return sortedLocations.filter(loc =>
+        loc.other.kind === 'Camera'
+      )
     }
   }
   return []
@@ -72,12 +84,16 @@ const filterOptions = [
 
     <template #map-content="{ hoveredId, selectedId, zoom, onHover, onHoverEnd, onSelect }">
 
+      <MapNavigationControl position="bottom-left" />
+      <GeolocationButton position="bottom-left" />
+      <BasemapToggle position="top-right" />
+
       <MapMarker
         v-if="!isLoading"
         v-for="loc in locations"
         :key="loc.id"
         :lng-lat="[loc.longitude, loc.latitude]"
-        :z-index="hoveredId === loc.id || selectedId === loc.id ? 10 : undefined"
+        :z-index="hoveredId === loc.id || selectedId === loc.id ? 10000 : Math.round((90 - loc.latitude) * 100)"
       >
         <MapIconTextPin
           :zoom="zoom"
