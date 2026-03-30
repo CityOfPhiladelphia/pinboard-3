@@ -90,10 +90,9 @@ const filterOptions = [
 
       <MapMarker
         v-if="!isLoading"
-        v-for="loc in locations"
+        v-for="loc in filteredLocations"
         :key="loc.id"
         :lng-lat="[loc.longitude, loc.latitude]"
-        :z-index="hoveredId === loc.id || selectedId === loc.id ? 10000 : Math.round((90 - loc.latitude) * 100)"
       >
         <MapIconTextPin
           :zoom="zoom"

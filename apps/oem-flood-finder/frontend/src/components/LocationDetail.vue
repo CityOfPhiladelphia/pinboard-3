@@ -39,11 +39,15 @@ const readingState = useLocationDetail(
 
         <h4>Gauge Information</h4>
           <table>
-            <tr><th>Last Updated</th><th>Coordinates</th></tr>
-            <tr>
-              <td>{{ location.lastUpdated }}</td>
-              <td>{{ location.latitude }}, {{ location.longitude }}</td>
-            </tr>
+            <thead>
+              <tr><th>Last Updated</th><th>Coordinates</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ location.lastUpdated }}</td>
+                <td>{{ location.latitude }}, {{ location.longitude }}</td>
+              </tr>
+            </tbody>
           </table>
 
       </template>

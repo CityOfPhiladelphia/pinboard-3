@@ -16,11 +16,15 @@ const props = defineProps<{
 
     <!-- Graph will go here -->
     <table >
-      <tr><th>Created On</th><th>Height</th></tr>
-      <tr v-for="reading in readingState.data" :key="reading.readingId">
-        <td>{{ reading.createdOn }}</td>
-        <td>{{ reading.gaugeHeight }}</td>
-      </tr>
+      <thead>
+        <tr><th>Created On</th><th>Height</th></tr>
+      </thead>
+      <tbody>
+        <tr v-for="reading in readingState.data" :key="reading.readingId">
+          <td>{{ reading.createdOn }}</td>
+          <td>{{ reading.gaugeHeight }}</td>
+        </tr>
+      </tbody>
     </table>
 
     <!-- Snapshot -->
