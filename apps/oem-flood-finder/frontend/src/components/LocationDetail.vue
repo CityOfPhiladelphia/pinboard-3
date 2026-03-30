@@ -32,12 +32,10 @@ const readingState = useLocationDetail(
         <h4>Gauge Reading</h4>
 
         <!-- Gauge detail -->
-        <GaugeReadings :reading-state="readingState" />
-
-        <template v-if="location.other.kind === 'Aware'">
-          <h4>Current Snapshot</h4>
-          <img :src="'https://images.flashflood.info:8282/' + location.other.data.modemNumber + '/' + location.other.data.pictureFilenameOnServer"/>
-        </template>
+        <GaugeReadings 
+          :reading-state="readingState"
+          :location="location"
+        />
 
         <h4>Gauge Information</h4>
           <table>
@@ -57,10 +55,6 @@ const readingState = useLocationDetail(
         <p v-if="location.other.data.locationDescription">
           {{ location.other.data.locationDescription }}
         </p>
-        
-        <a :href="location.other.data.pageUrl" target="_blank" rel="noopener noreferrer">
-          View camera feed
-        </a>
 
         <CameraVideoPlayer 
           :video-url="location.other.data.pageUrl"
