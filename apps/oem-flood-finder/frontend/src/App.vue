@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Pinboard, MapMarker, MapIconTextPin, usePinboardStore } from '@pinboard/ui'
+import { computed } from 'vue'
+import { Pinboard, MapMarker, MapIconTextPin, MapNavigationControl, GeolocationButton, BasemapToggle, usePinboardStore } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
@@ -10,6 +11,10 @@ import LocationDetail from './components/LocationDetail.vue'
 
 const pinboard = usePinboardStore()
 const floodFinder = useFloodFinderStore()
+
+const sortedLocations = computed(() =>
+  [...pinboard.allLocations].sort((a, b) => (b as any).latitude - (a as any).latitude)
+)
 
 function isGauge(loc: Location): boolean {
   return loc.other.kind === 'Aware' || loc.other.kind === 'Usgs'
@@ -65,11 +70,14 @@ const filterOptions = [
     </template>
 
     <template #map-content="{ hoveredId, selectedId, zoom, onHover, onHoverEnd, onSelect }">
+      <MapNavigationControl position="bottom-left" />
+      <GeolocationButton position="bottom-left" />
+      <BasemapToggle position="top-right" />
       <MapMarker
-        v-for="loc in pinboard.allLocations"
+        v-for="loc in sortedLocations"
         :key="loc.id"
         :lng-lat="[(loc as any).longitude, (loc as any).latitude]"
-        :z-index="hoveredId === loc.id || selectedId === loc.id ? 10 : undefined"
+        :z-index="hoveredId === loc.id || selectedId === loc.id ? 10000 : Math.round((90 - (loc as any).latitude) * 100)"
       >
         <MapIconTextPin
           :zoom="zoom"
