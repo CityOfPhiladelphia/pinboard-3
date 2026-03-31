@@ -2,7 +2,6 @@
 import '@phila/phila-ui-core/styles/template-light.css'
 import { useSlots, inject, ref, computed } from 'vue'
 import { PINBOARD_CONFIG_KEY } from '../types'
-import SearchFilterPanel from './SearchFilterPanel.vue'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 
@@ -84,8 +83,6 @@ function closeLocationDetail() {
           :class="{ 'is-active': activeMobilePanel === 'list' }"
         >
             <slot name="locations-header" />
-
-            <SearchFilterPanel :locations="locations" />
 
             <div v-if="isLoading" class="status-message">Loading...</div>
 

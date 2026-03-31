@@ -24,7 +24,6 @@ const MobileNavContent: FunctionalComponent = () =>
   <div class="pinboard">
 
     <AppHeader id="pinboard-nav"
-      :style="{ boxShadow: 'none'}"
       :show-trusted-site="true"
       :mobile-nav="$slots['mobile-nav'] ? MobileNavContent : undefined"
       :links="[]"
