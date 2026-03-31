@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { 
-  Pinboard, 
-  MapMarker, 
-  MapIconTextPin, 
-  MapNavigationControl, 
-  GeolocationButton, 
-  BasemapToggle 
+import {
+  Pinboard,
+  MapMarker,
+  MapIconTextPin,
+  MapNavigationControl,
+  GeolocationButton,
+  BasemapToggle
 } from '@pinboard/ui'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { useLocations } from '../composables/useLocations'
@@ -84,8 +84,8 @@ const filterOptions = [
 
     <template #map-content="{ hoveredId, selectedId, zoom, onHover, onHoverEnd, onSelect }">
 
-      <MapNavigationControl position="bottom-left" />
-      <GeolocationButton position="bottom-left" />
+      <MapNavigationControl position="bottom-right" />
+      <GeolocationButton position="bottom-right" />
       <BasemapToggle position="top-right" />
 
       <div v-if="!isLoading">

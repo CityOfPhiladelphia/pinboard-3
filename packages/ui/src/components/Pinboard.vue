@@ -1,8 +1,7 @@
 <script setup lang="ts" generic="T">
 import '@phila/phila-ui-core/styles/template-light.css'
-import { useSlots, inject, ref, computed, Component } from 'vue'
+import { useSlots, inject, ref, computed } from 'vue'
 import { PINBOARD_CONFIG_KEY } from '../types'
-import SearchFilterPanel from './SearchFilterPanel.vue'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 
@@ -68,14 +67,22 @@ function closeLocationDetail() {
 
   <div class="pinboard">
     <main class="pinboard-main">
+      <div v-if="selectedLocation !== null" class="detail-overlay">
+        <button
+          class="detail-close-btn"
+          @click="closeLocationDetail"
+          aria-label="Close details"
+        >
+          ×
+        </button>
+        <slot name="location-detail" :location="selectedLocationUnsafe" />
+      </div>
       <div class="finder-panel">
         <div
           class="finder-panel-locations"
           :class="{ 'is-active': activeMobilePanel === 'list' }"
         >
             <slot name="locations-header" />
-
-            <SearchFilterPanel :locations="locations" />
 
             <div v-if="isLoading" class="status-message">Loading...</div>
 
@@ -125,17 +132,6 @@ function closeLocationDetail() {
       >
         {{ activeMobilePanel === 'list' ? 'Map view' : 'List view' }}
       </button>
-
-      <div v-if="selectedLocation !== null" class="detail-overlay">
-        <button
-          class="detail-close-btn"
-          @click="closeLocationDetail"
-          aria-label="Close details"
-        >
-          ×
-        </button>
-        <slot name="location-detail" :location="selectedLocationUnsafe" />
-      </div>
     </main>
   </div>
 </template>
@@ -158,7 +154,7 @@ function closeLocationDetail() {
 .pinboard {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
 }
 
 .pinboard-main {
@@ -168,7 +164,8 @@ function closeLocationDetail() {
 }
 
 .finder-panel {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
   width: 100%;
   height: 100%;
 }
@@ -176,7 +173,6 @@ function closeLocationDetail() {
 .finder-panel-locations {
   display: flex;
   flex-direction: column;
-  width: 25%;
   border-right: 1px solid #ccc;
   overflow: hidden;
 }
@@ -196,7 +192,6 @@ function closeLocationDetail() {
 }
 
 .finder-panel-map {
-  width: 75%;
   overflow: hidden;
 }
 
@@ -223,7 +218,7 @@ function closeLocationDetail() {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 33%;
+  width: 40%;
   z-index: 10;
   background: var(--Schemes-Surface-Bright, white);
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);

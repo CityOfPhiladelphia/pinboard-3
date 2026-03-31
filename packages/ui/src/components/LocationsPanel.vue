@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="T">
 import { ref } from 'vue'
 import { BaseCard, CardContent } from '@phila/phila-ui-cards'
+import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 
 const props = defineProps<{
   locations: T[]
@@ -27,6 +28,7 @@ function onCardKeyup(location: T) {
 </script>
 
 <template>
+  <LocationSearchFilterPanel :locations="locations" />
   <div class="location-list content">
     <BaseCard
       v-for="location in locations"

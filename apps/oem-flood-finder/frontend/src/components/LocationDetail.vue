@@ -21,7 +21,7 @@ const readingState = useLocationDetail(
 
     <div class="location-detail__body">
 
-      <template v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'"> 
+      <template v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'">
         <h2>{{ location.name }}</h2>
         <p >
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
@@ -32,7 +32,7 @@ const readingState = useLocationDetail(
         <h4>Gauge Reading</h4>
 
         <!-- Gauge detail -->
-        <GaugeReadings 
+        <GaugeReadings
           :reading-state="readingState"
           :location="location"
         />
@@ -55,16 +55,16 @@ const readingState = useLocationDetail(
       <!-- Camera detail -->
       <template v-else-if="location.other.kind === 'Camera'">
         <h2>{{ location.name }}</h2>
-        
+
         <p v-if="location.other.data.locationDescription">
           {{ location.other.data.locationDescription }}
         </p>
 
-        <CameraVideoPlayer 
+        <CameraVideoPlayer
           :video-url="location.other.data.pageUrl"
           :autoplay="true"
         />
-        
+
       </template>
     </div>
 
