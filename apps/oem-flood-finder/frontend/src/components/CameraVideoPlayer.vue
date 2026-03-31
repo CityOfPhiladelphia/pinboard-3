@@ -59,15 +59,6 @@ const initializeVideo = () => {
   }
 }
 
-const reloadVideo = () => {
-  if (hls) {
-    hls.stopLoad()
-    hls.startLoad()
-  } else if (videoRef.value) {
-    videoRef.value.load()
-  }
-}
-
 // Watch for URL changes and reinitialize
 watch(() => props.videoUrl, () => {
   if (props.videoUrl) {
@@ -93,7 +84,7 @@ onUnmounted(() => {
   <div class="camera-video-player">
     <video 
       ref="videoRef"
-      :autoplay="autoplay || false" 
+      :autoplay="autoplay" 
       :playsinline="true" 
       :controls="true"
       :muted="true"
@@ -101,10 +92,6 @@ onUnmounted(() => {
     >
       Your browser does not support the video tag.
     </video>
-    
-    <button @click="reloadVideo" class="reload-video-btn" title="Reload video">
-      🔄 Reload Stream
-    </button>
   </div>
 </template>
 
@@ -115,18 +102,5 @@ onUnmounted(() => {
   gap: 0.5rem;
 }
 
-.reload-video-btn {
-  background-color: #007acc;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.875rem;
-  align-self: flex-start;
-}
 
-.reload-video-btn:hover {
-  background-color: #005999;
-}
 </style>

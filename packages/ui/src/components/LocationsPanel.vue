@@ -1,24 +1,24 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
 import { ref } from 'vue'
 import { BaseCard, CardContent } from '@phila/phila-ui-cards'
-import type { Location } from '../types'
 
 const props = defineProps<{
-  locations: Location[]
+  locations: T[]
   hoveredId?: string | null
   selectedId?: string | null
-  locationCardSlot?: (props: { location: Location; isHovered: boolean; isSelected: boolean }) => unknown
+  locationCardSlot?: (props: { location: T; isHovered: boolean; isSelected: boolean }) => unknown
+  getId: (loc: T) => string
 }>()
 
 const emit = defineEmits<{
-  select: [location: Location]
+  select: [location: T]
   hover: [id: string]
   'hover-end': []
 }>()
 
 const pendingKeydown = ref(false)
 
-function onCardKeyup(location: Location) {
+function onCardKeyup(location: T) {
   if (pendingKeydown.value) {
     emit('select', location)
     pendingKeydown.value = false
@@ -30,15 +30,15 @@ function onCardKeyup(location: Location) {
   <div class="location-list content">
     <BaseCard
       v-for="location in locations"
-      :key="location.id"
+      :key="getId(location)"
       layout="vertical"
       :class="['location-card', {
-        'location-card--hovered': hoveredId === location.id,
-        'location-card--selected': selectedId === location.id,
+        'location-card--hovered': hoveredId === getId(location),
+        'location-card--selected': selectedId === getId(location),
       }]"
       tabindex="0"
       @click="emit('select', location)"
-      @mouseenter="emit('hover', location.id)"
+      @mouseenter="emit('hover', getId(location))"
       @mouseleave="emit('hover-end')"
       @keydown.enter="pendingKeydown = true"
       @keyup.enter="onCardKeyup(location)"
@@ -46,9 +46,9 @@ function onCardKeyup(location: Location) {
       <CardContent>
         <component
           v-if="props.locationCardSlot"
-          :is="() => props.locationCardSlot!({ location, isHovered: hoveredId === location.id, isSelected: selectedId === location.id })"
+          :is="() => props.locationCardSlot!({ location, isHovered: hoveredId === getId(location), isSelected: selectedId === getId(location) })"
         />
-        <template v-else>{{ location.id }}</template>
+        <template v-else>{{ getId(location) }}</template>
       </CardContent>
     </BaseCard>
   </div>

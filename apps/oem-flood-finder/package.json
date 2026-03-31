@@ -7,7 +7,5 @@
     "synth": "cd cdk && cdk synth",
     "deploy": "cd cdk && cdk deploy",
     "diff": "cd cdk && cdk diff"
-  },
-  "dependencies": {
   }
 }

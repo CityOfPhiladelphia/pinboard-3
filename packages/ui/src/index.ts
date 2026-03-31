@@ -1,7 +1,7 @@
-export { default as Pinboard } from './components/Pinboard.vue'
+import PinboardShell from './components/PinboardShell.vue'
+import Pinboard from './components/Pinboard.vue'
 export { createPinboard } from './plugin'
-export type { PinboardConfig, MapConfig, State, Location } from './types'
-export { usePinboardStore } from './stores/pinboard'
+export type { PinboardConfig, MapConfig } from './types'
 
 // Re-export map-core layer components so apps use the same MapLibre instance as PhilaMap
 export {
@@ -16,3 +16,5 @@ export {
   GeolocationButton,
   BasemapToggle,
 } from '@phila/phila-ui-map-core'
+
+export { PinboardShell, Pinboard }

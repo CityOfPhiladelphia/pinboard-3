@@ -46,7 +46,6 @@ export type AwareGauge = {
   longitude: number,
   lastUpdated: Date | null,
   modemNumber: string,
-  pictureFilenameOnServer: string,
   actionStage: number,
   minorStage: number,
   moderateStage: number,
@@ -76,7 +75,8 @@ export type Reading = {
   saltWater: boolean,
   dropRateIndicator: boolean,
   dropRateThreshold: number,
-  deviceDropCount: number
+  deviceDropCount: number,
+  pictureFilenameOnServer: string
 }
 
 export type Camera = {

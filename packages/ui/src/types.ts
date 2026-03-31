@@ -1,5 +1,5 @@
 // packages/ui/src/types.ts
-import type { InjectionKey, Ref } from 'vue'
+import type { InjectionKey } from 'vue'
 
 export type MapControlPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
@@ -17,19 +17,8 @@ export interface MapConfig {
   ariaLabel?: string
 }
 
-export interface Location {
-  id: string
-  [key: string]: unknown
-}
-
-export type State =
-  | { kind: 'Loading' }
-  | { kind: 'Loaded'; data: Location[]; geojson?: unknown }
-  | { kind: 'Error'; message: string }
-
 export interface PinboardConfig {
   title: string
-  useLocations: () => Ref<State>
   map?: MapConfig
 }
 
