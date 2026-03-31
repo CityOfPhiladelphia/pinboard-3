@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="T">
 import '@phila/phila-ui-core/styles/template-light.css'
 import { useSlots, inject, ref, computed } from 'vue'
+import { MapCard } from '@phila/phila-ui-cards'
 import { PINBOARD_CONFIG_KEY } from '../types'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
@@ -8,7 +9,6 @@ import LocationsPanel from './LocationsPanel.vue'
 defineSlots<{
   nav?(): unknown
   'locations-header'?(props: {}): unknown
-  'location-card'?(props: { location: T }): unknown
   'location-detail'?(props: { location: T }): unknown
   'map-content'?(props: {
     locations: T[]
@@ -26,6 +26,7 @@ defineSlots<{
 const props = defineProps<{
   locations: T[]
   getId: (loc: T) => string
+  getCardDetails: (loc: T) => Record<string, unknown>
   isLoading: boolean
   errorMessage: string | null
   geojson?: unknown
@@ -84,7 +85,9 @@ function closeLocationDetail() {
         >
             <slot name="locations-header" />
 
-            <div v-if="isLoading" class="status-message">Loading...</div>
+            <div v-if="isLoading" class="location-list">
+              <MapCard v-for="n in 5" :key="n" :is-loading="true" />
+            </div>
 
             <div
               v-else-if="errorMessage"
@@ -98,8 +101,8 @@ function closeLocationDetail() {
               :locations="locations"
               :hovered-id="hoveredLocationId"
               :selected-id="selectedLocationId"
-              :location-card-slot="slots['location-card']"
               :get-id="getId"
+              :get-card-details="getCardDetails"
               @select="handleSelect"
               @hover="handleHover"
               @hover-end="handleHoverEnd"
@@ -177,18 +180,18 @@ function closeLocationDetail() {
   overflow: hidden;
 }
 
-.status-message {
-  padding: 1rem;
-  color: var(--Schemes-On-Surface, #333);
-}
-
 .status-message--error {
   color: var(--Schemes-Error, #b3261e);
 }
 
-.finder-panel-locations > :deep(.location-list) {
+.finder-panel-locations > :deep(.location-list),
+.finder-panel-locations > .location-list {
   flex: 1;
   overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .finder-panel-map {

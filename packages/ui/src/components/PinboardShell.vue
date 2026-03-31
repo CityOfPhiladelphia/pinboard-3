@@ -6,6 +6,8 @@ import MobileNavPanel from './MobileNavPanel.vue';
 
 defineProps<{
   title: string
+  bannerTitle?: string
+  bannerMessage?: string
 }>()
 
 const slots = defineSlots<{
@@ -30,7 +32,10 @@ const MobileNavContent: FunctionalComponent = () =>
       :navbar-brand="{
       brandingImage: { src: '', href: '/', altText: 'City of Philadelphia' },
       brandingLink: { text: title , href: '/' },
-    }" />
+    }"
+      :banner-title="bannerTitle"
+      :banner-message="bannerMessage"
+    />
 
     <main class="pinboard-main">
       <slot />

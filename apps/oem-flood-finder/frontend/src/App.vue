@@ -6,7 +6,11 @@ import '@pinboard/ui/style.css'
 
 <template>
 
-  <PinboardShell title="Flood Monitor">
+  <PinboardShell
+    title="Flood Monitor"
+    banner-title="Flood Advisory in Effect"
+    banner-message="Minor flooding is possible in low-lying areas. Monitor conditions and avoid flood-prone roads."
+  >
 
     <template #mobile-nav>
       <h4><RouterLink to="/"> Finder </RouterLink></h4>
