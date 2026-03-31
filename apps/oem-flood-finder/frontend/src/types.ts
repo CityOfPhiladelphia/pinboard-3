@@ -1,4 +1,5 @@
 /** Shared types for OEM Flood Finder */
+import type { LocationBasic } from "../../../../packages/ui/src/types"
 
 export type FloodImpact = {
   stage: number,
@@ -11,17 +12,15 @@ export type LocationDTO = {
   cameras: Camera[]
 }
 
-export type Location = {
-  id: string,
-  name: string,
-  latitude: number,
-  longitude: number,
+export type LocationInfo = {
   lastUpdated: Date | null,
   other:
     { kind: 'Aware', data: AwareGauge } |
     { kind: 'Usgs', data: UsgsGauge } |
     { kind: 'Camera', data: Camera }
 }
+
+export type Location = LocationBasic & LocationInfo
 
 export type UsgsGauge = {
   gaugeId: string,

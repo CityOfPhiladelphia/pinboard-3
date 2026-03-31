@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { LocationBasic } from '../types';
+
 defineProps<{
   locations: unknown
 }>()

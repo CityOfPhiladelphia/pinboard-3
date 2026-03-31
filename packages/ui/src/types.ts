@@ -23,3 +23,10 @@ export interface PinboardConfig {
 }
 
 export const PINBOARD_CONFIG_KEY: InjectionKey<PinboardConfig> = Symbol('pinboard-config')
+
+export type LocationBasic = {
+  id: string
+  name: string
+  latitude: number
+  longitude: number
+}

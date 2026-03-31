@@ -23,10 +23,11 @@ const MobileNavContent: FunctionalComponent = () =>
 
   <div class="pinboard">
 
-    <AppHeader id="pinboard-nav" 
-      :show-trusted-site="true" 
-      :mobile-nav="$slots['mobile-nav'] ? MobileNavContent : undefined" 
-      :links="[]" 
+    <AppHeader id="pinboard-nav"
+      :style="{ boxShadow: 'none'}"
+      :show-trusted-site="true"
+      :mobile-nav="$slots['mobile-nav'] ? MobileNavContent : undefined"
+      :links="[]"
       :navbar-brand="{
       brandingImage: { src: '', href: '/', altText: 'City of Philadelphia' },
       brandingLink: { text: title , href: '/' },
@@ -37,7 +38,7 @@ const MobileNavContent: FunctionalComponent = () =>
     </main>
 
     <AppFooter :sub-footer-only="true" />
-    
+
   </div>
 
 </template>
