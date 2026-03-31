@@ -88,30 +88,30 @@ const filterOptions = [
       <GeolocationButton position="bottom-left" />
       <BasemapToggle position="top-right" />
 
-      <MapMarker
-        v-if="!isLoading"
-        v-for="loc in filteredLocations"
-        :key="loc.id"
-        :lng-lat="[loc.longitude, loc.latitude]"
-      >
-        <MapIconTextPin
-          :zoom="zoom"
-          :icon="isGauge(loc) ? faGauge : faCamera"
-          :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'"
-          :hovered="hoveredId === loc.id"
-          :selected="selectedId === loc.id"
-          :style="
-            filteredLocations.some((f) => f.id === loc.id)
-              ? undefined
-              : { visibility: 'hidden', pointerEvents: 'none' }
-          "
-          @mouseenter="onHover(loc.id)"
-          @mouseleave="onHoverEnd()"
-          @click="onSelect(loc)"
-        />
+      <div v-if="!isLoading">
+        <MapMarker
+          v-for="loc in filteredLocations"
+          :key="loc.id"
+          :lng-lat="[loc.longitude, loc.latitude]"
+        >
+          <MapIconTextPin
+            :zoom="zoom"
+            :icon="isGauge(loc) ? faGauge : faCamera"
+            :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'"
+            :hovered="hoveredId === loc.id"
+            :selected="selectedId === loc.id"
+            :style="
+              filteredLocations.some((f) => f.id === loc.id)
+                ? undefined
+                : { visibility: 'hidden', pointerEvents: 'none' }
+            "
+            @mouseenter="onHover(loc.id)"
+            @mouseleave="onHoverEnd()"
+            @click="onSelect(loc)"
+          />
 
-      </MapMarker>
-
+        </MapMarker>
+      </div>
     </template>
 
   </Pinboard>
