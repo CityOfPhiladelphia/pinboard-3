@@ -51,6 +51,11 @@ const filterOptions = [
   { value: 'cameras' as const, label: 'Camera' },
 ]
 
+function shouldShow(loc: Location): boolean {
+  if (loc.name === 'TestCamera') return false
+  return true
+}
+
 </script>
 
 <template>
@@ -58,6 +63,8 @@ const filterOptions = [
   <Pinboard
     :locations="filteredLocations"
     :get-id="(loc: Location) => loc.id"
+    :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]"
+    :filter="shouldShow"
     :is-loading="isLoading"
     :error-message="errorMessage"
   >
@@ -90,7 +97,7 @@ const filterOptions = [
 
       <div v-if="!isLoading">
         <MapMarker
-          v-for="loc in filteredLocations"
+          v-for="loc in locations"
           :key="loc.id"
           :lng-lat="[loc.longitude, loc.latitude]"
         >
@@ -101,7 +108,7 @@ const filterOptions = [
             :hovered="hoveredId === loc.id"
             :selected="selectedId === loc.id"
             :style="
-              filteredLocations.some((f) => f.id === loc.id)
+              shouldShow(loc) && filteredLocations.some((f) => f.id === loc.id)
                 ? undefined
                 : { visibility: 'hidden', pointerEvents: 'none' }
             "
