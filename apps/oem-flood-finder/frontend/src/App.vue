@@ -7,7 +7,7 @@ import '@pinboard/ui/style.css'
 <template>
 
   <PinboardShell
-    title="Flood Monitor"
+    title="Flood Monitoring"
     banner-title="Flood Advisory in Effect"
     banner-message="Minor flooding is possible in low-lying areas. Monitor conditions and avoid flood-prone roads."
   >

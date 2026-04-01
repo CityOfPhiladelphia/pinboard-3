@@ -26,7 +26,16 @@ defineSlots<{
 const props = defineProps<{
   locations: T[]
   getId: (loc: T) => string
-  getCardDetails: (loc: T) => Record<string, unknown>
+  getCardDetails: (loc: T) => {
+    heading?: string
+    subheader?: string
+    tag?: string
+    body?: string
+    src?: string
+    alt?: string
+    href?: string
+    isLoading: boolean
+  }
   isLoading: boolean
   errorMessage: string | null
   geojson?: unknown

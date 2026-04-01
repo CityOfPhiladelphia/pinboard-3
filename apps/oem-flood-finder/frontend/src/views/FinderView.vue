@@ -59,7 +59,13 @@ const filterOptions = [
   <Pinboard
     :locations="filteredLocations"
     :get-id="(loc: Location) => loc.id"
-    :get-card-details="(loc: Location) => ({ heading: loc.name })"
+    :get-card-details="(loc: Location) => ({ 
+      heading: loc.name,
+      subheader: '0.8 mi',
+      tag: '0.9 in',
+      src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
+      isLoading: isLoading
+    })"
     :is-loading="isLoading"
     :error-message="errorMessage"
   >
