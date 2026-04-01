@@ -1,13 +1,13 @@
 import type { EverbridgeNotification } from "@/types";
 import { onMounted, ref, toValue, type MaybeRefOrGetter } from "vue";
 
-export function useAlertBanner(
+export function useEverbridgeNotifications(
   limit: MaybeRefOrGetter<number>
 ) {
 
   let everbridgeNotifications = ref<EverbridgeNotification[]>([]);
 
-  async function fetchLatestAlert() {
+  async function fetchLatestAlerts() {
 
     const myHeaders = new Headers();
     myHeaders.append("x-api-key", import.meta.env.VITE_FLOOD_API_KEY || "");
@@ -24,7 +24,7 @@ export function useAlertBanner(
     everbridgeNotifications.value = await response.json();
   }
 
-  onMounted(fetchLatestAlert);
+  onMounted(fetchLatestAlerts);
 
   return { everbridgeNotifications };
 }

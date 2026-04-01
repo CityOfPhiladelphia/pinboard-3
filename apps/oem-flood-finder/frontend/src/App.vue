@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { PinboardShell } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
-import { useAlertBanner } from './composables/useAlertBanner';
+import { useEverbridgeNotifications } from './composables/useEverbridgeNotifications';
 import type { AlertBanner } from './types';
 import { computed, type ComputedRef } from 'vue'
 
-const { everbridgeNotifications } = useAlertBanner(1);
+const { everbridgeNotifications } = useEverbridgeNotifications(1);
 
 // if OEM wants to pass in just a title or just a body, we still want to display the alert banner
 const alertBanner : ComputedRef<AlertBanner | null> = computed(() => {
