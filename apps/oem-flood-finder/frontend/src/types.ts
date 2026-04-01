@@ -1,6 +1,19 @@
 /** Shared types for OEM Flood Finder */
 import type { LocationBasic } from "../../../../packages/ui/src/types"
 
+export type AlertBanner = {
+  title: string,
+  body: string
+}
+
+export type EverbridgeNotification = {
+  notificationId: string,
+  createdOn: Date,
+  title: string,
+  body: string,
+  fileAttachments?: string
+}
+
 export type FloodImpact = {
   stage: number,
   statement: string

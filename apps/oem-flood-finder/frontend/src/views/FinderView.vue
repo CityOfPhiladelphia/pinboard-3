@@ -7,6 +7,7 @@ import {
   GeolocationButton,
   BasemapToggle
 } from '@pinboard/ui'
+import { Tags } from '@phila/phila-ui-tags'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { useLocations } from '../composables/useLocations'
 import type { Location } from '../types'
@@ -63,6 +64,13 @@ function shouldShow(loc: Location): boolean {
   <Pinboard
     :locations="filteredLocations"
     :get-id="(loc: Location) => loc.id"
+    :get-card-details="(loc: Location) => ({ 
+      heading: loc.name,
+      subheader: '0.8 mi',
+      tag: '0.9 in',
+      src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
+      isLoading: isLoading
+    })"
     :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]"
     :filter="shouldShow"
     :is-loading="isLoading"
@@ -70,19 +78,17 @@ function shouldShow(loc: Location): boolean {
   >
     <template #locations-header>
       <div class="location-filters">
-        <button
+        <Tags
           v-for="opt in filterOptions"
-          :key="opt.value"
-          :class="['filter-pill', { active: locationMode === opt.value }]"
-          @click="locationMode = opt.value"
-        >
-          {{ opt.label }}
-        </button>
+          :key="`${opt.value}-${locationMode}`"
+          variant="action"
+          size="large"
+          color="grey"
+          :text="opt.label"
+          :selected="locationMode === opt.value"
+          @update:selected="(selected) => { if (selected) locationMode = opt.value }"
+        />
       </div>
-    </template>
-
-    <template #location-card="{ location }">
-      {{ location.name }}
     </template>
 
     <template #location-detail="{ location }">
@@ -141,18 +147,4 @@ function shouldShow(loc: Location): boolean {
   flex-shrink: 0;
 }
 
-.filter-pill {
-  padding: 0.375rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 1rem;
-  background: #fff;
-  cursor: pointer;
-  font-size: 0.8125rem;
-}
-
-.filter-pill.active {
-  background: var(--Schemes-Primary, #2176d2);
-  border-color: var(--Schemes-Primary, #2176d2);
-  color: #fff;
-}
 </style>

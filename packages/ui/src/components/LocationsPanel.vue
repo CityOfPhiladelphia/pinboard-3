@@ -1,14 +1,15 @@
 <script setup lang="ts" generic="T">
 import { ref } from 'vue'
-import { BaseCard, CardContent } from '@phila/phila-ui-cards'
+import { MapCard } from '@phila/phila-ui-cards'
+import type { MapCardProps } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 
 const props = defineProps<{
   locations: T[]
   hoveredId?: string | null
   selectedId?: string | null
-  locationCardSlot?: (props: { location: T; isHovered: boolean; isSelected: boolean }) => unknown
   getId: (loc: T) => string
+  getCardDetails: (loc: T) => MapCardProps
 }>()
 
 const emit = defineEmits<{
@@ -30,10 +31,10 @@ function onCardKeyup(location: T) {
 <template>
   <LocationSearchFilterPanel :locations="locations" />
   <div class="location-list content">
-    <BaseCard
+    <MapCard
       v-for="location in locations"
       :key="getId(location)"
-      layout="vertical"
+      v-bind="getCardDetails(location)"
       :class="['location-card', {
         'location-card--hovered': hoveredId === getId(location),
         'location-card--selected': selectedId === getId(location),
@@ -44,15 +45,7 @@ function onCardKeyup(location: T) {
       @mouseleave="emit('hover-end')"
       @keydown.enter="pendingKeydown = true"
       @keyup.enter="onCardKeyup(location)"
-    >
-      <CardContent>
-        <component
-          v-if="props.locationCardSlot"
-          :is="() => props.locationCardSlot!({ location, isHovered: hoveredId === getId(location), isSelected: selectedId === getId(location) })"
-        />
-        <template v-else>{{ getId(location) }}</template>
-      </CardContent>
-    </BaseCard>
+    />
   </div>
 </template>
 

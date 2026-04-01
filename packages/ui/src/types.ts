@@ -22,6 +22,11 @@ export interface PinboardConfig {
   map?: MapConfig
 }
 
+export type AlertBanner = {
+  title: string,
+  message: string
+}
+
 export const PINBOARD_CONFIG_KEY: InjectionKey<PinboardConfig> = Symbol('pinboard-config')
 
 export type LocationBasic = {
