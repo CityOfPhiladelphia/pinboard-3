@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { BaseCard, CardContent } from '@phila/phila-ui-cards'
 import { Search } from "@phila/phila-ui-search";
+import { MapCard } from '@phila/phila-ui-cards'
+import type { MapCardProps } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 import type { Location, LocationFilterOption } from '../types';
 
@@ -12,6 +13,7 @@ const props = defineProps<{
   hoveredId?: string | null
   selectedId?: string | null
   locationCardSlot?: (props: { location: Location; isHovered: boolean; isSelected: boolean }) => unknown
+  getCardDetails: (loc: Location) => MapCardProps
 }>()
 
 const emit = defineEmits<{
@@ -34,17 +36,11 @@ function onCardKeyup(location: Location) {
   <LocationSearchFilterPanel v-if="locationFilter" :filterOptions="locationFilter" />
   <Search v-if="search" class-name="location-search" :placeholder="search" />
   <div class="location-list content">
-    <BaseCard v-for="location in locations" :key="location.id" layout="vertical" :class="['location-card', {
+    <MapCard v-for="location in locations" :key="location.id" v-bind="getCardDetails(location)" :class="['location-card', {
       'location-card--hovered': hoveredId === location.id,
       'location-card--selected': selectedId === location.id,
     }]" tabindex="0" @click="emit('select', location)" @mouseenter="emit('hover', location.id)"
-      @mouseleave="emit('hover-end')" @keydown.enter="pendingKeydown = true" @keyup.enter="onCardKeyup(location)">
-      <CardContent>
-        <component v-if="props.locationCardSlot"
-          :is="() => props.locationCardSlot!({ location, isHovered: hoveredId === location.id, isSelected: selectedId === location.id })" />
-        <template v-else>{{ location.id }}</template>
-      </CardContent>
-    </BaseCard>
+      @mouseleave="emit('hover-end')" @keydown.enter="pendingKeydown = true" @keyup.enter="onCardKeyup(location)" />
   </div>
 </template>
 

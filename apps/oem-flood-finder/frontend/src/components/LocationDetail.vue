@@ -21,15 +21,10 @@ const readingState = useLocationDetail(
 
     <div class="location-detail__body">
 
-      <template v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'">
-        <h2>{{ location.name }}</h2>
-        <p >
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-          labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-          laboris nisi ut aliquip ex ea commodo consequat.
-        </p>
+      <template v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'"> 
+        <h4>{{ location.name }}</h4>
 
-        <h4>Gauge Reading</h4>
+        <h6>Gauge Reading</h6>
 
         <!-- Gauge detail -->
         <GaugeReadings
@@ -37,14 +32,30 @@ const readingState = useLocationDetail(
           :location="location"
         />
 
-        <h4>Gauge Information</h4>
+        <h6>Gauge Information</h6>
           <table>
             <thead>
               <tr><th>Last Updated</th><th>Coordinates</th></tr>
             </thead>
             <tbody>
               <tr>
-                <td>{{ location.lastUpdated }}</td>
+
+                <td>
+                  {{
+                    location.lastUpdated
+                      ? new Date(location.lastUpdated).toLocaleString('en-US', { 
+                          timeZone: 'America/New_York',
+                          year: 'numeric', 
+                          month: 'short', 
+                          day: 'numeric', 
+                          hour: 'numeric', 
+                          minute: '2-digit',
+                          hour12: true 
+                        })
+                      : 'N/A' 
+                  }}
+                </td>
+
                 <td>{{ location.latitude }}, {{ location.longitude }}</td>
               </tr>
             </tbody>
@@ -84,5 +95,30 @@ const readingState = useLocationDetail(
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f0f0f0;
 }
 </style>
