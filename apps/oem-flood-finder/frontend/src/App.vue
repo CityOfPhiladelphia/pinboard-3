@@ -1,6 +1,34 @@
 <script setup lang="ts">
 import { PinboardShell } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
+import { useAlertBanner } from './composables/useAlertBanner';
+import type { AlertBanner } from './types';
+import { computed, type ComputedRef } from 'vue'
+
+const { everbridgeNotifications } = useAlertBanner(1);
+
+// if OEM wants to pass in just a title or just a body, we still want to display the alert banner
+const alertBanner : ComputedRef<AlertBanner | null> = computed(() => {
+
+  // only displaying LATEST notification if it was created in the last 24 hours
+  const oneDayAgo = new Date();
+  oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+
+  if 
+  ( 
+    everbridgeNotifications.value[0]?.createdOn &&
+    new Date(everbridgeNotifications.value[0]?.createdOn) >= oneDayAgo
+  )
+  {
+    return { 
+      title: everbridgeNotifications.value[0]?.title,
+      body: everbridgeNotifications.value[0]?.body
+    }
+  }
+  return null
+})
+
+
 
 </script>
 
@@ -8,8 +36,8 @@ import '@pinboard/ui/style.css'
 
   <PinboardShell
     title="Flood Monitoring"
-    banner-title="Flood Advisory in Effect"
-    banner-message="Minor flooding is possible in low-lying areas. Monitor conditions and avoid flood-prone roads."
+    :banner-title=alertBanner?.title
+    :banner-message=alertBanner?.body
   >
 
     <template #mobile-nav>
