@@ -1,25 +1,28 @@
-<script setup lang="ts" generic="T">
+<script setup lang="ts">
 import { ref } from 'vue'
 import { BaseCard, CardContent } from '@phila/phila-ui-cards'
+import { Search } from "@phila/phila-ui-search";
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
+import type { Location, LocationFilterOption } from '../types';
 
 const props = defineProps<{
-  locations: T[]
+  locationFilter: LocationFilterOption[] | null
+  search: string | null
+  locations: Location[]
   hoveredId?: string | null
   selectedId?: string | null
-  locationCardSlot?: (props: { location: T; isHovered: boolean; isSelected: boolean }) => unknown
-  getId: (loc: T) => string
+  locationCardSlot?: (props: { location: Location; isHovered: boolean; isSelected: boolean }) => unknown
 }>()
 
 const emit = defineEmits<{
-  select: [location: T]
+  select: [location: Location]
   hover: [id: string]
   'hover-end': []
 }>()
 
 const pendingKeydown = ref(false)
 
-function onCardKeyup(location: T) {
+function onCardKeyup(location: Location) {
   if (pendingKeydown.value) {
     emit('select', location)
     pendingKeydown.value = false
@@ -28,29 +31,18 @@ function onCardKeyup(location: T) {
 </script>
 
 <template>
-  <LocationSearchFilterPanel :locations="locations" />
+  <LocationSearchFilterPanel v-if="locationFilter" :filterOptions="locationFilter" />
+  <Search v-if="search" class-name="location-search" :placeholder="search" />
   <div class="location-list content">
-    <BaseCard
-      v-for="location in locations"
-      :key="getId(location)"
-      layout="vertical"
-      :class="['location-card', {
-        'location-card--hovered': hoveredId === getId(location),
-        'location-card--selected': selectedId === getId(location),
-      }]"
-      tabindex="0"
-      @click="emit('select', location)"
-      @mouseenter="emit('hover', getId(location))"
-      @mouseleave="emit('hover-end')"
-      @keydown.enter="pendingKeydown = true"
-      @keyup.enter="onCardKeyup(location)"
-    >
+    <BaseCard v-for="location in locations" :key="location.id" layout="vertical" :class="['location-card', {
+      'location-card--hovered': hoveredId === location.id,
+      'location-card--selected': selectedId === location.id,
+    }]" tabindex="0" @click="emit('select', location)" @mouseenter="emit('hover', location.id)"
+      @mouseleave="emit('hover-end')" @keydown.enter="pendingKeydown = true" @keyup.enter="onCardKeyup(location)">
       <CardContent>
-        <component
-          v-if="props.locationCardSlot"
-          :is="() => props.locationCardSlot!({ location, isHovered: hoveredId === getId(location), isSelected: selectedId === getId(location) })"
-        />
-        <template v-else>{{ getId(location) }}</template>
+        <component v-if="props.locationCardSlot"
+          :is="() => props.locationCardSlot!({ location, isHovered: hoveredId === location.id, isSelected: selectedId === location.id })" />
+        <template v-else>{{ location.id }}</template>
       </CardContent>
     </BaseCard>
   </div>
@@ -78,5 +70,9 @@ function onCardKeyup(location: T) {
   background-color: var(--Schemes-Surface-Container, #eee);
   outline: 2px solid var(--Schemes-Primary, #1976d2);
 }
-</style>
 
+.location-search {
+  padding: 1rem;
+  width: 100%
+}
+</style>

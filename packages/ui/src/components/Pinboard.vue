@@ -1,17 +1,17 @@
-<script setup lang="ts" generic="T">
+<script setup lang="ts">
 import '@phila/phila-ui-core/styles/template-light.css'
 import { useSlots, inject, ref, computed } from 'vue'
-import { PINBOARD_CONFIG_KEY } from '../types'
+import { PINBOARD_CONFIG_KEY, Location, LocationFilterOption } from '../types'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 
 defineSlots<{
   nav?(): unknown
   'locations-header'?(props: {}): unknown
-  'location-card'?(props: { location: T }): unknown
-  'location-detail'?(props: { location: T }): unknown
+  'location-card'?(props: { location: Location }): unknown
+  'location-detail'?(props: { location: Location }): unknown
   'map-content'?(props: {
-    locations: T[]
+    locations: Location[]
     geojson: unknown
     map: unknown
     zoom: number
@@ -19,15 +19,16 @@ defineSlots<{
     selectedId: string | null
     onHover: (id: string) => void
     onHoverEnd: () => void
-    onSelect: (loc: T) => void
+    onSelect: (loc: Location) => void
   }): unknown
 }>()
 
 const props = defineProps<{
-  locations: T[]
-  getId: (loc: T) => string
+  locations: Location[]
   isLoading: boolean
   errorMessage: string | null
+  locationFilter: LocationFilterOption[] | null
+  search: string | null
   geojson?: unknown
 }>()
 
@@ -35,15 +36,12 @@ const config = inject(PINBOARD_CONFIG_KEY)!
 const slots = useSlots()
 
 const hoveredLocationId = ref<string | null>(null)
-const selectedLocation = ref<T | null>(null)
+const selectedLocation = ref<Location | null>(null)
 const activeMobilePanel = ref<'list' | 'map'>('list')
 
 const selectedLocationId = computed(() =>
-  selectedLocation.value === null ? null : props.getId(selectedLocation.value)
+  selectedLocation.value === null ? null : selectedLocation.value.id
 )
-
-// Only access this when a location is actually selected
-const selectedLocationUnsafe = computed<T>(() => selectedLocation.value!)
 
 // Event handlers for location interaction
 function handleHover(id: string) {
@@ -54,7 +52,7 @@ function handleHoverEnd() {
   hoveredLocationId.value = null
 }
 
-function handleSelect(location: T) {
+function handleSelect(location: Location) {
   selectedLocation.value = location
 }
 
@@ -68,68 +66,36 @@ function closeLocationDetail() {
   <div class="pinboard">
     <main class="pinboard-main">
       <div v-if="selectedLocation !== null" class="detail-overlay">
-        <button
-          class="detail-close-btn"
-          @click="closeLocationDetail"
-          aria-label="Close details"
-        >
+        <button class="detail-close-btn" @click="closeLocationDetail" aria-label="Close details">
           ×
         </button>
-        <slot name="location-detail" :location="selectedLocationUnsafe" />
+        <slot name="location-detail" :location="selectedLocation" />
       </div>
       <div class="finder-panel">
-        <div
-          class="finder-panel-locations"
-          :class="{ 'is-active': activeMobilePanel === 'list' }"
-        >
-            <slot name="locations-header" />
+        <div class="finder-panel-locations" :class="{ 'is-active': activeMobilePanel === 'list' }">
+          <slot name="locations-header" />
 
-            <div v-if="isLoading" class="status-message">Loading...</div>
+          <div v-if="isLoading" class="status-message">Loading...</div>
 
-            <div
-              v-else-if="errorMessage"
-              class="status-message status-message--error"
-            >
-              {{ errorMessage }}
-            </div>
+          <div v-else-if="errorMessage" class="status-message status-message--error">
+            {{ errorMessage }}
+          </div>
 
-            <LocationsPanel
-              v-else-if="!isLoading"
-              :locations="locations"
-              :hovered-id="hoveredLocationId"
-              :selected-id="selectedLocationId"
-              :location-card-slot="slots['location-card']"
-              :get-id="getId"
-              @select="handleSelect"
-              @hover="handleHover"
-              @hover-end="handleHoverEnd"
-            />
+          <LocationsPanel v-else-if="!isLoading" :location-filter="locationFilter" :search="search"
+            :locations="locations" :hovered-id="hoveredLocationId" :selected-id="selectedLocationId"
+            :location-card-slot="slots['location-card']" @select="handleSelect" @hover="handleHover"
+            @hover-end="handleHoverEnd" />
         </div>
 
-        <div
-          class="finder-panel-map"
-          :class="{ 'is-active': activeMobilePanel === 'map' }"
-        >
-          <MapPanel
-            v-if="!isLoading"
-            :config="config.map"
-            :locations="locations"
-            :geojson="geojson"
-            :hovered-id="hoveredLocationId"
-            :selected-id="selectedLocationId"
-            :map-content-slot="slots['map-content']"
-            :on-hover="handleHover"
-            :on-hover-end="handleHoverEnd"
-            :on-select="handleSelect"
-          />
+        <div class="finder-panel-map" :class="{ 'is-active': activeMobilePanel === 'map' }">
+          <MapPanel v-if="!isLoading" :config="config.map" :locations="locations" :geojson="geojson"
+            :hovered-id="hoveredLocationId" :selected-id="selectedLocationId" :map-content-slot="slots['map-content']"
+            :on-hover="handleHover" :on-hover-end="handleHoverEnd" :on-select="handleSelect" />
         </div>
       </div>
-      <button
-        class="mobile-panel-toggle"
-        @click="
-          activeMobilePanel = activeMobilePanel === 'list' ? 'map' : 'list'
-        "
-      >
+      <button class="mobile-panel-toggle" @click="
+        activeMobilePanel = activeMobilePanel === 'list' ? 'map' : 'list'
+        ">
         {{ activeMobilePanel === 'list' ? 'Map view' : 'List view' }}
       </button>
     </main>
@@ -186,7 +152,7 @@ function closeLocationDetail() {
   color: var(--Schemes-Error, #b3261e);
 }
 
-.finder-panel-locations > :deep(.location-list) {
+.finder-panel-locations> :deep(.location-list) {
   flex: 1;
   overflow-y: auto;
 }
@@ -290,7 +256,7 @@ function closeLocationDetail() {
     width: 100%;
   }
 
-  .pinboard > :deep(footer) {
+  .pinboard> :deep(footer) {
     display: none;
   }
 }

@@ -9,7 +9,7 @@ import {
 } from '@pinboard/ui'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { useLocations } from '../composables/useLocations'
-import type { Location } from '../types'
+import type { Location, LocationFilterOption } from '@ui/types'
 import LocationDetail from '../components/LocationDetail.vue'
 import { computed, ref } from 'vue'
 
@@ -45,33 +45,20 @@ function isGauge(loc: Location): boolean {
   return loc.other.kind === 'Aware' || loc.other.kind === 'Usgs'
 }
 
-const filterOptions = [
-  { value: 'all' as const, label: 'All' },
-  { value: 'gauges' as const, label: 'Gauge' },
-  { value: 'cameras' as const, label: 'Camera' },
+const filterOptions: LocationFilterOption[] = [
+  { value: 'all', label: 'All' },
+  { value: 'gauges', label: 'Gauge' },
+  { value: 'cameras', label: 'Camera' },
 ]
 
 </script>
 
 <template>
 
-  <Pinboard
-    :locations="filteredLocations"
-    :get-id="(loc: Location) => loc.id"
-    :is-loading="isLoading"
-    :error-message="errorMessage"
-  >
+  <Pinboard :locations="filteredLocations" :get-id="(loc: Location) => loc.id" :is-loading="isLoading"
+    :error-message="errorMessage" :locationFilter="filterOptions" search="Search by address or keyword">
     <template #locations-header>
-      <div class="location-filters">
-        <button
-          v-for="opt in filterOptions"
-          :key="opt.value"
-          :class="['filter-pill', { active: locationMode === opt.value }]"
-          @click="locationMode = opt.value"
-        >
-          {{ opt.label }}
-        </button>
-      </div>
+
     </template>
 
     <template #location-card="{ location }">
@@ -89,26 +76,13 @@ const filterOptions = [
       <BasemapToggle position="top-right" />
 
       <div v-if="!isLoading">
-        <MapMarker
-          v-for="loc in filteredLocations"
-          :key="loc.id"
-          :lng-lat="[loc.longitude, loc.latitude]"
-        >
-          <MapIconTextPin
-            :zoom="zoom"
-            :icon="isGauge(loc) ? faGauge : faCamera"
-            :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'"
-            :hovered="hoveredId === loc.id"
-            :selected="selectedId === loc.id"
-            :style="
-              filteredLocations.some((f) => f.id === loc.id)
-                ? undefined
-                : { visibility: 'hidden', pointerEvents: 'none' }
-            "
-            @mouseenter="onHover(loc.id)"
-            @mouseleave="onHoverEnd()"
-            @click="onSelect(loc)"
-          />
+        <MapMarker v-for="loc in filteredLocations" :key="loc.id" :lng-lat="[loc.longitude, loc.latitude]">
+          <MapIconTextPin :zoom="zoom" :icon="isGauge(loc) ? faGauge : faCamera"
+            :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'" :hovered="hoveredId === loc.id"
+            :selected="selectedId === loc.id" :style="filteredLocations.some((f) => f.id === loc.id)
+              ? undefined
+              : { visibility: 'hidden', pointerEvents: 'none' }
+              " @mouseenter="onHover(loc.id)" @mouseleave="onHoverEnd()" @click="onSelect(loc)" />
 
         </MapMarker>
       </div>
@@ -118,34 +92,10 @@ const filterOptions = [
 
 </template>
 
-<style>
+<style scoped>
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-</style>
-
-<style scoped>
-.location-filters {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  flex-shrink: 0;
-}
-
-.filter-pill {
-  padding: 0.375rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 1rem;
-  background: #fff;
-  cursor: pointer;
-  font-size: 0.8125rem;
-}
-
-.filter-pill.active {
-  background: var(--Schemes-Primary, #2176d2);
-  border-color: var(--Schemes-Primary, #2176d2);
-  color: #fff;
 }
 </style>
