@@ -36,6 +36,12 @@ const props = defineProps<{
     href?: string
     isLoading: boolean
   }
+  getPosition?: (loc: T) => [number, number]
+  // Optional predicate to hide locations from both the card list and map.
+  // Return true to show, false to hide. If not provided, all locations are shown.
+  // The app defines its own rules, e.g.:
+  //   :filter="(loc) => loc.gaugeHeight !== -9999 && loc.isActive"
+  filter?: (loc: T) => boolean
   isLoading: boolean
   errorMessage: string | null
   geojson?: unknown
@@ -43,6 +49,13 @@ const props = defineProps<{
 
 const config = inject(PINBOARD_CONFIG_KEY)!
 const slots = useSlots()
+const mapPanelRef = ref<{ flyTo: (lngLat: [number, number]) => void } | null>(null)
+
+// Apply the filter prop to produce the visible subset of locations.
+// Both the card list and the map-content slot receive this filtered list.
+const visibleLocations = computed(() =>
+  props.filter ? props.locations.filter(props.filter) : props.locations
+)
 
 const hoveredLocationId = ref<string | null>(null)
 const selectedLocation = ref<T | null>(null)
@@ -66,6 +79,9 @@ function handleHoverEnd() {
 
 function handleSelect(location: T) {
   selectedLocation.value = location
+  if (props.getPosition) {
+    mapPanelRef.value?.flyTo(props.getPosition(location))
+  }
 }
 
 function closeLocationDetail() {
@@ -107,7 +123,7 @@ function closeLocationDetail() {
 
             <LocationsPanel
               v-else-if="!isLoading"
-              :locations="locations"
+              :locations="visibleLocations"
               :hovered-id="hoveredLocationId"
               :selected-id="selectedLocationId"
               :get-id="getId"
@@ -123,9 +139,10 @@ function closeLocationDetail() {
           :class="{ 'is-active': activeMobilePanel === 'map' }"
         >
           <MapPanel
-            v-if="!isLoading"
+            ref="mapPanelRef"
             :config="config.map"
-            :locations="locations"
+            :is-loading="isLoading"
+            :locations="visibleLocations"
             :geojson="geojson"
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"
