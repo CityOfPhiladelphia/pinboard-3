@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { Tags } from '@phila/phila-ui-tags'
 import type { LocationFilterOption } from '../types';
 
 const props = defineProps<{
@@ -7,19 +8,23 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  selectedOption: [location: Location]
+  selectedFilter: [filter: string]
 }>()
 
 const selectedFilter = ref(props.filterOptions[0].value);
+
+function handleChange(option: string) {
+  selectedFilter.value = option;
+  emit('selectedFilter', selectedFilter.value);
+}
 
 </script>
 
 <template>
   <div class="location-filters">
-    <button v-for="opt in filterOptions" :key="opt.value"
-      :class="['filter-pill', { active: selectedFilter === opt.value }]" @click="selectedFilter = opt.value">
-      {{ opt.label }}
-    </button>
+    <Tags v-for="opt in filterOptions" :key="`${opt.value}-${selectedFilter}`" variant="action" size="large"
+      color="grey" :text="opt.label" :selected="selectedFilter === opt.value"
+      @update:selected="handleChange(opt.value)" />
   </div>
 </template>
 

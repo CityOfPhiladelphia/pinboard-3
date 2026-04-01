@@ -101,3 +101,5 @@ export type Camera = {
   locationDescription?: string,
   pageUrl: string
 }
+
+export type Filters = 'all' | 'gauges' | 'cameras'

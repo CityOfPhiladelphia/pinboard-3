@@ -18,6 +18,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   select: [location: Location]
+  selectedFilter: [filter: string]
   hover: [id: string]
   'hover-end': []
 }>()
@@ -30,10 +31,16 @@ function onCardKeyup(location: Location) {
     pendingKeydown.value = false
   }
 }
+
+function handleFilterChange(selectedFilter: string) {
+  emit('selectedFilter', selectedFilter);
+}
+
 </script>
 
 <template>
-  <LocationSearchFilterPanel v-if="locationFilter" :filterOptions="locationFilter" />
+  <LocationSearchFilterPanel v-if="locationFilter" :filterOptions="locationFilter"
+    @selected-filter="handleFilterChange" />
   <Search v-if="search" class-name="location-search" :placeholder="search" />
   <div class="location-list content">
     <MapCard v-for="location in locations" :key="location.id" v-bind="getCardDetails(location)" :class="['location-card', {
