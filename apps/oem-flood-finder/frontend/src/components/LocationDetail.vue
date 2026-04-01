@@ -21,15 +21,10 @@ const readingState = useLocationDetail(
 
     <div class="location-detail__body">
 
-      <template v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'">
-        <h2>{{ location.name }}</h2>
-        <p >
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-          labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-          laboris nisi ut aliquip ex ea commodo consequat.
-        </p>
+      <template v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'"> 
+        <h4>{{ location.name }}</h4>
 
-        <h4>Gauge Reading</h4>
+        <label>Gauge Reading</label>
 
         <!-- Gauge detail -->
         <GaugeReadings
