@@ -51,7 +51,9 @@ const emit = defineEmits<{
 
 const config = inject(PINBOARD_CONFIG_KEY)!
 const slots = useSlots()
-const mapPanelRef = ref<{ flyTo: (lngLat: [number, number]) => void } | null>(null)
+const mapPanelRef = ref<{ flyTo: (lngLat: [number, number]) => void } | null>(
+  null
+)
 
 const hoveredLocationId = ref<string | null>(null)
 const selectedLocation = ref<Location | null>(null)
@@ -82,48 +84,80 @@ function closeLocationDetail() {
 }
 
 function handleLocationFilterChange(selectedFilter: string) {
-  emit('selectedFilter', selectedFilter);
+  emit('selectedFilter', selectedFilter)
 }
-
 </script>
 
 <template>
-
   <div class="pinboard">
     <main class="pinboard-main">
       <div v-if="selectedLocation !== null" class="detail-overlay">
-        <button class="detail-close-btn" @click="closeLocationDetail" aria-label="Close details">
+        <button
+          class="detail-close-btn"
+          @click="closeLocationDetail"
+          aria-label="Close details"
+        >
           ×
         </button>
         <slot name="location-detail" :location="selectedLocation" />
       </div>
       <div class="finder-panel">
-        <div class="finder-panel-locations" :class="{ 'is-active': activeMobilePanel === 'list' }">
+        <div
+          class="finder-panel-locations"
+          :class="{ 'is-active': activeMobilePanel === 'list' }"
+        >
           <slot name="locations-header" />
 
           <div v-if="isLoading" class="location-list">
             <MapCard v-for="n in 5" :key="n" :is-loading="true" />
           </div>
 
-          <div v-else-if="errorMessage" class="status-message status-message--error">
+          <div
+            v-else-if="errorMessage"
+            class="status-message status-message--error"
+          >
             {{ errorMessage }}
           </div>
 
-          <LocationsPanel v-else-if="!isLoading" :location-filter="locationFilter" :search="search"
-            :locations="locations" :hovered-id="hoveredLocationId" :selected-id="selectedLocationId"
-            :get-card-details="getCardDetails" @select="handleSelect" @hover="handleHover" @hover-end="handleHoverEnd"
-            @selected-filter="handleLocationFilterChange" />
+          <LocationsPanel
+            v-else-if="!isLoading"
+            :location-filter="locationFilter"
+            :search="search"
+            :locations="locations"
+            :hovered-id="hoveredLocationId"
+            :selected-id="selectedLocationId"
+            :get-card-details="getCardDetails"
+            @select="handleSelect"
+            @hover="handleHover"
+            @hover-end="handleHoverEnd"
+            @selected-filter="handleLocationFilterChange"
+          />
         </div>
 
-        <div class="finder-panel-map" :class="{ 'is-active': activeMobilePanel === 'map' }">
-          <MapPanel v-if="!isLoading" :config="config.map" :locations="locations" :geojson="geojson"
-            :hovered-id="hoveredLocationId" :selected-id="selectedLocationId" :map-content-slot="slots['map-content']"
-            :on-hover="handleHover" :on-hover-end="handleHoverEnd" :on-select="handleSelect" />
+        <div
+          class="finder-panel-map"
+          :class="{ 'is-active': activeMobilePanel === 'map' }"
+        >
+          <MapPanel
+            v-if="!isLoading"
+            :config="config.map"
+            :locations="locations"
+            :geojson="geojson"
+            :hovered-id="hoveredLocationId"
+            :selected-id="selectedLocationId"
+            :map-content-slot="slots['map-content']"
+            :on-hover="handleHover"
+            :on-hover-end="handleHoverEnd"
+            :on-select="handleSelect"
+          />
         </div>
       </div>
-      <button class="mobile-panel-toggle" @click="
-        activeMobilePanel = activeMobilePanel === 'list' ? 'map' : 'list'
-        ">
+      <button
+        class="mobile-panel-toggle"
+        @click="
+          activeMobilePanel = activeMobilePanel === 'list' ? 'map' : 'list'
+        "
+      >
         {{ activeMobilePanel === 'list' ? 'Map view' : 'List view' }}
       </button>
     </main>
@@ -175,8 +209,8 @@ function handleLocationFilterChange(selectedFilter: string) {
   color: var(--Schemes-Error, #b3261e);
 }
 
-.finder-panel-locations> :deep(.location-list),
-.finder-panel-locations>.location-list {
+.finder-panel-locations > :deep(.location-list),
+.finder-panel-locations > .location-list {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
@@ -284,7 +318,7 @@ function handleLocationFilterChange(selectedFilter: string) {
     width: 100%;
   }
 
-  .pinboard> :deep(footer) {
+  .pinboard > :deep(footer) {
     display: none;
   }
 }

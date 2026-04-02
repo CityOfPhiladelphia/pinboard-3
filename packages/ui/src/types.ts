@@ -1,7 +1,11 @@
 // packages/ui/src/types.ts
 import type { InjectionKey } from 'vue'
 
-export type MapControlPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+export type MapControlPosition =
+  | 'top-left'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-right'
 
 export interface MapConfig {
   center?: [number, number]
@@ -10,7 +14,11 @@ export interface MapConfig {
   bearing?: number
   minZoom?: number
   maxZoom?: number
-  basemapChangeControls?: { toggle?: boolean; dropdown?: boolean; position?: MapControlPosition }
+  basemapChangeControls?: {
+    toggle?: boolean
+    dropdown?: boolean
+    position?: MapControlPosition
+  }
   navigationControls?: { position?: MapControlPosition }
   geolocationControl?: { position?: MapControlPosition }
   mapSearchControl?: { position?: MapControlPosition; placeholder?: string }
@@ -23,11 +31,12 @@ export interface PinboardConfig {
 }
 
 export type AlertBanner = {
-  title: string,
+  title: string
   message: string
 }
 
-export const PINBOARD_CONFIG_KEY: InjectionKey<PinboardConfig> = Symbol('pinboard-config')
+export const PINBOARD_CONFIG_KEY: InjectionKey<PinboardConfig> =
+  Symbol('pinboard-config')
 
 export type LocationBasic = {
   id: string
