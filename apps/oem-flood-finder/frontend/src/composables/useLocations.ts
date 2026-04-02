@@ -1,4 +1,5 @@
-import type { LocationDTO, Location } from '@/types'
+import type { LocationDTO, OemLocation } from '@/types'
+import type { Location } from '@ui/types'
 import { ref, onMounted  } from 'vue'
 
 function transformLocationDTO(dto: LocationDTO): Location[] {
@@ -12,7 +13,7 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
       other: { kind: 'Aware', data: gauge },
-    })
+    } satisfies OemLocation)
   }
 
   for (const gauge of dto.usgsGauges) {
@@ -23,7 +24,7 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
       other: { kind: 'Usgs', data: gauge },
-    })
+    } satisfies OemLocation)
   }
 
   for (const camera of dto.cameras) {
@@ -34,10 +35,10 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
       longitude: camera.longitude,
       lastUpdated: camera.lastUpdated,
       other: { kind: 'Camera', data: camera },
-    })
+    } satisfies OemLocation)
   }
 
-  return locations
+  return locations.sort((a, b) => b.latitude - a.latitude)
 }
 
 export function useLocations() {
@@ -62,7 +63,6 @@ export function useLocations() {
       errorMessage.value = "Error retrieving gauges";
       return;
     }
-
 
     locations.value =  transformLocationDTO(await response.json());
     isLoading.value = false;

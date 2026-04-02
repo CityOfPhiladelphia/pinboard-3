@@ -7,83 +7,59 @@ import {
   GeolocationButton,
   BasemapToggle
 } from '@pinboard/ui'
-import { Tags } from '@phila/phila-ui-tags'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { useLocations } from '../composables/useLocations'
-import type { Location } from '../types'
+import type { Filters } from '../types'
+import type { Location, LocationFilterOption } from '@ui/types'
 import LocationDetail from '../components/LocationDetail.vue'
 import { computed, ref } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations()
 
-const locationMode = ref<'all' | 'gauges' | 'cameras'>('all')
+const locationMode = ref<Filters>('all')
 
 const filteredLocations = computed(() => {
-  if (!isLoading.value && errorMessage.value === null) {
-    const sortedLocations: Location[] = [...locations.value].sort((a, b) => b.latitude - a.latitude)
-
-    if (locationMode.value === 'all') {
-      return sortedLocations
+  if (isLoading.value || errorMessage.value) { return [] }
+  switch (locationMode.value) {
+    case ('gauges'): {
+      return locations.value.filter(loc => isGauge(loc))
     }
-
-    if (locationMode.value === 'gauges') {
-      return sortedLocations.filter(loc =>
-        loc.other.kind === 'Aware' ||
-        loc.other.kind === 'Usgs'
-      )
+    case ('cameras'): {
+      return locations.value.filter(loc => loc.other.kind === 'Camera')
     }
-
-    if (locationMode.value === 'cameras') {
-      return sortedLocations.filter(loc =>
-        loc.other.kind === 'Camera'
-      )
+    default: {
+      return locations.value
     }
   }
-  return []
 })
 
 function isGauge(loc: Location): boolean {
   return loc.other.kind === 'Aware' || loc.other.kind === 'Usgs'
 }
 
-const filterOptions = [
-  { value: 'all' as const, label: 'All' },
-  { value: 'gauges' as const, label: 'Gauge' },
-  { value: 'cameras' as const, label: 'Camera' },
+const filterOptions: LocationFilterOption[] = [
+  { value: 'all' satisfies Filters, label: 'All' },
+  { value: 'gauges' satisfies Filters, label: 'Gauge' },
+  { value: 'cameras' satisfies Filters, label: 'Camera' },
 ]
+
+function handleLocationFilterChange(selectedFilter: string) {
+  locationMode.value = selectedFilter as Filters
+}
 
 </script>
 
 <template>
 
-  <Pinboard
-    :locations="filteredLocations"
-    :get-id="(loc: Location) => loc.id"
-    :get-card-details="(loc: Location) => ({ 
-      heading: loc.name,
-      subheader: '0.8 mi',
-      tag: '0.9 in',
-      src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
-      isLoading: isLoading
-    })"
-    :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]"
-    :is-loading="isLoading"
-    :error-message="errorMessage"
-  >
-    <template #locations-header>
-      <div class="location-filters">
-        <Tags
-          v-for="opt in filterOptions"
-          :key="`${opt.value}-${locationMode}`"
-          variant="action"
-          size="large"
-          color="grey"
-          :text="opt.label"
-          :selected="locationMode === opt.value"
-          @update:selected="(selected) => { if (selected) locationMode = opt.value }"
-        />
-      </div>
-    </template>
+  <Pinboard :locations="filteredLocations" :get-card-details="(loc: Location) => ({
+    heading: loc.name,
+    subheader: '0.8 mi',
+    tag: '0.9 in',
+    src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
+    isLoading: isLoading
+  })" :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]" :is-loading="isLoading"
+    :error-message="errorMessage" :locationFilter="filterOptions" search="Search by address or keyword"
+    @selected-filter="handleLocationFilterChange">
 
     <template #location-detail="{ location }">
       <LocationDetail :location="location" />
@@ -96,21 +72,11 @@ const filterOptions = [
       <BasemapToggle position="top-right" />
 
       <div v-if="!isLoading">
-        <MapMarker
-          v-for="loc in filteredLocations"
-          :key="loc.id"
-          :lng-lat="[loc.longitude, loc.latitude]"
-        >
-          <MapIconTextPin
-            :zoom="zoom"
-            :icon="isGauge(loc) ? faGauge : faCamera"
-            :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'"
-            :hovered="hoveredId === loc.id"
-            :selected="selectedId === loc.id"
-            @mouseenter="onHover(loc.id)"
-            @mouseleave="onHoverEnd()"
-            @click="onSelect(loc)"
-          />
+        <MapMarker v-for="loc in filteredLocations" :key="loc.id" :lng-lat="[loc.longitude, loc.latitude]">
+          <MapIconTextPin :zoom="zoom" :icon="isGauge(loc) ? faGauge : faCamera"
+            :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'" :hovered="hoveredId === loc.id"
+            :selected="selectedId === loc.id" @mouseenter="onHover(loc.id)" @mouseleave="onHoverEnd()"
+            @click="onSelect(loc)" />
 
         </MapMarker>
       </div>
@@ -120,20 +86,10 @@ const filterOptions = [
 
 </template>
 
-<style>
+<style scoped>
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-</style>
-
-<style scoped>
-.location-filters {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  flex-shrink: 0;
-}
-
 </style>

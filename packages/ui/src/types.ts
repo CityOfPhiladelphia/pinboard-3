@@ -35,3 +35,10 @@ export type LocationBasic = {
   latitude: number
   longitude: number
 }
+
+export type Location = LocationBasic & Record<string, any>
+
+export type LocationFilterOption = {
+  readonly value: string
+  readonly label: string
+}

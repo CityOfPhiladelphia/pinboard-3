@@ -1,26 +1,53 @@
 <script setup lang="ts">
-import { Search } from "@phila/phila-ui-search";
-import type { LocationBasic } from '../types';
+import { ref } from 'vue'
+import { Tags } from '@phila/phila-ui-tags'
+import type { LocationFilterOption } from '../types';
 
-defineProps<{
-  locations: unknown
+const props = defineProps<{
+  filterOptions: LocationFilterOption[]
 }>()
+
+const emit = defineEmits<{
+  selectedFilter: [filter: string]
+}>()
+
+const selectedFilter = ref(props.filterOptions[0]?.value ?? null);
+
+function handleChange(option: string) {
+  selectedFilter.value = option;
+  emit('selectedFilter', selectedFilter.value);
+}
+
 </script>
 
 <template>
-  <div class="search-filter-pane">
-    <Search class-name="location-search"
-    placeholder="Search by address or keyword"
-    />
+  <div class="location-filters">
+    <Tags v-for="opt in filterOptions" :key="`${opt.value}-${selectedFilter}`" variant="action" size="large"
+      color="grey" :text="opt.label" :selected="selectedFilter === opt.value"
+      @update:selected="handleChange(opt.value)" />
   </div>
 </template>
 
 <style scoped>
-.search-filter-pane {
-  padding: 1rem;
+.location-filters {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  flex-shrink: 0;
 }
 
-.location-search {
-  width: 100%
+.filter-pill {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 1rem;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.8125rem;
+}
+
+.filter-pill.active {
+  background: var(--Schemes-Primary, #2176d2);
+  border-color: var(--Schemes-Primary, #2176d2);
+  color: #fff;
 }
 </style>
