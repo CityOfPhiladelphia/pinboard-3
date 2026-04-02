@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Location } from '../types'
+import type { Location } from '@ui/types'
 import GaugeReadings from './GaugeReadings.vue'
 import CameraVideoPlayer from './CameraVideoPlayer.vue'
 import { useLocationDetail } from '../composables/useLocationDetail'
@@ -21,45 +21,45 @@ const readingState = useLocationDetail(
 
     <div class="location-detail__body">
 
-      <template v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'"> 
+      <template v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'">
         <h4>{{ location.name }}</h4>
 
         <h6>Gauge Reading</h6>
 
         <!-- Gauge detail -->
-        <GaugeReadings
-          :reading-state="readingState"
-          :location="location"
-        />
+        <GaugeReadings :reading-state="readingState" :location="location" />
 
         <h6>Gauge Information</h6>
-          <table>
-            <thead>
-              <tr><th>Last Updated</th><th>Coordinates</th></tr>
-            </thead>
-            <tbody>
-              <tr>
+        <table>
+          <thead>
+            <tr>
+              <th>Last Updated</th>
+              <th>Coordinates</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
 
-                <td>
-                  {{
-                    location.lastUpdated
-                      ? new Date(location.lastUpdated).toLocaleString('en-US', { 
-                          timeZone: 'America/New_York',
-                          year: 'numeric', 
-                          month: 'short', 
-                          day: 'numeric', 
-                          hour: 'numeric', 
-                          minute: '2-digit',
-                          hour12: true 
-                        })
-                      : 'N/A' 
-                  }}
-                </td>
+              <td>
+                {{
+                  location.lastUpdated
+                    ? new Date(location.lastUpdated).toLocaleString('en-US', {
+                      timeZone: 'America/New_York',
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true
+                    })
+                    : 'N/A'
+                }}
+              </td>
 
-                <td>{{ location.latitude }}, {{ location.longitude }}</td>
-              </tr>
-            </tbody>
-          </table>
+              <td>{{ location.latitude }}, {{ location.longitude }}</td>
+            </tr>
+          </tbody>
+        </table>
 
       </template>
 
@@ -71,10 +71,7 @@ const readingState = useLocationDetail(
           {{ location.other.data.locationDescription }}
         </p>
 
-        <CameraVideoPlayer
-          :video-url="location.other.data.pageUrl"
-          :autoplay="true"
-        />
+        <CameraVideoPlayer :video-url="location.other.data.pageUrl" :autoplay="true" />
 
       </template>
     </div>
@@ -103,7 +100,8 @@ table {
   margin: 1rem 0;
 }
 
-th, td {
+th,
+td {
   border: 1px solid #ddd;
   padding: 0.75rem;
   text-align: left;
