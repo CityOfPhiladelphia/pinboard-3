@@ -72,7 +72,7 @@ function handleLocationFilterChange(selectedFilter: string) {
       <BasemapToggle position="top-right" />
 
       <div v-if="!isLoading">
-        <MapMarker v-for="loc in locations" :key="loc.id" :lng-lat="[loc.longitude, loc.latitude]">
+        <MapMarker v-for="loc in filteredLocations" :key="loc.id" :lng-lat="[loc.longitude, loc.latitude]">
           <MapIconTextPin :zoom="zoom" :icon="isGauge(loc) ? faGauge : faCamera"
             :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'" :hovered="hoveredId === loc.id"
             :selected="selectedId === loc.id" @mouseenter="onHover(loc.id)" @mouseleave="onHoverEnd()"
