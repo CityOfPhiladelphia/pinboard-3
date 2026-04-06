@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { Tags } from '@phila/phila-ui-tags'
 import type { LocationFilterOption } from '../types'
+import { SortLocationsValues } from '../types'
 
 const props = defineProps<{
   filterOptions: LocationFilterOption[]
@@ -9,9 +10,11 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   selectedFilter: [filter: string]
+  sortOption: [sort: number]
 }>()
 
 const selectedFilter = ref(props.filterOptions[0]?.value ?? null)
+const sortOption = ref<SortLocationsValues>(SortLocationsValues.None)
 
 function handleFilterChange(option: string) {
   if (selectedFilter.value === option) {
@@ -19,6 +22,14 @@ function handleFilterChange(option: string) {
   }
   selectedFilter.value = option
   emit('selectedFilter', selectedFilter.value)
+}
+
+function handleSortChange() {
+  sortOption.value =
+    ++sortOption.value in SortLocationsValues
+      ? sortOption.value
+      : SortLocationsValues.None
+  emit('sortOption', sortOption.value)
 }
 </script>
 
@@ -35,13 +46,14 @@ function handleFilterChange(option: string) {
       @update:selected="handleFilterChange(opt.value)"
     />
     <Tags
+      class="location-sort"
       :key="`filter-sort`"
       variant="action"
       size="large"
       color="grey"
       text="Sort"
-      :selected="false"
-      @update:selected="handleFilterChange('test')"
+      :selected="!!SortLocationsValues.None"
+      @update:selected="handleSortChange()"
     />
   </div>
 </template>
@@ -51,21 +63,9 @@ function handleFilterChange(option: string) {
   display: flex;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  flex-shrink: 0;
 }
 
-.filter-pill {
-  padding: 0.375rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 1rem;
-  background: #fff;
-  cursor: pointer;
-  font-size: 0.8125rem;
-}
-
-.filter-pill.active {
-  background: var(--Schemes-Primary, #2176d2);
-  border-color: var(--Schemes-Primary, #2176d2);
-  color: #fff;
+.location-sort {
+  margin-left: auto;
 }
 </style>

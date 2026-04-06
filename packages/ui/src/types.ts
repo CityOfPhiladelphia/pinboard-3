@@ -51,3 +51,11 @@ export type LocationFilterOption = {
   readonly value: string
   readonly label: string
 }
+
+export enum SortLocationsValues {
+  None,
+  AlphaAsc,
+  AlphaDes,
+  DistAsc,
+  DistDes,
+}

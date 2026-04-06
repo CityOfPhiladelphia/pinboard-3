@@ -8,21 +8,22 @@ import {
   BasemapToggle,
 } from '@pinboard/ui'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
-import { useLocations } from '../composables/useLocations'
-import type { Filters } from '../types'
+import { useLocations } from '@/composables/useLocations'
+import type { Filters } from '@/types'
 import type { Location, LocationFilterOption } from '@ui/types'
-import LocationDetail from '../components/LocationDetail.vue'
+import { SortLocationsValues } from '../../../../../packages/ui/src/types'
+import LocationDetail from '@/components/LocationDetail.vue'
 import { computed, ref } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations()
-
-const locationMode = ref<Filters>('all')
+const locationFilterMode = ref<Filters>('all')
+const locationSortMode = ref<number>(SortLocationsValues.None)
 
 const filteredLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
-  switch (locationMode.value) {
+  switch (locationFilterMode.value) {
     case 'gauges': {
       return locations.value.filter((loc) => isGauge(loc))
     }
@@ -35,7 +36,25 @@ const filteredLocations = computed(() => {
   }
 })
 
+function sortLocations() {
+  if (isLoading.value || errorMessage.value) {
+    return []
+  }
+  switch (locationFilterMode.value) {
+    case 'gauges': {
+      return locations.value.filter((loc) => isGauge(loc))
+    }
+    case 'cameras': {
+      return locations.value.filter((loc) => loc.other.kind === 'Camera')
+    }
+    default: {
+      return locations.value
+    }
+  }
+}
+
 function isGauge(loc: Location): boolean {
+  console.log(loc)
   return loc.other.kind === 'Aware' || loc.other.kind === 'Usgs'
 }
 
@@ -46,7 +65,12 @@ const filterOptions: LocationFilterOption[] = [
 ]
 
 function handleLocationFilterChange(selectedFilter: string) {
-  locationMode.value = selectedFilter as Filters
+  locationFilterMode.value = selectedFilter as Filters
+}
+
+function handleLocationSortChange(sortLocationsOption: number) {
+  locationSortMode.value = sortLocationsOption as SortLocationsValues
+  console.log(locationSortMode.value)
 }
 </script>
 
@@ -67,7 +91,8 @@ function handleLocationFilterChange(selectedFilter: string) {
     :error-message="errorMessage"
     :locationFilter="filterOptions"
     search="Search by address or keyword"
-    @selected-filter="handleLocationFilterChange"
+    @selected-locations-filter="handleLocationFilterChange"
+    @sort-locations-option="handleLocationSortChange"
   >
     <template #location-detail="{ location }">
       <LocationDetail :location="location" />

@@ -1,5 +1,5 @@
 /** Shared types for OEM Flood Finder */
-import type { LocationBasic, Location } from '../../../../packages/ui/src/types'
+import type { LocationBasic } from '@ui/types'
 
 export type AlertBanner = {
   title: string

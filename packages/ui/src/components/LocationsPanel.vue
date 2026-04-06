@@ -23,6 +23,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   select: [location: Location]
   selectedFilter: [filter: string]
+  sortOption: [sort: number]
   hover: [id: string]
   'hover-end': []
 }>()
@@ -39,6 +40,10 @@ function onCardKeyup(location: Location) {
 function handleFilterChange(selectedFilter: string) {
   emit('selectedFilter', selectedFilter)
 }
+
+function handleSortChange(sortOption: number) {
+  emit('sortOption', sortOption)
+}
 </script>
 
 <template>
@@ -47,6 +52,7 @@ function handleFilterChange(selectedFilter: string) {
     v-if="locationFilter"
     :filterOptions="locationFilter"
     @selected-filter="handleFilterChange"
+    @sort-option="handleSortChange"
   />
   <div class="location-list content">
     <MapCard
@@ -76,6 +82,7 @@ function handleFilterChange(selectedFilter: string) {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  scrollbar-width: none;
 }
 
 .location-card {

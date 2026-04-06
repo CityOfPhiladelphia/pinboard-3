@@ -46,7 +46,8 @@ const props = defineProps<{
 
 // emit to parent app to handle what gets sent to pinboard
 const emit = defineEmits<{
-  selectedFilter: [filter: string]
+  selectedLocationsFilter: [filter: string]
+  sortLocationsOption: [sort: number]
 }>()
 
 const config = inject(PINBOARD_CONFIG_KEY)!
@@ -83,8 +84,12 @@ function closeLocationDetail() {
   selectedLocation.value = null
 }
 
-function handleLocationFilterChange(selectedFilter: string) {
-  emit('selectedFilter', selectedFilter)
+function handleLocationFilterChange(selectedLocationsFilter: string) {
+  emit('selectedLocationsFilter', selectedLocationsFilter)
+}
+
+function handleLocationSortChange(sortLocationsOption: number) {
+  emit('sortLocationsOption', sortLocationsOption)
 }
 </script>
 
@@ -131,6 +136,7 @@ function handleLocationFilterChange(selectedFilter: string) {
             @hover="handleHover"
             @hover-end="handleHoverEnd"
             @selected-filter="handleLocationFilterChange"
+            @sort-option="handleLocationSortChange"
           />
         </div>
 
@@ -141,7 +147,7 @@ function handleLocationFilterChange(selectedFilter: string) {
           <MapPanel
             v-if="!isLoading"
             :config="config.map"
-            :locations="locations"
+            :locations="locations.sort((a, b) => b.latitude - a.latitude)"
             :geojson="geojson"
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"

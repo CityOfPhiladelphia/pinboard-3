@@ -38,7 +38,7 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
     } satisfies OemLocation)
   }
 
-  return locations.sort((a, b) => b.latitude - a.latitude)
+  return locations
 }
 
 export function useLocations() {
