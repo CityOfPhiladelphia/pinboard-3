@@ -59,4 +59,10 @@ const MobileNavContent: FunctionalComponent = () =>
   flex: 1;
   overflow: hidden;
 }
+
+@media (max-width: 768px) {
+  .pinboard > :deep(footer) {
+    display: none;
+  }
+}
 </style>
