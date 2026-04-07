@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Search } from '@phila/phila-ui-search'
 import { MapCard } from '@phila/phila-ui-cards'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 import type { Location, LocationFilterOption } from '../types'
 
 const props = defineProps<{
-  locationFilter: LocationFilterOption[] | null
-  search: string | null
+  locationSearch: string | undefined
+  locationFilter: LocationFilterOption[] | undefined
   locations: Location[]
   hoveredId?: string | null
   selectedId?: string | null
@@ -22,6 +21,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   select: [location: Location]
+  searchString: [search: string]
   selectedFilter: [filter: string]
   sortOption: [sort: number]
   hover: [id: string]
@@ -44,15 +44,20 @@ function handleFilterChange(selectedFilter: string) {
 function handleSortChange(sortOption: number) {
   emit('sortOption', sortOption)
 }
+
+function handleSearchSubmit(searchString: string) {
+  emit('searchString', searchString)
+}
 </script>
 
 <template>
-  <Search v-if="search" class-name="location-search" :placeholder="search" />
   <LocationSearchFilterPanel
     v-if="locationFilter"
+    :search="locationSearch"
     :filterOptions="locationFilter"
     @selected-filter="handleFilterChange"
     @sort-option="handleSortChange"
+    @search-string="handleSearchSubmit"
   />
   <div class="location-list content">
     <MapCard
@@ -98,10 +103,5 @@ function handleSortChange(sortOption: number) {
 .location-card--selected {
   background-color: var(--Schemes-Surface-Container, #eee);
   outline: 2px solid var(--Schemes-Primary, #1976d2);
-}
-
-.location-search {
-  padding: 1rem 1rem 0rem 1rem;
-  width: 100%;
 }
 </style>

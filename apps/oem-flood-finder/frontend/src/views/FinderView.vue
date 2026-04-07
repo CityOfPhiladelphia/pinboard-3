@@ -16,8 +16,10 @@ import LocationDetail from '@/components/LocationDetail.vue'
 import { computed, ref } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations()
+const locationSearchString = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
 const locationSortMode = ref<number>(SortLocationsValues.None)
+const searchPlaceholderText = 'Search by address or keyword...'
 
 const filteredLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
@@ -54,7 +56,6 @@ function sortLocations() {
 }
 
 function isGauge(loc: Location): boolean {
-  console.log(loc)
   return loc.other.kind === 'Aware' || loc.other.kind === 'Usgs'
 }
 
@@ -71,6 +72,10 @@ function handleLocationFilterChange(selectedFilter: string) {
 function handleLocationSortChange(sortLocationsOption: number) {
   locationSortMode.value = sortLocationsOption as SortLocationsValues
   console.log(locationSortMode.value)
+}
+
+function handleLocationSearchSubmit(locationsSearchString: string) {
+  locationSearchString.value = locationsSearchString
 }
 </script>
 
@@ -89,8 +94,9 @@ function handleLocationSortChange(sortLocationsOption: number) {
     :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]"
     :is-loading="isLoading"
     :error-message="errorMessage"
-    :locationFilter="filterOptions"
-    search="Search by address or keyword"
+    :location-panel-search="searchPlaceholderText"
+    :location-panel-filter="filterOptions"
+    @location-search-string="handleLocationSearchSubmit"
     @selected-locations-filter="handleLocationFilterChange"
     @sort-locations-option="handleLocationSortChange"
   >

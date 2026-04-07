@@ -39,13 +39,14 @@ const props = defineProps<{
   getPosition?: (loc: Location) => [number, number]
   isLoading: boolean
   errorMessage: string | null
-  locationFilter: LocationFilterOption[] | null
-  search: string | null
+  locationPanelFilter?: LocationFilterOption[] | undefined
+  locationPanelSearch?: string | undefined
   geojson?: unknown
 }>()
 
 // emit to parent app to handle what gets sent to pinboard
 const emit = defineEmits<{
+  locationSearchString: [search: string]
   selectedLocationsFilter: [filter: string]
   sortLocationsOption: [sort: number]
 }>()
@@ -91,6 +92,10 @@ function handleLocationFilterChange(selectedLocationsFilter: string) {
 function handleLocationSortChange(sortLocationsOption: number) {
   emit('sortLocationsOption', sortLocationsOption)
 }
+
+function handleLocationSearchSubmit(locationsSearchString: string) {
+  emit('locationSearchString', locationsSearchString)
+}
 </script>
 
 <template>
@@ -126,8 +131,8 @@ function handleLocationSortChange(sortLocationsOption: number) {
 
           <LocationsPanel
             v-else-if="!isLoading"
-            :location-filter="locationFilter"
-            :search="search"
+            :location-filter="locationPanelFilter"
+            :location-search="locationPanelSearch"
             :locations="locations"
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"
@@ -135,6 +140,7 @@ function handleLocationSortChange(sortLocationsOption: number) {
             @select="handleSelect"
             @hover="handleHover"
             @hover-end="handleHoverEnd"
+            @search-string="handleLocationSearchSubmit"
             @selected-filter="handleLocationFilterChange"
             @sort-option="handleLocationSortChange"
           />
