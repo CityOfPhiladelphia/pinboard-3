@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ReadingState } from '../composables/useLocationDetail'
+import type { ReadingState } from '@/composables/useLocationDetail'
 import type { Location } from '@ui/types'
 
 const props = defineProps<{

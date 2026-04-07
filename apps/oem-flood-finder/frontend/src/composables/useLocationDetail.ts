@@ -1,5 +1,5 @@
 import { ref, toValue, watchEffect, type MaybeRefOrGetter, type Ref } from 'vue'
-import type { Reading } from '../types'
+import type { Reading } from '@/types'
 
 export type ReadingState =
   | { kind: 'Loading' }

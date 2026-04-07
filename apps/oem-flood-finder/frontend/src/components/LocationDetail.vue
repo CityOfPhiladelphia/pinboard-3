@@ -2,7 +2,7 @@
 import type { Location } from '@ui/types'
 import GaugeReadings from './GaugeReadings.vue'
 import CameraVideoPlayer from './CameraVideoPlayer.vue'
-import { useLocationDetail } from '../composables/useLocationDetail'
+import { useLocationDetail } from '@/composables/useLocationDetail'
 
 const props = defineProps<{
   location: Location

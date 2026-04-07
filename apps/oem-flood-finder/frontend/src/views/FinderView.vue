@@ -9,7 +9,7 @@ import {
 } from '@pinboard/ui'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { useLocations } from '@/composables/useLocations'
-import type { Filters } from '@/types'
+import type { Filters, OemLocation } from '@/types'
 import type { Location, LocationFilterOption } from '@ui/types'
 import { SortLocationsValues } from '../../../../../packages/ui/src/types'
 import LocationDetail from '@/components/LocationDetail.vue'
@@ -21,16 +21,16 @@ const locationFilterMode = ref<Filters>('all')
 const locationSortMode = ref<number>(SortLocationsValues.None)
 const searchPlaceholderText = 'Search by address or keyword...'
 
-const filteredLocations = computed(() => {
+const filteredLocations = computed<Location[]>(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
   switch (locationFilterMode.value) {
     case 'gauges': {
-      return locations.value.filter((loc) => isGauge(loc))
+      return locations.value.filter((loc) => isGauge(loc as OemLocation))
     }
     case 'cameras': {
-      return locations.value.filter((loc) => loc.other.kind === 'Camera')
+      return locations.value.filter((loc) => (loc as OemLocation).other.kind === 'Camera')
     }
     default: {
       return locations.value
@@ -44,10 +44,10 @@ function sortLocations() {
   }
   switch (locationFilterMode.value) {
     case 'gauges': {
-      return locations.value.filter((loc) => isGauge(loc))
+      return locations.value.filter((loc) => isGauge(loc as OemLocation))
     }
     case 'cameras': {
-      return locations.value.filter((loc) => loc.other.kind === 'Camera')
+      return locations.value.filter((loc) => (loc as OemLocation).other.kind === 'Camera')
     }
     default: {
       return locations.value
@@ -55,7 +55,7 @@ function sortLocations() {
   }
 }
 
-function isGauge(loc: Location): boolean {
+function isGauge(loc: OemLocation): boolean {
   return loc.other.kind === 'Aware' || loc.other.kind === 'Usgs'
 }
 
@@ -117,8 +117,8 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
         >
           <MapIconTextPin
             :zoom="zoom"
-            :icon="isGauge(loc) ? faGauge : faCamera"
-            :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'"
+            :icon="isGauge(loc as OemLocation) ? faGauge : faCamera"
+            :color-theme="isGauge(loc as OemLocation) ? 'dark-primary' : 'dark-error'"
             :hovered="hoveredId === loc.id"
             :selected="selectedId === loc.id"
             @mouseenter="onHover(loc.id)"
