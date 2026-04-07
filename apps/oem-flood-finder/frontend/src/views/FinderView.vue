@@ -21,36 +21,72 @@ const locationFilterMode = ref<Filters>('all')
 const locationSortMode = ref<number>(SortLocationsValues.None)
 const searchPlaceholderText = 'Search by address or keyword...'
 
-const filteredLocations = computed<Location[]>(() => {
+const filteredLocations = computed<OemLocation[]>(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
-  switch (locationFilterMode.value) {
-    case 'gauges': {
-      return locations.value.filter((loc) => isGauge(loc as OemLocation))
-    }
-    case 'cameras': {
-      return locations.value.filter((loc) => (loc as OemLocation).other.kind === 'Camera')
-    }
-    default: {
-      return locations.value
-    }
-  }
+  return filterLocations(locations.value)
 })
 
-function sortLocations() {
-  if (isLoading.value || errorMessage.value) {
-    return []
-  }
+function filterLocations(locations: OemLocation[]) {
   switch (locationFilterMode.value) {
+    case 'all': {
+      const sorted = sortLocations(locations, locationSortMode.value)
+      return sorted
+    }
     case 'gauges': {
-      return locations.value.filter((loc) => isGauge(loc as OemLocation))
+      const filtered = locations.filter((loc) => isGauge(loc))
+      const sorted = sortLocations(filtered, locationSortMode.value)
+      return sorted
     }
     case 'cameras': {
-      return locations.value.filter((loc) => (loc as OemLocation).other.kind === 'Camera')
+      const filtered = locations.filter((loc) => loc.other.kind === 'Camera')
+      const sorted = sortLocations(filtered, locationSortMode.value)
+      return sorted
     }
-    default: {
-      return locations.value
+  }
+}
+
+function sortLocations(locations: OemLocation[], sortMode: SortLocationsValues) {
+  switch (sortMode) {
+    case SortLocationsValues.None: {
+      return locations
+    }
+    case SortLocationsValues.AlphaAsc: {
+      const arrayCopy = [...locations]
+      return arrayCopy.sort((a, b) => {
+        const aName = a.name.toLowerCase()
+        const bName = b.name.toLowerCase()
+        if (aName < bName) {
+          return -1
+        } else if (bName < aName) {
+          return 1
+        } else {
+          return 0
+        }
+      })
+    }
+    case SortLocationsValues.AlphaDes: {
+      const arrayCopy = [...locations]
+      return arrayCopy.sort((a, b) => {
+        const aName = a.name.toLowerCase()
+        const bName = b.name.toLowerCase()
+        if (aName > bName) {
+          return -1
+        } else if (bName > aName) {
+          return 1
+        } else {
+          return 0
+        }
+      })
+    }
+    case SortLocationsValues.DistAsc: {
+      // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
+      return locations
+    }
+    case SortLocationsValues.DistDes: {
+      // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
+      return locations
     }
   }
 }
@@ -117,8 +153,8 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
         >
           <MapIconTextPin
             :zoom="zoom"
-            :icon="isGauge(loc as OemLocation) ? faGauge : faCamera"
-            :color-theme="isGauge(loc as OemLocation) ? 'dark-primary' : 'dark-error'"
+            :icon="isGauge(loc) ? faGauge : faCamera"
+            :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'"
             :hovered="hoveredId === loc.id"
             :selected="selectedId === loc.id"
             @mouseenter="onHover(loc.id)"

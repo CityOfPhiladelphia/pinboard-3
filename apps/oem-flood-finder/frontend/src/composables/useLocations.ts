@@ -1,9 +1,8 @@
 import type { LocationDTO, OemLocation } from '@/types'
-import type { Location } from '@ui/types'
 import { ref, onMounted } from 'vue'
 
-function transformLocationDTO(dto: LocationDTO): Location[] {
-  const locations: Location[] = []
+function transformLocationDTO(dto: LocationDTO): OemLocation[] {
+  const locations: OemLocation[] = []
 
   for (const gauge of dto.awareGauges) {
     locations.push({
@@ -13,7 +12,7 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
       other: { kind: 'Aware', data: gauge },
-    } satisfies OemLocation)
+    })
   }
 
   for (const gauge of dto.usgsGauges) {
@@ -24,7 +23,7 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
       other: { kind: 'Usgs', data: gauge },
-    } satisfies OemLocation)
+    })
   }
 
   for (const camera of dto.cameras) {
@@ -35,7 +34,7 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
       longitude: camera.longitude,
       lastUpdated: camera.lastUpdated,
       other: { kind: 'Camera', data: camera },
-    } satisfies OemLocation)
+    })
   }
 
   return locations
@@ -43,9 +42,9 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
 
 export function useLocations() {
   // set to Loading initially
-  let isLoading = ref(true)
-  let errorMessage = ref<string | null>(null)
-  let locations = ref<Location[]>([])
+  const isLoading = ref(true)
+  const errorMessage = ref<string | null>(null)
+  const locations = ref<OemLocation[]>([])
 
   async function fetchLocations() {
     const myHeaders = new Headers()
