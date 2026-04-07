@@ -12,7 +12,7 @@ import { useLocations } from '../composables/useLocations'
 import type { Filters } from '../types'
 import type { Location, LocationFilterOption } from '@ui/types'
 import LocationDetail from '../components/LocationDetail.vue'
-import { computed, ref } from 'vue'
+import { computed, ref, reactive } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations()
 
@@ -48,27 +48,38 @@ const filterOptions: LocationFilterOption[] = [
 function handleLocationFilterChange(selectedFilter: string) {
   locationMode.value = selectedFilter as Filters
 }
+
+const visitedIds = reactive(new Set<string>())
+let lastSelectedId: string | null = null
+
+function handleSelect(loc: Location, onSelect: (loc: Location) => void) {
+  if (lastSelectedId && lastSelectedId !== loc.id) {
+    visitedIds.add(lastSelectedId)
+  }
+  lastSelectedId = loc.id
+  onSelect(loc)
+}
+
+function handleDeselect(id: string) {
+  visitedIds.add(id)
+  lastSelectedId = null
+}
+
 </script>
 
 <template>
-  <Pinboard
-    :locations="filteredLocations"
-    :get-card-details="
-      (loc: Location) => ({
-        heading: loc.name,
-        subheader: '0.8 mi',
-        tag: '0.9 in',
-        src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
-        isLoading: isLoading,
-      })
-    "
-    :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]"
-    :is-loading="isLoading"
-    :error-message="errorMessage"
-    :locationFilter="filterOptions"
-    search="Search by address or keyword"
+
+  <Pinboard :locations="filteredLocations" :get-card-details="(loc: Location) => ({
+    heading: loc.name,
+    subheader: '0.8 mi',
+    tag: '0.9 in',
+    src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
+    isLoading: isLoading
+  })" :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]" :is-loading="isLoading"
+    :error-message="errorMessage" :locationFilter="filterOptions" search="Search by address or keyword"
     @selected-filter="handleLocationFilterChange"
-  >
+    @deselect="handleDeselect">
+
     <template #location-detail="{ location }">
       <LocationDetail :location="location" />
     </template>
@@ -79,21 +90,12 @@ function handleLocationFilterChange(selectedFilter: string) {
       <BasemapToggle position="top-right" />
 
       <div v-if="!isLoading">
-        <MapMarker
-          v-for="loc in filteredLocations"
-          :key="loc.id"
-          :lng-lat="[loc.longitude, loc.latitude]"
-        >
-          <MapIconTextPin
-            :zoom="zoom"
-            :icon="isGauge(loc) ? faGauge : faCamera"
-            :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'"
-            :hovered="hoveredId === loc.id"
-            :selected="selectedId === loc.id"
-            @mouseenter="onHover(loc.id)"
-            @mouseleave="onHoverEnd()"
-            @click="onSelect(loc)"
-          />
+        <MapMarker v-for="loc in filteredLocations" :key="loc.id" :lng-lat="[loc.longitude, loc.latitude]">
+          <MapIconTextPin :zoom="zoom" :icon="isGauge(loc) ? faGauge : faCamera"
+            :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'" :hovered="hoveredId === loc.id"
+            :selected="selectedId === loc.id" :visited="visitedIds.has(loc.id)" @mouseenter="onHover(loc.id)" @mouseleave="onHoverEnd()"
+            @click="handleSelect(loc, onSelect)" />
+
         </MapMarker>
       </div>
     </template>
