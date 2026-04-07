@@ -1,6 +1,7 @@
 import type { LocationDTO, OemLocation } from '@/types'
 import type { Location } from '@ui/types'
 import { ref, onMounted  } from 'vue'
+import { fetchLocations } from './useApi'
 
 function transformLocationDTO(dto: LocationDTO): Location[] {
   const locations: Location[] = []
@@ -48,27 +49,18 @@ export function useLocations() {
   let errorMessage = ref<string | null>(null);
   let locations = ref<Location[]>([]);
 
-  async function fetchLocations() {
+  onMounted(async () => {
+    let locationsResult = await fetchLocations();
 
-    const myHeaders = new Headers();
-    myHeaders.append("x-api-key", import.meta.env.VITE_FLOOD_API_KEY || "");
-
-    const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/location/all`, {
-      method: "GET",
-      headers: myHeaders,
-      redirect: "follow"
-    });
-
-    if (!response.ok) {
-      errorMessage.value = "Error retrieving gauges";
-      return;
-    }
-
-    locations.value =  transformLocationDTO(await response.json());
     isLoading.value = false;
-  }
 
-  onMounted(fetchLocations);
+    if (locationsResult.kind === 'Error') {
+      errorMessage.value = 'API error fetching locations.'
+    }
+    else {
+      locations.value = transformLocationDTO(locationsResult.locationDto)
+    }
+  });
 
   return { locations, isLoading, errorMessage };
 }

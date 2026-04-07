@@ -7,8 +7,9 @@ import { computed, type ComputedRef } from 'vue'
 
 const { everbridgeNotifications } = useEverbridgeNotifications(1);
 
+
 // if OEM wants to pass in just a title or just a body, we still want to display the alert banner
-const alertBanner : ComputedRef<AlertBanner | null> = computed(() => {
+const alertBanner = computed<AlertBanner | null>(() => {
 
   // only displaying LATEST notification if it was created in the last 24 hours
   const oneDayAgo = new Date();
