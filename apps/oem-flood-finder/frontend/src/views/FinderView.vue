@@ -12,7 +12,7 @@ import { useLocations } from '../composables/useLocations'
 import type { Filters } from '../types'
 import type { Location, LocationFilterOption } from '@ui/types'
 import LocationDetail from '../components/LocationDetail.vue'
-import { computed, ref } from 'vue'
+import { computed, ref, reactive } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations()
 
@@ -47,6 +47,22 @@ function handleLocationFilterChange(selectedFilter: string) {
   locationMode.value = selectedFilter as Filters
 }
 
+const visitedIds = reactive(new Set<string>())
+let lastSelectedId: string | null = null
+
+function handleSelect(loc: Location, onSelect: (loc: Location) => void) {
+  if (lastSelectedId && lastSelectedId !== loc.id) {
+    visitedIds.add(lastSelectedId)
+  }
+  lastSelectedId = loc.id
+  onSelect(loc)
+}
+
+function handleDeselect(id: string) {
+  visitedIds.add(id)
+  lastSelectedId = null
+}
+
 </script>
 
 <template>
@@ -59,7 +75,8 @@ function handleLocationFilterChange(selectedFilter: string) {
     isLoading: isLoading
   })" :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]" :is-loading="isLoading"
     :error-message="errorMessage" :locationFilter="filterOptions" search="Search by address or keyword"
-    @selected-filter="handleLocationFilterChange">
+    @selected-filter="handleLocationFilterChange"
+    @deselect="handleDeselect">
 
     <template #location-detail="{ location }">
       <LocationDetail :location="location" />
@@ -75,8 +92,8 @@ function handleLocationFilterChange(selectedFilter: string) {
         <MapMarker v-for="loc in filteredLocations" :key="loc.id" :lng-lat="[loc.longitude, loc.latitude]">
           <MapIconTextPin :zoom="zoom" :icon="isGauge(loc) ? faGauge : faCamera"
             :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'" :hovered="hoveredId === loc.id"
-            :selected="selectedId === loc.id" @mouseenter="onHover(loc.id)" @mouseleave="onHoverEnd()"
-            @click="onSelect(loc)" />
+            :selected="selectedId === loc.id" :visited="visitedIds.has(loc.id)" @mouseenter="onHover(loc.id)" @mouseleave="onHoverEnd()"
+            @click="handleSelect(loc, onSelect)" />
 
         </MapMarker>
       </div>

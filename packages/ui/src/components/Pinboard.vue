@@ -49,6 +49,7 @@ const props = defineProps<{
 // emit to parent app to handle what gets sent to pinboard
 const emit = defineEmits<{
   selectedFilter: [filter: string]
+  deselect: [locationId: string]
 }>()
 
 const config = inject(PINBOARD_CONFIG_KEY)!
@@ -80,6 +81,9 @@ function handleSelect(location: Location) {
 }
 
 function closeLocationDetail() {
+  if (selectedLocation.value) {
+    emit('deselect', selectedLocation.value.id)
+  }
   selectedLocation.value = null
 }
 
