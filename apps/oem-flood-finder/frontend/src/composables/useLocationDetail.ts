@@ -1,5 +1,6 @@
 import { ref, toValue, watchEffect, type MaybeRefOrGetter, type Ref } from 'vue'
 import type { Reading } from '../types'
+import { fetchReadings } from './useApi';
 
 export type ReadingState = { kind: 'Loading' } | { kind: 'Loaded', data: Reading[] } | { kind: 'Error', message: string } | { kind: 'No Call Needed' }
 
@@ -26,24 +27,20 @@ export function useLocationDetail(
 
       readingState.value = { kind: 'Loading' };
 
-      const myHeaders = new Headers();
-      myHeaders.append("x-api-key", import.meta.env.VITE_FLOOD_API_KEY || "");
+      const readingResult = await fetchReadings(
+        toValue(gaugeId),
+        toValue(kind),
+        toValue(limit),
+        abortController
+      )
 
-      const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/${toValue(kind).toLowerCase()}/reading/${toValue(gaugeId)}?limit=${toValue(limit)}`, {
-        method: "GET",
-        headers: myHeaders,
-        redirect: "follow",
-        signal: abortController.signal
-      });
-
-      if (!response.ok) {
-        readingState.value = { kind: 'Error', message: "Readings API response error" };
-        return;
+      if(readingResult.kind === 'Error') {
+        readingState.value = { kind: 'Error', message: 'There was an error' } // TODO: add error message
+      } 
+      else {
+       readingState.value = { kind: 'Loaded', data: readingResult.data }; 
       }
 
-      const data = await response.json();
-
-      readingState.value = { kind: 'Loaded', data: data };
     }
   )
 

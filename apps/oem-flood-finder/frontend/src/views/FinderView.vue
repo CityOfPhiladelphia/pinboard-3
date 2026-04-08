@@ -13,6 +13,7 @@ import type { Filters } from '../types'
 import type { Location, LocationFilterOption } from '@ui/types'
 import LocationDetail from '../components/LocationDetail.vue'
 import { computed, ref } from 'vue'
+import { fetchReadings } from '@/composables/useApi'
 
 const { locations, isLoading, errorMessage } = useLocations()
 
@@ -51,13 +52,18 @@ function handleLocationFilterChange(selectedFilter: string) {
 
 <template>
 
-  <Pinboard :locations="filteredLocations" :get-card-details="(loc: Location) => ({
-    heading: loc.name,
-    subheader: '0.8 mi',
-    tag: '0.9 in',
-    src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
-    isLoading: isLoading
-  })" :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]" :is-loading="isLoading"
+  <Pinboard :locations="filteredLocations" :get-card-details="(loc: Location) => {
+
+    // fetchReadings(loc.id, loc.)
+
+    return {
+      heading: loc.name,
+      subheader: '0.8 mi',
+      tag: '0.9 in',
+      src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
+      isLoading: isLoading
+    }
+  }" :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]" :is-loading="isLoading"
     :error-message="errorMessage" :locationFilter="filterOptions" search="Search by address or keyword"
     @selected-filter="handleLocationFilterChange">
 

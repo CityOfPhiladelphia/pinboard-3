@@ -58,7 +58,7 @@ export function useLocations() {
       errorMessage.value = 'API error fetching locations.'
     }
     else {
-      locations.value = transformLocationDTO(locationsResult.locationDto)
+      locations.value = transformLocationDTO(locationsResult.data)
     }
   });
 
