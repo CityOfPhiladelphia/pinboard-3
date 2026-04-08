@@ -113,6 +113,9 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN_TEST_OEM }}
           aws-region: us-east-1
 
+      - name: Build workspace dependencies
+        run: pnpm turbo build --filter=@pinboard/oem-flood-finder^...
+
       - name: Deploy to test
         working-directory: apps/oem-flood-finder
         env:
@@ -154,6 +157,9 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN_TEST_PCF }}
           aws-region: us-east-1
+
+      - name: Build workspace dependencies
+        run: pnpm turbo build --filter=@pinboard/primary-care-finder^...
 
       - name: Deploy to test
         working-directory: apps/primary-care-finder
