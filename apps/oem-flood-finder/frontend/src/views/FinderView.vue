@@ -92,7 +92,7 @@ function handleDeselect(id: string) {
       <div v-if="!isLoading">
         <MapMarker v-for="loc in filteredLocations" :key="loc.id" :lng-lat="[loc.longitude, loc.latitude]">
           <MapIconTextPin :zoom="zoom" :icon="isGauge(loc) ? faGauge : faCamera"
-            :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'" :hovered="hoveredId === loc.id"
+            :color-theme="'dark-primary'" :color="isGauge(loc) ? undefined : '#3053B6'" :hovered="hoveredId === loc.id"
             :selected="selectedId === loc.id" :visited="visitedIds.has(loc.id)" @mouseenter="onHover(loc.id)" @mouseleave="onHoverEnd()"
             @click="handleSelect(loc, onSelect)" />
 
