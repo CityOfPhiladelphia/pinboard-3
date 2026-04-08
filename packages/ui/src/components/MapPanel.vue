@@ -3,10 +3,6 @@ import {
   ref,
   computed,
   defineComponent,
-<<<<<<< HEAD
-  h,
-=======
->>>>>>> origin/main
   type ComponentPublicInstance,
 } from 'vue'
 import { Map as PhilaMap } from '@phila/phila-ui-map-core'

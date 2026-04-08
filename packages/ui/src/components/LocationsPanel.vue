@@ -1,23 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-<<<<<<< HEAD
-=======
-import { Search } from '@phila/phila-ui-search'
->>>>>>> origin/main
 import { MapCard } from '@phila/phila-ui-cards'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 import type { Location, LocationFilterOption } from '../types'
 
-<<<<<<< HEAD
 const props = defineProps<{
   locationSearch: string | undefined
   locationFilter: LocationFilterOption[] | undefined
-=======
-defineProps<{
-  locationFilter: LocationFilterOption[] | null
-  search: string | null
->>>>>>> origin/main
   locations: Location[]
   hoveredId?: string | null
   selectedId?: string | null
@@ -50,7 +40,6 @@ function onCardKeyup(location: Location) {
 function handleFilterChange(selectedFilter: string) {
   emit('selectedFilter', selectedFilter)
 }
-<<<<<<< HEAD
 
 function handleSortChange(sortOption: number) {
   emit('sortOption', sortOption)
@@ -59,26 +48,17 @@ function handleSortChange(sortOption: number) {
 function handleSearchSubmit(searchString: string) {
   emit('searchString', searchString)
 }
-=======
->>>>>>> origin/main
 </script>
 
 <template>
   <LocationSearchFilterPanel
     v-if="locationFilter"
-<<<<<<< HEAD
     :search="locationSearch"
     :filterOptions="locationFilter"
     @selected-filter="handleFilterChange"
     @sort-option="handleSortChange"
     @search-string="handleSearchSubmit"
   />
-=======
-    :filterOptions="locationFilter"
-    @selected-filter="handleFilterChange"
-  />
-  <Search v-if="search" class-name="location-search" :placeholder="search" />
->>>>>>> origin/main
   <div class="location-list content">
     <MapCard
       v-for="location in locations"
@@ -124,12 +104,4 @@ function handleSearchSubmit(searchString: string) {
   background-color: var(--Schemes-Surface-Container, #eee);
   outline: 2px solid var(--Schemes-Primary, #1976d2);
 }
-<<<<<<< HEAD
-=======
-
-.location-search {
-  padding: 1rem;
-  width: 100%;
-}
->>>>>>> origin/main
 </style>

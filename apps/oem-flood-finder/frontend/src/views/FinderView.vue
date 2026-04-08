@@ -39,6 +39,35 @@ const filteredLocations = computed(() => {
   }
 })
 
+const sortedLocations = computed(() => {
+  if (isLoading.value || errorMessage.value) {
+    return []
+  }
+  const locs = [...filteredLocations.value] as OemLocation[]
+  switch (locationSortMode.value) {
+    case SortLocationsValues.AlphaAsc: {
+      quickSortObjectArrayByStringField(locs, 'name')
+      return locs
+    }
+    case SortLocationsValues.AlphaDes: {
+      quickSortObjectArrayByStringField(locs, 'name', '-')
+      return locs
+    }
+    case SortLocationsValues.DistAsc: {
+      // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
+      return locs
+    }
+    case SortLocationsValues.DistDes: {
+      // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
+      return locs
+    }
+    case SortLocationsValues.None:
+    default: {
+      return locs
+    }
+  }
+})
+
 // function sortedLocations() {
 //   switch (locationFilterMode.value) {
 //     case 'all': {
@@ -162,7 +191,7 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
 
 <template>
   <Pinboard
-    :locations="filteredLocations ?? new Array()"
+    :locations="sortedLocations ?? new Array()"
     :get-card-details="
       (loc: Location) => ({
         heading: loc.name,
@@ -192,7 +221,7 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
 
       <div v-if="!isLoading">
         <MapMarker
-          v-for="loc in filteredLocations"
+          v-for="loc in sortedLocations"
           :key="loc.id"
           :lng-lat="[loc.longitude, loc.latitude]"
         >
