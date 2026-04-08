@@ -84,7 +84,11 @@ function handleSelect(location: Location) {
 }
 
 function handleMapSelect(location: Location) {
-  selectedLocation.value = location
+  if (selectedLocation.value?.id === location.id) {
+    closeLocationDetail()
+  } else {
+    selectedLocation.value = location
+  }
 }
 
 function closeLocationDetail() {
