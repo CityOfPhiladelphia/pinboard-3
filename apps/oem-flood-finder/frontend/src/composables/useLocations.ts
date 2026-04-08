@@ -37,7 +37,7 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
     })
   }
 
-  return locations ?? null
+  return locations
 }
 
 export function useLocations() {

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" , generic="T">
 import {
   Pinboard,
   MapMarker,
@@ -13,84 +13,113 @@ import type { Filters, OemLocation } from '@/types'
 import type { Location, LocationFilterOption } from '@ui/types'
 import { SortLocationsValues } from '../../../../../packages/ui/src/types'
 import LocationDetail from '@/components/LocationDetail.vue'
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations()
-const filteredLocations = ref<OemLocation[] | null>(null)
 const locationSearchString = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
 const locationSortMode = ref<number>(SortLocationsValues.None)
 const searchPlaceholderText = 'Search by address or keyword...'
 
-watch(locations, () => {
-  filteredLocations.value = locations.value
-})
-
-watch(locationFilterMode, () => {
-  filteredLocations.value = filterLocations()
-})
-
-watch(locationSortMode, () => {
-  filteredLocations.value = filterLocations()
-})
-
-function filterLocations() {
+const filteredLocations = computed(() => {
+  if (isLoading.value || errorMessage.value) {
+    return []
+  }
+  const locs = [...locations.value] as OemLocation[]
   switch (locationFilterMode.value) {
     case 'all': {
-      return sortLocations(locations.value)
+      return locs
     }
     case 'gauges': {
-      const filtered = locations.value.filter((loc) => isGauge(loc))
-      return sortLocations(filtered)
+      return locs.filter((loc) => isGauge(loc))
     }
     case 'cameras': {
-      const filtered = locations.value.filter((loc) => loc.other.kind === 'Camera')
-      return sortLocations(filtered)
+      return locs.filter((loc) => loc.other.kind === 'Camera')
+    }
+  }
+})
+
+// function sortedLocations() {
+//   switch (locationFilterMode.value) {
+//     case 'all': {
+//       sortLocations(locs)
+//       console.log('IN FILTER: ', JSON.parse(JSON.stringify(locs)))
+//       return locs
+//     }
+//     case 'gauges': {
+
+//       sortLocations(filtered)
+//       console.log('IN FILTER: ', JSON.parse(JSON.stringify(filtered)))
+//       return filtered
+//     }
+//     case 'cameras': {
+//       const filtered = locs.filter((loc) => loc.other.kind === 'Camera')
+//       sortLocations(filtered)
+//       console.log('IN FILTER: ', JSON.parse(JSON.stringify(filtered)))
+//       return filtered
+//     }
+//   }
+// }
+
+watch(locationSortMode, () => {
+  sortLocations(filteredLocations.value)
+})
+
+function quickSortObjectArrayByStringField(
+  array: Array<any>,
+  field: string,
+  direction: '+' | '-' = '+',
+) {
+  quickSort(array, direction)
+  function quickSort(
+    array: Array<any>,
+    direction: '+' | '-',
+    low: number = 0,
+    high: number = array.length - 1,
+  ): void {
+    if (low >= 0 && high >= 0 && low < high) {
+      const pivot_i = partition(array, direction, low, high)
+      quickSort(array, direction, low, pivot_i - 1)
+      quickSort(array, direction, pivot_i + 1, high)
+    }
+  }
+
+  function partition(array: Array<any>, direction: '+' | '-', low: number, high: number): number {
+    const pivot = array[low]
+    while (true) {
+      if (direction === '+') {
+        while (array[low][field].localeCompare(pivot[field]) < 0) {
+          low++
+        }
+        while (array[high][field].localeCompare(pivot[field]) > 0) {
+          high--
+        }
+      } else if (direction === '-') {
+        while (array[low][field].localeCompare(pivot[field]) > 0) {
+          low++
+        }
+        while (array[high][field].localeCompare(pivot[field]) < 0) {
+          high--
+        }
+      }
+
+      if (low >= high) {
+        return high
+      }
+      const temp = array[low]
+      array[low] = array[high]
+      array[high] = temp
     }
   }
 }
 
 function sortLocations(locs: OemLocation[]) {
-  locs = locs.filter(Boolean)
   switch (locationSortMode.value) {
     case SortLocationsValues.AlphaAsc: {
-      console.log(locs)
-      let sortedArray: (OemLocation | null)[] = new Array()
-      while (locs.length) {
-        if (!sortedArray.length) {
-          sortedArray.push(locs.pop() ?? null)
-          sortedArray = sortedArray.filter(Boolean)
-          continue
-        }
-        const nextLoc = locs.pop() ?? null
-        sortedArray.forEach((loc, i, arr) => {
-          if (!loc) {
-          } else if (!nextLoc) {
-          } else {
-          }
-        })
-      }
-      locs.slice(1).forEach((loc, i, arr) => {
-        sortedArray.forEach((sortedLoc, j, sortedArr) => {
-          const sortedName = sortedLoc.name.toLowerCase()
-          const bName = loc.name.toLowerCase()
-        })
-      })
-      console.log(sortedArray)
-      return sortedArray
+      quickSortObjectArrayByStringField(locs, 'name')
     }
     case SortLocationsValues.AlphaDes: {
-      return locs.sort((a, b) => {
-        const aName = a.name.toLowerCase()
-        const bName = b.name.toLowerCase()
-        if (aName > bName) {
-          return -1
-        } else if (bName > aName) {
-          return 1
-        } else {
-          return 0
-        }
-      })
+      quickSortObjectArrayByStringField(locs, 'name', '-')
     }
     case SortLocationsValues.DistAsc: {
       // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
