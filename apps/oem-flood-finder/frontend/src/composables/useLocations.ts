@@ -2,7 +2,7 @@ import type { LocationDTO, OemLocation } from '@/types'
 import { ref, onMounted } from 'vue'
 
 function transformLocationDTO(dto: LocationDTO): OemLocation[] {
-  const locations: OemLocation[] = []
+  const locations: OemLocation[] = new Array()
 
   for (const gauge of dto.awareGauges) {
     locations.push({
@@ -37,7 +37,7 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
     })
   }
 
-  return locations
+  return locations ?? null
 }
 
 export function useLocations() {

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import '@phila/phila-ui-core/styles/template-light.css'
 import { useSlots, inject, ref, computed } from 'vue'
+import { PhilaButton } from '@phila/phila-ui-button'
+import { faMap, faList } from '@fortawesome/pro-solid-svg-icons'
 import { PINBOARD_CONFIG_KEY, Location, LocationFilterOption } from '../types'
 import { MapCard } from '@phila/phila-ui-cards'
 import MapPanel from './MapPanel.vue'
@@ -164,14 +166,16 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
           />
         </div>
       </div>
-      <button
+      <PhilaButton
+        v-if="selectedLocation === null"
         class="mobile-panel-toggle"
+        variant="secondary"
+        :icon-definition="activeMobilePanel === 'list' ? faMap : faList"
+        :text="activeMobilePanel === 'list' ? 'Map view' : 'List view'"
         @click="
           activeMobilePanel = activeMobilePanel === 'list' ? 'map' : 'list'
         "
-      >
-        {{ activeMobilePanel === 'list' ? 'Map view' : 'List view' }}
-      </button>
+      />
     </main>
   </div>
 </template>
@@ -238,20 +242,14 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
 .mobile-panel-toggle {
   display: none;
   position: fixed;
-  bottom: 1.25rem;
+  bottom: 3rem;
   left: 50%;
   transform: translateX(-50%);
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: white;
-  background: var(--Schemes-Primary, #2176d2);
-  border: none;
-  border-radius: 1.5rem;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border-radius: 1.5rem;
 }
+
 
 .detail-overlay {
   position: absolute;
@@ -323,15 +321,18 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
   }
 
   .mobile-panel-toggle {
-    display: block;
+    display: inline-flex;
   }
 
   .detail-overlay {
     width: 100%;
   }
+<<<<<<< HEAD
 
   .pinboard > :deep(footer) {
     display: none;
   }
+=======
+>>>>>>> origin/main
 }
 </style>

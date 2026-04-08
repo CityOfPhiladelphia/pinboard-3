@@ -13,62 +13,74 @@ import type { Filters, OemLocation } from '@/types'
 import type { Location, LocationFilterOption } from '@ui/types'
 import { SortLocationsValues } from '../../../../../packages/ui/src/types'
 import LocationDetail from '@/components/LocationDetail.vue'
-import { computed, ref } from 'vue'
+import { ref, watch } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations()
+const filteredLocations = ref<OemLocation[] | null>(null)
 const locationSearchString = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
 const locationSortMode = ref<number>(SortLocationsValues.None)
 const searchPlaceholderText = 'Search by address or keyword...'
 
-const filteredLocations = computed<OemLocation[]>(() => {
-  if (isLoading.value || errorMessage.value) {
-    return []
-  }
-  return filterLocations(locations.value)
+watch(locations, () => {
+  filteredLocations.value = locations.value
 })
 
-function filterLocations(locations: OemLocation[]) {
+watch(locationFilterMode, () => {
+  filteredLocations.value = filterLocations()
+})
+
+watch(locationSortMode, () => {
+  filteredLocations.value = filterLocations()
+})
+
+function filterLocations() {
   switch (locationFilterMode.value) {
     case 'all': {
-      const sorted = sortLocations(locations, locationSortMode.value)
-      return sorted
+      return sortLocations(locations.value)
     }
     case 'gauges': {
-      const filtered = locations.filter((loc) => isGauge(loc))
-      const sorted = sortLocations(filtered, locationSortMode.value)
-      return sorted
+      const filtered = locations.value.filter((loc) => isGauge(loc))
+      return sortLocations(filtered)
     }
     case 'cameras': {
-      const filtered = locations.filter((loc) => loc.other.kind === 'Camera')
-      const sorted = sortLocations(filtered, locationSortMode.value)
-      return sorted
+      const filtered = locations.value.filter((loc) => loc.other.kind === 'Camera')
+      return sortLocations(filtered)
     }
   }
 }
 
-function sortLocations(locations: OemLocation[], sortMode: SortLocationsValues) {
-  switch (sortMode) {
-    case SortLocationsValues.None: {
-      return locations
-    }
+function sortLocations(locs: OemLocation[]) {
+  locs = locs.filter(Boolean)
+  switch (locationSortMode.value) {
     case SortLocationsValues.AlphaAsc: {
-      const arrayCopy = [...locations]
-      return arrayCopy.sort((a, b) => {
-        const aName = a.name.toLowerCase()
-        const bName = b.name.toLowerCase()
-        if (aName < bName) {
-          return -1
-        } else if (bName < aName) {
-          return 1
-        } else {
-          return 0
+      console.log(locs)
+      let sortedArray: (OemLocation | null)[] = new Array()
+      while (locs.length) {
+        if (!sortedArray.length) {
+          sortedArray.push(locs.pop() ?? null)
+          sortedArray = sortedArray.filter(Boolean)
+          continue
         }
+        const nextLoc = locs.pop() ?? null
+        sortedArray.forEach((loc, i, arr) => {
+          if (!loc) {
+          } else if (!nextLoc) {
+          } else {
+          }
+        })
+      }
+      locs.slice(1).forEach((loc, i, arr) => {
+        sortedArray.forEach((sortedLoc, j, sortedArr) => {
+          const sortedName = sortedLoc.name.toLowerCase()
+          const bName = loc.name.toLowerCase()
+        })
       })
+      console.log(sortedArray)
+      return sortedArray
     }
     case SortLocationsValues.AlphaDes: {
-      const arrayCopy = [...locations]
-      return arrayCopy.sort((a, b) => {
+      return locs.sort((a, b) => {
         const aName = a.name.toLowerCase()
         const bName = b.name.toLowerCase()
         if (aName > bName) {
@@ -82,11 +94,15 @@ function sortLocations(locations: OemLocation[], sortMode: SortLocationsValues) 
     }
     case SortLocationsValues.DistAsc: {
       // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
-      return locations
+      return locs
     }
     case SortLocationsValues.DistDes: {
       // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
-      return locations
+      return locs
+    }
+    case SortLocationsValues.None:
+    default: {
+      return locs
     }
   }
 }
@@ -117,7 +133,7 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
 
 <template>
   <Pinboard
-    :locations="filteredLocations"
+    :locations="filteredLocations ?? new Array()"
     :get-card-details="
       (loc: Location) => ({
         heading: loc.name,
