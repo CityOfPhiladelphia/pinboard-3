@@ -53,8 +53,9 @@ const emit = defineEmits<{
 }>()
 
 const config = inject(PINBOARD_CONFIG_KEY)!
+
 const slots = useSlots()
-const mapPanelRef = ref<{ flyTo: (lngLat: [number, number]) => void } | null>(null)
+const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(null)
 
 const hoveredLocationId = ref<string | null>(null)
 const selectedLocation = ref<Location | null>(null)
@@ -76,7 +77,7 @@ function handleHoverEnd() {
 function handleSelect(location: Location) {
   selectedLocation.value = location
   if (props.getPosition) {
-    mapPanelRef.value?.flyTo(props.getPosition(location))
+    mapPanelRef.value?.panTo(props.getPosition(location))
   }
 }
 
@@ -122,7 +123,7 @@ function handleLocationFilterChange(selectedFilter: string) {
         </div>
 
         <div class="finder-panel-map" :class="{ 'is-active': activeMobilePanel === 'map' }">
-          <MapPanel v-if="!isLoading" :config="config.map" :locations="locations" :geojson="geojson"
+          <MapPanel v-if="!isLoading" ref="mapPanelRef" :config="config.map" :locations="locations" :geojson="geojson"
             :hovered-id="hoveredLocationId" :selected-id="selectedLocationId" :map-content-slot="slots['map-content']"
             :on-hover="handleHover" :on-hover-end="handleHoverEnd" :on-select="handleSelect" />
         </div>
