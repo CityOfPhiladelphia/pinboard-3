@@ -81,6 +81,10 @@ function handleSelect(location: Location) {
   }
 }
 
+function handleMapSelect(location: Location) {
+  selectedLocation.value = location
+}
+
 function closeLocationDetail() {
   if (selectedLocation.value) {
     emit('deselect', selectedLocation.value.id)
@@ -125,7 +129,7 @@ function handleLocationFilterChange(selectedFilter: string) {
         <div class="finder-panel-map" :class="{ 'is-active': activeMobilePanel === 'map' }">
           <MapPanel v-if="!isLoading" ref="mapPanelRef" :config="config.map" :locations="locations" :geojson="geojson"
             :hovered-id="hoveredLocationId" :selected-id="selectedLocationId" :map-content-slot="slots['map-content']"
-            :on-hover="handleHover" :on-hover-end="handleHoverEnd" :on-select="handleSelect" />
+            :on-hover="handleHover" :on-hover-end="handleHoverEnd" :on-select="handleMapSelect" />
         </div>
       </div>
       <PhilaButton
