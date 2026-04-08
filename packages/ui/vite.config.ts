@@ -26,6 +26,7 @@ export default defineConfig({
         return [
           'vue',
           'vue-router',
+          'pinia',
           '@pinboard/core',
           '@phila/phila-ui-map-core',
         ].some((dep) => id === dep || id.startsWith(dep + '/'))

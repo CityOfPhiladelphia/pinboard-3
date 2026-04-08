@@ -1,4 +1,4 @@
-<script setup lang="ts" , generic="T">
+<script setup lang="ts">
 import {
   Pinboard,
   MapMarker,
@@ -13,7 +13,7 @@ import type { Filters, OemLocation } from '@/types'
 import type { Location, LocationFilterOption } from '@ui/types'
 import { SortLocationsValues } from '../../../../../packages/ui/src/types'
 import LocationDetail from '@/components/LocationDetail.vue'
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations()
 const locationSearchString = ref<string>('')
@@ -27,31 +27,32 @@ const filteredLocations = computed(() => {
   }
   const locs = [...locations.value] as OemLocation[]
   switch (locationFilterMode.value) {
-    case 'all': {
-      return locs
-    }
     case 'gauges': {
       return locs.filter((loc) => isGauge(loc))
     }
     case 'cameras': {
       return locs.filter((loc) => loc.other.kind === 'Camera')
     }
+    case 'all':
+    default: {
+      return locs
+    }
   }
 })
 
-const sortedLocations = computed(() => {
+const filteredAndSortedLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
   const locs = [...filteredLocations.value] as OemLocation[]
   switch (locationSortMode.value) {
     case SortLocationsValues.AlphaAsc: {
-      quickSortObjectArrayByStringField(locs, 'name')
-      return locs
+      const sorted = locs.sort((a, b) => a.name.localeCompare(b.name))
+      return sorted
     }
     case SortLocationsValues.AlphaDes: {
-      quickSortObjectArrayByStringField(locs, 'name', '-')
-      return locs
+      const sorted = locs.sort((a, b) => b.name.localeCompare(a.name))
+      return sorted
     }
     case SortLocationsValues.DistAsc: {
       // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
@@ -67,103 +68,6 @@ const sortedLocations = computed(() => {
     }
   }
 })
-
-// function sortedLocations() {
-//   switch (locationFilterMode.value) {
-//     case 'all': {
-//       sortLocations(locs)
-//       console.log('IN FILTER: ', JSON.parse(JSON.stringify(locs)))
-//       return locs
-//     }
-//     case 'gauges': {
-
-//       sortLocations(filtered)
-//       console.log('IN FILTER: ', JSON.parse(JSON.stringify(filtered)))
-//       return filtered
-//     }
-//     case 'cameras': {
-//       const filtered = locs.filter((loc) => loc.other.kind === 'Camera')
-//       sortLocations(filtered)
-//       console.log('IN FILTER: ', JSON.parse(JSON.stringify(filtered)))
-//       return filtered
-//     }
-//   }
-// }
-
-watch(locationSortMode, () => {
-  sortLocations(filteredLocations.value)
-})
-
-function quickSortObjectArrayByStringField(
-  array: Array<any>,
-  field: string,
-  direction: '+' | '-' = '+',
-) {
-  quickSort(array, direction)
-  function quickSort(
-    array: Array<any>,
-    direction: '+' | '-',
-    low: number = 0,
-    high: number = array.length - 1,
-  ): void {
-    if (low >= 0 && high >= 0 && low < high) {
-      const pivot_i = partition(array, direction, low, high)
-      quickSort(array, direction, low, pivot_i - 1)
-      quickSort(array, direction, pivot_i + 1, high)
-    }
-  }
-
-  function partition(array: Array<any>, direction: '+' | '-', low: number, high: number): number {
-    const pivot = array[low]
-    while (true) {
-      if (direction === '+') {
-        while (array[low][field].localeCompare(pivot[field]) < 0) {
-          low++
-        }
-        while (array[high][field].localeCompare(pivot[field]) > 0) {
-          high--
-        }
-      } else if (direction === '-') {
-        while (array[low][field].localeCompare(pivot[field]) > 0) {
-          low++
-        }
-        while (array[high][field].localeCompare(pivot[field]) < 0) {
-          high--
-        }
-      }
-
-      if (low >= high) {
-        return high
-      }
-      const temp = array[low]
-      array[low] = array[high]
-      array[high] = temp
-    }
-  }
-}
-
-function sortLocations(locs: OemLocation[]) {
-  switch (locationSortMode.value) {
-    case SortLocationsValues.AlphaAsc: {
-      quickSortObjectArrayByStringField(locs, 'name')
-    }
-    case SortLocationsValues.AlphaDes: {
-      quickSortObjectArrayByStringField(locs, 'name', '-')
-    }
-    case SortLocationsValues.DistAsc: {
-      // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
-      return locs
-    }
-    case SortLocationsValues.DistDes: {
-      // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
-      return locs
-    }
-    case SortLocationsValues.None:
-    default: {
-      return locs
-    }
-  }
-}
 
 function isGauge(loc: OemLocation): boolean {
   return loc.other.kind === 'Aware' || loc.other.kind === 'Usgs'
@@ -191,7 +95,7 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
 
 <template>
   <Pinboard
-    :locations="sortedLocations ?? new Array()"
+    :locations="filteredAndSortedLocations"
     :get-card-details="
       (loc: Location) => ({
         heading: loc.name,
@@ -221,7 +125,7 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
 
       <div v-if="!isLoading">
         <MapMarker
-          v-for="loc in sortedLocations"
+          v-for="loc in [...filteredAndSortedLocations].sort((a, b) => b.latitude - a.latitude)"
           :key="loc.id"
           :lng-lat="[loc.longitude, loc.latitude]"
         >

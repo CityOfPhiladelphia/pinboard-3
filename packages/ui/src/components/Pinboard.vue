@@ -155,7 +155,7 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
           <MapPanel
             v-if="!isLoading"
             :config="config.map"
-            :locations="locations.sort((a, b) => b.latitude - a.latitude)"
+            :locations="locations"
             :geojson="geojson"
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"
