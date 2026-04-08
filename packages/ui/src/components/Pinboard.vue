@@ -53,8 +53,9 @@ const emit = defineEmits<{
 }>()
 
 const config = inject(PINBOARD_CONFIG_KEY)!
+
 const slots = useSlots()
-const mapPanelRef = ref<{ flyTo: (lngLat: [number, number]) => void } | null>(
+const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
   null
 )
 
@@ -78,7 +79,7 @@ function handleHoverEnd() {
 function handleSelect(location: Location) {
   selectedLocation.value = location
   if (props.getPosition) {
-    mapPanelRef.value?.flyTo(props.getPosition(location))
+    mapPanelRef.value?.panTo(props.getPosition(location))
   }
 }
 
@@ -146,6 +147,7 @@ function handleLocationFilterChange(selectedFilter: string) {
         >
           <MapPanel
             v-if="!isLoading"
+            ref="mapPanelRef"
             :config="config.map"
             :locations="locations"
             :geojson="geojson"

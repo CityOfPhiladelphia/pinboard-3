@@ -34,7 +34,7 @@
     "@phila/phila-ui-button": "^2.2.1",
     "@phila/phila-ui-cards": "0.2.0-beta.1",
     "@phila/phila-ui-core": "^2.3.2",
-    "@phila/phila-ui-map-core": "1.0.1-beta.4",
+    "@phila/phila-ui-map-core": "1.0.1-beta.5",
     "@phila/phila-ui-search": "^1.1.2",
     "@phila/phila-ui-tags": "0.0.1-beta.0",
     "@phila/phila-ui-text-field": "^1.1.2",
