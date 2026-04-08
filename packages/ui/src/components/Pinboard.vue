@@ -250,7 +250,6 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
   border-radius: 1.5rem;
 }
 
-
 .detail-overlay {
   position: absolute;
   top: 0;
@@ -327,12 +326,5 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
   .detail-overlay {
     width: 100%;
   }
-<<<<<<< HEAD
-
-  .pinboard > :deep(footer) {
-    display: none;
-  }
-=======
->>>>>>> origin/main
 }
 </style>
