@@ -5,3 +5,4 @@ dist
 cdk.out
 .claude/
 docs/superpowers/
+AGENTS.md
