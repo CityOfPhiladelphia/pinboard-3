@@ -1,8 +1,11 @@
-import type { Location } from '@pinboard/ui'
-
-export interface PrimaryCareLocation extends Location {
+export interface PrimaryCareLocation {
+  id: string
+  name: string
+  latitude: number
+  longitude: number
   properties: PrimaryCareProperties
   geometry: { type: 'Point'; coordinates: [number, number] }
+  [key: string]: unknown
 }
 
 export interface PrimaryCareProperties {
