@@ -83,6 +83,10 @@ function handleSelect(location: Location) {
   }
 }
 
+function handleMapSelect(location: Location) {
+  selectedLocation.value = location
+}
+
 function closeLocationDetail() {
   if (selectedLocation.value) {
     emit('deselect', selectedLocation.value.id)
@@ -156,7 +160,7 @@ function handleLocationFilterChange(selectedFilter: string) {
             :map-content-slot="slots['map-content']"
             :on-hover="handleHover"
             :on-hover-end="handleHoverEnd"
-            :on-select="handleSelect"
+            :on-select="handleMapSelect"
           />
         </div>
       </div>
