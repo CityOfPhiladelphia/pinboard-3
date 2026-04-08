@@ -40,10 +40,10 @@ const readingState = useLocationDetail(
           <tbody>
             <tr>
 
-              <td>
+              <td v-if="readingState.kind === 'Loaded'">
                 {{
-                  location.lastUpdated
-                    ? new Date(location.lastUpdated).toLocaleString('en-US', {
+                  readingState.data[0]?.createdOn
+                    ? new Date(readingState.data[0]?.createdOn).toLocaleString('en-US', {
                       timeZone: 'America/New_York',
                       year: 'numeric',
                       month: 'short',
@@ -52,11 +52,11 @@ const readingState = useLocationDetail(
                       minute: '2-digit',
                       hour12: true
                     })
-                    : 'N/A'
+                    : 'No data'
                 }}
               </td>
 
-              <td>{{ location.latitude }}, {{ location.longitude }}</td>
+              <td>{{ 'Latitude: ' + location.latitude }}, {{ 'Longitude: ' + location.longitude }}</td>
             </tr>
           </tbody>
         </table>
