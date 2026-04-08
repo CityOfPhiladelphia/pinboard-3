@@ -1,4 +1,4 @@
-import type { LocationDTO, OemLocation } from '@/types'
+import type { LocationDTO, OemLocation, Reading } from '@/types'
 import type { Location } from '@ui/types'
 import { ref, onMounted  } from 'vue'
 
@@ -13,6 +13,7 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
       other: { kind: 'Aware', data: gauge },
+      latestReading: null,
     } satisfies OemLocation)
   }
 
@@ -24,6 +25,7 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
       other: { kind: 'Usgs', data: gauge },
+      latestReading: null,
     } satisfies OemLocation)
   }
 
@@ -35,10 +37,25 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
       longitude: camera.longitude,
       lastUpdated: camera.lastUpdated,
       other: { kind: 'Camera', data: camera },
+      latestReading: null,
     } satisfies OemLocation)
   }
 
   return locations.sort((a, b) => b.latitude - a.latitude)
+}
+
+async function fetchLatestReading(kind: 'aware' | 'usgs', gaugeId: string, headers: Headers): Promise<Reading | null> {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_FLOOD_API_BASE_URL}/${kind}/reading/${gaugeId}?limit=1`,
+      { method: "GET", headers, redirect: "follow" }
+    )
+    if (!response.ok) return null
+    const data: Reading[] = await response.json()
+    return data.length > 0 ? data[0] : null
+  } catch {
+    return null
+  }
 }
 
 export function useLocations() {
@@ -64,8 +81,16 @@ export function useLocations() {
       return;
     }
 
-    locations.value =  transformLocationDTO(await response.json());
+    locations.value = transformLocationDTO(await response.json());
     isLoading.value = false;
+
+    // Fetch latest readings for all gauges in parallel
+    const gauges = locations.value.filter(loc => loc.other.kind !== 'Camera')
+    await Promise.all(gauges.map(async (loc) => {
+      const kind = loc.other.kind.toLowerCase() as 'aware' | 'usgs'
+      const reading = await fetchLatestReading(kind, loc.id, myHeaders)
+      loc.latestReading = reading
+    }))
   }
 
   onMounted(fetchLocations);

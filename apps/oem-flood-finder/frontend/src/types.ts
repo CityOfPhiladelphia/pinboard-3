@@ -30,7 +30,8 @@ export type LocationInfo = {
   other:
     { kind: 'Aware', data: AwareGauge } |
     { kind: 'Usgs', data: UsgsGauge } |
-    { kind: 'Camera', data: Camera }
+    { kind: 'Camera', data: Camera },
+  latestReading: Reading | null,
 }
 
 export type OemLocation = LocationBasic & LocationInfo
