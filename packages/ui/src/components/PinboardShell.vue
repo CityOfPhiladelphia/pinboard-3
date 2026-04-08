@@ -1,8 +1,8 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader } from '@phila/phila-ui-app-header'
-import { FunctionalComponent, h, VNode } from 'vue';
-import MobileNavPanel from './MobileNavPanel.vue';
+import { FunctionalComponent, h, VNode } from 'vue'
+import MobileNavPanel from './MobileNavPanel.vue'
 
 defineProps<{
   title: string
@@ -17,22 +17,19 @@ const slots = defineSlots<{
 
 const MobileNavContent: FunctionalComponent = () =>
   h(MobileNavPanel, null, { default: () => slots['mobile-nav']?.() })
-
 </script>
 
-
 <template>
-
   <div class="pinboard">
-
-    <AppHeader id="pinboard-nav"
+    <AppHeader
+      id="pinboard-nav"
       :show-trusted-site="true"
       :mobile-nav="$slots['mobile-nav'] ? MobileNavContent : undefined"
       :links="[]"
       :navbar-brand="{
-      brandingImage: { src: '', href: '/', altText: 'City of Philadelphia' },
-      brandingLink: { text: title , href: '/' },
-    }"
+        brandingImage: { src: '', href: '/', altText: 'City of Philadelphia' },
+        brandingLink: { text: title, href: '/' },
+      }"
       :banner-title="bannerTitle"
       :banner-message="bannerMessage"
     />
@@ -42,11 +39,8 @@ const MobileNavContent: FunctionalComponent = () =>
     </main>
 
     <AppFooter :sub-footer-only="true" />
-
   </div>
-
 </template>
-
 
 <style scoped>
 .pinboard {

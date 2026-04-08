@@ -5,7 +5,7 @@ import {
   MapIconTextPin,
   MapNavigationControl,
   GeolocationButton,
-  BasemapToggle
+  BasemapToggle,
 } from '@pinboard/ui'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { useLocations } from '../composables/useLocations'
@@ -19,13 +19,15 @@ const { locations, isLoading, errorMessage } = useLocations()
 const locationMode = ref<Filters>('all')
 
 const filteredLocations = computed(() => {
-  if (isLoading.value || errorMessage.value) { return [] }
+  if (isLoading.value || errorMessage.value) {
+    return []
+  }
   switch (locationMode.value) {
-    case ('gauges'): {
-      return locations.value.filter(loc => isGauge(loc))
+    case 'gauges': {
+      return locations.value.filter((loc) => isGauge(loc))
     }
-    case ('cameras'): {
-      return locations.value.filter(loc => loc.other.kind === 'Camera')
+    case 'cameras': {
+      return locations.value.filter((loc) => loc.other.kind === 'Camera')
     }
     default: {
       return locations.value
@@ -83,7 +85,6 @@ function handleDeselect(id: string) {
     </template>
 
     <template #map-content="{ hoveredId, selectedId, zoom, onHover, onHoverEnd, onSelect }">
-
       <MapNavigationControl position="bottom-right" />
       <GeolocationButton position="bottom-right" />
       <BasemapToggle position="top-right" />
@@ -99,9 +100,7 @@ function handleDeselect(id: string) {
         </MapMarker>
       </div>
     </template>
-
   </Pinboard>
-
 </template>
 
 <style scoped>

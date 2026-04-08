@@ -10,7 +10,7 @@ import LocationsPanel from './LocationsPanel.vue'
 
 defineSlots<{
   nav?(): unknown
-  'locations-header'?(props: {}): unknown
+  'locations-header'?(): unknown
   'location-card'?(props: { location: Location }): unknown
   'location-detail'?(props: { location: Location }): unknown
   'map-content'?(props: {
@@ -97,37 +97,54 @@ function closeLocationDetail() {
 }
 
 function handleLocationFilterChange(selectedFilter: string) {
-  emit('selectedFilter', selectedFilter);
+  emit('selectedFilter', selectedFilter)
 }
-
 </script>
 
 <template>
-
   <div class="pinboard">
     <main class="pinboard-main">
       <div v-if="selectedLocation !== null" class="detail-overlay">
-        <button class="detail-close-btn" @click="closeLocationDetail" aria-label="Close details">
+        <button
+          class="detail-close-btn"
+          @click="closeLocationDetail"
+          aria-label="Close details"
+        >
           ×
         </button>
         <slot name="location-detail" :location="selectedLocation" />
       </div>
       <div class="finder-panel">
-        <div class="finder-panel-locations" :class="{ 'is-active': activeMobilePanel === 'list' }">
+        <div
+          class="finder-panel-locations"
+          :class="{ 'is-active': activeMobilePanel === 'list' }"
+        >
           <slot name="locations-header" />
 
           <div v-if="isLoading" class="location-list">
             <MapCard v-for="n in 5" :key="n" :is-loading="true" />
           </div>
 
-          <div v-else-if="errorMessage" class="status-message status-message--error">
+          <div
+            v-else-if="errorMessage"
+            class="status-message status-message--error"
+          >
             {{ errorMessage }}
           </div>
 
-          <LocationsPanel v-else-if="!isLoading" :location-filter="locationFilter" :search="search"
-            :locations="locations" :hovered-id="hoveredLocationId" :selected-id="selectedLocationId"
-            :get-card-details="getCardDetails" @select="handleSelect" @hover="handleHover" @hover-end="handleHoverEnd"
-            @selected-filter="handleLocationFilterChange" />
+          <LocationsPanel
+            v-else-if="!isLoading"
+            :location-filter="locationFilter"
+            :search="search"
+            :locations="locations"
+            :hovered-id="hoveredLocationId"
+            :selected-id="selectedLocationId"
+            :get-card-details="getCardDetails"
+            @select="handleSelect"
+            @hover="handleHover"
+            @hover-end="handleHoverEnd"
+            @selected-filter="handleLocationFilterChange"
+          />
         </div>
 
         <div class="finder-panel-map" :class="{ 'is-active': activeMobilePanel === 'map' }">
@@ -142,7 +159,9 @@ function handleLocationFilterChange(selectedFilter: string) {
         variant="secondary"
         :icon-definition="activeMobilePanel === 'list' ? faMap : faList"
         :text="activeMobilePanel === 'list' ? 'Map view' : 'List view'"
-        @click="activeMobilePanel = activeMobilePanel === 'list' ? 'map' : 'list'"
+        @click="
+          activeMobilePanel = activeMobilePanel === 'list' ? 'map' : 'list'
+        "
       />
     </main>
   </div>
@@ -193,8 +212,8 @@ function handleLocationFilterChange(selectedFilter: string) {
   color: var(--Schemes-Error, #b3261e);
 }
 
-.finder-panel-locations> :deep(.location-list),
-.finder-panel-locations>.location-list {
+.finder-panel-locations > :deep(.location-list),
+.finder-panel-locations > .location-list {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
@@ -217,7 +236,6 @@ function handleLocationFilterChange(selectedFilter: string) {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   border-radius: 1.5rem;
 }
-
 
 .detail-overlay {
   position: absolute;

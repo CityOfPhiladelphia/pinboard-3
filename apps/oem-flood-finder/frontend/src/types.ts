@@ -1,32 +1,32 @@
 /** Shared types for OEM Flood Finder */
-import type { LocationBasic, Location } from "../../../../packages/ui/src/types"
+import type { LocationBasic } from '../../../../packages/ui/src/types'
 
 export type AlertBanner = {
-  title: string,
+  title: string
   body: string
 }
 
 export type EverbridgeNotification = {
-  notificationId: string,
-  createdOn: Date,
-  title: string,
-  body: string,
+  notificationId: string
+  createdOn: Date
+  title: string
+  body: string
   fileAttachments?: string
 }
 
 export type FloodImpact = {
-  stage: number,
+  stage: number
   statement: string
 }
 
 export type LocationDTO = {
-  awareGauges: AwareGauge[],
-  usgsGauges: UsgsGauge[],
+  awareGauges: AwareGauge[]
+  usgsGauges: UsgsGauge[]
   cameras: Camera[]
 }
 
 export type LocationInfo = {
-  lastUpdated: Date | null,
+  lastUpdated: Date | null
   other:
     { kind: 'Aware', data: AwareGauge } |
     { kind: 'Usgs', data: UsgsGauge } |
@@ -37,69 +37,69 @@ export type LocationInfo = {
 export type OemLocation = LocationBasic & LocationInfo
 
 export type UsgsGauge = {
-  gaugeId: string,
-  name: string,
-  latitude: number,
-  longitude: number,
-  lastUpdated: Date | null,
-  actionStage: number,
-  minorStage: number,
-  moderateStage: number,
-  majorStage: number,
-  hydrographURL: string,
-  hydrographWithFloodCategoriesURL: string,
-  stageUnits: string,
+  gaugeId: string
+  name: string
+  latitude: number
+  longitude: number
+  lastUpdated: Date | null
+  actionStage: number
+  minorStage: number
+  moderateStage: number
+  majorStage: number
+  hydrographURL: string
+  hydrographWithFloodCategoriesURL: string
+  stageUnits: string
   floodImpacts: FloodImpact[]
 }
 
 export type AwareGauge = {
-  gaugeId: string,
-  name: string,
-  latitude: number,
-  longitude: number,
-  lastUpdated: Date | null,
-  modemNumber: string,
-  actionStage: number,
-  minorStage: number,
-  moderateStage: number,
-  stageUnits: string,
+  gaugeId: string
+  name: string
+  latitude: number
+  longitude: number
+  lastUpdated: Date | null
+  modemNumber: string
+  actionStage: number
+  minorStage: number
+  moderateStage: number
+  stageUnits: string
   floodImpacts: FloodImpact[]
 }
 
 export type Reading = {
-  readingId: string,
-  createdOn: Date,
-  validTimeUTC: Date,
-  gaugeId: string,
-  flashFloodIndicator: boolean,
-  flashFloodThreshold: number,
-  flashFloodDetectionImagingEnabled: boolean,
-  gaugeHeight: number,
-  gaugeHeightUnit: string,
-  isFlooding: boolean,
-  depthHoldHours: number,
-  depthDetectionImagingEnabled: boolean,
-  rainfall: number,
-  rainIntensity: number,
-  tips: number,
-  barometricPressure: number,
-  airTemperature: number,
-  waterTemperature: number,
-  saltWater: boolean,
-  dropRateIndicator: boolean,
-  dropRateThreshold: number,
-  deviceDropCount: number,
+  readingId: string
+  createdOn: Date
+  validTimeUTC: Date
+  gaugeId: string
+  flashFloodIndicator: boolean
+  flashFloodThreshold: number
+  flashFloodDetectionImagingEnabled: boolean
+  gaugeHeight: number
+  gaugeHeightUnit: string
+  isFlooding: boolean
+  depthHoldHours: number
+  depthDetectionImagingEnabled: boolean
+  rainfall: number
+  rainIntensity: number
+  tips: number
+  barometricPressure: number
+  airTemperature: number
+  waterTemperature: number
+  saltWater: boolean
+  dropRateIndicator: boolean
+  dropRateThreshold: number
+  deviceDropCount: number
   pictureFilenameOnServer: string
 }
 
 export type Camera = {
-  cameraId: string,
-  name: string,
-  latitude: number,
-  longitude: number,
-  lastUpdated: Date,
-  createdOn: Date,
-  locationDescription?: string,
+  cameraId: string
+  name: string
+  latitude: number
+  longitude: number
+  lastUpdated: Date
+  createdOn: Date
+  locationDescription?: string
   pageUrl: string
 }
 
