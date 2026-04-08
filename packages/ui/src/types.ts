@@ -45,6 +45,7 @@ export type LocationBasic = {
   longitude: number
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Location = LocationBasic & Record<string, any>
 
 export type LocationFilterOption = {

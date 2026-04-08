@@ -25,11 +25,11 @@ const initializeVideo = () => {
       hls = new Hls({
         enableWorker: true,
         lowLatencyMode: true,
-        backBufferLength: 90
+        backBufferLength: 90,
       })
       hls.loadSource(props.videoUrl)
       hls.attachMedia(videoRef.value)
-      
+
       hls.on(Hls.Events.ERROR, (event, data) => {
         console.log('HLS Error:', data)
         if (data.fatal) {
@@ -60,11 +60,14 @@ const initializeVideo = () => {
 }
 
 // Watch for URL changes and reinitialize
-watch(() => props.videoUrl, () => {
-  if (props.videoUrl) {
-    setTimeout(initializeVideo, 100)
-  }
-})
+watch(
+  () => props.videoUrl,
+  () => {
+    if (props.videoUrl) {
+      setTimeout(initializeVideo, 100)
+    }
+  },
+)
 
 onMounted(() => {
   if (props.videoUrl) {
@@ -82,10 +85,10 @@ onUnmounted(() => {
 
 <template>
   <div class="camera-video-player">
-    <video 
+    <video
       ref="videoRef"
-      :autoplay="autoplay" 
-      :playsinline="true" 
+      :autoplay="autoplay"
+      :playsinline="true"
       :controls="true"
       :muted="true"
       preload="metadata"
@@ -101,6 +104,4 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 0.5rem;
 }
-
-
 </style>

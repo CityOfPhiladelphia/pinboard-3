@@ -18,7 +18,11 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
     "vite": "^6.1.0",

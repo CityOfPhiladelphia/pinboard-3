@@ -3,7 +3,10 @@ import { ref } from 'vue'
 import { Search } from '@phila/phila-ui-search'
 import { Tags } from '@phila/phila-ui-tags'
 import type { LocationFilterOption } from '../types'
+<<<<<<< HEAD
 import { SortLocationsValues } from '../types'
+=======
+>>>>>>> origin/main
 
 const props = defineProps<{
   search?: string
@@ -16,6 +19,7 @@ const emit = defineEmits<{
   sortOption: [sort: number]
 }>()
 
+<<<<<<< HEAD
 const selectedFilter = ref(
   props.filterOptions ? props.filterOptions[0].value : undefined
 )
@@ -41,6 +45,14 @@ function handleSortChange() {
 function handleSearchChange(search: string) {
   searchString.value = search
 }
+=======
+const selectedFilter = ref(props.filterOptions[0]?.value ?? null)
+
+function handleChange(option: string) {
+  selectedFilter.value = option
+  emit('selectedFilter', selectedFilter.value)
+}
+>>>>>>> origin/main
 </script>
 
 <template>
@@ -54,12 +66,17 @@ function handleSearchChange(search: string) {
   <div class="location-filters">
     <Tags
       v-for="opt in filterOptions"
+<<<<<<< HEAD
       :key="`filter-${opt.value}`"
+=======
+      :key="`${opt.value}-${selectedFilter}`"
+>>>>>>> origin/main
       variant="action"
       size="large"
       color="grey"
       :text="opt.label"
       :selected="selectedFilter === opt.value"
+<<<<<<< HEAD
       @update:selected="handleFilterChange(opt.value)"
     />
     <Tags
@@ -71,6 +88,9 @@ function handleSearchChange(search: string) {
       text="Sort"
       :selected="!!SortLocationsValues.None"
       @update:selected="handleSortChange()"
+=======
+      @update:selected="handleChange(opt.value)"
+>>>>>>> origin/main
     />
   </div>
 </template>

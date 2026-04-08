@@ -10,7 +10,7 @@ import LocationsPanel from './LocationsPanel.vue'
 
 defineSlots<{
   nav?(): unknown
-  'locations-header'?(props: {}): unknown
+  'locations-header'?(): unknown
   'location-card'?(props: { location: Location }): unknown
   'location-detail'?(props: { location: Location }): unknown
   'map-content'?(props: {
@@ -87,6 +87,7 @@ function closeLocationDetail() {
   selectedLocation.value = null
 }
 
+<<<<<<< HEAD
 function handleLocationFilterChange(selectedLocationsFilter: string) {
   emit('selectedLocationsFilter', selectedLocationsFilter)
 }
@@ -98,6 +99,11 @@ function handleLocationSortChange(sortLocationsOption: number) {
 function handleLocationSearchSubmit(locationsSearchString: string) {
   emit('locationSearchString', locationsSearchString)
 }
+=======
+function handleLocationFilterChange(selectedFilter: string) {
+  emit('selectedFilter', selectedFilter)
+}
+>>>>>>> origin/main
 </script>
 
 <template>
@@ -133,8 +139,13 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
 
           <LocationsPanel
             v-else-if="!isLoading"
+<<<<<<< HEAD
             :location-filter="locationPanelFilter"
             :location-search="locationPanelSearch"
+=======
+            :location-filter="locationFilter"
+            :search="search"
+>>>>>>> origin/main
             :locations="locations"
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"
@@ -142,9 +153,13 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
             @select="handleSelect"
             @hover="handleHover"
             @hover-end="handleHoverEnd"
+<<<<<<< HEAD
             @search-string="handleLocationSearchSubmit"
             @selected-filter="handleLocationFilterChange"
             @sort-option="handleLocationSortChange"
+=======
+            @selected-filter="handleLocationFilterChange"
+>>>>>>> origin/main
           />
         </div>
 
@@ -155,7 +170,11 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
           <MapPanel
             v-if="!isLoading"
             :config="config.map"
+<<<<<<< HEAD
             :locations="locations.sort((a, b) => b.latitude - a.latitude)"
+=======
+            :locations="locations"
+>>>>>>> origin/main
             :geojson="geojson"
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"

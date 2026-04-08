@@ -3,7 +3,10 @@ import {
   ref,
   computed,
   defineComponent,
+<<<<<<< HEAD
   h,
+=======
+>>>>>>> origin/main
   type ComponentPublicInstance,
 } from 'vue'
 import { Map as PhilaMap } from '@phila/phila-ui-map-core'
@@ -42,6 +45,7 @@ const mapRef = ref<ComponentPublicInstance | null>(null)
 const zoom = ref(props.config?.zoom ?? 14)
 
 function flyTo(lngLat: [number, number]) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapInstance = (mapRef.value as any)?.map
   if (mapInstance) {
     mapInstance.flyTo({ center: lngLat, zoom: 16, duration: 600 })
@@ -68,7 +72,9 @@ const SlotRenderer = defineComponent({
     renderProps: { type: Object, required: true },
   },
   render() {
-    return (this.renderFn as Function)(this.renderProps)
+    return (this.renderFn as (props: Record<string, unknown>) => unknown)(
+      this.renderProps
+    )
   },
 })
 </script>

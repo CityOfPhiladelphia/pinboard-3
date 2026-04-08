@@ -2,7 +2,7 @@ import type { EverbridgeNotification } from '@/types'
 import { onMounted, ref, toValue, type MaybeRefOrGetter } from 'vue'
 
 export function useEverbridgeNotifications(limit: MaybeRefOrGetter<number>) {
-  let everbridgeNotifications = ref<EverbridgeNotification[]>([])
+  const everbridgeNotifications = ref<EverbridgeNotification[]>([])
 
   async function fetchLatestAlerts() {
     const myHeaders = new Headers()

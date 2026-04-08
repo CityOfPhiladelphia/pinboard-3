@@ -15,7 +15,7 @@ export function useLocationDetail(
   const readingState = ref<ReadingState>({ kind: 'Loading' })
 
   watchEffect(async (onCleanup) => {
-    let abortController = new AbortController()
+    const abortController = new AbortController()
 
     onCleanup(() => abortController.abort())
 
