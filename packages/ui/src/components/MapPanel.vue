@@ -1,28 +1,47 @@
 <script setup lang="ts">
-import { ref, computed, defineComponent, h, type ComponentPublicInstance } from 'vue'
+import {
+  ref,
+  computed,
+  defineComponent,
+  type ComponentPublicInstance,
+} from 'vue'
 import { Map as PhilaMap } from '@phila/phila-ui-map-core'
 import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css'
 import type { MapConfig, Location } from '../types'
 
-const props = withDefaults(defineProps<{
-  config?: MapConfig
-  locations?: Location[]
-  geojson?: unknown
-  hoveredId?: string | null
-  selectedId?: string | null
-  isLoading?: boolean
-  onHover?: (id: string) => void
-  onHoverEnd?: () => void
-  onSelect?: (loc: Location) => void
-  mapContentSlot?: (props: { locations: Location[]; geojson: unknown; map: unknown; zoom: number; hoveredId: string | null; selectedId: string | null; onHover: (id: string) => void; onHoverEnd: () => void; onSelect: (loc: unknown) => void }) => unknown
-}>(), {
-  isLoading: false,
-})
+const props = withDefaults(
+  defineProps<{
+    config?: MapConfig
+    locations?: Location[]
+    geojson?: unknown
+    hoveredId?: string | null
+    selectedId?: string | null
+    isLoading?: boolean
+    onHover?: (id: string) => void
+    onHoverEnd?: () => void
+    onSelect?: (loc: Location) => void
+    mapContentSlot?: (props: {
+      locations: Location[]
+      geojson: unknown
+      map: unknown
+      zoom: number
+      hoveredId: string | null
+      selectedId: string | null
+      onHover: (id: string) => void
+      onHoverEnd: () => void
+      onSelect: (loc: unknown) => void
+    }) => unknown
+  }>(),
+  {
+    isLoading: false,
+  }
+)
 
 const mapRef = ref<ComponentPublicInstance | null>(null)
 const zoom = ref(props.config?.zoom ?? 14)
 
 function flyTo(lngLat: [number, number]) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapInstance = (mapRef.value as any)?.map
   if (mapInstance) {
     mapInstance.flyTo({ center: lngLat, zoom: 16, duration: 600 })
@@ -38,9 +57,9 @@ const slotProps = computed(() => ({
   zoom: zoom.value,
   hoveredId: props.hoveredId ?? null,
   selectedId: props.selectedId ?? null,
-  onHover: props.onHover ?? (() => { }),
-  onHoverEnd: props.onHoverEnd ?? (() => { }),
-  onSelect: props.onSelect ?? (() => { }),
+  onHover: props.onHover ?? (() => {}),
+  onHoverEnd: props.onHoverEnd ?? (() => {}),
+  onSelect: props.onSelect ?? (() => {}),
 }))
 
 const SlotRenderer = defineComponent({
@@ -49,7 +68,9 @@ const SlotRenderer = defineComponent({
     renderProps: { type: Object, required: true },
   },
   render() {
-    return (this.renderFn as Function)(this.renderProps)
+    return (this.renderFn as (props: Record<string, unknown>) => unknown)(
+      this.renderProps
+    )
   },
 })
 </script>
@@ -57,7 +78,11 @@ const SlotRenderer = defineComponent({
 <template>
   <div class="map-panel">
     <PhilaMap ref="mapRef" v-bind="config" @zoom="zoom = $event">
-      <SlotRenderer v-if="mapContentSlot" :render-fn="mapContentSlot" :render-props="slotProps" />
+      <SlotRenderer
+        v-if="mapContentSlot"
+        :render-fn="mapContentSlot"
+        :render-props="slotProps"
+      />
     </PhilaMap>
 
     <div v-if="isLoading" class="map-loading-overlay">

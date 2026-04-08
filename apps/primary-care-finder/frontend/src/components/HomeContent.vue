@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PhilaButton } from '@phila/phila-ui-button'
 
-const props = defineProps<{
+defineProps<{
   activateFinder: () => void
 }>()
 </script>
@@ -49,9 +49,12 @@ const props = defineProps<{
       <h3>{{ $t('introPage.section5Title') }}</h3>
       <p>
         {{ $t('introPage.p5') }}
-        <a target="_blank" href="https://www.phila.gov/departments/department-of-public-health/about-us/contact-us/#send-us-a-message">
-          {{ $t('introPage.feedbackForm') }}
-        </a>.
+        <a
+          target="_blank"
+          href="https://www.phila.gov/departments/department-of-public-health/about-us/contact-us/#send-us-a-message"
+        >
+          {{ $t('introPage.feedbackForm') }} </a
+        >.
       </p>
     </section>
   </div>

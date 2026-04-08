@@ -11,16 +11,13 @@ const props = defineProps<{
 const readingState = useLocationDetail(
   () => props.location.id,
   () => props.location.other.kind,
-  5
+  5,
 )
-
 </script>
 
 <template>
   <div class="location-detail content">
-
     <div class="location-detail__body">
-
       <template v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'">
         <h4>{{ location.name }}</h4>
 
@@ -39,19 +36,18 @@ const readingState = useLocationDetail(
           </thead>
           <tbody>
             <tr>
-
               <td>
                 {{
                   location.lastUpdated
                     ? new Date(location.lastUpdated).toLocaleString('en-US', {
-                      timeZone: 'America/New_York',
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true
-                    })
+                        timeZone: 'America/New_York',
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true,
+                      })
                     : 'N/A'
                 }}
               </td>
@@ -60,7 +56,6 @@ const readingState = useLocationDetail(
             </tr>
           </tbody>
         </table>
-
       </template>
 
       <!-- Camera detail -->
@@ -72,10 +67,8 @@ const readingState = useLocationDetail(
         </p>
 
         <CameraVideoPlayer :video-url="location.other.data.pageUrl" :autoplay="true" />
-
       </template>
     </div>
-
   </div>
 </template>
 

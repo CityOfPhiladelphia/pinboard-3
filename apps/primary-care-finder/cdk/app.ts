@@ -1,22 +1,30 @@
 #!/usr/bin/env node
-import 'source-map-support/register';
-import { App, CfnOutput, Fn, Stack } from 'aws-cdk-lib';
-import * as acm from 'aws-cdk-lib/aws-certificatemanager';
-import * as route53 from 'aws-cdk-lib/aws-route53';
-import { StaticSite, Confidentiality, Environment, applyStandardTags, applyNagChecks } from '@phila/constructs';
+import 'source-map-support/register'
+import { App, CfnOutput, Fn, Stack } from 'aws-cdk-lib'
+import * as acm from 'aws-cdk-lib/aws-certificatemanager'
+import * as route53 from 'aws-cdk-lib/aws-route53'
+import {
+  StaticSite,
+  Confidentiality,
+  Environment,
+  applyStandardTags,
+  applyNagChecks,
+} from '@phila/constructs'
 
-const app = new App();
+const app = new App()
 
 // Environment is determined by CDK context
-const environment = app.node.tryGetContext('environment') as Environment;
+const environment = app.node.tryGetContext('environment') as Environment
 
 if (!environment) {
-  throw new Error('Environment must be specified via context. Use: cdk deploy -c environment=dev');
+  throw new Error(
+    'Environment must be specified via context. Use: cdk deploy -c environment=dev'
+  )
 }
 
 // Read compliance frameworks from context
-const compliance = app.node.tryGetContext('compliance');
-const complianceFrameworks = compliance ? compliance.split(',') : [];
+const compliance = app.node.tryGetContext('compliance')
+const complianceFrameworks = compliance ? compliance.split(',') : []
 
 // Application context with governance metadata
 const context = {
@@ -28,7 +36,7 @@ const context = {
   compliance: complianceFrameworks,
   confidentiality: Confidentiality.LOW,
   cliVersion: '0.0.29',
-};
+}
 
 // Stack name follows pattern: {appName}-{environment}
 const stack = new Stack(app, 'primary-care-finder-' + environment, {
@@ -37,23 +45,29 @@ const stack = new Stack(app, 'primary-care-finder-' + environment, {
     region: process.env.CDK_DEFAULT_REGION || 'us-east-1',
   },
   stackName: 'primary-care-finder-' + environment,
-});
+})
 
-const certificateARN = app.node.tryGetContext('certificateARN') as string | undefined;
+const certificateARN = app.node.tryGetContext('certificateARN') as
+  | string
+  | undefined
 const certificate = certificateARN
   ? acm.Certificate.fromCertificateArn(stack, 'FrontendCert', certificateARN)
-  : undefined;
+  : undefined
 
-const frontendDomain = app.node.tryGetContext('frontendDomain') as string | undefined;
-let frontendZone: route53.IHostedZone | undefined;
+const frontendDomain = app.node.tryGetContext('frontendDomain') as
+  | string
+  | undefined
+let frontendZone: route53.IHostedZone | undefined
 if (frontendDomain && certificate) {
-  const zone = new route53.PublicHostedZone(stack, 'FrontendZone', { zoneName: frontendDomain });
-  frontendZone = zone;
+  const zone = new route53.PublicHostedZone(stack, 'FrontendZone', {
+    zoneName: frontendDomain,
+  })
+  frontendZone = zone
   if (zone.hostedZoneNameServers) {
     new CfnOutput(stack, 'FrontendHostedZoneNS', {
       value: Fn.join(', ', zone.hostedZoneNameServers),
       description: `Delegate ${frontendDomain} to Route53: add these NS records at your domain registrar`,
-    });
+    })
   }
 }
 
@@ -63,9 +77,9 @@ new StaticSite(stack as any, 'primary-care-finderSite', {
   assetDir: '../frontend/dist',
   ...(certificate ? { certificate } : {}),
   ...(frontendZone ? { hostedZone: frontendZone } : {}),
-} as any);
+} as any)
 
-applyStandardTags(app, context);
-applyNagChecks(app);
+applyStandardTags(app, context)
+applyNagChecks(app)
 
-app.synth();
+app.synth()
