@@ -14,7 +14,6 @@ import type { Location, LocationFilterOption, MapCardPropsObject } from '@ui/typ
 import { SortLocationsValues } from '../../../../../packages/ui/src/types'
 import LocationDetail from '@/components/LocationDetail.vue'
 import { computed, ref, reactive } from 'vue'
-import type { MapCardProps } from '@phila/phila-ui-cards'
 
 const { locations, isLoading, errorMessage } = useLocations()
 const locationSearchString = ref<string>('')
@@ -87,18 +86,17 @@ const filteredAndSortedLocations = computed(() => {
 
 const mapCardPropsList = computed(() => {
   if (isLoading.value || errorMessage.value) {
-    return []
+    return {}
   }
-  const locs = filteredAndSortedLocations.value
   const activeCardProps: MapCardPropsObject = {}
-  locs.forEach((loc) => {
+  locations.value.forEach((loc) => {
     switch (loc.other.kind) {
       case 'Camera': {
         activeCardProps[loc.id] = {
           heading: loc.name,
-          subheader: '',
-          tag: '',
-          src: '',
+          subheader: "I'm a camera!",
+          tag: 'Some fun info',
+          src: 'Pretty pretty picture!',
           isLoading: isLoading.value,
         }
         break
@@ -106,9 +104,9 @@ const mapCardPropsList = computed(() => {
       case 'Aware': {
         activeCardProps[loc.id] = {
           heading: loc.name,
-          subheader: '',
-          tag: '',
-          src: '',
+          subheader: "I'm an Aware gauge!",
+          tag: 'Photo I think?',
+          src: 'Pretty pretty picture!',
           isLoading: isLoading.value,
         }
         break
@@ -117,9 +115,9 @@ const mapCardPropsList = computed(() => {
       default: {
         activeCardProps[loc.id] = {
           heading: loc.name,
-          subheader: '',
-          tag: '',
-          src: '',
+          subheader: "I'm a USGS gauge!",
+          tag: '100% pure government efficiency',
+          src: 'Pretty pretty picture!',
           isLoading: isLoading.value,
         }
         break
@@ -171,7 +169,7 @@ function handleDeselect(id: string) {
 <template>
   <Pinboard
     :locations="filteredAndSortedLocations"
-    :card-details="MapCardPropsObject"
+    :card-details="mapCardPropsList"
     :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]"
     :is-loading="isLoading"
     :error-message="errorMessage"
