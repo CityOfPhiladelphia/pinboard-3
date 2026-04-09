@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import '@phila/phila-ui-core/styles/template-light.css'
 import { useSlots, inject, ref, computed } from 'vue'
-import { PhilaButton } from '@phila/phila-ui-button'
-import { faMap, faList } from '@fortawesome/pro-solid-svg-icons'
+import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
+import { faMap } from '@fortawesome/pro-solid-svg-icons'
 import { PINBOARD_CONFIG_KEY, Location, LocationFilterOption } from '../types'
 import { MapCard } from '@phila/phila-ui-cards'
 import MapPanel from './MapPanel.vue'
@@ -62,7 +62,7 @@ const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
 
 const hoveredLocationId = ref<string | null>(null)
 const selectedLocation = ref<Location | null>(null)
-const activeMobilePanel = ref<'list' | 'map'>('list')
+const bottomSheetOpen = ref(true)
 
 const selectedLocationId = computed(() =>
   selectedLocation.value === null ? null : selectedLocation.value.id
@@ -118,10 +118,7 @@ function handleLocationFilterChange(selectedFilter: string) {
         <slot name="location-detail" :location="selectedLocation" />
       </div>
       <div class="finder-panel">
-        <div
-          class="finder-panel-locations"
-          :class="{ 'is-active': activeMobilePanel === 'list' }"
-        >
+        <div class="finder-panel-locations">
           <slot name="locations-header" />
 
           <div v-if="isLoading" class="location-list">
@@ -150,10 +147,7 @@ function handleLocationFilterChange(selectedFilter: string) {
           />
         </div>
 
-        <div
-          class="finder-panel-map"
-          :class="{ 'is-active': activeMobilePanel === 'map' }"
-        >
+        <div class="finder-panel-map">
           <MapPanel
             ref="mapPanelRef"
             :config="config.map"
@@ -169,16 +163,40 @@ function handleLocationFilterChange(selectedFilter: string) {
           />
         </div>
       </div>
-      <PhilaButton
-        v-if="selectedLocation === null"
-        class="mobile-panel-toggle"
-        variant="secondary"
-        :icon-definition="activeMobilePanel === 'list' ? faMap : faList"
-        :text="activeMobilePanel === 'list' ? 'Map view' : 'List view'"
-        @click="
-          activeMobilePanel = activeMobilePanel === 'list' ? 'map' : 'list'
-        "
-      />
+      <BottomSheet
+        v-model="bottomSheetOpen"
+        :snap-points="[20, 50, 75, 100]"
+        collapse-label="Map view"
+        :collapse-icon="faMap"
+        class="mobile-bottom-sheet"
+      >
+        <slot name="locations-header" />
+
+        <div v-if="isLoading" class="location-list">
+          <MapCard v-for="n in 5" :key="n" :is-loading="true" />
+        </div>
+
+        <div
+          v-else-if="errorMessage"
+          class="status-message status-message--error"
+        >
+          {{ errorMessage }}
+        </div>
+
+        <LocationsPanel
+          v-else-if="!isLoading"
+          :location-filter="locationFilter"
+          :search="search"
+          :locations="locations"
+          :hovered-id="hoveredLocationId"
+          :selected-id="selectedLocationId"
+          :get-card-details="getCardDetails"
+          @select="handleSelect"
+          @hover="handleHover"
+          @hover-end="handleHoverEnd"
+          @selected-filter="handleLocationFilterChange"
+        />
+      </BottomSheet>
     </main>
   </div>
 </template>
@@ -242,15 +260,8 @@ function handleLocationFilterChange(selectedFilter: string) {
   overflow: hidden;
 }
 
-.mobile-panel-toggle {
+.mobile-bottom-sheet {
   display: none;
-  position: fixed;
-  bottom: 3rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  border-radius: 1.5rem;
 }
 
 .detail-overlay {
@@ -291,39 +302,22 @@ function handleLocationFilterChange(selectedFilter: string) {
 }
 
 @media (max-width: 768px) {
-  .finder-panel-locations {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-right: none;
-    display: none;
-  }
-
-  .finder-panel-locations.is-active {
-    display: flex;
-  }
-
-  .finder-panel-map {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: none;
-  }
-
-  .finder-panel-map.is-active {
+  .finder-panel {
+    position: relative;
     display: block;
   }
 
-  .finder-panel {
-    position: relative;
+  .finder-panel-locations {
+    display: none;
   }
 
-  .mobile-panel-toggle {
-    display: inline-flex;
+  .finder-panel-map {
+    width: 100%;
+    height: 100%;
+  }
+
+  .mobile-bottom-sheet {
+    display: block;
   }
 
   .detail-overlay {
