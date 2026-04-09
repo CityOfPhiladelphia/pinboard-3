@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Search } from '@phila/phila-ui-search'
 import { MapCard } from '@phila/phila-ui-cards'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 import type { Location, LocationFilterOption } from '../types'
 
-defineProps<{
+const listRef = ref<HTMLElement | null>(null)
+
+const props = defineProps<{
   locationFilter: LocationFilterOption[] | null
   search: string | null
   locations: Location[]
@@ -29,6 +31,13 @@ const emit = defineEmits<{
 
 const pendingKeydown = ref(false)
 
+watch(() => props.selectedId, (id) => {
+  if (id && listRef.value) {
+    const card = listRef.value.querySelector(`[data-location-id="${id}"]`)
+    card?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+})
+
 function onCardKeyup(location: Location) {
   if (pendingKeydown.value) {
     emit('select', location)
@@ -48,10 +57,11 @@ function handleFilterChange(selectedFilter: string) {
     @selected-filter="handleFilterChange"
   />
   <Search v-if="search" class-name="location-search" :placeholder="search" />
-  <div class="location-list content">
+  <div ref="listRef" class="location-list content">
     <MapCard
       v-for="location in locations"
       :key="location.id"
+      :data-location-id="location.id"
       v-bind="getCardDetails(location)"
       :class="[
         'location-card',
