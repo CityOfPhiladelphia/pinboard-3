@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Location } from '@ui/types'
 import GaugeReadings from './GaugeReadings.vue'
 import CameraVideoPlayer from './CameraVideoPlayer.vue'
@@ -13,6 +14,26 @@ const readingState = useLocationDetail(
   () => props.location.other.kind,
   5
 )
+
+const lastUpdatedDate = computed(() => {
+  if (readingState.value.kind !== 'Loaded') return 'Loading...'
+  
+  const validTime = readingState.value.data[0]?.validTimeUTC
+  if (!validTime) return 'No data'
+  
+  const date = new Date(validTime)
+  if (isNaN(date.getTime())) return 'Invalid date'
+  
+  return date.toLocaleString('en-US', {
+    timeZone: 'America/New_York',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  })
+})
 
 </script>
 
@@ -39,24 +60,8 @@ const readingState = useLocationDetail(
           </thead>
           <tbody>
             <tr>
-
-              <td v-if="readingState.kind === 'Loaded'">
-                {{
-                  readingState.data[0]?.createdOn
-                    ? new Date(readingState.data[0]?.createdOn).toLocaleString('en-US', {
-                      timeZone: 'America/New_York',
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true
-                    })
-                    : 'No data'
-                }}
-              </td>
-
-              <td>{{ 'Latitude: ' + location.latitude }}, {{ 'Longitude: ' + location.longitude }}</td>
+              <td>{{ lastUpdatedDate }}</td>
+              <td>{{ location.latitude }}, {{ location.longitude }}</td>
             </tr>
           </tbody>
         </table>
