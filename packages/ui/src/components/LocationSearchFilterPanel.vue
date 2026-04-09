@@ -21,6 +21,7 @@ const selectedFilter = ref(
 )
 const sortOption = ref<SortLocationsValues>(SortLocationsValues.None)
 const searchString = ref<string>('')
+const searchActive = ref<boolean>(false)
 
 function handleFilterChange(option: string) {
   if (selectedFilter.value === option) {
@@ -40,6 +41,15 @@ function handleSortChange() {
 
 function handleSearchChange(search: string) {
   searchString.value = search
+  if (searchActive.value && searchString.value === '') {
+    searchActive.value = false
+    emit('searchString', searchString.value)
+  }
+}
+
+function handleSearchSubmit() {
+  searchActive.value = true
+  emit('searchString', searchString.value)
 }
 </script>
 
@@ -49,7 +59,7 @@ function handleSearchChange(search: string) {
     class-name="location-search"
     :placeholder="search"
     @update:modelValue="handleSearchChange"
-    @search="searchString ? emit('searchString', searchString) : null"
+    @search="handleSearchSubmit"
   />
   <div class="location-filters">
     <Tags

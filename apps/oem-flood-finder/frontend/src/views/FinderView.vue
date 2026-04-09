@@ -40,11 +40,26 @@ const filteredLocations = computed(() => {
   }
 })
 
+const searchMatchedLocations = computed(() => {
+  if (isLoading.value || errorMessage.value) {
+    return []
+  }
+  if (locationSearchString.value) {
+    const searchTerms = locationSearchString.value.replace(/\W+/, ' ').toLowerCase().split(' ')
+    return filteredLocations.value.filter((loc) => {
+      const locString = JSON.stringify(Object.values(loc.other.data)).toLowerCase()
+      return searchTerms.some((term) => locString.match(term))
+    })
+  } else {
+    return filteredLocations.value
+  }
+})
+
 const filteredAndSortedLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
-  const locs = [...filteredLocations.value] as OemLocation[]
+  const locs = [...searchMatchedLocations.value] as OemLocation[]
   switch (locationSortMode.value) {
     case SortLocationsValues.AlphaAsc: {
       const sorted = locs.sort((a, b) => a.name.localeCompare(b.name))
@@ -85,7 +100,6 @@ function handleLocationFilterChange(selectedFilter: string) {
 
 function handleLocationSortChange(sortLocationsOption: number) {
   locationSortMode.value = sortLocationsOption as SortLocationsValues
-  console.log(locationSortMode.value)
 }
 
 function handleLocationSearchSubmit(locationsSearchString: string) {

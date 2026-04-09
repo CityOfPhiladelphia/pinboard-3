@@ -14,13 +14,17 @@ export default defineConfigWithVueTs(
     name: 'app/files-to-lint',
     files: ['**/*.{vue,ts,mts,tsx}'],
   },
-
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
-
   ...pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
-
   ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
-
   skipFormatting,
+  {
+    languageOptions: {
+      parserOptions: {
+        project: true,
+        tsconfigRootDir: __dirname,
+      },
+    },
+  },
 )
