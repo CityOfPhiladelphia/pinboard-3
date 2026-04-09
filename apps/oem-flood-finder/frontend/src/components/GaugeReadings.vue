@@ -2,18 +2,16 @@
 import type { ReadingState } from '../composables/useLocationDetail'
 import type { Location } from '@ui/types'
 
-const props = defineProps<{
-  readingState: ReadingState,
+defineProps<{
+  readingState: ReadingState
   location: Location
 }>()
-
 </script>
 
 <template>
   <progress v-if="readingState.kind === 'Loading'" />
 
   <div v-else-if="readingState.kind === 'Loaded'">
-
     <!-- Graph will go here -->
     <table v-if="location.other.kind === 'Aware'">
       <thead>
@@ -24,17 +22,18 @@ const props = defineProps<{
       </thead>
       <tbody>
         <tr v-for="reading in readingState.data" :key="reading.readingId">
-
-          <td>{{
-            new Date(reading.validTimeUTC).toLocaleString('en-US', {
-              timeZone: 'America/New_York',
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-              hour: 'numeric',
-              minute: '2-digit',
-              hour12: true
-            }) }}
+          <td>
+            {{
+              new Date(reading.validTimeUTC).toLocaleString('en-US', {
+                timeZone: 'America/New_York',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+              })
+            }}
           </td>
 
           <td>
@@ -46,22 +45,29 @@ const props = defineProps<{
     </table>
 
     <div v-if="location.other.kind === 'Usgs'">
-      <img :src="location.other.data.hydrographWithFloodCategoriesURL" :alt="location.other.data.hydrographURL">
+      <img
+        :src="location.other.data.hydrographWithFloodCategoriesURL"
+        :alt="location.other.data.hydrographURL"
+      />
     </div>
 
     <!-- Snapshot -->
     <template v-if="location.other.kind === 'Aware' && 0 in readingState.data">
       <h6>Current Snapshot</h6>
       <img
-        :src="'https://images.flashflood.info:8282/' + location.other.data.modemNumber + '/' + readingState.data[0].pictureFilenameOnServer" />
+        :src="
+          'https://images.flashflood.info:8282/' +
+          location.other.data.modemNumber +
+          '/' +
+          readingState.data[0].pictureFilenameOnServer
+        "
+      />
     </template>
-
   </div>
 
   <p v-else-if="readingState.kind === 'Error'">
     {{ readingState.message }}
   </p>
-
 </template>
 
 <style scoped>

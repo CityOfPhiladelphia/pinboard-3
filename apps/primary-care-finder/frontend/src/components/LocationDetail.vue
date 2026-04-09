@@ -6,7 +6,7 @@ import type { PrimaryCareLocation } from '@/types'
 
 const props = defineProps<{
   location: PrimaryCareLocation
-  onClose: (e: MouseEvent) => void
+  onClose?: (e: MouseEvent) => void
 }>()
 
 const { t, locale, messages } = useI18n()
@@ -22,8 +22,12 @@ const fullAddress = computed(() => {
 
 function siteName(): string {
   let value = p.value.record
-  if (value === 'Delaware Valley Community Health (DVCH) Maria de los Santos Womens Health Center') {
-    value = "Delaware Valley Community Health (DVCH) Maria de los Santos Women's Health Center"
+  if (
+    value ===
+    'Delaware Valley Community Health (DVCH) Maria de los Santos Womens Health Center'
+  ) {
+    value =
+      "Delaware Valley Community Health (DVCH) Maria de los Santos Women's Health Center"
   }
   return value
 }
@@ -92,9 +96,14 @@ const otherServices = computed<OtherServiceRow[]>(() => {
 
 // --- Hours ---
 const DAYS = ['mon', 'tues', 'wed', 'thurs', 'fri', 'sat', 'sun'] as const
-const DAY_I18N_KEYS: Record<typeof DAYS[number], string> = {
-  mon: 'Monday', tues: 'Tuesday', wed: 'Wednesday', thurs: 'Thursday',
-  fri: 'Friday', sat: 'Saturday', sun: 'Sunday',
+const DAY_I18N_KEYS: Record<(typeof DAYS)[number], string> = {
+  mon: 'Monday',
+  tues: 'Tuesday',
+  wed: 'Wednesday',
+  thurs: 'Thursday',
+  fri: 'Friday',
+  sat: 'Saturday',
+  sun: 'Sunday',
 }
 
 const exceptionsByDay = computed(() => {
@@ -142,7 +151,10 @@ function parseTimeRange(day: string): string {
 
 function parseException(exception: string, index: number): string {
   const stars = '*'.repeat(index)
-  const msgs = messages.value[locale.value] as any
+  const msgs = messages.value[locale.value] as Record<
+    string,
+    Record<string, string>
+  >
   const translated = msgs?.exceptions?.[exception]
   return stars + ' ' + (translated ?? exception)
 }
@@ -150,34 +162,46 @@ function parseException(exception: string, index: number): string {
 // --- Tests ---
 const tests = computed(() => {
   const fields = ['blood', 'sti', 'covid', 'mammo', 'xray']
-  return fields.filter(f => p.value[`tests_${f}`] === 'Yes')
+  return fields.filter((f) => p.value[`tests_${f}`] === 'Yes')
 })
 
 // --- Languages ---
 const languagesSpoken = computed<string[]>(() => {
   if (!p.value.language) return []
-  return p.value.language.split(',').map(s => s.trim())
+  return p.value.language.split(',').map((s) => s.trim())
 })
 
 function translateLanguage(lang: string): string {
-  const msgs = messages.value[locale.value] as any
+  const msgs = messages.value[locale.value] as Record<
+    string,
+    Record<string, string>
+  >
   return msgs?.languages?.[lang.toLowerCase()] ?? lang
 }
 
 function translateWarning(warning: string): string {
-  const msgs = messages.value[locale.value] as any
+  const msgs = messages.value[locale.value] as Record<
+    string,
+    Record<string, string>
+  >
   return msgs?.warnings?.[warning] ?? warning
 }
 
 // --- Transit helpers ---
 function translateTransitList(raw: string | null, category: string): string {
   if (!raw) return ''
-  const msgs = messages.value[locale.value] as any
+  const msgs = messages.value[locale.value] as Record<
+    string,
+    Record<string, Record<string, string>>
+  >
   const translations = msgs?.transit?.[category]
-  return raw.split(',').map(s => {
-    const key = s.trim()
-    return translations?.[key] ?? key
-  }).join(', ')
+  return raw
+    .split(',')
+    .map((s) => {
+      const key = s.trim()
+      return translations?.[key] ?? key
+    })
+    .join(', ')
 }
 </script>
 
@@ -208,21 +232,34 @@ function translateTransitList(raw: string | null, category: string): string {
       </section>
 
       <!-- Transit -->
-      <section v-if="p.transport_bus || p.transport_subway || p.transport_train || p.transport_trolley || p.transport_parking" class="transit-section">
+      <section
+        v-if="
+          p.transport_bus ||
+          p.transport_subway ||
+          p.transport_train ||
+          p.transport_trolley ||
+          p.transport_parking
+        "
+        class="transit-section"
+      >
         <div v-if="p.transport_bus">
           <strong>{{ $t('transit.bus') }}:</strong> {{ p.transport_bus }}
         </div>
         <div v-if="p.transport_subway">
-          <strong>{{ $t('transit.subway.label') }}:</strong> {{ translateTransitList(p.transport_subway, 'subway') }}
+          <strong>{{ $t('transit.subway.label') }}:</strong>
+          {{ translateTransitList(p.transport_subway, 'subway') }}
         </div>
         <div v-if="p.transport_train">
-          <strong>{{ $t('transit.regRail.label') }}:</strong> {{ translateTransitList(p.transport_train, 'regRail') }}
+          <strong>{{ $t('transit.regRail.label') }}:</strong>
+          {{ translateTransitList(p.transport_train, 'regRail') }}
         </div>
         <div v-if="p.transport_trolley">
-          <strong>{{ $t('transit.trolley') }}:</strong> {{ p.transport_trolley }}
+          <strong>{{ $t('transit.trolley') }}:</strong>
+          {{ p.transport_trolley }}
         </div>
         <div v-if="p.transport_parking">
-          <strong>{{ $t('transit.car.label') }}:</strong> {{ translateTransitList(p.transport_parking, 'car') }}
+          <strong>{{ $t('transit.car.label') }}:</strong>
+          {{ translateTransitList(p.transport_parking, 'car') }}
         </div>
       </section>
 
@@ -242,15 +279,23 @@ function translateTransitList(raw: string | null, category: string): string {
               <th>{{ $t('service') }}</th>
               <th class="center">{{ $t('ageRange.adult') }}</th>
               <th class="center">{{ $t('ageRange.child') }}</th>
-              <th class="center">{{ $t('patientType.patient_type_existing_only') }}</th>
+              <th class="center">
+                {{ $t('patientType.patient_type_existing_only') }}
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="row in ageSpecificServices" :key="row.id">
               <td>{{ $t(row.service) }}</td>
-              <td class="center">{{ YES_VALUES.includes(row.adult ?? '') ? '✓' : '' }}</td>
-              <td class="center">{{ YES_VALUES.includes(row.child ?? '') ? '✓' : '' }}</td>
-              <td class="center">{{ row.existing.includes('Established Patients') ? '✓' : '' }}</td>
+              <td class="center">
+                {{ YES_VALUES.includes(row.adult ?? '') ? '✓' : '' }}
+              </td>
+              <td class="center">
+                {{ YES_VALUES.includes(row.child ?? '') ? '✓' : '' }}
+              </td>
+              <td class="center">
+                {{ row.existing.includes('Established Patients') ? '✓' : '' }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -266,14 +311,18 @@ function translateTransitList(raw: string | null, category: string): string {
             <tr>
               <th>{{ $t('service') }}</th>
               <th class="center">{{ $t('patientType.patient_type_new') }}</th>
-              <th class="center">{{ $t('patientType.patient_type_existing') }}</th>
+              <th class="center">
+                {{ $t('patientType.patient_type_existing') }}
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="row in otherServices" :key="row.id">
               <td>{{ $t(row.service) }}</td>
               <td class="center">{{ row.value === 'Yes' ? '✓' : '' }}</td>
-              <td class="center">{{ YES_VALUES.includes(row.value ?? '') ? '✓' : '' }}</td>
+              <td class="center">
+                {{ YES_VALUES.includes(row.value ?? '') ? '✓' : '' }}
+              </td>
             </tr>
           </tbody>
         </table>

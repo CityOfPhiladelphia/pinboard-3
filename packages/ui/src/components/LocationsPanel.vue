@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Search } from "@phila/phila-ui-search";
+import { ref, watch } from 'vue'
+import { Search } from '@phila/phila-ui-search'
 import { MapCard } from '@phila/phila-ui-cards'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
-import type { Location, LocationFilterOption } from '../types';
+import type { Location, LocationFilterOption } from '../types'
+
+const listRef = ref<HTMLElement | null>(null)
 
 const props = defineProps<{
   locationFilter: LocationFilterOption[] | null
@@ -12,7 +14,11 @@ const props = defineProps<{
   locations: Location[]
   hoveredId?: string | null
   selectedId?: string | null
-  locationCardSlot?: (props: { location: Location; isHovered: boolean; isSelected: boolean }) => unknown
+  locationCardSlot?: (props: {
+    location: Location
+    isHovered: boolean
+    isSelected: boolean
+  }) => unknown
   getCardDetails: (loc: Location) => MapCardProps
 }>()
 
@@ -25,6 +31,16 @@ const emit = defineEmits<{
 
 const pendingKeydown = ref(false)
 
+watch(
+  () => props.selectedId,
+  (id) => {
+    if (id && listRef.value) {
+      const card = listRef.value.querySelector(`[data-location-id="${id}"]`)
+      card?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }
+)
+
 function onCardKeyup(location: Location) {
   if (pendingKeydown.value) {
     emit('select', location)
@@ -33,21 +49,37 @@ function onCardKeyup(location: Location) {
 }
 
 function handleFilterChange(selectedFilter: string) {
-  emit('selectedFilter', selectedFilter);
+  emit('selectedFilter', selectedFilter)
 }
-
 </script>
 
 <template>
-  <LocationSearchFilterPanel v-if="locationFilter" :filterOptions="locationFilter"
-    @selected-filter="handleFilterChange" />
+  <LocationSearchFilterPanel
+    v-if="locationFilter"
+    :filterOptions="locationFilter"
+    @selected-filter="handleFilterChange"
+  />
   <Search v-if="search" class-name="location-search" :placeholder="search" />
-  <div class="location-list content">
-    <MapCard v-for="location in locations" :key="location.id" v-bind="getCardDetails(location)" :class="['location-card', {
-      'location-card--hovered': hoveredId === location.id,
-      'location-card--selected': selectedId === location.id,
-    }]" tabindex="0" @click="emit('select', location)" @mouseenter="emit('hover', location.id)"
-      @mouseleave="emit('hover-end')" @keydown.enter="pendingKeydown = true" @keyup.enter="onCardKeyup(location)" />
+  <div ref="listRef" class="location-list content">
+    <MapCard
+      v-for="location in locations"
+      :key="location.id"
+      :data-location-id="location.id"
+      v-bind="getCardDetails(location)"
+      :class="[
+        'location-card',
+        {
+          'location-card--hovered': hoveredId === location.id,
+          'location-card--selected': selectedId === location.id,
+        },
+      ]"
+      tabindex="0"
+      @click="emit('select', location)"
+      @mouseenter="emit('hover', location.id)"
+      @mouseleave="emit('hover-end')"
+      @keydown.enter="pendingKeydown = true"
+      @keyup.enter="onCardKeyup(location)"
+    />
   </div>
 </template>
 
@@ -76,6 +108,6 @@ function handleFilterChange(selectedFilter: string) {
 
 .location-search {
   padding: 1rem;
-  width: 100%
+  width: 100%;
 }
 </style>

@@ -1,0 +1,168 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    name: Lint, type-check, build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - uses: pnpm/action-setup@v5
+        with:
+          version: 10.4.1
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          NPM_FONTAWESOME_SECRET: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+
+      - name: Lint
+        run: pnpm turbo lint
+
+      - name: Format check
+        run: pnpm turbo format:check
+
+      - name: Type-check
+        run: pnpm turbo type-check
+
+      - name: Build
+        run: pnpm turbo build
+
+  detect-changes:
+    name: Detect changed apps
+    runs-on: ubuntu-latest
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    outputs:
+      oem: ${{ steps.changes.outputs.oem }}
+      pcf: ${{ steps.changes.outputs.pcf }}
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Check changed files
+        id: changes
+        run: |
+          CHANGED=$(git diff --name-only HEAD^1 HEAD)
+          echo "$CHANGED"
+
+          packages_changed() { echo "$CHANGED" | grep -q "^packages/"; }
+          app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
+
+          if packages_changed || app_changed "oem-flood-finder"; then
+            echo "oem=true" >> $GITHUB_OUTPUT
+          else
+            echo "oem=false" >> $GITHUB_OUTPUT
+          fi
+
+          if packages_changed || app_changed "primary-care-finder"; then
+            echo "pcf=true" >> $GITHUB_OUTPUT
+          else
+            echo "pcf=false" >> $GITHUB_OUTPUT
+          fi
+
+  deploy-test-oem-flood-finder:
+    name: Deploy oem-flood-finder to test
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.oem == 'true'
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v5
+        with:
+          version: 10.4.1
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          NPM_FONTAWESOME_SECRET: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+
+      - name: Install city CLI
+        run: npm install -g @phila/cli
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_TEST_OEM }}
+          aws-region: us-east-1
+
+      - name: Build workspace dependencies
+        run: pnpm turbo build --filter=@pinboard/oem-flood-finder^...
+
+      - name: Deploy to test
+        working-directory: apps/oem-flood-finder
+        env:
+          CI: 'true'
+        run: city ship test --web
+
+  deploy-test-primary-care-finder:
+    name: Deploy primary-care-finder to test
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.pcf == 'true'
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v5
+        with:
+          version: 10.4.1
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          NPM_FONTAWESOME_SECRET: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+
+      - name: Install city CLI
+        run: npm install -g @phila/cli
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_TEST_PCF }}
+          aws-region: us-east-1
+
+      - name: Build workspace dependencies
+        run: pnpm turbo build --filter=@pinboard/primary-care-finder^...
+
+      - name: Deploy to test
+        working-directory: apps/primary-care-finder
+        env:
+          CI: 'true'
+        run: city ship test --web

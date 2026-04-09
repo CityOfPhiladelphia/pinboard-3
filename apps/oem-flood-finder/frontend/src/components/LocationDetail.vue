@@ -12,7 +12,7 @@ const props = defineProps<{
 const readingState = useLocationDetail(
   () => props.location.id,
   () => props.location.other.kind,
-  5
+  5,
 )
 
 const lastUpdatedDate = computed(() => {
@@ -39,9 +39,7 @@ const lastUpdatedDate = computed(() => {
 
 <template>
   <div class="location-detail content">
-
     <div class="location-detail__body">
-
       <template v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'">
         <h4>{{ location.name }}</h4>
 
@@ -65,7 +63,6 @@ const lastUpdatedDate = computed(() => {
             </tr>
           </tbody>
         </table>
-
       </template>
 
       <!-- Camera detail -->
@@ -77,10 +74,8 @@ const lastUpdatedDate = computed(() => {
         </p>
 
         <CameraVideoPlayer :video-url="location.other.data.pageUrl" :autoplay="true" />
-
       </template>
     </div>
-
   </div>
 </template>
 

@@ -10,19 +10,19 @@ This is a **pnpm workspace monorepo** with two top-level directories:
 
 Shared code that apps import. These are internal workspace packages, not published to npm.
 
-| Package | Description |
-| --- | --- |
-| [`@pinboard/core`](packages/core) | Shared utilities and data logic |
-| [`@pinboard/ui`](packages/ui) | Shared Vue component library — wraps PhilaUI components (`@phila/phila-ui-*`) and map-core (`@phila/phila-ui-map-core`) into a single import for apps |
+| Package                           | Description                                                                                                                                           |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`@pinboard/core`](packages/core) | Shared utilities and data logic                                                                                                                       |
+| [`@pinboard/ui`](packages/ui)     | Shared Vue component library — wraps PhilaUI components (`@phila/phila-ui-*`) and map-core (`@phila/phila-ui-map-core`) into a single import for apps |
 
 ### `apps/` — Deployable applications
 
 Each app is a standalone Vue 3 application that imports from the shared packages.
 
-| App | Description |
-| --- | --- |
-| [`oem-flood-finder`](apps/oem-flood-finder) | OEM flood monitoring — real-time gauge readings, flood cameras, and alerts |
-| [`primary-care-finder`](apps/primary-care-finder) | Primary care facility finder |
+| App                                               | Description                                                                |
+| ------------------------------------------------- | -------------------------------------------------------------------------- |
+| [`oem-flood-finder`](apps/oem-flood-finder)       | OEM flood monitoring — real-time gauge readings, flood cameras, and alerts |
+| [`primary-care-finder`](apps/primary-care-finder) | Primary care facility finder                                               |
 
 ## Getting Started
 

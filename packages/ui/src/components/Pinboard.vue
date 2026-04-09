@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import '@phila/phila-ui-core/styles/template-light.css'
 import { useSlots, inject, ref, computed } from 'vue'
+import { PhilaButton } from '@phila/phila-ui-button'
+import { faMap, faList } from '@fortawesome/pro-solid-svg-icons'
 import { PINBOARD_CONFIG_KEY, Location, LocationFilterOption } from '../types'
 import { MapCard } from '@phila/phila-ui-cards'
 import MapPanel from './MapPanel.vue'
@@ -8,7 +10,7 @@ import LocationsPanel from './LocationsPanel.vue'
 
 defineSlots<{
   nav?(): unknown
-  'locations-header'?(props: {}): unknown
+  'locations-header'?(): unknown
   'location-card'?(props: { location: Location }): unknown
   'location-detail'?(props: { location: Location }): unknown
   'map-content'?(props: {
@@ -47,11 +49,16 @@ const props = defineProps<{
 // emit to parent app to handle what gets sent to pinboard
 const emit = defineEmits<{
   selectedFilter: [filter: string]
+  deselect: [locationId: string]
 }>()
 
 const config = inject(PINBOARD_CONFIG_KEY)!
-const slots = useSlots()
-const mapPanelRef = ref<{ flyTo: (lngLat: [number, number]) => void } | null>(null)
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const slots: Record<string, any> = useSlots()
+const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
+  null
+)
 
 const hoveredLocationId = ref<string | null>(null)
 const selectedLocation = ref<Location | null>(null)
@@ -73,59 +80,105 @@ function handleHoverEnd() {
 function handleSelect(location: Location) {
   selectedLocation.value = location
   if (props.getPosition) {
-    mapPanelRef.value?.flyTo(props.getPosition(location))
+    mapPanelRef.value?.panTo(props.getPosition(location))
+  }
+}
+
+function handleMapSelect(location: Location) {
+  if (selectedLocation.value?.id === location.id) {
+    closeLocationDetail()
+  } else {
+    selectedLocation.value = location
   }
 }
 
 function closeLocationDetail() {
+  if (selectedLocation.value) {
+    emit('deselect', selectedLocation.value.id)
+  }
   selectedLocation.value = null
 }
 
 function handleLocationFilterChange(selectedFilter: string) {
-  emit('selectedFilter', selectedFilter);
+  emit('selectedFilter', selectedFilter)
 }
-
 </script>
 
 <template>
-
   <div class="pinboard">
     <main class="pinboard-main">
       <div v-if="selectedLocation !== null" class="detail-overlay">
-        <button class="detail-close-btn" @click="closeLocationDetail" aria-label="Close details">
+        <button
+          class="detail-close-btn"
+          @click="closeLocationDetail"
+          aria-label="Close details"
+        >
           ×
         </button>
         <slot name="location-detail" :location="selectedLocation" />
       </div>
       <div class="finder-panel">
-        <div class="finder-panel-locations" :class="{ 'is-active': activeMobilePanel === 'list' }">
+        <div
+          class="finder-panel-locations"
+          :class="{ 'is-active': activeMobilePanel === 'list' }"
+        >
           <slot name="locations-header" />
 
           <div v-if="isLoading" class="location-list">
             <MapCard v-for="n in 5" :key="n" :is-loading="true" />
           </div>
 
-          <div v-else-if="errorMessage" class="status-message status-message--error">
+          <div
+            v-else-if="errorMessage"
+            class="status-message status-message--error"
+          >
             {{ errorMessage }}
           </div>
 
-          <LocationsPanel v-else-if="!isLoading" :location-filter="locationFilter" :search="search"
-            :locations="locations" :hovered-id="hoveredLocationId" :selected-id="selectedLocationId"
-            :get-card-details="getCardDetails" @select="handleSelect" @hover="handleHover" @hover-end="handleHoverEnd"
-            @selected-filter="handleLocationFilterChange" />
+          <LocationsPanel
+            v-else-if="!isLoading"
+            :location-filter="locationFilter"
+            :search="search"
+            :locations="locations"
+            :hovered-id="hoveredLocationId"
+            :selected-id="selectedLocationId"
+            :get-card-details="getCardDetails"
+            @select="handleSelect"
+            @hover="handleHover"
+            @hover-end="handleHoverEnd"
+            @selected-filter="handleLocationFilterChange"
+          />
         </div>
 
-        <div class="finder-panel-map" :class="{ 'is-active': activeMobilePanel === 'map' }">
-          <MapPanel v-if="!isLoading" :config="config.map" :locations="locations" :geojson="geojson"
-            :hovered-id="hoveredLocationId" :selected-id="selectedLocationId" :map-content-slot="slots['map-content']"
-            :on-hover="handleHover" :on-hover-end="handleHoverEnd" :on-select="handleSelect" />
+        <div
+          class="finder-panel-map"
+          :class="{ 'is-active': activeMobilePanel === 'map' }"
+        >
+          <MapPanel
+            ref="mapPanelRef"
+            :config="config.map"
+            :is-loading="isLoading"
+            :locations="locations"
+            :geojson="geojson"
+            :hovered-id="hoveredLocationId"
+            :selected-id="selectedLocationId"
+            :map-content-slot="slots['map-content']"
+            :on-hover="handleHover"
+            :on-hover-end="handleHoverEnd"
+            :on-select="handleMapSelect"
+          />
         </div>
       </div>
-      <button class="mobile-panel-toggle" @click="
-        activeMobilePanel = activeMobilePanel === 'list' ? 'map' : 'list'
-        ">
-        {{ activeMobilePanel === 'list' ? 'Map view' : 'List view' }}
-      </button>
+      <PhilaButton
+        v-if="selectedLocation === null"
+        class="mobile-panel-toggle"
+        variant="secondary"
+        :icon-definition="activeMobilePanel === 'list' ? faMap : faList"
+        :text="activeMobilePanel === 'list' ? 'Map view' : 'List view'"
+        @click="
+          activeMobilePanel = activeMobilePanel === 'list' ? 'map' : 'list'
+        "
+      />
     </main>
   </div>
 </template>
@@ -175,8 +228,8 @@ function handleLocationFilterChange(selectedFilter: string) {
   color: var(--Schemes-Error, #b3261e);
 }
 
-.finder-panel-locations> :deep(.location-list),
-.finder-panel-locations>.location-list {
+.finder-panel-locations > :deep(.location-list),
+.finder-panel-locations > .location-list {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
@@ -192,19 +245,12 @@ function handleLocationFilterChange(selectedFilter: string) {
 .mobile-panel-toggle {
   display: none;
   position: fixed;
-  bottom: 1.25rem;
+  bottom: 3rem;
   left: 50%;
   transform: translateX(-50%);
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: white;
-  background: var(--Schemes-Primary, #2176d2);
-  border: none;
-  border-radius: 1.5rem;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border-radius: 1.5rem;
 }
 
 .detail-overlay {
@@ -277,15 +323,11 @@ function handleLocationFilterChange(selectedFilter: string) {
   }
 
   .mobile-panel-toggle {
-    display: block;
+    display: inline-flex;
   }
 
   .detail-overlay {
     width: 100%;
-  }
-
-  .pinboard> :deep(footer) {
-    display: none;
   }
 }
 </style>
