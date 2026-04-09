@@ -184,7 +184,11 @@ function handleLocationFilterChange(selectedFilter: string) {
             :on-select="handleMapSelect"
           />
           <div class="mobile-map-search-filter">
-            <Search v-if="search" class-name="mobile-search" :placeholder="search" />
+            <Search
+              v-if="search"
+              class-name="mobile-search"
+              :placeholder="search"
+            />
             <LocationSearchFilterPanel
               v-if="locationFilter"
               :filterOptions="locationFilter"
@@ -383,7 +387,6 @@ function handleLocationFilterChange(selectedFilter: string) {
     padding: 0.25rem 0 0;
     gap: 0.25rem;
   }
-
 
   .mobile-bottom-sheet :deep(.location-filters),
   .mobile-bottom-sheet :deep(.location-search) {
