@@ -289,8 +289,8 @@ importers:
         specifier: 0.3.0-beta.1
         version: 0.3.0-beta.1(@fortawesome/fontawesome-svg-core@7.1.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.27(typescript@5.9.3)))(vue-router@5.0.2(@vue/compiler-sfc@3.5.27)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3))
       '@phila/phila-ui-bottom-sheet':
-        specifier: link:../../../phila-ui-4/packages/bottom-sheet
-        version: link:../../../phila-ui-4/packages/bottom-sheet
+        specifier: 0.0.1-beta.1
+        version: 0.0.1-beta.1(@fortawesome/fontawesome-svg-core@7.1.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.27(typescript@5.9.3)))(vue-router@5.0.2(@vue/compiler-sfc@3.5.27)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3))
       '@phila/phila-ui-button':
         specifier: ^2.2.1
         version: 2.2.2(@fortawesome/fontawesome-svg-core@7.1.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.27(typescript@5.9.3)))(vue-router@5.0.2(@vue/compiler-sfc@3.5.27)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3))
@@ -1060,6 +1060,13 @@ packages:
   '@phila/phila-ui-app-header@0.3.0-beta.1':
     resolution: {integrity: sha512-3exWw5w0GhdPku3vONZeNiLSXffqwIk13P3rlEvNAbqY9zY7BXqKE7uxKtbW1/i6tbOVb14FSIl8cnNMFIS2qw==}
     peerDependencies:
+      '@fortawesome/vue-fontawesome': ^3.1.2
+      vue: ^3.0.0
+
+  '@phila/phila-ui-bottom-sheet@0.0.1-beta.1':
+    resolution: {integrity: sha512-ZFeYQg3qllG9T8u2MAKnQczGlvcPJhA9dWS7LHatTUFAJ7d9om5thpUms0JVvv7qPAvN6KCpp9+9b6+oZK8aCA==}
+    peerDependencies:
+      '@fortawesome/fontawesome-svg-core': '>=7.1.0'
       '@fortawesome/vue-fontawesome': ^3.1.2
       vue: ^3.0.0
 
@@ -3614,6 +3621,15 @@ snapshots:
       vue: 3.5.27(typescript@5.9.3)
     transitivePeerDependencies:
       - '@fortawesome/fontawesome-svg-core'
+      - vue-router
+
+  '@phila/phila-ui-bottom-sheet@0.0.1-beta.1(@fortawesome/fontawesome-svg-core@7.1.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.27(typescript@5.9.3)))(vue-router@5.0.2(@vue/compiler-sfc@3.5.27)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3))':
+    dependencies:
+      '@fortawesome/fontawesome-svg-core': 7.1.0
+      '@fortawesome/vue-fontawesome': 3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.27(typescript@5.9.3))
+      '@phila/phila-ui-core': 2.3.3-beta.0(@fortawesome/fontawesome-svg-core@7.1.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.27(typescript@5.9.3)))(vue-router@5.0.2(@vue/compiler-sfc@3.5.27)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3))
+      vue: 3.5.27(typescript@5.9.3)
+    transitivePeerDependencies:
       - vue-router
 
   '@phila/phila-ui-button@2.2.1(@fortawesome/fontawesome-svg-core@7.1.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.27(typescript@5.9.3)))(vue-router@5.0.2(@vue/compiler-sfc@3.5.27)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3)))(vue@3.5.27(typescript@5.9.3))':

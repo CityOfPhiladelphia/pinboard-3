@@ -38,7 +38,7 @@
     "@phila/phila-ui-search": "^1.1.2",
     "@phila/phila-ui-tags": "0.0.1-beta.0",
     "@phila/phila-ui-text-field": "^1.1.2",
-    "@phila/phila-ui-bottom-sheet": "link:../../../phila-ui-4/packages/bottom-sheet",
+    "@phila/phila-ui-bottom-sheet": "0.0.1-beta.1",
     "@pinboard/core": "workspace:*"
   },
   "peerDependencies": {
