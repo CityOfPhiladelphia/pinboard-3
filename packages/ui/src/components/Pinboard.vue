@@ -155,9 +155,9 @@ function handleLocationFilterChange(selectedFilter: string) {
           :class="{ 'is-active': activeMobilePanel === 'map' }"
         >
           <MapPanel
-            v-if="!isLoading"
             ref="mapPanelRef"
             :config="config.map"
+            :is-loading="isLoading"
             :locations="locations"
             :geojson="geojson"
             :hovered-id="hoveredLocationId"
