@@ -56,7 +56,7 @@ async function fetchLatestReading(
     )
     if (!response.ok) return null
     const data: Reading[] = await response.json()
-    return data.length > 0 ? data[0] : null
+    return data[0] ?? null
   } catch {
     return null
   }
