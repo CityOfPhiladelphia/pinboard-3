@@ -44,6 +44,7 @@ export type LocationBasic = {
   name: string
   latitude: number
   longitude: number
+  cardDetails: MapCardProps
 }
 
 export type Location = LocationBasic & Record<string, unknown>
@@ -51,10 +52,6 @@ export type Location = LocationBasic & Record<string, unknown>
 export type LocationFilterOption = {
   readonly value: string
   readonly label: string
-}
-
-export type MapCardPropsObject = {
-  [id: string]: MapCardProps
 }
 
 export enum SortLocationsValues {

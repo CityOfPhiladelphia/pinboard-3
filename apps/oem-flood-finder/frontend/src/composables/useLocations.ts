@@ -13,8 +13,14 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
       latestReading: null,
+      cardDetails: {
+        heading: gauge.name,
+        subheader: "I'm a USGS gauge!",
+        tag: '100% pure government efficiency',
+        src: 'Pretty pretty picture!',
+      },
       other: { kind: 'Aware' as const, data: gauge },
-    } satisfies Location)
+    } satisfies OemLocation)
   }
 
   for (const gauge of dto.usgsGauges) {
@@ -25,6 +31,12 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
       latestReading: null,
+      cardDetails: {
+        heading: gauge.name,
+        subheader: "I'm a USGS gauge!",
+        tag: '100% pure government efficiency',
+        src: 'Pretty pretty picture!',
+      },
       other: { kind: 'Usgs' as const, data: gauge },
     } satisfies Location)
   }
@@ -37,6 +49,12 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
       longitude: camera.longitude,
       lastUpdated: camera.lastUpdated,
       latestReading: null,
+      cardDetails: {
+        heading: camera.name,
+        subheader: "I'm a USGS gauge!",
+        tag: '100% pure government efficiency',
+        src: 'Pretty pretty picture!',
+      },
       other: { kind: 'Camera' as const, data: camera },
     } satisfies Location)
   }

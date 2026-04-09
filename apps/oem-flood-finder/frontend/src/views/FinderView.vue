@@ -10,7 +10,7 @@ import {
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation } from '@/types'
-import type { Location, LocationFilterOption, MapCardPropsObject } from '@ui/types'
+import type { Location, LocationFilterOption } from '@ui/types'
 import { SortLocationsValues } from '../../../../../packages/ui/src/types'
 import LocationDetail from '@/components/LocationDetail.vue'
 import { computed, ref, reactive } from 'vue'
@@ -25,7 +25,7 @@ const filteredLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
-  const locs = [...locations.value] as OemLocation[]
+  const locs: OemLocation[] = [...locations.value]
   switch (locationFilterMode.value) {
     case 'gauges': {
       return locs.filter((loc) => isGauge(loc))
@@ -59,7 +59,7 @@ const filteredAndSortedLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
-  const locs = [...searchMatchedLocations.value] as OemLocation[]
+  const locs: OemLocation[] = [...searchMatchedLocations.value]
   switch (locationSortMode.value) {
     case SortLocationsValues.AlphaAsc: {
       const sorted = locs.sort((a, b) => a.name.localeCompare(b.name))
@@ -82,49 +82,6 @@ const filteredAndSortedLocations = computed(() => {
       return locs
     }
   }
-})
-
-const mapCardPropsList = computed(() => {
-  if (isLoading.value || errorMessage.value) {
-    return {}
-  }
-  const activeCardProps: MapCardPropsObject = {}
-  locations.value.forEach((loc) => {
-    switch (loc.other.kind) {
-      case 'Camera': {
-        activeCardProps[loc.id] = {
-          heading: loc.name,
-          subheader: "I'm a camera!",
-          tag: 'Some fun info',
-          src: 'Pretty pretty picture!',
-          isLoading: isLoading.value,
-        }
-        break
-      }
-      case 'Aware': {
-        activeCardProps[loc.id] = {
-          heading: loc.name,
-          subheader: "I'm an Aware gauge!",
-          tag: 'Photo I think?',
-          src: 'Pretty pretty picture!',
-          isLoading: isLoading.value,
-        }
-        break
-      }
-      case 'Usgs':
-      default: {
-        activeCardProps[loc.id] = {
-          heading: loc.name,
-          subheader: "I'm a USGS gauge!",
-          tag: '100% pure government efficiency',
-          src: 'Pretty pretty picture!',
-          isLoading: isLoading.value,
-        }
-        break
-      }
-    }
-  })
-  return activeCardProps
 })
 
 function isGauge(loc: OemLocation): boolean {
@@ -169,7 +126,6 @@ function handleDeselect(id: string) {
 <template>
   <Pinboard
     :locations="filteredAndSortedLocations"
-    :card-details="mapCardPropsList"
     :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]"
     :is-loading="isLoading"
     :error-message="errorMessage"
