@@ -1,4 +1,5 @@
 import type { LocationDTO, OemLocation, Reading } from '@/types'
+import type { Location } from '@ui/types'
 import { ref, onMounted } from 'vue'
 
 function transformLocationDTO(dto: LocationDTO): OemLocation[] {
@@ -12,8 +13,8 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
       latestReading: null,
-      other: { kind: 'Aware', data: gauge },
-    } satisfies OemLocation)
+      other: { kind: 'Aware' as const, data: gauge },
+    } satisfies Location)
   }
 
   for (const gauge of dto.usgsGauges) {
@@ -24,8 +25,8 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
       latestReading: null,
-      other: { kind: 'Usgs', data: gauge },
-    } satisfies OemLocation)
+      other: { kind: 'Usgs' as const, data: gauge },
+    } satisfies Location)
   }
 
   for (const camera of dto.cameras) {
@@ -36,8 +37,8 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
       longitude: camera.longitude,
       lastUpdated: camera.lastUpdated,
       latestReading: null,
-      other: { kind: 'Camera', data: camera },
-    } satisfies OemLocation)
+      other: { kind: 'Camera' as const, data: camera },
+    } satisfies Location)
   }
 
   return locations
