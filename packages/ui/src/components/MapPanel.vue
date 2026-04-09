@@ -17,6 +17,7 @@ const props = withDefaults(
     hoveredId?: string | null
     selectedId?: string | null
     isLoading?: boolean
+    isMobile?: boolean
     onHover?: (id: string) => void
     onHoverEnd?: () => void
     onSelect?: (loc: Location) => void
@@ -25,6 +26,7 @@ const props = withDefaults(
       geojson: unknown
       map: unknown
       zoom: number
+      isMobile: boolean
       hoveredId: string | null
       selectedId: string | null
       onHover: (id: string) => void
@@ -56,6 +58,7 @@ const slotProps = computed(() => ({
   geojson: props.geojson,
   map: null as unknown,
   zoom: zoom.value,
+  isMobile: props.isMobile ?? false,
   hoveredId: props.hoveredId ?? null,
   selectedId: props.selectedId ?? null,
   onHover: props.onHover ?? (() => {}),

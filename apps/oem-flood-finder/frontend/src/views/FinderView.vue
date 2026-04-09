@@ -90,9 +90,9 @@ function handleDeselect(id: string) {
       <LocationDetail :location="location" />
     </template>
 
-    <template #map-content="{ hoveredId, selectedId, zoom, onHover, onHoverEnd, onSelect }">
-      <MapNavigationControl position="bottom-right" />
-      <GeolocationButton position="bottom-right" />
+    <template #map-content="{ hoveredId, selectedId, zoom, isMobile, onHover, onHoverEnd, onSelect }">
+      <MapNavigationControl v-if="!isMobile" position="bottom-right" />
+      <GeolocationButton :position="isMobile ? 'top-right' : 'bottom-right'" />
       <BasemapToggle position="top-right" />
 
       <div v-if="!isLoading">

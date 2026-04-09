@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
-import { useSlots, inject, ref, computed } from 'vue'
+import { useSlots, inject, ref, computed, onMounted, onUnmounted } from 'vue'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Search } from '@phila/phila-ui-search'
 import { faMap } from '@fortawesome/pro-solid-svg-icons'
@@ -21,6 +21,7 @@ defineSlots<{
     geojson: unknown
     map: unknown
     zoom: number
+    isMobile: boolean
     hoveredId: string | null
     selectedId: string | null
     onHover: (id: string) => void
@@ -62,6 +63,23 @@ const slots: Record<string, any> = useSlots()
 const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
   null
 )
+
+const isMobile = ref(false)
+let mql: MediaQueryList | null = null
+
+function onMediaChange(e: MediaQueryListEvent) {
+  isMobile.value = e.matches
+}
+
+onMounted(() => {
+  mql = window.matchMedia('(max-width: 768px)')
+  isMobile.value = mql.matches
+  mql.addEventListener('change', onMediaChange)
+})
+
+onUnmounted(() => {
+  mql?.removeEventListener('change', onMediaChange)
+})
 
 const hoveredLocationId = ref<string | null>(null)
 const selectedLocation = ref<Location | null>(null)
@@ -155,6 +173,7 @@ function handleLocationFilterChange(selectedFilter: string) {
             ref="mapPanelRef"
             :config="config.map"
             :is-loading="isLoading"
+            :is-mobile="isMobile"
             :locations="locations"
             :geojson="geojson"
             :hovered-id="hoveredLocationId"
@@ -340,11 +359,16 @@ function handleLocationFilterChange(selectedFilter: string) {
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
+    right: 60px;
     z-index: 2;
-    background: rgba(255, 255, 255, 0.95);
     padding: 0.5rem;
   }
+
+  .mobile-map-search-filter :deep(.mobile-search) {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
 
   .mobile-bottom-sheet :deep(.location-filters),
   .mobile-bottom-sheet :deep(.location-search) {
