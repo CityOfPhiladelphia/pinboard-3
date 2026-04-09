@@ -1,5 +1,6 @@
 // packages/ui/src/types.ts
 import type { InjectionKey } from 'vue'
+import type { MapCardProps } from '@phila/phila-ui-cards'
 
 export type MapControlPosition =
   | 'top-left'
@@ -50,6 +51,10 @@ export type Location = LocationBasic & Record<string, unknown>
 export type LocationFilterOption = {
   readonly value: string
   readonly label: string
+}
+
+export type MapCardPropsObject = {
+  [id: string]: MapCardProps
 }
 
 export enum SortLocationsValues {

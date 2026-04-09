@@ -3,7 +3,12 @@ import '@phila/phila-ui-core/styles/template-light.css'
 import { useSlots, inject, ref, computed } from 'vue'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { faMap, faList } from '@fortawesome/pro-solid-svg-icons'
-import { PINBOARD_CONFIG_KEY, Location, LocationFilterOption } from '../types'
+import {
+  PINBOARD_CONFIG_KEY,
+  Location,
+  LocationFilterOption,
+  MapCardPropsObject,
+} from '../types'
 import { MapCard } from '@phila/phila-ui-cards'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
@@ -28,16 +33,7 @@ defineSlots<{
 
 const props = defineProps<{
   locations: Location[]
-  getCardDetails: (loc: Location) => {
-    heading?: string
-    subheader?: string
-    tag?: string
-    body?: string
-    src?: string
-    alt?: string
-    href?: string
-    isLoading: boolean
-  }
+  cardDetails: MapCardPropsObject
   getPosition?: (loc: Location) => [number, number]
   isLoading: boolean
   errorMessage: string | null
@@ -152,7 +148,7 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
             :locations="locations"
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"
-            :get-card-details="getCardDetails"
+            :card-details="cardDetails"
             @select="handleSelect"
             @hover="handleHover"
             @hover-end="handleHoverEnd"

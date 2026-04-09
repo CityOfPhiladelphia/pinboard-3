@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { MapCard } from '@phila/phila-ui-cards'
-import type { MapCardProps } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
-import type { Location, LocationFilterOption } from '../types'
+import type {
+  Location,
+  LocationFilterOption,
+  MapCardPropsObject,
+} from '../types'
 
 const props = defineProps<{
   locationSearch: string | undefined
@@ -16,7 +19,7 @@ const props = defineProps<{
     isHovered: boolean
     isSelected: boolean
   }) => unknown
-  getCardDetails: (loc: Location) => MapCardProps
+  cardDetails: MapCardPropsObject
 }>()
 
 const emit = defineEmits<{
@@ -75,7 +78,7 @@ function handleSearchSubmit(searchString: string) {
       v-for="location in locations"
       :key="location.id"
       :data-location-id="location.id"
-      v-bind="getCardDetails(location)"
+      v-bind="cardDetails[location.id]"
       :class="[
         'location-card',
         {

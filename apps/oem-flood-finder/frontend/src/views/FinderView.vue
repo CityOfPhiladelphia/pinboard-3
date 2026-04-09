@@ -10,7 +10,7 @@ import {
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation } from '@/types'
-import type { Location, LocationFilterOption } from '@ui/types'
+import type { Location, LocationFilterOption, MapCardPropsObject } from '@ui/types'
 import { SortLocationsValues } from '../../../../../packages/ui/src/types'
 import LocationDetail from '@/components/LocationDetail.vue'
 import { computed, ref, reactive } from 'vue'
@@ -85,34 +85,44 @@ const filteredAndSortedLocations = computed(() => {
   }
 })
 
-const MapCardPropsList = computed(() => {
+const mapCardPropsList = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
   const locs = filteredAndSortedLocations.value
-  const activeCardProps = new Array()
-
+  const activeCardProps: MapCardPropsObject = {}
   locs.forEach((loc) => {
     switch (loc.other.kind) {
       case 'Camera': {
-        // map field to props
-        // push to activeCardProps
+        activeCardProps[loc.id] = {
+          heading: loc.name,
+          subheader: '',
+          tag: '',
+          src: '',
+          isLoading: isLoading.value,
+        }
+        break
       }
       case 'Aware': {
-        // map field to props
-        // push to activeCardProps
+        activeCardProps[loc.id] = {
+          heading: loc.name,
+          subheader: '',
+          tag: '',
+          src: '',
+          isLoading: isLoading.value,
+        }
+        break
       }
       case 'Usgs':
       default: {
-        const usgsProps: MapCardProps = {
+        activeCardProps[loc.id] = {
           heading: loc.name,
           subheader: '',
-          tag: '0.9 in',
-          src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
+          tag: '',
+          src: '',
           isLoading: isLoading.value,
         }
-        // map field to props
-        // push to activeCardProps
+        break
       }
     }
   })
@@ -161,21 +171,8 @@ function handleDeselect(id: string) {
 <template>
   <Pinboard
     :locations="filteredAndSortedLocations"
-    :get-card-details="
-      (loc: Location) => ({
-        heading: loc.name,
-        subheader: 'Buhhhhhhh!',
-        tag: '0.9 in',
-        src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
-        isLoading: isLoading,
-      })
-    "
-    :get-position="
-      (loc: Location): [number, number] => [
-        (loc as OemLocation).longitude,
-        (loc as OemLocation).latitude,
-      ]
-    "
+    :card-details="MapCardPropsObject"
+    :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]"
     :is-loading="isLoading"
     :error-message="errorMessage"
     :location-panel-search="searchPlaceholderText"
