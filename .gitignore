@@ -4,5 +4,6 @@ dist
 *.local
 cdk.out
 .claude/
+AGENTS.md
 docs/superpowers/
 AGENTS.md
