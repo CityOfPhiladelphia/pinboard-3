@@ -51,11 +51,14 @@ const emit = defineEmits<{
   locationSearchString: [search: string]
   selectedLocationsFilter: [filter: string]
   sortLocationsOption: [sort: number]
+  deselect: [locationId: string]
 }>()
 
 const config = inject(PINBOARD_CONFIG_KEY)!
-const slots = useSlots()
-const mapPanelRef = ref<{ flyTo: (lngLat: [number, number]) => void } | null>(
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const slots: Record<string, any> = useSlots()
+const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
   null
 )
 
@@ -79,11 +82,22 @@ function handleHoverEnd() {
 function handleSelect(location: Location) {
   selectedLocation.value = location
   if (props.getPosition) {
-    mapPanelRef.value?.flyTo(props.getPosition(location))
+    mapPanelRef.value?.panTo(props.getPosition(location))
+  }
+}
+
+function handleMapSelect(location: Location) {
+  if (selectedLocation.value?.id === location.id) {
+    closeLocationDetail()
+  } else {
+    selectedLocation.value = location
   }
 }
 
 function closeLocationDetail() {
+  if (selectedLocation.value) {
+    emit('deselect', selectedLocation.value.id)
+  }
   selectedLocation.value = null
 }
 
@@ -153,8 +167,9 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
           :class="{ 'is-active': activeMobilePanel === 'map' }"
         >
           <MapPanel
-            v-if="!isLoading"
+            ref="mapPanelRef"
             :config="config.map"
+            :is-loading="isLoading"
             :locations="locations"
             :geojson="geojson"
             :hovered-id="hoveredLocationId"
@@ -162,7 +177,7 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
             :map-content-slot="slots['map-content']"
             :on-hover="handleHover"
             :on-hover-end="handleHoverEnd"
-            :on-select="handleSelect"
+            :on-select="handleMapSelect"
           />
         </div>
       </div>

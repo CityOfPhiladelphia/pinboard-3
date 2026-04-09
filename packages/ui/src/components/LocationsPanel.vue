@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { MapCard } from '@phila/phila-ui-cards'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
@@ -29,6 +29,17 @@ const emit = defineEmits<{
 }>()
 
 const pendingKeydown = ref(false)
+const listRef = ref<HTMLElement | null>(null)
+
+watch(
+  () => props.selectedId,
+  (id) => {
+    if (id && listRef.value) {
+      const card = listRef.value.querySelector(`[data-location-id="${id}"]`)
+      card?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }
+)
 
 function onCardKeyup(location: Location) {
   if (pendingKeydown.value) {
@@ -59,10 +70,11 @@ function handleSearchSubmit(searchString: string) {
     @sort-option="handleSortChange"
     @search-string="handleSearchSubmit"
   />
-  <div class="location-list content">
+  <div ref="listRef" class="location-list content">
     <MapCard
       v-for="location in locations"
       :key="location.id"
+      :data-location-id="location.id"
       v-bind="getCardDetails(location)"
       :class="[
         'location-card',

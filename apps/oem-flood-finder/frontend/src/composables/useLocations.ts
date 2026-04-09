@@ -1,4 +1,4 @@
-import type { LocationDTO, OemLocation } from '@/types'
+import type { LocationDTO, OemLocation, Reading } from '@/types'
 import { ref, onMounted } from 'vue'
 
 function transformLocationDTO(dto: LocationDTO): OemLocation[] {
@@ -11,8 +11,9 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
       latitude: gauge.latitude,
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
+      latestReading: null,
       other: { kind: 'Aware', data: gauge },
-    })
+    } satisfies OemLocation)
   }
 
   for (const gauge of dto.usgsGauges) {
@@ -22,8 +23,9 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
       latitude: gauge.latitude,
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
+      latestReading: null,
       other: { kind: 'Usgs', data: gauge },
-    })
+    } satisfies OemLocation)
   }
 
   for (const camera of dto.cameras) {
@@ -33,11 +35,30 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
       latitude: camera.latitude,
       longitude: camera.longitude,
       lastUpdated: camera.lastUpdated,
+      latestReading: null,
       other: { kind: 'Camera', data: camera },
-    })
+    } satisfies OemLocation)
   }
 
   return locations
+}
+
+async function fetchLatestReading(
+  kind: 'aware' | 'usgs',
+  gaugeId: string,
+  headers: Headers,
+): Promise<Reading | null> {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_FLOOD_API_BASE_URL}/${kind}/reading/${gaugeId}?limit=1`,
+      { method: 'GET', headers, redirect: 'follow' },
+    )
+    if (!response.ok) return null
+    const data: Reading[] = await response.json()
+    return data[0] ?? null
+  } catch {
+    return null
+  }
 }
 
 export function useLocations() {
@@ -63,6 +84,16 @@ export function useLocations() {
 
     locations.value = transformLocationDTO(await response.json())
     isLoading.value = false
+
+    // Fetch latest readings for all gauges in parallel
+    const gauges = locations.value.filter((loc) => loc.other.kind !== 'Camera')
+    await Promise.all(
+      gauges.map(async (loc) => {
+        const kind = loc.other.kind.toLowerCase() as 'aware' | 'usgs'
+        const reading = await fetchLatestReading(kind, loc.id, myHeaders)
+        loc.latestReading = reading
+      }),
+    )
   }
 
   onMounted(fetchLocations)
