@@ -54,7 +54,8 @@ const emit = defineEmits<{
 
 const config = inject(PINBOARD_CONFIG_KEY)!
 
-const slots = useSlots()
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const slots: Record<string, any> = useSlots()
 const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
   null
 )

@@ -64,22 +64,28 @@ function handleDeselect(id: string) {
   visitedIds.add(id)
   lastSelectedId = null
 }
-
 </script>
 
 <template>
-
-  <Pinboard :locations="filteredLocations" :get-card-details="(loc: Location) => ({
-    heading: loc.name,
-    subheader: '0.8 mi',
-    tag: '0.9 in',
-    src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
-    isLoading: isLoading
-  })" :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]" :is-loading="isLoading"
-    :error-message="errorMessage" :locationFilter="filterOptions" search="Search by address or keyword"
+  <Pinboard
+    :locations="filteredLocations"
+    :get-card-details="
+      (loc: Location) => ({
+        heading: loc.name,
+        subheader: '0.8 mi',
+        tag: '0.9 in',
+        src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
+        isLoading: isLoading,
+      })
+    "
+    :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]"
+    :is-loading="isLoading"
+    :error-message="errorMessage"
+    :locationFilter="filterOptions"
+    search="Search by address or keyword"
     @selected-filter="handleLocationFilterChange"
-    @deselect="handleDeselect">
-
+    @deselect="handleDeselect"
+  >
     <template #location-detail="{ location }">
       <LocationDetail :location="location" />
     </template>
@@ -90,13 +96,28 @@ function handleDeselect(id: string) {
       <BasemapToggle position="top-right" />
 
       <div v-if="!isLoading">
-        <MapMarker v-for="loc in filteredLocations" :key="loc.id" :lng-lat="[loc.longitude, loc.latitude]">
-          <MapIconTextPin :zoom="zoom" :icon="isGauge(loc) ? faGauge : faCamera"
-            :text="loc.latestReading ? `${loc.latestReading.gaugeHeight} ${loc.latestReading.gaugeHeightUnit}` : undefined"
-            :color-theme="'dark-primary'" :color="isGauge(loc) ? undefined : '#3053B6'" :hovered="hoveredId === loc.id"
-            :selected="selectedId === loc.id" :visited="visitedIds.has(loc.id)" @mouseenter="onHover(loc.id)" @mouseleave="onHoverEnd()"
-            @click="handleSelect(loc, onSelect)" />
-
+        <MapMarker
+          v-for="loc in filteredLocations"
+          :key="loc.id"
+          :lng-lat="[loc.longitude, loc.latitude]"
+        >
+          <MapIconTextPin
+            :zoom="zoom"
+            :icon="isGauge(loc) ? faGauge : faCamera"
+            :text="
+              loc.latestReading
+                ? `${loc.latestReading.gaugeHeight} ${loc.latestReading.gaugeHeightUnit}`
+                : undefined
+            "
+            :color-theme="'dark-primary'"
+            :color="isGauge(loc) ? undefined : '#3053B6'"
+            :hovered="hoveredId === loc.id"
+            :selected="selectedId === loc.id"
+            :visited="visitedIds.has(loc.id)"
+            @mouseenter="onHover(loc.id)"
+            @mouseleave="onHoverEnd()"
+            @click="handleSelect(loc, onSelect)"
+          />
         </MapMarker>
       </div>
     </template>
