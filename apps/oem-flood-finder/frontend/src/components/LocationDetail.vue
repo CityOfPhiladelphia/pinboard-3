@@ -17,13 +17,13 @@ const readingState = useLocationDetail(
 
 const lastUpdatedDate = computed(() => {
   if (readingState.value.kind !== 'Loaded') return 'Loading...'
-  
+
   const validTime = readingState.value.data[0]?.validTimeUTC
   if (!validTime) return 'No data'
-  
+
   const date = new Date(validTime)
   if (isNaN(date.getTime())) return 'Invalid date'
-  
+
   return date.toLocaleString('en-US', {
     timeZone: 'America/New_York',
     year: 'numeric',
@@ -31,10 +31,9 @@ const lastUpdatedDate = computed(() => {
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true
+    hour12: true,
   })
 })
-
 </script>
 
 <template>
