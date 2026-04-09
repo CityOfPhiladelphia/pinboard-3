@@ -3,11 +3,13 @@ import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
 import { useSlots, inject, ref, computed } from 'vue'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
+import { Search } from '@phila/phila-ui-search'
 import { faMap } from '@fortawesome/pro-solid-svg-icons'
 import { PINBOARD_CONFIG_KEY, Location, LocationFilterOption } from '../types'
 import { MapCard } from '@phila/phila-ui-cards'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
+import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 
 defineSlots<{
   nav?(): unknown
@@ -162,6 +164,14 @@ function handleLocationFilterChange(selectedFilter: string) {
             :on-hover-end="handleHoverEnd"
             :on-select="handleMapSelect"
           />
+          <div class="mobile-map-search-filter">
+            <Search v-if="search" class-name="mobile-search" :placeholder="search" />
+            <LocationSearchFilterPanel
+              v-if="locationFilter"
+              :filterOptions="locationFilter"
+              @selected-filter="handleLocationFilterChange"
+            />
+          </div>
         </div>
       </div>
       <BottomSheet
@@ -265,6 +275,10 @@ function handleLocationFilterChange(selectedFilter: string) {
   display: none;
 }
 
+.mobile-map-search-filter {
+  display: none;
+}
+
 .detail-overlay {
   position: absolute;
   top: 0;
@@ -319,6 +333,22 @@ function handleLocationFilterChange(selectedFilter: string) {
 
   .mobile-bottom-sheet {
     display: block;
+  }
+
+  .mobile-map-search-filter {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0.5rem;
+  }
+
+  .mobile-bottom-sheet :deep(.location-filters),
+  .mobile-bottom-sheet :deep(.location-search) {
+    display: none;
   }
 
   .detail-overlay {
