@@ -12,7 +12,7 @@ import { useLocations } from '../composables/useLocations'
 import type { Filters } from '../types'
 import type { Location, LocationFilterOption } from '@ui/types'
 import LocationDetail from '../components/LocationDetail.vue'
-import { computed, ref } from 'vue'
+import { computed, ref, reactive } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations()
 
@@ -48,6 +48,22 @@ const filterOptions: LocationFilterOption[] = [
 function handleLocationFilterChange(selectedFilter: string) {
   locationMode.value = selectedFilter as Filters
 }
+
+const visitedIds = reactive(new Set<string>())
+let lastSelectedId: string | null = null
+
+function handleSelect(loc: Location, onSelect: (loc: Location) => void) {
+  if (lastSelectedId && lastSelectedId !== loc.id) {
+    visitedIds.add(lastSelectedId)
+  }
+  lastSelectedId = loc.id
+  onSelect(loc)
+}
+
+function handleDeselect(id: string) {
+  visitedIds.add(id)
+  lastSelectedId = null
+}
 </script>
 
 <template>
@@ -68,6 +84,7 @@ function handleLocationFilterChange(selectedFilter: string) {
     :locationFilter="filterOptions"
     search="Search by address or keyword"
     @selected-filter="handleLocationFilterChange"
+    @deselect="handleDeselect"
   >
     <template #location-detail="{ location }">
       <LocationDetail :location="location" />
@@ -87,12 +104,19 @@ function handleLocationFilterChange(selectedFilter: string) {
           <MapIconTextPin
             :zoom="zoom"
             :icon="isGauge(loc) ? faGauge : faCamera"
-            :color-theme="isGauge(loc) ? 'dark-primary' : 'dark-error'"
+            :text="
+              loc.latestReading
+                ? `${loc.latestReading.gaugeHeight} ${loc.latestReading.gaugeHeightUnit}`
+                : undefined
+            "
+            :color-theme="'dark-primary'"
+            :color="isGauge(loc) ? undefined : '#3053B6'"
             :hovered="hoveredId === loc.id"
             :selected="selectedId === loc.id"
+            :visited="visitedIds.has(loc.id)"
             @mouseenter="onHover(loc.id)"
             @mouseleave="onHoverEnd()"
-            @click="onSelect(loc)"
+            @click="handleSelect(loc, onSelect)"
           />
         </MapMarker>
       </div>
