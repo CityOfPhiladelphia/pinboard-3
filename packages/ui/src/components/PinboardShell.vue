@@ -47,7 +47,7 @@ const MobileNavContent: FunctionalComponent = () =>
   display: flex;
   flex-direction: column;
   height: 100vh;
-  width: min(100vw, 1450px); /** Trying out a max width for the app area */
+  /* width: min(100vw, 1450px); */
   margin: auto;
 }
 
