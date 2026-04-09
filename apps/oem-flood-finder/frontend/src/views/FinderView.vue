@@ -126,7 +126,6 @@ function handleDeselect(id: string) {
 <template>
   <Pinboard
     :locations="filteredAndSortedLocations"
-    :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]"
     :is-loading="isLoading"
     :error-message="errorMessage"
     :location-panel-search="searchPlaceholderText"

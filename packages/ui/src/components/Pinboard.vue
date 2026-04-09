@@ -28,7 +28,6 @@ defineSlots<{
 
 const props = defineProps<{
   locations: Location[]
-  getPosition?: (loc: Location) => [number, number]
   isLoading: boolean
   errorMessage: string | null
   locationPanelFilter?: LocationFilterOption[] | undefined
@@ -71,9 +70,7 @@ function handleHoverEnd() {
 
 function handleSelect(location: Location) {
   selectedLocation.value = location
-  if (props.getPosition) {
-    mapPanelRef.value?.panTo(props.getPosition(location))
-  }
+  mapPanelRef.value?.panTo([location.longitude, location.latitude])
 }
 
 function handleMapSelect(location: Location) {
