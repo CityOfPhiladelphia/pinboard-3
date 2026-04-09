@@ -23,12 +23,15 @@ export default defineConfig({
         // Allow map-core CSS to be bundled into our output
         if (id.includes('@phila/phila-ui-map-core') && id.endsWith('.css'))
           return false
+        if (id.includes('@phila/phila-ui-bottom-sheet') && id.endsWith('.css'))
+          return false
         return [
           'vue',
           'vue-router',
           'pinia',
           '@pinboard/core',
           '@phila/phila-ui-map-core',
+          '@phila/phila-ui-bottom-sheet',
         ].some((dep) => id === dep || id.startsWith(dep + '/'))
       },
       output: {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import '@phila/phila-ui-core/styles/template-light.css'
+import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
 import { useSlots, inject, ref, computed } from 'vue'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { faMap } from '@fortawesome/pro-solid-svg-icons'
