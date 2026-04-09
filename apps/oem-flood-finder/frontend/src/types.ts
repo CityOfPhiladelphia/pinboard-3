@@ -28,6 +28,7 @@ export type LocationDTO = {
 export type LocationInfo = {
   lastUpdated: Date | null
   latestReading: Reading | null
+  imageUrl?: ''
   other:
     | { kind: 'Aware'; data: AwareGauge }
     | { kind: 'Usgs'; data: UsgsGauge }

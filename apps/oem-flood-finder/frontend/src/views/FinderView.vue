@@ -14,6 +14,7 @@ import type { Location, LocationFilterOption } from '@ui/types'
 import { SortLocationsValues } from '../../../../../packages/ui/src/types'
 import LocationDetail from '@/components/LocationDetail.vue'
 import { computed, ref, reactive } from 'vue'
+import type { MapCardProps } from '@phila/phila-ui-cards'
 
 const { locations, isLoading, errorMessage } = useLocations()
 const locationSearchString = ref<string>('')
@@ -84,6 +85,40 @@ const filteredAndSortedLocations = computed(() => {
   }
 })
 
+const MapCardPropsList = computed(() => {
+  if (isLoading.value || errorMessage.value) {
+    return []
+  }
+  const locs = filteredAndSortedLocations.value
+  const activeCardProps = new Array()
+
+  locs.forEach((loc) => {
+    switch (loc.other.kind) {
+      case 'Camera': {
+        // map field to props
+        // push to activeCardProps
+      }
+      case 'Aware': {
+        // map field to props
+        // push to activeCardProps
+      }
+      case 'Usgs':
+      default: {
+        const usgsProps: MapCardProps = {
+          heading: loc.name,
+          subheader: '',
+          tag: '0.9 in',
+          src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
+          isLoading: isLoading.value,
+        }
+        // map field to props
+        // push to activeCardProps
+      }
+    }
+  })
+  return activeCardProps
+})
+
 function isGauge(loc: OemLocation): boolean {
   return loc.other.kind === 'Aware' || loc.other.kind === 'Usgs'
 }
@@ -129,13 +164,18 @@ function handleDeselect(id: string) {
     :get-card-details="
       (loc: Location) => ({
         heading: loc.name,
-        subheader: '0.8 mi',
+        subheader: 'Buhhhhhhh!',
         tag: '0.9 in',
         src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
         isLoading: isLoading,
       })
     "
-    :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]"
+    :get-position="
+      (loc: Location): [number, number] => [
+        (loc as OemLocation).longitude,
+        (loc as OemLocation).latitude,
+      ]
+    "
     :is-loading="isLoading"
     :error-message="errorMessage"
     :location-panel-search="searchPlaceholderText"
