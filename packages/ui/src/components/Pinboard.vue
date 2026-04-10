@@ -379,6 +379,7 @@ watch(selectedLocation, (loc) => {
   inset: 0;
   padding: 1rem;
   background: var(--Schemes-Surface-Bright, white);
+  overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: none;
   z-index: 1;
