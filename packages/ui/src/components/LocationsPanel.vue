@@ -31,10 +31,7 @@ const emit = defineEmits<{
 
 const pendingKeydown = ref(false)
 
-function scrollToCard(
-  id: string,
-  behavior: ScrollBehavior = 'smooth'
-) {
+function scrollToCard(id: string, behavior: ScrollBehavior = 'smooth') {
   const card = listRef.value?.querySelector(`[data-location-id="${id}"]`)
   card?.scrollIntoView({ behavior, block: 'center' })
 }
