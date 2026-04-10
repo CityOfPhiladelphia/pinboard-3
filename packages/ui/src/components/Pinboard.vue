@@ -380,7 +380,12 @@ watch(selectedLocation, (loc) => {
   padding: 1rem;
   background: var(--Schemes-Surface-Bright, white);
   overflow-y: auto;
+  scrollbar-width: none;
   z-index: 1;
+}
+
+.bottom-sheet-detail::-webkit-scrollbar {
+  display: none;
 }
 
 .detail-close-btn {
