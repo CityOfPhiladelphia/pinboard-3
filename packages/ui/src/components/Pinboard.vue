@@ -320,6 +320,7 @@ function handleLocationFilterChange(selectedFilter: string) {
 
 .location-count {
   padding: 0.75rem 1rem 0;
+  font-family: var(--Body-Default-font-body-default-family);
 }
 
 .mobile-bottom-sheet {
