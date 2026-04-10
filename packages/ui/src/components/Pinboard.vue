@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
-import { useSlots, inject, ref, computed, onMounted, onUnmounted } from 'vue'
+import {
+  useSlots,
+  inject,
+  ref,
+  computed,
+  onMounted,
+  onUnmounted,
+  watch,
+} from 'vue'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Search } from '@phila/phila-ui-search'
 import { faMap } from '@fortawesome/pro-solid-svg-icons'
@@ -84,6 +92,8 @@ onUnmounted(() => {
 const hoveredLocationId = ref<string | null>(null)
 const selectedLocation = ref<Location | null>(null)
 const bottomSheetOpen = ref(true)
+const snapPoints = [20, 50, 75, 100]
+const bottomSheetRef = ref<{ snapTo: (index: number) => void } | null>(null)
 
 const selectedLocationId = computed(() =>
   selectedLocation.value === null ? null : selectedLocation.value.id
@@ -130,6 +140,12 @@ function closeLocationDetail() {
 function handleLocationFilterChange(selectedFilter: string) {
   emit('selectedFilter', selectedFilter)
 }
+
+watch(selectedLocation, (loc) => {
+  if (loc && isMobile.value) {
+    bottomSheetRef.value?.snapTo(snapPoints.length - 1)
+  }
+})
 </script>
 
 <template>
@@ -205,8 +221,9 @@ function handleLocationFilterChange(selectedFilter: string) {
         </div>
       </div>
       <BottomSheet
+        ref="bottomSheetRef"
         v-model="bottomSheetOpen"
-        :snap-points="[20, 50, 75, 100]"
+        :snap-points="snapPoints"
         collapse-label="Map view"
         :collapse-icon="faMap"
         class="mobile-bottom-sheet"
