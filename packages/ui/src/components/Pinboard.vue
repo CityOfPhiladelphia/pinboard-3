@@ -397,6 +397,11 @@ watch(selectedLocation, (loc) => {
   max-width: 100%;
 }
 
+.bottom-sheet-detail :deep(img) {
+  max-width: 100%;
+  height: auto;
+}
+
 .bottom-sheet-detail::-webkit-scrollbar {
   display: none;
 }
