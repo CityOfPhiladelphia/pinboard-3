@@ -136,7 +136,7 @@ function handleDeselect(id: string) {
     @deselect="handleDeselect"
   >
     <template #location-detail="{ location }">
-      <LocationDetail :location="location" />
+      <LocationDetail :location="location as OemLocation" />
     </template>
 
     <template #map-content="{ hoveredId, selectedId, zoom, onHover, onHoverEnd, onSelect }">
