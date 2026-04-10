@@ -204,32 +204,46 @@ function handleLocationFilterChange(selectedFilter: string) {
         :collapse-icon="faMap"
         class="mobile-bottom-sheet"
       >
-        <slot name="locations-header" />
+        <template v-if="selectedLocation">
+          <div class="bottom-sheet-detail">
+            <button
+              class="detail-close-btn"
+              @click="closeLocationDetail"
+              aria-label="Close details"
+            >
+              ×
+            </button>
+            <slot name="location-detail" :location="selectedLocation" />
+          </div>
+        </template>
+        <template v-else>
+          <slot name="locations-header" />
 
-        <div v-if="isLoading" class="location-list">
-          <MapCard v-for="n in 5" :key="n" :is-loading="true" />
-        </div>
+          <div v-if="isLoading" class="location-list">
+            <MapCard v-for="n in 5" :key="n" :is-loading="true" />
+          </div>
 
-        <div
-          v-else-if="errorMessage"
-          class="status-message status-message--error"
-        >
-          {{ errorMessage }}
-        </div>
+          <div
+            v-else-if="errorMessage"
+            class="status-message status-message--error"
+          >
+            {{ errorMessage }}
+          </div>
 
-        <LocationsPanel
-          v-else-if="!isLoading"
-          :location-filter="locationFilter"
-          :search="search"
-          :locations="locations"
-          :hovered-id="hoveredLocationId"
-          :selected-id="selectedLocationId"
-          :get-card-details="getCardDetails"
-          @select="handleSelect"
-          @hover="handleHover"
-          @hover-end="handleHoverEnd"
-          @selected-filter="handleLocationFilterChange"
-        />
+          <LocationsPanel
+            v-else
+            :location-filter="locationFilter"
+            :search="search"
+            :locations="locations"
+            :hovered-id="hoveredLocationId"
+            :selected-id="selectedLocationId"
+            :get-card-details="getCardDetails"
+            @select="handleSelect"
+            @hover="handleHover"
+            @hover-end="handleHoverEnd"
+            @selected-filter="handleLocationFilterChange"
+          />
+        </template>
       </BottomSheet>
     </main>
   </div>
@@ -316,6 +330,11 @@ function handleLocationFilterChange(selectedFilter: string) {
   overflow: hidden;
 }
 
+.bottom-sheet-detail {
+  position: relative;
+  padding: 1rem;
+}
+
 .detail-close-btn {
   position: absolute;
   top: 1rem;
@@ -394,7 +413,7 @@ function handleLocationFilterChange(selectedFilter: string) {
   }
 
   .detail-overlay {
-    width: 100%;
+    display: none;
   }
 }
 </style>
