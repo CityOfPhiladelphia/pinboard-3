@@ -36,7 +36,7 @@ watch(
   (id) => {
     if (id && listRef.value) {
       const card = listRef.value.querySelector(`[data-location-id="${id}"]`)
-      card?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      card?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
   }
 )
