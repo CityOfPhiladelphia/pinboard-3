@@ -89,6 +89,13 @@ const selectedLocationId = computed(() =>
   selectedLocation.value === null ? null : selectedLocation.value.id
 )
 
+const locationCountLabel = computed(() => {
+  const n = props.locations.length
+  if (n === 0) return 'No locations match'
+  if (n === 1) return '1 item'
+  return `${n} items`
+})
+
 // Event handlers for location interaction
 function handleHover(id: string) {
   hoveredLocationId.value = id
@@ -218,6 +225,9 @@ function handleLocationFilterChange(selectedFilter: string) {
         </template>
         <template v-else>
           <slot name="locations-header" />
+          <div v-if="!isLoading && !errorMessage" class="location-count">
+            {{ locationCountLabel }}
+          </div>
 
           <div v-if="isLoading" class="location-list">
             <MapCard v-for="n in 5" :key="n" :is-loading="true" />
@@ -306,6 +316,10 @@ function handleLocationFilterChange(selectedFilter: string) {
 
 .finder-panel-map {
   overflow: hidden;
+}
+
+.location-count {
+  padding: 0.75rem 1rem 0;
 }
 
 .mobile-bottom-sheet {
