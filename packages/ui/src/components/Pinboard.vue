@@ -228,8 +228,40 @@ watch(selectedLocation, (loc) => {
         :collapse-icon="faMap"
         class="mobile-bottom-sheet"
       >
-        <template v-if="selectedLocation">
-          <div class="bottom-sheet-detail">
+        <div class="bottom-sheet-stack">
+          <div class="bottom-sheet-list-scroll">
+            <slot name="locations-header" />
+            <div v-if="!isLoading && !errorMessage" class="location-count">
+              {{ locationCountLabel }}
+            </div>
+
+            <div v-if="isLoading" class="location-list">
+              <MapCard v-for="n in 5" :key="n" :is-loading="true" />
+            </div>
+
+            <div
+              v-else-if="errorMessage"
+              class="status-message status-message--error"
+            >
+              {{ errorMessage }}
+            </div>
+
+            <LocationsPanel
+              v-else
+              :location-filter="locationFilter"
+              :search="search"
+              :locations="locations"
+              :hovered-id="hoveredLocationId"
+              :selected-id="selectedLocationId"
+              :get-card-details="getCardDetails"
+              @select="handleSelect"
+              @hover="handleHover"
+              @hover-end="handleHoverEnd"
+              @selected-filter="handleLocationFilterChange"
+            />
+          </div>
+
+          <div v-if="selectedLocation" class="bottom-sheet-detail">
             <button
               class="detail-close-btn"
               @click="closeLocationDetail"
@@ -239,38 +271,7 @@ watch(selectedLocation, (loc) => {
             </button>
             <slot name="location-detail" :location="selectedLocation" />
           </div>
-        </template>
-        <template v-else>
-          <slot name="locations-header" />
-          <div v-if="!isLoading && !errorMessage" class="location-count">
-            {{ locationCountLabel }}
-          </div>
-
-          <div v-if="isLoading" class="location-list">
-            <MapCard v-for="n in 5" :key="n" :is-loading="true" />
-          </div>
-
-          <div
-            v-else-if="errorMessage"
-            class="status-message status-message--error"
-          >
-            {{ errorMessage }}
-          </div>
-
-          <LocationsPanel
-            v-else
-            :location-filter="locationFilter"
-            :search="search"
-            :locations="locations"
-            :hovered-id="hoveredLocationId"
-            :selected-id="selectedLocationId"
-            :get-card-details="getCardDetails"
-            @select="handleSelect"
-            @hover="handleHover"
-            @hover-end="handleHoverEnd"
-            @selected-filter="handleLocationFilterChange"
-          />
-        </template>
+        </div>
       </BottomSheet>
     </main>
   </div>
@@ -362,9 +363,24 @@ watch(selectedLocation, (loc) => {
   overflow: hidden;
 }
 
-.bottom-sheet-detail {
+.bottom-sheet-stack {
   position: relative;
+  height: 100%;
+}
+
+.bottom-sheet-list-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+}
+
+.bottom-sheet-detail {
+  position: absolute;
+  inset: 0;
   padding: 1rem;
+  background: var(--Schemes-Surface-Bright, white);
+  overflow-y: auto;
+  z-index: 1;
 }
 
 .detail-close-btn {
