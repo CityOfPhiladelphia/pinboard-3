@@ -1,5 +1,4 @@
 import type { LocationDTO, OemLocation, Reading } from '@/types'
-import type { Location } from '@ui/types'
 import { ref, onMounted } from 'vue'
 
 function transformLocationDTO(dto: LocationDTO): OemLocation[] {
@@ -38,7 +37,7 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
         src: 'Pretty pretty picture!',
       },
       other: { kind: 'Usgs' as const, data: gauge },
-    } satisfies Location)
+    } satisfies OemLocation)
   }
 
   for (const camera of dto.cameras) {
@@ -56,9 +55,8 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
         src: 'Pretty pretty picture!',
       },
       other: { kind: 'Camera' as const, data: camera },
-    } satisfies Location)
+    } satisfies OemLocation)
   }
-
   return locations
 }
 
@@ -105,13 +103,17 @@ export function useLocations() {
     isLoading.value = false
 
     // Fetch latest readings for all gauges in parallel
-    const gauges = locations.value.filter((loc) => loc.other.kind !== 'Camera')
+    const gauges = locations.value.filter(
+      (loc: { other: { kind: string } }) => loc.other.kind !== 'Camera',
+    )
     await Promise.all(
-      gauges.map(async (loc) => {
-        const kind = loc.other.kind.toLowerCase() as 'aware' | 'usgs'
-        const reading = await fetchLatestReading(kind, loc.id, myHeaders)
-        loc.latestReading = reading
-      }),
+      gauges.map(
+        async (loc: { other: { kind: string }; id: string; latestReading: Reading | null }) => {
+          const kind = loc.other.kind.toLowerCase() as 'aware' | 'usgs'
+          const reading = await fetchLatestReading(kind, loc.id, myHeaders)
+          loc.latestReading = reading
+        },
+      ),
     )
   }
 

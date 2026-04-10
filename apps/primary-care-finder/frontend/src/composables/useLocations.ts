@@ -54,16 +54,19 @@ export function useLocations(): {
       const rawGeojson = await response.json()
       const filteredFeatures = rawGeojson.features.filter(isVisible)
 
-      locations.value = filteredFeatures.map((feature: RawFeature) => ({
-        id: String(feature.properties.objectid),
-        name: String(
-          feature.properties.record ?? feature.properties.address ?? ''
-        ),
-        latitude: feature.geometry.coordinates[1],
-        longitude: feature.geometry.coordinates[0],
-        properties: feature.properties as PrimaryCareLocation['properties'],
-        geometry: feature.geometry as PrimaryCareLocation['geometry'],
-      }))
+      locations.value = filteredFeatures.map(
+        (feature: RawFeature) =>
+          ({
+            id: String(feature.properties.objectid),
+            name: String(
+              feature.properties.record ?? feature.properties.address ?? ''
+            ),
+            latitude: feature.geometry.coordinates[1],
+            longitude: feature.geometry.coordinates[0],
+            properties: feature.properties,
+            geometry: feature.geometry,
+          }) satisfies PrimaryCareLocation
+      )
 
       geojson.value = {
         type: 'FeatureCollection' as const,
