@@ -363,15 +363,23 @@ watch(selectedLocation, (loc) => {
   overflow: hidden;
 }
 
+.mobile-bottom-sheet :deep(.bottom-sheet-content) {
+  overflow-x: hidden;
+}
+
 .bottom-sheet-stack {
   position: relative;
   height: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .bottom-sheet-list-scroll {
   position: absolute;
   inset: 0;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .bottom-sheet-detail {
@@ -383,6 +391,10 @@ watch(selectedLocation, (loc) => {
   overflow-y: auto;
   scrollbar-width: none;
   z-index: 1;
+}
+
+.bottom-sheet-detail > * {
+  max-width: 100%;
 }
 
 .bottom-sheet-detail::-webkit-scrollbar {
