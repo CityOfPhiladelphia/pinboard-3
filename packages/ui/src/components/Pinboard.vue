@@ -26,7 +26,7 @@ defineSlots<{
   }): unknown
 }>()
 
-const props = defineProps<{
+defineProps<{
   locations: Location[]
   isLoading: boolean
   errorMessage: string | null
@@ -134,9 +134,9 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
 
           <LocationsPanel
             v-else-if="!isLoading"
+            :locations="locations"
             :location-filter="locationPanelFilter"
             :location-search="locationPanelSearch"
-            :locations="locations"
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"
             @select="handleSelect"
