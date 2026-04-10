@@ -385,13 +385,16 @@ watch(selectedLocation, (loc) => {
 
 .bottom-sheet-detail {
   position: absolute;
-  inset: 0;
-  padding: 1rem;
+  top: -6px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: calc(1rem + 6px) 1rem 1rem;
   background: var(--Schemes-Surface-Bright, white);
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: none;
-  z-index: 1;
+  z-index: 2;
 }
 
 .bottom-sheet-detail > * {
