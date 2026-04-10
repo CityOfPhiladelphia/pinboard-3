@@ -72,7 +72,10 @@ const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
   null
 )
 
-const isMobile = ref(false)
+const isMobile = ref(
+  typeof window !== 'undefined' &&
+    window.matchMedia('(max-width: 768px)').matches
+)
 let mql: MediaQueryList | null = null
 
 function onMediaChange(e: MediaQueryListEvent) {
@@ -85,6 +88,19 @@ onMounted(() => {
   mql.addEventListener('change', onMediaChange)
 })
 
+// Merge mobile overrides into the map config ONCE at setup — not reactively.
+// Once the map is initialized, we don't want it to re-center or re-zoom if
+// the user changes orientation or resizes across the breakpoint.
+const effectiveMapConfig = (() => {
+  const map = config.map
+  if (!map) return undefined
+  const { mobile, ...base } = map
+  if (isMobile.value && mobile) {
+    return { ...base, ...mobile }
+  }
+  return base
+})()
+
 onUnmounted(() => {
   mql?.removeEventListener('change', onMediaChange)
 })
@@ -94,6 +110,9 @@ const selectedLocation = ref<Location | null>(null)
 const bottomSheetOpen = ref(true)
 const snapPoints = [15, 50, 75, 100]
 const bottomSheetRef = ref<{ snapTo: (index: number) => void } | null>(null)
+const locationsPanelRef = ref<{
+  scrollToCard: (id: string, behavior?: ScrollBehavior) => void
+} | null>(null)
 
 const selectedLocationId = computed(() =>
   selectedLocation.value === null ? null : selectedLocation.value.id
@@ -131,10 +150,24 @@ function handleMapSelect(location: Location) {
 }
 
 function closeLocationDetail() {
-  if (selectedLocation.value) {
-    emit('deselect', selectedLocation.value.id)
+  const closedId = selectedLocation.value?.id ?? null
+  if (closedId) {
+    emit('deselect', closedId)
   }
-  selectedLocation.value = null
+
+  if (isMobile.value && closedId) {
+    bottomSheetRef.value?.snapTo(1)
+    // Re-center the card in the shrunken list viewport AFTER the sheet
+    // snap animation finishes. Keep the list hidden (selectedLocation
+    // still truthy) during the snap so the user doesn't see the card
+    // drift, then reveal at the correct position via an instant scroll.
+    setTimeout(() => {
+      locationsPanelRef.value?.scrollToCard(closedId, 'instant')
+      selectedLocation.value = null
+    }, 350)
+  } else {
+    selectedLocation.value = null
+  }
 }
 
 function handleLocationFilterChange(selectedFilter: string) {
@@ -194,7 +227,7 @@ watch(selectedLocation, (loc) => {
         <div class="finder-panel-map">
           <MapPanel
             ref="mapPanelRef"
-            :config="config.map"
+            :config="effectiveMapConfig"
             :is-loading="isLoading"
             :is-mobile="isMobile"
             :locations="locations"
@@ -251,6 +284,7 @@ watch(selectedLocation, (loc) => {
 
             <LocationsPanel
               v-else
+              ref="locationsPanelRef"
               :location-filter="locationFilter"
               :search="search"
               :locations="locations"

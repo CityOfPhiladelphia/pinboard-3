@@ -31,6 +31,14 @@ const emit = defineEmits<{
 
 const pendingKeydown = ref(false)
 
+function scrollToCard(
+  id: string,
+  behavior: ScrollBehavior = 'smooth'
+) {
+  const card = listRef.value?.querySelector(`[data-location-id="${id}"]`)
+  card?.scrollIntoView({ behavior, block: 'center' })
+}
+
 watch(
   () => props.selectedId,
   (id) => {
@@ -39,15 +47,12 @@ watch(
       // before measuring scroll position — otherwise "center" is computed
       // against the old (small) viewport and the card ends up near the
       // top of the new (large) viewport.
-      setTimeout(() => {
-        const card = listRef.value?.querySelector(
-          `[data-location-id="${id}"]`
-        )
-        card?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }, 350)
+      setTimeout(() => scrollToCard(id), 350)
     }
   }
 )
+
+defineExpose({ scrollToCard })
 
 function onCardKeyup(location: Location) {
   if (pendingKeydown.value) {

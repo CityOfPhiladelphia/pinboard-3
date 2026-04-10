@@ -23,6 +23,10 @@ export interface MapConfig {
   geolocationControl?: { position?: MapControlPosition }
   mapSearchControl?: { position?: MapControlPosition; placeholder?: string }
   ariaLabel?: string
+  mobile?: {
+    center?: [number, number]
+    zoom?: number
+  }
 }
 
 export interface PinboardConfig {
