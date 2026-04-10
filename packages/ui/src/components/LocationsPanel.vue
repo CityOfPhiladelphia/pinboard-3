@@ -73,7 +73,7 @@ function handleSearchSubmit(searchString: string) {
       v-for="location in locations"
       :key="location.id"
       :data-location-id="location.id"
-      v-bind="location.cardDetails"
+      v-bind="location.locationCardInfo"
       :class="[
         'location-card',
         {

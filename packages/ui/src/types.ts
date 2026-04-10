@@ -44,7 +44,7 @@ export type Location = {
   name: string
   latitude: number
   longitude: number
-  cardDetails: MapCardProps
+  locationCardInfo: MapCardProps
 }
 
 export type LocationFilterOption = {

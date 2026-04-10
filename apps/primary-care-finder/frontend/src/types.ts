@@ -2,7 +2,7 @@ import type { Location } from '@ui/types'
 
 export interface PrimaryCareLocationInfo {
   properties: PrimaryCareProperties
-  geometry: { type: 'Point'; coordinates: [number, number] }
+  geometry: { type: string; coordinates: [number, number, ...number[]] }
 }
 
 export type PrimaryCareLocation = Location & PrimaryCareLocationInfo

@@ -1,5 +1,5 @@
 import { ref, onMounted, type Ref } from 'vue'
-import type { PrimaryCareLocation } from '@/types'
+import type { PrimaryCareLocation, PrimaryCareProperties } from '@/types'
 
 const ARCGIS_URL =
   'https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/red_PrimaryCare/FeatureServer/0/query'
@@ -63,8 +63,15 @@ export function useLocations(): {
             ),
             latitude: feature.geometry.coordinates[1],
             longitude: feature.geometry.coordinates[0],
-            properties: feature.properties,
+            properties: feature.properties as PrimaryCareProperties,
             geometry: feature.geometry,
+            locationCardInfo: {
+              heading: String(
+                feature.properties.record ?? feature.properties.address ?? ''
+              ),
+              subheader: 'Some date!',
+              tag: 'Some other stuff...',
+            },
           }) satisfies PrimaryCareLocation
       )
 

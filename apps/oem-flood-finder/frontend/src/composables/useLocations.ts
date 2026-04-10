@@ -12,7 +12,7 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
       latestReading: null,
-      cardDetails: {
+      locationCardInfo: {
         heading: gauge.name,
         subheader: "I'm a USGS gauge!",
         tag: '100% pure government efficiency',
@@ -30,7 +30,7 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
       latestReading: null,
-      cardDetails: {
+      locationCardInfo: {
         heading: gauge.name,
         subheader: "I'm a USGS gauge!",
         tag: '100% pure government efficiency',
@@ -48,7 +48,7 @@ function transformLocationDTO(dto: LocationDTO): OemLocation[] {
       longitude: camera.longitude,
       lastUpdated: camera.lastUpdated,
       latestReading: null,
-      cardDetails: {
+      locationCardInfo: {
         heading: camera.name,
         subheader: "I'm a USGS gauge!",
         tag: '100% pure government efficiency',
