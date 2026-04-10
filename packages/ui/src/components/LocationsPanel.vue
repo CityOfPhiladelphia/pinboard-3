@@ -35,8 +35,16 @@ watch(
   () => props.selectedId,
   (id) => {
     if (id && listRef.value) {
-      const card = listRef.value.querySelector(`[data-location-id="${id}"]`)
-      card?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      // Wait for the bottom sheet's snap animation (~300ms) to settle
+      // before measuring scroll position — otherwise "center" is computed
+      // against the old (small) viewport and the card ends up near the
+      // top of the new (large) viewport.
+      setTimeout(() => {
+        const card = listRef.value?.querySelector(
+          `[data-location-id="${id}"]`
+        )
+        card?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 350)
     }
   }
 )
