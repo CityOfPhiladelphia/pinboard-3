@@ -229,7 +229,10 @@ watch(selectedLocation, (loc) => {
         class="mobile-bottom-sheet"
       >
         <div class="bottom-sheet-stack">
-          <div class="bottom-sheet-list-scroll">
+          <div
+            class="bottom-sheet-list-scroll"
+            :class="{ 'is-hidden': selectedLocation }"
+          >
             <slot name="locations-header" />
             <div v-if="!isLoading && !errorMessage" class="location-count">
               {{ locationCountLabel }}
@@ -382,13 +385,14 @@ watch(selectedLocation, (loc) => {
   overflow-x: hidden;
 }
 
+.bottom-sheet-list-scroll.is-hidden {
+  visibility: hidden;
+}
+
 .bottom-sheet-detail {
   position: absolute;
-  top: -6px;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: calc(1rem + 6px) 1rem 1rem;
+  inset: 0;
+  padding: 1rem;
   background: var(--Schemes-Surface-Bright, white);
   overflow-x: hidden;
   overflow-y: auto;
