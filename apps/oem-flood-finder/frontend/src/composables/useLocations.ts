@@ -3,7 +3,7 @@ import type { Location } from '@ui/types'
 import { ref, onMounted } from 'vue'
 
 function transformLocationDTO(dto: LocationDTO): OemLocation[] {
-  const locations: OemLocation[] = new Array()
+  const locations: OemLocation[] = []
 
   for (const gauge of dto.awareGauges) {
     locations.push({

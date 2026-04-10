@@ -22,7 +22,7 @@ export default defineConfigWithVueTs(
   {
     languageOptions: {
       parserOptions: {
-        project: true,
+        projectService: true,
         tsconfigRootDir: __dirname,
       },
     },
