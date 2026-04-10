@@ -455,7 +455,7 @@ watch(selectedLocation, (loc) => {
     left: 0;
     right: 60px;
     z-index: 2;
-    padding: 10px;
+    padding: 6px;
   }
 
   .mobile-map-search-filter :deep(.mobile-search) {
