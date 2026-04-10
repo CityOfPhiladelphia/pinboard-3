@@ -92,7 +92,7 @@ onUnmounted(() => {
 const hoveredLocationId = ref<string | null>(null)
 const selectedLocation = ref<Location | null>(null)
 const bottomSheetOpen = ref(true)
-const snapPoints = [20, 50, 75, 100]
+const snapPoints = [15, 50, 75, 100]
 const bottomSheetRef = ref<{ snapTo: (index: number) => void } | null>(null)
 
 const selectedLocationId = computed(() =>
