@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Location } from '@ui/types'
+import type { OemLocation } from '@/types'
 import GaugeReadings from './GaugeReadings.vue'
 import CameraVideoPlayer from './CameraVideoPlayer.vue'
-import { useLocationDetail } from '../composables/useLocationDetail'
+import { useLocationDetail } from '@/composables/useLocationDetail'
 
 const props = defineProps<{
-  location: Location
+  location: OemLocation
 }>()
 
 const readingState = useLocationDetail(

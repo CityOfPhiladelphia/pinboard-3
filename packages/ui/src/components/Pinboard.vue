@@ -26,29 +26,20 @@ defineSlots<{
   }): unknown
 }>()
 
-const props = defineProps<{
+defineProps<{
   locations: Location[]
-  getCardDetails: (loc: Location) => {
-    heading?: string
-    subheader?: string
-    tag?: string
-    body?: string
-    src?: string
-    alt?: string
-    href?: string
-    isLoading: boolean
-  }
-  getPosition?: (loc: Location) => [number, number]
   isLoading: boolean
   errorMessage: string | null
-  locationFilter: LocationFilterOption[] | null
-  search: string | null
+  locationPanelFilter?: LocationFilterOption[] | undefined
+  locationPanelSearch?: string | undefined
   geojson?: unknown
 }>()
 
 // emit to parent app to handle what gets sent to pinboard
 const emit = defineEmits<{
-  selectedFilter: [filter: string]
+  locationSearchString: [search: string]
+  selectedLocationsFilter: [filter: string]
+  sortLocationsOption: [sort: number]
   deselect: [locationId: string]
 }>()
 
@@ -79,9 +70,7 @@ function handleHoverEnd() {
 
 function handleSelect(location: Location) {
   selectedLocation.value = location
-  if (props.getPosition) {
-    mapPanelRef.value?.panTo(props.getPosition(location))
-  }
+  mapPanelRef.value?.panTo([location.longitude, location.latitude])
 }
 
 function handleMapSelect(location: Location) {
@@ -99,8 +88,16 @@ function closeLocationDetail() {
   selectedLocation.value = null
 }
 
-function handleLocationFilterChange(selectedFilter: string) {
-  emit('selectedFilter', selectedFilter)
+function handleLocationFilterChange(selectedLocationsFilter: string) {
+  emit('selectedLocationsFilter', selectedLocationsFilter)
+}
+
+function handleLocationSortChange(sortLocationsOption: number) {
+  emit('sortLocationsOption', sortLocationsOption)
+}
+
+function handleLocationSearchSubmit(locationsSearchString: string) {
+  emit('locationSearchString', locationsSearchString)
 }
 </script>
 
@@ -137,16 +134,17 @@ function handleLocationFilterChange(selectedFilter: string) {
 
           <LocationsPanel
             v-else-if="!isLoading"
-            :location-filter="locationFilter"
-            :search="search"
             :locations="locations"
+            :location-filter="locationPanelFilter"
+            :location-search="locationPanelSearch"
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"
-            :get-card-details="getCardDetails"
             @select="handleSelect"
             @hover="handleHover"
             @hover-end="handleHoverEnd"
+            @search-string="handleLocationSearchSubmit"
             @selected-filter="handleLocationFilterChange"
+            @sort-option="handleLocationSortChange"
           />
         </div>
 

@@ -1,9 +1,8 @@
 import type { LocationDTO, OemLocation, Reading } from '@/types'
-import type { Location } from '@ui/types'
 import { ref, onMounted } from 'vue'
 
-function transformLocationDTO(dto: LocationDTO): Location[] {
-  const locations: Location[] = []
+function transformLocationDTO(dto: LocationDTO): OemLocation[] {
+  const locations: OemLocation[] = []
 
   for (const gauge of dto.awareGauges) {
     locations.push({
@@ -12,8 +11,14 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
       latitude: gauge.latitude,
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
-      other: { kind: 'Aware', data: gauge },
       latestReading: null,
+      locationCardInfo: {
+        heading: gauge.name,
+        subheader: "I'm a USGS gauge!",
+        tag: '100% pure government efficiency',
+        src: 'Pretty pretty picture!',
+      },
+      other: { kind: 'Aware' as const, data: gauge },
     } satisfies OemLocation)
   }
 
@@ -24,8 +29,14 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
       latitude: gauge.latitude,
       longitude: gauge.longitude,
       lastUpdated: gauge.lastUpdated,
-      other: { kind: 'Usgs', data: gauge },
       latestReading: null,
+      locationCardInfo: {
+        heading: gauge.name,
+        subheader: "I'm a USGS gauge!",
+        tag: '100% pure government efficiency',
+        src: 'Pretty pretty picture!',
+      },
+      other: { kind: 'Usgs' as const, data: gauge },
     } satisfies OemLocation)
   }
 
@@ -36,12 +47,17 @@ function transformLocationDTO(dto: LocationDTO): Location[] {
       latitude: camera.latitude,
       longitude: camera.longitude,
       lastUpdated: camera.lastUpdated,
-      other: { kind: 'Camera', data: camera },
       latestReading: null,
+      locationCardInfo: {
+        heading: camera.name,
+        subheader: "I'm a USGS gauge!",
+        tag: '100% pure government efficiency',
+        src: 'Pretty pretty picture!',
+      },
+      other: { kind: 'Camera' as const, data: camera },
     } satisfies OemLocation)
   }
-
-  return locations.sort((a, b) => b.latitude - a.latitude)
+  return locations
 }
 
 async function fetchLatestReading(
@@ -66,7 +82,7 @@ export function useLocations() {
   // set to Loading initially
   const isLoading = ref(true)
   const errorMessage = ref<string | null>(null)
-  const locations = ref<Location[]>([])
+  const locations = ref<OemLocation[]>([])
 
   async function fetchLocations() {
     const myHeaders = new Headers()
@@ -87,13 +103,17 @@ export function useLocations() {
     isLoading.value = false
 
     // Fetch latest readings for all gauges in parallel
-    const gauges = locations.value.filter((loc) => loc.other.kind !== 'Camera')
+    const gauges = locations.value.filter(
+      (loc: { other: { kind: string } }) => loc.other.kind !== 'Camera',
+    )
     await Promise.all(
-      gauges.map(async (loc) => {
-        const kind = loc.other.kind.toLowerCase() as 'aware' | 'usgs'
-        const reading = await fetchLatestReading(kind, loc.id, myHeaders)
-        loc.latestReading = reading
-      }),
+      gauges.map(
+        async (loc: { other: { kind: string }; id: string; latestReading: Reading | null }) => {
+          const kind = loc.other.kind.toLowerCase() as 'aware' | 'usgs'
+          const reading = await fetchLatestReading(kind, loc.id, myHeaders)
+          loc.latestReading = reading
+        },
+      ),
     )
   }
 

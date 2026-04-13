@@ -5,8 +5,5 @@
     "rootDir": "./src",
     "jsx": "preserve"
   },
-  "include": [
-    "src",
-    "../../apps/oem-flood-finder/frontend/src/components/LocationList.vue"
-  ]
+  "include": ["src"]
 }

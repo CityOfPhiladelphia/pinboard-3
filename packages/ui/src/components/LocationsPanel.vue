@@ -1,16 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Search } from '@phila/phila-ui-search'
 import { MapCard } from '@phila/phila-ui-cards'
-import type { MapCardProps } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 import type { Location, LocationFilterOption } from '../types'
 
-const listRef = ref<HTMLElement | null>(null)
-
 const props = defineProps<{
-  locationFilter: LocationFilterOption[] | null
-  search: string | null
+  locationSearch: string | undefined
+  locationFilter: LocationFilterOption[] | undefined
   locations: Location[]
   hoveredId?: string | null
   selectedId?: string | null
@@ -19,17 +15,19 @@ const props = defineProps<{
     isHovered: boolean
     isSelected: boolean
   }) => unknown
-  getCardDetails: (loc: Location) => MapCardProps
 }>()
 
 const emit = defineEmits<{
   select: [location: Location]
+  searchString: [search: string]
   selectedFilter: [filter: string]
+  sortOption: [sort: number]
   hover: [id: string]
   'hover-end': []
 }>()
 
 const pendingKeydown = ref(false)
+const listRef = ref<HTMLElement | null>(null)
 
 watch(
   () => props.selectedId,
@@ -51,21 +49,31 @@ function onCardKeyup(location: Location) {
 function handleFilterChange(selectedFilter: string) {
   emit('selectedFilter', selectedFilter)
 }
+
+function handleSortChange(sortOption: number) {
+  emit('sortOption', sortOption)
+}
+
+function handleSearchSubmit(searchString: string) {
+  emit('searchString', searchString)
+}
 </script>
 
 <template>
   <LocationSearchFilterPanel
     v-if="locationFilter"
+    :search="locationSearch"
     :filterOptions="locationFilter"
     @selected-filter="handleFilterChange"
+    @sort-option="handleSortChange"
+    @search-string="handleSearchSubmit"
   />
-  <Search v-if="search" class-name="location-search" :placeholder="search" />
   <div ref="listRef" class="location-list content">
     <MapCard
       v-for="location in locations"
       :key="location.id"
       :data-location-id="location.id"
-      v-bind="getCardDetails(location)"
+      v-bind="location.locationCardInfo"
       :class="[
         'location-card',
         {
@@ -89,6 +97,7 @@ function handleFilterChange(selectedFilter: string) {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  scrollbar-width: none;
 }
 
 .location-card {
@@ -104,10 +113,5 @@ function handleFilterChange(selectedFilter: string) {
 .location-card--selected {
   background-color: var(--Schemes-Surface-Container, #eee);
   outline: 2px solid var(--Schemes-Primary, #1976d2);
-}
-
-.location-search {
-  padding: 1rem;
-  width: 100%;
 }
 </style>

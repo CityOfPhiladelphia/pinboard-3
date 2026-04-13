@@ -1,59 +1,103 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { Search } from '@phila/phila-ui-search'
 import { Tags } from '@phila/phila-ui-tags'
 import type { LocationFilterOption } from '../types'
+import { SortLocationsValues } from '../types'
 
 const props = defineProps<{
-  filterOptions: LocationFilterOption[]
+  search?: string
+  filterOptions?: LocationFilterOption[]
 }>()
 
 const emit = defineEmits<{
+  searchString: [search: string]
   selectedFilter: [filter: string]
+  sortOption: [sort: number]
 }>()
 
-const selectedFilter = ref(props.filterOptions[0]?.value ?? null)
+const selectedFilter = ref(
+  props.filterOptions ? props.filterOptions[0].value : undefined
+)
+const sortOption = ref<SortLocationsValues>(SortLocationsValues.None)
+const searchString = ref<string>('')
+const searchActive = ref<boolean>(false)
 
-function handleChange(option: string) {
+function handleFilterChange(option: string) {
+  if (selectedFilter.value === option) {
+    return
+  }
   selectedFilter.value = option
   emit('selectedFilter', selectedFilter.value)
+}
+
+function handleSortChange() {
+  sortOption.value =
+    ++sortOption.value in SortLocationsValues
+      ? sortOption.value
+      : SortLocationsValues.None
+  emit('sortOption', sortOption.value)
+}
+
+function handleSearchChange(search: string) {
+  searchString.value = search
+  if (searchActive.value && searchString.value === '') {
+    searchActive.value = false
+    emit('searchString', searchString.value)
+  }
+}
+
+function handleSearchSubmit() {
+  searchActive.value = true
+  emit('searchString', searchString.value)
 }
 </script>
 
 <template>
+  <Search
+    v-if="search"
+    class-name="location-search"
+    :placeholder="search"
+    @update:modelValue="handleSearchChange"
+    @search="handleSearchSubmit"
+  />
   <div class="location-filters">
     <Tags
       v-for="opt in filterOptions"
-      :key="`${opt.value}-${selectedFilter}`"
+      :key="`filter-${opt.value}`"
       variant="action"
       size="large"
       color="grey"
       :text="opt.label"
       :selected="selectedFilter === opt.value"
-      @update:selected="handleChange(opt.value)"
+      @update:selected="handleFilterChange(opt.value)"
+    />
+    <Tags
+      class="location-sort"
+      :key="`filter-sort`"
+      variant="action"
+      size="large"
+      color="grey"
+      text="Sort"
+      :selected="!!SortLocationsValues.None"
+      @update:selected="handleSortChange()"
     />
   </div>
 </template>
 
 <style scoped>
+.location-search {
+  padding: 1rem 1rem 0rem 1rem;
+  width: 100%;
+}
+
 .location-filters {
   display: flex;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  flex-shrink: 0;
 }
 
-.filter-pill {
-  padding: 0.375rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 1rem;
-  background: #fff;
-  cursor: pointer;
-  font-size: 0.8125rem;
-}
-
-.filter-pill.active {
-  background: var(--Schemes-Primary, #2176d2);
-  border-color: var(--Schemes-Primary, #2176d2);
-  color: #fff;
+.location-sort {
+  margin-left: auto;
 }
 </style>

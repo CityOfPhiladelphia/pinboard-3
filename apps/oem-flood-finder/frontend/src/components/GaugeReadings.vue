@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { ReadingState } from '../composables/useLocationDetail'
-import type { Location } from '@ui/types'
+import type { ReadingState } from '@/composables/useLocationDetail'
+import type { OemLocation } from '@/types'
 
 defineProps<{
   readingState: ReadingState
-  location: Location
+  location: OemLocation
 }>()
 </script>
 

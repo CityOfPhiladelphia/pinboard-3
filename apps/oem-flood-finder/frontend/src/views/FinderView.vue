@@ -8,34 +8,83 @@ import {
   BasemapToggle,
 } from '@pinboard/ui'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
-import { useLocations } from '../composables/useLocations'
-import type { Filters } from '../types'
+import { useLocations } from '@/composables/useLocations'
+import type { Filters, OemLocation } from '@/types'
 import type { Location, LocationFilterOption } from '@ui/types'
-import LocationDetail from '../components/LocationDetail.vue'
+import { SortLocationsValues } from '../../../../../packages/ui/src/types'
+import LocationDetail from '@/components/LocationDetail.vue'
 import { computed, ref, reactive } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations()
-
-const locationMode = ref<Filters>('all')
+const locationSearchString = ref<string>('')
+const locationFilterMode = ref<Filters>('all')
+const locationSortMode = ref<number>(SortLocationsValues.None)
+const searchPlaceholderText = 'Search by address or keyword...'
 
 const filteredLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
-  switch (locationMode.value) {
+  const locs: OemLocation[] = [...locations.value]
+  switch (locationFilterMode.value) {
     case 'gauges': {
-      return locations.value.filter((loc) => isGauge(loc))
+      return locs.filter((loc) => isGauge(loc))
     }
     case 'cameras': {
-      return locations.value.filter((loc) => loc.other.kind === 'Camera')
+      return locs.filter((loc) => loc.other.kind === 'Camera')
     }
+    case 'all':
     default: {
-      return locations.value
+      return locs
     }
   }
 })
 
-function isGauge(loc: Location): boolean {
+const searchMatchedLocations = computed(() => {
+  if (isLoading.value || errorMessage.value) {
+    return []
+  }
+  if (locationSearchString.value) {
+    const searchTerms = locationSearchString.value.replace(/\W+/, ' ').toLowerCase().split(' ')
+    return filteredLocations.value.filter((loc) => {
+      const locString = JSON.stringify(Object.values(loc.other.data)).toLowerCase()
+      return searchTerms.some((term) => locString.match(term))
+    })
+  } else {
+    return filteredLocations.value
+  }
+})
+
+const filteredAndSortedLocations = computed(() => {
+  if (isLoading.value || errorMessage.value) {
+    return []
+  }
+  const locs: OemLocation[] = [...searchMatchedLocations.value]
+  switch (locationSortMode.value) {
+    case SortLocationsValues.AlphaAsc: {
+      const sorted = locs.sort((a, b) => a.name.localeCompare(b.name))
+      return sorted
+    }
+    case SortLocationsValues.AlphaDes: {
+      const sorted = locs.sort((a, b) => b.name.localeCompare(a.name))
+      return sorted
+    }
+    case SortLocationsValues.DistAsc: {
+      // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
+      return locs
+    }
+    case SortLocationsValues.DistDes: {
+      // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
+      return locs
+    }
+    case SortLocationsValues.None:
+    default: {
+      return locs
+    }
+  }
+})
+
+function isGauge(loc: OemLocation): boolean {
   return loc.other.kind === 'Aware' || loc.other.kind === 'Usgs'
 }
 
@@ -46,7 +95,15 @@ const filterOptions: LocationFilterOption[] = [
 ]
 
 function handleLocationFilterChange(selectedFilter: string) {
-  locationMode.value = selectedFilter as Filters
+  locationFilterMode.value = selectedFilter as Filters
+}
+
+function handleLocationSortChange(sortLocationsOption: number) {
+  locationSortMode.value = sortLocationsOption as SortLocationsValues
+}
+
+function handleLocationSearchSubmit(locationsSearchString: string) {
+  locationSearchString.value = locationsSearchString
 }
 
 const visitedIds = reactive(new Set<string>())
@@ -68,26 +125,18 @@ function handleDeselect(id: string) {
 
 <template>
   <Pinboard
-    :locations="filteredLocations"
-    :get-card-details="
-      (loc: Location) => ({
-        heading: loc.name,
-        subheader: '0.8 mi',
-        tag: '0.9 in',
-        src: 'https://images.flashflood.info:8282/352753093609236/352753093609236_00806_2026-04-01_115739.jpg',
-        isLoading: isLoading,
-      })
-    "
-    :get-position="(loc: Location): [number, number] => [loc.longitude, loc.latitude]"
+    :locations="filteredAndSortedLocations"
     :is-loading="isLoading"
     :error-message="errorMessage"
-    :locationFilter="filterOptions"
-    search="Search by address or keyword"
-    @selected-filter="handleLocationFilterChange"
+    :location-panel-search="searchPlaceholderText"
+    :location-panel-filter="filterOptions"
+    @location-search-string="handleLocationSearchSubmit"
+    @selected-locations-filter="handleLocationFilterChange"
+    @sort-locations-option="handleLocationSortChange"
     @deselect="handleDeselect"
   >
     <template #location-detail="{ location }">
-      <LocationDetail :location="location" />
+      <LocationDetail :location="location as OemLocation" />
     </template>
 
     <template #map-content="{ hoveredId, selectedId, zoom, onHover, onHoverEnd, onSelect }">
@@ -97,7 +146,7 @@ function handleDeselect(id: string) {
 
       <div v-if="!isLoading">
         <MapMarker
-          v-for="loc in filteredLocations"
+          v-for="loc in [...filteredAndSortedLocations].sort((a, b) => b.latitude - a.latitude)"
           :key="loc.id"
           :lng-lat="[loc.longitude, loc.latitude]"
         >

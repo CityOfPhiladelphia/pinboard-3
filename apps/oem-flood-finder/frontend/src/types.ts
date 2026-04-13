@@ -1,5 +1,5 @@
 /** Shared types for OEM Flood Finder */
-import type { LocationBasic } from '../../../../packages/ui/src/types'
+import type { Location } from '@ui/types'
 
 export type AlertBanner = {
   title: string
@@ -27,14 +27,14 @@ export type LocationDTO = {
 
 export type LocationInfo = {
   lastUpdated: Date | null
+  latestReading: Reading | null
   other:
     | { kind: 'Aware'; data: AwareGauge }
     | { kind: 'Usgs'; data: UsgsGauge }
     | { kind: 'Camera'; data: Camera }
-  latestReading: Reading | null
 }
 
-export type OemLocation = LocationBasic & LocationInfo
+export type OemLocation = Location & LocationInfo
 
 export type UsgsGauge = {
   gaugeId: string
