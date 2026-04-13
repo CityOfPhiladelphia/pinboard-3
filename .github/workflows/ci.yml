@@ -21,7 +21,7 @@ jobs:
 
       - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
 
       - name: Install dependencies
@@ -64,14 +64,15 @@ jobs:
 
           packages_changed() { echo "$CHANGED" | grep -q "^packages/"; }
           app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
+          ci_changed() { echo "$CHANGED" | grep -q "^\.github/workflows/ci\.yml$"; }
 
-          if packages_changed || app_changed "oem-flood-finder"; then
+          if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
             echo "oem=true" >> $GITHUB_OUTPUT
           else
             echo "oem=false" >> $GITHUB_OUTPUT
           fi
 
-          if packages_changed || app_changed "primary-care-finder"; then
+          if packages_changed || app_changed "primary-care-finder" || ci_changed; then
             echo "pcf=true" >> $GITHUB_OUTPUT
           else
             echo "pcf=false" >> $GITHUB_OUTPUT
@@ -96,7 +97,7 @@ jobs:
 
       - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
 
       - name: Install dependencies
@@ -120,6 +121,8 @@ jobs:
         working-directory: apps/oem-flood-finder
         env:
           CI: 'true'
+          VITE_FLOOD_API_KEY: ${{ secrets.FLOOD_API_KEY }}
+          VITE_FLOOD_API_BASE_URL: ${{ secrets.FLOOD_API_BASE_URL }}
         run: city ship test --web
 
   deploy-test-primary-care-finder:
@@ -141,7 +144,7 @@ jobs:
 
       - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
 
       - name: Install dependencies
