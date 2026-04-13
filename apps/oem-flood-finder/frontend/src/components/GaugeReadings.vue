@@ -13,7 +13,7 @@ defineProps<{
 
   <div v-else-if="readingState.kind === 'Loaded'">
     <!-- Graph will go here -->
-    <table v-if="location.other.kind === 'Aware'">
+    <table v-if="location.deviceType === 'Aware'">
       <thead>
         <tr>
           <th>Created On</th>
@@ -43,12 +43,12 @@ defineProps<{
       </tbody>
     </table>
 
-    <div v-if="location.other.kind === 'Usgs'">
+    <!-- <div v-if="location.deviceType === 'Usgs'">
       <img
         :src="location.other.data.hydrographWithFloodCategoriesURL"
         :alt="location.other.data.hydrographURL"
       />
-    </div>
+    </div> -->
 
     <!-- Snapshot -->
     <template v-if="location.other.kind === 'Aware' && 0 in readingState.data">

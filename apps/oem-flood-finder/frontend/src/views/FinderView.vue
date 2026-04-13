@@ -31,7 +31,7 @@ const filteredLocations = computed(() => {
       return locs.filter((loc) => isGauge(loc))
     }
     case 'cameras': {
-      return locs.filter((loc) => loc.other.kind === 'Camera')
+      return locs.filter((loc) => loc.deviceType === 'Camera')
     }
     case 'all':
     default: {
@@ -47,7 +47,7 @@ const searchMatchedLocations = computed(() => {
   if (locationSearchString.value) {
     const searchTerms = locationSearchString.value.replace(/\W+/, ' ').toLowerCase().split(' ')
     return filteredLocations.value.filter((loc) => {
-      const locString = JSON.stringify(Object.values(loc.other.data)).toLowerCase()
+      const locString = JSON.stringify(Object.values(loc)).toLowerCase()
       return searchTerms.some((term) => locString.match(term))
     })
   } else {
@@ -85,7 +85,7 @@ const filteredAndSortedLocations = computed(() => {
 })
 
 function isGauge(loc: OemLocation): boolean {
-  return loc.other.kind === 'Aware' || loc.other.kind === 'Usgs'
+  return loc.deviceType === 'Aware' || loc.deviceType === 'Usgs'
 }
 
 const filterOptions: LocationFilterOption[] = [
