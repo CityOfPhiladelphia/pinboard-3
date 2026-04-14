@@ -15,7 +15,7 @@ function transformLocationDTO(dto: LocationListDTO[]): OemLocation[] {
       locationCardInfo: {
         heading: loc.name,
         subheader: "0.8 mi",
-        tag: `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`,
+        tag: loc.gaugeHeight === -9999.9 ? 'No data' : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`,
         src: loc.imageUrl,
       },
       actionStage: loc.actionStage,
@@ -24,62 +24,8 @@ function transformLocationDTO(dto: LocationListDTO[]): OemLocation[] {
       majorStage: loc.majorStage
     } satisfies OemLocation)
   }
-
-  // for (const gauge of dto.usgsGauges) {
-  //   locations.push({
-  //     id: gauge.gaugeId,
-  //     name: gauge.name,
-  //     latitude: gauge.latitude,
-  //     longitude: gauge.longitude,
-  //     lastUpdated: gauge.lastUpdated,
-  //     latestReading: null,
-  //     locationCardInfo: {
-  //       heading: gauge.name,
-  //       subheader: "I'm a USGS gauge!",
-  //       tag: '100% pure government efficiency',
-  //       src: 'Pretty pretty picture!',
-  //     },
-  //     other: { kind: 'Usgs' as const, data: gauge },
-  //   } satisfies OemLocation)
-  // }
-
-  // for (const camera of dto.cameras) {
-  //   locations.push({
-  //     id: camera.cameraId,
-  //     name: camera.name,
-  //     latitude: camera.latitude,
-  //     longitude: camera.longitude,
-  //     lastUpdated: camera.lastUpdated,
-  //     latestReading: null,
-  //     locationCardInfo: {
-  //       heading: camera.name,
-  //       subheader: "I'm a USGS gauge!",
-  //       tag: '100% pure government efficiency',
-  //       src: 'Pretty pretty picture!',
-  //     },
-  //     other: { kind: 'Camera' as const, data: camera },
-  //   } satisfies OemLocation)
-  // }
   return locations
 }
-
-// async function fetchLatestReading(
-//   kind: 'aware' | 'usgs',
-//   gaugeId: string,
-//   headers: Headers,
-// ): Promise<Reading | null> {
-//   try {
-//     const response = await fetch(
-//       `${import.meta.env.VITE_FLOOD_API_BASE_URL}/${kind}/reading/${gaugeId}?limit=1`,
-//       { method: 'GET', headers, redirect: 'follow' },
-//     )
-//     if (!response.ok) return null
-//     const data: Reading[] = await response.json()
-//     return data[0] ?? null
-//   } catch {
-//     return null
-//   }
-// }
 
 export function useLocations() {
   // set to Loading initially
@@ -103,21 +49,8 @@ export function useLocations() {
     }
 
     locations.value = transformLocationDTO(await response.json())
-    // isLoading.value = false
 
-    // // Fetch latest readings for all gauges in parallel
-    // const gauges = locations.value.filter(
-    //   (loc: { other: { kind: string } }) => loc. !== 'Camera',
-    // )
-    // await Promise.all(
-    //   gauges.map(
-    //     async (loc: { other: { kind: string }; id: string; latestReading: Reading | null }) => {
-    //       const kind = loc.other.kind.toLowerCase() as 'aware' | 'usgs'
-    //       const reading = await fetchLatestReading(kind, loc.id, myHeaders)
-    //       loc.latestReading = reading
-    //     },
-    //   ),
-    // )
+    isLoading.value = false
   }
 
   onMounted(fetchLocations)

@@ -153,11 +153,7 @@ function handleDeselect(id: string) {
           <MapIconTextPin
             :zoom="zoom"
             :icon="isGauge(loc) ? faGauge : faCamera"
-            :text="
-              loc.latestReading
-                ? `${loc.latestReading.gaugeHeight} ${loc.latestReading.gaugeHeightUnit}`
-                : undefined
-            "
+            :text="loc.locationCardInfo.tag"
             :color-theme="'dark-primary'"
             :color="isGauge(loc) ? undefined : '#3053B6'"
             :hovered="hoveredId === loc.id"

@@ -19,12 +19,6 @@ export type FloodImpact = {
   statement: string
 }
 
-// export type LocationDTO = {
-//   awareGauges: AwareGauge[]
-//   usgsGauges: UsgsGauge[]
-//   cameras: Camera[]
-// }
-
 export type LocationListDTO = {
   id: string
   name: string
@@ -34,26 +28,15 @@ export type LocationListDTO = {
   gaugeHeight: number
   gaugeHeightUnit: string
   imageUrl: string
-  deviceType: string
+  deviceType: DeviceType
   actionStage: number
   minorStage: number
   moderateStage: number
   majorStage: number
 }
 
-// export type LocationInfo = {
-//   lastUpdated: Date | null
-//   latestReading: Reading | null
-//   other:
-//     | { kind: 'Aware'; data: AwareGauge }
-//     | { kind: 'Usgs'; data: UsgsGauge }
-//     | { kind: 'Camera'; data: Camera }
-// }
-
-// export type OemLocation = Location & LocationInfo
-
 export type OemLocation = Location & {
-  deviceType: string,
+  deviceType: DeviceType
   lastUpdated: Date | null
   actionStage: number
   minorStage: number
@@ -128,5 +111,8 @@ export type Camera = {
   locationDescription?: string
   pageUrl: string
 }
+
+type DeviceType = 'Aware' | 'Usgs' | 'Camera'
+
 
 export type Filters = 'all' | 'gauges' | 'cameras'

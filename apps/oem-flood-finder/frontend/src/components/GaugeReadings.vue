@@ -43,24 +43,10 @@ defineProps<{
       </tbody>
     </table>
 
-    <!-- <div v-if="location.deviceType === 'Usgs'">
-      <img
-        :src="location.other.data.hydrographWithFloodCategoriesURL"
-        :alt="location.other.data.hydrographURL"
-      />
-    </div> -->
-
     <!-- Snapshot -->
-    <template v-if="location.other.kind === 'Aware' && 0 in readingState.data">
+    <template v-if="location.deviceType === 'Aware' && 0 in readingState.data">
       <h6>Current Snapshot</h6>
-      <img
-        :src="
-          'https://images.flashflood.info:8282/' +
-          location.other.data.modemNumber +
-          '/' +
-          readingState.data[0].pictureFilenameOnServer
-        "
-      />
+      <img :src="location.locationCardInfo.src" />
     </template>
   </div>
 
