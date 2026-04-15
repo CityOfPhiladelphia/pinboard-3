@@ -11,7 +11,7 @@ const props = defineProps<{
 
 const readingState = useLocationDetail(
   () => props.location.id,
-  () => props.location.other.kind,
+  () => props.location.deviceType,
   5,
 )
 
@@ -39,7 +39,7 @@ const lastUpdatedDate = computed(() => {
 <template>
   <div class="location-detail content">
     <div class="location-detail__body">
-      <template v-if="location.other.kind === 'Aware' || location.other.kind === 'Usgs'">
+      <template v-if="location.deviceType === 'Aware' || location.deviceType === 'Usgs'">
         <h4>{{ location.name }}</h4>
 
         <h6>Gauge Reading</h6>
@@ -64,15 +64,22 @@ const lastUpdatedDate = computed(() => {
         </table>
       </template>
 
+      <!-- this will be part of new Location Detail query on backend -->
       <!-- Camera detail -->
-      <template v-else-if="location.other.kind === 'Camera'">
+      <template v-else-if="location.deviceType === 'Camera'">
         <h2>{{ location.name }}</h2>
 
-        <p v-if="location.other.data.locationDescription">
-          {{ location.other.data.locationDescription }}
+        <p>
+          This video camera is located at the intersection of
+          {{ location.name }} and allows you to monitor road conditions and potential flooding in
+          real time.
         </p>
 
-        <CameraVideoPlayer :video-url="location.other.data.pageUrl" :autoplay="true" />
+        <CameraVideoPlayer
+          v-if="location.locationCardInfo.src"
+          :video-url="location.locationCardInfo.src"
+          :autoplay="true"
+        />
       </template>
     </div>
   </div>
