@@ -49,6 +49,10 @@ const searchMode: ComputedRef<SearchMode> = computed(() => {
   }
 })
 
+// const previousSearches: ComputedRef<Set<string>> = computed(() => {
+
+// })
+
 async function updateSearchSuggestions(): Promise<MenuChoice[]> {
   if (
     searchString.value.length < 3 ||
