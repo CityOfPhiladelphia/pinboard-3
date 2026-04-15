@@ -17,7 +17,7 @@ import LocationDetail from '@/components/LocationDetail.vue'
 import { computed, ref, reactive } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations()
-const { setUserLocation } = useUserLocation()
+const { userCoords, setUserLocation } = useUserLocation()
 const locationSearchString = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
 const locationSortMode = ref<number>(SortLocationsValues.None)
