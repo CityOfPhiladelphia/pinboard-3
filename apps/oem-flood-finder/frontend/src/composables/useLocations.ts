@@ -15,7 +15,12 @@ function transformLocationDTO(dto: LocationListDTO[]): OemLocation[] {
       locationCardInfo: {
         heading: loc.name,
         subheader: '0.8 mi',
-        tag: loc.gaugeHeight === -9999.9 ? 'No data' : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`,
+        tag:
+          loc.deviceType === 'Camera'
+            ? ''
+            : !loc.gaugeHeight || loc.gaugeHeight === -9999.9
+              ? 'No data'
+              : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`,
         src: loc.imageUrl,
       },
       actionStage: loc.actionStage,
