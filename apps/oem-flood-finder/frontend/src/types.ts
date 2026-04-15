@@ -114,5 +114,4 @@ export type Camera = {
 
 type DeviceType = 'Aware' | 'Usgs' | 'Camera'
 
-
 export type Filters = 'all' | 'gauges' | 'cameras'

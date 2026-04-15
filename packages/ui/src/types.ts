@@ -62,6 +62,13 @@ export enum SortLocationsValues {
   DistDes,
 }
 
+export type LocationCardInfo = {
+  heading: string
+  subheader: string
+  tag: string
+  src: string
+}
+
 export type AisAutocompleteResult = {
   query: string
   query_type: string

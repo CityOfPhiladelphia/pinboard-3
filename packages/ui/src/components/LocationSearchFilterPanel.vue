@@ -2,6 +2,7 @@
 import { ref, computed, ComputedRef } from 'vue'
 import { Search } from '@phila/phila-ui-search'
 import { Tags } from '@phila/phila-ui-tags'
+import { Menu, MenuChoice } from '@phila/phila-ui-menu'
 import type {
   LocationFilterOption,
   SearchMode,
@@ -29,7 +30,7 @@ const selectedFilter = ref(
 )
 const sortOption = ref<SortLocationsValues>(SortLocationsValues.None)
 const searchString = ref<string>('')
-const searchSuggestions = ref<string[]>([])
+const searchSuggestions = ref<MenuChoice[]>([])
 
 const searchMode: ComputedRef<SearchMode> = computed(() => {
   switch (true) {
@@ -48,7 +49,7 @@ const searchMode: ComputedRef<SearchMode> = computed(() => {
   }
 })
 
-async function updateSearchSuggestions(): Promise<string[]> {
+async function updateSearchSuggestions(): Promise<MenuChoice[]> {
   if (
     searchString.value.length < 3 ||
     !/^\d{3,5} [A-Za-z ]*/.test(searchString.value)
@@ -60,12 +61,10 @@ async function updateSearchSuggestions(): Promise<string[]> {
       `https://ais-autocomplete.citygeo.phila.city/autocomplete?q=${searchString.value.replace(/ /, '+')}`
     )
   ).json()
-  console.log(suggestions)
   const suggestedAddresses = suggestions.count
-    ? Array.from(
-        suggestions.results.addresses,
-        (suggestion) => suggestion.address
-      )
+    ? Array.from(suggestions.results.addresses, (suggestion) => {
+        return { text: suggestion.address, value: suggestion.address }
+      })
     : []
   return suggestedAddresses
 }
@@ -89,7 +88,9 @@ function handleSortChange() {
 async function handleSearchChange(search: string) {
   searchString.value = search
   searchSuggestions.value = await updateSearchSuggestions()
-  console.log('handleSearchChange:')
+  if (searchSuggestions.value.length) {
+    console.log('handleSearchChange:', searchSuggestions.value)
+  }
   if (searchMode.value && searchString.value === '') {
     emit('searchString', searchString.value)
   }
@@ -101,13 +102,21 @@ function handleSearchSubmit() {
 </script>
 
 <template>
-  <Search
-    v-if="searchPlaceholder"
-    class-name="location-search"
-    :placeholder="searchPlaceholder"
-    @update:modelValue="handleSearchChange"
-    @search="handleSearchSubmit"
-  />
+  <div>
+    <Search
+      v-if="searchPlaceholder"
+      class-name="location-search"
+      :placeholder="searchPlaceholder"
+      @update:modelValue="handleSearchChange"
+      @search="handleSearchSubmit"
+    />
+    <Menu
+      v-if="searchSuggestions.length"
+      class="location-search-autocomplete"
+      :choices="searchSuggestions"
+    />
+  </div>
+
   <div class="location-filters">
     <Tags
       v-for="opt in filterOptions"
@@ -135,6 +144,10 @@ function handleSearchSubmit() {
 <style scoped>
 .location-search {
   padding: 1rem 1rem 0rem 1rem;
+  width: 100%;
+}
+
+.location-search-autocomplete {
   width: 100%;
 }
 

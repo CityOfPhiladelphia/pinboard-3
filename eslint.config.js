@@ -22,6 +22,7 @@ export default typescriptEslint.config(
       globals: globals.browser,
       parserOptions: {
         parser: typescriptEslint.parser,
+        tsconfigRootDir: __dirname,
       },
     },
     rules: {
