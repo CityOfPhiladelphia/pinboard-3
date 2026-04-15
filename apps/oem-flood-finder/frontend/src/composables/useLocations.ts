@@ -1,10 +1,23 @@
 import type { LocationListDTO, OemLocation } from '@/types'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, type Ref } from 'vue'
+import { useUserLocation } from './useUserLocation'
 
-function transformLocationDTO(dto: LocationListDTO[]): OemLocation[] {
-  const locations: OemLocation[] = []
+function transformLocationDTO(dto: LocationListDTO[]): Ref<OemLocation[]> {
+  const locations: Ref<OemLocation[]> = []
+
+  const currentCoordinates = useUserLocation().userCoords.value;
 
   for (const loc of dto) {
+
+    const distance = currentCoordinates
+      ? getHaversineDistanceMiles(
+        loc.latitude,
+        loc.longitude,
+        currentCoordinates.latitude,
+        currentCoordinates.longitude
+      )
+      : undefined
+
     locations.push({
       id: loc.id,
       name: loc.name,
@@ -14,7 +27,7 @@ function transformLocationDTO(dto: LocationListDTO[]): OemLocation[] {
       deviceType: loc.deviceType,
       locationCardInfo: {
         heading: loc.name,
-        subheader: '0.8 mi',
+        subheader: distance ? distance + ' mi' : undefined,
         tag:
           loc.deviceType === 'Camera'
             ? ''
@@ -32,6 +45,31 @@ function transformLocationDTO(dto: LocationListDTO[]): OemLocation[] {
   return locations
 }
 
+function getHaversineDistanceMiles
+  (
+    deviceLat: number,
+    deviceLong: number,
+    userLat: number,
+    userLong: number
+  ): number {
+  const R = 6371; // Earth's mean radius in kilometers
+
+  const dLat = (userLat - deviceLat) * (Math.PI / 180);
+  const dLon = (userLong - deviceLong) * (Math.PI / 180);
+
+  const lat1 = deviceLat * (Math.PI / 180);
+  const lat2 = userLat * (Math.PI / 180);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1) * Math.cos(lat2) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c * 0.621371; // convert to miles
+}
+
 export function useLocations() {
   // set to Loading initially
   const isLoading = ref(true)
@@ -42,7 +80,7 @@ export function useLocations() {
     const myHeaders = new Headers()
     myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
 
-    const response = await fetch(`https://flood-monitoring-test-api.phila.gov/location/all`, {
+    const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/location/all`, {
       method: 'GET',
       headers: myHeaders,
       redirect: 'follow',
