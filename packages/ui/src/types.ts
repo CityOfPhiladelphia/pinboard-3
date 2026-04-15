@@ -1,5 +1,6 @@
 // packages/ui/src/types.ts
 import type { InjectionKey } from 'vue'
+import type { MapCardProps } from '@phila/phila-ui-cards'
 
 export type MapControlPosition =
   | 'top-left'
@@ -42,17 +43,46 @@ export type AlertBanner = {
 export const PINBOARD_CONFIG_KEY: InjectionKey<PinboardConfig> =
   Symbol('pinboard-config')
 
-export type LocationBasic = {
+export type Location = {
   id: string
   name: string
   latitude: number
   longitude: number
+  locationCardInfo: MapCardProps
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Location = LocationBasic & Record<string, any>
 
 export type LocationFilterOption = {
   readonly value: string
   readonly label: string
+}
+
+export type SearchMode = 'address' | 'zipcode' | 'keyword' | false
+
+export enum SortLocationsValues {
+  None,
+  AlphaAsc,
+  AlphaDes,
+  DistAsc,
+  DistDes,
+}
+
+export type LocationCardInfo = {
+  heading: string
+  subheader: string
+  tag: string
+  src: string
+}
+
+export type AisAutocompleteResult = {
+  query: string
+  query_type: string
+  count: number
+  results: {
+    placenames: string[]
+    addresses: {
+      address: string
+      search_address: string
+      has_opa: boolean
+    }[]
+  }
 }

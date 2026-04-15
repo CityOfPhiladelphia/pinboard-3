@@ -1,78 +1,48 @@
-import type { LocationDTO, OemLocation, Reading } from '@/types'
-import type { Location } from '@ui/types'
+import type { LocationListDTO, OemLocation } from '@/types'
 import { ref, onMounted } from 'vue'
 
-function transformLocationDTO(dto: LocationDTO): Location[] {
-  const locations: Location[] = []
+function transformLocationDTO(dto: LocationListDTO[]): OemLocation[] {
+  const locations: OemLocation[] = []
 
-  for (const gauge of dto.awareGauges) {
+  for (const loc of dto) {
     locations.push({
-      id: gauge.gaugeId,
-      name: gauge.name,
-      latitude: gauge.latitude,
-      longitude: gauge.longitude,
-      lastUpdated: gauge.lastUpdated,
-      other: { kind: 'Aware', data: gauge },
-      latestReading: null,
+      id: loc.id,
+      name: loc.name,
+      latitude: loc.latitude,
+      longitude: loc.longitude,
+      lastUpdated: loc.lastUpdated,
+      deviceType: loc.deviceType,
+      locationCardInfo: {
+        heading: loc.name,
+        subheader: '0.8 mi',
+        tag:
+          loc.deviceType === 'Camera'
+            ? ''
+            : !loc.gaugeHeight || loc.gaugeHeight === -9999.9
+              ? 'No data'
+              : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`,
+        src: loc.imageUrl,
+      },
+      actionStage: loc.actionStage,
+      minorStage: loc.minorStage,
+      moderateStage: loc.moderateStage,
+      majorStage: loc.majorStage,
     } satisfies OemLocation)
   }
-
-  for (const gauge of dto.usgsGauges) {
-    locations.push({
-      id: gauge.gaugeId,
-      name: gauge.name,
-      latitude: gauge.latitude,
-      longitude: gauge.longitude,
-      lastUpdated: gauge.lastUpdated,
-      other: { kind: 'Usgs', data: gauge },
-      latestReading: null,
-    } satisfies OemLocation)
-  }
-
-  for (const camera of dto.cameras) {
-    locations.push({
-      id: camera.cameraId,
-      name: camera.name,
-      latitude: camera.latitude,
-      longitude: camera.longitude,
-      lastUpdated: camera.lastUpdated,
-      other: { kind: 'Camera', data: camera },
-      latestReading: null,
-    } satisfies OemLocation)
-  }
-
-  return locations.sort((a, b) => b.latitude - a.latitude)
-}
-
-async function fetchLatestReading(
-  kind: 'aware' | 'usgs',
-  gaugeId: string,
-  headers: Headers,
-): Promise<Reading | null> {
-  try {
-    const response = await fetch(
-      `${import.meta.env.VITE_FLOOD_API_BASE_URL}/${kind}/reading/${gaugeId}?limit=1`,
-      { method: 'GET', headers, redirect: 'follow' },
-    )
-    if (!response.ok) return null
-    const data: Reading[] = await response.json()
-    return data[0] ?? null
-  } catch {
-    return null
-  }
+  return locations
 }
 
 export function useLocations() {
   // set to Loading initially
   const isLoading = ref(true)
   const errorMessage = ref<string | null>(null)
-  const locations = ref<Location[]>([])
+  const locations = ref<OemLocation[]>([])
 
   async function fetchLocations() {
     const myHeaders = new Headers()
     myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
 
-    const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/location/all`, {
+    const response = await fetch(`https://flood-monitoring-test-api.phila.gov/location/all`, {
       method: 'GET',
       headers: myHeaders,
       redirect: 'follow',
@@ -84,17 +54,8 @@ export function useLocations() {
     }
 
     locations.value = transformLocationDTO(await response.json())
-    isLoading.value = false
 
-    // Fetch latest readings for all gauges in parallel
-    const gauges = locations.value.filter((loc) => loc.other.kind !== 'Camera')
-    await Promise.all(
-      gauges.map(async (loc) => {
-        const kind = loc.other.kind.toLowerCase() as 'aware' | 'usgs'
-        const reading = await fetchLatestReading(kind, loc.id, myHeaders)
-        loc.latestReading = reading
-      }),
-    )
+    isLoading.value = false
   }
 
   onMounted(fetchLocations)

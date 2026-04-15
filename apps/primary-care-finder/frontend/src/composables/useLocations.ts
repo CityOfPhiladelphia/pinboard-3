@@ -1,5 +1,5 @@
 import { ref, onMounted, type Ref } from 'vue'
-import type { PrimaryCareLocation } from '@/types'
+import type { PrimaryCareLocation, PrimaryCareProperties } from '@/types'
 
 const ARCGIS_URL =
   'https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/red_PrimaryCare/FeatureServer/0/query'
@@ -54,16 +54,26 @@ export function useLocations(): {
       const rawGeojson = await response.json()
       const filteredFeatures = rawGeojson.features.filter(isVisible)
 
-      locations.value = filteredFeatures.map((feature: RawFeature) => ({
-        id: String(feature.properties.objectid),
-        name: String(
-          feature.properties.record ?? feature.properties.address ?? ''
-        ),
-        latitude: feature.geometry.coordinates[1],
-        longitude: feature.geometry.coordinates[0],
-        properties: feature.properties as PrimaryCareLocation['properties'],
-        geometry: feature.geometry as PrimaryCareLocation['geometry'],
-      }))
+      locations.value = filteredFeatures.map(
+        (feature: RawFeature) =>
+          ({
+            id: String(feature.properties.objectid),
+            name: String(
+              feature.properties.record ?? feature.properties.address ?? ''
+            ),
+            latitude: feature.geometry.coordinates[1],
+            longitude: feature.geometry.coordinates[0],
+            properties: feature.properties as PrimaryCareProperties,
+            geometry: feature.geometry,
+            locationCardInfo: {
+              heading: String(
+                feature.properties.record ?? feature.properties.address ?? ''
+              ),
+              subheader: 'Some date!',
+              tag: 'Some other stuff...',
+            },
+          }) satisfies PrimaryCareLocation
+      )
 
       geojson.value = {
         type: 'FeatureCollection' as const,

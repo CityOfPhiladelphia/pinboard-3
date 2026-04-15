@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { ReadingState } from '../composables/useLocationDetail'
-import type { Location } from '@ui/types'
+import type { ReadingState } from '@/composables/useLocationDetail'
+import type { OemLocation } from '@/types'
 
 defineProps<{
   readingState: ReadingState
-  location: Location
+  location: OemLocation
 }>()
 </script>
 
@@ -13,7 +13,7 @@ defineProps<{
 
   <div v-else-if="readingState.kind === 'Loaded'">
     <!-- Graph will go here -->
-    <table v-if="location.other.kind === 'Aware'">
+    <table v-if="location.deviceType === 'Aware'">
       <thead>
         <tr>
           <th>Created On</th>
@@ -43,24 +43,10 @@ defineProps<{
       </tbody>
     </table>
 
-    <div v-if="location.other.kind === 'Usgs'">
-      <img
-        :src="location.other.data.hydrographWithFloodCategoriesURL"
-        :alt="location.other.data.hydrographURL"
-      />
-    </div>
-
     <!-- Snapshot -->
-    <template v-if="location.other.kind === 'Aware' && 0 in readingState.data">
+    <template v-if="location.deviceType === 'Aware' && 0 in readingState.data">
       <h6>Current Snapshot</h6>
-      <img
-        :src="
-          'https://images.flashflood.info:8282/' +
-          location.other.data.modemNumber +
-          '/' +
-          readingState.data[0].pictureFilenameOnServer
-        "
-      />
+      <img :src="location.locationCardInfo.src" />
     </template>
   </div>
 
