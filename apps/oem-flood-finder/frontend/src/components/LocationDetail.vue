@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, toValue } from 'vue'
+import { computed } from 'vue'
 import type { OemLocation } from '@/types'
 import GaugeReadings from './GaugeReadings.vue'
 import CameraVideoPlayer from './CameraVideoPlayer.vue'
