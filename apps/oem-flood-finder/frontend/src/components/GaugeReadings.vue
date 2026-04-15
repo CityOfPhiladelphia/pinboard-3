@@ -36,7 +36,9 @@ defineProps<{
             }}
           </td>
 
-          <td>{{ reading.gaugeHeight }} in</td>
+          <td>
+            {{ reading.gaugeHeight === -9999.9 ? 'No data' : reading.gaugeHeight + ' in' }}
+          </td>
         </tr>
       </tbody>
     </table>
