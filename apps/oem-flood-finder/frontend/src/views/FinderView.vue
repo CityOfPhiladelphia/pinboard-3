@@ -9,13 +9,16 @@ import {
 } from '@pinboard/ui'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { useLocations } from '@/composables/useLocations'
+import { useUserLocation } from '@/composables/useUserLocation'
 import type { Filters, OemLocation } from '@/types'
 import type { Location, LocationFilterOption } from '@ui/types'
 import { SortLocationsValues } from '../../../../../packages/ui/src/types'
 import LocationDetail from '@/components/LocationDetail.vue'
-import { computed, ref, reactive } from 'vue'
+import { computed, ref, reactive, watch } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations()
+const { userCoords, setUserLocation } = useUserLocation()
+watch(userCoords, (coords) => console.log('user coords:', coords))
 const locationSearchString = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
 const locationSortMode = ref<number>(SortLocationsValues.None)
@@ -141,7 +144,7 @@ function handleDeselect(id: string) {
 
     <template #map-content="{ hoveredId, selectedId, zoom, onHover, onHoverEnd, onSelect }">
       <MapNavigationControl position="bottom-right" />
-      <GeolocationButton position="bottom-right" />
+      <GeolocationButton position="bottom-right" @located="setUserLocation" />
       <BasemapToggle position="top-right" />
 
       <div v-if="!isLoading">
