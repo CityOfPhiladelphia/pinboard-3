@@ -2,7 +2,6 @@
 import { ref, computed, ComputedRef } from 'vue'
 import { Search } from '@phila/phila-ui-search'
 import { Tags } from '@phila/phila-ui-tags'
-import { Menu, MenuChoice } from '@phila/phila-ui-menu'
 import type {
   LocationFilterOption,
   SearchMode,
@@ -30,7 +29,7 @@ const selectedFilter = ref(
 )
 const sortOption = ref<SortLocationsValues>(SortLocationsValues.None)
 const searchString = ref<string>('')
-const searchSuggestions = ref<MenuChoice[]>([])
+const searchSuggestions = ref<string[]>([])
 
 const searchMode: ComputedRef<SearchMode> = computed(() => {
   switch (true) {
@@ -49,11 +48,7 @@ const searchMode: ComputedRef<SearchMode> = computed(() => {
   }
 })
 
-// const previousSearches: ComputedRef<Set<string>> = computed(() => {
-
-// })
-
-async function updateSearchSuggestions(): Promise<MenuChoice[]> {
+async function updateSearchSuggestions(): Promise<string[]> {
   if (
     searchString.value.length < 3 ||
     !/^\d{3,5} [A-Za-z ]*/.test(searchString.value)
@@ -66,9 +61,10 @@ async function updateSearchSuggestions(): Promise<MenuChoice[]> {
     )
   ).json()
   const suggestedAddresses = suggestions.count
-    ? Array.from(suggestions.results.addresses, (suggestion) => {
-        return { text: suggestion.address, value: suggestion.address }
-      })
+    ? Array.from(
+        suggestions.results.addresses,
+        (suggestion) => suggestion.address
+      )
     : []
   return suggestedAddresses
 }
@@ -114,11 +110,11 @@ function handleSearchSubmit() {
       @update:modelValue="handleSearchChange"
       @search="handleSearchSubmit"
     />
-    <Menu
+    <!-- <Menu
       v-if="searchSuggestions.length"
       class="location-search-autocomplete"
       :choices="searchSuggestions"
-    />
+    /> -->
   </div>
 
   <div class="location-filters">
