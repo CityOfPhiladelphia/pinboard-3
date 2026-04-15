@@ -1,12 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, ComputedRef } from 'vue'
 import { Search } from '@phila/phila-ui-search'
 import { Tags } from '@phila/phila-ui-tags'
-import type { LocationFilterOption } from '../types'
+import type {
+  LocationFilterOption,
+  SearchMode,
+  AisAutocompleteResult,
+} from '../types'
 import { SortLocationsValues } from '../types'
 
+const addressRegex = /^(?:\d{1,5} ){1}(?:\w+ ){1,2}(?:\w+)?(?:\w+ # ?\d{1,5})?$/
+const zipcodeRegex = /^\d{5}(?:-\d{4})?$/
+
 const props = defineProps<{
-  search?: string
+  searchPlaceholder?: string
   filterOptions?: LocationFilterOption[]
 }>()
 
@@ -14,6 +21,7 @@ const emit = defineEmits<{
   searchString: [search: string]
   selectedFilter: [filter: string]
   sortOption: [sort: number]
+  searchMode: [mode: string]
 }>()
 
 const selectedFilter = ref(
@@ -21,7 +29,46 @@ const selectedFilter = ref(
 )
 const sortOption = ref<SortLocationsValues>(SortLocationsValues.None)
 const searchString = ref<string>('')
-const searchActive = ref<boolean>(false)
+const searchSuggestions = ref<string[]>([])
+
+const searchMode: ComputedRef<SearchMode> = computed(() => {
+  switch (true) {
+    case addressRegex.test(searchString.value): {
+      return 'address'
+    }
+    case zipcodeRegex.test(searchString.value): {
+      return 'zipcode'
+    }
+    case searchString.value !== '': {
+      return 'keyword'
+    }
+    default: {
+      return false
+    }
+  }
+})
+
+async function updateSearchSuggestions(): Promise<string[]> {
+  if (
+    searchString.value.length < 3 ||
+    !/^\d{3,5} [A-Za-z ]*/.test(searchString.value)
+  ) {
+    return []
+  }
+  const suggestions: AisAutocompleteResult = await (
+    await fetch(
+      `https://ais-autocomplete.citygeo.phila.city/autocomplete?q=${searchString.value.replace(/ /, '+')}`
+    )
+  ).json()
+  console.log(suggestions)
+  const suggestedAddresses = suggestions.count
+    ? Array.from(
+        suggestions.results.addresses,
+        (suggestion) => suggestion.address
+      )
+    : []
+  return suggestedAddresses
+}
 
 function handleFilterChange(option: string) {
   if (selectedFilter.value === option) {
@@ -39,25 +86,25 @@ function handleSortChange() {
   emit('sortOption', sortOption.value)
 }
 
-function handleSearchChange(search: string) {
+async function handleSearchChange(search: string) {
   searchString.value = search
-  if (searchActive.value && searchString.value === '') {
-    searchActive.value = false
+  searchSuggestions.value = await updateSearchSuggestions()
+  console.log('handleSearchChange:')
+  if (searchMode.value && searchString.value === '') {
     emit('searchString', searchString.value)
   }
 }
 
 function handleSearchSubmit() {
-  searchActive.value = true
   emit('searchString', searchString.value)
 }
 </script>
 
 <template>
   <Search
-    v-if="search"
+    v-if="searchPlaceholder"
     class-name="location-search"
-    :placeholder="search"
+    :placeholder="searchPlaceholder"
     @update:modelValue="handleSearchChange"
     @search="handleSearchSubmit"
   />

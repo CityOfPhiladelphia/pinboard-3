@@ -88,7 +88,7 @@ export function useLocations() {
     const myHeaders = new Headers()
     myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
 
-    const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/location/all`, {
+    const response = await fetch(`https://flood-monitoring-test-api.phila.gov/aware/gauge/all`, {
       method: 'GET',
       headers: myHeaders,
       redirect: 'follow',

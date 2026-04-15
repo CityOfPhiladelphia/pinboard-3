@@ -52,10 +52,26 @@ export type LocationFilterOption = {
   readonly label: string
 }
 
+export type SearchMode = 'address' | 'zipcode' | 'keyword' | false
+
 export enum SortLocationsValues {
   None,
   AlphaAsc,
   AlphaDes,
   DistAsc,
   DistDes,
+}
+
+export type AisAutocompleteResult = {
+  query: string
+  query_type: string
+  count: number
+  results: {
+    placenames: string[]
+    addresses: {
+      address: string
+      search_address: string
+      has_opa: boolean
+    }[]
+  }
 }
