@@ -14,14 +14,14 @@ function transformLocationDTO(dto: LocationListDTO[]): OemLocation[] {
       deviceType: loc.deviceType,
       locationCardInfo: {
         heading: loc.name,
-        subheader: "0.8 mi",
+        subheader: '0.8 mi',
         tag: loc.gaugeHeight === -9999.9 ? 'No data' : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`,
         src: loc.imageUrl,
       },
       actionStage: loc.actionStage,
       minorStage: loc.minorStage,
       moderateStage: loc.moderateStage,
-      majorStage: loc.majorStage
+      majorStage: loc.majorStage,
     } satisfies OemLocation)
   }
   return locations
@@ -37,7 +37,7 @@ export function useLocations() {
     const myHeaders = new Headers()
     myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
 
-    const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/location/all`, {
+    const response = await fetch(`https://flood-monitoring-test-api.phila.gov/location/all`, {
       method: 'GET',
       headers: myHeaders,
       redirect: 'follow',
