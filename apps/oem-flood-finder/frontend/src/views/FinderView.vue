@@ -14,10 +14,11 @@ import type { Filters, OemLocation } from '@/types'
 import type { Location, LocationFilterOption } from '@ui/types'
 import { SortLocationsValues } from '../../../../../packages/ui/src/types'
 import LocationDetail from '@/components/LocationDetail.vue'
-import { computed, ref, reactive } from 'vue'
+import { computed, ref, reactive, watch } from 'vue'
 
 const { locations, isLoading, errorMessage } = useLocations()
 const { userCoords, setUserLocation } = useUserLocation()
+watch(userCoords, (coords) => console.log('user coords:', coords))
 const locationSearchString = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
 const locationSortMode = ref<number>(SortLocationsValues.None)
