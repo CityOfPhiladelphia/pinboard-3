@@ -1,4 +1,4 @@
-import type { LocationListDTO, OemLocation, Reading } from '@/types'
+import type { LocationListDTO, OemLocation } from '@/types'
 import { ref, onMounted } from 'vue'
 
 function transformLocationDTO(dto: LocationListDTO[]): OemLocation[] {
