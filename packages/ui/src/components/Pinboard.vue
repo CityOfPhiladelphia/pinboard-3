@@ -214,7 +214,136 @@ watch(selectedLocation, (loc) => {
 </script>
 
 <template>
-      <div v-if="selectedLocation !== null" class="detail-overlay">
+  <div v-if="selectedLocation !== null" class="detail-overlay">
+    <button
+      class="detail-close-btn"
+      @click="closeLocationDetail"
+      aria-label="Close details"
+    >
+      ×
+    </button>
+    <slot name="location-detail" :location="selectedLocation" />
+  </div>
+  <div class="finder-panel">
+    <div class="finder-panel-locations">
+      <slot name="locations-header" />
+
+      <div v-if="isLoading" class="location-list">
+        <MapCard v-for="n in 5" :key="n" :is-loading="true" />
+      </div>
+
+      <div
+        v-else-if="errorMessage"
+        class="status-message status-message--error"
+      >
+        {{ errorMessage }}
+      </div>
+
+      <LocationsPanel
+        v-else-if="!isLoading"
+        :locations="locations"
+        :location-filter="locationPanelFilter"
+        :location-search="locationPanelSearch"
+        :hovered-id="hoveredLocationId"
+        :selected-id="selectedLocationId"
+        @select="handleSelect"
+        @hover="handleHover"
+        @hover-end="handleHoverEnd"
+        @search-string="handleLocationSearchSubmit"
+        @selected-filter="handleLocationFilterChange"
+        @sort-option="handleLocationSortChange"
+      />
+    </div>
+
+    <div class="finder-panel-map">
+      <MapPanel
+        ref="mapPanelRef"
+        :config="effectiveMapConfig"
+        :is-loading="isLoading"
+        :is-mobile="isMobile"
+        :locations="locations"
+        :geojson="geojson"
+        :hovered-id="hoveredLocationId"
+        :selected-id="selectedLocationId"
+        :mobile-controls-target="mobileControlsTarget"
+        :map-content-slot="slots['map-content']"
+        :on-hover="handleHover"
+        :on-hover-end="handleHoverEnd"
+        :on-select="handleMapSelect"
+      />
+      <div
+        v-if="isMobile"
+        ref="mobileControlsTarget"
+        class="mobile-controls-float"
+        :style="mobileControlsStyle"
+      />
+      <div class="mobile-map-search-filter">
+        <Search
+          v-if="locationPanelSearch"
+          class-name="mobile-search"
+          :placeholder="locationPanelSearch"
+        />
+        <LocationSearchFilterPanel
+          v-if="locationPanelFilter"
+          :filterOptions="locationPanelFilter"
+          @selected-filter="handleLocationFilterChange"
+        />
+      </div>
+    </div>
+  </div>
+  <BottomSheet
+    ref="bottomSheetRef"
+    v-model="bottomSheetOpen"
+    :snap-points="snapPoints"
+    collapse-label="Map view"
+    :collapse-icon="faMap"
+    class="mobile-bottom-sheet"
+  >
+    <div class="bottom-sheet-stack">
+      <div
+        class="bottom-sheet-list-scroll"
+        :class="{ 'is-hidden': selectedLocation }"
+      >
+        <slot name="locations-header" />
+        <div v-if="!isLoading && !errorMessage" class="location-count">
+          <span>{{ locationCountLabel }}</span>
+          <Tags
+            variant="action"
+            size="large"
+            color="grey"
+            text="Sort"
+            :selected="mobileSortOption !== SortLocationsValues.None"
+            @update:selected="handleMobileSortChange()"
+          />
+        </div>
+
+        <div v-if="isLoading" class="location-list">
+          <MapCard v-for="n in 5" :key="n" :is-loading="true" />
+        </div>
+
+        <div
+          v-else-if="errorMessage"
+          class="status-message status-message--error"
+        >
+          {{ errorMessage }}
+        </div>
+
+        <LocationsPanel
+          v-else
+          ref="locationsPanelRef"
+          :locations="locations"
+          :location-filter="locationPanelFilter"
+          :location-search="locationPanelSearch"
+          :hovered-id="hoveredLocationId"
+          :selected-id="selectedLocationId"
+          @select="handleSelect"
+          @hover="handleHover"
+          @hover-end="handleHoverEnd"
+          @selected-filter="handleLocationFilterChange"
+        />
+      </div>
+
+      <div v-if="selectedLocation" class="bottom-sheet-detail">
         <button
           class="detail-close-btn"
           @click="closeLocationDetail"
@@ -224,137 +353,8 @@ watch(selectedLocation, (loc) => {
         </button>
         <slot name="location-detail" :location="selectedLocation" />
       </div>
-      <div class="finder-panel">
-        <div class="finder-panel-locations">
-          <slot name="locations-header" />
-
-          <div v-if="isLoading" class="location-list">
-            <MapCard v-for="n in 5" :key="n" :is-loading="true" />
-          </div>
-
-          <div
-            v-else-if="errorMessage"
-            class="status-message status-message--error"
-          >
-            {{ errorMessage }}
-          </div>
-
-          <LocationsPanel
-            v-else-if="!isLoading"
-            :locations="locations"
-            :location-filter="locationPanelFilter"
-            :location-search="locationPanelSearch"
-            :hovered-id="hoveredLocationId"
-            :selected-id="selectedLocationId"
-            @select="handleSelect"
-            @hover="handleHover"
-            @hover-end="handleHoverEnd"
-            @search-string="handleLocationSearchSubmit"
-            @selected-filter="handleLocationFilterChange"
-            @sort-option="handleLocationSortChange"
-          />
-        </div>
-
-        <div class="finder-panel-map">
-          <MapPanel
-            ref="mapPanelRef"
-            :config="effectiveMapConfig"
-            :is-loading="isLoading"
-            :is-mobile="isMobile"
-            :locations="locations"
-            :geojson="geojson"
-            :hovered-id="hoveredLocationId"
-            :selected-id="selectedLocationId"
-            :mobile-controls-target="mobileControlsTarget"
-            :map-content-slot="slots['map-content']"
-            :on-hover="handleHover"
-            :on-hover-end="handleHoverEnd"
-            :on-select="handleMapSelect"
-          />
-          <div
-            v-if="isMobile"
-            ref="mobileControlsTarget"
-            class="mobile-controls-float"
-            :style="mobileControlsStyle"
-          />
-          <div class="mobile-map-search-filter">
-            <Search
-              v-if="locationPanelSearch"
-              class-name="mobile-search"
-              :placeholder="locationPanelSearch"
-            />
-            <LocationSearchFilterPanel
-              v-if="locationPanelFilter"
-              :filterOptions="locationPanelFilter"
-              @selected-filter="handleLocationFilterChange"
-            />
-          </div>
-        </div>
-      </div>
-      <BottomSheet
-        ref="bottomSheetRef"
-        v-model="bottomSheetOpen"
-        :snap-points="snapPoints"
-        collapse-label="Map view"
-        :collapse-icon="faMap"
-        class="mobile-bottom-sheet"
-      >
-        <div class="bottom-sheet-stack">
-          <div
-            class="bottom-sheet-list-scroll"
-            :class="{ 'is-hidden': selectedLocation }"
-          >
-            <slot name="locations-header" />
-            <div v-if="!isLoading && !errorMessage" class="location-count">
-              <span>{{ locationCountLabel }}</span>
-              <Tags
-                variant="action"
-                size="large"
-                color="grey"
-                text="Sort"
-                :selected="mobileSortOption !== SortLocationsValues.None"
-                @update:selected="handleMobileSortChange()"
-              />
-            </div>
-
-            <div v-if="isLoading" class="location-list">
-              <MapCard v-for="n in 5" :key="n" :is-loading="true" />
-            </div>
-
-            <div
-              v-else-if="errorMessage"
-              class="status-message status-message--error"
-            >
-              {{ errorMessage }}
-            </div>
-
-            <LocationsPanel
-              v-else
-              ref="locationsPanelRef"
-              :locations="locations"
-              :location-filter="locationPanelFilter"
-              :location-search="locationPanelSearch"
-              :hovered-id="hoveredLocationId"
-              :selected-id="selectedLocationId"
-              @select="handleSelect"
-              @hover="handleHover"
-              @hover-end="handleHoverEnd"
-              @selected-filter="handleLocationFilterChange"
-            />
-          </div>
-
-          <div v-if="selectedLocation" class="bottom-sheet-detail">
-            <button
-              class="detail-close-btn"
-              @click="closeLocationDetail"
-              aria-label="Close details"
-            >
-              ×
-            </button>
-            <slot name="location-detail" :location="selectedLocation" />
-          </div>
-        </div>
-      </BottomSheet>
+    </div>
+  </BottomSheet>
 </template>
 
 <style>
