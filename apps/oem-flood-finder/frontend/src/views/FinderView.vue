@@ -143,12 +143,25 @@ function handleDeselect(id: string) {
     </template>
 
     <template
-      #map-content="{ hoveredId, selectedId, zoom, isMobile, onHover, onHoverEnd, onSelect }"
+      #map-content="{
+        hoveredId,
+        selectedId,
+        zoom,
+        isMobile,
+        mobileControlsTarget,
+        onHover,
+        onHoverEnd,
+        onSelect,
+      }"
     >
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />
-      <BasemapToggle position="top-right" />
+      <BasemapToggle
+        position="top-right"
+        :teleport-to="isMobile ? mobileControlsTarget : undefined"
+      />
       <GeolocationButton
         :position="isMobile ? 'top-right' : 'bottom-right'"
+        :teleport-to="isMobile ? mobileControlsTarget : undefined"
         @located="setUserLocation"
       />
 

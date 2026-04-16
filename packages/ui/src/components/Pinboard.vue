@@ -12,8 +12,14 @@ import {
 } from 'vue'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Search } from '@phila/phila-ui-search'
+import { Tags } from '@phila/phila-ui-tags'
 import { faMap } from '@fortawesome/pro-solid-svg-icons'
-import { PINBOARD_CONFIG_KEY, Location, LocationFilterOption } from '../types'
+import {
+  PINBOARD_CONFIG_KEY,
+  Location,
+  LocationFilterOption,
+  SortLocationsValues,
+} from '../types'
 import { MapCard } from '@phila/phila-ui-cards'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
@@ -32,6 +38,7 @@ defineSlots<{
     isMobile: boolean
     hoveredId: string | null
     selectedId: string | null
+    mobileControlsTarget: HTMLDivElement | null
     onHover: (id: string) => void
     onHoverEnd: () => void
     onSelect: (loc: Location) => void
@@ -99,8 +106,26 @@ onUnmounted(() => {
 const hoveredLocationId = ref<string | null>(null)
 const selectedLocation = ref<Location | null>(null)
 const bottomSheetOpen = ref(true)
-const snapPoints = [15, 50, 75, 100]
-const bottomSheetRef = ref<{ snapTo: (index: number) => void } | null>(null)
+const snapPoints = [15, 50, 100]
+const bottomSheetRef = ref<{
+  snapTo: (index: number) => void
+  displayPercent: number
+  isDragging: boolean
+} | null>(null)
+const mobileControlsTarget = ref<HTMLDivElement | null>(null)
+
+const bottomSheetPercent = computed(
+  () => bottomSheetRef.value?.displayPercent ?? snapPoints[0]
+)
+
+const bottomSheetDragging = computed(
+  () => bottomSheetRef.value?.isDragging ?? false
+)
+
+const mobileControlsStyle = computed(() => ({
+  bottom: `calc(${bottomSheetPercent.value}% + 10px)`,
+  transition: bottomSheetDragging.value ? 'none' : 'bottom 0.3s ease-out',
+}))
 const locationsPanelRef = ref<{
   scrollToCard: (id: string, behavior?: ScrollBehavior) => void
 } | null>(null)
@@ -163,8 +188,18 @@ function handleLocationFilterChange(selectedLocationsFilter: string) {
   emit('selectedLocationsFilter', selectedLocationsFilter)
 }
 
+const mobileSortOption = ref<SortLocationsValues>(SortLocationsValues.None)
+
 function handleLocationSortChange(sortLocationsOption: number) {
   emit('sortLocationsOption', sortLocationsOption)
+}
+
+function handleMobileSortChange() {
+  mobileSortOption.value =
+    ++mobileSortOption.value in SortLocationsValues
+      ? mobileSortOption.value
+      : SortLocationsValues.None
+  emit('sortLocationsOption', mobileSortOption.value)
 }
 
 function handleLocationSearchSubmit(locationsSearchString: string) {
@@ -232,10 +267,17 @@ watch(selectedLocation, (loc) => {
             :geojson="geojson"
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"
+            :mobile-controls-target="mobileControlsTarget"
             :map-content-slot="slots['map-content']"
             :on-hover="handleHover"
             :on-hover-end="handleHoverEnd"
             :on-select="handleMapSelect"
+          />
+          <div
+            v-if="isMobile"
+            ref="mobileControlsTarget"
+            class="mobile-controls-float"
+            :style="mobileControlsStyle"
           />
           <div class="mobile-map-search-filter">
             <Search
@@ -266,7 +308,15 @@ watch(selectedLocation, (loc) => {
           >
             <slot name="locations-header" />
             <div v-if="!isLoading && !errorMessage" class="location-count">
-              {{ locationCountLabel }}
+              <span>{{ locationCountLabel }}</span>
+              <Tags
+                variant="action"
+                size="large"
+                color="grey"
+                text="Sort"
+                :selected="mobileSortOption !== SortLocationsValues.None"
+                @update:selected="handleMobileSortChange()"
+              />
             </div>
 
             <div v-if="isLoading" class="location-list">
@@ -371,6 +421,9 @@ watch(selectedLocation, (loc) => {
 }
 
 .location-count {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 0.75rem 1rem 0;
   font-family: var(--Body-Default-font-body-default-family);
 }
@@ -486,14 +539,29 @@ watch(selectedLocation, (loc) => {
     display: block;
   }
 
+  .mobile-controls-float {
+    position: absolute;
+    right: 10px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    pointer-events: none;
+  }
+
+  .mobile-controls-float > :deep(*) {
+    pointer-events: auto;
+  }
+
   .mobile-map-search-filter {
     display: block;
     position: absolute;
     top: 0;
     left: 0;
-    right: 60px;
+    right: 0;
     z-index: 2;
-    padding: 6px;
+    padding: 10px 24px;
   }
 
   .mobile-map-search-filter :deep(.mobile-search) {
@@ -513,7 +581,12 @@ watch(selectedLocation, (loc) => {
 
   .mobile-map-search-filter :deep(.location-filters) {
     padding: 0.25rem 0 0;
+    padding-left: 2px;
     gap: 0.25rem;
+  }
+
+  .mobile-map-search-filter :deep(.location-sort) {
+    display: none;
   }
 
   .mobile-bottom-sheet :deep(.location-filters),
