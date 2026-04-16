@@ -1,6 +1,7 @@
 // packages/ui/src/types.ts
 import type { InjectionKey } from 'vue'
 import type { MapCardProps } from '@phila/phila-ui-cards'
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 
 export type MapControlPosition =
   | 'top-left'
@@ -69,7 +70,7 @@ export enum SortLocationsValues {
 export type LocationCardInfo = {
   heading: string
   subheader: string
-  tag: string
+  tags: { text: string; color?: string; iconDefinition?: IconDefinition }[]
   src: string
 }
 
