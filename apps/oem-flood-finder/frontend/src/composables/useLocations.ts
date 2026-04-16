@@ -2,8 +2,8 @@ import type { LocationListDTO, OemLocation } from '@/types'
 import { ref, onMounted, type Ref } from 'vue'
 import { useUserLocation } from './useUserLocation'
 
-function transformLocationDTO(dto: LocationListDTO[]): Ref<OemLocation[]> {
-  const locations: Ref<OemLocation[]> = []
+function transformLocationDTO(dto: LocationListDTO[]): OemLocation[] {
+  const locations: OemLocation[] = []
 
   const currentCoordinates = useUserLocation().userCoords.value;
 
