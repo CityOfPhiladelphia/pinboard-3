@@ -64,6 +64,7 @@ const MobileNavContent: FunctionalComponent = () =>
 }
 
 .pinboard-main {
+  position: relative;
   flex: 1;
   overflow: hidden;
 }

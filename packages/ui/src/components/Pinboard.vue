@@ -214,8 +214,6 @@ watch(selectedLocation, (loc) => {
 </script>
 
 <template>
-  <div class="pinboard">
-    <main class="pinboard-main">
       <div v-if="selectedLocation !== null" class="detail-overlay">
         <button
           class="detail-close-btn"
@@ -357,8 +355,6 @@ watch(selectedLocation, (loc) => {
           </div>
         </div>
       </BottomSheet>
-    </main>
-  </div>
 </template>
 
 <style>
@@ -376,18 +372,6 @@ watch(selectedLocation, (loc) => {
 </style>
 
 <style scoped>
-.pinboard {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.pinboard-main {
-  position: relative;
-  flex: 1;
-  overflow: hidden;
-}
-
 .finder-panel {
   display: grid;
   grid-template-columns: 1fr 2fr;
