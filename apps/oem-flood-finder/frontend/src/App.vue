@@ -29,12 +29,28 @@ const alertBanner: ComputedRef<AlertBanner | null> = computed(() => {
 <template>
   <PinboardShell
     title="Flood Monitoring"
+    :logo="{
+      variant: 'city',
+      layout: 'single-line',
+      colorScheme: 'on-primary',
+      customName: 'Flood Monitoring',
+      href: '/',
+    }"
+    info-title="About this tool"
     :banner-title="alertBanner?.title"
     :banner-message="alertBanner?.body"
   >
     <template #mobile-nav>
       <h4><RouterLink to="/"> Finder </RouterLink></h4>
       <h4><RouterLink to="/glossary"> Glossary </RouterLink></h4>
+    </template>
+
+    <template #info-body>
+      <span class="has-text-body-small">
+        This map allows residents to keep an eye on water levels in parts of the city and make
+        informed decisions prior to, during, and after a flooding event.
+        <a href="/glossary">Learn more</a>
+      </span>
     </template>
 
     <RouterView />
