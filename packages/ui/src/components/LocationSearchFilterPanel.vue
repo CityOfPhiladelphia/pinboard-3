@@ -22,40 +22,41 @@ import { Tags } from '@phila/phila-ui-tags'
 import type {
   LocationFilterOption,
   SearchMode,
+  SortLocationsOptions,
   AisAutocompleteResult,
 } from '../types'
-import { SortLocationsValues } from '../types'
-
-const addressRegex =
-  /^(?:\d{1,5}(?:-\d{1,5})? )(?:\w+ ){1,2}(?:\w+)?(?:\w+ # ?\d{1,5})?/
-const zipcodeRegex = /^\d{5}(?:-\d{4})?$/
+import { StreetAddress, Zipcode, SortLocationsNone } from '../types'
 
 const props = defineProps<{
   searchPlaceholder?: string
   filterOptions?: LocationFilterOption[]
-  // ADD PROP FOR SORT MODES
+  sortOptions?: SortLocationsOptions
 }>()
 
 const emit = defineEmits<{
   searchString: [search: string]
   selectedFilter: [filter: string]
-  sortOption: [sort: number]
+  sortOption: [sort: string]
   searchMode: [mode: string]
 }>()
+
+const sortOptionComp = computed(() => {
+  return props.sortOptions ?? SortLocationsNone
+})
 
 const selectedFilter = ref(
   props.filterOptions ? props.filterOptions[0].value : undefined
 )
-const sortOption = ref<SortLocationsValues>(SortLocationsValues.None)
+const sortOption = ref<string>(SortLocationsNone.None)
 const searchString = ref<string>('')
 const searchSuggestions = ref<string[]>([])
 
 const searchMode: ComputedRef<SearchMode> = computed(() => {
   switch (true) {
-    case addressRegex.test(searchString.value): {
+    case StreetAddress.test(searchString.value): {
       return 'address'
     }
-    case zipcodeRegex.test(searchString.value): {
+    case Zipcode.test(searchString.value): {
       return 'zipcode'
     }
     case searchString.value !== '': {
@@ -97,10 +98,12 @@ function handleFilterChange(option: string) {
 }
 
 function handleSortChange() {
-  sortOption.value =
-    ++sortOption.value in SortLocationsValues
-      ? sortOption.value
-      : SortLocationsValues.None
+  const i = Object.values(sortOptionComp.value).indexOf(sortOption.value) + 1
+  const key =
+    i < Object.keys(sortOptionComp.value).length
+      ? Object.keys(sortOptionComp.value)[i]
+      : 'None'
+  sortOption.value = sortOptionComp.value[key] || SortLocationsNone.None
   emit('sortOption', sortOption.value)
 }
 
@@ -154,8 +157,8 @@ function handleSearchSubmit() {
       variant="action"
       size="large"
       color="grey"
-      text="Sort"
-      :selected="!!SortLocationsValues.None"
+      :text="sortOption"
+      :selected="sortOption !== SortLocationsNone.None"
       @update:selected="handleSortChange()"
     />
   </div>

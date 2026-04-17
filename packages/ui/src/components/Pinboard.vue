@@ -19,7 +19,7 @@ import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css' // what doe
 import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Search } from '@phila/phila-ui-search'
-import { Tags } from '@phila/phila-ui-tags'
+// import { Tags } from '@phila/phila-ui-tags'
 
 // component imports
 import MapPanel from './MapPanel.vue'
@@ -31,7 +31,7 @@ import {
   PINBOARD_CONFIG_KEY,
   BasicLocation,
   LocationFilterOption,
-  SortLocationsValues,
+  SortLocationsOptions,
 } from '../types'
 
 defineSlots<{
@@ -57,8 +57,9 @@ const props = defineProps<{
   locations: BasicLocation[]
   isLoading: boolean
   errorMessage: string | null
-  locationPanelFilter?: LocationFilterOption[] | undefined
-  locationPanelSearch?: string | undefined
+  locationPanelFilter?: LocationFilterOption[]
+  locationPanelSearch?: string
+  locationPanelSort?: SortLocationsOptions
   geojson?: unknown
 }>()
 
@@ -66,7 +67,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   locationSearchString: [search: string]
   selectedLocationsFilter: [filter: string]
-  sortLocationsOption: [sort: number]
+  sortLocationsOption: [sort: string]
   deselect: [locationId: string]
 }>()
 
@@ -196,18 +197,8 @@ function handleLocationFilterChange(selectedLocationsFilter: string) {
   emit('selectedLocationsFilter', selectedLocationsFilter)
 }
 
-const mobileSortOption = ref<SortLocationsValues>(SortLocationsValues.None)
-
-function handleLocationSortChange(sortLocationsOption: number) {
+function handleLocationSortChange(sortLocationsOption: string) {
   emit('sortLocationsOption', sortLocationsOption)
-}
-
-function handleMobileSortChange() {
-  mobileSortOption.value =
-    ++mobileSortOption.value in SortLocationsValues
-      ? mobileSortOption.value
-      : SortLocationsValues.None
-  emit('sortLocationsOption', mobileSortOption.value)
 }
 
 function handleLocationSearchSubmit(locationsSearchString: string) {
@@ -252,6 +243,7 @@ watch(selectedLocation, (loc) => {
         :locations="locations"
         :location-filter="locationPanelFilter"
         :location-search="locationPanelSearch"
+        :location-sort="locationPanelSort"
         :hovered-id="hoveredLocationId"
         :selected-id="selectedLocationId"
         @select="handleSelect"
@@ -315,14 +307,14 @@ watch(selectedLocation, (loc) => {
         <slot name="locations-header" />
         <div v-if="!isLoading && !errorMessage" class="location-count">
           <span>{{ locationCountLabel }}</span>
-          <Tags
+          <!-- <Tags
             variant="action"
             size="large"
             color="grey"
             text="Sort"
             :selected="mobileSortOption !== SortLocationsValues.None"
-            @update:selected="handleMobileSortChange()"
-          />
+            @update:selected="handleLocationSortChange"
+          /> -->
         </div>
 
         <div v-if="isLoading" class="location-list">

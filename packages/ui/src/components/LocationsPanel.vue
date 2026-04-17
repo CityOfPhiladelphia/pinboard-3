@@ -2,12 +2,17 @@
 import { ref, watch } from 'vue'
 import { MapCard } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
-import type { BasicLocation, LocationFilterOption } from '../types'
+import type {
+  BasicLocation,
+  LocationFilterOption,
+  SortLocationsOptions,
+} from '../types'
 
 const props = defineProps<{
-  locationSearch: string | undefined
-  locationFilter: LocationFilterOption[] | undefined
   locations: BasicLocation[]
+  locationSearch?: string
+  locationFilter?: LocationFilterOption[]
+  locationSort?: SortLocationsOptions
   hoveredId?: string | null
   selectedId?: string | null
   locationCardSlot?: (props: {
@@ -21,7 +26,7 @@ const emit = defineEmits<{
   select: [location: BasicLocation]
   searchString: [search: string]
   selectedFilter: [filter: string]
-  sortOption: [sort: number]
+  sortOption: [sort: string]
   hover: [id: string]
   'hover-end': []
 }>()
@@ -60,7 +65,7 @@ function handleFilterChange(selectedFilter: string) {
   emit('selectedFilter', selectedFilter)
 }
 
-function handleSortChange(sortOption: number) {
+function handleSortChange(sortOption: string) {
   emit('sortOption', sortOption)
 }
 
@@ -74,6 +79,7 @@ function handleSearchSubmit(searchString: string) {
     v-if="locationFilter"
     :searchPlaceholder="locationSearch"
     :filterOptions="locationFilter"
+    :sortOptions="locationSort"
     @selected-filter="handleFilterChange"
     @sort-option="handleSortChange"
     @search-string="handleSearchSubmit"

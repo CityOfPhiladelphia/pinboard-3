@@ -1,5 +1,6 @@
 /** Shared types for OEM Flood Finder */
 import type { BasicLocation } from '@ui/types'
+import { type SortLocationsOptions } from '../../../../packages/ui/src/types'
 
 export type AlertBanner = {
   title: string
@@ -18,6 +19,8 @@ export type FloodImpact = {
   stage: number
   statement: string
 }
+
+type DeviceType = 'Aware' | 'Usgs' | 'Camera'
 
 export type LocationListDTO = {
   id: string
@@ -72,6 +75,12 @@ export type Reading = {
   pictureFilenameOnServer: string
 }
 
-type DeviceType = 'Aware' | 'Usgs' | 'Camera'
-
 export type Filters = 'all' | 'gauges' | 'cameras'
+
+export const sortLocationsOptions: SortLocationsOptions = {
+  None: 'Sort',
+  AlphaAsc: 'Alpha-Asc',
+  AlphaDes: 'Alpha-Des',
+  DistAsc: 'Dist-Asc',
+  DistDes: 'Dist-Des',
+} as const

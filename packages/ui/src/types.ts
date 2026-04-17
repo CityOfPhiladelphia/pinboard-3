@@ -58,13 +58,17 @@ export type LocationFilterOption = {
 
 export type SearchMode = 'address' | 'zipcode' | 'keyword' | false
 
-export enum SortLocationsValues {
-  None,
-  AlphaAsc,
-  AlphaDes,
-  DistAsc,
-  DistDes,
+export type SortLocationsOptions = {
+  readonly None: 'Sort'
+  readonly [key: string]: string
 }
+
+export const SortLocationsNone: SortLocationsOptions = {
+  None: 'Sort',
+}
+
+export type SortLocationsValues =
+  (typeof SortLocationsNone)[keyof typeof SortLocationsNone]
 
 export type AisAutocompleteResult = {
   query: string
@@ -79,3 +83,7 @@ export type AisAutocompleteResult = {
     }[]
   }
 }
+
+export const Zipcode = /^\d{5}(?:-\d{4})?$/
+export const StreetAddress =
+  /^(?:\d{1,5}(?:-\d{1,5})?[A-Za-z]{0,3} )(?:(?:(?:[NnSs](?:[Oo][RrUu][Tt][Hh])?)|(?:[EeWw](?:[AaEe][Ss][Tt])?)){0,2} )?(?:\w+ )(?:\w{2,})$/

@@ -10,8 +10,8 @@ import {
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation } from '@/types'
+import { sortLocationsOptions } from '@/types'
 import type { LocationFilterOption } from '@ui/types'
-import { SortLocationsValues } from '../../../../../packages/ui/src/types'
 import LocationDetail from '@/components/LocationDetail.vue'
 import { computed, ref, watch } from 'vue'
 
@@ -22,7 +22,7 @@ watch(userCoords, (coords) => console.log('user coords:', coords))
 const { locations, isLoading, errorMessage } = useLocations()
 const locationSearchString = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
-const locationSortMode = ref<SortLocationsValues>(SortLocationsValues.None)
+const locationSortMode = ref<string>(sortLocationsOptions.None)
 const visitedIds = ref(new Set<string>())
 const searchPlaceholderText = 'Search by address or keyword...'
 
@@ -65,23 +65,23 @@ const filteredAndSortedLocations = computed(() => {
   }
   const locs: OemLocation[] = [...searchMatchedLocations.value]
   switch (locationSortMode.value) {
-    case SortLocationsValues.AlphaAsc: {
+    case sortLocationsOptions.AlphaAsc: {
       const sorted = locs.sort((a, b) => a.name.localeCompare(b.name))
       return sorted
     }
-    case SortLocationsValues.AlphaDes: {
+    case sortLocationsOptions.AlphaDes: {
       const sorted = locs.sort((a, b) => b.name.localeCompare(a.name))
       return sorted
     }
-    case SortLocationsValues.DistAsc: {
+    case sortLocationsOptions.DistAsc: {
       // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
       return locs
     }
-    case SortLocationsValues.DistDes: {
+    case sortLocationsOptions.DistDes: {
       // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
       return locs
     }
-    case SortLocationsValues.None:
+    case sortLocationsOptions.None:
     default: {
       return locs
     }
@@ -102,8 +102,8 @@ function handleLocationFilterChange(selectedFilter: string) {
   locationFilterMode.value = selectedFilter as Filters
 }
 
-function handleLocationSortChange(sortLocationsOption: number) {
-  locationSortMode.value = sortLocationsOption as SortLocationsValues
+function handleLocationSortChange(sortLocationsOption: string) {
+  locationSortMode.value = sortLocationsOption
 }
 
 function handleLocationSearchSubmit(locationsSearchString: string) {
@@ -126,6 +126,7 @@ function handleDeselect(id: string) {
     :error-message="errorMessage"
     :location-panel-search="searchPlaceholderText"
     :location-panel-filter="filterOptions"
+    :location-panel-sort="sortLocationsOptions"
     @location-search-string="handleLocationSearchSubmit"
     @selected-locations-filter="handleLocationFilterChange"
     @sort-locations-option="handleLocationSortChange"
