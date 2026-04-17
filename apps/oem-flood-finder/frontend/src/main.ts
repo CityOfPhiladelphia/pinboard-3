@@ -12,6 +12,9 @@ app.use(
     map: {
       center: [-75.12, 39.98],
       zoom: 11,
+      mobile: {
+        zoom: 9.5,
+      },
     },
   }),
 )

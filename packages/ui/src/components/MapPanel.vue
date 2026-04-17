@@ -17,16 +17,20 @@ const props = withDefaults(
     hoveredId?: string | null
     selectedId?: string | null
     isLoading?: boolean
+    isMobile?: boolean
     onHover?: (id: string) => void
     onHoverEnd?: () => void
-    onSelect?: (loc: AppLocation) => void
+    onSelect?: (loc: Location) => void
+    mobileControlsTarget?: HTMLDivElement | null
     mapContentSlot?: (props: {
       locations: AppLocation[]
       geojson: unknown
       map: unknown
       zoom: number
+      isMobile: boolean
       hoveredId: string | null
       selectedId: string | null
+      mobileControlsTarget: HTMLDivElement | null
       onHover: (id: string) => void
       onHoverEnd: () => void
       onSelect: (loc: unknown) => void
@@ -56,8 +60,10 @@ const slotProps = computed(() => ({
   geojson: props.geojson,
   map: null as unknown,
   zoom: zoom.value,
+  isMobile: props.isMobile ?? false,
   hoveredId: props.hoveredId ?? null,
   selectedId: props.selectedId ?? null,
+  mobileControlsTarget: props.mobileControlsTarget ?? null,
   onHover: props.onHover ?? (() => {}),
   onHoverEnd: props.onHoverEnd ?? (() => {}),
   onSelect: props.onSelect ?? (() => {}),
