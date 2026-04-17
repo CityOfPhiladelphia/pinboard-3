@@ -3,7 +3,11 @@ import '@phila/phila-ui-core/styles/template-light.css'
 import { useSlots, inject, ref, computed } from 'vue'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { faMap, faList } from '@fortawesome/pro-solid-svg-icons'
-import { PINBOARD_CONFIG_KEY, Location, LocationFilterOption } from '../types'
+import {
+  PINBOARD_CONFIG_KEY,
+  AppLocation,
+  LocationFilterOption,
+} from '../types'
 import { MapCard } from '@phila/phila-ui-cards'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
@@ -11,10 +15,9 @@ import LocationsPanel from './LocationsPanel.vue'
 defineSlots<{
   nav?(): unknown
   'locations-header'?(): unknown
-  'location-card'?(props: { location: Location }): unknown
-  'location-detail'?(props: { location: Location }): unknown
+  'location-detail'?: unknown
   'map-content'?(props: {
-    locations: Location[]
+    locations: AppLocation[]
     geojson: unknown
     map: unknown
     zoom: number
@@ -22,12 +25,12 @@ defineSlots<{
     selectedId: string | null
     onHover: (id: string) => void
     onHoverEnd: () => void
-    onSelect: (loc: Location) => void
+    onSelect: (loc: AppLocation) => void
   }): unknown
 }>()
 
 defineProps<{
-  locations: Location[]
+  locations: AppLocation[]
   isLoading: boolean
   errorMessage: string | null
   locationPanelFilter?: LocationFilterOption[] | undefined
@@ -52,7 +55,7 @@ const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
 )
 
 const hoveredLocationId = ref<string | null>(null)
-const selectedLocation = ref<Location | null>(null)
+const selectedLocation = ref<AppLocation | null>(null)
 const activeMobilePanel = ref<'list' | 'map'>('list')
 
 const selectedLocationId = computed(() =>
@@ -68,12 +71,12 @@ function handleHoverEnd() {
   hoveredLocationId.value = null
 }
 
-function handleSelect(location: Location) {
+function handleSelect(location: AppLocation) {
   selectedLocation.value = location
   mapPanelRef.value?.panTo([location.longitude, location.latitude])
 }
 
-function handleMapSelect(location: Location) {
+function handleMapSelect(location: AppLocation) {
   if (selectedLocation.value?.id === location.id) {
     closeLocationDetail()
   } else {

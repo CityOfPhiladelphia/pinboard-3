@@ -1,3 +1,20 @@
+<!-- LocationSearchFilterPanel -->
+<!--
+Component for rendering the features search bar, filter buttons, and sort buttons inside of location panel.
+Because not all finders will use the exact some layout, search, filter and sort are all optional.
+Search, filter, and sort will only render if a prop for them is passed into LocationSearchFilterPanel
+
+Features in component have minimal state and logic.
+They will emit current values, and the logic for handling those values will be done in the parent app.
+
+
+
+To render a feature:
+  Search: string - placeholder string to render inside search bar
+  Filter: string[] - array of string to match
+  Sort: enum -
+ -->
+
 <script setup lang="ts">
 import { ref, computed, ComputedRef } from 'vue'
 import { Search } from '@phila/phila-ui-search'
@@ -9,12 +26,14 @@ import type {
 } from '../types'
 import { SortLocationsValues } from '../types'
 
-const addressRegex = /^(?:\d{1,5} ){1}(?:\w+ ){1,2}(?:\w+)?(?:\w+ # ?\d{1,5})?$/
+const addressRegex =
+  /^(?:\d{1,5}(?:-\d{1,5})? )(?:\w+ ){1,2}(?:\w+)?(?:\w+ # ?\d{1,5})?/
 const zipcodeRegex = /^\d{5}(?:-\d{4})?$/
 
 const props = defineProps<{
   searchPlaceholder?: string
   filterOptions?: LocationFilterOption[]
+  // ADD PROP FOR SORT MODES
 }>()
 
 const emit = defineEmits<{
@@ -51,7 +70,7 @@ const searchMode: ComputedRef<SearchMode> = computed(() => {
 async function updateSearchSuggestions(): Promise<string[]> {
   if (
     searchString.value.length < 3 ||
-    !/^\d{3,5} [A-Za-z ]*/.test(searchString.value)
+    !/^\d{1,5}(?:-\d{1,5})?(?: [NnSs])? [A-Za-z ]*/.test(searchString.value)
   ) {
     return []
   }
@@ -115,6 +134,7 @@ function handleSearchSubmit() {
       class="location-search-autocomplete"
       :choices="searchSuggestions"
     /> -->
+    <!-- Make new component for sedarch suggestions -->
   </div>
 
   <div class="location-filters">

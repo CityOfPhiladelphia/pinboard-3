@@ -35,7 +35,7 @@ export type LocationListDTO = {
   majorStage: number
 }
 
-export type OemLocation = Location & {
+export type OemFields = {
   deviceType: DeviceType
   lastUpdated: Date | null
   actionStage: number
@@ -43,6 +43,8 @@ export type OemLocation = Location & {
   moderateStage: number
   majorStage: number
 }
+
+export type OemLocation = Location & OemFields
 
 export type UsgsGauge = {
   gaugeId: string

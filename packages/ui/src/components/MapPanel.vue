@@ -7,21 +7,21 @@ import {
 } from 'vue'
 import { Map as PhilaMap } from '@phila/phila-ui-map-core'
 import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css'
-import type { MapConfig, Location } from '../types'
+import type { MapConfig, AppLocation } from '../types'
 
 const props = withDefaults(
   defineProps<{
     config?: MapConfig
-    locations?: Location[]
+    locations?: AppLocation[]
     geojson?: unknown
     hoveredId?: string | null
     selectedId?: string | null
     isLoading?: boolean
     onHover?: (id: string) => void
     onHoverEnd?: () => void
-    onSelect?: (loc: Location) => void
+    onSelect?: (loc: AppLocation) => void
     mapContentSlot?: (props: {
-      locations: Location[]
+      locations: AppLocation[]
       geojson: unknown
       map: unknown
       zoom: number

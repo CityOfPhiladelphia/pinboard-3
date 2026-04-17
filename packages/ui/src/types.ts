@@ -47,6 +47,8 @@ export type Location = {
   locationCardInfo: MapCardProps
 }
 
+export type AppLocation = Location & Record<string, unknown>
+
 export type LocationFilterOption = {
   readonly value: string
   readonly label: string
