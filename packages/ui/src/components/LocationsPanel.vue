@@ -49,7 +49,7 @@ watch(
 
 defineExpose({ scrollToCard })
 
-function onCardKeyup(location: Location) {
+function onCardKeyup(location: AppLocation) {
   if (pendingKeydown.value) {
     emit('select', location)
     pendingKeydown.value = false

@@ -16,7 +16,7 @@ import { Tags } from '@phila/phila-ui-tags'
 import { faMap } from '@fortawesome/pro-solid-svg-icons'
 import {
   PINBOARD_CONFIG_KEY,
-  Location,
+  AppLocation,
   LocationFilterOption,
   SortLocationsValues,
 } from '../types'
@@ -45,7 +45,7 @@ defineSlots<{
 }>()
 
 const props = defineProps<{
-  locations: Location[]
+  locations: AppLocation[]
   isLoading: boolean
   errorMessage: string | null
   locationPanelFilter?: LocationFilterOption[] | undefined
@@ -103,7 +103,7 @@ onUnmounted(() => {
 })
 
 const hoveredLocationId = ref<string | null>(null)
-const selectedLocation = ref<Location | null>(null)
+const selectedLocation = ref<AppLocation | null>(null)
 const bottomSheetOpen = ref(true)
 const snapPoints = [15, 50, 100]
 const bottomSheetRef = ref<{

@@ -44,7 +44,7 @@ export type AlertBanner = {
 export const PINBOARD_CONFIG_KEY: InjectionKey<PinboardConfig> =
   Symbol('pinboard-config')
 
-export type Location = {
+export type BasicLocation = {
   id: string
   name: string
   latitude: number
@@ -52,7 +52,7 @@ export type Location = {
   locationCardInfo: MapCardProps
 }
 
-export type AppLocation = Location & Record<string, unknown>
+export type AppLocation = BasicLocation & Record<string, unknown>
 
 export type LocationFilterOption = {
   readonly value: string

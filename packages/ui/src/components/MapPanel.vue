@@ -20,7 +20,7 @@ const props = withDefaults(
     isMobile?: boolean
     onHover?: (id: string) => void
     onHoverEnd?: () => void
-    onSelect?: (loc: Location) => void
+    onSelect?: (loc: AppLocation) => void
     mobileControlsTarget?: HTMLDivElement | null
     mapContentSlot?: (props: {
       locations: AppLocation[]
