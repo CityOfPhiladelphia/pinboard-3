@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import '@phila/phila-ui-core/styles/template-light.css'
-import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
+// vue imports
 import {
   useSlots,
   inject,
@@ -10,27 +9,37 @@ import {
   onUnmounted,
   watch,
 } from 'vue'
+
+// font-awesome imports
+import { faMap } from '@fortawesome/pro-solid-svg-icons'
+
+// philly ui imports
+import '@phila/phila-ui-core/styles/template-light.css'
+import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css' // what does this need to be imported for?
+import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Search } from '@phila/phila-ui-search'
 import { Tags } from '@phila/phila-ui-tags'
-import { faMap } from '@fortawesome/pro-solid-svg-icons'
-import {
-  PINBOARD_CONFIG_KEY,
-  AppLocation,
-  LocationFilterOption,
-  SortLocationsValues,
-} from '../types'
-import { MapCard } from '@phila/phila-ui-cards'
+
+// component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 
+// type imports
+import {
+  PINBOARD_CONFIG_KEY,
+  BasicLocation,
+  LocationFilterOption,
+  SortLocationsValues,
+} from '../types'
+
 defineSlots<{
   nav?(): unknown
-  'locations-header'?(): unknown
+  'locations-header'?: unknown
   'location-detail'?: unknown
   'map-content'?(props: {
-    locations: AppLocation[]
+    locations: BasicLocation[]
     geojson: unknown
     map: unknown
     zoom: number
@@ -40,12 +49,12 @@ defineSlots<{
     mobileControlsTarget: HTMLDivElement | null
     onHover: (id: string) => void
     onHoverEnd: () => void
-    onSelect: (loc: AppLocation) => void
+    onSelect: (loc: BasicLocation) => void
   }): unknown
 }>()
 
 const props = defineProps<{
-  locations: AppLocation[]
+  locations: BasicLocation[]
   isLoading: boolean
   errorMessage: string | null
   locationPanelFilter?: LocationFilterOption[] | undefined
@@ -53,7 +62,7 @@ const props = defineProps<{
   geojson?: unknown
 }>()
 
-// emit to parent app to handle what gets sent to pinboard
+// emit to parent app to handle
 const emit = defineEmits<{
   locationSearchString: [search: string]
   selectedLocationsFilter: [filter: string]
@@ -103,7 +112,7 @@ onUnmounted(() => {
 })
 
 const hoveredLocationId = ref<string | null>(null)
-const selectedLocation = ref<AppLocation | null>(null)
+const selectedLocation = ref<BasicLocation | null>(null)
 const bottomSheetOpen = ref(true)
 const snapPoints = [15, 50, 100]
 const bottomSheetRef = ref<{
@@ -149,12 +158,12 @@ function handleHoverEnd() {
   hoveredLocationId.value = null
 }
 
-function handleSelect(location: AppLocation) {
+function handleSelect(location: BasicLocation) {
   selectedLocation.value = location
   mapPanelRef.value?.panTo([location.longitude, location.latitude])
 }
 
-function handleMapSelect(location: AppLocation) {
+function handleMapSelect(location: BasicLocation) {
   if (selectedLocation.value?.id === location.id) {
     closeLocationDetail()
   } else {

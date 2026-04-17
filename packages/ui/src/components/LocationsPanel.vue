@@ -2,23 +2,23 @@
 import { ref, watch } from 'vue'
 import { MapCard } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
-import type { AppLocation, LocationFilterOption } from '../types'
+import type { BasicLocation, LocationFilterOption } from '../types'
 
 const props = defineProps<{
   locationSearch: string | undefined
   locationFilter: LocationFilterOption[] | undefined
-  locations: AppLocation[]
+  locations: BasicLocation[]
   hoveredId?: string | null
   selectedId?: string | null
   locationCardSlot?: (props: {
-    location: AppLocation
+    location: BasicLocation
     isHovered: boolean
     isSelected: boolean
   }) => unknown
 }>()
 
 const emit = defineEmits<{
-  select: [location: AppLocation]
+  select: [location: BasicLocation]
   searchString: [search: string]
   selectedFilter: [filter: string]
   sortOption: [sort: number]
@@ -49,7 +49,7 @@ watch(
 
 defineExpose({ scrollToCard })
 
-function onCardKeyup(location: AppLocation) {
+function onCardKeyup(location: BasicLocation) {
   if (pendingKeydown.value) {
     emit('select', location)
     pendingKeydown.value = false

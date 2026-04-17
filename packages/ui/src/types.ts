@@ -1,8 +1,6 @@
 // packages/ui/src/types.ts
 import type { InjectionKey } from 'vue'
 import type { MapCardProps } from '@phila/phila-ui-cards'
-import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
-import type { TagsProps } from '@phila/phila-ui-tags'
 
 export type MapControlPosition =
   | 'top-left'
@@ -52,8 +50,6 @@ export type BasicLocation = {
   longitude: number
   locationCardInfo: MapCardProps
 }
-
-export type AppLocation = BasicLocation
 
 export type LocationFilterOption = {
   readonly value: string
