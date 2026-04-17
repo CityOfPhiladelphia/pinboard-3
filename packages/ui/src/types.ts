@@ -2,6 +2,7 @@
 import type { InjectionKey } from 'vue'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
+import type { TagsProps } from '@phila/phila-ui-tags'
 
 export type MapControlPosition =
   | 'top-left'
@@ -52,7 +53,7 @@ export type BasicLocation = {
   locationCardInfo: MapCardProps
 }
 
-export type AppLocation = BasicLocation & Record<string, unknown>
+export type AppLocation = BasicLocation
 
 export type LocationFilterOption = {
   readonly value: string
@@ -67,13 +68,6 @@ export enum SortLocationsValues {
   AlphaDes,
   DistAsc,
   DistDes,
-}
-
-export type LocationCardInfo = {
-  heading: string
-  subheader: string
-  tags: { text: string; color?: string; iconDefinition?: IconDefinition }[]
-  src: string
 }
 
 export type AisAutocompleteResult = {

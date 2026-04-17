@@ -1,5 +1,5 @@
 /** Shared types for OEM Flood Finder */
-import type { Location } from '@ui/types'
+import type { BasicLocation } from '@ui/types'
 
 export type AlertBanner = {
   title: string
@@ -44,38 +44,7 @@ export type OemFields = {
   majorStage: number
 }
 
-export type OemLocation = Location & OemFields
-
-export type UsgsGauge = {
-  gaugeId: string
-  name: string
-  latitude: number
-  longitude: number
-  lastUpdated: Date | null
-  actionStage: number
-  minorStage: number
-  moderateStage: number
-  majorStage: number
-  hydrographURL: string
-  hydrographWithFloodCategoriesURL: string
-  stageUnits: string
-  floodImpacts: FloodImpact[]
-}
-
-export type AwareGauge = {
-  gaugeId: string
-  name: string
-  latitude: number
-  longitude: number
-  lastUpdated: Date | null
-  modemNumber: string
-  actionStage: number
-  minorStage: number
-  moderateStage: number
-  majorStage: number
-  stageUnits: string
-  floodImpacts: FloodImpact[]
-}
+export type OemLocation = BasicLocation & OemFields
 
 export type Reading = {
   readingId: string
@@ -101,17 +70,6 @@ export type Reading = {
   dropRateThreshold: number
   deviceDropCount: number
   pictureFilenameOnServer: string
-}
-
-export type Camera = {
-  cameraId: string
-  name: string
-  latitude: number
-  longitude: number
-  lastUpdated: Date
-  createdOn: Date
-  locationDescription?: string
-  pageUrl: string
 }
 
 type DeviceType = 'Aware' | 'Usgs' | 'Camera'

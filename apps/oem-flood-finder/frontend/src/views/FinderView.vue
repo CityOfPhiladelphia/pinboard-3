@@ -30,17 +30,16 @@ const filteredLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
-  const locs: OemLocation[] = [...locations.value]
   switch (locationFilterMode.value) {
     case 'gauges': {
-      return locs.filter((loc) => isGauge(loc))
+      return locations.value.filter((loc) => isGauge(loc))
     }
     case 'cameras': {
-      return locs.filter((loc) => loc.deviceType === 'Camera')
+      return locations.value.filter((loc) => loc.deviceType === 'Camera')
     }
     case 'all':
     default: {
-      return locs
+      return locations.value
     }
   }
 })
