@@ -70,7 +70,7 @@ export function useLocations(): {
                 feature.properties.record ?? feature.properties.address ?? ''
               ),
               subheader: 'Some date!',
-              tag: 'Some other stuff...',
+              tags: [{ text: 'Some other stuff...' }],
             },
           }) satisfies PrimaryCareLocation
       )
