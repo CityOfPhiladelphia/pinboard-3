@@ -41,11 +41,11 @@ export function useLocations() {
             currentLocation.value === null
               ? undefined
               : getHaversineDistance(
-                loc.latitude,
-                loc.longitude,
-                currentLocation.value.lat,
-                currentLocation.value.long,
-              ).toFixed(1) + ' mi',
+                  loc.latitude,
+                  loc.longitude,
+                  currentLocation.value.lat,
+                  currentLocation.value.long,
+                ).toFixed(1) + ' mi',
           tags: getLocationTags(loc),
           src: loc.imageUrl,
         },
