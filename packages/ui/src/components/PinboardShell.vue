@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { VNode } from 'vue'
 import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader } from '@phila/phila-ui-app-header'
 import type { NavbarBrand } from '@phila/phila-ui-app-header'
-import { FunctionalComponent, h, VNode } from 'vue'
 import MobileNavPanel from './MobileNavPanel.vue'
 
 defineProps<{
@@ -14,14 +14,11 @@ defineProps<{
   bannerMessage?: string
 }>()
 
-const slots = defineSlots<{
+defineSlots<{
   default(): VNode[]
   'mobile-nav'(): VNode[]
   'info-body'?(): VNode[]
 }>()
-
-const MobileNavContent: FunctionalComponent = () =>
-  h(MobileNavPanel, null, { default: () => slots['mobile-nav']?.() })
 </script>
 
 <template>
@@ -29,7 +26,7 @@ const MobileNavContent: FunctionalComponent = () =>
     <AppHeader
       id="pinboard-nav"
       :show-trusted-site="true"
-      :mobile-nav="$slots['mobile-nav'] ? MobileNavContent : undefined"
+      :mobile-nav="$slots['mobile-nav'] ? MobileNavPanel : undefined"
       :links="[]"
       :navbar-brand="{
         brandingImage: { src: '', href: '/', altText: title },

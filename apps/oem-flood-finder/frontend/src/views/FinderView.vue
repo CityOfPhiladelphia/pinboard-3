@@ -9,36 +9,37 @@ import {
 } from '@pinboard/ui'
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { useLocations } from '@/composables/useLocations'
-import { useUserLocation } from '@/composables/useUserLocation'
 import type { Filters, OemLocation } from '@/types'
-import type { Location, LocationFilterOption } from '@ui/types'
+import type { LocationFilterOption } from '@ui/types'
 import { SortLocationsValues } from '../../../../../packages/ui/src/types'
 import LocationDetail from '@/components/LocationDetail.vue'
-import { computed, ref, reactive, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
-const { locations, isLoading, errorMessage } = useLocations()
+import { useUserLocation } from '@/composables/useUserLocation'
 const { userCoords, setUserLocation } = useUserLocation()
 watch(userCoords, (coords) => console.log('user coords:', coords))
+
+const { locations, isLoading, errorMessage } = useLocations()
 const locationSearchString = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
-const locationSortMode = ref<number>(SortLocationsValues.None)
+const locationSortMode = ref<SortLocationsValues>(SortLocationsValues.None)
+const visitedIds = ref(new Set<string>())
 const searchPlaceholderText = 'Search by address or keyword...'
 
 const filteredLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
-  const locs: OemLocation[] = [...locations.value]
   switch (locationFilterMode.value) {
     case 'gauges': {
-      return locs.filter((loc) => isGauge(loc))
+      return locations.value.filter((loc) => isGauge(loc))
     }
     case 'cameras': {
-      return locs.filter((loc) => loc.deviceType === 'Camera')
+      return locations.value.filter((loc) => loc.deviceType === 'Camera')
     }
     case 'all':
     default: {
-      return locs
+      return locations.value
     }
   }
 })
@@ -109,20 +110,12 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
   locationSearchString.value = locationsSearchString
 }
 
-const visitedIds = reactive(new Set<string>())
-let lastSelectedId: string | null = null
-
-function handleSelect(loc: Location, onSelect: (loc: Location) => void) {
-  if (lastSelectedId && lastSelectedId !== loc.id) {
-    visitedIds.add(lastSelectedId)
-  }
-  lastSelectedId = loc.id
+function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
   onSelect(loc)
 }
 
 function handleDeselect(id: string) {
-  visitedIds.add(id)
-  lastSelectedId = null
+  visitedIds.value.add(id)
 }
 </script>
 
@@ -139,7 +132,7 @@ function handleDeselect(id: string) {
     @deselect="handleDeselect"
   >
     <template #location-detail="{ location }">
-      <LocationDetail :location="location as OemLocation" />
+      <LocationDetail :location="location" />
     </template>
 
     <template

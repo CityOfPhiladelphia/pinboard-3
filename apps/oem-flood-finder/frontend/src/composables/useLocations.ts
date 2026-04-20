@@ -1,8 +1,9 @@
-import type { LocationListDTO, OemLocation } from '@/types'
 import { ref, onMounted } from 'vue'
 import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
+import type { TagsProps } from '@phila/phila-ui-tags'
+import type { LocationListDTO, OemLocation } from '@/types'
 
-function getLocationTags(loc: LocationListDTO): OemLocation['locationCardInfo']['tags'] {
+function getLocationTags(loc: LocationListDTO): TagsProps[] {
   if (loc.deviceType === 'Camera') {
     return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
   }
@@ -34,7 +35,7 @@ function transformLocationDTO(dto: LocationListDTO[]): OemLocation[] {
       minorStage: loc.minorStage,
       moderateStage: loc.moderateStage,
       majorStage: loc.majorStage,
-    } satisfies OemLocation)
+    })
   }
   return locations
 }

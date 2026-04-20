@@ -1,11 +1,11 @@
-import type { Location } from '@ui/types'
+import type { BasicLocation } from '@ui/types'
 
 export interface PrimaryCareLocationInfo {
   properties: PrimaryCareProperties
   geometry: { type: string; coordinates: [number, number, ...number[]] }
 }
 
-export type PrimaryCareLocation = Location & PrimaryCareLocationInfo
+export type PrimaryCareLocation = BasicLocation & PrimaryCareLocationInfo
 
 export interface PrimaryCareProperties {
   objectid: number
