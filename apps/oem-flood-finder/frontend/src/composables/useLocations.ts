@@ -2,7 +2,6 @@ import type { LocationListDTO, OemLocation } from '@/types'
 import { ref, onMounted, computed } from 'vue'
 import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
 import type { TagsProps } from '@phila/phila-ui-tags'
-import type { LocationListDTO, OemLocation } from '@/types'
 
 function getLocationTags(loc: LocationListDTO): TagsProps[] {
   if (loc.deviceType === 'Camera') {
