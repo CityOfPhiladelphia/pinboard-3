@@ -25,6 +25,7 @@ import { Search } from '@phila/phila-ui-search'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
+import LocationFilter from './LocationFilter.vue'
 
 // type imports
 import {
@@ -282,7 +283,7 @@ watch(selectedLocation, (loc) => {
           class-name="mobile-search"
           :placeholder="locationPanelSearch"
         />
-        <LocationSearchFilterPanel
+        <LocationFilter
           v-if="locationPanelFilter"
           :filterOptions="locationPanelFilter"
           @selected-filter="handleLocationFilterChange"

@@ -28,7 +28,6 @@ export default defineConfig({
         return [
           'vue',
           'vue-router',
-          'pinia',
           '@pinboard/core',
           '@phila/phila-ui-map-core',
           '@phila/phila-ui-bottom-sheet',

@@ -60,7 +60,6 @@ const filteredAndSortedLocations = computed(() => {
     return []
   }
   const locs: OemLocation[] = [...searchMatchedLocations.value]
-  console.log('Switch: ', locationSortMode.value)
   switch (locationSortMode.value) {
     case 'AlphaAsc': {
       const sorted = locs.sort((a, b) => a.name.localeCompare(b.name))

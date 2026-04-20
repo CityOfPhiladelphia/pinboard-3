@@ -18,8 +18,8 @@ To render a feature:
 <script setup lang="ts">
 import { ref, computed, ComputedRef } from 'vue'
 import { Search } from '@phila/phila-ui-search'
-import { Tags } from '@phila/phila-ui-tags'
 import { Menu } from '@phila/phila-ui-menu'
+import LocationFilter from './LocationFilter.vue'
 import type {
   LocationFilterOption,
   SearchMode,
@@ -56,9 +56,6 @@ const sortChoices = computed(() => {
   return choices
 })
 
-const selectedFilter = ref(
-  props.filterOptions ? props.filterOptions[0].value : undefined
-)
 const sortOption = ref<string>('')
 const searchString = ref<string>('')
 const searchSuggestions = ref<string[]>([])
@@ -102,11 +99,7 @@ async function updateSearchSuggestions(): Promise<string[]> {
 }
 
 function handleFilterChange(option: string) {
-  if (selectedFilter.value === option) {
-    return
-  }
-  selectedFilter.value = option
-  emit('selectedFilter', selectedFilter.value)
+  emit('selectedFilter', option)
 }
 
 function handleSortChange(value: string | string[]) {
@@ -132,60 +125,53 @@ function handleSearchSubmit() {
 </script>
 
 <template>
-  <div>
+  <div class="location-search-filter-sort">
     <Search
       v-if="searchPlaceholder"
-      class-name="location-search"
+      class="location-search"
       :placeholder="searchPlaceholder"
       @update:modelValue="handleSearchChange"
       @search="handleSearchSubmit"
     />
-    <!-- <Menu
-      v-if="searchSuggestions.length"
-      class="location-search-autocomplete"
-      :choices="searchSuggestions"
-    /> -->
-    <!-- Make new component for search suggestions -->
-  </div>
-
-  <div class="location-filters">
-    <Tags
-      v-for="opt in filterOptions"
-      :key="`filter-${opt.value}`"
-      variant="action"
-      size="large"
-      color="grey"
-      :text="opt.label"
-      :selected="selectedFilter === opt.value"
-      @update:selected="handleFilterChange(opt.value)"
-    />
-    <Menu
-      v-if="sortOptions"
-      :choices="sortChoices"
-      placeholder="Sort"
-      className="location-sort"
-      @update:modelValue="handleSortChange"
-    />
+    <div class="location-filters">
+      <LocationFilter
+        v-if="filterOptions"
+        :filterOptions="filterOptions"
+        @selectedFilter="handleFilterChange"
+      />
+    </div>
+    <div class="location-sort">
+      <Menu
+        v-if="sortOptions"
+        :choices="sortChoices"
+        placeholder="Sort"
+        @update:modelValue="handleSortChange"
+      />
+    </div>
   </div>
 </template>
 
 <style scoped>
-.location-search {
-  padding: 1rem 1rem 0rem 1rem;
-  width: 100%;
+.location-search-filter-sort {
+  display: grid;
+  grid-template:
+    'search search'
+    'filters sort';
 }
 
-.location-search-autocomplete {
+.location-search {
+  grid-area: search;
   width: 100%;
+  padding: 1rem 1rem 0rem 1rem;
 }
 
 .location-filters {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  grid-area: filters;
 }
 
 .location-sort {
+  grid-area: sort;
   margin-left: auto;
+  padding-right: 1rem;
 }
 </style>
