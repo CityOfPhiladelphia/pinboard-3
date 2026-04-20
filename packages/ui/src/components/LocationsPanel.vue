@@ -76,7 +76,7 @@ function handleSearchSubmit(searchString: string) {
 
 <template>
   <LocationSearchFilterPanel
-    v-if="locationFilter"
+    v-if="locationSearch || locationFilter || locationSort"
     :searchPlaceholder="locationSearch"
     :filterOptions="locationFilter"
     :sortOptions="locationSort"

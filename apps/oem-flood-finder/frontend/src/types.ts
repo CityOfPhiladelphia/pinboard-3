@@ -78,9 +78,8 @@ export type Reading = {
 export type Filters = 'all' | 'gauges' | 'cameras'
 
 export const sortLocationsOptions: SortLocationsOptions = {
-  None: 'Sort',
   AlphaAsc: 'Alpha-Asc',
   AlphaDes: 'Alpha-Des',
   DistAsc: 'Dist-Asc',
   DistDes: 'Dist-Des',
-} as const
+}

@@ -58,31 +58,30 @@ export type LocationFilterOption = {
 
 export type SearchMode = 'address' | 'zipcode' | 'keyword' | false
 
-export type SortLocationsOptions = {
-  readonly None: 'Sort'
-  readonly [key: string]: string
-}
+export type MenuOption = Readonly<{
+  text: string
+  value: string
+}>
 
-export const SortLocationsNone: SortLocationsOptions = {
-  None: 'Sort',
-}
+export type SortLocationsOptions = Readonly<{
+  [key: string]: string
+}>
 
-export type SortLocationsValues =
-  (typeof SortLocationsNone)[keyof typeof SortLocationsNone]
-
-export type AisAutocompleteResult = {
+export type AisAutocompleteResult = Readonly<{
   query: string
   query_type: string
   count: number
-  results: {
+  results: Readonly<{
     placenames: string[]
-    addresses: {
-      address: string
-      search_address: string
-      has_opa: boolean
-    }[]
-  }
-}
+    addresses: Readonly<
+      {
+        address: string
+        search_address: string
+        has_opa: boolean
+      }[]
+    >
+  }>
+}>
 
 export const Zipcode = /^\d{5}(?:-\d{4})?$/
 export const StreetAddress =

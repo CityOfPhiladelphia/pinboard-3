@@ -19,13 +19,15 @@ To render a feature:
 import { ref, computed, ComputedRef } from 'vue'
 import { Search } from '@phila/phila-ui-search'
 import { Tags } from '@phila/phila-ui-tags'
+import { Menu } from '@phila/phila-ui-menu'
 import type {
   LocationFilterOption,
   SearchMode,
   SortLocationsOptions,
   AisAutocompleteResult,
+  MenuOption,
 } from '../types'
-import { StreetAddress, Zipcode, SortLocationsNone } from '../types'
+import { StreetAddress, Zipcode } from '../types'
 
 const props = defineProps<{
   searchPlaceholder?: string
@@ -40,14 +42,24 @@ const emit = defineEmits<{
   searchMode: [mode: string]
 }>()
 
-const sortOptionComp = computed(() => {
-  return props.sortOptions ?? SortLocationsNone
+const sortChoices = computed(() => {
+  const sortOptions = props.sortOptions ?? {}
+  const choices: MenuOption[] = Array.from(
+    Object.keys(sortOptions),
+    (option, i) => {
+      return {
+        text: Object.values(sortOptions)[i],
+        value: option,
+      }
+    }
+  )
+  return choices
 })
 
 const selectedFilter = ref(
   props.filterOptions ? props.filterOptions[0].value : undefined
 )
-const sortOption = ref<string>(SortLocationsNone.None)
+const sortOption = ref<string>('')
 const searchString = ref<string>('')
 const searchSuggestions = ref<string[]>([])
 
@@ -97,13 +109,9 @@ function handleFilterChange(option: string) {
   emit('selectedFilter', selectedFilter.value)
 }
 
-function handleSortChange() {
-  const i = Object.values(sortOptionComp.value).indexOf(sortOption.value) + 1
-  const key =
-    i < Object.keys(sortOptionComp.value).length
-      ? Object.keys(sortOptionComp.value)[i]
-      : 'None'
-  sortOption.value = sortOptionComp.value[key] || SortLocationsNone.None
+function handleSortChange(value: string | string[]) {
+  value = Array.isArray(value) ? value[0] : value
+  sortOption.value = value ?? ''
   emit('sortOption', sortOption.value)
 }
 
@@ -137,7 +145,7 @@ function handleSearchSubmit() {
       class="location-search-autocomplete"
       :choices="searchSuggestions"
     /> -->
-    <!-- Make new component for sedarch suggestions -->
+    <!-- Make new component for search suggestions -->
   </div>
 
   <div class="location-filters">
@@ -151,15 +159,12 @@ function handleSearchSubmit() {
       :selected="selectedFilter === opt.value"
       @update:selected="handleFilterChange(opt.value)"
     />
-    <Tags
-      class="location-sort"
-      :key="`filter-sort`"
-      variant="action"
-      size="large"
-      color="grey"
-      :text="sortOption"
-      :selected="sortOption !== SortLocationsNone.None"
-      @update:selected="handleSortChange()"
+    <Menu
+      v-if="sortOptions"
+      :choices="sortChoices"
+      placeholder="Sort"
+      className="location-sort"
+      @update:modelValue="handleSortChange"
     />
   </div>
 </template>

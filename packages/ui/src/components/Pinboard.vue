@@ -146,8 +146,7 @@ const selectedLocationId = computed(() =>
 const locationCountLabel = computed(() => {
   const n = props.locations.length
   if (n === 0) return 'No locations match'
-  if (n === 1) return '1 item'
-  return `${n} items`
+  return `${n} item${n > 1 ? 's' : ''}`
 })
 
 // Event handlers for location interaction
@@ -305,16 +304,21 @@ watch(selectedLocation, (loc) => {
         :class="{ 'is-hidden': selectedLocation }"
       >
         <slot name="locations-header" />
-        <div v-if="!isLoading && !errorMessage" class="location-count">
+        <div v-if="!isLoading && !errorMessage" class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
           <!-- <Tags
             variant="action"
             size="large"
             color="grey"
             text="Sort"
-            :selected="mobileSortOption !== SortLocationsValues.None"
+            :selected="true"
             @update:selected="handleLocationSortChange"
           /> -->
+          <LocationSearchFilterPanel
+            v-if="locationPanelSort"
+            :sortOptions="locationPanelSort"
+            @sort-option="handleLocationSortChange"
+          />
         </div>
 
         <div v-if="isLoading" class="location-list">
@@ -404,7 +408,7 @@ watch(selectedLocation, (loc) => {
   overflow: hidden;
 }
 
-.location-count {
+.location-sheet-header {
   display: flex;
   align-items: center;
   justify-content: space-between;

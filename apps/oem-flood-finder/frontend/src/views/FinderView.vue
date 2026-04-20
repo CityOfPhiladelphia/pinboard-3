@@ -22,7 +22,7 @@ watch(userCoords, (coords) => console.log('user coords:', coords))
 const { locations, isLoading, errorMessage } = useLocations()
 const locationSearchString = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
-const locationSortMode = ref<string>(sortLocationsOptions.None)
+const locationSortMode = ref<string>('')
 const visitedIds = ref(new Set<string>())
 const searchPlaceholderText = 'Search by address or keyword...'
 
@@ -64,24 +64,24 @@ const filteredAndSortedLocations = computed(() => {
     return []
   }
   const locs: OemLocation[] = [...searchMatchedLocations.value]
+  console.log('Switch: ', locationSortMode.value)
   switch (locationSortMode.value) {
-    case sortLocationsOptions.AlphaAsc: {
+    case 'AlphaAsc': {
       const sorted = locs.sort((a, b) => a.name.localeCompare(b.name))
       return sorted
     }
-    case sortLocationsOptions.AlphaDes: {
+    case 'AlphaDes': {
       const sorted = locs.sort((a, b) => b.name.localeCompare(a.name))
       return sorted
     }
-    case sortLocationsOptions.DistAsc: {
+    case 'DistAsc': {
       // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
       return locs
     }
-    case sortLocationsOptions.DistDes: {
+    case 'DistDes': {
       // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
       return locs
     }
-    case sortLocationsOptions.None:
     default: {
       return locs
     }
