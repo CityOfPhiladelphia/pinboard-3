@@ -1,5 +1,17 @@
 import type { LocationListDTO, OemLocation } from '@/types'
 import { ref, onMounted, computed } from 'vue'
+import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
+
+function getLocationTags(loc: LocationListDTO): OemLocation['locationCardInfo']['tags'] {
+  if (loc.deviceType === 'Camera') {
+    return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
+  }
+  const gaugeValue =
+    !loc.gaugeHeight || loc.gaugeHeight === -9999.9
+      ? 'No data'
+      : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
+  return [{ text: 'Gauge', color: 'blue' as const, iconDefinition: faWater }, { text: gaugeValue }]
+}
 
 export function useLocations() {
   let locationListDTO = ref<LocationListDTO[] | null>(null)
@@ -34,12 +46,7 @@ export function useLocations() {
                 currentLocation.value.lat,
                 currentLocation.value.long,
               ).toFixed(1) + ' mi',
-          tag:
-            loc.deviceType === 'Camera'
-              ? ''
-              : !loc.gaugeHeight || loc.gaugeHeight === -9999.9
-                ? 'No data'
-                : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`,
+          tags: getLocationTags(loc),
           src: loc.imageUrl,
         },
         actionStage: loc.actionStage,

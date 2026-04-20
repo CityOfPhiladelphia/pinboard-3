@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader } from '@phila/phila-ui-app-header'
+import type { NavbarBrand } from '@phila/phila-ui-app-header'
 import { FunctionalComponent, h, VNode } from 'vue'
 import MobileNavPanel from './MobileNavPanel.vue'
 
 defineProps<{
   title: string
+  logo?: NavbarBrand['logo']
+  infoTitle?: string
+  infoMessage?: string
   bannerTitle?: string
   bannerMessage?: string
 }>()
@@ -13,6 +17,7 @@ defineProps<{
 const slots = defineSlots<{
   default(): VNode[]
   'mobile-nav'(): VNode[]
+  'info-body'?(): VNode[]
 }>()
 
 const MobileNavContent: FunctionalComponent = () =>
@@ -27,12 +32,19 @@ const MobileNavContent: FunctionalComponent = () =>
       :mobile-nav="$slots['mobile-nav'] ? MobileNavContent : undefined"
       :links="[]"
       :navbar-brand="{
-        brandingImage: { src: '', href: '/', altText: 'City of Philadelphia' },
-        brandingLink: { text: title, href: '/' },
+        brandingImage: { src: '', href: '/', altText: title },
+        brandingLink: logo ? undefined : { text: title, href: '/' },
+        logo: logo,
       }"
       :banner-title="bannerTitle"
       :banner-message="bannerMessage"
-    />
+      :info-title="infoTitle"
+      :info-message="infoMessage"
+    >
+      <template v-if="$slots['info-body']" #info-body>
+        <slot name="info-body" />
+      </template>
+    </AppHeader>
 
     <main class="pinboard-main">
       <slot />
@@ -52,6 +64,7 @@ const MobileNavContent: FunctionalComponent = () =>
 }
 
 .pinboard-main {
+  position: relative;
   flex: 1;
   overflow: hidden;
 }

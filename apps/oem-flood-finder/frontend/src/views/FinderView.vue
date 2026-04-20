@@ -142,10 +142,28 @@ function handleDeselect(id: string) {
       <LocationDetail :location="location as OemLocation" />
     </template>
 
-    <template #map-content="{ hoveredId, selectedId, zoom, onHover, onHoverEnd, onSelect }">
-      <MapNavigationControl position="bottom-right" />
-      <GeolocationButton position="bottom-right" @located="setUserLocation" />
-      <BasemapToggle position="top-right" />
+    <template
+      #map-content="{
+        hoveredId,
+        selectedId,
+        zoom,
+        isMobile,
+        mobileControlsTarget,
+        onHover,
+        onHoverEnd,
+        onSelect,
+      }"
+    >
+      <MapNavigationControl v-if="!isMobile" position="bottom-right" />
+      <BasemapToggle
+        position="top-right"
+        :teleport-to="isMobile ? mobileControlsTarget : undefined"
+      />
+      <GeolocationButton
+        :position="isMobile ? 'top-right' : 'bottom-right'"
+        :teleport-to="isMobile ? mobileControlsTarget : undefined"
+        @located="setUserLocation"
+      />
 
       <div v-if="!isLoading">
         <MapMarker
@@ -156,7 +174,11 @@ function handleDeselect(id: string) {
           <MapIconTextPin
             :zoom="zoom"
             :icon="isGauge(loc) ? faGauge : faCamera"
-            :text="loc.locationCardInfo.tag === 'No data' ? '' : loc.locationCardInfo.tag"
+            :text="
+              loc.locationCardInfo.tags?.[1]?.text !== 'No data'
+                ? loc.locationCardInfo.tags?.[1]?.text
+                : undefined
+            "
             :color-theme="'dark-primary'"
             :color="isGauge(loc) ? undefined : '#3053B6'"
             :hovered="hoveredId === loc.id"

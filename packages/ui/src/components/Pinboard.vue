@@ -1,12 +1,29 @@
 <script setup lang="ts">
 import '@phila/phila-ui-core/styles/template-light.css'
-import { useSlots, inject, ref, computed } from 'vue'
-import { PhilaButton } from '@phila/phila-ui-button'
-import { faMap, faList } from '@fortawesome/pro-solid-svg-icons'
-import { PINBOARD_CONFIG_KEY, Location, LocationFilterOption } from '../types'
+import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
+import {
+  useSlots,
+  inject,
+  ref,
+  computed,
+  onMounted,
+  onUnmounted,
+  watch,
+} from 'vue'
+import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
+import { Search } from '@phila/phila-ui-search'
+import { Tags } from '@phila/phila-ui-tags'
+import { faMap } from '@fortawesome/pro-solid-svg-icons'
+import {
+  PINBOARD_CONFIG_KEY,
+  Location,
+  LocationFilterOption,
+  SortLocationsValues,
+} from '../types'
 import { MapCard } from '@phila/phila-ui-cards'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
+import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 
 defineSlots<{
   nav?(): unknown
@@ -18,15 +35,17 @@ defineSlots<{
     geojson: unknown
     map: unknown
     zoom: number
+    isMobile: boolean
     hoveredId: string | null
     selectedId: string | null
+    mobileControlsTarget: HTMLDivElement | null
     onHover: (id: string) => void
     onHoverEnd: () => void
     onSelect: (loc: Location) => void
   }): unknown
 }>()
 
-defineProps<{
+const props = defineProps<{
   locations: Location[]
   isLoading: boolean
   errorMessage: string | null
@@ -51,13 +70,76 @@ const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
   null
 )
 
+const isMobile = ref(
+  typeof window !== 'undefined' &&
+    window.matchMedia('(max-width: 768px)').matches
+)
+let mql: MediaQueryList | null = null
+
+function onMediaChange(e: MediaQueryListEvent) {
+  isMobile.value = e.matches
+}
+
+onMounted(() => {
+  mql = window.matchMedia('(max-width: 768px)')
+  isMobile.value = mql.matches
+  mql.addEventListener('change', onMediaChange)
+})
+
+// Merge mobile overrides into the map config ONCE at setup — not reactively.
+// Once the map is initialized, we don't want it to re-center or re-zoom if
+// the user changes orientation or resizes across the breakpoint.
+const effectiveMapConfig = (() => {
+  const map = config.map
+  if (!map) return undefined
+  const { mobile, ...base } = map
+  if (isMobile.value && mobile) {
+    return { ...base, ...mobile }
+  }
+  return base
+})()
+
+onUnmounted(() => {
+  mql?.removeEventListener('change', onMediaChange)
+})
+
 const hoveredLocationId = ref<string | null>(null)
 const selectedLocation = ref<Location | null>(null)
-const activeMobilePanel = ref<'list' | 'map'>('list')
+const bottomSheetOpen = ref(true)
+const snapPoints = [15, 50, 100]
+const bottomSheetRef = ref<{
+  snapTo: (index: number) => void
+  displayPercent: number
+  isDragging: boolean
+} | null>(null)
+const mobileControlsTarget = ref<HTMLDivElement | null>(null)
+
+const bottomSheetPercent = computed(
+  () => bottomSheetRef.value?.displayPercent ?? snapPoints[0]
+)
+
+const bottomSheetDragging = computed(
+  () => bottomSheetRef.value?.isDragging ?? false
+)
+
+const mobileControlsStyle = computed(() => ({
+  bottom: `calc(${bottomSheetPercent.value}% + 10px)`,
+  transition: bottomSheetDragging.value ? 'none' : 'bottom 0.3s ease-out',
+}))
+const locationsPanelRef = ref<{
+  scrollToCard: (id: string, behavior?: ScrollBehavior) => void
+} | null>(null)
 
 const selectedLocationId = computed(() =>
   selectedLocation.value === null ? null : selectedLocation.value.id
 )
+
+const locationCountLabel = computed(() => {
+  const n = props.locations.length
+  if (n === 0) return 'No locations match'
+  if (n === 1) return '1 item'
+  return `${n} items`
+})
 
 // Event handlers for location interaction
 function handleHover(id: string) {
@@ -82,29 +164,186 @@ function handleMapSelect(location: Location) {
 }
 
 function closeLocationDetail() {
-  if (selectedLocation.value) {
-    emit('deselect', selectedLocation.value.id)
+  const closedId = selectedLocation.value?.id ?? null
+  if (closedId) {
+    emit('deselect', closedId)
   }
-  selectedLocation.value = null
+
+  if (isMobile.value && closedId) {
+    bottomSheetRef.value?.snapTo(1)
+    // Re-center the card in the shrunken list viewport AFTER the sheet
+    // snap animation finishes. Keep the list hidden (selectedLocation
+    // still truthy) during the snap so the user doesn't see the card
+    // drift, then reveal at the correct position via an instant scroll.
+    setTimeout(() => {
+      locationsPanelRef.value?.scrollToCard(closedId, 'instant')
+      selectedLocation.value = null
+    }, 350)
+  } else {
+    selectedLocation.value = null
+  }
 }
 
 function handleLocationFilterChange(selectedLocationsFilter: string) {
   emit('selectedLocationsFilter', selectedLocationsFilter)
 }
 
+const mobileSortOption = ref<SortLocationsValues>(SortLocationsValues.None)
+
 function handleLocationSortChange(sortLocationsOption: number) {
   emit('sortLocationsOption', sortLocationsOption)
+}
+
+function handleMobileSortChange() {
+  mobileSortOption.value =
+    ++mobileSortOption.value in SortLocationsValues
+      ? mobileSortOption.value
+      : SortLocationsValues.None
+  emit('sortLocationsOption', mobileSortOption.value)
 }
 
 function handleLocationSearchSubmit(locationsSearchString: string) {
   emit('locationSearchString', locationsSearchString)
 }
+
+watch(selectedLocation, (loc) => {
+  if (loc && isMobile.value) {
+    bottomSheetRef.value?.snapTo(snapPoints.length - 1)
+  }
+})
 </script>
 
 <template>
-  <div class="pinboard">
-    <main class="pinboard-main">
-      <div v-if="selectedLocation !== null" class="detail-overlay">
+  <div v-if="selectedLocation !== null" class="detail-overlay">
+    <button
+      class="detail-close-btn"
+      @click="closeLocationDetail"
+      aria-label="Close details"
+    >
+      ×
+    </button>
+    <slot name="location-detail" :location="selectedLocation" />
+  </div>
+  <div class="finder-panel">
+    <div class="finder-panel-locations">
+      <slot name="locations-header" />
+
+      <div v-if="isLoading" class="location-list">
+        <MapCard v-for="n in 5" :key="n" :is-loading="true" />
+      </div>
+
+      <div
+        v-else-if="errorMessage"
+        class="status-message status-message--error"
+      >
+        {{ errorMessage }}
+      </div>
+
+      <LocationsPanel
+        v-else-if="!isLoading"
+        :locations="locations"
+        :location-filter="locationPanelFilter"
+        :location-search="locationPanelSearch"
+        :hovered-id="hoveredLocationId"
+        :selected-id="selectedLocationId"
+        @select="handleSelect"
+        @hover="handleHover"
+        @hover-end="handleHoverEnd"
+        @search-string="handleLocationSearchSubmit"
+        @selected-filter="handleLocationFilterChange"
+        @sort-option="handleLocationSortChange"
+      />
+    </div>
+
+    <div class="finder-panel-map">
+      <MapPanel
+        ref="mapPanelRef"
+        :config="effectiveMapConfig"
+        :is-loading="isLoading"
+        :is-mobile="isMobile"
+        :locations="locations"
+        :geojson="geojson"
+        :hovered-id="hoveredLocationId"
+        :selected-id="selectedLocationId"
+        :mobile-controls-target="mobileControlsTarget"
+        :map-content-slot="slots['map-content']"
+        :on-hover="handleHover"
+        :on-hover-end="handleHoverEnd"
+        :on-select="handleMapSelect"
+      />
+      <div
+        v-if="isMobile"
+        ref="mobileControlsTarget"
+        class="mobile-controls-float"
+        :style="mobileControlsStyle"
+      />
+      <div class="mobile-map-search-filter">
+        <Search
+          v-if="locationPanelSearch"
+          class-name="mobile-search"
+          :placeholder="locationPanelSearch"
+        />
+        <LocationSearchFilterPanel
+          v-if="locationPanelFilter"
+          :filterOptions="locationPanelFilter"
+          @selected-filter="handleLocationFilterChange"
+        />
+      </div>
+    </div>
+  </div>
+  <BottomSheet
+    ref="bottomSheetRef"
+    v-model="bottomSheetOpen"
+    :snap-points="snapPoints"
+    collapse-label="Map view"
+    :collapse-icon="faMap"
+    class="mobile-bottom-sheet"
+  >
+    <div class="bottom-sheet-stack">
+      <div
+        class="bottom-sheet-list-scroll"
+        :class="{ 'is-hidden': selectedLocation }"
+      >
+        <slot name="locations-header" />
+        <div v-if="!isLoading && !errorMessage" class="location-count">
+          <span>{{ locationCountLabel }}</span>
+          <Tags
+            variant="action"
+            size="large"
+            color="grey"
+            text="Sort"
+            :selected="mobileSortOption !== SortLocationsValues.None"
+            @update:selected="handleMobileSortChange()"
+          />
+        </div>
+
+        <div v-if="isLoading" class="location-list">
+          <MapCard v-for="n in 5" :key="n" :is-loading="true" />
+        </div>
+
+        <div
+          v-else-if="errorMessage"
+          class="status-message status-message--error"
+        >
+          {{ errorMessage }}
+        </div>
+
+        <LocationsPanel
+          v-else
+          ref="locationsPanelRef"
+          :locations="locations"
+          :location-filter="locationPanelFilter"
+          :location-search="locationPanelSearch"
+          :hovered-id="hoveredLocationId"
+          :selected-id="selectedLocationId"
+          @select="handleSelect"
+          @hover="handleHover"
+          @hover-end="handleHoverEnd"
+          @selected-filter="handleLocationFilterChange"
+        />
+      </div>
+
+      <div v-if="selectedLocation" class="bottom-sheet-detail">
         <button
           class="detail-close-btn"
           @click="closeLocationDetail"
@@ -114,71 +353,8 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
         </button>
         <slot name="location-detail" :location="selectedLocation" />
       </div>
-      <div class="finder-panel">
-        <div
-          class="finder-panel-locations"
-          :class="{ 'is-active': activeMobilePanel === 'list' }"
-        >
-          <slot name="locations-header" />
-
-          <div v-if="isLoading" class="location-list">
-            <MapCard v-for="n in 5" :key="n" :is-loading="true" />
-          </div>
-
-          <div
-            v-else-if="errorMessage"
-            class="status-message status-message--error"
-          >
-            {{ errorMessage }}
-          </div>
-
-          <LocationsPanel
-            v-else-if="!isLoading"
-            :locations="locations"
-            :location-filter="locationPanelFilter"
-            :location-search="locationPanelSearch"
-            :hovered-id="hoveredLocationId"
-            :selected-id="selectedLocationId"
-            @select="handleSelect"
-            @hover="handleHover"
-            @hover-end="handleHoverEnd"
-            @search-string="handleLocationSearchSubmit"
-            @selected-filter="handleLocationFilterChange"
-            @sort-option="handleLocationSortChange"
-          />
-        </div>
-
-        <div
-          class="finder-panel-map"
-          :class="{ 'is-active': activeMobilePanel === 'map' }"
-        >
-          <MapPanel
-            ref="mapPanelRef"
-            :config="config.map"
-            :is-loading="isLoading"
-            :locations="locations"
-            :geojson="geojson"
-            :hovered-id="hoveredLocationId"
-            :selected-id="selectedLocationId"
-            :map-content-slot="slots['map-content']"
-            :on-hover="handleHover"
-            :on-hover-end="handleHoverEnd"
-            :on-select="handleMapSelect"
-          />
-        </div>
-      </div>
-      <PhilaButton
-        v-if="selectedLocation === null"
-        class="mobile-panel-toggle"
-        variant="secondary"
-        :icon-definition="activeMobilePanel === 'list' ? faMap : faList"
-        :text="activeMobilePanel === 'list' ? 'Map view' : 'List view'"
-        @click="
-          activeMobilePanel = activeMobilePanel === 'list' ? 'map' : 'list'
-        "
-      />
-    </main>
-  </div>
+    </div>
+  </BottomSheet>
 </template>
 
 <style>
@@ -196,18 +372,6 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
 </style>
 
 <style scoped>
-.pinboard {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.pinboard-main {
-  position: relative;
-  flex: 1;
-  overflow: hidden;
-}
-
 .finder-panel {
   display: grid;
   grid-template-columns: 1fr 2fr;
@@ -240,15 +404,20 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
   overflow: hidden;
 }
 
-.mobile-panel-toggle {
+.location-count {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem 0;
+  font-family: var(--Body-Default-font-body-default-family);
+}
+
+.mobile-bottom-sheet {
   display: none;
-  position: fixed;
-  bottom: 3rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  border-radius: 1.5rem;
+}
+
+.mobile-map-search-filter {
+  display: none;
 }
 
 .detail-overlay {
@@ -263,6 +432,53 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.mobile-bottom-sheet :deep(.bottom-sheet-content) {
+  overflow-x: hidden;
+}
+
+.bottom-sheet-stack {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  background: var(--Schemes-Surface-Bright, white);
+}
+
+.bottom-sheet-list-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.bottom-sheet-list-scroll.is-hidden {
+  visibility: hidden;
+}
+
+.bottom-sheet-detail {
+  position: absolute;
+  inset: 0;
+  padding: 1rem;
+  background: var(--Schemes-Surface-Bright, white);
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  z-index: 2;
+}
+
+.bottom-sheet-detail > * {
+  max-width: 100%;
+}
+
+.bottom-sheet-detail :deep(img) {
+  max-width: 100%;
+  height: auto;
+}
+
+.bottom-sheet-detail::-webkit-scrollbar {
+  display: none;
 }
 
 .detail-close-btn {
@@ -289,43 +505,81 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
 }
 
 @media (max-width: 768px) {
-  .finder-panel-locations {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-right: none;
-    display: none;
-  }
-
-  .finder-panel-locations.is-active {
-    display: flex;
-  }
-
-  .finder-panel-map {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: none;
-  }
-
-  .finder-panel-map.is-active {
+  .finder-panel {
+    position: relative;
     display: block;
   }
 
-  .finder-panel {
-    position: relative;
+  .finder-panel-locations {
+    display: none;
   }
 
-  .mobile-panel-toggle {
-    display: inline-flex;
+  .finder-panel-map {
+    width: 100%;
+    height: 100%;
+  }
+
+  .mobile-bottom-sheet {
+    display: block;
+  }
+
+  .mobile-controls-float {
+    position: absolute;
+    right: 10px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    pointer-events: none;
+  }
+
+  .mobile-controls-float > :deep(*) {
+    pointer-events: auto;
+  }
+
+  .mobile-map-search-filter {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    padding: 10px 24px;
+  }
+
+  .mobile-map-search-filter :deep(.mobile-search) {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .mobile-map-search-filter :deep(.mobile-search .state-layer),
+  .mobile-map-search-filter :deep(.mobile-search .content) {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .mobile-map-search-filter :deep(.mobile-search .phila-text-field) {
+    padding: 0 var(--scale-small, 0.5rem) !important;
+  }
+
+  .mobile-map-search-filter :deep(.location-filters) {
+    padding: 0.25rem 0 0;
+    padding-left: 2px;
+    gap: 0.25rem;
+  }
+
+  .mobile-map-search-filter :deep(.location-sort) {
+    display: none;
+  }
+
+  .mobile-bottom-sheet :deep(.location-filters),
+  .mobile-bottom-sheet :deep(.location-search) {
+    display: none;
   }
 
   .detail-overlay {
-    width: 100%;
+    display: none;
   }
 }
 </style>
