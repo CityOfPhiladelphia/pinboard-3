@@ -16,7 +16,7 @@ import { SortLocationsValues } from '../../../../../packages/ui/src/types'
 import LocationDetail from '@/components/LocationDetail.vue'
 import { computed, ref, reactive, watch } from 'vue'
 
-const { locations, isLoading, errorMessage } = useLocations()
+const { oemLocations, isLoading, errorMessage } = useLocations()
 const { userCoords, setUserLocation } = useUserLocation()
 watch(userCoords, (coords) => console.log('user coords:', coords))
 const locationSearchString = ref<string>('')
@@ -25,10 +25,10 @@ const locationSortMode = ref<number>(SortLocationsValues.None)
 const searchPlaceholderText = 'Search by address or keyword...'
 
 const filteredLocations = computed(() => {
-  if (isLoading.value || errorMessage.value) {
+  if (isLoading.value || errorMessage.value || !oemLocations.value) {
     return []
   }
-  const locs: OemLocation[] = [...locations.value]
+  const locs: OemLocation[] = [...oemLocations.value]
   switch (locationFilterMode.value) {
     case 'gauges': {
       return locs.filter((loc) => isGauge(loc))
