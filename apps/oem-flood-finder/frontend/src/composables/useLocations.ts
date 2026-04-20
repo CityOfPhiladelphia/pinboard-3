@@ -14,12 +14,12 @@ function getLocationTags(loc: LocationListDTO): OemLocation['locationCardInfo'][
 }
 
 export function useLocations() {
-  let locationListDTO = ref<LocationListDTO[] | null>(null)
-  let currentLocation = ref<{ lat: number; long: number } | null>(null)
-  let isLoading = ref<boolean>(true)
-  let errorMessage = ref<string | null>(null)
+  const locationListDTO = ref<LocationListDTO[] | null>(null)
+  const currentLocation = ref<{ lat: number; long: number } | null>(null)
+  const isLoading = ref<boolean>(true)
+  const errorMessage = ref<string | null>(null)
 
-  let oemLocations = computed(() => {
+  const oemLocations = computed(() => {
 
     const result: OemLocation[] = []
 
