@@ -13,13 +13,9 @@ import type { Filters, OemLocation } from '@/types'
 import { sortLocationsOptions } from '@/types'
 import type { LocationFilterOption } from '@ui/types'
 import LocationDetail from '@/components/LocationDetail.vue'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
-import { useUserLocation } from '@/composables/useUserLocation'
-const { userCoords, setUserLocation } = useUserLocation()
-watch(userCoords, (coords) => console.log('user coords:', coords))
-
-const { locations, isLoading, errorMessage } = useLocations()
+const { oemLocations, isLoading, errorMessage } = useLocations()
 const locationSearchString = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
 const locationSortMode = ref<string>('')
@@ -27,19 +23,19 @@ const visitedIds = ref(new Set<string>())
 const searchPlaceholderText = 'Search by address or keyword...'
 
 const filteredLocations = computed(() => {
-  if (isLoading.value || errorMessage.value) {
+  if (isLoading.value || errorMessage.value || !oemLocations.value) {
     return []
   }
   switch (locationFilterMode.value) {
     case 'gauges': {
-      return locations.value.filter((loc) => isGauge(loc))
+      return oemLocations.value.filter((loc) => isGauge(loc))
     }
     case 'cameras': {
-      return locations.value.filter((loc) => loc.deviceType === 'Camera')
+      return oemLocations.value.filter((loc) => loc.deviceType === 'Camera')
     }
     case 'all':
     default: {
-      return locations.value
+      return oemLocations.value
     }
   }
 })
@@ -156,7 +152,6 @@ function handleDeselect(id: string) {
       <GeolocationButton
         :position="isMobile ? 'top-right' : 'bottom-right'"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
-        @located="setUserLocation"
       />
 
       <div v-if="!isLoading">
