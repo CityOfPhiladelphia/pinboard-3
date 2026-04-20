@@ -1,8 +1,10 @@
 import type { LocationListDTO, OemLocation } from '@/types'
 import { ref, onMounted, computed } from 'vue'
 import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
+import type { TagsProps } from '@phila/phila-ui-tags'
+import type { LocationListDTO, OemLocation } from '@/types'
 
-function getLocationTags(loc: LocationListDTO): OemLocation['locationCardInfo']['tags'] {
+function getLocationTags(loc: LocationListDTO): TagsProps[] {
   if (loc.deviceType === 'Camera') {
     return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
   }
@@ -40,11 +42,11 @@ export function useLocations() {
             currentLocation.value === null
               ? undefined
               : getHaversineDistance(
-                  loc.latitude,
-                  loc.longitude,
-                  currentLocation.value.lat,
-                  currentLocation.value.long,
-                ).toFixed(1) + ' mi',
+                loc.latitude,
+                loc.longitude,
+                currentLocation.value.lat,
+                currentLocation.value.long,
+              ).toFixed(1) + ' mi',
           tags: getLocationTags(loc),
           src: loc.imageUrl,
         },
