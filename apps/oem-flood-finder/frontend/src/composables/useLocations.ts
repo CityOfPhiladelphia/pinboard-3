@@ -3,16 +3,17 @@ import { ref, onMounted, computed } from 'vue'
 import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
 import type { TagsProps } from '@phila/phila-ui-tags'
 
-function getLocationTags(loc: LocationListDTO): TagsProps[] {
-  if (loc.deviceType === 'Camera') {
-    return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
-  }
-  const gaugeValue =
-    !loc.gaugeHeight || loc.gaugeHeight === -9999.9
-      ? 'No data'
-      : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
-  return [{ text: 'Gauge', color: 'blue' as const, iconDefinition: faWater }, { text: gaugeValue }]
-}
+// function getLocationTags(loc: LocationListDTO): TagsProps[] {
+//   if (loc.deviceType === 'Camera') {
+//     return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
+//   }
+//   const gaugeValue =
+//     !loc.gaugeHeight || loc.gaugeHeight === -9999.9
+//       ? 'No data'
+//       : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
+
+//   return [{ text: 'Gauge', color: 'blue' as const, iconDefinition: faWater }, { text: gaugeValue }]
+// }
 
 export function useLocations() {
   const locationListDTO = ref<LocationListDTO[] | null>(null)
@@ -41,12 +42,21 @@ export function useLocations() {
             currentLocation.value === null
               ? undefined
               : getHaversineDistance(
-                  loc.latitude,
-                  loc.longitude,
-                  currentLocation.value.lat,
-                  currentLocation.value.long,
-                ).toFixed(1) + ' mi',
-          tags: getLocationTags(loc),
+                loc.latitude,
+                loc.longitude,
+                currentLocation.value.lat,
+                currentLocation.value.long,
+              ).toFixed(1) + ' mi',
+
+          tags: loc.deviceType === 'Camera'
+            ? [
+              { text: 'Camera', color: 'purple', iconDefinition: faCamera }
+            ]
+            : [
+              { text: 'Gauge', color: 'blue', iconDefinition: faWater },
+              { text: !loc.gaugeHeight || loc.gaugeHeight === -9999.9 ? 'No data' : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}` }
+            ],
+
           src: loc.imageUrl,
         },
         actionStage: loc.actionStage,

@@ -1,18 +1,37 @@
 <script setup lang="ts">
 import type { ReadingState } from '@/composables/useLocationDetail'
 import type { OemLocation } from '@/types'
+import { LineChart, type ChartData, type LevelArea } from '@phila/phila-ui-charts'
+import { computed, type ComputedRef, type Ref } from 'vue'
 
-defineProps<{
+const props = defineProps<{
   readingState: ReadingState
   location: OemLocation
 }>()
+
+let chartData: Ref<ChartData[]> = computed(() => {
+  if (props.readingState.kind === 'Loaded' && props.readingState.data) {
+    return props.readingState.data.map((reading) => ({
+      x: reading.validTimeUTC.toString(),
+      y: reading.gaugeHeight,
+    }))
+  }
+  return []
+})
+
+// 2026-02-12T16:40:23z
 </script>
 
 <template>
   <progress v-if="readingState.kind === 'Loading'" />
 
   <div v-else-if="readingState.kind === 'Loaded'">
-    <!-- Graph will go here -->
+    <LineChart
+      :data="chartData"
+      :y-label="`Stage (${readingState.data[0]?.gaugeHeightUnit})`"
+      :minimum-y-level="0"
+    />
+
     <table v-if="location.deviceType === 'Aware'">
       <thead>
         <tr>

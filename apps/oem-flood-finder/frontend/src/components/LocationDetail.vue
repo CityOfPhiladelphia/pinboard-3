@@ -12,7 +12,7 @@ const props = defineProps<{
 const readingState = useLocationDetail(
   () => props.location.id,
   () => props.location.deviceType,
-  5,
+  30,
 )
 
 const lastUpdatedDate = computed(() => {
