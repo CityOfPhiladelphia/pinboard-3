@@ -7,7 +7,7 @@ export function useSearchSuggestions(search: string | Ref<string, string>) {
 
   async function getSearchSuggestions() {
     const stringValue = toValue(search)
-    console.log(stringValue)
+    // console.log(stringValue)
     if (!stringValue || stringValue.length < 3) {
       return []
     }

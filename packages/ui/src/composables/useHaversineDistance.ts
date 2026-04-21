@@ -26,7 +26,6 @@ export function useHaversineDistance(
   const haversineDistance = (R * c * 0.621371).toFixed(
     decimalPrecisionFloor <= 20 ? decimalPrecisionFloor : 20
   ) // convert to miles
-  console.log(haversineDistance)
 
   return haversineDistance
 }

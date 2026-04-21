@@ -21,7 +21,7 @@ import type { LocationFilterOption } from '@ui/types'
 import LocationDetail from '@/components/LocationDetail.vue'
 import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation } from '@/types'
-import { sortLocationsOptions } from '@/types'
+import type { SortLocationsOptions } from '@ui/types'
 
 // app variables
 const searchPlaceholderText = 'Search by address or keyword...'
@@ -30,15 +30,28 @@ const filterOptions: LocationFilterOption[] = [
   { value: 'gauges' satisfies Filters, label: 'Gauge' },
   { value: 'cameras' satisfies Filters, label: 'Camera' },
 ]
+const sortLocationsOptionsAlpha: SortLocationsOptions = {
+  AlphaAsc: 'Alpha-Asc',
+  AlphaDes: 'Alpha-Des',
+}
+const sortLocationsOptionsDist: SortLocationsOptions = {
+  DistAsc: 'Dist-Asc',
+  DistDes: 'Dist-Des',
+}
 
 // refs
-const { oemLocations, isLoading, errorMessage } = useLocations()
+const { oemLocations, currentLocation, isLoading, errorMessage } = useLocations()
 const locationSearchString = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
 const locationSortMode = ref<string>('')
 const visitedIds = ref(new Set<string>())
 
 // conputed refs
+const sortLocationsOptions = computed(() => {
+  return currentLocation.value
+    ? { ...sortLocationsOptionsAlpha, ...sortLocationsOptionsDist }
+    : sortLocationsOptionsAlpha
+})
 const filteredLocations = computed(() => {
   if (isLoading.value || errorMessage.value || !oemLocations.value) {
     return []
@@ -79,20 +92,24 @@ const filteredAndSortedLocations = computed(() => {
   const locs: OemLocation[] = [...searchMatchedLocations.value]
   switch (locationSortMode.value) {
     case 'AlphaAsc': {
-      const sorted = locs.sort((a, b) => a.name.localeCompare(b.name))
-      return sorted
+      return locs.sort((a, b) => a.name.localeCompare(b.name))
     }
     case 'AlphaDes': {
-      const sorted = locs.sort((a, b) => b.name.localeCompare(a.name))
-      return sorted
+      return locs.sort((a, b) => b.name.localeCompare(a.name))
     }
     case 'DistAsc': {
-      // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
-      return locs
+      return locs.sort(
+        (a, b) =>
+          Number(a.locationCardInfo.subheader?.replace(' mi', '')) -
+          Number(b.locationCardInfo.subheader?.replace(' mi', '')),
+      )
     }
     case 'DistDes': {
-      // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
-      return locs
+      return locs.sort(
+        (a, b) =>
+          Number(b.locationCardInfo.subheader?.replace(' mi', '')) -
+          Number(a.locationCardInfo.subheader?.replace(' mi', '')),
+      )
     }
     default: {
       return locs

@@ -1,7 +1,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
 import type { TagsProps } from '@phila/phila-ui-tags'
-import { useHaversineDistance } from '../../../../../packages/ui/src/composables/useHaversineDistance'
+import { useHaversineDistance } from '@ui/composables/useHaversineDistance'
 import type { LocationListDTO, OemLocation } from '@/types'
 
 function getLocationTags(loc: LocationListDTO): TagsProps[] {
@@ -54,7 +54,7 @@ export function useLocations() {
         minorStage: loc.minorStage,
         moderateStage: loc.moderateStage,
         majorStage: loc.majorStage,
-      } satisfies OemLocation)
+      })
     }
 
     return result
@@ -88,5 +88,5 @@ export function useLocations() {
     isLoading.value = false
   })
 
-  return { oemLocations, isLoading, errorMessage }
+  return { oemLocations, currentLocation, isLoading, errorMessage }
 }
