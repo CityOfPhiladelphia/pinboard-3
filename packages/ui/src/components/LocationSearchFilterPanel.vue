@@ -14,25 +14,34 @@ To render a feature:
  -->
 
 <script setup lang="ts">
-import { ref, computed, ComputedRef } from 'vue'
+// vue imports
+import { ref, computed } from 'vue'
+
+// 3rd party imports
+// philly ui imports
 import { Search } from '@phila/phila-ui-search'
 import { Menu } from '@phila/phila-ui-menu'
+
+// pinboard component imports
 import LocationFilter from './LocationFilter.vue'
+
+// type imports
 import type {
   LocationFilterOption,
-  SearchMode,
   SortLocationsOptions,
   AisAutocompleteResult,
   MenuOption,
 } from '../types'
 import { StreetAddress, Zipcode } from '../types'
 
+// props
 const props = defineProps<{
   searchPlaceholder?: string
   filterOptions?: LocationFilterOption[]
   sortOptions?: SortLocationsOptions
 }>()
 
+// emits
 const emit = defineEmits<{
   searchString: [search: string]
   selectedFilter: [filter: string]
@@ -40,10 +49,12 @@ const emit = defineEmits<{
   searchMode: [mode: string]
 }>()
 
+// refs
 const sortOption = ref<string>('')
 const searchString = ref<string>('')
 const searchSuggestions = ref<string[]>([])
 
+// computed refs
 const sortChoices = computed(() => {
   const sortOptions = props.sortOptions ?? {}
   const choices: MenuOption[] = Array.from(
@@ -58,7 +69,7 @@ const sortChoices = computed(() => {
   return choices
 })
 
-const searchMode: ComputedRef<SearchMode> = computed(() => {
+const searchMode = computed(() => {
   switch (true) {
     case StreetAddress.test(searchString.value): {
       return 'address'
@@ -75,27 +86,7 @@ const searchMode: ComputedRef<SearchMode> = computed(() => {
   }
 })
 
-async function updateSearchSuggestions(): Promise<string[]> {
-  if (
-    searchString.value.length < 3 ||
-    !/^\d{1,5}(?:-\d{1,5})?(?: [NnSs])? [A-Za-z ]*/.test(searchString.value)
-  ) {
-    return []
-  }
-  const suggestions: AisAutocompleteResult = await (
-    await fetch(
-      `https://ais-autocomplete.citygeo.phila.city/autocomplete?q=${searchString.value.replace(/ /, '+')}`
-    )
-  ).json()
-  const suggestedAddresses = suggestions.count
-    ? Array.from(
-        suggestions.results.addresses,
-        (suggestion) => suggestion.address
-      )
-    : []
-  return suggestedAddresses
-}
-
+// event handlers
 function handleFilterChange(option: string) {
   emit('selectedFilter', option)
 }
@@ -119,6 +110,28 @@ async function handleSearchChange(search: string) {
 
 function handleSearchSubmit() {
   emit('searchString', searchString.value)
+}
+
+// utility functions
+async function updateSearchSuggestions(): Promise<string[]> {
+  if (
+    searchString.value.length < 3 ||
+    !/^\d{1,5}(?:-\d{1,5})?(?: [NnSs])? [A-Za-z ]*/.test(searchString.value)
+  ) {
+    return []
+  }
+  const suggestions: AisAutocompleteResult = await (
+    await fetch(
+      `https://ais-autocomplete.citygeo.phila.city/autocomplete?q=${searchString.value.replace(/ /, '+')}`
+    )
+  ).json()
+  const suggestedAddresses = suggestions.count
+    ? Array.from(
+        suggestions.results.addresses,
+        (suggestion) => suggestion.address
+      )
+    : []
+  return suggestedAddresses
 }
 </script>
 

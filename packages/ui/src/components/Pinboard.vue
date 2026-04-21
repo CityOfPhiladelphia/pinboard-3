@@ -131,7 +131,7 @@ watch(selectedLocation, (loc) => {
   }
 })
 
-// Event handlers for location interaction
+// event handlers
 function handleHover(id: string) {
   hoveredLocationId.value = id
 }
