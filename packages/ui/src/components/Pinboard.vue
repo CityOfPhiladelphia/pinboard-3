@@ -25,6 +25,9 @@ import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 
+// pinboard composables imports
+import { useSearchSuggestions } from '../composables/useSearchSuggestions'
+
 // type imports
 import {
   PINBOARD_CONFIG_KEY,
@@ -67,6 +70,7 @@ const props = defineProps<{
 // emits to parent app to handle
 const emit = defineEmits<{
   locationSearchString: [search: string]
+  search: [search: void]
   selectedLocationsFilter: [filter: string]
   sortLocationsOption: [sort: string]
   deselect: [locationId: string]
@@ -99,6 +103,9 @@ const locationsPanelRef = ref<{
 const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
   null
 )
+const searchString = ref<string>('')
+const { searchSuggestions, searchSuggestionsError } =
+  useSearchSuggestions(searchString)
 
 // computed refs
 const bottomSheetPercent = computed(
@@ -161,8 +168,12 @@ function handleLocationSortChange(sortLocationsOption: string) {
   emit('sortLocationsOption', sortLocationsOption)
 }
 
-function handleLocationSearchSubmit(locationsSearchString: string) {
-  emit('locationSearchString', locationsSearchString)
+function handleSearchChange(search: string) {
+  if (searchSuggestions.value) {
+    console.log('locationSearchChange:', searchSuggestions.value)
+  }
+  searchString.value = search
+  emit('locationSearchString', search)
 }
 
 function handleCloseLocationDetail() {
@@ -253,7 +264,8 @@ const effectiveMapConfig = (() => {
         @select="handleSelect"
         @hover="handleHover"
         @hover-end="handleHoverEnd"
-        @search-string="handleLocationSearchSubmit"
+        @search-string="handleSearchChange"
+        @search="emit('search')"
         @selected-filter="handleLocationFilterChange"
         @sort-option="handleLocationSortChange"
       />
@@ -286,7 +298,11 @@ const effectiveMapConfig = (() => {
           v-if="locationPanelSearch"
           class-name="mobile-search"
           :placeholder="locationPanelSearch"
+          @update:modelValue="handleSearchChange"
+          @search="emit('search')"
         />
+        <div v-if="searchSuggestions"></div>
+        <div v-if="searchSuggestionsError"></div>
         <LocationSearchFilterPanel
           v-if="locationPanelFilter"
           :filterOptions="locationPanelFilter"

@@ -25,14 +25,16 @@ import { Menu } from '@phila/phila-ui-menu'
 // pinboard component imports
 import LocationFilter from './LocationFilter.vue'
 
+// pinboard composables imports
+import { useSearchSuggestions } from '../composables/useSearchSuggestions'
+
 // type imports
 import type {
   LocationFilterOption,
   SortLocationsOptions,
-  AisAutocompleteResult,
   MenuOption,
 } from '../types'
-import { StreetAddress, Zipcode } from '../types'
+// import { StreetAddress, Zipcode } from '../types'
 
 // props
 const props = defineProps<{
@@ -44,15 +46,16 @@ const props = defineProps<{
 // emits
 const emit = defineEmits<{
   searchString: [search: string]
+  search: [search: void]
   selectedFilter: [filter: string]
   sortOption: [sort: string]
-  searchMode: [mode: string]
 }>()
 
 // refs
 const sortOption = ref<string>('')
 const searchString = ref<string>('')
-const searchSuggestions = ref<string[]>([])
+const { searchSuggestions, searchSuggestionsError } =
+  useSearchSuggestions(searchString)
 
 // computed refs
 const sortChoices = computed(() => {
@@ -69,22 +72,22 @@ const sortChoices = computed(() => {
   return choices
 })
 
-const searchMode = computed(() => {
-  switch (true) {
-    case StreetAddress.test(searchString.value): {
-      return 'address'
-    }
-    case Zipcode.test(searchString.value): {
-      return 'zipcode'
-    }
-    case searchString.value !== '': {
-      return 'keyword'
-    }
-    default: {
-      return false
-    }
-  }
-})
+// const searchMode = computed(() => {
+//   switch (true) {
+//     case StreetAddress.test(searchString.value): {
+//       return 'address'
+//     }
+//     case Zipcode.test(searchString.value): {
+//       return 'zipcode'
+//     }
+//     case searchString.value !== '': {
+//       return 'keyword'
+//     }
+//     default: {
+//       return false
+//     }
+//   }
+// })
 
 // event handlers
 function handleFilterChange(option: string) {
@@ -97,42 +100,15 @@ function handleSortChange(value: string | string[]) {
   emit('sortOption', sortOption.value)
 }
 
-async function handleSearchChange(search: string) {
+function handleSearchChange(search: string) {
+  emit('searchString', search)
+  if (searchSuggestions.value) {
+    console.log('locationSearchChange:', searchSuggestions.value)
+  }
   searchString.value = search
-  searchSuggestions.value = await updateSearchSuggestions()
-  if (searchSuggestions.value.length) {
-    console.log('handleSearchChange:', searchSuggestions.value)
-  }
-  if (searchMode.value && searchString.value === '') {
-    emit('searchString', searchString.value)
-  }
-}
-
-function handleSearchSubmit() {
-  emit('searchString', searchString.value)
 }
 
 // utility functions
-async function updateSearchSuggestions(): Promise<string[]> {
-  if (
-    searchString.value.length < 3 ||
-    !/^\d{1,5}(?:-\d{1,5})?(?: [NnSs])? [A-Za-z ]*/.test(searchString.value)
-  ) {
-    return []
-  }
-  const suggestions: AisAutocompleteResult = await (
-    await fetch(
-      `https://ais-autocomplete.citygeo.phila.city/autocomplete?q=${searchString.value.replace(/ /, '+')}`
-    )
-  ).json()
-  const suggestedAddresses = suggestions.count
-    ? Array.from(
-        suggestions.results.addresses,
-        (suggestion) => suggestion.address
-      )
-    : []
-  return suggestedAddresses
-}
 </script>
 
 <template>
@@ -142,8 +118,10 @@ async function updateSearchSuggestions(): Promise<string[]> {
       class="location-search"
       :placeholder="searchPlaceholder"
       @update:modelValue="handleSearchChange"
-      @search="handleSearchSubmit"
+      @search="emit('search')"
     />
+    <div v-if="searchSuggestions"></div>
+    <div v-if="searchSuggestionsError"></div>
     <LocationFilter
       v-if="filterOptions"
       class="location-filters"

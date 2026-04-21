@@ -34,6 +34,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   select: [location: BasicLocation]
   searchString: [search: string]
+  search: [search: void]
   selectedFilter: [filter: string]
   sortOption: [sort: string]
   hover: [id: string]
@@ -69,7 +70,7 @@ function handleSortChange(sortOption: string) {
   emit('sortOption', sortOption)
 }
 
-function handleSearchSubmit(searchString: string) {
+function handleSearchChange(searchString: string) {
   emit('searchString', searchString)
 }
 
@@ -98,7 +99,8 @@ defineExpose({ scrollToCard })
     :sortOptions="locationSort"
     @selected-filter="handleFilterChange"
     @sort-option="handleSortChange"
-    @search-string="handleSearchSubmit"
+    @search-string="handleSearchChange"
+    @search="emit('search')"
   />
   <div ref="listRef" class="location-list content">
     <MapCard

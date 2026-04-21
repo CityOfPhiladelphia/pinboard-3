@@ -1,7 +1,8 @@
-import type { LocationListDTO, OemLocation } from '@/types'
 import { ref, onMounted, computed } from 'vue'
 import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
 import type { TagsProps } from '@phila/phila-ui-tags'
+import { useHaversineDistance } from '../../../../../packages/ui/src/composables/useHaversineDistance'
+import type { LocationListDTO, OemLocation } from '@/types'
 
 function getLocationTags(loc: LocationListDTO): TagsProps[] {
   if (loc.deviceType === 'Camera') {
@@ -28,6 +29,14 @@ export function useLocations() {
     }
 
     for (const loc of locationListDTO.value) {
+      const distance =
+        currentLocation.value === null
+          ? undefined
+          : useHaversineDistance(
+              { latitude: loc.latitude, longitude: loc.longitude },
+              { latitude: currentLocation.value.lat, longitude: currentLocation.value.long },
+              1,
+            )
       result.push({
         id: loc.id,
         name: loc.name,
@@ -37,15 +46,7 @@ export function useLocations() {
         deviceType: loc.deviceType,
         locationCardInfo: {
           heading: loc.name,
-          subheader:
-            currentLocation.value === null
-              ? undefined
-              : getHaversineDistance(
-                  loc.latitude,
-                  loc.longitude,
-                  currentLocation.value.lat,
-                  currentLocation.value.long,
-                ).toFixed(1) + ' mi',
+          subheader: distance ? `${distance} mi` : distance,
           tags: getLocationTags(loc),
           src: loc.imageUrl,
         },
@@ -88,30 +89,4 @@ export function useLocations() {
   })
 
   return { oemLocations, isLoading, errorMessage }
-}
-
-/**
- * @returns distance in miles
- */
-function getHaversineDistance(
-  deviceLat: number,
-  deviceLong: number,
-  userLat: number,
-  userLong: number,
-): number {
-  const R = 6371 // Earth's mean radius in kilometers
-
-  const dLat = (userLat - deviceLat) * (Math.PI / 180)
-  const dLon = (userLong - deviceLong) * (Math.PI / 180)
-
-  const lat1 = deviceLat * (Math.PI / 180)
-  const lat2 = userLat * (Math.PI / 180)
-
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-
-  return R * c * 0.621371 // convert to miles
 }
