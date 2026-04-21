@@ -7,12 +7,10 @@ Search, filter, and sort will only render if a prop for them is passed into Loca
 Features in component have minimal state and logic.
 They will emit current values, and the logic for handling those values will be done in the parent app.
 
-
-
 To render a feature:
   Search: string - placeholder string to render inside search bar
   Filter: string[] - array of string to match
-  Sort: enum -
+  Sort: SortLocationsOptions - Object that will be converted into MenuOption[]
  -->
 
 <script setup lang="ts">
@@ -42,6 +40,10 @@ const emit = defineEmits<{
   searchMode: [mode: string]
 }>()
 
+const sortOption = ref<string>('')
+const searchString = ref<string>('')
+const searchSuggestions = ref<string[]>([])
+
 const sortChoices = computed(() => {
   const sortOptions = props.sortOptions ?? {}
   const choices: MenuOption[] = Array.from(
@@ -55,10 +57,6 @@ const sortChoices = computed(() => {
   )
   return choices
 })
-
-const sortOption = ref<string>('')
-const searchString = ref<string>('')
-const searchSuggestions = ref<string[]>([])
 
 const searchMode: ComputedRef<SearchMode> = computed(() => {
   switch (true) {
@@ -133,13 +131,12 @@ function handleSearchSubmit() {
       @update:modelValue="handleSearchChange"
       @search="handleSearchSubmit"
     />
-    <div class="location-filters">
-      <LocationFilter
-        v-if="filterOptions"
-        :filterOptions="filterOptions"
-        @selectedFilter="handleFilterChange"
-      />
-    </div>
+    <LocationFilter
+      v-if="filterOptions"
+      class="location-filters"
+      :filterOptions="filterOptions"
+      @selectedFilter="handleFilterChange"
+    />
     <div class="location-sort">
       <Menu
         v-if="sortOptions"
@@ -161,8 +158,8 @@ function handleSearchSubmit() {
 
 .location-search {
   grid-area: search;
-  width: 100%;
   padding: 1rem 1rem 0rem 1rem;
+  width: 100%;
 }
 
 .location-filters {

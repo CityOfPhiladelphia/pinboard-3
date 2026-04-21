@@ -1,13 +1,21 @@
 <script setup lang="ts">
+// vue imports
 import { ref, watch } from 'vue'
+
+// philly ui imports
 import { MapCard } from '@phila/phila-ui-cards'
+
+// pinboard component imports
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
+
+// type imports
 import type {
   BasicLocation,
   LocationFilterOption,
   SortLocationsOptions,
 } from '../types'
 
+// props
 const props = defineProps<{
   locations: BasicLocation[]
   locationSearch?: string
@@ -22,6 +30,7 @@ const props = defineProps<{
   }) => unknown
 }>()
 
+// emits
 const emit = defineEmits<{
   select: [location: BasicLocation]
   searchString: [search: string]
@@ -31,14 +40,14 @@ const emit = defineEmits<{
   'hover-end': []
 }>()
 
+// component variables
+
+// refs
 const pendingKeydown = ref(false)
 const listRef = ref<HTMLElement | null>(null)
+// computed refs
 
-function scrollToCard(id: string, behavior: ScrollBehavior = 'smooth') {
-  const card = listRef.value?.querySelector(`[data-location-id="${id}"]`)
-  card?.scrollIntoView({ behavior, block: 'center' })
-}
-
+// watchers
 watch(
   () => props.selectedId,
   (id) => {
@@ -51,16 +60,7 @@ watch(
     }
   }
 )
-
-defineExpose({ scrollToCard })
-
-function onCardKeyup(location: BasicLocation) {
-  if (pendingKeydown.value) {
-    emit('select', location)
-    pendingKeydown.value = false
-  }
-}
-
+// event handlers
 function handleFilterChange(selectedFilter: string) {
   emit('selectedFilter', selectedFilter)
 }
@@ -72,6 +72,22 @@ function handleSortChange(sortOption: string) {
 function handleSearchSubmit(searchString: string) {
   emit('searchString', searchString)
 }
+
+function handleCardKeyup(location: BasicLocation) {
+  if (pendingKeydown.value) {
+    emit('select', location)
+    pendingKeydown.value = false
+  }
+}
+
+// utility functions
+function scrollToCard(id: string, behavior: ScrollBehavior = 'smooth') {
+  const card = listRef.value?.querySelector(`[data-location-id="${id}"]`)
+  card?.scrollIntoView({ behavior, block: 'center' })
+}
+
+// expose
+defineExpose({ scrollToCard })
 </script>
 
 <template>
@@ -102,7 +118,7 @@ function handleSearchSubmit(searchString: string) {
       @mouseenter="emit('hover', location.id)"
       @mouseleave="emit('hover-end')"
       @keydown.enter="pendingKeydown = true"
-      @keyup.enter="onCardKeyup(location)"
+      @keyup.enter="handleCardKeyup(location)"
     />
   </div>
 </template>

@@ -10,7 +10,7 @@ import {
   watch,
 } from 'vue'
 
-// font-awesome imports
+// 3rd party imports
 import { faMap } from '@fortawesome/pro-solid-svg-icons'
 
 // philly ui imports
@@ -19,13 +19,11 @@ import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css' // what doe
 import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Search } from '@phila/phila-ui-search'
-// import { Tags } from '@phila/phila-ui-tags'
 
-// component imports
+// pinboard component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
-import LocationFilter from './LocationFilter.vue'
 
 // type imports
 import {
@@ -35,6 +33,7 @@ import {
   SortLocationsOptions,
 } from '../types'
 
+// slots
 defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
@@ -54,6 +53,7 @@ defineSlots<{
   }): unknown
 }>()
 
+// props
 const props = defineProps<{
   locations: BasicLocation[]
   isLoading: boolean
@@ -64,7 +64,7 @@ const props = defineProps<{
   geojson?: unknown
 }>()
 
-// emit to parent app to handle
+// emits to parent app to handle
 const emit = defineEmits<{
   locationSearchString: [search: string]
   selectedLocationsFilter: [filter: string]
@@ -72,58 +72,35 @@ const emit = defineEmits<{
   deselect: [locationId: string]
 }>()
 
+// component variables
+const snapPoints = [15, 50, 100]
+let mql: MediaQueryList | null = null
 const config = inject(PINBOARD_CONFIG_KEY)!
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const slots: Record<string, any> = useSlots()
-const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
-  null
-)
 
+// refs
 const isMobile = ref(
   typeof window !== 'undefined' &&
     window.matchMedia('(max-width: 768px)').matches
 )
-let mql: MediaQueryList | null = null
-
-function onMediaChange(e: MediaQueryListEvent) {
-  isMobile.value = e.matches
-}
-
-onMounted(() => {
-  mql = window.matchMedia('(max-width: 768px)')
-  isMobile.value = mql.matches
-  mql.addEventListener('change', onMediaChange)
-})
-
-// Merge mobile overrides into the map config ONCE at setup — not reactively.
-// Once the map is initialized, we don't want it to re-center or re-zoom if
-// the user changes orientation or resizes across the breakpoint.
-const effectiveMapConfig = (() => {
-  const map = config.map
-  if (!map) return undefined
-  const { mobile, ...base } = map
-  if (isMobile.value && mobile) {
-    return { ...base, ...mobile }
-  }
-  return base
-})()
-
-onUnmounted(() => {
-  mql?.removeEventListener('change', onMediaChange)
-})
-
 const hoveredLocationId = ref<string | null>(null)
 const selectedLocation = ref<BasicLocation | null>(null)
 const bottomSheetOpen = ref(true)
-const snapPoints = [15, 50, 100]
 const bottomSheetRef = ref<{
   snapTo: (index: number) => void
   displayPercent: number
   isDragging: boolean
 } | null>(null)
 const mobileControlsTarget = ref<HTMLDivElement | null>(null)
+const locationsPanelRef = ref<{
+  scrollToCard: (id: string, behavior?: ScrollBehavior) => void
+} | null>(null)
+const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
+  null
+)
 
+// computed refs
 const bottomSheetPercent = computed(
   () => bottomSheetRef.value?.displayPercent ?? snapPoints[0]
 )
@@ -136,9 +113,6 @@ const mobileControlsStyle = computed(() => ({
   bottom: `calc(${bottomSheetPercent.value}% + 10px)`,
   transition: bottomSheetDragging.value ? 'none' : 'bottom 0.3s ease-out',
 }))
-const locationsPanelRef = ref<{
-  scrollToCard: (id: string, behavior?: ScrollBehavior) => void
-} | null>(null)
 
 const selectedLocationId = computed(() =>
   selectedLocation.value === null ? null : selectedLocation.value.id
@@ -148,6 +122,13 @@ const locationCountLabel = computed(() => {
   const n = props.locations.length
   if (n === 0) return 'No locations match'
   return `${n} item${n > 1 ? 's' : ''}`
+})
+
+// watchers
+watch(selectedLocation, (loc) => {
+  if (loc && isMobile.value) {
+    bottomSheetRef.value?.snapTo(snapPoints.length - 1)
+  }
 })
 
 // Event handlers for location interaction
@@ -166,13 +147,25 @@ function handleSelect(location: BasicLocation) {
 
 function handleMapSelect(location: BasicLocation) {
   if (selectedLocation.value?.id === location.id) {
-    closeLocationDetail()
+    handleCloseLocationDetail()
   } else {
     selectedLocation.value = location
   }
 }
 
-function closeLocationDetail() {
+function handleLocationFilterChange(selectedLocationsFilter: string) {
+  emit('selectedLocationsFilter', selectedLocationsFilter)
+}
+
+function handleLocationSortChange(sortLocationsOption: string) {
+  emit('sortLocationsOption', sortLocationsOption)
+}
+
+function handleLocationSearchSubmit(locationsSearchString: string) {
+  emit('locationSearchString', locationsSearchString)
+}
+
+function handleCloseLocationDetail() {
   const closedId = selectedLocation.value?.id ?? null
   if (closedId) {
     emit('deselect', closedId)
@@ -193,30 +186,41 @@ function closeLocationDetail() {
   }
 }
 
-function handleLocationFilterChange(selectedLocationsFilter: string) {
-  emit('selectedLocationsFilter', selectedLocationsFilter)
+function handleMediaChange(e: MediaQueryListEvent) {
+  isMobile.value = e.matches
 }
 
-function handleLocationSortChange(sortLocationsOption: string) {
-  emit('sortLocationsOption', sortLocationsOption)
-}
-
-function handleLocationSearchSubmit(locationsSearchString: string) {
-  emit('locationSearchString', locationsSearchString)
-}
-
-watch(selectedLocation, (loc) => {
-  if (loc && isMobile.value) {
-    bottomSheetRef.value?.snapTo(snapPoints.length - 1)
-  }
+// lifecycle functions
+onMounted(() => {
+  mql = window.matchMedia('(max-width: 768px)')
+  isMobile.value = mql.matches
+  mql.addEventListener('change', handleMediaChange)
 })
+
+onUnmounted(() => {
+  mql?.removeEventListener('change', handleMediaChange)
+})
+
+// utility functions
+const effectiveMapConfig = (() => {
+  // Merge mobile overrides into the map config ONCE at setup — not reactively.
+  // Once the map is initialized, we don't want it to re-center or re-zoom if
+  // the user changes orientation or resizes across the breakpoint.
+  const map = config.map
+  if (!map) return undefined
+  const { mobile, ...base } = map
+  if (isMobile.value && mobile) {
+    return { ...base, ...mobile }
+  }
+  return base
+})()
 </script>
 
 <template>
   <div v-if="selectedLocation !== null" class="detail-overlay">
     <button
       class="detail-close-btn"
-      @click="closeLocationDetail"
+      @click="handleCloseLocationDetail"
       aria-label="Close details"
     >
       ×
@@ -283,7 +287,7 @@ watch(selectedLocation, (loc) => {
           class-name="mobile-search"
           :placeholder="locationPanelSearch"
         />
-        <LocationFilter
+        <LocationSearchFilterPanel
           v-if="locationPanelFilter"
           :filterOptions="locationPanelFilter"
           @selected-filter="handleLocationFilterChange"
@@ -307,14 +311,6 @@ watch(selectedLocation, (loc) => {
         <slot name="locations-header" />
         <div v-if="!isLoading && !errorMessage" class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
-          <!-- <Tags
-            variant="action"
-            size="large"
-            color="grey"
-            text="Sort"
-            :selected="true"
-            @update:selected="handleLocationSortChange"
-          /> -->
           <LocationSearchFilterPanel
             v-if="locationPanelSort"
             :sortOptions="locationPanelSort"
@@ -351,7 +347,7 @@ watch(selectedLocation, (loc) => {
       <div v-if="selectedLocation" class="bottom-sheet-detail">
         <button
           class="detail-close-btn"
-          @click="closeLocationDetail"
+          @click="handleCloseLocationDetail"
           aria-label="Close details"
         >
           ×

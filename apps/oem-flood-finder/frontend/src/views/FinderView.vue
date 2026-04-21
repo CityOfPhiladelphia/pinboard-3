@@ -1,4 +1,12 @@
 <script setup lang="ts">
+// vue imports
+import { computed, ref } from 'vue'
+
+// 3rd party imports
+import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
+
+// philly ui imports
+// pinboard imports
 import {
   Pinboard,
   MapMarker,
@@ -7,21 +15,30 @@ import {
   GeolocationButton,
   BasemapToggle,
 } from '@pinboard/ui'
-import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
+import type { LocationFilterOption } from '@ui/types'
+
+// app imports
+import LocationDetail from '@/components/LocationDetail.vue'
 import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation } from '@/types'
 import { sortLocationsOptions } from '@/types'
-import type { LocationFilterOption } from '@ui/types'
-import LocationDetail from '@/components/LocationDetail.vue'
-import { computed, ref } from 'vue'
 
+// app variables
+const searchPlaceholderText = 'Search by address or keyword...'
+const filterOptions: LocationFilterOption[] = [
+  { value: 'all' satisfies Filters, label: 'All' },
+  { value: 'gauges' satisfies Filters, label: 'Gauge' },
+  { value: 'cameras' satisfies Filters, label: 'Camera' },
+]
+
+// refs
 const { oemLocations, isLoading, errorMessage } = useLocations()
 const locationSearchString = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
 const locationSortMode = ref<string>('')
 const visitedIds = ref(new Set<string>())
-const searchPlaceholderText = 'Search by address or keyword...'
 
+// conputed refs
 const filteredLocations = computed(() => {
   if (isLoading.value || errorMessage.value || !oemLocations.value) {
     return []
@@ -83,16 +100,7 @@ const filteredAndSortedLocations = computed(() => {
   }
 })
 
-function isGauge(loc: OemLocation): boolean {
-  return loc.deviceType === 'Aware' || loc.deviceType === 'Usgs'
-}
-
-const filterOptions: LocationFilterOption[] = [
-  { value: 'all' satisfies Filters, label: 'All' },
-  { value: 'gauges' satisfies Filters, label: 'Gauge' },
-  { value: 'cameras' satisfies Filters, label: 'Camera' },
-]
-
+// event handlers
 function handleLocationFilterChange(selectedFilter: string) {
   locationFilterMode.value = selectedFilter as Filters
 }
@@ -111,6 +119,11 @@ function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
 
 function handleDeselect(id: string) {
   visitedIds.value.add(id)
+}
+
+// utility functions
+function isGauge(loc: OemLocation): boolean {
+  return loc.deviceType === 'Aware' || loc.deviceType === 'Usgs'
 }
 </script>
 
