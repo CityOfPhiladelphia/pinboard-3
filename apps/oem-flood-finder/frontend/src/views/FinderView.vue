@@ -15,7 +15,7 @@ import {
   GeolocationButton,
   BasemapToggle,
 } from '@pinboard/ui'
-import type { LocationFilterOption } from '@ui/types'
+import type { LatLon, LocationFilterOption } from '@ui/types'
 
 // app imports
 import LocationDetail from '@/components/LocationDetail.vue'
@@ -30,11 +30,12 @@ const filterOptions: LocationFilterOption[] = [
   { value: 'gauges' satisfies Filters, label: 'Gauge' },
   { value: 'cameras' satisfies Filters, label: 'Camera' },
 ]
-const sortLocationsOptionsAlpha: SortLocationsOptions = {
+const sortLocationsOptionsAlphaOnly: SortLocationsOptions = {
   AlphaAsc: 'Alpha-Asc',
   AlphaDes: 'Alpha-Des',
 }
-const sortLocationsOptionsDist: SortLocationsOptions = {
+const sortLocationsOptionsAlphaDist: SortLocationsOptions = {
+  ...sortLocationsOptionsAlphaOnly,
   DistAsc: 'Dist-Asc',
   DistDes: 'Dist-Des',
 }
@@ -48,9 +49,7 @@ const visitedIds = ref(new Set<string>())
 
 // conputed refs
 const sortLocationsOptions = computed(() => {
-  return currentLocation.value
-    ? { ...sortLocationsOptionsAlpha, ...sortLocationsOptionsDist }
-    : sortLocationsOptionsAlpha
+  return currentLocation.value ? sortLocationsOptionsAlphaDist : sortLocationsOptionsAlphaOnly
 })
 const filteredLocations = computed(() => {
   if (isLoading.value || errorMessage.value || !oemLocations.value) {
@@ -130,6 +129,18 @@ function handleLocationSearchSubmit(locationsSearchString: string) {
   locationSearchString.value = locationsSearchString
 }
 
+function handleGeolocate(locationData: LatLon & { accuracy: number }) {
+  console.log('Geolocation Accuracy: ', locationData.accuracy)
+  currentLocation.value = {
+    latitude: locationData.latitude,
+    longitude: locationData.longitude,
+  }
+}
+
+function handleGeolocateError(error: Error | GeolocationPositionError) {
+  console.log(error)
+}
+
 function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
   onSelect(loc)
 }
@@ -181,6 +192,8 @@ function isGauge(loc: OemLocation): boolean {
       <GeolocationButton
         :position="isMobile ? 'top-right' : 'bottom-right'"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
+        @located="handleGeolocate"
+        @error="handleGeolocateError"
       />
 
       <div v-if="!isLoading">

@@ -1,8 +1,10 @@
 import { ref, onMounted, computed } from 'vue'
 import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
 import type { TagsProps } from '@phila/phila-ui-tags'
-import { useHaversineDistance } from '@ui/composables/useHaversineDistance'
+import type { MapCardProps } from '@phila/phila-ui-cards'
 import type { LocationListDTO, OemLocation } from '@/types'
+import type { LatLon } from '@ui/types'
+import { useHaversineDistance } from '@ui/composables/useHaversineDistance'
 
 function getLocationTags(loc: LocationListDTO): TagsProps[] {
   if (loc.deviceType === 'Camera') {
@@ -17,7 +19,7 @@ function getLocationTags(loc: LocationListDTO): TagsProps[] {
 
 export function useLocations() {
   const locationListDTO = ref<LocationListDTO[] | null>(null)
-  const currentLocation = ref<{ lat: number; long: number } | null>(null)
+  const currentLocation = ref<LatLon | null>(null)
   const isLoading = ref<boolean>(true)
   const errorMessage = ref<string | null>(null)
 
@@ -34,9 +36,19 @@ export function useLocations() {
           ? undefined
           : useHaversineDistance(
               { latitude: loc.latitude, longitude: loc.longitude },
-              { latitude: currentLocation.value.lat, longitude: currentLocation.value.long },
+              {
+                latitude: currentLocation.value.latitude,
+                longitude: currentLocation.value.longitude,
+              },
               1,
             )
+      const cardInfo: MapCardProps = {
+        heading: loc.name,
+        subheader: distance ? `${distance} mi` : distance,
+        tags: getLocationTags(loc),
+        src: loc.imageUrl,
+      }
+
       result.push({
         id: loc.id,
         name: loc.name,
@@ -44,12 +56,7 @@ export function useLocations() {
         longitude: loc.longitude,
         lastUpdated: loc.lastUpdated,
         deviceType: loc.deviceType,
-        locationCardInfo: {
-          heading: loc.name,
-          subheader: distance ? `${distance} mi` : distance,
-          tags: getLocationTags(loc),
-          src: loc.imageUrl,
-        },
+        locationCardInfo: cardInfo,
         actionStage: loc.actionStage,
         minorStage: loc.minorStage,
         moderateStage: loc.moderateStage,
@@ -63,8 +70,8 @@ export function useLocations() {
   if (navigator.geolocation) {
     navigator.geolocation.watchPosition((pos) => {
       currentLocation.value = {
-        lat: pos.coords.latitude,
-        long: pos.coords.longitude,
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
       }
     })
   }
