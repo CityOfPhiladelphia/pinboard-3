@@ -1,4 +1,4 @@
-import { Ref, toValue } from 'vue'
+import { type Ref, toValue } from 'vue'
 import type { LatLon } from '../types'
 
 export function useHaversineDistance(
