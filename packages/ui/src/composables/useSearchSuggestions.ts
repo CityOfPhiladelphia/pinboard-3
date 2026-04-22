@@ -1,4 +1,4 @@
-import { Ref, ref, toValue, watchEffect } from 'vue'
+import { type Ref, ref, toValue, watchEffect } from 'vue'
 import type { AisAutocompleteResult } from '../types'
 
 export function useSearchSuggestions(search: string | Ref<string>) {
