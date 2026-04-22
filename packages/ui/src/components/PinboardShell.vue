@@ -26,7 +26,6 @@ defineSlots<{
     <AppHeader
       id="pinboard-nav"
       :show-trusted-site="true"
-      :mobile-nav="$slots['mobile-nav'] ? MobileNavPanel : undefined"
       :links="[]"
       :navbar-brand="{
         brandingImage: { src: '', href: '/', altText: title },
@@ -38,6 +37,11 @@ defineSlots<{
       :info-title="infoTitle"
       :info-message="infoMessage"
     >
+      <template v-if="$slots['mobile-nav']" #mobile-nav>
+        <MobileNavPanel>
+          <slot name="mobile-nav" />
+        </MobileNavPanel>
+      </template>
       <template v-if="$slots['info-body']" #info-body>
         <slot name="info-body" />
       </template>
