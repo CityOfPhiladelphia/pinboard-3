@@ -15,13 +15,21 @@ import {
   GeolocationButton,
   BasemapToggle,
 } from '@pinboard/ui'
-import type { LatLon, LocationFilterOption } from '@ui/types'
+import { useAddressSearch } from '@ui/composables/useAddressSearch'
+import { useHaversineDistance } from '@ui/composables/useHaversineDistance'
+import { useUserLocation } from '@ui/composables/useUserLocation'
+import {
+  type LatLon,
+  type LocationFilterOption,
+  type SortLocationsOptions,
+  StreetAddress,
+  Zipcode,
+} from '@ui/types'
 
 // app imports
 import LocationDetail from '@/components/LocationDetail.vue'
 import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation } from '@/types'
-import type { SortLocationsOptions } from '@ui/types'
 
 // app variables
 const searchPlaceholderText = 'Search by address or keyword...'
@@ -41,16 +49,25 @@ const sortLocationsOptionsAlphaDist: SortLocationsOptions = {
 }
 
 // refs
-const { oemLocations, currentLocation, isLoading, errorMessage } = useLocations()
-const locationSearchString = ref<string>('')
+const addressForSearch = ref<string>('')
+const zipcodeForSearch = ref<string>('')
+const keywordsForSearch = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
 const locationSortMode = ref<string>('')
 const visitedIds = ref(new Set<string>())
+const { oemLocations, isLoading, errorMessage } = useLocations()
+const { userLocation } = useUserLocation()
+const { addressCoordinates } = useAddressSearch(addressForSearch)
 
 // conputed refs
+const currentLocation = computed(() => {
+  return addressForSearch.value ? addressCoordinates.value : userLocation.value
+})
+
 const sortLocationsOptions = computed(() => {
   return currentLocation.value ? sortLocationsOptionsAlphaDist : sortLocationsOptionsAlphaOnly
 })
+
 const filteredLocations = computed(() => {
   if (isLoading.value || errorMessage.value || !oemLocations.value) {
     return []
@@ -73,8 +90,8 @@ const searchMatchedLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
-  if (locationSearchString.value) {
-    const searchTerms = locationSearchString.value.replace(/\W+/, ' ').toLowerCase().split(' ')
+  if (keywordsForSearch.value) {
+    const searchTerms = keywordsForSearch.value.replace(/\W+/, ' ').toLowerCase().split(' ')
     return filteredLocations.value.filter((loc) => {
       const locString = JSON.stringify(Object.values(loc)).toLowerCase()
       return searchTerms.some((term) => locString.match(term))
@@ -88,32 +105,48 @@ const filteredAndSortedLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
+
   const locs: OemLocation[] = [...searchMatchedLocations.value]
   switch (locationSortMode.value) {
     case 'AlphaAsc': {
-      return locs.sort((a, b) => a.name.localeCompare(b.name))
+      locs.sort((a, b) => a.name.localeCompare(b.name))
+      break
     }
     case 'AlphaDes': {
-      return locs.sort((a, b) => b.name.localeCompare(a.name))
+      locs.sort((a, b) => b.name.localeCompare(a.name))
+      break
     }
     case 'DistAsc': {
-      return locs.sort(
+      locs.sort(
         (a, b) =>
           Number(a.locationCardInfo.subheader?.replace(' mi', '')) -
           Number(b.locationCardInfo.subheader?.replace(' mi', '')),
       )
+      break
     }
     case 'DistDes': {
-      return locs.sort(
+      locs.sort(
         (a, b) =>
           Number(b.locationCardInfo.subheader?.replace(' mi', '')) -
           Number(a.locationCardInfo.subheader?.replace(' mi', '')),
       )
-    }
-    default: {
-      return locs
+      break
     }
   }
+  locs.forEach((location) => {
+    location.locationCardInfo.subheader =
+      Number.isNaN(currentLocation.value.latitude) || Number.isNaN(currentLocation.value.longitude)
+        ? undefined
+        : `${useHaversineDistance(
+            { latitude: location.latitude, longitude: location.longitude },
+            {
+              latitude: currentLocation.value.latitude,
+              longitude: currentLocation.value.longitude,
+            },
+            1,
+          )} mi`
+  })
+  return locs
 })
 
 // event handlers
@@ -125,13 +158,38 @@ function handleLocationSortChange(sortLocationsOption: string) {
   locationSortMode.value = sortLocationsOption
 }
 
-function handleLocationSearchSubmit(locationsSearchString: string) {
-  locationSearchString.value = locationsSearchString
+function handleSearchSubmit(locationSearchString: string) {
+  switch (true) {
+    case StreetAddress.test(locationSearchString): {
+      console.log('StreetAddress: ', locationSearchString)
+      addressForSearch.value = locationSearchString
+      break
+    }
+    case Zipcode.test(locationSearchString): {
+      // TODO: implement zipcode search. acts as keyword search for now
+      console.log('Zipcode: ', locationSearchString)
+      // zipcodeForSearch.value = locationSearchString
+      keywordsForSearch.value = locationSearchString
+      break
+    }
+    case locationSearchString !== '': {
+      console.log('Keyword: ', locationSearchString)
+      keywordsForSearch.value = locationSearchString
+      break
+    }
+    default: {
+      console.log('Clear: ', locationSearchString)
+      addressForSearch.value = locationSearchString
+      zipcodeForSearch.value = locationSearchString
+      keywordsForSearch.value = locationSearchString
+    }
+  }
 }
 
 function handleGeolocate(locationData: LatLon & { accuracy: number }) {
   console.log('Geolocation Accuracy: ', locationData.accuracy)
-  currentLocation.value = {
+  addressForSearch.value = ''
+  userLocation.value = {
     latitude: locationData.latitude,
     longitude: locationData.longitude,
   }
@@ -163,7 +221,7 @@ function isGauge(loc: OemLocation): boolean {
     :location-panel-search="searchPlaceholderText"
     :location-panel-filter="filterOptions"
     :location-panel-sort="sortLocationsOptions"
-    @location-search-string="handleLocationSearchSubmit"
+    @search="handleSearchSubmit"
     @selected-locations-filter="handleLocationFilterChange"
     @sort-locations-option="handleLocationSortChange"
     @deselect="handleDeselect"
