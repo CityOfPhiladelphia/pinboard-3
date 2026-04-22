@@ -1,4 +1,4 @@
-import { Ref, ref, toValue, watchEffect } from 'vue'
+import { type Ref, ref, toValue, watchEffect } from 'vue'
 import type { AisAddressSearchResponse, LatLon } from '../types'
 
 export function useAddressSearch(address: string | Ref<string>) {
