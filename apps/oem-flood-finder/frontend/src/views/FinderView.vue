@@ -1,4 +1,12 @@
 <script setup lang="ts">
+// vue imports
+import { computed, ref } from 'vue'
+
+// 3rd party imports
+import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
+
+// philly ui imports
+// pinboard imports
 import {
   Pinboard,
   MapMarker,
@@ -7,21 +15,42 @@ import {
   GeolocationButton,
   BasemapToggle,
 } from '@pinboard/ui'
-import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
+import type { LatLon, LocationFilterOption } from '@ui/types'
+
+// app imports
+import LocationDetail from '@/components/LocationDetail.vue'
 import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation } from '@/types'
-import type { LocationFilterOption } from '@ui/types'
-import { SortLocationsValues } from '../../../../../packages/ui/src/types'
-import LocationDetail from '@/components/LocationDetail.vue'
-import { computed, ref } from 'vue'
+import type { SortLocationsOptions } from '@ui/types'
 
-const { oemLocations, isLoading, errorMessage } = useLocations()
+// app variables
+const searchPlaceholderText = 'Search by address or keyword...'
+const filterOptions: LocationFilterOption[] = [
+  { value: 'all' satisfies Filters, label: 'All' },
+  { value: 'gauges' satisfies Filters, label: 'Gauge' },
+  { value: 'cameras' satisfies Filters, label: 'Camera' },
+]
+const sortLocationsOptionsAlphaOnly: SortLocationsOptions = {
+  AlphaAsc: 'Alpha-Asc',
+  AlphaDes: 'Alpha-Des',
+}
+const sortLocationsOptionsAlphaDist: SortLocationsOptions = {
+  ...sortLocationsOptionsAlphaOnly,
+  DistAsc: 'Dist-Asc',
+  DistDes: 'Dist-Des',
+}
+
+// refs
+const { oemLocations, currentLocation, isLoading, errorMessage } = useLocations()
 const locationSearchString = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
-const locationSortMode = ref<SortLocationsValues>(SortLocationsValues.None)
+const locationSortMode = ref<string>('')
 const visitedIds = ref(new Set<string>())
-const searchPlaceholderText = 'Search by address or keyword...'
 
+// conputed refs
+const sortLocationsOptions = computed(() => {
+  return currentLocation.value ? sortLocationsOptionsAlphaDist : sortLocationsOptionsAlphaOnly
+})
 const filteredLocations = computed(() => {
   if (isLoading.value || errorMessage.value || !oemLocations.value) {
     return []
@@ -61,49 +90,55 @@ const filteredAndSortedLocations = computed(() => {
   }
   const locs: OemLocation[] = [...searchMatchedLocations.value]
   switch (locationSortMode.value) {
-    case SortLocationsValues.AlphaAsc: {
-      const sorted = locs.sort((a, b) => a.name.localeCompare(b.name))
-      return sorted
+    case 'AlphaAsc': {
+      return locs.sort((a, b) => a.name.localeCompare(b.name))
     }
-    case SortLocationsValues.AlphaDes: {
-      const sorted = locs.sort((a, b) => b.name.localeCompare(a.name))
-      return sorted
+    case 'AlphaDes': {
+      return locs.sort((a, b) => b.name.localeCompare(a.name))
     }
-    case SortLocationsValues.DistAsc: {
-      // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
-      return locs
+    case 'DistAsc': {
+      return locs.sort(
+        (a, b) =>
+          Number(a.locationCardInfo.subheader?.replace(' mi', '')) -
+          Number(b.locationCardInfo.subheader?.replace(' mi', '')),
+      )
     }
-    case SortLocationsValues.DistDes: {
-      // NEED TO IMPLEMENT ONCE THE CARD INFO IF FIXED
-      return locs
+    case 'DistDes': {
+      return locs.sort(
+        (a, b) =>
+          Number(b.locationCardInfo.subheader?.replace(' mi', '')) -
+          Number(a.locationCardInfo.subheader?.replace(' mi', '')),
+      )
     }
-    case SortLocationsValues.None:
     default: {
       return locs
     }
   }
 })
 
-function isGauge(loc: OemLocation): boolean {
-  return loc.deviceType === 'Aware' || loc.deviceType === 'Usgs'
-}
-
-const filterOptions: LocationFilterOption[] = [
-  { value: 'all' satisfies Filters, label: 'All' },
-  { value: 'gauges' satisfies Filters, label: 'Gauge' },
-  { value: 'cameras' satisfies Filters, label: 'Camera' },
-]
-
+// event handlers
 function handleLocationFilterChange(selectedFilter: string) {
   locationFilterMode.value = selectedFilter as Filters
 }
 
-function handleLocationSortChange(sortLocationsOption: number) {
-  locationSortMode.value = sortLocationsOption as SortLocationsValues
+function handleLocationSortChange(sortLocationsOption: string) {
+  locationSortMode.value = sortLocationsOption
 }
 
 function handleLocationSearchSubmit(locationsSearchString: string) {
   locationSearchString.value = locationsSearchString
+}
+
+function handleGeolocate(locationData: LatLon & { accuracy: number }) {
+  console.log('Geolocation Accuracy: ', locationData.accuracy)
+  currentLocation.value = {
+    latitude: locationData.latitude,
+    longitude: locationData.longitude,
+  }
+}
+
+function handleGeolocateError(error: Error | GeolocationPositionError) {
+  console.log(error)
 }
 
 function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
@@ -112,6 +147,11 @@ function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
 
 function handleDeselect(id: string) {
   visitedIds.value.add(id)
+}
+
+// utility functions
+function isGauge(loc: OemLocation): boolean {
+  return loc.deviceType === 'Aware' || loc.deviceType === 'Usgs'
 }
 </script>
 
@@ -122,6 +162,7 @@ function handleDeselect(id: string) {
     :error-message="errorMessage"
     :location-panel-search="searchPlaceholderText"
     :location-panel-filter="filterOptions"
+    :location-panel-sort="sortLocationsOptions"
     @location-search-string="handleLocationSearchSubmit"
     @selected-locations-filter="handleLocationFilterChange"
     @sort-locations-option="handleLocationSortChange"
@@ -151,6 +192,8 @@ function handleDeselect(id: string) {
       <GeolocationButton
         :position="isMobile ? 'top-right' : 'bottom-right'"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
+        @located="handleGeolocate"
+        @error="handleGeolocateError"
       />
 
       <div v-if="!isLoading">

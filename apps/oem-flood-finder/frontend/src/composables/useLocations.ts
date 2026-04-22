@@ -1,7 +1,10 @@
-import type { LocationListDTO, OemLocation } from '@/types'
 import { ref, onMounted, computed } from 'vue'
 import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
 import type { TagsProps } from '@phila/phila-ui-tags'
+import type { MapCardProps } from '@phila/phila-ui-cards'
+import type { LocationListDTO, OemLocation } from '@/types'
+import type { LatLon } from '@ui/types'
+import { useHaversineDistance } from '@ui/composables/useHaversineDistance'
 
 function getLocationTags(loc: LocationListDTO): TagsProps[] {
   if (loc.deviceType === 'Camera') {
@@ -16,7 +19,7 @@ function getLocationTags(loc: LocationListDTO): TagsProps[] {
 
 export function useLocations() {
   const locationListDTO = ref<LocationListDTO[] | null>(null)
-  const currentLocation = ref<{ lat: number; long: number } | null>(null)
+  const currentLocation = ref<LatLon | null>(null)
   const isLoading = ref<boolean>(true)
   const errorMessage = ref<string | null>(null)
 
@@ -28,6 +31,24 @@ export function useLocations() {
     }
 
     for (const loc of locationListDTO.value) {
+      const distance =
+        currentLocation.value === null
+          ? undefined
+          : useHaversineDistance(
+              { latitude: loc.latitude, longitude: loc.longitude },
+              {
+                latitude: currentLocation.value.latitude,
+                longitude: currentLocation.value.longitude,
+              },
+              1,
+            )
+      const cardInfo: MapCardProps = {
+        heading: loc.name,
+        subheader: distance ? `${distance} mi` : distance,
+        tags: getLocationTags(loc),
+        src: loc.imageUrl,
+      }
+
       result.push({
         id: loc.id,
         name: loc.name,
@@ -35,25 +56,12 @@ export function useLocations() {
         longitude: loc.longitude,
         lastUpdated: loc.lastUpdated,
         deviceType: loc.deviceType,
-        locationCardInfo: {
-          heading: loc.name,
-          subheader:
-            currentLocation.value === null
-              ? undefined
-              : getHaversineDistance(
-                  loc.latitude,
-                  loc.longitude,
-                  currentLocation.value.lat,
-                  currentLocation.value.long,
-                ).toFixed(1) + ' mi',
-          tags: getLocationTags(loc),
-          src: loc.imageUrl,
-        },
+        locationCardInfo: cardInfo,
         actionStage: loc.actionStage,
         minorStage: loc.minorStage,
         moderateStage: loc.moderateStage,
         majorStage: loc.majorStage,
-      } satisfies OemLocation)
+      })
     }
 
     return result
@@ -62,8 +70,8 @@ export function useLocations() {
   if (navigator.geolocation) {
     navigator.geolocation.watchPosition((pos) => {
       currentLocation.value = {
-        lat: pos.coords.latitude,
-        long: pos.coords.longitude,
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
       }
     })
   }
@@ -87,31 +95,5 @@ export function useLocations() {
     isLoading.value = false
   })
 
-  return { oemLocations, isLoading, errorMessage }
-}
-
-/**
- * @returns distance in miles
- */
-function getHaversineDistance(
-  deviceLat: number,
-  deviceLong: number,
-  userLat: number,
-  userLong: number,
-): number {
-  const R = 6371 // Earth's mean radius in kilometers
-
-  const dLat = (userLat - deviceLat) * (Math.PI / 180)
-  const dLon = (userLong - deviceLong) * (Math.PI / 180)
-
-  const lat1 = deviceLat * (Math.PI / 180)
-  const lat2 = userLat * (Math.PI / 180)
-
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-
-  return R * c * 0.621371 // convert to miles
+  return { oemLocations, currentLocation, isLoading, errorMessage }
 }

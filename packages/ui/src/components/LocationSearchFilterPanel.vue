@@ -7,177 +7,159 @@ Search, filter, and sort will only render if a prop for them is passed into Loca
 Features in component have minimal state and logic.
 They will emit current values, and the logic for handling those values will be done in the parent app.
 
-
-
 To render a feature:
   Search: string - placeholder string to render inside search bar
   Filter: string[] - array of string to match
-  Sort: enum -
+  Sort: SortLocationsOptions - Object that will be converted into MenuOption[]
  -->
 
 <script setup lang="ts">
-import { ref, computed, ComputedRef } from 'vue'
+// vue imports
+import { ref, computed } from 'vue'
+
+// 3rd party imports
+// philly ui imports
 import { Search } from '@phila/phila-ui-search'
-import { Tags } from '@phila/phila-ui-tags'
+import { Menu } from '@phila/phila-ui-menu'
+
+// pinboard component imports
+import LocationFilter from './LocationFilter.vue'
+
+// pinboard composables imports
+import { useSearchSuggestions } from '../composables/useSearchSuggestions'
+
+// type imports
 import type {
   LocationFilterOption,
-  SearchMode,
-  AisAutocompleteResult,
+  SortLocationsOptions,
+  MenuOption,
 } from '../types'
-import { SortLocationsValues } from '../types'
+// import { StreetAddress, Zipcode } from '../types'
 
-const addressRegex =
-  /^(?:\d{1,5}(?:-\d{1,5})? )(?:\w+ ){1,2}(?:\w+)?(?:\w+ # ?\d{1,5})?/
-const zipcodeRegex = /^\d{5}(?:-\d{4})?$/
-
+// props
 const props = defineProps<{
   searchPlaceholder?: string
   filterOptions?: LocationFilterOption[]
-  // ADD PROP FOR SORT MODES
+  sortOptions?: SortLocationsOptions
 }>()
 
+// emits
 const emit = defineEmits<{
   searchString: [search: string]
+  search: [search: void]
   selectedFilter: [filter: string]
-  sortOption: [sort: number]
-  searchMode: [mode: string]
+  sortOption: [sort: string]
 }>()
 
-const selectedFilter = ref(
-  props.filterOptions ? props.filterOptions[0].value : undefined
-)
-const sortOption = ref<SortLocationsValues>(SortLocationsValues.None)
+// refs
+const sortOption = ref<string>('')
 const searchString = ref<string>('')
-const searchSuggestions = ref<string[]>([])
+const { searchSuggestions, searchSuggestionsError } =
+  useSearchSuggestions(searchString)
 
-const searchMode: ComputedRef<SearchMode> = computed(() => {
-  switch (true) {
-    case addressRegex.test(searchString.value): {
-      return 'address'
+// computed refs
+const sortChoices = computed(() => {
+  const sortOptions = props.sortOptions ?? {}
+  const choices: MenuOption[] = Array.from(
+    Object.keys(sortOptions),
+    (option, i) => {
+      return {
+        text: Object.values(sortOptions)[i],
+        value: option,
+      }
     }
-    case zipcodeRegex.test(searchString.value): {
-      return 'zipcode'
-    }
-    case searchString.value !== '': {
-      return 'keyword'
-    }
-    default: {
-      return false
-    }
-  }
+  )
+  return choices
 })
 
-async function updateSearchSuggestions(): Promise<string[]> {
-  if (
-    searchString.value.length < 3 ||
-    !/^\d{1,5}(?:-\d{1,5})?(?: [NnSs])? [A-Za-z ]*/.test(searchString.value)
-  ) {
-    return []
-  }
-  const suggestions: AisAutocompleteResult = await (
-    await fetch(
-      `https://ais-autocomplete.citygeo.phila.city/autocomplete?q=${searchString.value.replace(/ /, '+')}`
-    )
-  ).json()
-  const suggestedAddresses = suggestions.count
-    ? Array.from(
-        suggestions.results.addresses,
-        (suggestion) => suggestion.address
-      )
-    : []
-  return suggestedAddresses
-}
+// const searchMode = computed(() => {
+//   switch (true) {
+//     case StreetAddress.test(searchString.value): {
+//       return 'address'
+//     }
+//     case Zipcode.test(searchString.value): {
+//       return 'zipcode'
+//     }
+//     case searchString.value !== '': {
+//       return 'keyword'
+//     }
+//     default: {
+//       return false
+//     }
+//   }
+// })
 
+// event handlers
 function handleFilterChange(option: string) {
-  if (selectedFilter.value === option) {
-    return
-  }
-  selectedFilter.value = option
-  emit('selectedFilter', selectedFilter.value)
+  emit('selectedFilter', option)
 }
 
-function handleSortChange() {
-  sortOption.value =
-    ++sortOption.value in SortLocationsValues
-      ? sortOption.value
-      : SortLocationsValues.None
+function handleSortChange(value: string | string[]) {
+  value = Array.isArray(value) ? value[0] : value
+  sortOption.value = value ?? ''
   emit('sortOption', sortOption.value)
 }
 
-async function handleSearchChange(search: string) {
+function handleSearchChange(search: string) {
+  emit('searchString', search)
+  if (searchSuggestions.value) {
+    console.log('locationSearchChange:', searchSuggestions.value)
+  }
   searchString.value = search
-  searchSuggestions.value = await updateSearchSuggestions()
-  if (searchSuggestions.value.length) {
-    console.log('handleSearchChange:', searchSuggestions.value)
-  }
-  if (searchMode.value && searchString.value === '') {
-    emit('searchString', searchString.value)
-  }
 }
 
-function handleSearchSubmit() {
-  emit('searchString', searchString.value)
-}
+// utility functions
 </script>
 
 <template>
-  <div>
+  <div class="location-search-filter-sort">
     <Search
       v-if="searchPlaceholder"
-      class-name="location-search"
+      class="location-search"
       :placeholder="searchPlaceholder"
       @update:modelValue="handleSearchChange"
-      @search="handleSearchSubmit"
+      @search="emit('search')"
     />
-    <!-- <Menu
-      v-if="searchSuggestions.length"
-      class="location-search-autocomplete"
-      :choices="searchSuggestions"
-    /> -->
-    <!-- Make new component for sedarch suggestions -->
-  </div>
-
-  <div class="location-filters">
-    <Tags
-      v-for="opt in filterOptions"
-      :key="`filter-${opt.value}`"
-      variant="action"
-      size="large"
-      color="grey"
-      :text="opt.label"
-      :selected="selectedFilter === opt.value"
-      @update:selected="handleFilterChange(opt.value)"
+    <div v-if="searchSuggestions"></div>
+    <div v-if="searchSuggestionsError"></div>
+    <LocationFilter
+      v-if="filterOptions"
+      class="location-filters"
+      :filterOptions="filterOptions"
+      @selectedFilter="handleFilterChange"
     />
-    <Tags
-      class="location-sort"
-      :key="`filter-sort`"
-      variant="action"
-      size="large"
-      color="grey"
-      text="Sort"
-      :selected="!!SortLocationsValues.None"
-      @update:selected="handleSortChange()"
-    />
+    <div class="location-sort">
+      <Menu
+        v-if="sortOptions"
+        :choices="sortChoices"
+        placeholder="Sort"
+        @update:modelValue="handleSortChange"
+      />
+    </div>
   </div>
 </template>
 
 <style scoped>
+.location-search-filter-sort {
+  display: grid;
+  grid-template:
+    'search search'
+    'filters sort';
+}
+
 .location-search {
+  grid-area: search;
   padding: 1rem 1rem 0rem 1rem;
   width: 100%;
 }
 
-.location-search-autocomplete {
-  width: 100%;
-}
-
 .location-filters {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  grid-area: filters;
 }
 
 .location-sort {
+  grid-area: sort;
   margin-left: auto;
+  padding-right: 1rem;
 }
 </style>

@@ -43,13 +43,16 @@ export type AlertBanner = {
 export const PINBOARD_CONFIG_KEY: InjectionKey<PinboardConfig> =
   Symbol('pinboard-config')
 
+export type LatLon = {
+  latitude: number
+  longitude: number
+}
+
 export type BasicLocation = {
   id: string
   name: string
-  latitude: number
-  longitude: number
   locationCardInfo: MapCardProps
-}
+} & LatLon
 
 export type LocationFilterOption = {
   readonly value: string
@@ -58,24 +61,31 @@ export type LocationFilterOption = {
 
 export type SearchMode = 'address' | 'zipcode' | 'keyword' | false
 
-export enum SortLocationsValues {
-  None,
-  AlphaAsc,
-  AlphaDes,
-  DistAsc,
-  DistDes,
-}
+export type MenuOption = Readonly<{
+  text: string
+  value: string
+}>
 
-export type AisAutocompleteResult = {
+export type SortLocationsOptions = Readonly<{
+  [key: string]: string
+}>
+
+export type AisAutocompleteResult = Readonly<{
   query: string
   query_type: string
   count: number
-  results: {
+  results: Readonly<{
     placenames: string[]
-    addresses: {
-      address: string
-      search_address: string
-      has_opa: boolean
-    }[]
-  }
-}
+    addresses: Readonly<
+      {
+        address: string
+        search_address: string
+        has_opa: boolean
+      }[]
+    >
+  }>
+}>
+
+export const Zipcode: Readonly<RegExp> = /^\d{5}(?:-\d{4})?$/
+export const StreetAddress: Readonly<RegExp> =
+  /^(?:\d{1,5}(?:-\d{1,5})?[A-Za-z]{0,3} )(?:(?:(?:[NnSs](?:[Oo][RrUu][Tt][Hh])?)|(?:[EeWw](?:[AaEe][Ss][Tt])?)){0,2} )?(?:\w+ )(?:\w{2,})$/

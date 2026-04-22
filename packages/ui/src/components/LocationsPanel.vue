@@ -1,13 +1,26 @@
 <script setup lang="ts">
+// vue imports
 import { ref, watch } from 'vue'
-import { MapCard } from '@phila/phila-ui-cards'
-import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
-import type { BasicLocation, LocationFilterOption } from '../types'
 
+// philly ui imports
+import { MapCard } from '@phila/phila-ui-cards'
+
+// pinboard component imports
+import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
+
+// type imports
+import type {
+  BasicLocation,
+  LocationFilterOption,
+  SortLocationsOptions,
+} from '../types'
+
+// props
 const props = defineProps<{
-  locationSearch: string | undefined
-  locationFilter: LocationFilterOption[] | undefined
   locations: BasicLocation[]
+  locationSearch?: string
+  locationFilter?: LocationFilterOption[]
+  locationSort?: SortLocationsOptions
   hoveredId?: string | null
   selectedId?: string | null
   locationCardSlot?: (props: {
@@ -17,23 +30,25 @@ const props = defineProps<{
   }) => unknown
 }>()
 
+// emits
 const emit = defineEmits<{
   select: [location: BasicLocation]
   searchString: [search: string]
+  search: [search: void]
   selectedFilter: [filter: string]
-  sortOption: [sort: number]
+  sortOption: [sort: string]
   hover: [id: string]
   'hover-end': []
 }>()
 
+// component variables
+
+// refs
 const pendingKeydown = ref(false)
 const listRef = ref<HTMLElement | null>(null)
+// computed refs
 
-function scrollToCard(id: string, behavior: ScrollBehavior = 'smooth') {
-  const card = listRef.value?.querySelector(`[data-location-id="${id}"]`)
-  card?.scrollIntoView({ behavior, block: 'center' })
-}
-
+// watchers
 watch(
   () => props.selectedId,
   (id) => {
@@ -46,37 +61,46 @@ watch(
     }
   }
 )
+// event handlers
+function handleFilterChange(selectedFilter: string) {
+  emit('selectedFilter', selectedFilter)
+}
 
-defineExpose({ scrollToCard })
+function handleSortChange(sortOption: string) {
+  emit('sortOption', sortOption)
+}
 
-function onCardKeyup(location: BasicLocation) {
+function handleSearchChange(searchString: string) {
+  emit('searchString', searchString)
+}
+
+function handleCardKeyup(location: BasicLocation) {
   if (pendingKeydown.value) {
     emit('select', location)
     pendingKeydown.value = false
   }
 }
 
-function handleFilterChange(selectedFilter: string) {
-  emit('selectedFilter', selectedFilter)
+// utility functions
+function scrollToCard(id: string, behavior: ScrollBehavior = 'smooth') {
+  const card = listRef.value?.querySelector(`[data-location-id="${id}"]`)
+  card?.scrollIntoView({ behavior, block: 'center' })
 }
 
-function handleSortChange(sortOption: number) {
-  emit('sortOption', sortOption)
-}
-
-function handleSearchSubmit(searchString: string) {
-  emit('searchString', searchString)
-}
+// expose
+defineExpose({ scrollToCard })
 </script>
 
 <template>
   <LocationSearchFilterPanel
-    v-if="locationFilter"
+    v-if="locationSearch || locationFilter || locationSort"
     :searchPlaceholder="locationSearch"
     :filterOptions="locationFilter"
+    :sortOptions="locationSort"
     @selected-filter="handleFilterChange"
     @sort-option="handleSortChange"
-    @search-string="handleSearchSubmit"
+    @search-string="handleSearchChange"
+    @search="emit('search')"
   />
   <div ref="listRef" class="location-list content">
     <MapCard
@@ -96,7 +120,7 @@ function handleSearchSubmit(searchString: string) {
       @mouseenter="emit('hover', location.id)"
       @mouseleave="emit('hover-end')"
       @keydown.enter="pendingKeydown = true"
-      @keyup.enter="onCardKeyup(location)"
+      @keyup.enter="handleCardKeyup(location)"
     />
   </div>
 </template>
