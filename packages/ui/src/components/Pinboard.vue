@@ -69,8 +69,7 @@ const props = defineProps<{
 
 // emits to parent app to handle
 const emit = defineEmits<{
-  locationSearchString: [search: string]
-  search: [search: void]
+  search: [search: string]
   selectedLocationsFilter: [filter: string]
   sortLocationsOption: [sort: string]
   deselect: [locationId: string]
@@ -169,11 +168,17 @@ function handleLocationSortChange(sortLocationsOption: string) {
 }
 
 function handleSearchChange(search: string) {
-  if (searchSuggestions.value) {
+  if (searchSuggestions.value.length) {
     console.log('locationSearchChange:', searchSuggestions.value)
   }
   searchString.value = search
-  emit('locationSearchString', search)
+  if (!searchString.value) {
+    emit('search', searchString.value)
+  }
+}
+
+function handleSearchSubmit() {
+  emit('search', searchString.value)
 }
 
 function handleCloseLocationDetail() {
@@ -265,7 +270,7 @@ const effectiveMapConfig = (() => {
         @hover="handleHover"
         @hover-end="handleHoverEnd"
         @search-string="handleSearchChange"
-        @search="emit('search')"
+        @search="handleSearchSubmit"
         @selected-filter="handleLocationFilterChange"
         @sort-option="handleLocationSortChange"
       />
@@ -299,7 +304,7 @@ const effectiveMapConfig = (() => {
           class-name="mobile-search"
           :placeholder="locationPanelSearch"
           @update:modelValue="handleSearchChange"
-          @search="emit('search')"
+          @search="handleSearchSubmit"
         />
         <div v-if="searchSuggestions"></div>
         <div v-if="searchSuggestionsError"></div>

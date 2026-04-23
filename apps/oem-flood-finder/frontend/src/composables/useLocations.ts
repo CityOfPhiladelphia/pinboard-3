@@ -3,15 +3,13 @@ import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
 import type { TagsProps } from '@phila/phila-ui-tags'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 import type { LocationListDTO, OemLocation } from '@/types'
-import type { LatLon } from '@ui/types'
-import { useHaversineDistance } from '@ui/composables/useHaversineDistance'
 
 function getLocationTags(loc: LocationListDTO): TagsProps[] {
   if (loc.deviceType === 'Camera') {
     return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
   }
   const gaugeValue =
-    !loc.gaugeHeight || loc.gaugeHeight === -9999.9
+    Number.isNaN(loc.gaugeHeight) || loc.gaugeHeight === -9999.9
       ? 'No data'
       : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
   return [{ text: 'Gauge', color: 'blue' as const, iconDefinition: faWater }, { text: gaugeValue }]
@@ -19,7 +17,6 @@ function getLocationTags(loc: LocationListDTO): TagsProps[] {
 
 export function useLocations() {
   const locationListDTO = ref<LocationListDTO[] | null>(null)
-  const currentLocation = ref<LatLon | null>(null)
   const isLoading = ref<boolean>(true)
   const errorMessage = ref<string | null>(null)
 
@@ -31,20 +28,9 @@ export function useLocations() {
     }
 
     for (const loc of locationListDTO.value) {
-      const distance =
-        currentLocation.value === null
-          ? undefined
-          : useHaversineDistance(
-            { latitude: loc.latitude, longitude: loc.longitude },
-            {
-              latitude: currentLocation.value.latitude,
-              longitude: currentLocation.value.longitude,
-            },
-            1,
-          )
       const cardInfo: MapCardProps = {
         heading: loc.name,
-        subheader: distance ? `${distance} mi` : distance,
+        subheader: undefined,
         tags: getLocationTags(loc),
         src: loc.imageUrl,
       }
@@ -67,15 +53,6 @@ export function useLocations() {
     return result
   })
 
-  if (navigator.geolocation) {
-    navigator.geolocation.watchPosition((pos) => {
-      currentLocation.value = {
-        latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude,
-      }
-    })
-  }
-
   onMounted(async () => {
     const myHeaders = new Headers()
     myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
@@ -95,5 +72,5 @@ export function useLocations() {
     isLoading.value = false
   })
 
-  return { oemLocations, currentLocation, isLoading, errorMessage }
+  return { oemLocations, isLoading, errorMessage }
 }
