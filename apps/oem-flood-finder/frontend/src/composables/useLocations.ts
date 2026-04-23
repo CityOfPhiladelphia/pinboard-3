@@ -9,7 +9,7 @@ function getLocationTags(loc: LocationListDTO): TagsProps[] {
     return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
   }
   const gaugeValue =
-    !loc.gaugeHeight || loc.gaugeHeight === -9999.9
+    Number.isNaN(loc.gaugeHeight) || loc.gaugeHeight === -9999.9
       ? 'No data'
       : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
   return [{ text: 'Gauge', color: 'blue' as const, iconDefinition: faWater }, { text: gaugeValue }]

@@ -65,7 +65,10 @@ const currentLocation = computed(() => {
 })
 
 const sortLocationsOptions = computed(() => {
-  return currentLocation.value ? sortLocationsOptionsAlphaDist : sortLocationsOptionsAlphaOnly
+  return Number.isNaN(currentLocation.value.latitude) ||
+    Number.isNaN(currentLocation.value.longitude)
+    ? sortLocationsOptionsAlphaOnly
+    : sortLocationsOptionsAlphaDist
 })
 
 const filteredLocations = computed(() => {
