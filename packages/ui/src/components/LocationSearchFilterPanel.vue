@@ -72,23 +72,6 @@ const sortChoices = computed(() => {
   return choices
 })
 
-// const searchMode = computed(() => {
-//   switch (true) {
-//     case StreetAddress.test(searchString.value): {
-//       return 'address'
-//     }
-//     case Zipcode.test(searchString.value): {
-//       return 'zipcode'
-//     }
-//     case searchString.value !== '': {
-//       return 'keyword'
-//     }
-//     default: {
-//       return false
-//     }
-//   }
-// })
-
 // event handlers
 function handleFilterChange(option: string) {
   emit('selectedFilter', option)
@@ -102,9 +85,6 @@ function handleSortChange(value: string | string[]) {
 
 function handleSearchChange(search: string) {
   emit('searchString', search)
-  if (searchSuggestions.value) {
-    console.log('locationSearchChange:', searchSuggestions.value)
-  }
   searchString.value = search
 }
 

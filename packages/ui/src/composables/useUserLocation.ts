@@ -1,21 +1,19 @@
-import { ref, readonly, type Ref, type DeepReadonly } from 'vue'
+import { ref } from 'vue'
+import type { LatLon } from '../types'
 
-export type UserCoords = {
-  longitude: number
-  latitude: number
-  accuracy: number
-}
+export function useUserLocation() {
+  const userLocation = ref<LatLon>({
+    latitude: NaN,
+    longitude: NaN,
+  })
 
-const userCoords = ref<UserCoords | null>(null)
-
-export function useUserLocation(): {
-  userCoords: DeepReadonly<Ref<UserCoords | null>>
-  setUserLocation: (coords: UserCoords) => void
-} {
-  return {
-    userCoords: readonly(userCoords),
-    setUserLocation: (coords) => {
-      userCoords.value = coords
-    },
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition((pos) => {
+      console.log('Position accuracy: ', pos.coords.accuracy)
+      userLocation.value.latitude = pos.coords.latitude
+      userLocation.value.longitude = pos.coords.longitude
+    })
   }
+
+  return { userLocation }
 }
