@@ -1,7 +1,6 @@
 // packages/ui/src/plugin.ts
 import type { Plugin } from 'vue'
-import type { PinboardConfig } from './types'
-import { PINBOARD_CONFIG_KEY } from './types'
+import { type PinboardConfig, PINBOARD_CONFIG_KEY } from './types'
 
 export function createPinboard(config: PinboardConfig): Plugin {
   return {

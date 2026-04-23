@@ -12,8 +12,11 @@ const props = defineProps<{
 let chartData: Ref<ChartData[]> = computed(() => {
   if (props.readingState.kind === 'Loaded' && props.readingState.data) {
     return props.readingState.data.map((reading) => ({
-      x: reading.validTimeUTC.toString(),
-      y: reading.gaugeHeight,
+      x: new Date(reading.validTimeUTC).toLocaleString('en-US', {
+        timeZone: 'America/New_York',
+        hour12: true,
+      }),
+      y: reading.gaugeHeight === -9999.9 ? undefined : reading.gaugeHeight,
     }))
   }
   return []
@@ -29,7 +32,7 @@ let chartData: Ref<ChartData[]> = computed(() => {
     <LineChart
       :data="chartData"
       :y-label="`Stage (${readingState.data[0]?.gaugeHeightUnit})`"
-      :minimum-y-level="0"
+      :minimum-y-level="150"
     />
 
     <table v-if="location.deviceType === 'Aware'">

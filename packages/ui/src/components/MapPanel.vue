@@ -128,6 +128,7 @@ const SlotRenderer = defineComponent({
 }
 
 .map-loading-text {
+  font-family: var(--Body-Default-font-body-default-family);
   font-size: 0.875rem;
   color: #555;
 }
