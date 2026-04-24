@@ -247,10 +247,6 @@ function isGauge(loc: OemLocation): boolean {
 function hasLocation(loc: LatLon) {
   return !(Number.isNaN(loc.latitude) || Number.isNaN(loc.longitude))
 }
-
-function changedLocation(locA: LatLon, locB: LatLon) {
-  return locA.latitude !== locB.latitude || locA.longitude !== locB.longitude
-}
 </script>
 
 <template>
