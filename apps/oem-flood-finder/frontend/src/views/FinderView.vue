@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // vue imports
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 // 3rd party imports
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
@@ -29,7 +29,7 @@ import {
 // app imports
 import LocationDetail from '@/components/LocationDetail.vue'
 import { useLocations } from '@/composables/useLocations'
-import type { Filters, OemLocation } from '@/types'
+import type { Filters, OemLocation, SortMode } from '@/types'
 
 // app variables
 const searchPlaceholderText = 'Search by address or keyword...'
@@ -38,14 +38,19 @@ const filterOptions: LocationFilterOption[] = [
   { value: 'gauges' satisfies Filters, label: 'Gauge' },
   { value: 'cameras' satisfies Filters, label: 'Camera' },
 ]
-const sortLocationsOptionsAlphaOnly: SortLocationsOptions = {
+const sortLocationsOptionsAlpha: SortLocationsOptions = {
   AlphaAsc: 'Alpha-Asc',
   AlphaDes: 'Alpha-Des',
 }
-const sortLocationsOptionsAlphaDist: SortLocationsOptions = {
-  ...sortLocationsOptionsAlphaOnly,
+
+const sortLocationsOptionsDist: SortLocationsOptions = {
   DistAsc: 'Dist-Asc',
   DistDes: 'Dist-Des',
+}
+
+const sortLocationsOptionsAll: SortLocationsOptions = {
+  ...sortLocationsOptionsAlpha,
+  ...sortLocationsOptionsDist,
 }
 
 // refs
@@ -53,7 +58,7 @@ const addressForSearch = ref<string>('')
 const zipcodeForSearch = ref<string>('')
 const keywordsForSearch = ref<string>('')
 const locationFilterMode = ref<Filters>('all')
-const locationSortMode = ref<string>('')
+const locationSortMode = ref<SortMode>('')
 const visitedIds = ref(new Set<string>())
 const { oemLocations, isLoading, errorMessage } = useLocations()
 const { userLocation } = useUserLocation()
@@ -61,14 +66,11 @@ const { addressCoordinates } = useAddressSearch(addressForSearch)
 
 // conputed refs
 const currentLocation = computed(() => {
-  return addressForSearch.value ? addressCoordinates.value : userLocation.value
+  return hasLocation(addressCoordinates.value) ? addressCoordinates.value : userLocation.value
 })
 
 const sortLocationsOptions = computed(() => {
-  return Number.isNaN(currentLocation.value.latitude) ||
-    Number.isNaN(currentLocation.value.longitude)
-    ? sortLocationsOptionsAlphaOnly
-    : sortLocationsOptionsAlphaDist
+  return hasLocation(currentLocation.value) ? sortLocationsOptionsAll : sortLocationsOptionsAlpha
 })
 
 const filteredLocations = computed(() => {
@@ -110,7 +112,24 @@ const filteredAndSortedLocations = computed(() => {
   }
 
   const locs: OemLocation[] = [...searchMatchedLocations.value]
-  switch (locationSortMode.value) {
+  locs.forEach((location) => {
+    location.locationCardInfo.subheader = hasLocation(currentLocation.value)
+      ? `${useHaversineDistance(
+          { latitude: location.latitude, longitude: location.longitude },
+          {
+            latitude: currentLocation.value.latitude,
+            longitude: currentLocation.value.longitude,
+          },
+          1,
+        )} mi`
+      : undefined
+  })
+
+  switch (
+    hasLocation(currentLocation.value) && !locationSortMode.value
+      ? 'DistAsc'
+      : locationSortMode.value
+  ) {
     case 'AlphaAsc': {
       locs.sort((a, b) => a.name.localeCompare(b.name))
       break
@@ -135,22 +154,33 @@ const filteredAndSortedLocations = computed(() => {
       )
       break
     }
+    default: {
+      // south to north
+      locs.sort((a, b) => a.latitude - b.latitude)
+    }
   }
-  locs.forEach((location) => {
-    location.locationCardInfo.subheader =
-      Number.isNaN(currentLocation.value.latitude) || Number.isNaN(currentLocation.value.longitude)
-        ? undefined
-        : `${useHaversineDistance(
-            { latitude: location.latitude, longitude: location.longitude },
-            {
-              latitude: currentLocation.value.latitude,
-              longitude: currentLocation.value.longitude,
-            },
-            1,
-          )} mi`
-  })
   return locs
 })
+
+// watchers
+watch(
+  currentLocation,
+  () => {
+    const newLocHasLoc = hasLocation(currentLocation.value)
+    switch (true) {
+      case newLocHasLoc && !locationSortMode.value: {
+        locationSortMode.value = 'DistAsc'
+        break
+      }
+      case !newLocHasLoc &&
+        Object.keys(sortLocationsOptionsDist).includes(locationSortMode.value): {
+        locationSortMode.value = ''
+        break
+      }
+    }
+  },
+  // { immediate: true },
+)
 
 // event handlers
 function handleLocationFilterChange(selectedFilter: string) {
@@ -158,7 +188,7 @@ function handleLocationFilterChange(selectedFilter: string) {
 }
 
 function handleLocationSortChange(sortLocationsOption: string) {
-  locationSortMode.value = sortLocationsOption
+  locationSortMode.value = sortLocationsOption as SortMode
 }
 
 function handleSearchSubmit(locationSearchString: string) {
@@ -191,7 +221,6 @@ function handleSearchSubmit(locationSearchString: string) {
 
 function handleGeolocate(locationData: LatLon & { accuracy: number }) {
   console.log('Geolocation Accuracy: ', locationData.accuracy)
-  addressForSearch.value = ''
   userLocation.value = {
     latitude: locationData.latitude,
     longitude: locationData.longitude,
@@ -213,6 +242,14 @@ function handleDeselect(id: string) {
 // utility functions
 function isGauge(loc: OemLocation): boolean {
   return loc.deviceType === 'Aware' || loc.deviceType === 'Usgs'
+}
+
+function hasLocation(loc: LatLon) {
+  return !(Number.isNaN(loc.latitude) || Number.isNaN(loc.longitude))
+}
+
+function changedLocation(locA: LatLon, locB: LatLon) {
+  return locA.latitude !== locB.latitude || locA.longitude !== locB.longitude
 }
 </script>
 
