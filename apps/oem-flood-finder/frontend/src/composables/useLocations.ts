@@ -1,8 +1,13 @@
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, type Ref, computed } from 'vue'
 import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
 import type { TagsProps } from '@phila/phila-ui-tags'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 import type { LocationListDTO, OemLocation } from '@/types'
+import { useUserLocation } from '@ui/composables/useUserLocation'
+import { hasLocationData } from '@ui/utilities/hasLocationData'
+import { getHaversineDistance } from '@ui/utilities/getHaversineDistance'
+
+const { userLocation, userLocationPermission } = useUserLocation()
 
 function getLocationTags(loc: LocationListDTO): TagsProps[] {
   if (loc.deviceType === 'Camera') {
@@ -16,41 +21,14 @@ function getLocationTags(loc: LocationListDTO): TagsProps[] {
 }
 
 export function useLocations() {
-  const locationListDTO = ref<LocationListDTO[] | null>(null)
-  const isLoading = ref<boolean>(true)
+  const oemLocations = ref<OemLocation[]>([])
+  const hasData = ref<boolean>(false)
   const errorMessage = ref<string | null>(null)
 
-  const oemLocations = computed(() => {
-    const result: OemLocation[] = []
-
-    if (locationListDTO.value === null) {
-      return null
-    }
-
-    for (const loc of locationListDTO.value) {
-      const cardInfo: MapCardProps = {
-        heading: loc.name,
-        subheader: undefined,
-        tags: getLocationTags(loc),
-        src: loc.imageUrl,
-      }
-
-      result.push({
-        id: loc.id,
-        name: loc.name,
-        latitude: loc.latitude,
-        longitude: loc.longitude,
-        lastUpdated: loc.lastUpdated,
-        deviceType: loc.deviceType,
-        locationCardInfo: cardInfo,
-        actionStage: loc.actionStage,
-        minorStage: loc.minorStage,
-        moderateStage: loc.moderateStage,
-        majorStage: loc.majorStage,
-      })
-    }
-
-    return result
+  const isLoading = computed(() => {
+    const userLocationFound = hasLocationData(userLocation)
+    const hasLocationPermission = userLocationPermission.value === 'granted'
+    return hasData.value ? hasLocationPermission && !userLocationFound : true
   })
 
   onMounted(async () => {
@@ -68,9 +46,36 @@ export function useLocations() {
       return
     }
 
-    locationListDTO.value = await response.json()
-    isLoading.value = false
+    const locations: LocationListDTO[] = await response.json()
+    locations.forEach((loc) => {
+      const cardInfo: MapCardProps = {
+        heading: loc.name,
+        subheader: hasLocationData(userLocation)
+          ? getHaversineDistance(
+              userLocation,
+              { latitude: loc.latitude, longitude: loc.longitude },
+              1,
+            )
+          : undefined,
+        tags: getLocationTags(loc),
+        src: loc.imageUrl,
+      }
+      oemLocations.value.push({
+        id: loc.id,
+        name: loc.name,
+        latitude: loc.latitude,
+        longitude: loc.longitude,
+        lastUpdated: loc.lastUpdated,
+        deviceType: loc.deviceType,
+        locationCardInfo: cardInfo,
+        actionStage: loc.actionStage,
+        minorStage: loc.minorStage,
+        moderateStage: loc.moderateStage,
+        majorStage: loc.majorStage,
+      })
+    })
+    hasData.value = true
   })
 
-  return { oemLocations, isLoading, errorMessage }
+  return { oemLocations, userLocation, isLoading, errorMessage }
 }

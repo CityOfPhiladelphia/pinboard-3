@@ -17,8 +17,8 @@ import {
 } from '@pinboard/ui'
 import { useSearchAddress } from '@ui/composables/useSearchAddress'
 import { useSearchZipcode } from '@ui/composables/useSearchZipcode'
-import { useHaversineDistance } from '@ui/composables/useHaversineDistance'
-import { useUserLocation } from '@ui/composables/useUserLocation'
+import { getHaversineDistance } from '@ui/utilities/getHaversineDistance'
+import { hasLocationData } from '@ui/utilities/hasLocationData'
 import {
   type LatLon,
   type SearchMode,
@@ -62,13 +62,11 @@ const { addressCoordinates } = useSearchAddress(addressForSearch)
 const zipcodeForSearch = ref<string>('')
 const { zipcodePolygon } = useSearchZipcode(zipcodeForSearch)
 const keywordsForSearch = ref<string>('')
-const { userLocation } = useUserLocation()
-const locationSortMode = ref<SortMode>(hasLocation(userLocation.value) ? 'DistAsc' : '')
 const locationSearchMode = ref<SearchMode>(false)
 const locationFilterMode = ref<Filters>('all')
 const visitedIds = ref(new Set<string>())
-
-const { oemLocations, isLoading, errorMessage } = useLocations()
+const { oemLocations, userLocation, isLoading, errorMessage } = useLocations()
+const locationSortMode = ref<SortMode>(hasLocationData(userLocation) ? 'DistAsc' : '')
 
 // conputed refs
 const currentLocation = computed(() => {
@@ -87,7 +85,9 @@ const currentLocation = computed(() => {
 })
 
 const sortLocationsOptions = computed(() => {
-  return hasLocation(currentLocation.value) ? sortLocationsOptionsAll : sortLocationsOptionsAlpha
+  return hasLocationData(currentLocation.value)
+    ? sortLocationsOptionsAll
+    : sortLocationsOptionsAlpha
 })
 
 const filteredLocations = computed(() => {
@@ -130,8 +130,8 @@ const filteredAndSortedLocations = computed(() => {
 
   const locs: OemLocation[] = [...searchMatchedLocations.value]
   locs.forEach((location) => {
-    location.locationCardInfo.subheader = hasLocation(currentLocation.value)
-      ? `${useHaversineDistance(
+    location.locationCardInfo.subheader = hasLocationData(currentLocation.value)
+      ? `${getHaversineDistance(
           { latitude: location.latitude, longitude: location.longitude },
           {
             latitude: currentLocation.value.latitude,
@@ -143,7 +143,7 @@ const filteredAndSortedLocations = computed(() => {
   })
 
   switch (
-    hasLocation(currentLocation.value) && !locationSortMode.value
+    hasLocationData(currentLocation.value) && !locationSortMode.value
       ? 'DistAsc'
       : locationSortMode.value
   ) {
@@ -182,7 +182,7 @@ const filteredAndSortedLocations = computed(() => {
 // watchers
 watch(currentLocation, () => {
   // watch for changes in currentLocation to handle changes to sort mode
-  const newLocHasLoc = hasLocation(currentLocation.value)
+  const newLocHasLoc = hasLocationData(currentLocation.value)
   switch (true) {
     case newLocHasLoc && !locationSortMode.value: {
       // if new location matches type of LatLon and no sort mode has been selected, set sort mode to distance-ascending
@@ -265,10 +265,6 @@ function handleDeselect(id: string) {
 // utility functions
 function isGauge(loc: OemLocation): boolean {
   return loc.deviceType === 'Aware' || loc.deviceType === 'Usgs'
-}
-
-function hasLocation(loc: LatLon) {
-  return !(Number.isNaN(loc.latitude) || Number.isNaN(loc.longitude))
 }
 </script>
 
