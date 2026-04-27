@@ -17,6 +17,8 @@ export type ZipcodePolygon = {
   nodes: LocationCoordinate[]
 }
 
+export type LocationPermissionState = 'granted' | 'prompt' | 'denied'
+
 export type MapControlPosition =
   | 'top-left'
   | 'top-right'

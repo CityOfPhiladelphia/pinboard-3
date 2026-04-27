@@ -5,14 +5,12 @@ const userLocation = ref<LatLon>({
   latitude: NaN,
   longitude: NaN,
 })
-
 const userLocationPermission = ref<LocationPermissionState>('denied')
 
 export function useUserLocation() {
   navigator.permissions
     .query({ name: 'geolocation' })
     .then(function (permission) {
-      console.log(permission.state)
       userLocationPermission.value = permission.state
     })
 

@@ -22,13 +22,13 @@ function getLocationTags(loc: LocationListDTO): TagsProps[] {
 
 export function useLocations() {
   const oemLocations = ref<OemLocation[]>([])
-  const hasData = ref<boolean>(false)
   const errorMessage = ref<string | null>(null)
+  const hasData = ref<boolean>(false)
 
   const isLoading = computed(() => {
-    const userLocationFound = hasLocationData(userLocation)
-    const hasLocationPermission = userLocationPermission.value === 'granted'
-    return hasData.value ? hasLocationPermission && !userLocationFound : true
+    return hasData.value
+      ? userLocationPermission.value === 'granted' && !hasLocationData(userLocation)
+      : true
   })
 
   onMounted(async () => {
