@@ -1,21 +1,15 @@
 import { type Ref, ref, toValue, watchEffect } from 'vue'
 import type { ZipcodePolygon } from '../types'
 
+const zipcodePolygon = ref<ZipcodePolygon>({
+  centroid: {
+    latitude: NaN,
+    longitude: NaN,
+  },
+  nodes: [],
+})
+
 export function useSearchZipcode(zipcode: string | Ref<string>) {
-  const zipcodePolygon = ref<ZipcodePolygon>({
-    centroid: {
-      latitude: NaN,
-      longitude: NaN,
-    },
-    nodes: [],
-  })
-
-  function clearZipcode() {
-    zipcodePolygon.value.centroid.longitude = NaN
-    zipcodePolygon.value.centroid.latitude = NaN
-    zipcodePolygon.value.nodes = []
-  }
-
   async function getZipcodeCentroidAndPolygon() {
     const zipcodeDeref = toValue(zipcode).replace(/-\d{4}/, '')
     if (!zipcodeDeref) {
@@ -48,4 +42,10 @@ export function useSearchZipcode(zipcode: string | Ref<string>) {
   })
 
   return { zipcodePolygon }
+}
+
+function clearZipcode() {
+  zipcodePolygon.value.centroid.longitude = NaN
+  zipcodePolygon.value.centroid.latitude = NaN
+  zipcodePolygon.value.nodes = []
 }

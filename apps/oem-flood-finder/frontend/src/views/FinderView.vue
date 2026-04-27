@@ -58,16 +58,17 @@ const sortLocationsOptionsAll: SortLocationsOptions = {
 
 // refs
 const addressForSearch = ref<string>('')
+const { addressCoordinates } = useSearchAddress(addressForSearch)
 const zipcodeForSearch = ref<string>('')
+const { zipcodePolygon } = useSearchZipcode(zipcodeForSearch)
 const keywordsForSearch = ref<string>('')
+const { userLocation } = useUserLocation()
+const locationSortMode = ref<SortMode>(hasLocation(userLocation.value) ? 'DistAsc' : '')
 const locationSearchMode = ref<SearchMode>(false)
 const locationFilterMode = ref<Filters>('all')
-const locationSortMode = ref<SortMode>('')
 const visitedIds = ref(new Set<string>())
+
 const { oemLocations, isLoading, errorMessage } = useLocations()
-const { userLocation } = useUserLocation()
-const { addressCoordinates } = useSearchAddress(addressForSearch)
-const { zipcodePolygon } = useSearchZipcode(zipcodeForSearch)
 
 // conputed refs
 const currentLocation = computed(() => {
