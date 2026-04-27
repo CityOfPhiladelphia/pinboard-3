@@ -1,4 +1,4 @@
-import { ref, onMounted, type Ref, computed } from 'vue'
+import { ref, computed, onBeforeMount } from 'vue'
 import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
 import type { TagsProps } from '@phila/phila-ui-tags'
 import type { MapCardProps } from '@phila/phila-ui-cards'
@@ -26,12 +26,13 @@ export function useLocations() {
   const hasData = ref<boolean>(false)
 
   const isLoading = computed(() => {
+    // if has has location services active, isLoading will remain true while resolving user location
     return hasData.value
       ? userLocationPermission.value === 'granted' && !hasLocationData(userLocation)
       : true
   })
 
-  onMounted(async () => {
+  onBeforeMount(async () => {
     const myHeaders = new Headers()
     myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
 
