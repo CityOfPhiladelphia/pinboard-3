@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import GlossaryView from '../views/GlossaryView.vue'
+import ResourcesView from '../views/ResourcesView.vue'
 import FinderView from '../views/FinderView.vue'
 
 const router = createRouter({
@@ -10,8 +10,8 @@ const router = createRouter({
       component: FinderView,
     },
     {
-      path: '/glossary',
-      component: GlossaryView,
+      path: '/resources',
+      component: ResourcesView,
     },
   ],
 })
