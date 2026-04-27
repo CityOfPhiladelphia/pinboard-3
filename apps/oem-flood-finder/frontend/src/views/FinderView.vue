@@ -15,14 +15,17 @@ import {
   GeolocationButton,
   BasemapToggle,
 } from '@pinboard/ui'
-import { useAddressSearch } from '@ui/composables/useAddressSearch'
+import { useSearchAddress } from '@ui/composables/useSearchAddress'
+import { useSearchZipcode } from '@ui/composables/useSearchZipcode'
 import { useHaversineDistance } from '@ui/composables/useHaversineDistance'
 import { useUserLocation } from '@ui/composables/useUserLocation'
 import {
   type LatLon,
+  type SearchMode,
   type LocationFilterOption,
   type SortLocationsOptions,
   StreetAddress,
+  StreetIntersection,
   Zipcode,
 } from '@ui/types'
 
@@ -57,16 +60,29 @@ const sortLocationsOptionsAll: SortLocationsOptions = {
 const addressForSearch = ref<string>('')
 const zipcodeForSearch = ref<string>('')
 const keywordsForSearch = ref<string>('')
+const locationSearchMode = ref<SearchMode>(false)
 const locationFilterMode = ref<Filters>('all')
 const locationSortMode = ref<SortMode>('')
 const visitedIds = ref(new Set<string>())
 const { oemLocations, isLoading, errorMessage } = useLocations()
 const { userLocation } = useUserLocation()
-const { addressCoordinates } = useAddressSearch(addressForSearch)
+const { addressCoordinates } = useSearchAddress(addressForSearch)
+const { zipcodePolygon } = useSearchZipcode(zipcodeForSearch)
 
 // conputed refs
 const currentLocation = computed(() => {
-  return hasLocation(addressCoordinates.value) ? addressCoordinates.value : userLocation.value
+  switch (locationSearchMode.value) {
+    case 'address': {
+      return addressCoordinates.value
+    }
+    case 'zipcode': {
+      return zipcodePolygon.value.centroid
+    }
+    case 'keyword':
+    default: {
+      return userLocation.value
+    }
+  }
 })
 
 const sortLocationsOptions = computed(() => {
@@ -163,24 +179,22 @@ const filteredAndSortedLocations = computed(() => {
 })
 
 // watchers
-watch(
-  currentLocation,
-  () => {
-    const newLocHasLoc = hasLocation(currentLocation.value)
-    switch (true) {
-      case newLocHasLoc && !locationSortMode.value: {
-        locationSortMode.value = 'DistAsc'
-        break
-      }
-      case !newLocHasLoc &&
-        Object.keys(sortLocationsOptionsDist).includes(locationSortMode.value): {
-        locationSortMode.value = ''
-        break
-      }
+watch(currentLocation, () => {
+  // watch for changes in currentLocation to handle changes to sort mode
+  const newLocHasLoc = hasLocation(currentLocation.value)
+  switch (true) {
+    case newLocHasLoc && !locationSortMode.value: {
+      // if new location matches type of LatLon and no sort mode has been selected, set sort mode to distance-ascending
+      locationSortMode.value = 'DistAsc'
+      break
     }
-  },
-  // { immediate: true },
-)
+    case !newLocHasLoc && Object.keys(sortLocationsOptionsDist).includes(locationSortMode.value): {
+      // if new location does not match type LatLon and a distance sort is selected, set sort mode to default sort
+      locationSortMode.value = ''
+      break
+    }
+  }
+})
 
 // event handlers
 function handleLocationFilterChange(selectedFilter: string) {
@@ -195,18 +209,26 @@ function handleSearchSubmit(locationSearchString: string) {
   switch (true) {
     case StreetAddress.test(locationSearchString): {
       console.log('StreetAddress: ', locationSearchString)
+      locationSearchMode.value = 'address'
+      addressForSearch.value = locationSearchString
+      break
+    }
+    case StreetIntersection.test(locationSearchString): {
+      console.log('StreetIntersection: ', locationSearchString)
+      locationSearchMode.value = 'address'
       addressForSearch.value = locationSearchString
       break
     }
     case Zipcode.test(locationSearchString): {
       // TODO: implement zipcode search. acts as keyword search for now
       console.log('Zipcode: ', locationSearchString)
-      // zipcodeForSearch.value = locationSearchString
-      keywordsForSearch.value = locationSearchString
+      locationSearchMode.value = 'zipcode'
+      zipcodeForSearch.value = locationSearchString
       break
     }
     case locationSearchString !== '': {
       console.log('Keyword: ', locationSearchString)
+      locationSearchMode.value = 'keyword'
       keywordsForSearch.value = locationSearchString
       break
     }

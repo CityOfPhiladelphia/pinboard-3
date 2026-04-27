@@ -1,17 +1,21 @@
 import { type Ref, ref, toValue, watchEffect } from 'vue'
 import type { AisAddressSearchResponse, LatLon } from '../types'
 
-export function useAddressSearch(address: string | Ref<string>) {
+export function useSearchAddress(address: string | Ref<string>) {
   const addressCoordinates = ref<LatLon>({
     latitude: NaN,
     longitude: NaN,
   })
 
+  function clearAddress() {
+    addressCoordinates.value.longitude = NaN
+    addressCoordinates.value.latitude = NaN
+  }
+
   async function getAddressCoordinatesFromAIS() {
     const addressDeref = toValue(address)
     if (!addressDeref) {
-      addressCoordinates.value.longitude = NaN
-      addressCoordinates.value.latitude = NaN
+      clearAddress()
       return
     }
 
@@ -25,8 +29,7 @@ export function useAddressSearch(address: string | Ref<string>) {
         result.features[0].geometry.coordinates[1]
     } catch (err) {
       console.error('Failed to get response from AIS: ', err)
-      addressCoordinates.value.longitude = NaN
-      addressCoordinates.value.latitude = NaN
+      clearAddress()
     }
   }
 
