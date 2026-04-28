@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import type { ReadingState } from '@/composables/useLocationDetail'
 import type { OemLocation } from '@/types'
-import { LineChart, type ChartData, type LevelArea } from '@phila/phila-ui-charts'
-import { computed, type ComputedRef, type Ref } from 'vue'
+import { LineChart, type ChartData } from '@phila/phila-ui-charts'
+import { computed, type Ref } from 'vue'
 
 const props = defineProps<{
   readingState: ReadingState
   location: OemLocation
 }>()
 
-let chartData: Ref<ChartData[]> = computed(() => {
+const chartData: Ref<ChartData[]> = computed(() => {
   if (props.readingState.kind === 'Loaded' && props.readingState.data) {
     return props.readingState.data.map((reading) => ({
       x: new Date(reading.validTimeUTC).toLocaleString('en-US', {
