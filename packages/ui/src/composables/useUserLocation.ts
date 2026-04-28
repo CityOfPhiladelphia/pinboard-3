@@ -16,7 +16,6 @@ export function useUserLocation() {
 
   if (navigator.geolocation) {
     navigator.geolocation.watchPosition((pos) => {
-      console.log('Geolocation Accuracy: ', pos.coords.accuracy)
       userLocation.value.latitude = pos.coords.latitude
       userLocation.value.longitude = pos.coords.longitude
     })
