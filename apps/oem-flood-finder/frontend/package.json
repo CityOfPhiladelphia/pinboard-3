@@ -9,9 +9,8 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "lint": "run-s lint:*",
-    "lint:oxlint": "oxlint . --fix",
-    "lint:eslint": "eslint . --fix --cache",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -40,18 +39,10 @@
     "eslint-plugin-vue": "~10.7.0",
     "jiti": "^2.6.1",
     "npm-run-all2": "^8.0.4",
-    "oxlint": "~1.42.0",
     "prettier": "3.8.1",
-    "typescript": "~5.9.3",
+    "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vite-plugin-vue-devtools": "^8.0.5",
     "vue-tsc": "^3.2.4"
-  },
-  "pnpm": {
-    "overrides": {
-      "minimatch@>=10.0.0 <10.2.1": ">=10.2.1",
-      "minimatch@>=10.0.0 <10.2.3": ">=10.2.3",
-      "picomatch@>=4.0.0 <4.0.4": ">=4.0.4"
-    }
   }
 }

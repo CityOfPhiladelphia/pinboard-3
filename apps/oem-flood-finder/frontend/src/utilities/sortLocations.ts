@@ -1,7 +1,7 @@
+import { toValue, type Ref } from 'vue'
+import { getHaversineDistance, hasLocationData } from '@ui/utilities/_index'
 import type { LatLon } from '@ui/types'
 import type { OemLocation, SortMode } from '@/types'
-import { getHaversineDistance, hasLocationData } from '@ui/utilities/_index'
-import { toValue, type Ref } from 'vue'
 
 export function sortLocations(
   locations: Ref<OemLocation[]> | OemLocation[],

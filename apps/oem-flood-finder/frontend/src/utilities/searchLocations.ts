@@ -1,5 +1,5 @@
-import type { OemLocation } from '@/types'
 import { toValue, type Ref } from 'vue'
+import type { OemLocation } from '@/types'
 
 export function searchLocations(
   locations: Ref<OemLocation[]> | OemLocation[],
