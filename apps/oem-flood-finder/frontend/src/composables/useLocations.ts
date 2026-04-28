@@ -2,8 +2,7 @@ import { ref, computed, onBeforeMount } from 'vue'
 import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
 import type { TagsProps } from '@phila/phila-ui-tags'
 import type { MapCardProps } from '@phila/phila-ui-cards'
-<<<<<<< HEAD
-import type { LocationListDTO, OemLocation } from '@/types'
+import type { LocationPanelDTO, OemLocation } from '@/types'
 import { useUserLocation } from '@ui/composables/_index'
 import { hasLocationData } from '@ui/utilities/_index'
 
@@ -11,24 +10,6 @@ const { userLocation, userLocationPermission } = useUserLocation()
 
 export function useLocations() {
   const oemLocations = ref<OemLocation[]>([])
-=======
-import type { LocationPanelDTO, OemLocation } from '@/types'
-
-function getLocationTags(loc: LocationPanelDTO): TagsProps[] {
-  if (loc.deviceType === 'Camera') {
-    return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
-  }
-  const gaugeValue =
-    Number.isNaN(loc.gaugeHeight) || loc.gaugeHeight === -9999.9
-      ? 'No data'
-      : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
-  return [{ text: 'Gauge', color: 'blue' as const, iconDefinition: faWater }, { text: gaugeValue }]
-}
-
-export function useLocations() {
-  const locationListDTO = ref<LocationPanelDTO[] | null>(null)
-  const isLoading = ref<boolean>(true)
->>>>>>> 1dd7e5cc5e5b1f4c0eaebb1330c88b316d72cb42
   const errorMessage = ref<string | null>(null)
   const hasData = ref<boolean>(false)
 
@@ -55,7 +36,7 @@ export function useLocations() {
       return
     }
 
-    const locations: LocationListDTO[] = await response.json()
+    const locations: LocationPanelDTO[] = await response.json()
     oemLocations.value = Array.from(locations, (loc) => {
       const cardInfo: MapCardProps = {
         heading: loc.name,
@@ -83,7 +64,7 @@ export function useLocations() {
   return { oemLocations, userLocation, isLoading, errorMessage }
 }
 
-function getLocationTags(loc: LocationListDTO): TagsProps[] {
+function getLocationTags(loc: LocationPanelDTO): TagsProps[] {
   if (loc.deviceType === 'Camera') {
     return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
   }
