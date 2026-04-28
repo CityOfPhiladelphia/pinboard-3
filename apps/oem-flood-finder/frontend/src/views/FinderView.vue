@@ -16,16 +16,9 @@ import {
   BasemapToggle,
 } from '@pinboard/ui'
 import { useSearchAddress, useSearchZipcode } from '@ui/composables/_index'
-import { getHaversineDistance, hasLocationData } from '@ui/utilities/_index'
-import {
-  type LatLon,
-  type SearchMode,
-  type LocationFilterOption,
-  type SortLocationsOptions,
-  StreetAddress,
-  StreetIntersection,
-  Zipcode,
-} from '@ui/types'
+import { hasLocationData, StreetAddress, StreetIntersection, Zipcode } from '@ui/utilities/_index'
+import type { LatLon, SearchMode, LocationFilterOption, SortLocationsOptions } from '@ui/types'
+import { filterLocations, isGauge, searchLocations, sortLocations } from '@/utilities/_index'
 
 // app imports
 import LocationDetail from '@/components/LocationDetail.vue'
@@ -88,93 +81,15 @@ const sortLocationsOptions = computed(() => {
     : sortLocationsOptionsAlpha
 })
 
-const filteredLocations = computed(() => {
-  if (isLoading.value || errorMessage.value || !oemLocations.value) {
-    return []
-  }
-  switch (locationFilterMode.value) {
-    case 'gauges': {
-      return oemLocations.value.filter((loc) => isGauge(loc))
-    }
-    case 'cameras': {
-      return oemLocations.value.filter((loc) => loc.deviceType === 'Camera')
-    }
-    case 'all':
-    default: {
-      return oemLocations.value
-    }
-  }
-})
-
-const searchMatchedLocations = computed(() => {
+const currentLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
-  if (keywordsForSearch.value) {
-    const searchTerms = keywordsForSearch.value.replace(/\W+/, ' ').toLowerCase().split(' ')
-    return filteredLocations.value.filter((loc) => {
-      const locString = JSON.stringify(Object.values(loc)).toLowerCase()
-      return searchTerms.some((term) => locString.match(term))
-    })
-  } else {
-    return filteredLocations.value
-  }
-})
-
-const filteredAndSortedLocations = computed(() => {
-  if (isLoading.value || errorMessage.value) {
-    return []
-  }
-
-  const locs: OemLocation[] = [...searchMatchedLocations.value]
-  locs.forEach((location) => {
-    location.locationCardInfo.subheader = hasLocationData(currentLocation.value)
-      ? `${getHaversineDistance(
-          { latitude: location.latitude, longitude: location.longitude },
-          {
-            latitude: currentLocation.value.latitude,
-            longitude: currentLocation.value.longitude,
-          },
-          1,
-        )} mi`
-      : undefined
-  })
-
-  switch (
-    hasLocationData(currentLocation.value) && !locationSortMode.value
-      ? 'DistAsc'
-      : locationSortMode.value
-  ) {
-    case 'AlphaAsc': {
-      locs.sort((a, b) => a.name.localeCompare(b.name))
-      break
-    }
-    case 'AlphaDes': {
-      locs.sort((a, b) => b.name.localeCompare(a.name))
-      break
-    }
-    case 'DistAsc': {
-      locs.sort(
-        (a, b) =>
-          Number(a.locationCardInfo.subheader?.replace(' mi', '')) -
-          Number(b.locationCardInfo.subheader?.replace(' mi', '')),
-      )
-      break
-    }
-    case 'DistDes': {
-      locs.sort(
-        (a, b) =>
-          Number(b.locationCardInfo.subheader?.replace(' mi', '')) -
-          Number(a.locationCardInfo.subheader?.replace(' mi', '')),
-      )
-      break
-    }
-    default: {
-      // south to north
-      locs.sort((a, b) => a.latitude - b.latitude)
-    }
-  }
-  return locs
+  const filteredLocations = filterLocations(oemLocations, locationFilterMode)
+  const searchedLocations = keywordsForSearch.value
+    ? searchLocations(filteredLocations, keywordsForSearch)
+    : filteredLocations
+  return sortLocations(searchedLocations, currentLocation, locationSortMode)
 })
 
 // watchers
@@ -206,33 +121,24 @@ function handleLocationSortChange(sortLocationsOption: string) {
 
 function handleSearchSubmit(locationSearchString: string) {
   switch (true) {
-    case StreetAddress.test(locationSearchString): {
-      console.log('StreetAddress: ', locationSearchString)
-      locationSearchMode.value = 'address'
-      addressForSearch.value = locationSearchString
-      break
-    }
+    case StreetAddress.test(locationSearchString):
     case StreetIntersection.test(locationSearchString): {
-      console.log('StreetIntersection: ', locationSearchString)
       locationSearchMode.value = 'address'
       addressForSearch.value = locationSearchString
       break
     }
     case Zipcode.test(locationSearchString): {
-      // TODO: implement zipcode search. acts as keyword search for now
-      console.log('Zipcode: ', locationSearchString)
       locationSearchMode.value = 'zipcode'
       zipcodeForSearch.value = locationSearchString
       break
     }
     case locationSearchString !== '': {
-      console.log('Keyword: ', locationSearchString)
       locationSearchMode.value = 'keyword'
       keywordsForSearch.value = locationSearchString
       break
     }
     default: {
-      console.log('Clear: ', locationSearchString)
+      locationSearchMode.value = false
       addressForSearch.value = locationSearchString
       zipcodeForSearch.value = locationSearchString
       keywordsForSearch.value = locationSearchString
@@ -259,16 +165,11 @@ function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
 function handleDeselect(id: string) {
   visitedIds.value.add(id)
 }
-
-// utility functions
-function isGauge(loc: OemLocation): boolean {
-  return loc.deviceType === 'Aware' || loc.deviceType === 'Usgs'
-}
 </script>
 
 <template>
   <Pinboard
-    :locations="filteredAndSortedLocations"
+    :locations="currentLocations"
     :is-loading="isLoading"
     :error-message="errorMessage"
     :location-panel-search="searchPlaceholderText"
@@ -309,7 +210,7 @@ function isGauge(loc: OemLocation): boolean {
 
       <div v-if="!isLoading">
         <MapMarker
-          v-for="loc in [...filteredAndSortedLocations].sort((a, b) => b.latitude - a.latitude)"
+          v-for="loc in [...currentLocations].sort((a, b) => b.latitude - a.latitude)"
           :key="loc.id"
           :lng-lat="[loc.longitude, loc.latitude]"
         >

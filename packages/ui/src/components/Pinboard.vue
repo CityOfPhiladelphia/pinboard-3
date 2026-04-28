@@ -172,9 +172,6 @@ function handleSearchChange(search: string) {
     console.log('locationSearchChange:', searchSuggestions.value)
   }
   searchString.value = search
-  if (!searchString.value) {
-    emit('search', searchString.value)
-  }
 }
 
 function handleSearchSubmit() {

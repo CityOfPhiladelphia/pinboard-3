@@ -4,12 +4,12 @@ import type { TagsProps } from '@phila/phila-ui-tags'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 import type { LocationListDTO, OemLocation } from '@/types'
 import { useUserLocation } from '@ui/composables/_index'
-import { hasLocationData, getHaversineDistance } from '@ui/utilities/_index'
+import { hasLocationData } from '@ui/utilities/_index'
 
 const { userLocation, userLocationPermission } = useUserLocation()
 
 export function useLocations() {
-  const oemLocations = ref<OemLocation[] | null>(null)
+  const oemLocations = ref<OemLocation[]>([])
   const errorMessage = ref<string | null>(null)
   const hasData = ref<boolean>(false)
 
@@ -40,13 +40,7 @@ export function useLocations() {
     oemLocations.value = Array.from(locations, (loc) => {
       const cardInfo: MapCardProps = {
         heading: loc.name,
-        subheader: hasLocationData(userLocation)
-          ? getHaversineDistance(
-              userLocation,
-              { latitude: loc.latitude, longitude: loc.longitude },
-              1,
-            )
-          : undefined,
+        subheader: undefined,
         tags: getLocationTags(loc),
         src: loc.imageUrl,
       }

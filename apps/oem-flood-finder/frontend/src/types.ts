@@ -19,7 +19,7 @@ export type FloodImpact = {
   statement: string
 }
 
-type DeviceType = 'Aware' | 'Usgs' | 'Camera'
+export type DeviceType = 'Aware' | 'Usgs' | 'Camera'
 
 export type LocationListDTO = {
   id: string
