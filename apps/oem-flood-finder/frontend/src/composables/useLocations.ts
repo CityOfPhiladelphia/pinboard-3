@@ -21,15 +21,16 @@ function getLocationTags(loc: LocationListDTO): TagsProps[] {
 }
 
 export function useLocations() {
-  const oemLocations = ref<OemLocation[]>([])
+  const oemLocations = ref<OemLocation[] | null>(null)
   const errorMessage = ref<string | null>(null)
   const hasData = ref<boolean>(false)
 
   const isLoading = computed(() => {
     // if has has location services active, isLoading will remain true while resolving user location
-    return hasData.value
-      ? userLocationPermission.value === 'granted' && !hasLocationData(userLocation)
-      : true
+    return !(
+      hasData.value &&
+      (userLocationPermission.value === 'denied' || hasLocationData(userLocation))
+    )
   })
 
   onBeforeMount(async () => {
@@ -48,7 +49,7 @@ export function useLocations() {
     }
 
     const locations: LocationListDTO[] = await response.json()
-    locations.forEach((loc) => {
+    oemLocations.value = Array.from(locations, (loc) => {
       const cardInfo: MapCardProps = {
         heading: loc.name,
         subheader: hasLocationData(userLocation)
@@ -61,7 +62,7 @@ export function useLocations() {
         tags: getLocationTags(loc),
         src: loc.imageUrl,
       }
-      oemLocations.value.push({
+      return {
         id: loc.id,
         name: loc.name,
         latitude: loc.latitude,
@@ -73,7 +74,7 @@ export function useLocations() {
         minorStage: loc.minorStage,
         moderateStage: loc.moderateStage,
         majorStage: loc.majorStage,
-      })
+      }
     })
     hasData.value = true
   })
