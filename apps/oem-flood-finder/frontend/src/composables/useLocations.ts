@@ -3,22 +3,10 @@ import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
 import type { TagsProps } from '@phila/phila-ui-tags'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 import type { LocationListDTO, OemLocation } from '@/types'
-import { useUserLocation } from '@ui/composables/useUserLocation'
-import { hasLocationData } from '@ui/utilities/hasLocationData'
-import { getHaversineDistance } from '@ui/utilities/getHaversineDistance'
+import { useUserLocation } from '@ui/composables/_index'
+import { hasLocationData, getHaversineDistance } from '@ui/utilities/_index'
 
 const { userLocation, userLocationPermission } = useUserLocation()
-
-function getLocationTags(loc: LocationListDTO): TagsProps[] {
-  if (loc.deviceType === 'Camera') {
-    return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
-  }
-  const gaugeValue =
-    Number.isNaN(loc.gaugeHeight) || loc.gaugeHeight === -9999.9
-      ? 'No data'
-      : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
-  return [{ text: 'Gauge', color: 'blue' as const, iconDefinition: faWater }, { text: gaugeValue }]
-}
 
 export function useLocations() {
   const oemLocations = ref<OemLocation[] | null>(null)
@@ -80,4 +68,15 @@ export function useLocations() {
   })
 
   return { oemLocations, userLocation, isLoading, errorMessage }
+}
+
+function getLocationTags(loc: LocationListDTO): TagsProps[] {
+  if (loc.deviceType === 'Camera') {
+    return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
+  }
+  const gaugeValue =
+    Number.isNaN(loc.gaugeHeight) || loc.gaugeHeight === -9999.9
+      ? 'No data'
+      : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
+  return [{ text: 'Gauge', color: 'blue' as const, iconDefinition: faWater }, { text: gaugeValue }]
 }

@@ -15,10 +15,8 @@ import {
   GeolocationButton,
   BasemapToggle,
 } from '@pinboard/ui'
-import { useSearchAddress } from '@ui/composables/useSearchAddress'
-import { useSearchZipcode } from '@ui/composables/useSearchZipcode'
-import { getHaversineDistance } from '@ui/utilities/getHaversineDistance'
-import { hasLocationData } from '@ui/utilities/hasLocationData'
+import { useSearchAddress, useSearchZipcode } from '@ui/composables/_index'
+import { getHaversineDistance, hasLocationData } from '@ui/utilities/_index'
 import {
   type LatLon,
   type SearchMode,
