@@ -170,5 +170,4 @@
     padding-bottom: var(--spacing-2xl, 2rem);
   }
 }
-
 </style>
