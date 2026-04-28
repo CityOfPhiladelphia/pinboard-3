@@ -21,7 +21,7 @@ export type FloodImpact = {
 
 export type DeviceType = 'Aware' | 'Usgs' | 'Camera'
 
-export type LocationListDTO = {
+export type LocationPanelDTO = {
   id: string
   name: string
   lastUpdated: Date

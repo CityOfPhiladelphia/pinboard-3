@@ -69,8 +69,7 @@ export function useLocations(): {
               heading: String(
                 feature.properties.record ?? feature.properties.address ?? ''
               ),
-              subheader: 'Some date!',
-              tags: [{ text: 'Some other stuff...' }],
+              body: String(feature.properties.address ?? ''),
             },
           }) satisfies PrimaryCareLocation
       )
