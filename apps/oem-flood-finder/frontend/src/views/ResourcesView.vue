@@ -89,7 +89,7 @@
         </div>
       </div>
 
-      <div class="jump-links">Jump Links</div>
+      <!-- TODO: jump links component -->
     </div>
   </div>
 </template>
@@ -100,6 +100,8 @@
   justify-content: center;
   align-items: flex-start;
   gap: 2rem;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .inner-container {
@@ -133,7 +135,8 @@
 
 .content-container {
   display: flex;
-  width: 45rem;
+  width: 100%;
+  max-width: 45rem;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--spacing-3xl, 3rem);
@@ -153,15 +156,19 @@
 
 .main-description {
   font-weight: 600;
-  width: 59.5rem;
+  width: 100%;
+  max-width: 59.5rem;
 }
 
-.jump-links {
-  padding: 0 1.9375rem 49rem 0;
-  flex-direction: column;
-  align-items: center;
-  align-self: stretch;
-  min-width: 15rem;
-  background-color: lightgray;
+@media (max-width: 768px) {
+  .content-area {
+    padding: 1.5rem 1rem 0 1rem;
+  }
+
+  .section {
+    gap: var(--spacing-2xl, 2rem);
+    padding-bottom: var(--spacing-2xl, 2rem);
+  }
 }
+
 </style>
