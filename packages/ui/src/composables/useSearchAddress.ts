@@ -8,13 +8,13 @@ const addressCoordinates = ref<LatLon>({
 
 export function useSearchAddress(address: string | Ref<string>) {
   async function getAddressCoordinatesFromAIS() {
-    const addressDeref = toValue(address)
-    if (!addressDeref) {
+    address = toValue(address)
+    if (!address) {
       clearAddress()
       return
     }
 
-    const url = `https://api.phila.gov/ais/v1/search/${encodeURIComponent(addressDeref)}?gatekeeperKey=${import.meta.env.VITE_OEM_FLOOD_GATEKEEPER_KEY}`
+    const url = `https://api.phila.gov/ais/v1/search/${encodeURIComponent(address)}?gatekeeperKey=${import.meta.env.VITE_OEM_FLOOD_GATEKEEPER_KEY}`
 
     try {
       const result: AisAddressSearchResponse = await (await fetch(url)).json()

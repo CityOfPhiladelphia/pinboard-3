@@ -8,8 +8,8 @@ import {
   GeolocationButton,
   BasemapToggle,
   useUserLocation,
-  useHaversineDistance,
 } from '@pinboard/ui'
+import { getHaversineDistance } from '@ui/utilities/_index'
 import '@pinboard/ui/style.css'
 import { useLocations } from './composables/useLocations'
 import LocationCard from './components/LocationCard.vue'
@@ -30,7 +30,7 @@ const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
     locationCardInfo: {
       ...loc.locationCardInfo,
       subheader: hasUserLocation
-        ? `${useHaversineDistance(
+        ? `${getHaversineDistance(
             { latitude: loc.latitude, longitude: loc.longitude },
             { latitude, longitude },
             1

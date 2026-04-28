@@ -1,5 +1,5 @@
 import type { LatLon } from '../types'
-import { Ref, toValue } from 'vue'
+import { type Ref, toValue } from 'vue'
 
 export function hasLocationData(loc: LatLon | Ref<LatLon>) {
   loc = toValue(loc)

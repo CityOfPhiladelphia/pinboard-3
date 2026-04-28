@@ -11,8 +11,8 @@ const zipcodePolygon = ref<ZipcodePolygon>({
 
 export function useSearchZipcode(zipcode: string | Ref<string>) {
   async function getZipcodeCentroidAndPolygon() {
-    const zipcodeDeref = toValue(zipcode).replace(/-\d{4}/, '')
-    if (!zipcodeDeref) {
+    zipcode = toValue(zipcode).replace(/-\d{4}/, '')
+    if (!zipcode) {
       clearZipcode()
       return
     }
@@ -20,7 +20,7 @@ export function useSearchZipcode(zipcode: string | Ref<string>) {
     const url =
       'https://services.arcgis.com/fLeGjb7u4uXqeF9q/arcgis/rest/services/Zipcodes_Poly/FeatureServer/0/query'
     const params = new URLSearchParams({
-      where: `code=${zipcodeDeref}`,
+      where: `code=${zipcode}`,
       f: 'json',
       outSR: '4326',
       returnCentroid: 'true',
