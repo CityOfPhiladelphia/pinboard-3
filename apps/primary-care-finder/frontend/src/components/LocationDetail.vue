@@ -6,7 +6,6 @@ import type { PrimaryCareLocation } from '@/types'
 
 const props = defineProps<{
   location: PrimaryCareLocation
-  onClose?: (e: MouseEvent) => void
 }>()
 
 const { t, locale, messages } = useI18n()
@@ -209,7 +208,6 @@ function translateTransitList(raw: string | null, category: string): string {
   <div class="location-detail content">
     <div class="detail-header">
       <h2>{{ siteName() }}</h2>
-      <button class="close-button" @click="onClose">&#x2715;</button>
     </div>
 
     <div class="detail-body">
@@ -390,14 +388,6 @@ function translateTransitList(raw: string | null, category: string): string {
 .detail-header h2 {
   font-size: 1.25rem;
   margin: 0;
-}
-
-.close-button {
-  background: none;
-  border: none;
-  font-size: 1.25rem;
-  cursor: pointer;
-  padding: 0.25rem;
 }
 
 .detail-body {

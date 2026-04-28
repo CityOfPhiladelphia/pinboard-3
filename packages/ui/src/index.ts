@@ -2,6 +2,8 @@ import PinboardShell from './components/PinboardShell.vue'
 import Pinboard from './components/Pinboard.vue'
 export { createPinboard } from './plugin'
 export type { PinboardConfig, MapConfig } from './types'
+export { useUserLocation } from './composables/useUserLocation'
+export { useHaversineDistance } from './composables/useHaversineDistance'
 
 // Re-export map-core layer components so apps use the same MapLibre instance as PhilaMap
 export {
