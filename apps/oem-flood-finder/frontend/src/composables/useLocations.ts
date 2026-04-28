@@ -2,9 +2,9 @@ import { ref, onMounted, computed } from 'vue'
 import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
 import type { TagsProps } from '@phila/phila-ui-tags'
 import type { MapCardProps } from '@phila/phila-ui-cards'
-import type { LocationListDTO, OemLocation } from '@/types'
+import type { LocationPanelDTO, OemLocation } from '@/types'
 
-function getLocationTags(loc: LocationListDTO): TagsProps[] {
+function getLocationTags(loc: LocationPanelDTO): TagsProps[] {
   if (loc.deviceType === 'Camera') {
     return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
   }
@@ -16,7 +16,7 @@ function getLocationTags(loc: LocationListDTO): TagsProps[] {
 }
 
 export function useLocations() {
-  const locationListDTO = ref<LocationListDTO[] | null>(null)
+  const locationListDTO = ref<LocationPanelDTO[] | null>(null)
   const isLoading = ref<boolean>(true)
   const errorMessage = ref<string | null>(null)
 
