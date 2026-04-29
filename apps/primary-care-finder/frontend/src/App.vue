@@ -7,9 +7,9 @@ import {
   MapNavigationControl,
   GeolocationButton,
   BasemapToggle,
-  useUserLocation,
 } from '@pinboard/ui'
 import { getHaversineDistance } from '@ui/utilities/_index'
+import { useUserLocation } from '@ui/composables/_index'
 import '@pinboard/ui/style.css'
 import { useLocations } from './composables/useLocations'
 import LocationCard from './components/LocationCard.vue'
