@@ -63,9 +63,9 @@ const sortChoices = computed(() => {
     Object.keys(sortOptions),
     (option, i) => {
       return {
-        text: Object.values(sortOptions)[i],
+        text: Object.values(sortOptions)[i]!,
         value: option,
-      } as const
+      }
     }
   )
   return choices
@@ -77,7 +77,7 @@ function handleFilterChange(option: string) {
 }
 
 function handleSortChange(value: string | string[]) {
-  value = Array.isArray(value) ? value[0] : value
+  value = Array.isArray(value) ? (value[0] ?? '') : value
   sortOption.value = value ?? ''
   emit('sortOption', sortOption.value)
 }

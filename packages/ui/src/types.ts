@@ -69,14 +69,14 @@ export type LocationFilterOption = {
 
 export type SearchMode = 'address' | 'zipcode' | 'keyword' | false
 
-export type MenuOption = Readonly<{
+export type MenuOption = {
   text: string
   value: string
-}>
+}
 
-export type SortLocationsOptions = Readonly<{
+export type SortLocationsOptions = {
   [key: string]: string
-}>
+}
 
 export type AisAutocompleteResult = Readonly<{
   query: string
