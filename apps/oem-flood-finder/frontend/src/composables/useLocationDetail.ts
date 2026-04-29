@@ -10,7 +10,7 @@ export type ReadingState =
 
 export function useLocationDetail(
   gaugeId: MaybeRefOrGetter<string>,
-  deviceType: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>
+  deviceType: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
 ): Ref<ReadingState> {
   const readingState = ref<ReadingState>({ kind: 'Loading' })
 
@@ -47,12 +47,10 @@ export function useLocationDetail(
     if (toValue(deviceType) === 'Aware') {
       const data: AwareReadingDTO[] = await response.json()
       readingState.value = { kind: 'Loaded', gaugeType: 'Aware', data: data }
-    }
-    else {
+    } else {
       const data: UsgsReadingDTO[] = await response.json()
       readingState.value = { kind: 'Loaded', gaugeType: 'Usgs', data: data }
     }
-
   })
 
   return readingState
