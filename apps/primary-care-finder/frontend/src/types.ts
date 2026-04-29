@@ -1,11 +1,12 @@
-import type { BasicLocation } from '@ui/types'
+import type { PinboardTypes } from '@pinboard/ui'
 
 export interface PrimaryCareLocationInfo {
   properties: PrimaryCareProperties
   geometry: { type: string; coordinates: [number, number, ...number[]] }
 }
 
-export type PrimaryCareLocation = BasicLocation & PrimaryCareLocationInfo
+export type PrimaryCareLocation = PinboardTypes.BasicLocation &
+  PrimaryCareLocationInfo
 
 export interface PrimaryCareProperties {
   objectid: number

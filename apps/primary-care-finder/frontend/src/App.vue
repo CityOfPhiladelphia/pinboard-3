@@ -24,12 +24,11 @@ const searchString = ref('')
 
 const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   const { latitude, longitude } = userLocation.value
-  const hasUserLocation = !Number.isNaN(latitude) && !Number.isNaN(longitude)
   return locations.value.map((loc) => ({
     ...loc,
     locationCardInfo: {
       ...loc.locationCardInfo,
-      subheader: hasUserLocation
+      subheader: PinboardUtilities.hasLocationData(userLocation.value)
         ? `${PinboardUtilities.getHaversineDistance(
             { latitude: loc.latitude, longitude: loc.longitude },
             { latitude, longitude },

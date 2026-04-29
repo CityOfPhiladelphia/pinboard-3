@@ -65,7 +65,7 @@ const sortChoices = computed(() => {
       return {
         text: Object.values(sortOptions)[i],
         value: option,
-      }
+      } as const
     }
   )
   return choices
