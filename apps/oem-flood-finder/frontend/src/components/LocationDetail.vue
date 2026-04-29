@@ -42,8 +42,6 @@ const lastUpdatedDate = computed(() => {
       <template v-if="location.deviceType === 'Aware' || location.deviceType === 'Usgs'">
         <h4>{{ location.name }}</h4>
 
-        <h6>Gauge Reading</h6>
-
         <!-- Gauge detail -->
         <GaugeReadings :reading-state="readingState" :location="location" />
 
