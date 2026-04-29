@@ -11,7 +11,7 @@ const emit = defineEmits<{
   selectedFilter: [filter: string]
 }>()
 
-const selectedFilter = ref(props.filterOptions[0].value)
+const selectedFilter = ref(props.filterOptions[0].value ?? undefined)
 
 function handleFilterChange(option: string) {
   if (selectedFilter.value === option) {

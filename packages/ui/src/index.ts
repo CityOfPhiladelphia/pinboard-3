@@ -1,7 +1,9 @@
 import PinboardShell from './components/PinboardShell.vue'
 import Pinboard from './components/Pinboard.vue'
+export * as PinboardComposables from './composables/_index'
+export * as PinboardUtilities from './utilities/_index'
 export { createPinboard } from './plugin'
-export type { PinboardConfig, MapConfig } from './types'
+export type * as PinboardTypes from './types'
 
 // Re-export map-core layer components so apps use the same MapLibre instance as PhilaMap
 export {

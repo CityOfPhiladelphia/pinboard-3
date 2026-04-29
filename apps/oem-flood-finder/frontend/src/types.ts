@@ -1,5 +1,5 @@
 /** Shared types for OEM Flood Finder */
-import type { BasicLocation, LatLon } from '@ui/types'
+import type { PinboardTypes } from '@pinboard/ui'
 
 export type AlertBanner = {
   title: string
@@ -21,7 +21,7 @@ export type FloodImpact = {
 
 export type DeviceType = 'Aware' | 'Usgs' | 'Camera'
 
-export type LocationListDTO = {
+export type LocationPanelDTO = {
   id: string
   name: string
   lastUpdated: Date
@@ -33,7 +33,7 @@ export type LocationListDTO = {
   minorStage: number
   moderateStage: number
   majorStage: number
-} & LatLon
+} & PinboardTypes.LatLon
 
 export type OemFields = {
   deviceType: DeviceType
@@ -44,7 +44,7 @@ export type OemFields = {
   majorStage: number
 }
 
-export type OemLocation = BasicLocation & OemFields
+export type OemLocation = PinboardTypes.BasicLocation & OemFields
 
 export type Reading = {
   readingId: string

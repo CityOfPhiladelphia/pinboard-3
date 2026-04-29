@@ -1,17 +1,16 @@
-import type { LatLon } from '@ui/types'
-import type { OemLocation, SortMode } from '@/types'
-import { getHaversineDistance, hasLocationData } from '@ui/utilities/_index'
 import { toValue, type Ref } from 'vue'
+import { PinboardUtilities, type PinboardTypes } from '@pinboard/ui'
+import type { OemLocation, SortMode } from '@/types'
 
 export function sortLocations(
   locations: Ref<OemLocation[]> | OemLocation[],
-  currentLocation: Ref<LatLon>,
+  currentLocation: Ref<PinboardTypes.LatLon>,
   sortMode: Ref<SortMode>,
 ) {
   locations = toValue(locations)
   locations.forEach((location) => {
-    location.locationCardInfo.subheader = hasLocationData(currentLocation.value)
-      ? `${getHaversineDistance(
+    location.locationCardInfo.subheader = PinboardUtilities.hasLocationData(currentLocation.value)
+      ? `${PinboardUtilities.getHaversineDistance(
           { latitude: location.latitude, longitude: location.longitude },
           {
             latitude: currentLocation.value.latitude,
@@ -22,7 +21,11 @@ export function sortLocations(
       : undefined
   })
 
-  switch (hasLocationData(currentLocation.value) && !sortMode.value ? 'DistAsc' : sortMode.value) {
+  switch (
+    PinboardUtilities.hasLocationData(currentLocation.value) && !sortMode.value
+      ? 'DistAsc'
+      : sortMode.value
+  ) {
     case 'AlphaAsc': {
       locations.sort((a, b) => a.name.localeCompare(b.name))
       break

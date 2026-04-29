@@ -42,14 +42,14 @@ const alertBanner: ComputedRef<AlertBanner | null> = computed(() => {
   >
     <template #mobile-nav>
       <h4><RouterLink to="/"> Finder </RouterLink></h4>
-      <h4><RouterLink to="/glossary"> Glossary </RouterLink></h4>
+      <h4><RouterLink to="/resources"> Resources </RouterLink></h4>
     </template>
 
     <template #info-body>
       <span class="has-text-body-small">
         This map allows residents to keep an eye on water levels in parts of the city and make
         informed decisions prior to, during, and after a flooding event.
-        <a href="/glossary">Learn more</a>
+        <a href="/resources">Learn more</a>
       </span>
     </template>
 

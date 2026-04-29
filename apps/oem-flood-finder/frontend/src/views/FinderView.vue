@@ -14,10 +14,10 @@ import {
   MapNavigationControl,
   GeolocationButton,
   BasemapToggle,
+  PinboardComposables,
+  PinboardUtilities,
+  type PinboardTypes,
 } from '@pinboard/ui'
-import { useSearchAddress, useSearchZipcode } from '@ui/composables/_index'
-import { hasLocationData, StreetAddress, StreetIntersection, Zipcode } from '@ui/utilities/_index'
-import type { LatLon, SearchMode, LocationFilterOption, SortLocationsOptions } from '@ui/types'
 import { filterLocations, isGauge, searchLocations, sortLocations } from '@/utilities/_index'
 
 // app imports
@@ -27,37 +27,39 @@ import type { Filters, OemLocation, SortMode } from '@/types'
 
 // app variables
 const searchPlaceholderText = 'Search by address or keyword...'
-const filterOptions: LocationFilterOption[] = [
+const filterOptions: PinboardTypes.LocationFilterOption[] = [
   { value: 'all' satisfies Filters, label: 'All' },
   { value: 'gauges' satisfies Filters, label: 'Gauge' },
   { value: 'cameras' satisfies Filters, label: 'Camera' },
 ]
-const sortLocationsOptionsAlpha: SortLocationsOptions = {
+const sortLocationsOptionsAlpha: PinboardTypes.SortLocationsOptions = {
   AlphaAsc: 'Alpha-Asc',
   AlphaDes: 'Alpha-Des',
 }
 
-const sortLocationsOptionsDist: SortLocationsOptions = {
+const sortLocationsOptionsDist: PinboardTypes.SortLocationsOptions = {
   DistAsc: 'Dist-Asc',
   DistDes: 'Dist-Des',
 }
 
-const sortLocationsOptionsAll: SortLocationsOptions = {
+const sortLocationsOptionsAll: PinboardTypes.SortLocationsOptions = {
   ...sortLocationsOptionsAlpha,
   ...sortLocationsOptionsDist,
 }
 
 // refs
 const addressForSearch = ref<string>('')
-const { addressCoordinates } = useSearchAddress(addressForSearch)
+const { addressCoordinates } = PinboardComposables.useSearchAddress(addressForSearch)
 const zipcodeForSearch = ref<string>('')
-const { zipcodePolygon } = useSearchZipcode(zipcodeForSearch)
+const { zipcodePolygon } = PinboardComposables.useSearchZipcode(zipcodeForSearch)
 const keywordsForSearch = ref<string>('')
-const locationSearchMode = ref<SearchMode>(false)
+const locationSearchMode = ref<PinboardTypes.SearchMode>(false)
 const locationFilterMode = ref<Filters>('all')
 const visitedIds = ref(new Set<string>())
 const { oemLocations, userLocation, isLoading, errorMessage } = useLocations()
-const locationSortMode = ref<SortMode>(hasLocationData(userLocation) ? 'DistAsc' : '')
+const locationSortMode = ref<SortMode>(
+  PinboardUtilities.hasLocationData(userLocation) ? 'DistAsc' : '',
+)
 
 // conputed refs
 const currentLocation = computed(() => {
@@ -76,7 +78,7 @@ const currentLocation = computed(() => {
 })
 
 const sortLocationsOptions = computed(() => {
-  return hasLocationData(currentLocation.value)
+  return PinboardUtilities.hasLocationData(currentLocation.value)
     ? sortLocationsOptionsAll
     : sortLocationsOptionsAlpha
 })
@@ -95,7 +97,7 @@ const currentLocations = computed(() => {
 // watchers
 watch(currentLocation, () => {
   // watch for changes in currentLocation to handle changes to sort mode
-  const newLocHasLoc = hasLocationData(currentLocation.value)
+  const newLocHasLoc = PinboardUtilities.hasLocationData(currentLocation.value)
   switch (true) {
     case newLocHasLoc && !locationSortMode.value: {
       // if new location matches type of LatLon and no sort mode has been selected, set sort mode to distance-ascending
@@ -121,13 +123,13 @@ function handleLocationSortChange(sortLocationsOption: string) {
 
 function handleSearchSubmit(locationSearchString: string) {
   switch (true) {
-    case StreetAddress.test(locationSearchString):
-    case StreetIntersection.test(locationSearchString): {
+    case PinboardUtilities.StreetAddress.test(locationSearchString):
+    case PinboardUtilities.StreetIntersection.test(locationSearchString): {
       locationSearchMode.value = 'address'
       addressForSearch.value = locationSearchString
       break
     }
-    case Zipcode.test(locationSearchString): {
+    case PinboardUtilities.Zipcode.test(locationSearchString): {
       locationSearchMode.value = 'zipcode'
       zipcodeForSearch.value = locationSearchString
       break
@@ -146,7 +148,7 @@ function handleSearchSubmit(locationSearchString: string) {
   }
 }
 
-function handleGeolocate(locationData: LatLon & { accuracy: number }) {
+function handleGeolocate(locationData: PinboardTypes.LatLon & { accuracy: number }) {
   console.log('Geolocation Accuracy: ', locationData.accuracy)
   userLocation.value = {
     latitude: locationData.latitude,

@@ -34,7 +34,6 @@ import type {
   SortLocationsOptions,
   MenuOption,
 } from '../types'
-// import { StreetAddress, Zipcode } from '../types'
 
 // props
 const props = defineProps<{

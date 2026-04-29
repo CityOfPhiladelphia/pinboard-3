@@ -2,11 +2,10 @@ import { ref, computed, onBeforeMount } from 'vue'
 import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
 import type { TagsProps } from '@phila/phila-ui-tags'
 import type { MapCardProps } from '@phila/phila-ui-cards'
-import type { LocationListDTO, OemLocation } from '@/types'
-import { useUserLocation } from '@ui/composables/_index'
-import { hasLocationData } from '@ui/utilities/_index'
+import type { LocationPanelDTO, OemLocation } from '@/types'
+import { PinboardComposables, PinboardUtilities } from '@pinboard/ui'
 
-const { userLocation, userLocationPermission } = useUserLocation()
+const { userLocation, userLocationPermission } = PinboardComposables.useUserLocation()
 
 export function useLocations() {
   const oemLocations = ref<OemLocation[]>([])
@@ -17,7 +16,7 @@ export function useLocations() {
     // if has has location services active, isLoading will remain true while resolving user location
     return !(
       hasData.value &&
-      (userLocationPermission.value === 'denied' || hasLocationData(userLocation))
+      (userLocationPermission.value === 'denied' || PinboardUtilities.hasLocationData(userLocation))
     )
   })
 
@@ -36,7 +35,7 @@ export function useLocations() {
       return
     }
 
-    const locations: LocationListDTO[] = await response.json()
+    const locations: LocationPanelDTO[] = await response.json()
     oemLocations.value = Array.from(locations, (loc) => {
       const cardInfo: MapCardProps = {
         heading: loc.name,
@@ -64,7 +63,7 @@ export function useLocations() {
   return { oemLocations, userLocation, isLoading, errorMessage }
 }
 
-function getLocationTags(loc: LocationListDTO): TagsProps[] {
+function getLocationTags(loc: LocationPanelDTO): TagsProps[] {
   if (loc.deviceType === 'Camera') {
     return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
   }

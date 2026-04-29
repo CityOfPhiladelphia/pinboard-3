@@ -20,6 +20,7 @@ import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Search } from '@phila/phila-ui-search'
 
+import { PINBOARD_CONFIG_KEY } from '../plugin'
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
@@ -29,8 +30,7 @@ import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 
 // type imports
-import {
-  PINBOARD_CONFIG_KEY,
+import type {
   BasicLocation,
   LocationFilterOption,
   SortLocationsOptions,

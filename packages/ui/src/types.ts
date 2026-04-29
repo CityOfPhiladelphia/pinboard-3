@@ -1,5 +1,4 @@
 // packages/ui/src/types.ts
-import type { InjectionKey } from 'vue'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 
 export type Latitude = number
@@ -56,9 +55,6 @@ export type AlertBanner = {
   title: string
   message: string
 }
-
-export const PINBOARD_CONFIG_KEY: InjectionKey<PinboardConfig> =
-  Symbol('pinboard-config')
 
 export type BasicLocation = {
   id: string
