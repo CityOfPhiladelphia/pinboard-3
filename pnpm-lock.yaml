@@ -124,9 +124,6 @@ importers:
       hls.js:
         specifier: ^1.6.15
         version: 1.6.15
-      pinia:
-        specifier: ^3.0.0
-        version: 3.0.4(typescript@5.8.2)(vue@3.5.27(typescript@5.8.2))
       vue:
         specifier: ^3.5.27
         version: 3.5.27(typescript@5.8.2)
@@ -155,21 +152,12 @@ importers:
       eslint-config-prettier:
         specifier: ^10.1.8
         version: 10.1.8(eslint@9.39.2(jiti@2.6.1))
-      eslint-plugin-oxlint:
-        specifier: ~1.42.0
-        version: 1.42.0
       eslint-plugin-vue:
         specifier: ~10.7.0
         version: 10.7.0(@typescript-eslint/parser@8.59.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.8.2))(eslint@9.39.2(jiti@2.6.1))(vue-eslint-parser@10.2.0(eslint@9.39.2(jiti@2.6.1)))
-      jiti:
-        specifier: ^2.6.1
-        version: 2.6.1
       npm-run-all2:
         specifier: ^8.0.4
         version: 8.0.4
-      oxlint:
-        specifier: ~1.42.0
-        version: 1.42.0
       prettier:
         specifier: 3.8.1
         version: 3.8.1
@@ -240,9 +228,6 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
-      pinia:
-        specifier: ^3.0.0
-        version: 3.0.4(typescript@5.8.2)(vue@3.5.27(typescript@5.8.2))
       vue:
         specifier: ^3.5.27
         version: 3.5.27(typescript@5.8.2)
@@ -905,46 +890,6 @@ packages:
   '@oxc-project/types@0.124.0':
     resolution: {integrity: sha512-VBFWMTBvHxS11Z5Lvlr3IWgrwhMTXV+Md+EQF0Xf60+wAdsGFTBx7X7K/hP4pi8N7dcm1RvcHwDxZ16Qx8keUg==}
 
-  '@oxlint/darwin-arm64@1.42.0':
-    resolution: {integrity: sha512-ui5CdAcDsXPQwZQEXOOSWsilJWhgj9jqHCvYBm2tDE8zfwZZuF9q58+hGKH1x5y0SV4sRlyobB2Quq6uU6EgeA==}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@oxlint/darwin-x64@1.42.0':
-    resolution: {integrity: sha512-wo0M/hcpHRv7vFje99zHHqheOhVEwUOKjOgBKyi0M99xcLizv04kcSm1rTd6HSCeZgOtiJYZRVAlKhQOQw2byQ==}
-    cpu: [x64]
-    os: [darwin]
-
-  '@oxlint/linux-arm64-gnu@1.42.0':
-    resolution: {integrity: sha512-j4QzfCM8ks+OyM+KKYWDiBEQsm5RCW50H1Wz16wUyoFsobJ+X5qqcJxq6HvkE07m8euYmZelyB0WqsiDoz1v8g==}
-    cpu: [arm64]
-    os: [linux]
-
-  '@oxlint/linux-arm64-musl@1.42.0':
-    resolution: {integrity: sha512-g5b1Uw7zo6yw4Ymzyd1etKzAY7xAaGA3scwB8tAp3QzuY7CYdfTwlhiLKSAKbd7T/JBgxOXAGNcLDorJyVTXcg==}
-    cpu: [arm64]
-    os: [linux]
-
-  '@oxlint/linux-x64-gnu@1.42.0':
-    resolution: {integrity: sha512-HnD99GD9qAbpV4q9iQil7mXZUJFpoBdDavfcC2CgGLPlawfcV5COzQPNwOgvPVkr7C0cBx6uNCq3S6r9IIiEIg==}
-    cpu: [x64]
-    os: [linux]
-
-  '@oxlint/linux-x64-musl@1.42.0':
-    resolution: {integrity: sha512-8NTe8A78HHFn+nBi+8qMwIjgv9oIBh+9zqCPNLH56ah4vKOPvbePLI6NIv9qSkmzrBuu8SB+FJ2TH/G05UzbNA==}
-    cpu: [x64]
-    os: [linux]
-
-  '@oxlint/win32-arm64@1.42.0':
-    resolution: {integrity: sha512-lAPS2YAuu+qFqoTNPFcNsxXjwSV0M+dOgAzzVTAN7Yo2ifj+oLOx0GsntWoM78PvQWI7Q827ZxqtU2ImBmDapA==}
-    cpu: [arm64]
-    os: [win32]
-
-  '@oxlint/win32-x64@1.42.0':
-    resolution: {integrity: sha512-3/KmyUOHNriL6rLpaFfm9RJxdhpXY2/Ehx9UuorJr2pUA+lrZL15FAEx/DOszYm5r10hfzj40+efAHcCilNvSQ==}
-    cpu: [x64]
-    os: [win32]
-
   '@phila/constructs@0.2.0':
     resolution: {integrity: sha512-BnQ+99WUUVUFVrxxXJXdmfZprSa6Hf95gx9PW+yWuWHmcyij3wYALk6MEXctTCxckRRgtCYNRNnpDImbJgToCw==}
     peerDependencies:
@@ -1517,7 +1462,7 @@ packages:
     resolution: {integrity: sha512-uM5iXipgYIn13UUQCZNdWkYk+sysBeA97d5mHsAoAt1u/wpN3+zxOmsVJWosuzX+IMGRzeYUNytztrYznboIkQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
-      vite: '>=7.3.2'
+      vite: '>=6.4.2'
       vue: ^3.2.25
 
   '@volar/language-core@2.4.27':
@@ -2067,9 +2012,6 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-oxlint@1.42.0:
-    resolution: {integrity: sha512-3hB/TDbS0f+8ZnPffl0Z/wZ7Yc5NeY5slrxG60kEWInAA9047pdqRcv+Ckk/5KiL3HS2vWtHvmkavPKSFZVKxA==}
-
   eslint-plugin-vue@10.7.0:
     resolution: {integrity: sha512-r2XFCK4qlo1sxEoAMIoTTX0PZAdla0JJDt1fmYiworZUX67WeEGqm+JbyAg3M+pGiJ5U6Mp5WQbontXWtIW7TA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -2383,9 +2325,6 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  jsonc-parser@3.3.1:
-    resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
-
   jsonfile@6.2.0:
     resolution: {integrity: sha512-FGuPw30AdOIUTRMC2OMRtQV+jkVj2cfPqSeWXv1NEAJ1qZ5zb1X6z1mFhbfOB/iy3ssJCD+3KuZ8r8C3uVFlAg==}
 
@@ -2594,16 +2533,6 @@ packages:
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
-
-  oxlint@1.42.0:
-    resolution: {integrity: sha512-qnspC/lrp8FgKNaONLLn14dm+W5t0SSlus6V5NJpgI2YNT1tkFYZt4fBf14ESxf9AAh98WBASnW5f0gtw462Lg==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    hasBin: true
-    peerDependencies:
-      oxlint-tsgolint: '>=0.11.2'
-    peerDependenciesMeta:
-      oxlint-tsgolint:
-        optional: true
 
   p-limit@3.1.0:
     resolution: {integrity: sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ==}
@@ -2991,7 +2920,7 @@ packages:
   vite-hot-client@2.1.0:
     resolution: {integrity: sha512-7SpgZmU7R+dDnSmvXE1mfDtnHLHQSisdySVR7lO8ceAXvM0otZeuQQ6C8LrS5d/aYyP/QZ0hI0L+dIPrm4YlFQ==}
     peerDependencies:
-      vite: '>=7.3.2'
+      vite: '>=6.4.2'
 
   vite-plugin-dts@4.5.4:
     resolution: {integrity: sha512-d4sOM8M/8z7vRXHHq/ebbblfaxENjogAAekcfcDCCwAyvGqnPrc7f4NZbvItS+g4WTgerW0xDwSz5qz11JT3vg==}
@@ -3760,30 +3689,6 @@ snapshots:
       fastq: 1.20.1
 
   '@oxc-project/types@0.124.0': {}
-
-  '@oxlint/darwin-arm64@1.42.0':
-    optional: true
-
-  '@oxlint/darwin-x64@1.42.0':
-    optional: true
-
-  '@oxlint/linux-arm64-gnu@1.42.0':
-    optional: true
-
-  '@oxlint/linux-arm64-musl@1.42.0':
-    optional: true
-
-  '@oxlint/linux-x64-gnu@1.42.0':
-    optional: true
-
-  '@oxlint/linux-x64-musl@1.42.0':
-    optional: true
-
-  '@oxlint/win32-arm64@1.42.0':
-    optional: true
-
-  '@oxlint/win32-x64@1.42.0':
-    optional: true
 
   '@phila/constructs@0.2.0(aws-cdk-lib@2.237.1(constructs@10.4.5))(cdk-nag@2.37.55(aws-cdk-lib@2.237.1(constructs@10.4.5))(constructs@10.4.5))(constructs@10.4.5)':
     dependencies:
@@ -4600,6 +4505,7 @@ snapshots:
   '@vue/devtools-api@7.7.9':
     dependencies:
       '@vue/devtools-kit': 7.7.9
+    optional: true
 
   '@vue/devtools-api@8.0.6':
     dependencies:
@@ -4626,6 +4532,7 @@ snapshots:
       perfect-debounce: 1.0.0
       speakingurl: 14.0.1
       superjson: 2.2.6
+    optional: true
 
   '@vue/devtools-kit@8.0.6':
     dependencies:
@@ -4640,6 +4547,7 @@ snapshots:
   '@vue/devtools-shared@7.7.9':
     dependencies:
       rfdc: 1.4.1
+    optional: true
 
   '@vue/devtools-shared@8.0.6':
     dependencies:
@@ -5113,10 +5021,6 @@ snapshots:
     dependencies:
       eslint: 9.39.4(jiti@2.6.1)
 
-  eslint-plugin-oxlint@1.42.0:
-    dependencies:
-      jsonc-parser: 3.3.1
-
   eslint-plugin-vue@10.7.0(@typescript-eslint/parser@8.59.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.8.2))(eslint@9.39.2(jiti@2.6.1))(vue-eslint-parser@10.2.0(eslint@9.39.2(jiti@2.6.1))):
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.2(jiti@2.6.1))
@@ -5410,7 +5314,8 @@ snapshots:
 
   isexe@3.1.1: {}
 
-  jiti@2.6.1: {}
+  jiti@2.6.1:
+    optional: true
 
   jju@1.4.0: {}
 
@@ -5435,8 +5340,6 @@ snapshots:
   json-stringify-pretty-compact@4.0.0: {}
 
   json5@2.2.3: {}
-
-  jsonc-parser@3.3.1: {}
 
   jsonfile@6.2.0:
     dependencies:
@@ -5647,17 +5550,6 @@ snapshots:
       type-check: 0.4.0
       word-wrap: 1.2.5
 
-  oxlint@1.42.0:
-    optionalDependencies:
-      '@oxlint/darwin-arm64': 1.42.0
-      '@oxlint/darwin-x64': 1.42.0
-      '@oxlint/linux-arm64-gnu': 1.42.0
-      '@oxlint/linux-arm64-musl': 1.42.0
-      '@oxlint/linux-x64-gnu': 1.42.0
-      '@oxlint/linux-x64-musl': 1.42.0
-      '@oxlint/win32-arm64': 1.42.0
-      '@oxlint/win32-x64': 1.42.0
-
   p-limit@3.1.0:
     dependencies:
       yocto-queue: 0.1.0
@@ -5686,7 +5578,8 @@ snapshots:
 
   pepjs@0.5.3: {}
 
-  perfect-debounce@1.0.0: {}
+  perfect-debounce@1.0.0:
+    optional: true
 
   perfect-debounce@2.1.0: {}
 
@@ -5704,6 +5597,7 @@ snapshots:
       vue: 3.5.27(typescript@5.8.2)
     optionalDependencies:
       typescript: 5.8.2
+    optional: true
 
   pinia@3.0.4(typescript@5.9.3)(vue@3.5.27(typescript@5.9.3)):
     dependencies:
