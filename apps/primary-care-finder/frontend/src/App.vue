@@ -1,13 +1,77 @@
 <script setup lang="ts">
-import { toRaw } from 'vue'
-import { Pinboard, PinboardShell, CircleLayer } from '@pinboard/ui'
+import { computed, ref, toRaw } from 'vue'
+import {
+  Pinboard,
+  PinboardShell,
+  CircleLayer,
+  MapNavigationControl,
+  GeolocationButton,
+  BasemapToggle,
+  PinboardComposables,
+  PinboardUtilities,
+} from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import { useLocations } from './composables/useLocations'
 import LocationCard from './components/LocationCard.vue'
 import LocationDetail from './components/LocationDetail.vue'
 import type { PrimaryCareLocation } from './types'
 
+const searchPlaceholderText = 'Search by address or keyword...'
+
 const { locations, isLoading, errorMessage, geojson } = useLocations()
+const { userLocation } = PinboardComposables.useUserLocation()
+const searchString = ref('')
+
+const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
+  const { latitude, longitude } = userLocation.value
+  const hasUserLocation = !Number.isNaN(latitude) && !Number.isNaN(longitude)
+  return locations.value.map((loc) => ({
+    ...loc,
+    locationCardInfo: {
+      ...loc.locationCardInfo,
+      subheader: hasUserLocation
+        ? `${PinboardUtilities.getHaversineDistance(
+            { latitude: loc.latitude, longitude: loc.longitude },
+            { latitude, longitude },
+            1
+          )} mi`
+        : undefined,
+    },
+  }))
+})
+
+const filteredLocations = computed<PrimaryCareLocation[]>(() => {
+  if (!searchString.value) return locationsWithDistance.value
+  const terms = searchString.value
+    .replace(/\W+/g, ' ')
+    .toLowerCase()
+    .split(' ')
+    .filter(Boolean)
+  return locationsWithDistance.value.filter((loc) => {
+    const haystack = JSON.stringify(Object.values(loc)).toLowerCase()
+    return terms.some((term) => haystack.includes(term))
+  })
+})
+
+function handleSearchSubmit(s: string) {
+  searchString.value = s
+}
+
+function handleGeolocate(locationData: {
+  latitude: number
+  longitude: number
+  accuracy: number
+}) {
+  console.log('Geolocation Accuracy: ', locationData.accuracy)
+  userLocation.value = {
+    latitude: locationData.latitude,
+    longitude: locationData.longitude,
+  }
+}
+
+function handleGeolocateError(error: Error | GeolocationPositionError) {
+  console.log(error)
+}
 
 function getCardDetails(loc: { name: string; [key: string]: unknown }) {
   return { heading: loc.name, isLoading: false }
@@ -15,15 +79,38 @@ function getCardDetails(loc: { name: string; [key: string]: unknown }) {
 </script>
 
 <template>
-  <PinboardShell title="Primary Care Finder">
+  <PinboardShell
+    title="Primary Care Finder"
+    :logo="{
+      variant: 'city',
+      layout: 'single-line',
+      colorScheme: 'on-primary',
+      customName: 'Primary Care Finder',
+      href: '/',
+    }"
+    info-title="About this tool"
+  >
+    <template #mobile-nav>
+      <h4><a href="/">Finder</a></h4>
+      <h4><a href="/about">About</a></h4>
+    </template>
+
+    <template #info-body>
+      <span class="has-text-body-small">
+        This tool helps Philadelphia residents find free and low-cost primary
+        care providers near them. Search by location, filter by services, and
+        view details like hours, transit options, and available tests.
+      </span>
+    </template>
+
     <Pinboard
-      :locations="locations"
+      :locations="filteredLocations"
       :get-card-details="getCardDetails"
       :is-loading="isLoading"
       :error-message="errorMessage"
-      :location-filter="null"
-      :search="null"
+      :location-panel-search="searchPlaceholderText"
       :geojson="geojson"
+      @search="handleSearchSubmit"
     >
       <template #location-card="{ location }">
         <LocationCard :location="location as PrimaryCareLocation" />
@@ -38,11 +125,25 @@ function getCardDetails(loc: { name: string; [key: string]: unknown }) {
           geojson,
           hoveredId,
           selectedId,
+          isMobile,
+          mobileControlsTarget,
           onHover,
           onHoverEnd,
           onSelect,
         }"
       >
+        <MapNavigationControl v-if="!isMobile" position="bottom-right" />
+        <BasemapToggle
+          position="top-right"
+          :teleport-to="isMobile ? mobileControlsTarget : undefined"
+        />
+        <GeolocationButton
+          :position="isMobile ? 'top-right' : 'bottom-right'"
+          :teleport-to="isMobile ? mobileControlsTarget : undefined"
+          @located="handleGeolocate"
+          @error="handleGeolocateError"
+        />
+
         <CircleLayer
           v-if="geojson"
           id="locations"
@@ -73,7 +174,9 @@ function getCardDetails(loc: { name: string; [key: string]: unknown }) {
             (e: any) => {
               const feature = e.features?.[0]
               if (!feature) return
-              const loc = locations.find((l) => l.id === feature.properties?.id)
+              const loc = locationsWithDistance.find(
+                (l) => l.id === feature.properties?.id
+              )
               if (loc) onSelect(loc)
             }
           "

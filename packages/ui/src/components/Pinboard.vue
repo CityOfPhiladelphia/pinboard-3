@@ -20,7 +20,9 @@ import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Search } from '@phila/phila-ui-search'
 
+// pinboard config
 import { PINBOARD_CONFIG_KEY } from '../plugin'
+
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
