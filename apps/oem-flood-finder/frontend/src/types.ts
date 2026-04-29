@@ -37,7 +37,8 @@ export type LocationPanelDTO = {
   lastUpdated: Date
   gaugeHeight: number
   gaugeHeightUnit: string
-  imageUrl: string
+  thumbnailUrl: string
+  cameraStreamUrl: string
   deviceType: DeviceType
   actionStage: number
   minorStage: number
@@ -52,6 +53,7 @@ export type OemFields = {
   minorStage: number
   moderateStage: number
   majorStage: number
+  cameraStreamUrl: string
 }
 
 export type OemLocation = BasicLocation & OemFields
@@ -82,32 +84,6 @@ export type UsgsReadingDTO = {
   gaugeHeightUnit: string
   floodImpacts: FloodImpact[]
   floodEvents: Flood[]
-}
-
-export type Reading = {
-  readingId: string
-  createdOn: Date
-  validTimeUTC: Date
-  gaugeId: string
-  flashFloodIndicator: boolean
-  flashFloodThreshold: number
-  flashFloodDetectionImagingEnabled: boolean
-  gaugeHeight: number
-  gaugeHeightUnit: string
-  isFlooding: boolean
-  depthHoldHours: number
-  depthDetectionImagingEnabled: boolean
-  rainfall: number
-  rainIntensity: number
-  tips: number
-  barometricPressure: number
-  airTemperature: number
-  waterTemperature: number
-  saltWater: boolean
-  dropRateIndicator: boolean
-  dropRateThreshold: number
-  deviceDropCount: number
-  pictureFilenameOnServer: string
 }
 
 export type Filters = 'all' | 'gauges' | 'cameras'
