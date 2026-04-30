@@ -18,6 +18,7 @@ defineSlots<{
   default(): VNode[]
   'mobile-nav'(): VNode[]
   'info-body'?(): VNode[]
+  'sub-footer'?(): VNode[]
 }>()
 </script>
 
@@ -51,7 +52,11 @@ defineSlots<{
       <slot />
     </main>
 
-    <AppFooter :sub-footer-only="true" />
+    <AppFooter :sub-footer-only="true">
+      <template v-if="$slots['sub-footer']" #subFooterSlot>
+        <slot name="sub-footer" />
+      </template>
+    </AppFooter>
   </div>
 </template>
 
@@ -70,9 +75,26 @@ defineSlots<{
   overflow: hidden;
 }
 
+.pinboard :deep(.phila-navbar) {
+  column-gap: var(--spacing-s);
+}
+
 @media (max-width: 768px) {
   .pinboard > :deep(footer) {
     display: none;
+  }
+
+  .pinboard :deep(#trusted-site) {
+    height: 2rem !important;
+  }
+
+  .pinboard :deep(.phila-navbar-logo.logo--single-line) {
+    font-size: 1.3rem;
+    white-space: nowrap;
+  }
+
+  .pinboard :deep(.phila-navbar-brand-link) {
+    margin-left: var(--spacing-s) !important;
   }
 }
 </style>

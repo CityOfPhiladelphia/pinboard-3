@@ -28,12 +28,12 @@ const alertBanner: ComputedRef<AlertBanner | null> = computed(() => {
 
 <template>
   <PinboardShell
-    title="Flood Monitoring"
+    title="Flood Monitoring Map"
     :logo="{
       variant: 'city',
       layout: 'single-line',
       colorScheme: 'on-primary',
-      customName: 'Flood Monitoring',
+      customName: 'Flood Monitoring Map',
       href: '/',
     }"
     info-title="About this tool"
@@ -53,6 +53,12 @@ const alertBanner: ComputedRef<AlertBanner | null> = computed(() => {
       </span>
     </template>
 
+    <template #sub-footer>
+      <a class="sub-footer-link" href="https://www.phila.gov/">phila.gov</a>
+      <a class="sub-footer-link" href="https://www.phila.gov/departments/oem/">OEM</a>
+      <a class="sub-footer-link" href="https://www.phila.gov/feedback/">Feedback</a>
+    </template>
+
     <RouterView />
   </PinboardShell>
 </template>
@@ -62,5 +68,9 @@ const alertBanner: ComputedRef<AlertBanner | null> = computed(() => {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+.sub-footer-link {
+  font-weight: 400;
 }
 </style>
