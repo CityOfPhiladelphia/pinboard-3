@@ -12,7 +12,6 @@ const props = defineProps<{
 const readingState = useLocationDetail(
   () => props.location.id,
   () => props.location.deviceType,
-  500,
 )
 
 const lastUpdatedDate = computed(() => {
@@ -74,8 +73,8 @@ const lastUpdatedDate = computed(() => {
         </p>
 
         <CameraVideoPlayer
-          v-if="location.locationCardInfo.src"
-          :video-url="location.locationCardInfo.src"
+          v-if="location.cameraStreamUrl"
+          :video-url="location.cameraStreamUrl"
           :autoplay="true"
         />
       </template>
