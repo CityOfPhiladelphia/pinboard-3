@@ -1,16 +1,16 @@
 import { ref, toValue, watchEffect, type MaybeRefOrGetter, type Ref } from 'vue'
-import type { Reading } from '@/types'
+import type { AwareReadingDTO, UsgsReadingDTO } from '@/types'
 
 export type ReadingState =
   | { kind: 'Loading' }
-  | { kind: 'Loaded'; data: Reading[] }
+  | { kind: 'Loaded'; gaugeType: 'Aware'; data: AwareReadingDTO[] }
+  | { kind: 'Loaded'; gaugeType: 'Usgs'; data: UsgsReadingDTO[] }
   | { kind: 'Error'; message: string }
   | { kind: 'No Call Needed' }
 
 export function useLocationDetail(
   gaugeId: MaybeRefOrGetter<string>,
-  kind: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
-  limit: MaybeRefOrGetter<number>,
+  deviceType: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
 ): Ref<ReadingState> {
   const readingState = ref<ReadingState>({ kind: 'Loading' })
 
@@ -19,7 +19,7 @@ export function useLocationDetail(
 
     onCleanup(() => abortController.abort())
 
-    if (toValue(kind) === 'Camera') {
+    if (toValue(deviceType) === 'Camera') {
       readingState.value = { kind: 'No Call Needed' }
       return
     }
@@ -30,7 +30,7 @@ export function useLocationDetail(
     myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
 
     const response = await fetch(
-      `${import.meta.env.VITE_FLOOD_API_BASE_URL}/${toValue(kind).toLowerCase()}/reading/${toValue(gaugeId)}?limit=${toValue(limit)}`,
+      `${import.meta.env.VITE_FLOOD_API_BASE_URL}/${toValue(deviceType).toLowerCase()}/reading/${toValue(gaugeId)}`,
       {
         method: 'GET',
         headers: myHeaders,
@@ -44,9 +44,13 @@ export function useLocationDetail(
       return
     }
 
-    const data = await response.json()
-
-    readingState.value = { kind: 'Loaded', data: data }
+    if (toValue(deviceType) === 'Aware') {
+      const data: AwareReadingDTO[] = await response.json()
+      readingState.value = { kind: 'Loaded', gaugeType: 'Aware', data: data }
+    } else {
+      const data: UsgsReadingDTO[] = await response.json()
+      readingState.value = { kind: 'Loaded', gaugeType: 'Usgs', data: data }
+    }
   })
 
   return readingState

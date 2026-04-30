@@ -19,6 +19,16 @@ export type FloodImpact = {
   statement: string
 }
 
+export type Flood = {
+  floodId: string
+  gaugeId: string
+  crestReadingId: string
+  crest: number
+  startDate: Date
+  endDate: Date
+  crestTime: Date
+}
+
 type DeviceType = 'Aware' | 'Usgs' | 'Camera'
 
 export type LocationPanelDTO = {
@@ -27,7 +37,8 @@ export type LocationPanelDTO = {
   lastUpdated: Date
   gaugeHeight: number
   gaugeHeightUnit: string
-  imageUrl: string
+  thumbnailUrl: string
+  cameraStreamUrl: string
   deviceType: DeviceType
   actionStage: number
   minorStage: number
@@ -42,13 +53,12 @@ export type OemFields = {
   minorStage: number
   moderateStage: number
   majorStage: number
+  cameraStreamUrl: string
 }
 
 export type OemLocation = BasicLocation & OemFields
 
-export type Reading = {
-  readingId: string
-  createdOn: Date
+export type AwareReadingDTO = {
   validTimeUTC: Date
   gaugeId: string
   flashFloodIndicator: boolean
@@ -57,19 +67,23 @@ export type Reading = {
   gaugeHeight: number
   gaugeHeightUnit: string
   isFlooding: boolean
-  depthHoldHours: number
-  depthDetectionImagingEnabled: boolean
   rainfall: number
   rainIntensity: number
-  tips: number
   barometricPressure: number
   airTemperature: number
   waterTemperature: number
-  saltWater: boolean
-  dropRateIndicator: boolean
-  dropRateThreshold: number
-  deviceDropCount: number
-  pictureFilenameOnServer: string
+  floodImpacts: FloodImpact[]
+  floodEvents: Flood[]
+}
+
+export type UsgsReadingDTO = {
+  validTimeUTC: Date
+  gaugeId: string
+  isFlooding: boolean
+  gaugeHeight: number
+  gaugeHeightUnit: string
+  floodImpacts: FloodImpact[]
+  floodEvents: Flood[]
 }
 
 export type Filters = 'all' | 'gauges' | 'cameras'

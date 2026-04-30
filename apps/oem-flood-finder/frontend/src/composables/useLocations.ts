@@ -32,7 +32,7 @@ export function useLocations() {
         heading: loc.name,
         subheader: undefined,
         tags: getLocationTags(loc),
-        src: loc.imageUrl,
+        src: loc.thumbnailUrl,
       }
 
       result.push({
@@ -42,6 +42,7 @@ export function useLocations() {
         longitude: loc.longitude,
         lastUpdated: loc.lastUpdated,
         deviceType: loc.deviceType,
+        cameraStreamUrl: loc.cameraStreamUrl,
         locationCardInfo: cardInfo,
         actionStage: loc.actionStage,
         minorStage: loc.minorStage,
