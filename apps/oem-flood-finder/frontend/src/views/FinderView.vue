@@ -38,19 +38,9 @@ const filterOptions: LocationFilterOption[] = [
   { value: 'gauges' satisfies Filters, label: 'Gauge' },
   { value: 'cameras' satisfies Filters, label: 'Camera' },
 ]
-const sortLocationsOptionsAlpha: SortLocationsOptions = {
-  AlphaAsc: 'Alpha-Asc',
-  AlphaDes: 'Alpha-Des',
-}
-
-const sortLocationsOptionsDist: SortLocationsOptions = {
-  DistAsc: 'Dist-Asc',
-  DistDes: 'Dist-Des',
-}
-
-const sortLocationsOptionsAll: SortLocationsOptions = {
-  ...sortLocationsOptionsAlpha,
-  ...sortLocationsOptionsDist,
+const sortLocationsOptions: SortLocationsOptions = {
+  DistAsc: 'Distance',
+  AlphaAsc: 'Alphabetical',
 }
 
 // refs
@@ -67,10 +57,6 @@ const { addressCoordinates } = useAddressSearch(addressForSearch)
 // conputed refs
 const currentLocation = computed(() => {
   return hasLocation(addressCoordinates.value) ? addressCoordinates.value : userLocation.value
-})
-
-const sortLocationsOptions = computed(() => {
-  return hasLocation(currentLocation.value) ? sortLocationsOptionsAll : sortLocationsOptionsAlpha
 })
 
 const filteredLocations = computed(() => {
@@ -134,23 +120,11 @@ const filteredAndSortedLocations = computed(() => {
       locs.sort((a, b) => a.name.localeCompare(b.name))
       break
     }
-    case 'AlphaDes': {
-      locs.sort((a, b) => b.name.localeCompare(a.name))
-      break
-    }
     case 'DistAsc': {
       locs.sort(
         (a, b) =>
           Number(a.locationCardInfo.subheader?.replace(' mi', '')) -
           Number(b.locationCardInfo.subheader?.replace(' mi', '')),
-      )
-      break
-    }
-    case 'DistDes': {
-      locs.sort(
-        (a, b) =>
-          Number(b.locationCardInfo.subheader?.replace(' mi', '')) -
-          Number(a.locationCardInfo.subheader?.replace(' mi', '')),
       )
       break
     }
@@ -163,24 +137,14 @@ const filteredAndSortedLocations = computed(() => {
 })
 
 // watchers
-watch(
-  currentLocation,
-  () => {
-    const newLocHasLoc = hasLocation(currentLocation.value)
-    switch (true) {
-      case newLocHasLoc && !locationSortMode.value: {
-        locationSortMode.value = 'DistAsc'
-        break
-      }
-      case !newLocHasLoc &&
-        Object.keys(sortLocationsOptionsDist).includes(locationSortMode.value): {
-        locationSortMode.value = ''
-        break
-      }
-    }
-  },
-  // { immediate: true },
-)
+watch(currentLocation, () => {
+  const newLocHasLoc = hasLocation(currentLocation.value)
+  if (newLocHasLoc && !locationSortMode.value) {
+    locationSortMode.value = 'DistAsc'
+  } else if (!newLocHasLoc && locationSortMode.value === 'DistAsc') {
+    locationSortMode.value = ''
+  }
+})
 
 // event handlers
 function handleLocationFilterChange(selectedFilter: string) {
