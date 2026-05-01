@@ -36,15 +36,8 @@ export const viteJsConfig = [
         'error',
         { argsIgnorePattern: '^_' },
       ],
+      'no-undef': 'off'
     },
-    overrides: [
-      {
-        files: ["*.ts"],
-        rules: {
-          "no-undef": "off"
-        }
-      }
-    ]
   },
   turboPlugin.configs["flat/recommended"],
   ...eslintPluginVue.configs['flat/recommended'],

@@ -250,8 +250,7 @@ const effectiveMapConfig = (() => {
         {{ errorMessage }}
       </div>
 
-      <LocationsPanel
-v-else-if="!isLoading" :locations="locations" :location-filter="locationPanelFilter"
+      <LocationsPanel v-else-if="!isLoading" :locations="locations" :location-filter="locationPanelFilter"
         :location-search="locationPanelSearch" :location-sort="locationPanelSort" :hovered-id="hoveredLocationId"
         :selected-id="selectedLocationId" @select="handleSelect" @hover="handleHover" @hover-end="handleHoverEnd"
         @search-string="handleSearchChange" @search="handleSearchSubmit" @selected-filter="handleLocationFilterChange"
@@ -259,34 +258,29 @@ v-else-if="!isLoading" :locations="locations" :location-filter="locationPanelFil
     </div>
 
     <div class="finder-panel-map">
-      <MapPanel
-ref="mapPanelRef" :config="effectiveMapConfig" :is-loading="isLoading" :is-mobile="isMobile"
+      <MapPanel ref="mapPanelRef" :config="effectiveMapConfig" :is-loading="isLoading" :is-mobile="isMobile"
         :locations="locations" :geojson="geojson" :hovered-id="hoveredLocationId" :selected-id="selectedLocationId"
         :mobile-controls-target="mobileControlsTarget" :map-content-slot="slots['map-content']" :on-hover="handleHover"
         :on-hover-end="handleHoverEnd" :on-select="handleMapSelect" />
       <div v-if="isMobile" ref="mobileControlsTarget" class="mobile-controls-float" :style="mobileControlsStyle" />
       <div class="mobile-map-search-filter">
-        <Search
-v-if="locationPanelSearch" class-name="mobile-search" :placeholder="locationPanelSearch"
+        <Search v-if="locationPanelSearch" class-name="mobile-search" :placeholder="locationPanelSearch"
           @update:model-value="handleSearchChange" @search="handleSearchSubmit" />
         <div v-if="searchSuggestions"></div>
         <div v-if="searchSuggestionsError"></div>
-        <LocationSearchFilterPanel
-v-if="locationPanelFilter" :filter-options="locationPanelFilter"
+        <LocationSearchFilterPanel v-if="locationPanelFilter" :filter-options="locationPanelFilter"
           @selected-filter="handleLocationFilterChange" />
       </div>
     </div>
   </div>
-  <BottomSheet
-ref="bottomSheetRef" v-model="bottomSheetOpen" :snap-points="snapPoints" collapse-label="Map view"
+  <BottomSheet ref="bottomSheetRef" v-model="bottomSheetOpen" :snap-points="snapPoints" collapse-label="Map view"
     :collapse-icon="faMap" class="mobile-bottom-sheet">
     <div class="bottom-sheet-stack">
       <div class="bottom-sheet-list-scroll" :class="{ 'is-hidden': selectedLocation }">
         <slot name="locations-header" />
         <div v-if="!isLoading && !errorMessage" class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
-          <LocationSearchFilterPanel
-v-if="locationPanelSort" :sort-options="locationPanelSort"
+          <LocationSearchFilterPanel v-if="locationPanelSort" :sort-options="locationPanelSort"
             @sort-option="handleLocationSortChange" />
         </div>
 
@@ -298,8 +292,7 @@ v-if="locationPanelSort" :sort-options="locationPanelSort"
           {{ errorMessage }}
         </div>
 
-        <LocationsPanel
-v-else ref="locationsPanelRef" :locations="locations" :location-filter="locationPanelFilter"
+        <LocationsPanel v-else ref="locationsPanelRef" :locations="locations" :location-filter="locationPanelFilter"
           :location-search="locationPanelSearch" :hovered-id="hoveredLocationId" :selected-id="selectedLocationId"
           @select="handleSelect" @hover="handleHover" @hover-end="handleHoverEnd"
           @selected-filter="handleLocationFilterChange" />
