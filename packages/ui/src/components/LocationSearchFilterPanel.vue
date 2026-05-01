@@ -98,9 +98,8 @@ function handleSearchChange(search: string) {
       :filterOptions="filterOptions"
       @selectedFilter="handleFilterChange"
     />
-    <div class="location-sort">
+    <div v-if="sortOptions" class="location-sort">
       <SortPanel
-        v-if="sortOptions"
         :sort-options="sortChoices"
         :applied-sort="appliedSort"
         :location-available="locationAvailable ?? false"
@@ -113,9 +112,10 @@ function handleSearchChange(search: string) {
 <style scoped>
 .location-search-filter-sort {
   display: grid;
-  grid-template:
+  grid-template-areas:
     'search search'
     'filters sort';
+  grid-template-columns: 1fr auto;
 }
 
 .location-search {
@@ -131,6 +131,6 @@ function handleSearchChange(search: string) {
 .location-sort {
   grid-area: sort;
   margin-left: auto;
-  padding-right: 1rem;
+  padding: 0.75rem 1rem;
 }
 </style>

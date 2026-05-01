@@ -436,6 +436,11 @@ const effectiveMapConfig = (() => {
   justify-content: space-between;
   padding: 0.75rem 1rem 0;
   font-family: var(--Body-Default-font-body-default-family);
+  font-weight: 700;
+}
+
+.bottom-sheet-list-scroll :deep(.location-list) {
+  padding-top: 0.5rem;
 }
 
 .mobile-bottom-sheet {
@@ -477,6 +482,11 @@ const effectiveMapConfig = (() => {
   inset: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.bottom-sheet-list-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .bottom-sheet-list-scroll.is-hidden {

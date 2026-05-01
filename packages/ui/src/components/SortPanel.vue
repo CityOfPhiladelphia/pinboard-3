@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { Tags } from '@phila/phila-ui-tags'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
 
 export type SortPanelOption = {
   value: string
@@ -68,8 +69,8 @@ function recomputeAnchor() {
   if (!rect) return
   anchorStyle.value = {
     position: 'fixed',
-    top: `${rect.bottom + 4}px`,
-    left: `${rect.left}px`,
+    top: `${rect.bottom + 16}px`,
+    right: `${window.innerWidth - rect.right}px`,
     zIndex: '1000',
   }
 }
@@ -115,27 +116,28 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="sort-panel-root">
-    <span ref="triggerEl">
-      <Tags
-        variant="action"
-        size="large"
-        color="grey"
-        :text="triggerLabel"
-        :selected="false"
-        @update:selected="openPanel"
+    <button
+      ref="triggerEl"
+      type="button"
+      class="sort-panel-trigger"
+      @click="openPanel"
+    >
+      <FontAwesomeIcon
+        :icon="faArrowUpArrowDown"
+        class="sort-panel-trigger-icon"
       />
-    </span>
+      <span>{{ triggerLabel }}</span>
+    </button>
   </div>
   <Teleport to="body">
     <BottomSheet
       v-if="panelOpen && isMobile"
       :model-value="true"
-      :snap-points="[100]"
+      :snap-points="[40]"
       class="sort-panel-sheet"
       @update:model-value="(v: boolean) => { if (!v) closePanel() }"
     >
       <div ref="formEl" class="sort-panel-form sort-panel-form--mobile">
-        <h3 class="sort-panel-heading">Sort by</h3>
         <ul class="sort-panel-options">
           <li
             v-for="option in sortOptions"
@@ -158,11 +160,12 @@ onBeforeUnmount(() => {
               />
               <span>{{ option.label }}</span>
             </label>
-            <p
-              v-if="option.value === 'DistAsc' && !locationAvailable"
-              class="sort-panel-hint"
-            >
-              Share your location to sort by distance
+            <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
+              {{
+                locationAvailable
+                  ? 'Closest to furthest'
+                  : 'Share your location to sort by distance'
+              }}
             </p>
           </li>
         </ul>
@@ -182,7 +185,6 @@ onBeforeUnmount(() => {
       class="sort-panel-form"
       :style="anchorStyle"
     >
-      <h3 class="sort-panel-heading">Sort by</h3>
       <ul class="sort-panel-options">
         <li
           v-for="option in sortOptions"
@@ -205,11 +207,12 @@ onBeforeUnmount(() => {
             />
             <span>{{ option.label }}</span>
           </label>
-          <p
-            v-if="option.value === 'DistAsc' && !locationAvailable"
-            class="sort-panel-hint"
-          >
-            Share your location to sort by distance
+          <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
+            {{
+              locationAvailable
+                ? 'Closest to furthest'
+                : 'Share your location to sort by distance'
+            }}
           </p>
         </li>
       </ul>
@@ -230,21 +233,47 @@ onBeforeUnmount(() => {
   position: relative;
 }
 
+.sort-panel-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  height: var(--scale-400, 2rem);
+  padding: var(--scale-75) var(--spacing-xs);
+  background: #ffffff;
+  border: 1px solid #c2c2c2;
+  border-radius: var(--border-radius-xs);
+  font-family: var(--Body-Default-font-body-default-family);
+  font-size: 0.875rem;
+  color: #454545;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.sort-panel-trigger:hover {
+  background: #f5f5f5;
+  color: #000;
+}
+
+.sort-panel-trigger-icon {
+  font-size: 0.875rem;
+}
+
 .sort-panel-form {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  padding: 1rem;
+  padding: 1rem 1rem 0.5rem;
   background: var(--Schemes-Surface-Bright, white);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.18),
+    0 2px 6px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(0, 0, 0, 0.06);
   border-radius: 8px;
   width: 280px;
-}
-
-.sort-panel-heading {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
+  font-family: var(--Body-Default-font-body-default-family);
+  font-size: var(--Body-Default-font-body-default-size, 1rem);
+  color: var(--Schemes-On-Surface, #333);
 }
 
 .sort-panel-options {
@@ -277,8 +306,11 @@ onBeforeUnmount(() => {
 .sort-panel-actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 0.75rem;
   margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--Schemes-Outline-Variant, #e0e0e0);
 }
 
 .sort-panel-reset {

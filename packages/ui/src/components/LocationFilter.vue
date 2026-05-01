@@ -43,4 +43,16 @@ function handleFilterChange(option: string) {
   gap: 0.5rem;
   padding: 0.75rem 1rem;
 }
+
+:deep(.phila-tag.phila-tag--grey:not(.is-selected)) {
+  background: #ffffff;
+}
+
+:deep(
+  .phila-tag.phila-tag--grey:not(.is-selected):not(.phila-tag--readonly):hover:not(
+      :disabled
+    )
+) {
+  background: #f5f5f5;
+}
 </style>
