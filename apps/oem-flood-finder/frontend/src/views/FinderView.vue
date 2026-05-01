@@ -59,6 +59,8 @@ const currentLocation = computed(() => {
   return hasLocation(addressCoordinates.value) ? addressCoordinates.value : userLocation.value
 })
 
+const hasCurrentLocation = computed(() => hasLocation(currentLocation.value))
+
 const filteredLocations = computed(() => {
   if (isLoading.value || errorMessage.value || !oemLocations.value) {
     return []
@@ -221,6 +223,7 @@ function hasLocation(loc: LatLon) {
     :location-panel-search="searchPlaceholderText"
     :location-panel-filter="filterOptions"
     :location-panel-sort="sortLocationsOptions"
+    :location-panel-location-available="hasCurrentLocation"
     @search="handleSearchSubmit"
     @selected-locations-filter="handleLocationFilterChange"
     @sort-locations-option="handleLocationSortChange"
