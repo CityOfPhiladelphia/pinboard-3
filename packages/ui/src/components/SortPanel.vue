@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { Tags } from '@phila/phila-ui-tags'
 
 export type SortPanelOption = {
@@ -44,19 +44,54 @@ function resetSort() {
   emit('update:appliedSort', null)
   closePanel()
 }
+
+const formEl = ref<HTMLElement | null>(null)
+const triggerEl = ref<HTMLElement | null>(null)
+
+function handleDocumentClick(e: MouseEvent) {
+  if (!panelOpen.value) return
+  const target = e.target as Node
+  if (formEl.value?.contains(target) || triggerEl.value?.contains(target)) {
+    return
+  }
+  closePanel()
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && panelOpen.value) {
+    closePanel()
+  }
+}
+
+watch(panelOpen, (isOpen) => {
+  if (isOpen) {
+    document.addEventListener('mousedown', handleDocumentClick)
+    document.addEventListener('keydown', handleKeydown)
+  } else {
+    document.removeEventListener('mousedown', handleDocumentClick)
+    document.removeEventListener('keydown', handleKeydown)
+  }
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('mousedown', handleDocumentClick)
+  document.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <template>
   <div class="sort-panel-root">
-    <Tags
-      variant="action"
-      size="large"
-      color="grey"
-      :text="triggerLabel"
-      :selected="false"
-      @update:selected="openPanel"
-    />
-    <div class="sort-panel-form">
+    <span ref="triggerEl">
+      <Tags
+        variant="action"
+        size="large"
+        color="grey"
+        :text="triggerLabel"
+        :selected="false"
+        @update:selected="openPanel"
+      />
+    </span>
+    <div v-if="panelOpen" ref="formEl" class="sort-panel-form">
       <h3 class="sort-panel-heading">Sort by</h3>
       <ul class="sort-panel-options">
         <li
