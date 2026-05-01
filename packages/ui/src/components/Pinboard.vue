@@ -87,7 +87,7 @@ const slots: Record<string, any> = useSlots()
 // refs
 const isMobile = ref(
   typeof window !== 'undefined' &&
-  window.matchMedia('(max-width: 768px)').matches
+    window.matchMedia('(max-width: 768px)').matches
 )
 const hoveredLocationId = ref<string | null>(null)
 const selectedLocation = ref<BasicLocation | null>(null)
@@ -233,7 +233,11 @@ const effectiveMapConfig = (() => {
 
 <template>
   <div v-if="selectedLocation !== null" class="detail-overlay">
-    <button class="detail-close-btn" aria-label="Close details" @click="handleCloseLocationDetail">
+    <button
+      class="detail-close-btn"
+      aria-label="Close details"
+      @click="handleCloseLocationDetail"
+    >
       ×
     </button>
     <slot name="location-detail" :location="selectedLocation" />
@@ -246,60 +250,126 @@ const effectiveMapConfig = (() => {
         <MapCard v-for="n in 5" :key="n" :is-loading="true" />
       </div>
 
-      <div v-else-if="errorMessage" class="status-message status-message--error">
+      <div
+        v-else-if="errorMessage"
+        class="status-message status-message--error"
+      >
         {{ errorMessage }}
       </div>
 
-      <LocationsPanel v-else-if="!isLoading" :locations="locations" :location-filter="locationPanelFilter"
-        :location-search="locationPanelSearch" :location-sort="locationPanelSort" :hovered-id="hoveredLocationId"
-        :selected-id="selectedLocationId" @select="handleSelect" @hover="handleHover" @hover-end="handleHoverEnd"
-        @search-string="handleSearchChange" @search="handleSearchSubmit" @selected-filter="handleLocationFilterChange"
-        @sort-option="handleLocationSortChange" />
+      <LocationsPanel
+        v-else-if="!isLoading"
+        :locations="locations"
+        :location-filter="locationPanelFilter"
+        :location-search="locationPanelSearch"
+        :location-sort="locationPanelSort"
+        :hovered-id="hoveredLocationId"
+        :selected-id="selectedLocationId"
+        @select="handleSelect"
+        @hover="handleHover"
+        @hover-end="handleHoverEnd"
+        @search-string="handleSearchChange"
+        @search="handleSearchSubmit"
+        @selected-filter="handleLocationFilterChange"
+        @sort-option="handleLocationSortChange"
+      />
     </div>
 
     <div class="finder-panel-map">
-      <MapPanel ref="mapPanelRef" :config="effectiveMapConfig" :is-loading="isLoading" :is-mobile="isMobile"
-        :locations="locations" :geojson="geojson" :hovered-id="hoveredLocationId" :selected-id="selectedLocationId"
-        :mobile-controls-target="mobileControlsTarget" :map-content-slot="slots['map-content']" :on-hover="handleHover"
-        :on-hover-end="handleHoverEnd" :on-select="handleMapSelect" />
-      <div v-if="isMobile" ref="mobileControlsTarget" class="mobile-controls-float" :style="mobileControlsStyle" />
+      <MapPanel
+        ref="mapPanelRef"
+        :config="effectiveMapConfig"
+        :is-loading="isLoading"
+        :is-mobile="isMobile"
+        :locations="locations"
+        :geojson="geojson"
+        :hovered-id="hoveredLocationId"
+        :selected-id="selectedLocationId"
+        :mobile-controls-target="mobileControlsTarget"
+        :map-content-slot="slots['map-content']"
+        :on-hover="handleHover"
+        :on-hover-end="handleHoverEnd"
+        :on-select="handleMapSelect"
+      />
+      <div
+        v-if="isMobile"
+        ref="mobileControlsTarget"
+        class="mobile-controls-float"
+        :style="mobileControlsStyle"
+      />
       <div class="mobile-map-search-filter">
-        <Search v-if="locationPanelSearch" class-name="mobile-search" :placeholder="locationPanelSearch"
-          @update:model-value="handleSearchChange" @search="handleSearchSubmit" />
+        <Search
+          v-if="locationPanelSearch"
+          class-name="mobile-search"
+          :placeholder="locationPanelSearch"
+          @update:model-value="handleSearchChange"
+          @search="handleSearchSubmit"
+        />
         <div v-if="searchSuggestions"></div>
         <div v-if="searchSuggestionsError"></div>
-        <LocationSearchFilterPanel v-if="locationPanelFilter" :filter-options="locationPanelFilter"
-          @selected-filter="handleLocationFilterChange" />
+        <LocationSearchFilterPanel
+          v-if="locationPanelFilter"
+          :filter-options="locationPanelFilter"
+          @selected-filter="handleLocationFilterChange"
+        />
       </div>
     </div>
   </div>
-  <BottomSheet ref="bottomSheetRef" v-model="bottomSheetOpen" :snap-points="snapPoints" collapse-label="Map view"
-    :collapse-icon="faMap" class="mobile-bottom-sheet">
+  <BottomSheet
+    ref="bottomSheetRef"
+    v-model="bottomSheetOpen"
+    :snap-points="snapPoints"
+    collapse-label="Map view"
+    :collapse-icon="faMap"
+    class="mobile-bottom-sheet"
+  >
     <div class="bottom-sheet-stack">
-      <div class="bottom-sheet-list-scroll" :class="{ 'is-hidden': selectedLocation }">
+      <div
+        class="bottom-sheet-list-scroll"
+        :class="{ 'is-hidden': selectedLocation }"
+      >
         <slot name="locations-header" />
         <div v-if="!isLoading && !errorMessage" class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
-          <LocationSearchFilterPanel v-if="locationPanelSort" :sort-options="locationPanelSort"
-            @sort-option="handleLocationSortChange" />
+          <LocationSearchFilterPanel
+            v-if="locationPanelSort"
+            :sort-options="locationPanelSort"
+            @sort-option="handleLocationSortChange"
+          />
         </div>
 
         <div v-if="isLoading" class="location-list">
           <MapCard v-for="n in 5" :key="n" :is-loading="true" />
         </div>
 
-        <div v-else-if="errorMessage" class="status-message status-message--error">
+        <div
+          v-else-if="errorMessage"
+          class="status-message status-message--error"
+        >
           {{ errorMessage }}
         </div>
 
-        <LocationsPanel v-else ref="locationsPanelRef" :locations="locations" :location-filter="locationPanelFilter"
-          :location-search="locationPanelSearch" :hovered-id="hoveredLocationId" :selected-id="selectedLocationId"
-          @select="handleSelect" @hover="handleHover" @hover-end="handleHoverEnd"
-          @selected-filter="handleLocationFilterChange" />
+        <LocationsPanel
+          v-else
+          ref="locationsPanelRef"
+          :locations="locations"
+          :location-filter="locationPanelFilter"
+          :location-search="locationPanelSearch"
+          :hovered-id="hoveredLocationId"
+          :selected-id="selectedLocationId"
+          @select="handleSelect"
+          @hover="handleHover"
+          @hover-end="handleHoverEnd"
+          @selected-filter="handleLocationFilterChange"
+        />
       </div>
 
       <div v-if="selectedLocation" class="bottom-sheet-detail">
-        <button class="detail-close-btn" aria-label="Close details" @click="handleCloseLocationDetail">
+        <button
+          class="detail-close-btn"
+          aria-label="Close details"
+          @click="handleCloseLocationDetail"
+        >
           ×
         </button>
         <slot name="location-detail" :location="selectedLocation" />
@@ -341,8 +411,8 @@ const effectiveMapConfig = (() => {
   color: var(--Schemes-Error, #b3261e);
 }
 
-.finder-panel-locations> :deep(.location-list),
-.finder-panel-locations>.location-list {
+.finder-panel-locations > :deep(.location-list),
+.finder-panel-locations > .location-list {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
@@ -419,7 +489,7 @@ const effectiveMapConfig = (() => {
   z-index: 2;
 }
 
-.bottom-sheet-detail>* {
+.bottom-sheet-detail > * {
   max-width: 100%;
 }
 
@@ -485,7 +555,7 @@ const effectiveMapConfig = (() => {
     pointer-events: none;
   }
 
-  .mobile-controls-float> :deep(*) {
+  .mobile-controls-float > :deep(*) {
     pointer-events: auto;
   }
 
