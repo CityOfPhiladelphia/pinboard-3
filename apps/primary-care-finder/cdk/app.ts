@@ -8,7 +8,7 @@ import {
   Confidentiality,
   applyStandardTags,
   applyNagChecks,
-  type Environment
+  type Environment,
 } from '@phila/constructs'
 
 const app = new App()
@@ -72,12 +72,12 @@ if (frontendDomain && certificate) {
 }
 
 // Scope as any so linked @phila/constructs resolves to a single Construct type at runtime.
-new StaticSite(stack as any, 'primary-care-finderSite', {
+new StaticSite(stack, 'primary-care-finderSite', {
   ...context,
   assetDir: '../frontend/dist',
   ...(certificate ? { certificate } : {}),
   ...(frontendZone ? { hostedZone: frontendZone } : {}),
-} as any)
+})
 
 applyStandardTags(app, context)
 applyNagChecks(app)

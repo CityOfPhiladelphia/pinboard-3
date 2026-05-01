@@ -55,23 +55,23 @@ const domainName =
     ? `${context.appName}.phila.gov`
     : `${context.appName}-${environment}.phila.gov`
 
-const hostedZone = HostedZone.fromLookup(stack as any, 'HostedZone', {
+const hostedZone = HostedZone.fromLookup(stack, 'HostedZone', {
   domainName,
 })
 
-const dnsValidatedCertificate = new Certificate(stack as any, 'Certificate', {
+const dnsValidatedCertificate = new Certificate(stack, 'Certificate', {
   domainName,
   certificateName: `phila-gov-dns-cert-frontend-${environment}`, // is this right?
   validation: CertificateValidation.fromDns(hostedZone),
 })
 
 // Scope as any so linked @phila/constructs resolves to a single Construct type at runtime.
-new StaticSite(stack as any, 'StaticSite', {
+new StaticSite(stack, 'StaticSite', {
   ...context,
   assetDir: '../frontend/dist',
   certificate: dnsValidatedCertificate,
   hostedZone,
-} as any)
+})
 
 // Apply compliance checks
 Aspects.of(app).add(new NIST80053R5Checks({ verbose: true }))
