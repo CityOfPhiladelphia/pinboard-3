@@ -24,8 +24,6 @@
     "vue-router": "^5.0.6"
   },
   "devDependencies": {
-    "@repo/pinboard/core": "workspace:*",
-    "@repo/pinboard/ui": "workspace:*",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@vitejs/plugin-vue": "^6.0.3",

@@ -17,9 +17,13 @@
     "dist"
   ],
   "scripts": {
-    "lint": "eslint",
-    "lint:fix": "eslint --fix",
-    "type-check": "vue-tsc --noEmit"
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "type-check": "vue-tsc --noEmit",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
