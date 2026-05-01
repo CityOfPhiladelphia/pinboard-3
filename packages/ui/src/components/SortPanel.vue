@@ -47,6 +47,18 @@ function resetSort() {
 
 const formEl = ref<HTMLElement | null>(null)
 const triggerEl = ref<HTMLElement | null>(null)
+const anchorStyle = ref<Record<string, string>>({})
+
+function recomputeAnchor() {
+  const rect = triggerEl.value?.getBoundingClientRect()
+  if (!rect) return
+  anchorStyle.value = {
+    position: 'fixed',
+    top: `${rect.bottom + 4}px`,
+    left: `${rect.left}px`,
+    zIndex: '1000',
+  }
+}
 
 function handleDocumentClick(e: MouseEvent) {
   if (!panelOpen.value) return
@@ -65,17 +77,24 @@ function handleKeydown(e: KeyboardEvent) {
 
 watch(panelOpen, (isOpen) => {
   if (isOpen) {
+    recomputeAnchor()
     document.addEventListener('mousedown', handleDocumentClick)
     document.addEventListener('keydown', handleKeydown)
+    window.addEventListener('resize', recomputeAnchor)
+    window.addEventListener('scroll', recomputeAnchor, true)
   } else {
     document.removeEventListener('mousedown', handleDocumentClick)
     document.removeEventListener('keydown', handleKeydown)
+    window.removeEventListener('resize', recomputeAnchor)
+    window.removeEventListener('scroll', recomputeAnchor, true)
   }
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('mousedown', handleDocumentClick)
   document.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener('resize', recomputeAnchor)
+  window.removeEventListener('scroll', recomputeAnchor, true)
 })
 </script>
 
@@ -91,7 +110,14 @@ onBeforeUnmount(() => {
         @update:selected="openPanel"
       />
     </span>
-    <div v-if="panelOpen" ref="formEl" class="sort-panel-form">
+  </div>
+  <Teleport to="body">
+    <div
+      v-if="panelOpen"
+      ref="formEl"
+      class="sort-panel-form"
+      :style="anchorStyle"
+    >
       <h3 class="sort-panel-heading">Sort by</h3>
       <ul class="sort-panel-options">
         <li
@@ -132,7 +158,7 @@ onBeforeUnmount(() => {
         </button>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <style scoped>
