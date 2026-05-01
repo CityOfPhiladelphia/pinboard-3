@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
+import { Radio } from '@phila/phila-ui-radio'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
 
@@ -148,22 +149,14 @@ onBeforeUnmount(() => {
             :key="option.value"
             class="sort-panel-option"
           >
-            <label
-              :class="{
-                'sort-panel-label--disabled':
-                  option.value === 'DistAsc' && !locationAvailable,
-              }"
-            >
-              <input
-                type="radio"
-                name="sort-panel-radio"
-                :value="option.value"
-                :checked="pendingSelection === option.value"
-                :disabled="option.value === 'DistAsc' && !locationAvailable"
-                @change="pendingSelection = option.value"
-              />
-              <span>{{ option.label }}</span>
-            </label>
+            <Radio
+              name="sort-panel-radio"
+              :value="option.value"
+              :text="option.label"
+              :modelValue="pendingSelection ?? undefined"
+              :disabled="option.value === 'DistAsc' && !locationAvailable"
+              @update:modelValue="pendingSelection = $event"
+            />
             <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
               {{
                 locationAvailable
@@ -195,22 +188,14 @@ onBeforeUnmount(() => {
           :key="option.value"
           class="sort-panel-option"
         >
-          <label
-            :class="{
-              'sort-panel-label--disabled':
-                option.value === 'DistAsc' && !locationAvailable,
-            }"
-          >
-            <input
-              type="radio"
-              name="sort-panel-radio"
-              :value="option.value"
-              :checked="pendingSelection === option.value"
-              :disabled="option.value === 'DistAsc' && !locationAvailable"
-              @change="pendingSelection = option.value"
-            />
-            <span>{{ option.label }}</span>
-          </label>
+          <Radio
+            name="sort-panel-radio"
+            :value="option.value"
+            :text="option.label"
+            :modelValue="pendingSelection ?? undefined"
+            :disabled="option.value === 'DistAsc' && !locationAvailable"
+            @update:modelValue="pendingSelection = $event"
+          />
           <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
             {{
               locationAvailable
@@ -289,20 +274,8 @@ onBeforeUnmount(() => {
   gap: 0.5rem;
 }
 
-.sort-panel-option label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.sort-panel-label--disabled {
-  cursor: not-allowed;
-  color: var(--Schemes-On-Surface-Variant, #888);
-}
-
 .sort-panel-hint {
-  margin: 0.25rem 0 0 1.5rem;
+  margin: 0.25rem 0 0 calc(20px + var(--spacing-s, 0.75rem));
   font-size: 0.75rem;
   color: var(--Schemes-On-Surface-Variant, #888);
 }
