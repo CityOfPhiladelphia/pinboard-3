@@ -63,7 +63,7 @@ const sortChoices = computed(() => {
     Object.keys(sortOptions),
     (option, i) => {
       return {
-        text: Object.values(sortOptions)[i]!,
+        text: Object.values(sortOptions)[i],
         value: option,
       }
     }
@@ -93,27 +93,15 @@ function handleSearchChange(search: string) {
 <template>
   <div class="location-search-filter-sort">
     <Search
-      v-if="searchPlaceholder"
-      class="location-search"
-      :placeholder="searchPlaceholder"
-      @update:model-value="handleSearchChange"
-      @search="emit('search')"
-    />
+v-if="searchPlaceholder" class="location-search" :placeholder="searchPlaceholder"
+      @update:model-value="handleSearchChange" @search="emit('search')" />
     <div v-if="searchSuggestions"></div>
     <div v-if="searchSuggestionsError"></div>
     <LocationFilter
-      v-if="filterOptions"
-      class="location-filters"
-      :filter-options="filterOptions"
-      @selected-filter="handleFilterChange"
-    />
+v-if="filterOptions" class="location-filters" :filter-options="filterOptions"
+      @selected-filter="handleFilterChange" />
     <div class="location-sort">
-      <Menu
-        v-if="sortOptions"
-        :choices="sortChoices"
-        placeholder="Sort"
-        @update:model-value="handleSortChange"
-      />
+      <Menu v-if="sortOptions" :choices="sortChoices" placeholder="Sort" @update:model-value="handleSortChange" />
     </div>
   </div>
 </template>
