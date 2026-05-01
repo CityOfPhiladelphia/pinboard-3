@@ -4,9 +4,12 @@ import type { OemLocation } from '@/types'
 import GaugeReadings from './GaugeReadings.vue'
 import CameraVideoPlayer from './CameraVideoPlayer.vue'
 import { useLocationDetail } from '@/composables/useLocationDetail'
+import { PhilaButton } from '@phila/phila-ui-button'
+import { faXmark } from '@fortawesome/pro-solid-svg-icons'
 
 const props = defineProps<{
   location: OemLocation
+  onClose: () => void
 }>()
 
 const readingState = useLocationDetail(
@@ -37,10 +40,24 @@ const lastUpdatedDate = computed(() => {
 
 <template>
   <div class="location-detail content">
-    <div class="location-detail__body">
-      <template v-if="location.deviceType === 'Aware' || location.deviceType === 'Usgs'">
-        <h4>{{ location.name }}</h4>
+    <div class="detail-header">
+      <h4 v-if="location.deviceType === 'Aware' || location.deviceType === 'Usgs'">
+        {{ location.name }}
+      </h4>
+      <h2 v-else-if="location.deviceType === 'Camera'">{{ location.name }}</h2>
+      <PhilaButton
+        :icon-definition="faXmark"
+        :icon-only="true"
+        variant="standard"
+        size="small"
+        class="detail-close-btn"
+        aria-label="Close details"
+        @click="onClose"
+      />
+    </div>
 
+    <div class="detail-body">
+      <template v-if="location.deviceType === 'Aware' || location.deviceType === 'Usgs'">
         <!-- Gauge detail -->
         <GaugeReadings :reading-state="readingState" :location="location" />
 
@@ -64,8 +81,6 @@ const lastUpdatedDate = computed(() => {
       <!-- this will be part of new Location Detail query on backend -->
       <!-- Camera detail -->
       <template v-else-if="location.deviceType === 'Camera'">
-        <h2>{{ location.name }}</h2>
-
         <p>
           This video camera is located at the intersection of
           {{ location.name }} and allows you to monitor road conditions and potential flooding in
@@ -87,10 +102,35 @@ const lastUpdatedDate = computed(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
-.location-detail__body {
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem;
+  flex-shrink: 0;
+}
+
+.detail-header h2,
+.detail-header h4 {
+  margin: 0;
+  flex: 1;
+}
+
+.detail-close-btn {
+  flex-shrink: 0;
+}
+
+.detail-close-btn :deep(svg) {
+  color: var(--Schemes-On-Primary-Container);
+}
+
+.detail-body {
+  flex: 1;
+  overflow-y: auto;
   padding: 1rem;
   display: flex;
   flex-direction: column;

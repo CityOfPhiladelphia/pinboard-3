@@ -30,10 +30,10 @@ const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
       ...loc.locationCardInfo,
       subheader: PinboardUtilities.hasLocationData(userLocation.value)
         ? `${PinboardUtilities.getHaversineDistance(
-          { latitude: loc.latitude, longitude: loc.longitude },
-          { latitude, longitude },
-          1
-        )} mi`
+            { latitude: loc.latitude, longitude: loc.longitude },
+            { latitude, longitude },
+            1
+          )} mi`
         : undefined,
     },
   }))
@@ -72,20 +72,23 @@ function handleGeolocateError(error: Error | GeolocationPositionError) {
   console.log(error)
 }
 
-function getCardDetails(loc: { name: string;[key: string]: unknown }) {
+function getCardDetails(loc: { name: string; [key: string]: unknown }) {
   return { heading: loc.name, isLoading: false }
 }
 </script>
 
 <template>
   <PinboardShell
-title="Primary Care Finder" :logo="{
-    variant: 'city',
-    layout: 'single-line',
-    colorScheme: 'on-primary',
-    customName: 'Primary Care Finder',
-    href: '/',
-  }" info-title="About this tool">
+    title="Primary Care Finder"
+    :logo="{
+      variant: 'city',
+      layout: 'single-line',
+      colorScheme: 'on-primary',
+      customName: 'Primary Care Finder',
+      href: '/',
+    }"
+    info-title="About this tool"
+  >
     <template #mobile-nav>
       <h4><a href="/">Finder</a></h4>
       <h4><a href="/about">About</a></h4>
@@ -100,65 +103,86 @@ title="Primary Care Finder" :logo="{
     </template>
 
     <Pinboard
-:locations="filteredLocations" :get-card-details="getCardDetails" :is-loading="isLoading"
-      :error-message="errorMessage" :location-panel-search="searchPlaceholderText" :geojson="geojson"
-      @search="handleSearchSubmit">
+      :locations="filteredLocations"
+      :get-card-details="getCardDetails"
+      :is-loading="isLoading"
+      :error-message="errorMessage"
+      :location-panel-search="searchPlaceholderText"
+      :geojson="geojson"
+      @search="handleSearchSubmit"
+    >
       <template #location-card="{ location }">
         <LocationCard :location="location" />
       </template>
 
-      <template #location-detail="{ location }">
-        <LocationDetail :location="location" />
+      <template #location-detail="{ location, onClose }">
+        <LocationDetail
+          :location="location as PrimaryCareLocation"
+          :on-close="onClose"
+        />
       </template>
 
       <template
-#map-content="{
-        geojson,
-        hoveredId,
-        selectedId,
-        isMobile,
-        mobileControlsTarget,
-        onHover,
-        onHoverEnd,
-        onSelect,
-      }">
+        #map-content="{
+          geojson,
+          hoveredId,
+          selectedId,
+          isMobile,
+          mobileControlsTarget,
+          onHover,
+          onHoverEnd,
+          onSelect,
+        }"
+      >
         <MapNavigationControl v-if="!isMobile" position="bottom-right" />
-        <BasemapToggle position="top-right" :teleport-to="isMobile ? mobileControlsTarget : undefined" />
+        <BasemapToggle
+          position="top-right"
+          :teleport-to="isMobile ? mobileControlsTarget : undefined"
+        />
         <GeolocationButton
-:position="isMobile ? 'top-right' : 'bottom-right'"
-          :teleport-to="isMobile ? mobileControlsTarget : undefined" @located="handleGeolocate"
-          @error="handleGeolocateError" />
+          :position="isMobile ? 'top-right' : 'bottom-right'"
+          :teleport-to="isMobile ? mobileControlsTarget : undefined"
+          @located="handleGeolocate"
+          @error="handleGeolocateError"
+        />
 
         <CircleLayer
-v-if="geojson" id="locations" :source="{ type: 'geojson', data: toRaw(geojson) as any }" :paint="{
-          'circle-radius': [
-            'case',
-            ['==', ['get', 'id'], selectedId ?? ''],
-            12,
-            ['==', ['get', 'id'], hoveredId ?? ''],
-            10,
-            7,
-          ],
-          'circle-color': [
-            'case',
-            ['==', ['get', 'id'], selectedId ?? ''],
-            '#0D47A1',
-            ['==', ['get', 'id'], hoveredId ?? ''],
-            '#1976D2',
-            '#1976D2',
-          ],
-          'circle-stroke-color': '#ffffff',
-          'circle-stroke-width': 2,
-        }" @mouseenter="(e: any) => onHover(e.features?.[0]?.properties?.id)" @mouseleave="onHoverEnd" @click="
-          (e: any) => {
-            const feature = e.features?.[0]
-            if (!feature) return
-            const loc = locationsWithDistance.find(
-              (l) => l.id === feature.properties?.id
-            )
-            if (loc) onSelect(loc)
-          }
-        " />
+          v-if="geojson"
+          id="locations"
+          :source="{ type: 'geojson', data: toRaw(geojson) as any }"
+          :paint="{
+            'circle-radius': [
+              'case',
+              ['==', ['get', 'id'], selectedId ?? ''],
+              12,
+              ['==', ['get', 'id'], hoveredId ?? ''],
+              10,
+              7,
+            ],
+            'circle-color': [
+              'case',
+              ['==', ['get', 'id'], selectedId ?? ''],
+              '#0D47A1',
+              ['==', ['get', 'id'], hoveredId ?? ''],
+              '#1976D2',
+              '#1976D2',
+            ],
+            'circle-stroke-color': '#ffffff',
+            'circle-stroke-width': 2,
+          }"
+          @mouseenter="(e: any) => onHover(e.features?.[0]?.properties?.id)"
+          @mouseleave="onHoverEnd"
+          @click="
+            (e: any) => {
+              const feature = e.features?.[0]
+              if (!feature) return
+              const loc = locationsWithDistance.find(
+                (l) => l.id === feature.properties?.id
+              )
+              if (loc) onSelect(loc)
+            }
+          "
+        />
       </template>
     </Pinboard>
   </PinboardShell>

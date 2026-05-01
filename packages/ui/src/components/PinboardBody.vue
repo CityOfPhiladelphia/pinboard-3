@@ -42,7 +42,10 @@ import type {
 defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
-  'location-detail'?: unknown
+  'location-detail'?(props: {
+    location: BasicLocation
+    onClose: () => void
+  }): unknown
   'map-content'?(props: {
     locations: BasicLocation[]
     geojson: unknown
@@ -233,14 +236,11 @@ const effectiveMapConfig = (() => {
 
 <template>
   <div v-if="selectedLocation !== null" class="detail-overlay">
-    <button
-      class="detail-close-btn"
-      aria-label="Close details"
-      @click="handleCloseLocationDetail"
-    >
-      ×
-    </button>
-    <slot name="location-detail" :location="selectedLocation" />
+    <slot
+      name="location-detail"
+      :location="selectedLocation"
+      :on-close="handleCloseLocationDetail"
+    />
   </div>
   <div class="finder-panel">
     <div class="finder-panel-locations">
@@ -365,14 +365,11 @@ const effectiveMapConfig = (() => {
       </div>
 
       <div v-if="selectedLocation" class="bottom-sheet-detail">
-        <button
-          class="detail-close-btn"
-          aria-label="Close details"
-          @click="handleCloseLocationDetail"
-        >
-          ×
-        </button>
-        <slot name="location-detail" :location="selectedLocation" />
+        <slot
+          name="location-detail"
+          :location="selectedLocation"
+          :on-close="handleCloseLocationDetail"
+        />
       </div>
     </div>
   </BottomSheet>
@@ -481,11 +478,10 @@ const effectiveMapConfig = (() => {
 .bottom-sheet-detail {
   position: absolute;
   inset: 0;
-  padding: 1rem;
   background: var(--Schemes-Surface-Bright, white);
-  overflow-x: hidden;
-  overflow-y: auto;
-  scrollbar-width: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   z-index: 2;
 }
 
@@ -496,33 +492,6 @@ const effectiveMapConfig = (() => {
 .bottom-sheet-detail :deep(img) {
   max-width: 100%;
   height: auto;
-}
-
-.bottom-sheet-detail::-webkit-scrollbar {
-  display: none;
-}
-
-.detail-close-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 2rem;
-  height: 2rem;
-  border: none;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  color: var(--Schemes-On-Surface, #333);
-  z-index: 11;
-  transition: background-color 0.2s;
-}
-
-.detail-close-btn:hover {
-  background: rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 768px) {
