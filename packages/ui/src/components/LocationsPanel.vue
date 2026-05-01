@@ -21,6 +21,7 @@ const props = defineProps<{
   locationSearch?: string
   locationFilter?: LocationFilterOption[]
   locationSort?: SortLocationsOptions
+  locationAvailable?: boolean
   hoveredId?: string | null
   selectedId?: string | null
   locationCardSlot?: (props: {
@@ -97,6 +98,7 @@ defineExpose({ scrollToCard })
     :searchPlaceholder="locationSearch"
     :filterOptions="locationFilter"
     :sortOptions="locationSort"
+    :locationAvailable="locationAvailable"
     @selected-filter="handleFilterChange"
     @sort-option="handleSortChange"
     @search-string="handleSearchChange"

@@ -64,6 +64,7 @@ const props = defineProps<{
   locationPanelFilter?: LocationFilterOption[]
   locationPanelSearch?: string
   locationPanelSort?: SortLocationsOptions
+  locationPanelLocationAvailable?: boolean
   geojson?: unknown
 }>()
 
@@ -264,6 +265,7 @@ const effectiveMapConfig = (() => {
         :location-filter="locationPanelFilter"
         :location-search="locationPanelSearch"
         :location-sort="locationPanelSort"
+        :location-available="locationPanelLocationAvailable"
         :hovered-id="hoveredLocationId"
         :selected-id="selectedLocationId"
         @select="handleSelect"
@@ -311,6 +313,7 @@ const effectiveMapConfig = (() => {
         <LocationSearchFilterPanel
           v-if="locationPanelFilter"
           :filterOptions="locationPanelFilter"
+          :locationAvailable="locationPanelLocationAvailable"
           @selected-filter="handleLocationFilterChange"
         />
       </div>
@@ -335,6 +338,7 @@ const effectiveMapConfig = (() => {
           <LocationSearchFilterPanel
             v-if="locationPanelSort"
             :sortOptions="locationPanelSort"
+            :locationAvailable="locationPanelLocationAvailable"
             @sort-option="handleLocationSortChange"
           />
         </div>
