@@ -8,17 +8,17 @@ const addressCoordinates = ref<LatLon>({
 
 export function useSearchAddress(address: string | Ref<string>) {
   async function getAddressCoordinatesFromAIS() {
-    address = toValue(address)
-    if (!address) {
+    const addressDeref = toValue(address)
+    if (!addressDeref) {
       clearAddress()
       return
     }
 
-    const url = `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/queryAisAddress?address=${encodeURIComponent(address)}`
+    const url = `https://api.phila.gov/ais/v1/search/${encodeURIComponent(addressDeref)}?gatekeeperKey=${import.meta.env.VITE_OEM_FLOOD_GATEKEEPER_KEY}`
 
     try {
       const result: AisAddressSearchResponse = await (await fetch(url)).json()
-      console.log(result)
+      console.log("AIS RESULT: ", result)
       addressCoordinates.value.longitude =
         result.features[0].geometry.coordinates[0]
       addressCoordinates.value.latitude =
