@@ -1,7 +1,7 @@
 import { type Ref, toValue } from 'vue'
 import type { LatLon } from '../types'
 
-export function useHaversineDistance(
+export function getHaversineDistance(
   locA: LatLon | Ref<LatLon>,
   locB: LatLon | Ref<LatLon>,
   decimalPrecision: number

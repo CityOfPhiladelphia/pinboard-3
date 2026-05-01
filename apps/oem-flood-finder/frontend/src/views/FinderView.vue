@@ -14,17 +14,11 @@ import {
   MapNavigationControl,
   GeolocationButton,
   BasemapToggle,
+  PinboardComposables,
+  PinboardUtilities,
+  type PinboardTypes,
 } from '@pinboard/ui'
-import { useAddressSearch } from '@ui/composables/useAddressSearch'
-import { useHaversineDistance } from '@ui/composables/useHaversineDistance'
-import { useUserLocation } from '@ui/composables/useUserLocation'
-import {
-  type LatLon,
-  type LocationFilterOption,
-  type SortLocationsOptions,
-  StreetAddress,
-  Zipcode,
-} from '@ui/types'
+import { filterLocations, isGauge, searchLocations, sortLocations } from '@/utilities/_index'
 
 // app imports
 import LocationDetail from '@/components/LocationDetail.vue'
@@ -33,154 +27,90 @@ import type { Filters, OemLocation, SortMode } from '@/types'
 
 // app variables
 const searchPlaceholderText = 'Search by address or keyword...'
-const filterOptions: LocationFilterOption[] = [
+const filterOptions: PinboardTypes.LocationFilterOption[] = [
   { value: 'all' satisfies Filters, label: 'All' },
   { value: 'gauges' satisfies Filters, label: 'Gauge' },
   { value: 'cameras' satisfies Filters, label: 'Camera' },
 ]
-const sortLocationsOptionsAlpha: SortLocationsOptions = {
+const sortLocationsOptionsAlpha: PinboardTypes.SortLocationsOptions = {
   AlphaAsc: 'Alpha-Asc',
   AlphaDes: 'Alpha-Des',
 }
 
-const sortLocationsOptionsDist: SortLocationsOptions = {
+const sortLocationsOptionsDist: PinboardTypes.SortLocationsOptions = {
   DistAsc: 'Dist-Asc',
   DistDes: 'Dist-Des',
 }
 
-const sortLocationsOptionsAll: SortLocationsOptions = {
+const sortLocationsOptionsAll: PinboardTypes.SortLocationsOptions = {
   ...sortLocationsOptionsAlpha,
   ...sortLocationsOptionsDist,
 }
 
 // refs
 const addressForSearch = ref<string>('')
+const { addressCoordinates } = PinboardComposables.useSearchAddress(addressForSearch)
 const zipcodeForSearch = ref<string>('')
+const { zipcodePolygon } = PinboardComposables.useSearchZipcode(zipcodeForSearch)
 const keywordsForSearch = ref<string>('')
+const locationSearchMode = ref<PinboardTypes.SearchMode>(false)
 const locationFilterMode = ref<Filters>('all')
-const locationSortMode = ref<SortMode>('')
 const visitedIds = ref(new Set<string>())
-const { oemLocations, isLoading, errorMessage } = useLocations()
-const { userLocation } = useUserLocation()
-const { addressCoordinates } = useAddressSearch(addressForSearch)
+const { oemLocations, userLocation, isLoading, errorMessage } = useLocations()
+const locationSortMode = ref<SortMode>(
+  PinboardUtilities.hasLocationData(userLocation) ? 'DistAsc' : '',
+)
 
 // conputed refs
 const currentLocation = computed(() => {
-  return hasLocation(addressCoordinates.value) ? addressCoordinates.value : userLocation.value
+  switch (locationSearchMode.value) {
+    case 'address': {
+      return addressCoordinates.value
+    }
+    case 'zipcode': {
+      return zipcodePolygon.value.centroid
+    }
+    case 'keyword':
+    default: {
+      return userLocation.value
+    }
+  }
 })
 
 const sortLocationsOptions = computed(() => {
-  return hasLocation(currentLocation.value) ? sortLocationsOptionsAll : sortLocationsOptionsAlpha
+  return PinboardUtilities.hasLocationData(currentLocation.value)
+    ? sortLocationsOptionsAll
+    : sortLocationsOptionsAlpha
 })
 
-const filteredLocations = computed(() => {
-  if (isLoading.value || errorMessage.value || !oemLocations.value) {
-    return []
-  }
-  switch (locationFilterMode.value) {
-    case 'gauges': {
-      return oemLocations.value.filter((loc) => isGauge(loc))
-    }
-    case 'cameras': {
-      return oemLocations.value.filter((loc) => loc.deviceType === 'Camera')
-    }
-    case 'all':
-    default: {
-      return oemLocations.value
-    }
-  }
-})
-
-const searchMatchedLocations = computed(() => {
+const currentLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
   }
-  if (keywordsForSearch.value) {
-    const searchTerms = keywordsForSearch.value.replace(/\W+/, ' ').toLowerCase().split(' ')
-    return filteredLocations.value.filter((loc) => {
-      const locString = JSON.stringify(Object.values(loc)).toLowerCase()
-      return searchTerms.some((term) => locString.match(term))
-    })
-  } else {
-    return filteredLocations.value
-  }
-})
-
-const filteredAndSortedLocations = computed(() => {
-  if (isLoading.value || errorMessage.value) {
-    return []
-  }
-
-  const locs: OemLocation[] = [...searchMatchedLocations.value]
-  locs.forEach((location) => {
-    location.locationCardInfo.subheader = hasLocation(currentLocation.value)
-      ? `${useHaversineDistance(
-          { latitude: location.latitude, longitude: location.longitude },
-          {
-            latitude: currentLocation.value.latitude,
-            longitude: currentLocation.value.longitude,
-          },
-          1,
-        )} mi`
-      : undefined
-  })
-
-  switch (
-    hasLocation(currentLocation.value) && !locationSortMode.value
-      ? 'DistAsc'
-      : locationSortMode.value
-  ) {
-    case 'AlphaAsc': {
-      locs.sort((a, b) => a.name.localeCompare(b.name))
-      break
-    }
-    case 'AlphaDes': {
-      locs.sort((a, b) => b.name.localeCompare(a.name))
-      break
-    }
-    case 'DistAsc': {
-      locs.sort(
-        (a, b) =>
-          Number(a.locationCardInfo.subheader?.replace(' mi', '')) -
-          Number(b.locationCardInfo.subheader?.replace(' mi', '')),
-      )
-      break
-    }
-    case 'DistDes': {
-      locs.sort(
-        (a, b) =>
-          Number(b.locationCardInfo.subheader?.replace(' mi', '')) -
-          Number(a.locationCardInfo.subheader?.replace(' mi', '')),
-      )
-      break
-    }
-    default: {
-      // south to north
-      locs.sort((a, b) => a.latitude - b.latitude)
-    }
-  }
-  return locs
+  const filteredLocations = filterLocations(oemLocations, locationFilterMode)
+  const searchedLocations = keywordsForSearch.value
+    ? searchLocations(filteredLocations, keywordsForSearch)
+    : filteredLocations
+  return sortLocations(searchedLocations, currentLocation, locationSortMode)
 })
 
 // watchers
-watch(
-  currentLocation,
-  () => {
-    const newLocHasLoc = hasLocation(currentLocation.value)
-    switch (true) {
-      case newLocHasLoc && !locationSortMode.value: {
-        locationSortMode.value = 'DistAsc'
-        break
-      }
-      case !newLocHasLoc &&
-        Object.keys(sortLocationsOptionsDist).includes(locationSortMode.value): {
-        locationSortMode.value = ''
-        break
-      }
+watch(currentLocation, () => {
+  // watch for changes in currentLocation to handle changes to sort mode
+  const newLocHasLoc = PinboardUtilities.hasLocationData(currentLocation.value)
+  switch (true) {
+    case newLocHasLoc && !locationSortMode.value: {
+      // if new location matches type of LatLon and no sort mode has been selected, set sort mode to distance-ascending
+      locationSortMode.value = 'DistAsc'
+      break
     }
-  },
-  // { immediate: true },
-)
+    case !newLocHasLoc && Object.keys(sortLocationsOptionsDist).includes(locationSortMode.value): {
+      // if new location does not match type LatLon and a distance sort is selected, set sort mode to default sort
+      locationSortMode.value = ''
+      break
+    }
+  }
+})
 
 // event handlers
 function handleLocationFilterChange(selectedFilter: string) {
@@ -193,25 +123,24 @@ function handleLocationSortChange(sortLocationsOption: string) {
 
 function handleSearchSubmit(locationSearchString: string) {
   switch (true) {
-    case StreetAddress.test(locationSearchString): {
-      console.log('StreetAddress: ', locationSearchString)
+    case PinboardUtilities.StreetAddress.test(locationSearchString):
+    case PinboardUtilities.StreetIntersection.test(locationSearchString): {
+      locationSearchMode.value = 'address'
       addressForSearch.value = locationSearchString
       break
     }
-    case Zipcode.test(locationSearchString): {
-      // TODO: implement zipcode search. acts as keyword search for now
-      console.log('Zipcode: ', locationSearchString)
-      // zipcodeForSearch.value = locationSearchString
-      keywordsForSearch.value = locationSearchString
+    case PinboardUtilities.Zipcode.test(locationSearchString): {
+      locationSearchMode.value = 'zipcode'
+      zipcodeForSearch.value = locationSearchString
       break
     }
     case locationSearchString !== '': {
-      console.log('Keyword: ', locationSearchString)
+      locationSearchMode.value = 'keyword'
       keywordsForSearch.value = locationSearchString
       break
     }
     default: {
-      console.log('Clear: ', locationSearchString)
+      locationSearchMode.value = false
       addressForSearch.value = locationSearchString
       zipcodeForSearch.value = locationSearchString
       keywordsForSearch.value = locationSearchString
@@ -219,7 +148,7 @@ function handleSearchSubmit(locationSearchString: string) {
   }
 }
 
-function handleGeolocate(locationData: LatLon & { accuracy: number }) {
+function handleGeolocate(locationData: PinboardTypes.LatLon & { accuracy: number }) {
   console.log('Geolocation Accuracy: ', locationData.accuracy)
   userLocation.value = {
     latitude: locationData.latitude,
@@ -238,20 +167,11 @@ function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
 function handleDeselect(id: string) {
   visitedIds.value.add(id)
 }
-
-// utility functions
-function isGauge(loc: OemLocation): boolean {
-  return loc.deviceType === 'Aware' || loc.deviceType === 'Usgs'
-}
-
-function hasLocation(loc: LatLon) {
-  return !(Number.isNaN(loc.latitude) || Number.isNaN(loc.longitude))
-}
 </script>
 
 <template>
   <Pinboard
-    :locations="filteredAndSortedLocations"
+    :locations="currentLocations"
     :is-loading="isLoading"
     :error-message="errorMessage"
     :location-panel-search="searchPlaceholderText"
@@ -292,7 +212,7 @@ function hasLocation(loc: LatLon) {
 
       <div v-if="!isLoading">
         <MapMarker
-          v-for="loc in [...filteredAndSortedLocations].sort((a, b) => b.latitude - a.latitude)"
+          v-for="loc in [...currentLocations].sort((a, b) => b.latitude - a.latitude)"
           :key="loc.id"
           :lng-lat="[loc.longitude, loc.latitude]"
         >

@@ -34,7 +34,6 @@ import type {
   SortLocationsOptions,
   MenuOption,
 } from '../types'
-// import { StreetAddress, Zipcode } from '../types'
 
 // props
 const props = defineProps<{
@@ -44,9 +43,10 @@ const props = defineProps<{
 }>()
 
 // emits
+
 const emit = defineEmits<{
+  search: []
   searchString: [search: string]
-  search: [search: void]
   selectedFilter: [filter: string]
   sortOption: [sort: string]
 }>()
@@ -78,7 +78,7 @@ function handleFilterChange(option: string) {
 }
 
 function handleSortChange(value: string | string[]) {
-  value = Array.isArray(value) ? value[0] : value
+  value = Array.isArray(value) ? (value[0] ?? '') : value
   sortOption.value = value ?? ''
   emit('sortOption', sortOption.value)
 }
@@ -97,7 +97,7 @@ function handleSearchChange(search: string) {
       v-if="searchPlaceholder"
       class="location-search"
       :placeholder="searchPlaceholder"
-      @update:modelValue="handleSearchChange"
+      @update:model-value="handleSearchChange"
       @search="emit('search')"
     />
     <div v-if="searchSuggestions"></div>
@@ -105,15 +105,15 @@ function handleSearchChange(search: string) {
     <LocationFilter
       v-if="filterOptions"
       class="location-filters"
-      :filterOptions="filterOptions"
-      @selectedFilter="handleFilterChange"
+      :filter-options="filterOptions"
+      @selected-filter="handleFilterChange"
     />
     <div class="location-sort">
       <Menu
         v-if="sortOptions"
         :choices="sortChoices"
         placeholder="Sort"
-        @update:modelValue="handleSortChange"
+        @update:model-value="handleSortChange"
       />
     </div>
   </div>

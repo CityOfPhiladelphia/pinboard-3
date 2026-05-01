@@ -33,8 +33,8 @@ const props = defineProps<{
 // emits
 const emit = defineEmits<{
   select: [location: BasicLocation]
+  search: []
   searchString: [search: string]
-  search: [search: void]
   selectedFilter: [filter: string]
   sortOption: [sort: string]
   hover: [id: string]
@@ -93,35 +93,21 @@ defineExpose({ scrollToCard })
 
 <template>
   <LocationSearchFilterPanel
-    v-if="locationSearch || locationFilter || locationSort"
-    :searchPlaceholder="locationSearch"
-    :filterOptions="locationFilter"
-    :sortOptions="locationSort"
-    @selected-filter="handleFilterChange"
-    @sort-option="handleSortChange"
-    @search-string="handleSearchChange"
-    @search="emit('search')"
-  />
+v-if="locationSearch || locationFilter || locationSort"
+    :search-placeholder="locationSearch" :filter-options="locationFilter" :sort-options="locationSort"
+    @selected-filter="handleFilterChange" @sort-option="handleSortChange" @search-string="handleSearchChange"
+    @search="emit('search')" />
   <div ref="listRef" class="location-list content">
     <MapCard
-      v-for="location in locations"
-      :key="location.id"
-      :data-location-id="location.id"
-      v-bind="location.locationCardInfo"
-      :class="[
+v-for="location in locations" :key="location.id" :data-location-id="location.id"
+      v-bind="location.locationCardInfo" :class="[
         'location-card',
         {
           'location-card--hovered': hoveredId === location.id,
           'location-card--selected': selectedId === location.id,
         },
-      ]"
-      tabindex="0"
-      @click="emit('select', location)"
-      @mouseenter="emit('hover', location.id)"
-      @mouseleave="emit('hover-end')"
-      @keydown.enter="pendingKeydown = true"
-      @keyup.enter="handleCardKeyup(location)"
-    />
+      ]" tabindex="0" @click="emit('select', location)" @mouseenter="emit('hover', location.id)"
+      @mouseleave="emit('hover-end')" @keydown.enter="pendingKeydown = true" @keyup.enter="handleCardKeyup(location)" />
   </div>
 </template>
 

@@ -1,12 +1,12 @@
 /** Shared types for OEM Flood Finder */
-import type { BasicLocation, LatLon } from '@ui/types'
+import type { PinboardTypes } from '@pinboard/ui'
 
-export type AlertBanner = {
+export interface AlertBanner {
   title: string
   body: string
 }
 
-export type EverbridgeNotification = {
+export interface EverbridgeNotification {
   notificationId: string
   createdOn: Date
   title: string
@@ -14,12 +14,12 @@ export type EverbridgeNotification = {
   fileAttachments?: string
 }
 
-export type FloodImpact = {
+export interface FloodImpact {
   stage: number
   statement: string
 }
 
-export type Flood = {
+export interface Flood {
   floodId: string
   gaugeId: string
   crestReadingId: string
@@ -44,9 +44,9 @@ export type LocationPanelDTO = {
   minorStage: number
   moderateStage: number
   majorStage: number
-} & LatLon
+} & PinboardTypes.LatLon
 
-export type OemFields = {
+export interface OemFields {
   deviceType: DeviceType
   lastUpdated: Date | null
   actionStage: number
@@ -56,9 +56,9 @@ export type OemFields = {
   cameraStreamUrl: string
 }
 
-export type OemLocation = BasicLocation & OemFields
+export type OemLocation = PinboardTypes.BasicLocation & OemFields
 
-export type AwareReadingDTO = {
+export interface AwareReadingDTO {
   validTimeUTC: Date
   gaugeId: string
   flashFloodIndicator: boolean
@@ -76,7 +76,7 @@ export type AwareReadingDTO = {
   floodEvents: Flood[]
 }
 
-export type UsgsReadingDTO = {
+export interface UsgsReadingDTO {
   validTimeUTC: Date
   gaugeId: string
   isFlooding: boolean

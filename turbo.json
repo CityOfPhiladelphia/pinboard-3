@@ -17,5 +17,10 @@
       "cache": false
     },
     "format:check": {}
-  }
+  },
+  "globalPassThroughEnv": [
+    "CDK_DEFAULT_ACCOUNT",
+    "CDK_DEFAULT_REGION",
+    "BASE_URL"
+  ]
 }

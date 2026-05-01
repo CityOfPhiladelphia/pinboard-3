@@ -20,6 +20,9 @@ import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Search } from '@phila/phila-ui-search'
 
+// import pinboard config
+import { PINBOARD_CONFIG_KEY } from '../plugin'
+
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
@@ -29,8 +32,7 @@ import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 
 // type imports
-import {
-  PINBOARD_CONFIG_KEY,
+import type {
   BasicLocation,
   LocationFilterOption,
   SortLocationsOptions,
@@ -78,7 +80,7 @@ const emit = defineEmits<{
 // component variables
 const snapPoints = [15, 50, 100]
 let mql: MediaQueryList | null = null
-const config = inject(PINBOARD_CONFIG_KEY)!
+const config = inject(PINBOARD_CONFIG_KEY)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const slots: Record<string, any> = useSlots()
 
@@ -172,9 +174,6 @@ function handleSearchChange(search: string) {
     console.log('locationSearchChange:', searchSuggestions.value)
   }
   searchString.value = search
-  if (!searchString.value) {
-    emit('search', searchString.value)
-  }
 }
 
 function handleSearchSubmit() {
@@ -222,8 +221,8 @@ const effectiveMapConfig = (() => {
   // Merge mobile overrides into the map config ONCE at setup — not reactively.
   // Once the map is initialized, we don't want it to re-center or re-zoom if
   // the user changes orientation or resizes across the breakpoint.
-  const map = config.map
-  if (!map) return undefined
+  const map = config?.map
+  if (!map) return map
   const { mobile, ...base } = map
   if (isMobile.value && mobile) {
     return { ...base, ...mobile }
@@ -236,8 +235,8 @@ const effectiveMapConfig = (() => {
   <div v-if="selectedLocation !== null" class="detail-overlay">
     <button
       class="detail-close-btn"
-      @click="handleCloseLocationDetail"
       aria-label="Close details"
+      @click="handleCloseLocationDetail"
     >
       ×
     </button>
@@ -303,14 +302,14 @@ const effectiveMapConfig = (() => {
           v-if="locationPanelSearch"
           class-name="mobile-search"
           :placeholder="locationPanelSearch"
-          @update:modelValue="handleSearchChange"
+          @update:model-value="handleSearchChange"
           @search="handleSearchSubmit"
         />
         <div v-if="searchSuggestions"></div>
         <div v-if="searchSuggestionsError"></div>
         <LocationSearchFilterPanel
           v-if="locationPanelFilter"
-          :filterOptions="locationPanelFilter"
+          :filter-options="locationPanelFilter"
           @selected-filter="handleLocationFilterChange"
         />
       </div>
@@ -334,7 +333,7 @@ const effectiveMapConfig = (() => {
           <span>{{ locationCountLabel }}</span>
           <LocationSearchFilterPanel
             v-if="locationPanelSort"
-            :sortOptions="locationPanelSort"
+            :sort-options="locationPanelSort"
             @sort-option="handleLocationSortChange"
           />
         </div>
@@ -368,8 +367,8 @@ const effectiveMapConfig = (() => {
       <div v-if="selectedLocation" class="bottom-sheet-detail">
         <button
           class="detail-close-btn"
-          @click="handleCloseLocationDetail"
           aria-label="Close details"
+          @click="handleCloseLocationDetail"
         >
           ×
         </button>

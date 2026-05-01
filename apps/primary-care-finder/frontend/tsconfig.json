@@ -1,4 +1,10 @@
 {
-  "files": [],
-  "references": [{ "path": "./tsconfig.app.json" }]
+  "extends": "@repo/typescript-config/vite.json",
+  "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@pinboard/ui": ["../../../packages/ui/src/index.ts"]
+    }
+  }
 }

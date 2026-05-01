@@ -1,21 +1,20 @@
 import { type Ref, ref, toValue, watchEffect } from 'vue'
 import type { AisAddressSearchResponse, LatLon } from '../types'
 
-export function useAddressSearch(address: string | Ref<string>) {
-  const addressCoordinates = ref<LatLon>({
-    latitude: NaN,
-    longitude: NaN,
-  })
+const addressCoordinates = ref<LatLon>({
+  latitude: NaN,
+  longitude: NaN,
+})
 
+export function useSearchAddress(address: string | Ref<string>) {
   async function getAddressCoordinatesFromAIS() {
     const addressDeref = toValue(address)
     if (!addressDeref) {
-      addressCoordinates.value.longitude = NaN
-      addressCoordinates.value.latitude = NaN
+      clearAddress()
       return
     }
 
-    const url = `https://api.phila.gov/ais/v1/search/${encodeURIComponent(addressDeref)}?gatekeeperKey=${import.meta.env.VITE_OEM_FLOOD_GATEKEEPER_KEY}`
+    const url = `https://api.phila.gov/ais/v1/search/${encodeURIComponent(addressDeref)}`
 
     try {
       const result: AisAddressSearchResponse = await (await fetch(url)).json()
@@ -25,8 +24,7 @@ export function useAddressSearch(address: string | Ref<string>) {
         result.features[0].geometry.coordinates[1]
     } catch (err) {
       console.error('Failed to get response from AIS: ', err)
-      addressCoordinates.value.longitude = NaN
-      addressCoordinates.value.latitude = NaN
+      clearAddress()
     }
   }
 
@@ -35,4 +33,9 @@ export function useAddressSearch(address: string | Ref<string>) {
   })
 
   return { addressCoordinates }
+}
+
+function clearAddress() {
+  addressCoordinates.value.longitude = NaN
+  addressCoordinates.value.latitude = NaN
 }

@@ -9,8 +9,7 @@ import { Map as PhilaMap } from '@phila/phila-ui-map-core'
 import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css' // shouldn't the style be bundled with the component?
 import type { MapConfig, BasicLocation } from '../types'
 
-const props = withDefaults(
-  defineProps<{
+const props = defineProps<{
     config?: MapConfig
     locations?: BasicLocation[]
     geojson?: unknown
@@ -35,11 +34,7 @@ const props = withDefaults(
       onHoverEnd: () => void
       onSelect: (loc: unknown) => void
     }) => unknown
-  }>(),
-  {
-    isLoading: false,
-  }
-)
+  }>()
 
 const mapRef = ref<ComponentPublicInstance | null>(null)
 const zoom = ref(props.config?.zoom ?? 14)
@@ -64,9 +59,9 @@ const slotProps = computed(() => ({
   hoveredId: props.hoveredId ?? null,
   selectedId: props.selectedId ?? null,
   mobileControlsTarget: props.mobileControlsTarget ?? null,
-  onHover: props.onHover ?? (() => {}),
-  onHoverEnd: props.onHoverEnd ?? (() => {}),
-  onSelect: props.onSelect ?? (() => {}),
+  onHover: props.onHover ?? (() => null),
+  onHoverEnd: props.onHoverEnd ?? (() => null),
+  onSelect: props.onSelect ?? (() => null),
 }))
 
 const SlotRenderer = defineComponent({

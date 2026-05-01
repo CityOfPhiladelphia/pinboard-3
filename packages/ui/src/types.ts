@@ -1,5 +1,4 @@
 // packages/ui/src/types.ts
-import type { InjectionKey } from 'vue'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 
 export type Latitude = number
@@ -7,10 +6,17 @@ export type Longitude = number
 
 export type LocationCoordinate = [Longitude, Latitude]
 
-export type LatLon = {
+export interface LatLon {
   latitude: Latitude
   longitude: Longitude
 }
+
+export interface ZipcodePolygon {
+  centroid: LatLon
+  nodes: LocationCoordinate[]
+}
+
+export type LocationPermissionState = 'granted' | 'prompt' | 'denied'
 
 export type MapControlPosition =
   | 'top-left'
@@ -45,13 +51,10 @@ export interface PinboardConfig {
   map?: MapConfig
 }
 
-export type AlertBanner = {
+export interface AlertBanner {
   title: string
   message: string
 }
-
-export const PINBOARD_CONFIG_KEY: InjectionKey<PinboardConfig> =
-  Symbol('pinboard-config')
 
 export type BasicLocation = {
   id: string
@@ -59,21 +62,19 @@ export type BasicLocation = {
   locationCardInfo: MapCardProps
 } & LatLon
 
-export type LocationFilterOption = {
+export interface LocationFilterOption {
   readonly value: string
   readonly label: string
 }
 
 export type SearchMode = 'address' | 'zipcode' | 'keyword' | false
 
-export type MenuOption = Readonly<{
+export interface MenuOption {
   text: string
   value: string
-}>
+}
 
-export type SortLocationsOptions = Readonly<{
-  [key: string]: string
-}>
+export type SortLocationsOptions = Record<string, string>;
 
 export type AisAutocompleteResult = Readonly<{
   query: string
@@ -81,17 +82,15 @@ export type AisAutocompleteResult = Readonly<{
   count: number
   results: Readonly<{
     placenames: string[]
-    addresses: Array<
-      Readonly<{
+    addresses: Readonly<{
         address: string
         search_address: string
         has_opa: boolean
-      }>
-    >
+      }>[]
   }>
 }>
 
-export type AisAddressSearchResponse = {
+export interface AisAddressSearchResponse {
   search_type: string
   search_params: Record<string, string>
   query: string
@@ -142,10 +141,10 @@ export type AisAddressSearchResponse = {
         eclipse_location_id: string
         bin: string
         i_parcel_id: string
-        zoning_document_ids: Array<string>
-        pwd_account_nums: Array<string>
+        zoning_document_ids: string[]
+        pwd_account_nums: string[]
         opa_account_num: string
-        opa_owners: Array<string>
+        opa_owners: string[]
         opa_address: string
         center_city_district: string
         cua_zone: string
@@ -221,7 +220,3 @@ export type AisAddressSearchResponse = {
     },
   ]
 }
-
-export const Zipcode: Readonly<RegExp> = /^\d{5}(?:-\d{4})?$/
-export const StreetAddress: Readonly<RegExp> =
-  /^(?:\d{1,5}(?:-\d{1,5})?[A-Za-z]{0,3} )(?:(?:(?:[NnSs](?:[Oo][RrUu][Tt][Hh])?)|(?:[EeWw](?:[AaEe][Ss][Tt])?)){0,2} )?(?:\w+ )(?:\w{2,})$/
