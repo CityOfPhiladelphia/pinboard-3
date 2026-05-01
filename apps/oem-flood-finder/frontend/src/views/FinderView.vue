@@ -170,7 +170,8 @@ function handleDeselect(id: string) {
 </script>
 
 <template>
-  <Pinboard :locations="currentLocations" :is-loading="isLoading" :error-message="errorMessage"
+  <Pinboard
+:locations="currentLocations" :is-loading="isLoading" :error-message="errorMessage"
     :location-panel-search="searchPlaceholderText" :location-panel-filter="filterOptions"
     :location-panel-sort="sortLocationsOptions" @search="handleSearchSubmit"
     @selected-locations-filter="handleLocationFilterChange" @sort-locations-option="handleLocationSortChange"
@@ -179,7 +180,8 @@ function handleDeselect(id: string) {
       <LocationDetail :location="location" />
     </template>
 
-    <template #map-content="{
+    <template
+#map-content="{
       hoveredId,
       selectedId,
       zoom,
@@ -191,14 +193,17 @@ function handleDeselect(id: string) {
     }">
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />
       <BasemapToggle position="top-right" :teleport-to="isMobile ? mobileControlsTarget : undefined" />
-      <GeolocationButton :position="isMobile ? 'top-right' : 'bottom-right'"
+      <GeolocationButton
+:position="isMobile ? 'top-right' : 'bottom-right'"
         :teleport-to="isMobile ? mobileControlsTarget : undefined" @located="handleGeolocate"
         @error="handleGeolocateError" />
 
       <div v-if="!isLoading">
-        <MapMarker v-for="loc in [...currentLocations].sort((a, b) => b.latitude - a.latitude)" :key="loc.id"
+        <MapMarker
+v-for="loc in [...currentLocations].sort((a, b) => b.latitude - a.latitude)" :key="loc.id"
           :lng-lat="[loc.longitude, loc.latitude]">
-          <MapIconTextPin :zoom="zoom" :icon="isGauge(loc) ? faGauge : faCamera" :text="loc.locationCardInfo.tags?.[1]?.text !== 'No data'
+          <MapIconTextPin
+:zoom="zoom" :icon="isGauge(loc) ? faGauge : faCamera" :text="loc.locationCardInfo.tags?.[1]?.text !== 'No data'
             ? loc.locationCardInfo.tags?.[1]?.text
             : undefined
             " :color-theme="'dark-primary'" :color="isGauge(loc) ? undefined : '#3053B6'"

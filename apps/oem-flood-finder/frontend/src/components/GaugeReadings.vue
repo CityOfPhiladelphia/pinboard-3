@@ -71,7 +71,7 @@ const tableData = computed((): Record<string, unknown>[] => {
   <div v-else-if="readingState.kind === 'Loaded'" class="gauge-readings">
     <div class="gauge-readings__header">
       <h6>Gauge Reading</h6>
-      <PhlTabNav v-if="location.deviceType === 'Aware'" variant="primary" v-model="activeTab">
+      <PhlTabNav v-if="location.deviceType === 'Aware'" v-model="activeTab" variant="primary">
         <PhlTab id="graph" label="Graph" />
         <PhlTab id="table" label="Table" />
       </PhlTabNav>

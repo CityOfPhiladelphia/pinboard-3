@@ -94,9 +94,9 @@ defineExpose({ scrollToCard })
 <template>
   <LocationSearchFilterPanel
     v-if="locationSearch || locationFilter || locationSort"
-    :searchPlaceholder="locationSearch"
-    :filterOptions="locationFilter"
-    :sortOptions="locationSort"
+    :search-placeholder="locationSearch"
+    :filter-options="locationFilter"
+    :sort-options="locationSort"
     @selected-filter="handleFilterChange"
     @sort-option="handleSortChange"
     @search-string="handleSearchChange"

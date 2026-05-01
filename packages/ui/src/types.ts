@@ -6,12 +6,12 @@ export type Longitude = number
 
 export type LocationCoordinate = [Longitude, Latitude]
 
-export type LatLon = {
+export interface LatLon {
   latitude: Latitude
   longitude: Longitude
 }
 
-export type ZipcodePolygon = {
+export interface ZipcodePolygon {
   centroid: LatLon
   nodes: LocationCoordinate[]
 }
@@ -51,7 +51,7 @@ export interface PinboardConfig {
   map?: MapConfig
 }
 
-export type AlertBanner = {
+export interface AlertBanner {
   title: string
   message: string
 }
@@ -62,21 +62,19 @@ export type BasicLocation = {
   locationCardInfo: MapCardProps
 } & LatLon
 
-export type LocationFilterOption = {
+export interface LocationFilterOption {
   readonly value: string
   readonly label: string
 }
 
 export type SearchMode = 'address' | 'zipcode' | 'keyword' | false
 
-export type MenuOption = {
+export interface MenuOption {
   text: string
   value: string
 }
 
-export type SortLocationsOptions = {
-  [key: string]: string
-}
+export type SortLocationsOptions = Record<string, string>;
 
 export type AisAutocompleteResult = Readonly<{
   query: string
@@ -84,17 +82,15 @@ export type AisAutocompleteResult = Readonly<{
   count: number
   results: Readonly<{
     placenames: string[]
-    addresses: Array<
-      Readonly<{
+    addresses: Readonly<{
         address: string
         search_address: string
         has_opa: boolean
-      }>
-    >
+      }>[]
   }>
 }>
 
-export type AisAddressSearchResponse = {
+export interface AisAddressSearchResponse {
   search_type: string
   search_params: Record<string, string>
   query: string
@@ -145,10 +141,10 @@ export type AisAddressSearchResponse = {
         eclipse_location_id: string
         bin: string
         i_parcel_id: string
-        zoning_document_ids: Array<string>
-        pwd_account_nums: Array<string>
+        zoning_document_ids: string[]
+        pwd_account_nums: string[]
         opa_account_num: string
-        opa_owners: Array<string>
+        opa_owners: string[]
         opa_address: string
         center_city_district: string
         cua_zone: string

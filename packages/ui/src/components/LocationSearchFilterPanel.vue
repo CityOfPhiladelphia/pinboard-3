@@ -96,7 +96,7 @@ function handleSearchChange(search: string) {
       v-if="searchPlaceholder"
       class="location-search"
       :placeholder="searchPlaceholder"
-      @update:modelValue="handleSearchChange"
+      @update:model-value="handleSearchChange"
       @search="emit('search')"
     />
     <div v-if="searchSuggestions"></div>
@@ -104,15 +104,15 @@ function handleSearchChange(search: string) {
     <LocationFilter
       v-if="filterOptions"
       class="location-filters"
-      :filterOptions="filterOptions"
-      @selectedFilter="handleFilterChange"
+      :filter-options="filterOptions"
+      @selected-filter="handleFilterChange"
     />
     <div class="location-sort">
       <Menu
         v-if="sortOptions"
         :choices="sortChoices"
         placeholder="Sort"
-        @update:modelValue="handleSortChange"
+        @update:model-value="handleSortChange"
       />
     </div>
   </div>

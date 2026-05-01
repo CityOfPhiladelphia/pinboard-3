@@ -235,8 +235,8 @@ const effectiveMapConfig = (() => {
   <div v-if="selectedLocation !== null" class="detail-overlay">
     <button
       class="detail-close-btn"
-      @click="handleCloseLocationDetail"
       aria-label="Close details"
+      @click="handleCloseLocationDetail"
     >
       ×
     </button>
@@ -302,14 +302,14 @@ const effectiveMapConfig = (() => {
           v-if="locationPanelSearch"
           class-name="mobile-search"
           :placeholder="locationPanelSearch"
-          @update:modelValue="handleSearchChange"
+          @update:model-value="handleSearchChange"
           @search="handleSearchSubmit"
         />
         <div v-if="searchSuggestions"></div>
         <div v-if="searchSuggestionsError"></div>
         <LocationSearchFilterPanel
           v-if="locationPanelFilter"
-          :filterOptions="locationPanelFilter"
+          :filter-options="locationPanelFilter"
           @selected-filter="handleLocationFilterChange"
         />
       </div>
@@ -333,7 +333,7 @@ const effectiveMapConfig = (() => {
           <span>{{ locationCountLabel }}</span>
           <LocationSearchFilterPanel
             v-if="locationPanelSort"
-            :sortOptions="locationPanelSort"
+            :sort-options="locationPanelSort"
             @sort-option="handleLocationSortChange"
           />
         </div>
@@ -367,8 +367,8 @@ const effectiveMapConfig = (() => {
       <div v-if="selectedLocation" class="bottom-sheet-detail">
         <button
           class="detail-close-btn"
-          @click="handleCloseLocationDetail"
           aria-label="Close details"
+          @click="handleCloseLocationDetail"
         >
           ×
         </button>
