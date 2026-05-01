@@ -13,13 +13,17 @@ const props = defineProps<{
 
 const chartData: Ref<ChartData[]> = computed(() => {
   if (props.readingState.kind === 'Loaded' && props.readingState.data) {
-    return props.readingState.data.map((reading) => ({
-      x: new Date(reading.validTimeUTC).toLocaleString('en-US', {
-        timeZone: 'America/New_York',
-        hour12: true,
-      }),
-      y: reading.gaugeHeight === -9999.9 ? undefined : reading.gaugeHeight,
-    }))
+    const offset = new Date().getTimezoneOffset() * 60 * 1000
+    return props.readingState.data
+      .map((reading) => {
+        const x = new Date(new Date(reading.validTimeUTC).getTime() - offset).toString()
+        let y = reading.gaugeHeight === -9999.9 ? undefined : reading.gaugeHeight
+        if (reading.gaugeHeightUnit === 'in' && y !== undefined) {
+          y = Math.ceil((y / 12) * 100) / 100
+        }
+        return { x, y }
+      })
+      .reverse()
   }
   return []
 })
@@ -74,11 +78,7 @@ const tableData = computed((): Record<string, unknown>[] => {
     </div>
 
     <div v-show="location.deviceType !== 'Aware' || activeTab === 'graph'">
-      <LineChart
-        :data="chartData"
-        :y-label="`Stage (${readingState.data[0]?.gaugeHeightUnit})`"
-        :minimum-y-level="150"
-      />
+      <LineChart :data="chartData" :y-label="`Stage (ft)`" />
     </div>
 
     <div v-if="location.deviceType === 'Aware'" v-show="activeTab === 'table'">
