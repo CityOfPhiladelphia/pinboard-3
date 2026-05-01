@@ -1,22 +1,22 @@
 {
-	"files.associations": {
-		"*.vue": "vue"
-	},
-	"editor.formatOnSave": true,
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"editor.tabSize": 2,
-	"prettier.useTabs": true,
-	"prettier.printWidth": 80,
-	"prettier.singleQuote": true,
-	"prettier.jsxSingleQuote": true,
-	"prettier.bracketSameLine": false,
-	"editor.renderFinalNewline": "on",
-	"emmet.includeLanguages": {
-		"vue": "html"
-	},
-	"emmet.syntaxProfiles": {
-		"vue": {
-			"attr_quotes": "single"
-		}
-	}
+  "files.associations": {
+    "*.vue": "vue"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.tabSize": 2,
+  "prettier.useTabs": true,
+  "prettier.printWidth": 80,
+  "prettier.singleQuote": true,
+  "prettier.jsxSingleQuote": true,
+  "prettier.bracketSameLine": false,
+  "editor.renderFinalNewline": "on",
+  "emmet.includeLanguages": {
+    "vue": "html"
+  },
+  "emmet.syntaxProfiles": {
+    "vue": {
+      "attr_quotes": "single"
+    }
+  }
 }

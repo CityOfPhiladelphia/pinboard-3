@@ -41,7 +41,7 @@ export function useLocations() {
         heading: loc.name,
         subheader: undefined,
         tags: getLocationTags(loc),
-        src: loc.imageUrl,
+        src: loc.thumbnailUrl,
       }
       return {
         id: loc.id,
@@ -49,12 +49,16 @@ export function useLocations() {
         latitude: loc.latitude,
         longitude: loc.longitude,
         lastUpdated: loc.lastUpdated,
+        gaugeHeight: loc.gaugeHeight,
+        gaugeHeightUnit: loc.gaugeHeightUnit,
+        thumbnailUrl: loc.thumbnailUrl,
+        cameraStreamUrl: loc.cameraStreamUrl,
         deviceType: loc.deviceType,
-        locationCardInfo: cardInfo,
         actionStage: loc.actionStage,
         minorStage: loc.minorStage,
         moderateStage: loc.moderateStage,
         majorStage: loc.majorStage,
+        locationCardInfo: cardInfo,
       }
     })
     hasData.value = true
