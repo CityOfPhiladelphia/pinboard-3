@@ -45,10 +45,8 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/web": "^0.0.348",
     "@vitejs/plugin-vue": "^5.2.1",
     "vite": "^6.1.0",
-    "vite-plugin-dts": "^4.5.0",
-    "vue-tsc": "^3.2.4"
+    "vite-plugin-dts": "^4.5.0"
   }
 }

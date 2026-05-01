@@ -1,5 +1,5 @@
 import PinboardShell from './components/PinboardShell.vue'
-import Pinboard from './components/Pinboard.vue'
+import PinboardBody from './components/PinboardBody.vue'
 export * as PinboardComposables from './composables/_index'
 export * as PinboardUtilities from './utilities/_index'
 export { createPinboard } from './plugin'
@@ -19,4 +19,4 @@ export {
   BasemapToggle,
 } from '@phila/phila-ui-map-core'
 
-export { PinboardShell, Pinboard }
+export { PinboardShell, PinboardBody as Pinboard }

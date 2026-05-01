@@ -33,8 +33,8 @@ const props = defineProps<{
 // emits
 const emit = defineEmits<{
   select: [location: BasicLocation]
+  search: []
   searchString: [search: string]
-  search: [search: void]
   selectedFilter: [filter: string]
   sortOption: [sort: string]
   hover: [id: string]
