@@ -135,7 +135,11 @@ onBeforeUnmount(() => {
       :model-value="true"
       :snap-points="[40]"
       class="sort-panel-sheet"
-      @update:model-value="(v: boolean) => { if (!v) closePanel() }"
+      @update:model-value="
+        (v: boolean) => {
+          if (!v) closePanel()
+        }
+      "
     >
       <div ref="formEl" class="sort-panel-form sort-panel-form--mobile">
         <ul class="sort-panel-options">

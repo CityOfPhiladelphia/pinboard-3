@@ -29,10 +29,7 @@ import SortPanel, { type SortPanelOption } from './SortPanel.vue'
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 
 // type imports
-import type {
-  LocationFilterOption,
-  SortLocationsOptions,
-} from '../types'
+import type { LocationFilterOption, SortLocationsOptions } from '../types'
 // import { StreetAddress, Zipcode } from '../types'
 
 // props

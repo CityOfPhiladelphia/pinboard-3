@@ -49,9 +49,9 @@ function handleFilterChange(option: string) {
 }
 
 :deep(
-  .phila-tag.phila-tag--grey:not(.is-selected):not(.phila-tag--readonly):hover:not(
-      :disabled
-    )
+  .phila-tag.phila-tag--grey:not(.is-selected):not(
+      .phila-tag--readonly
+    ):hover:not(:disabled)
 ) {
   background: #f5f5f5;
 }
