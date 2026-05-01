@@ -3,12 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w",
     "cdk": "cdk",
     "lint": "eslint",
-    "lint:fix": "eslint --fix",
-    "type-check": "vue-tsc --noEmit"
+    "lint:fix": "eslint --fix"
   },
   "dependencies": {
     "@phila/constructs": "^0.8.0",
