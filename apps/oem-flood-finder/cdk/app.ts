@@ -2,7 +2,7 @@
 import 'source-map-support/register'
 import { App, Aspects, Stack } from 'aws-cdk-lib'
 import { AwsSolutionsChecks, NIST80053R5Checks } from 'cdk-nag'
-import { StaticSite, Confidentiality, Environment } from '@phila/constructs'
+import { StaticSite, Confidentiality, type Environment } from '@phila/constructs'
 import {
   Certificate,
   CertificateValidation,
@@ -67,7 +67,7 @@ new StaticSite(stack as any, 'StaticSite', {
   assetDir: '../frontend/dist',
   certificate: dnsValidatedCertificate,
   hostedZone,
-})
+} as any)
 
 // Apply compliance checks
 Aspects.of(app).add(new NIST80053R5Checks({ verbose: true }))

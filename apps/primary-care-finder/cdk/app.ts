@@ -6,9 +6,9 @@ import * as route53 from 'aws-cdk-lib/aws-route53'
 import {
   StaticSite,
   Confidentiality,
-  Environment,
   applyStandardTags,
   applyNagChecks,
+  type Environment
 } from '@phila/constructs'
 
 const app = new App()
