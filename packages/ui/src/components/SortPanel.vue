@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Tags } from '@phila/phila-ui-tags'
+import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 
 export type SortPanelOption = {
   value: string
@@ -49,6 +50,19 @@ const formEl = ref<HTMLElement | null>(null)
 const triggerEl = ref<HTMLElement | null>(null)
 const anchorStyle = ref<Record<string, string>>({})
 
+const isMobile = ref(false)
+let mql: MediaQueryList | null = null
+
+function handleMediaChange(e: MediaQueryListEvent) {
+  isMobile.value = e.matches
+}
+
+onMounted(() => {
+  mql = window.matchMedia('(max-width: 768px)')
+  isMobile.value = mql.matches
+  mql.addEventListener('change', handleMediaChange)
+})
+
 function recomputeAnchor() {
   const rect = triggerEl.value?.getBoundingClientRect()
   if (!rect) return
@@ -61,7 +75,7 @@ function recomputeAnchor() {
 }
 
 function handleDocumentClick(e: MouseEvent) {
-  if (!panelOpen.value) return
+  if (!panelOpen.value || isMobile.value) return
   const target = e.target as Node
   if (formEl.value?.contains(target) || triggerEl.value?.contains(target)) {
     return
@@ -95,6 +109,7 @@ onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleKeydown)
   window.removeEventListener('resize', recomputeAnchor)
   window.removeEventListener('scroll', recomputeAnchor, true)
+  mql?.removeEventListener('change', handleMediaChange)
 })
 </script>
 
@@ -112,8 +127,57 @@ onBeforeUnmount(() => {
     </span>
   </div>
   <Teleport to="body">
+    <BottomSheet
+      v-if="panelOpen && isMobile"
+      :model-value="true"
+      :snap-points="[100]"
+      class="sort-panel-sheet"
+      @update:model-value="(v: boolean) => { if (!v) closePanel() }"
+    >
+      <div ref="formEl" class="sort-panel-form sort-panel-form--mobile">
+        <h3 class="sort-panel-heading">Sort by</h3>
+        <ul class="sort-panel-options">
+          <li
+            v-for="option in sortOptions"
+            :key="option.value"
+            class="sort-panel-option"
+          >
+            <label
+              :class="{
+                'sort-panel-label--disabled':
+                  option.value === 'DistAsc' && !locationAvailable,
+              }"
+            >
+              <input
+                type="radio"
+                name="sort-panel-radio"
+                :value="option.value"
+                :checked="pendingSelection === option.value"
+                :disabled="option.value === 'DistAsc' && !locationAvailable"
+                @change="pendingSelection = option.value"
+              />
+              <span>{{ option.label }}</span>
+            </label>
+            <p
+              v-if="option.value === 'DistAsc' && !locationAvailable"
+              class="sort-panel-hint"
+            >
+              Share your location to sort by distance
+            </p>
+          </li>
+        </ul>
+        <div class="sort-panel-actions">
+          <button type="button" class="sort-panel-reset" @click="resetSort">
+            Reset
+          </button>
+          <button type="button" class="sort-panel-apply" @click="applySort">
+            Apply
+          </button>
+        </div>
+      </div>
+    </BottomSheet>
     <div
-      v-if="panelOpen"
+      v-else-if="panelOpen"
       ref="formEl"
       class="sort-panel-form"
       :style="anchorStyle"
@@ -233,5 +297,15 @@ onBeforeUnmount(() => {
   padding: 0.5rem 1.25rem;
   cursor: pointer;
   font-weight: 600;
+}
+
+.sort-panel-form--mobile {
+  width: 100%;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.sort-panel-sheet {
+  z-index: 30;
 }
 </style>
