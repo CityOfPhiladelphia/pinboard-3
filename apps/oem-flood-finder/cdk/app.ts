@@ -2,7 +2,11 @@
 import 'source-map-support/register'
 import { App, Aspects, Stack } from 'aws-cdk-lib'
 import { AwsSolutionsChecks, NIST80053R5Checks } from 'cdk-nag'
-import { StaticSite, Confidentiality, type Environment } from '@phila/constructs'
+import {
+  StaticSite,
+  Confidentiality,
+  type Environment,
+} from '@phila/constructs'
 import {
   Certificate,
   CertificateValidation,

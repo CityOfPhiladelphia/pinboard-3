@@ -14,11 +14,10 @@ export function useSearchAddress(address: string | Ref<string>) {
       return
     }
 
-    const url = `https://api.phila.gov/ais/v1/search/${encodeURIComponent(addressDeref)}?gatekeeperKey=${import.meta.env.VITE_OEM_FLOOD_GATEKEEPER_KEY}`
+    const url = `https://api.phila.gov/ais/v1/search/${encodeURIComponent(addressDeref)}`
 
     try {
       const result: AisAddressSearchResponse = await (await fetch(url)).json()
-      console.log("AIS RESULT: ", result)
       addressCoordinates.value.longitude =
         result.features[0].geometry.coordinates[0]
       addressCoordinates.value.latitude =
