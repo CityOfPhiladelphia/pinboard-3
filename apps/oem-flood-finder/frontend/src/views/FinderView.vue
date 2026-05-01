@@ -182,8 +182,8 @@ function handleDeselect(id: string) {
     @sort-locations-option="handleLocationSortChange"
     @deselect="handleDeselect"
   >
-    <template #location-detail="{ location }">
-      <LocationDetail :location="location" />
+    <template #location-detail="{ location, onClose }">
+      <LocationDetail :location="location as OemLocation" :on-close="onClose" />
     </template>
 
     <template
@@ -224,8 +224,7 @@ function handleDeselect(id: string) {
                 ? loc.locationCardInfo.tags?.[1]?.text
                 : undefined
             "
-            :color-theme="'dark-primary'"
-            :color="isGauge(loc) ? undefined : '#3053B6'"
+            :color-theme="isGauge(loc) ? 'light-primary' : 'light-purple'"
             :hovered="hoveredId === loc.id"
             :selected="selectedId === loc.id"
             :visited="visitedIds.has(loc.id)"

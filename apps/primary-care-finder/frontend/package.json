@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
-    "@phila/phila-ui-button": "2.2.3-beta.1",
+    "@phila/phila-ui-button": "2.2.3-beta.2",
     "@pinboard/ui": "workspace:*",
     "date-fns": "^4.1.0",
     "vue": "^3.5.33",
