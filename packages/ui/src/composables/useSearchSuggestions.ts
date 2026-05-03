@@ -1,12 +1,12 @@
-import { type Ref, ref, toValue, watchEffect } from 'vue'
+import { type Ref, ref, toValue, watch } from 'vue'
 import type { AisAutocompleteResult } from '../types'
 
 export function useSearchSuggestions(search: string | Ref<string>) {
   const searchSuggestions = ref<string[]>([])
   const searchSuggestionsError = ref<unknown>(null)
+  let skipNextFetch = false
 
-  async function getSearchSuggestions() {
-    const stringValue = toValue(search)
+  async function getSearchSuggestions(stringValue: string) {
     if (!stringValue || stringValue.length < 3) {
       searchSuggestions.value = []
       return
@@ -29,9 +29,21 @@ export function useSearchSuggestions(search: string | Ref<string>) {
     }
   }
 
-  watchEffect(() => {
-    getSearchSuggestions()
-  })
+  function dismissSuggestions() {
+    skipNextFetch = true
+    searchSuggestions.value = []
+  }
 
-  return { searchSuggestions, searchSuggestionsError }
+  watch(
+    () => toValue(search),
+    (value) => {
+      if (skipNextFetch) {
+        skipNextFetch = false
+        return
+      }
+      getSearchSuggestions(value)
+    },
+  )
+
+  return { searchSuggestions, searchSuggestionsError, dismissSuggestions }
 }
