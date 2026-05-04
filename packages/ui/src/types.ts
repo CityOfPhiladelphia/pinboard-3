@@ -74,7 +74,7 @@ export interface MenuOption {
   value: string
 }
 
-export type SortLocationsOptions = Record<string, string>;
+export type SortLocationsOptions = Record<string, string>
 
 export type AisAutocompleteResult = Readonly<{
   query: string
@@ -83,10 +83,10 @@ export type AisAutocompleteResult = Readonly<{
   results: Readonly<{
     placenames: string[]
     addresses: Readonly<{
-        address: string
-        search_address: string
-        has_opa: boolean
-      }>[]
+      address: string
+      search_address: string
+      has_opa: boolean
+    }>[]
   }>
 }>
 

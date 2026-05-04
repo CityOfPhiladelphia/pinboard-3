@@ -3,9 +3,12 @@ import { computed } from 'vue'
 import { format, parseISO } from 'date-fns'
 import { useI18n } from 'vue-i18n'
 import type { PrimaryCareLocation } from '@/types'
+import { PhilaButton } from '@phila/phila-ui-button'
+import { faXmark } from '@fortawesome/free-solid-svg-icons'
 
 const props = defineProps<{
   location: PrimaryCareLocation
+  onClose: () => void
 }>()
 
 const { t, locale, messages } = useI18n()
@@ -208,6 +211,15 @@ function translateTransitList(raw: string | null, category: string): string {
   <div class="location-detail content">
     <div class="detail-header">
       <h2>{{ siteName() }}</h2>
+      <PhilaButton
+        :icon-definition="faXmark"
+        :icon-only="true"
+        variant="standard"
+        size="small"
+        class="detail-close-btn"
+        aria-label="Close details"
+        @click="onClose"
+      />
     </div>
 
     <div class="detail-body">
@@ -379,15 +391,25 @@ function translateTransitList(raw: string | null, category: string): string {
 
 .detail-header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: flex-start;
+  gap: 0.75rem;
   padding: 1rem;
-  border-bottom: 1px solid #ccc;
+  flex-shrink: 0;
 }
 
 .detail-header h2 {
   font-size: 1.25rem;
   margin: 0;
+  flex: 1;
+}
+
+.detail-close-btn {
+  flex-shrink: 0;
+}
+
+.detail-close-btn :deep(svg) {
+  color: var(--Schemes-On-Primary-Container);
 }
 
 .detail-body {

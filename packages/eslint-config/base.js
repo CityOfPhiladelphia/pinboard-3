@@ -1,17 +1,13 @@
-import js from "@eslint/js";
-import { globalIgnores } from "eslint/config";
-import eslintConfigPrettier from "eslint-config-prettier/flat";
-import tseslint from "typescript-eslint";
+import js from '@eslint/js'
+import { globalIgnores } from 'eslint/config'
+import eslintConfigPrettier from 'eslint-config-prettier/flat'
+import tseslint from 'typescript-eslint'
 import eslintPluginVue from 'eslint-plugin-vue'
 import globals from 'globals'
-import turboPlugin from "eslint-plugin-turbo";
+import turboPlugin from 'eslint-plugin-turbo'
 
 export const viteJsConfig = [
-  globalIgnores([
-    'node_modules/**',
-    'dist/**',
-    "cdk.out"
-  ]),
+  globalIgnores(['node_modules/**', 'dist/**', 'cdk.out']),
   js.configs.recommended,
   ...tseslint.configs.strict,
   ...tseslint.configs.stylistic,
@@ -23,11 +19,11 @@ export const viteJsConfig = [
       globals: {
         ...globals.browser,
         ...globals.node,
-        ...globals.es2022
+        ...globals.es2022,
       },
       parserOptions: {
         parser: tseslint.parser,
-        tsconfigRootDir: import.meta.dirname
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     rules: {
@@ -36,10 +32,10 @@ export const viteJsConfig = [
         'error',
         { argsIgnorePattern: '^_' },
       ],
-      'no-undef': 'off'
+      'no-undef': 'off',
     },
   },
-  turboPlugin.configs["flat/recommended"],
+  turboPlugin.configs['flat/recommended'],
   ...eslintPluginVue.configs['flat/recommended'],
-  eslintConfigPrettier
-];
+  eslintConfigPrettier,
+]
