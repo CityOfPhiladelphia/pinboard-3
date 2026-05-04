@@ -434,7 +434,7 @@ const effectiveMapConfig = (() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem 0;
+  padding: 0 1rem;
   font-family: var(--Body-Default-font-body-default-family);
   font-weight: 700;
 }
@@ -474,7 +474,7 @@ const effectiveMapConfig = (() => {
   height: 100%;
   width: 100%;
   max-width: 100%;
-  background: var(--Schemes-Surface-Bright, white);
+  background: transparent;
 }
 
 .bottom-sheet-list-scroll {
@@ -497,7 +497,7 @@ const effectiveMapConfig = (() => {
   position: absolute;
   inset: 0;
   padding: 1rem;
-  background: var(--Schemes-Surface-Bright, white);
+  background: transparent;
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: none;

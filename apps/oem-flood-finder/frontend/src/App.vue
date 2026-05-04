@@ -63,4 +63,16 @@ const alertBanner: ComputedRef<AlertBanner | null> = computed(() => {
   padding: 0;
   box-sizing: border-box;
 }
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
+#app {
+  height: 100dvh;
+}
 </style>

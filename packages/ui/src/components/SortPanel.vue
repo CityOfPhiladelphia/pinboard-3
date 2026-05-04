@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Radio } from '@phila/phila-ui-radio'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
+import { faArrowUpArrowDown, faXmark } from '@fortawesome/pro-solid-svg-icons'
 
 export type SortPanelOption = {
   value: string
@@ -131,10 +131,12 @@ onBeforeUnmount(() => {
     </button>
   </div>
   <Teleport to="body">
+    <div v-if="panelOpen && isMobile" class="sort-panel-scrim" />
     <BottomSheet
       v-if="panelOpen && isMobile"
       :model-value="true"
-      :snap-points="[40]"
+      :snap-points="[35]"
+      :style="{ zIndex: 101 }"
       class="sort-panel-sheet"
       @update:model-value="
         (v: boolean) => {
@@ -143,6 +145,14 @@ onBeforeUnmount(() => {
       "
     >
       <div ref="formEl" class="sort-panel-form sort-panel-form--mobile">
+        <button
+          type="button"
+          class="sort-panel-close"
+          aria-label="Close"
+          @click="closePanel"
+        >
+          <FontAwesomeIcon :icon="faXmark" />
+        </button>
         <ul class="sort-panel-options">
           <li
             v-for="option in sortOptions"
@@ -310,11 +320,36 @@ onBeforeUnmount(() => {
 
 .sort-panel-form--mobile {
   width: 100%;
+  background: transparent;
   box-shadow: none;
   border-radius: 0;
 }
 
-.sort-panel-sheet {
-  z-index: 30;
+.sort-panel-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.sort-panel-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.125rem;
+  color: var(--Schemes-On-Surface, #333);
+  cursor: pointer;
+}
+
+.sort-panel-close:hover {
+  background: rgba(0, 0, 0, 0.06);
 }
 </style>
