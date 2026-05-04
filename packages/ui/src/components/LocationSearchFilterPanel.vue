@@ -24,6 +24,7 @@ import { Menu } from '@phila/phila-ui-menu'
 
 // pinboard component imports
 import LocationFilter from './LocationFilter.vue'
+import SearchSuggestions from './SearchSuggestions.vue'
 
 // pinboard composables imports
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
@@ -54,7 +55,9 @@ const emit = defineEmits<{
 // refs
 const sortOption = ref<string>('')
 const searchString = ref<string>('')
-const { searchSuggestions, searchSuggestionsError } =
+const searchWrapperRef = ref<HTMLElement | null>(null)
+const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
+const { searchSuggestions, searchSuggestionsError, dismissSuggestions } =
   useSearchSuggestions(searchString)
 
 // computed refs
@@ -88,20 +91,59 @@ function handleSearchChange(search: string) {
   searchString.value = search
 }
 
+function handleSuggestionSelect(suggestion: string) {
+  dismissSuggestions()
+  searchString.value = suggestion
+  emit('searchString', suggestion)
+  emit('search')
+  focusSearchInput()
+}
+
+function handleSearchKeydown(event: KeyboardEvent) {
+  const target = event.target as HTMLElement
+  if (
+    event.key === 'ArrowDown' &&
+    searchSuggestions.value.length &&
+    target.tagName === 'INPUT'
+  ) {
+    event.preventDefault()
+    suggestionsRef.value?.focusFirst()
+  }
+}
+
+function handleSuggestionDismiss() {
+  focusSearchInput()
+}
+
+function focusSearchInput() {
+  const input = searchWrapperRef.value?.querySelector<HTMLElement>('input')
+  input?.focus()
+}
+
 // utility functions
 </script>
 
 <template>
   <div class="location-search-filter-sort">
-    <Search
+    <div
       v-if="searchPlaceholder"
+      ref="searchWrapperRef"
       class="location-search"
-      :placeholder="searchPlaceholder"
-      @update:model-value="handleSearchChange"
-      @search="emit('search')"
-    />
-    <div v-if="searchSuggestions"></div>
-    <div v-if="searchSuggestionsError"></div>
+      @keydown="handleSearchKeydown"
+    >
+      <Search
+        v-model="searchString"
+        :placeholder="searchPlaceholder"
+        @update:model-value="handleSearchChange"
+        @search="emit('search')"
+      />
+      <SearchSuggestions
+        ref="suggestionsRef"
+        :suggestions="searchSuggestions"
+        @select="handleSuggestionSelect"
+        @dismiss="handleSuggestionDismiss"
+      />
+    </div>
     <LocationFilter
       v-if="filterOptions"
       class="location-filters"
@@ -130,6 +172,10 @@ function handleSearchChange(search: string) {
 .location-search {
   grid-area: search;
   padding: 1rem 1rem 0rem 1rem;
+  width: 100%;
+}
+
+.location-search :deep(.search) {
   width: 100%;
 }
 
