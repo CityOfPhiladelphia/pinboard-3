@@ -1,4 +1,4 @@
-import { ref, watchEffect } from 'vue'
+import { ref } from 'vue'
 import { useUserLocationPermission } from './useUserLocationPermission'
 import type { LatLon } from '../types'
 

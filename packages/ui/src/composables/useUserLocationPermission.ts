@@ -1,4 +1,4 @@
-import { ref, watchEffect } from 'vue'
+import { ref } from 'vue'
 import type { LocationPermissionState } from '../types'
 
 const userLocationPermission = ref<LocationPermissionState>('granted')
