@@ -62,7 +62,7 @@ const locationSortMode = ref<SortMode>(
 )
 
 // conputed refs
-const currentLocation = computed(() => {
+const searchOrUserLocation = computed(() => {
   switch (locationSearchMode.value) {
     case 'address': {
       return addressCoordinates.value
@@ -78,7 +78,7 @@ const currentLocation = computed(() => {
 })
 
 const sortLocationsOptions = computed(() => {
-  return PinboardUtilities.hasLocationData(currentLocation.value)
+  return PinboardUtilities.hasLocationData(searchOrUserLocation.value)
     ? sortLocationsOptionsAll
     : sortLocationsOptionsAlpha
 })
@@ -93,22 +93,26 @@ const currentLocations = computed(() => {
     : filteredLocations
   const gotSearchMatches = typeof searchedLocations !== 'string'
   if (!gotSearchMatches) console.log(searchedLocations)
-  return gotSearchMatches ? sortLocations(searchedLocations, currentLocation, locationSortMode) : []
+  return gotSearchMatches
+    ? sortLocations(searchedLocations, searchOrUserLocation, locationSortMode)
+    : []
 })
 
 // watchers
-watch(currentLocation, () => {
-  // watch for changes in currentLocation to handle changes to sort mode
-  const newLocHasLoc = PinboardUtilities.hasLocationData(currentLocation.value)
+watch(searchOrUserLocation.value, () => {
+  // watch for changes in searchOrUserLocation to handle changes to sort mode
+  const newLocHasLoc = PinboardUtilities.hasLocationData(searchOrUserLocation.value)
   switch (true) {
     case newLocHasLoc && !locationSortMode.value: {
       // if new location matches type of LatLon and no sort mode has been selected, set sort mode to distance-ascending
       locationSortMode.value = 'DistAsc'
+      console.log("ASCENDING!!!!")
       break
     }
     case !newLocHasLoc && Object.keys(sortLocationsOptionsDist).includes(locationSortMode.value): {
       // if new location does not match type LatLon and a distance sort is selected, set sort mode to default sort
       locationSortMode.value = ''
+      console.log("BLANK!!!")
       break
     }
   }
@@ -173,6 +177,7 @@ function handleDeselect(id: string) {
 <template>
   <Pinboard
     :locations="currentLocations"
+    :search-or-user-location="searchOrUserLocation"
     :is-loading="isLoading"
     :error-message="errorMessage"
     :location-panel-search="searchPlaceholderText"
@@ -232,6 +237,17 @@ function handleDeselect(id: string) {
             @mouseenter="onHover(loc.id)"
             @mouseleave="onHoverEnd()"
             @click="handleSelect(loc, onSelect)"
+          />
+        </MapMarker>
+        <MapMarker
+          v-if="PinboardUtilities.hasLocationData(searchOrUserLocation)"
+          key="searchOrUserLocation"
+          :lng-lat="[searchOrUserLocation.longitude, searchOrUserLocation.latitude]"
+        >
+          <MapIconTextPin
+            :zoom="zoom"
+            :icon="faCamera"
+            text="YOUR LOCATION"
           />
         </MapMarker>
       </div>

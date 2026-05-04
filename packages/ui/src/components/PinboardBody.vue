@@ -35,9 +35,11 @@ import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 // type imports
 import type {
   BasicLocation,
+  LatLon,
   LocationFilterOption,
   SortLocationsOptions,
 } from '../types'
+import { hasLocationData } from '../utilities/hasLocationData'
 
 // slots
 defineSlots<{
@@ -65,6 +67,7 @@ defineSlots<{
 // props
 const props = defineProps<{
   locations: BasicLocation[]
+  searchOrUserLocation: LatLon
   isLoading: boolean
   errorMessage: string | null
   locationPanelFilter?: LocationFilterOption[]
@@ -146,6 +149,24 @@ watch(selectedLocation, (loc) => {
     bottomSheetRef.value?.snapTo(snapPoints.length - 1)
   }
 })
+
+// watch(props.searchOrUserLocation, (loc) => {
+//   console.log("LOCATION CHANGED: ", loc)
+//   if (hasLocationData(loc)) {
+//     mapPanelRef.value?.panTo([loc.longitude, loc.latitude])
+//   }
+// })
+
+watch(
+  () => props.searchOrUserLocation,
+  (newValue, oldValue) => {
+    console.log(`Prop changed from ${oldValue} to ${newValue.latitude}`);
+      if (hasLocationData(newValue)) {
+        mapPanelRef.value?.panTo([newValue.longitude, newValue.latitude])
+      }
+
+  }
+);
 
 // event handlers
 function handleHover(id: string) {
