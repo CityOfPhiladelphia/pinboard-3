@@ -8,12 +8,6 @@ const userLocation = ref<LatLon>({
 const userLocationPermission = ref<LocationPermissionState>('denied')
 
 export function useUserLocation() {
-  navigator.permissions
-    .query({ name: 'geolocation' })
-    .then(function (permission) {
-      userLocationPermission.value = permission.state
-    })
-
   if (navigator.geolocation) {
     navigator.geolocation.watchPosition((pos) => {
       userLocation.value.latitude = pos.coords.latitude
@@ -22,4 +16,12 @@ export function useUserLocation() {
   }
 
   return { userLocation, userLocationPermission }
+}
+
+export function useUserLocationPermission() {
+  navigator.permissions
+    .query({ name: 'geolocation' })
+    .then(function (permission) {
+      userLocationPermission.value = permission.state
+    })
 }
