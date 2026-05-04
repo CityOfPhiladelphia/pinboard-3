@@ -42,7 +42,7 @@ export function useSearchSuggestions(search: string | Ref<string>) {
         return
       }
       getSearchSuggestions(value)
-    },
+    }
   )
 
   return { searchSuggestions, searchSuggestionsError, dismissSuggestions }

@@ -101,7 +101,11 @@ function handleSuggestionSelect(suggestion: string) {
 
 function handleSearchKeydown(event: KeyboardEvent) {
   const target = event.target as HTMLElement
-  if (event.key === 'ArrowDown' && searchSuggestions.value.length && target.tagName === 'INPUT') {
+  if (
+    event.key === 'ArrowDown' &&
+    searchSuggestions.value.length &&
+    target.tagName === 'INPUT'
+  ) {
     event.preventDefault()
     suggestionsRef.value?.focusFirst()
   }

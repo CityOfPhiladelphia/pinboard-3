@@ -112,7 +112,9 @@ const searchString = ref<string>('')
 const { searchSuggestions, searchSuggestionsError, dismissSuggestions } =
   useSearchSuggestions(searchString)
 const mobileSearchWrapperRef = ref<HTMLElement | null>(null)
-const mobileSuggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
+const mobileSuggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(
+  null
+)
 
 // computed refs
 const bottomSheetPercent = computed(
@@ -191,7 +193,11 @@ function handleSuggestionSelect(suggestion: string) {
 
 function handleMobileSearchKeydown(event: KeyboardEvent) {
   const target = event.target as HTMLElement
-  if (event.key === 'ArrowDown' && searchSuggestions.value.length && target.tagName === 'INPUT') {
+  if (
+    event.key === 'ArrowDown' &&
+    searchSuggestions.value.length &&
+    target.tagName === 'INPUT'
+  ) {
     event.preventDefault()
     mobileSuggestionsRef.value?.focusFirst()
   }
@@ -202,7 +208,8 @@ function handleSuggestionDismiss() {
 }
 
 function focusMobileSearchInput() {
-  const input = mobileSearchWrapperRef.value?.querySelector<HTMLElement>('input')
+  const input =
+    mobileSearchWrapperRef.value?.querySelector<HTMLElement>('input')
   input?.focus()
 }
 

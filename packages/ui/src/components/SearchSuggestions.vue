@@ -17,11 +17,12 @@ watch(
   () => props.suggestions,
   () => {
     activeIndex.value = -1
-  },
+  }
 )
 
 function focusItem(index: number) {
-  const items = listRef.value?.querySelectorAll<HTMLElement>('.search-suggestion')
+  const items =
+    listRef.value?.querySelectorAll<HTMLElement>('.search-suggestion')
   items?.[index]?.focus()
 }
 
