@@ -1,19 +1,21 @@
 import { ref } from 'vue'
+import { useUserLocationPermission } from './useUserLocationPermission'
 import type { LatLon } from '../types'
 
-export function useUserLocation() {
-  const userLocation = ref<LatLon>({
-    latitude: NaN,
-    longitude: NaN,
-  })
+const { userLocationPermission } = useUserLocationPermission()
 
-  if (navigator.geolocation) {
+const userLocation = ref<LatLon>({
+  latitude: NaN,
+  longitude: NaN,
+})
+
+export function useUserLocation() {
+  if (userLocationPermission.value === 'granted' && navigator.geolocation) {
     navigator.geolocation.watchPosition((pos) => {
-      console.log('Geolocation Accuracy: ', pos.coords.accuracy)
       userLocation.value.latitude = pos.coords.latitude
       userLocation.value.longitude = pos.coords.longitude
     })
   }
 
-  return { userLocation }
+  return { userLocation, userLocationPermission }
 }

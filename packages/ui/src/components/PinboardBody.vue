@@ -20,17 +20,20 @@ import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Search } from '@phila/phila-ui-search'
 
+// import pinboard config
+import { PINBOARD_CONFIG_KEY } from '../plugin'
+
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
+import SearchSuggestions from './SearchSuggestions.vue'
 
 // pinboard composables imports
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 
 // type imports
-import {
-  PINBOARD_CONFIG_KEY,
+import type {
   BasicLocation,
   LocationFilterOption,
   SortLocationsOptions,
@@ -40,7 +43,10 @@ import {
 defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
-  'location-detail'?: unknown
+  'location-detail'?(props: {
+    location: BasicLocation
+    onClose: () => void
+  }): unknown
   'map-content'?(props: {
     locations: BasicLocation[]
     geojson: unknown
@@ -79,7 +85,7 @@ const emit = defineEmits<{
 // component variables
 const snapPoints = [15, 50, 100]
 let mql: MediaQueryList | null = null
-const config = inject(PINBOARD_CONFIG_KEY)!
+const config = inject(PINBOARD_CONFIG_KEY)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const slots: Record<string, any> = useSlots()
 
@@ -104,8 +110,12 @@ const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
   null
 )
 const searchString = ref<string>('')
-const { searchSuggestions, searchSuggestionsError } =
+const { searchSuggestions, searchSuggestionsError, dismissSuggestions } =
   useSearchSuggestions(searchString)
+const mobileSearchWrapperRef = ref<HTMLElement | null>(null)
+const mobileSuggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(
+  null
+)
 
 // computed refs
 const bottomSheetPercent = computed(
@@ -169,13 +179,39 @@ function handleLocationSortChange(sortLocationsOption: string) {
 }
 
 function handleSearchChange(search: string) {
-  if (searchSuggestions.value.length) {
-    console.log('locationSearchChange:', searchSuggestions.value)
-  }
   searchString.value = search
   if (!searchString.value) {
-    emit('search', searchString.value)
+    emit('search', '')
   }
+}
+
+function handleSuggestionSelect(suggestion: string) {
+  dismissSuggestions()
+  searchString.value = suggestion
+  emit('search', suggestion)
+  focusMobileSearchInput()
+}
+
+function handleMobileSearchKeydown(event: KeyboardEvent) {
+  const target = event.target as HTMLElement
+  if (
+    event.key === 'ArrowDown' &&
+    searchSuggestions.value.length &&
+    target.tagName === 'INPUT'
+  ) {
+    event.preventDefault()
+    mobileSuggestionsRef.value?.focusFirst()
+  }
+}
+
+function handleSuggestionDismiss() {
+  focusMobileSearchInput()
+}
+
+function focusMobileSearchInput() {
+  const input =
+    mobileSearchWrapperRef.value?.querySelector<HTMLElement>('input')
+  input?.focus()
 }
 
 function handleSearchSubmit() {
@@ -223,8 +259,8 @@ const effectiveMapConfig = (() => {
   // Merge mobile overrides into the map config ONCE at setup — not reactively.
   // Once the map is initialized, we don't want it to re-center or re-zoom if
   // the user changes orientation or resizes across the breakpoint.
-  const map = config.map
-  if (!map) return undefined
+  const map = config?.map
+  if (!map) return map
   const { mobile, ...base } = map
   if (isMobile.value && mobile) {
     return { ...base, ...mobile }
@@ -235,14 +271,11 @@ const effectiveMapConfig = (() => {
 
 <template>
   <div v-if="selectedLocation !== null" class="detail-overlay">
-    <button
-      class="detail-close-btn"
-      @click="handleCloseLocationDetail"
-      aria-label="Close details"
-    >
-      ×
-    </button>
-    <slot name="location-detail" :location="selectedLocation" />
+    <slot
+      name="location-detail"
+      :location="selectedLocation"
+      :on-close="handleCloseLocationDetail"
+    />
   </div>
   <div class="finder-panel">
     <div class="finder-panel-locations">
@@ -300,20 +333,29 @@ const effectiveMapConfig = (() => {
         class="mobile-controls-float"
         :style="mobileControlsStyle"
       />
-      <div class="mobile-map-search-filter">
+      <div
+        ref="mobileSearchWrapperRef"
+        class="mobile-map-search-filter"
+        @keydown="handleMobileSearchKeydown"
+      >
         <Search
           v-if="locationPanelSearch"
+          v-model="searchString"
           class-name="mobile-search"
           :placeholder="locationPanelSearch"
-          @update:modelValue="handleSearchChange"
+          @update:model-value="handleSearchChange"
           @search="handleSearchSubmit"
         />
-        <div v-if="searchSuggestions"></div>
-        <div v-if="searchSuggestionsError"></div>
+        <SearchSuggestions
+          ref="mobileSuggestionsRef"
+          :suggestions="searchSuggestions"
+          @select="handleSuggestionSelect"
+          @dismiss="handleSuggestionDismiss"
+        />
         <LocationSearchFilterPanel
           v-if="locationPanelFilter"
-          :filterOptions="locationPanelFilter"
-          :locationAvailable="locationPanelLocationAvailable"
+          :filter-options="locationPanelFilter"
+          :location-available="locationPanelLocationAvailable"
           @selected-filter="handleLocationFilterChange"
         />
       </div>
@@ -337,8 +379,8 @@ const effectiveMapConfig = (() => {
           <span>{{ locationCountLabel }}</span>
           <LocationSearchFilterPanel
             v-if="locationPanelSort"
-            :sortOptions="locationPanelSort"
-            :locationAvailable="locationPanelLocationAvailable"
+            :sort-options="locationPanelSort"
+            :location-available="locationPanelLocationAvailable"
             @sort-option="handleLocationSortChange"
           />
         </div>
@@ -370,14 +412,11 @@ const effectiveMapConfig = (() => {
       </div>
 
       <div v-if="selectedLocation" class="bottom-sheet-detail">
-        <button
-          class="detail-close-btn"
-          @click="handleCloseLocationDetail"
-          aria-label="Close details"
-        >
-          ×
-        </button>
-        <slot name="location-detail" :location="selectedLocation" />
+        <slot
+          name="location-detail"
+          :location="selectedLocation"
+          :on-close="handleCloseLocationDetail"
+        />
       </div>
     </div>
   </BottomSheet>
@@ -496,11 +535,10 @@ const effectiveMapConfig = (() => {
 .bottom-sheet-detail {
   position: absolute;
   inset: 0;
-  padding: 1rem;
   background: transparent;
-  overflow-x: hidden;
-  overflow-y: auto;
-  scrollbar-width: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   z-index: 2;
 }
 
@@ -511,33 +549,6 @@ const effectiveMapConfig = (() => {
 .bottom-sheet-detail :deep(img) {
   max-width: 100%;
   height: auto;
-}
-
-.bottom-sheet-detail::-webkit-scrollbar {
-  display: none;
-}
-
-.detail-close-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 2rem;
-  height: 2rem;
-  border: none;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  color: var(--Schemes-On-Surface, #333);
-  z-index: 11;
-  transition: background-color 0.2s;
-}
-
-.detail-close-btn:hover {
-  background: rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 768px) {

@@ -2,7 +2,11 @@
 import 'source-map-support/register'
 import { App, Aspects, Stack } from 'aws-cdk-lib'
 import { AwsSolutionsChecks, NIST80053R5Checks } from 'cdk-nag'
-import { StaticSite, Confidentiality, Environment } from '@phila/constructs'
+import {
+  StaticSite,
+  Confidentiality,
+  type Environment,
+} from '@phila/constructs'
 import {
   Certificate,
   CertificateValidation,
@@ -51,18 +55,18 @@ const domainName =
     ? `${context.appName}.phila.gov`
     : `${context.appName}-${environment}.phila.gov`
 
-const hostedZone = HostedZone.fromLookup(stack as any, 'HostedZone', {
+const hostedZone = HostedZone.fromLookup(stack, 'HostedZone', {
   domainName,
 })
 
-const dnsValidatedCertificate = new Certificate(stack as any, 'Certificate', {
+const dnsValidatedCertificate = new Certificate(stack, 'Certificate', {
   domainName,
   certificateName: `phila-gov-dns-cert-frontend-${environment}`, // is this right?
   validation: CertificateValidation.fromDns(hostedZone),
 })
 
 // Scope as any so linked @phila/constructs resolves to a single Construct type at runtime.
-new StaticSite(stack as any, 'StaticSite', {
+new StaticSite(stack, 'StaticSite', {
   ...context,
   assetDir: '../frontend/dist',
   certificate: dnsValidatedCertificate,

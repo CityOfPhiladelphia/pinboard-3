@@ -34,8 +34,8 @@ const props = defineProps<{
 // emits
 const emit = defineEmits<{
   select: [location: BasicLocation]
+  search: []
   searchString: [search: string]
-  search: [search: void]
   selectedFilter: [filter: string]
   sortOption: [sort: string]
   hover: [id: string]
@@ -95,10 +95,10 @@ defineExpose({ scrollToCard })
 <template>
   <LocationSearchFilterPanel
     v-if="locationSearch || locationFilter || locationSort"
-    :searchPlaceholder="locationSearch"
-    :filterOptions="locationFilter"
-    :sortOptions="locationSort"
-    :locationAvailable="locationAvailable"
+    :search-placeholder="locationSearch"
+    :filter-options="locationFilter"
+    :sort-options="locationSort"
+    :location-available="locationAvailable"
     @selected-filter="handleFilterChange"
     @sort-option="handleSortChange"
     @search-string="handleSearchChange"

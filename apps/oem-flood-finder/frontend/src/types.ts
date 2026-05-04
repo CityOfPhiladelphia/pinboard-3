@@ -1,12 +1,12 @@
 /** Shared types for OEM Flood Finder */
-import type { BasicLocation, LatLon } from '@ui/types'
+import type { PinboardTypes } from '@pinboard/ui'
 
-export type AlertBanner = {
+export interface AlertBanner {
   title: string
   body: string
 }
 
-export type EverbridgeNotification = {
+export interface EverbridgeNotification {
   notificationId: string
   createdOn: Date
   title: string
@@ -14,41 +14,49 @@ export type EverbridgeNotification = {
   fileAttachments?: string
 }
 
-export type FloodImpact = {
+export interface FloodImpact {
   stage: number
   statement: string
+}
+
+export interface Flood {
+  floodId: string
+  gaugeId: string
+  crestReadingId: string
+  crest: number
+  startDate: Date
+  endDate: Date
+  crestTime: Date
 }
 
 type DeviceType = 'Aware' | 'Usgs' | 'Camera'
 
 export type LocationPanelDTO = {
-  id: string
-  name: string
   lastUpdated: Date
   gaugeHeight: number
   gaugeHeightUnit: string
-  imageUrl: string
+  thumbnailUrl: string
+  cameraStreamUrl: string
   deviceType: DeviceType
   actionStage: number
   minorStage: number
   moderateStage: number
   majorStage: number
-} & LatLon
+} & PinboardTypes.BasicLocation
 
-export type OemFields = {
+export interface OemFields {
   deviceType: DeviceType
   lastUpdated: Date | null
   actionStage: number
   minorStage: number
   moderateStage: number
   majorStage: number
+  cameraStreamUrl: string
 }
 
-export type OemLocation = BasicLocation & OemFields
+export type OemLocation = PinboardTypes.BasicLocation & OemFields
 
-export type Reading = {
-  readingId: string
-  createdOn: Date
+export interface AwareReadingDTO {
   validTimeUTC: Date
   gaugeId: string
   flashFloodIndicator: boolean
@@ -57,19 +65,23 @@ export type Reading = {
   gaugeHeight: number
   gaugeHeightUnit: string
   isFlooding: boolean
-  depthHoldHours: number
-  depthDetectionImagingEnabled: boolean
   rainfall: number
   rainIntensity: number
-  tips: number
   barometricPressure: number
   airTemperature: number
   waterTemperature: number
-  saltWater: boolean
-  dropRateIndicator: boolean
-  dropRateThreshold: number
-  deviceDropCount: number
-  pictureFilenameOnServer: string
+  floodImpacts: FloodImpact[]
+  floodEvents: Flood[]
+}
+
+export interface UsgsReadingDTO {
+  validTimeUTC: Date
+  gaugeId: string
+  isFlooding: boolean
+  gaugeHeight: number
+  gaugeHeightUnit: string
+  floodImpacts: FloodImpact[]
+  floodEvents: Flood[]
 }
 
 export type Filters = 'all' | 'gauges' | 'cameras'

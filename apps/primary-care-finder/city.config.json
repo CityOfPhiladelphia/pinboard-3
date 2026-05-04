@@ -7,7 +7,6 @@
   "compliance": [],
   "confidentiality": "low",
   "cdkPath": "./cdk",
-  "packageManager": "pnpm",
   "environments": {
     "dev": {
       "profile": "OITDevelopers",

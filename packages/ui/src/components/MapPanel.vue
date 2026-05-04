@@ -9,37 +9,32 @@ import { Map as PhilaMap } from '@phila/phila-ui-map-core'
 import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css' // shouldn't the style be bundled with the component?
 import type { MapConfig, BasicLocation } from '../types'
 
-const props = withDefaults(
-  defineProps<{
-    config?: MapConfig
-    locations?: BasicLocation[]
-    geojson?: unknown
-    hoveredId?: string | null
-    selectedId?: string | null
-    isLoading?: boolean
-    isMobile?: boolean
-    onHover?: (id: string) => void
-    onHoverEnd?: () => void
-    onSelect?: (loc: BasicLocation) => void
-    mobileControlsTarget?: HTMLDivElement | null
-    mapContentSlot?: (props: {
-      locations: BasicLocation[]
-      geojson: unknown
-      map: unknown
-      zoom: number
-      isMobile: boolean
-      hoveredId: string | null
-      selectedId: string | null
-      mobileControlsTarget: HTMLDivElement | null
-      onHover: (id: string) => void
-      onHoverEnd: () => void
-      onSelect: (loc: unknown) => void
-    }) => unknown
-  }>(),
-  {
-    isLoading: false,
-  }
-)
+const props = defineProps<{
+  config?: MapConfig
+  locations?: BasicLocation[]
+  geojson?: unknown
+  hoveredId?: string | null
+  selectedId?: string | null
+  isLoading?: boolean
+  isMobile?: boolean
+  onHover?: (id: string) => void
+  onHoverEnd?: () => void
+  onSelect?: (loc: BasicLocation) => void
+  mobileControlsTarget?: HTMLDivElement | null
+  mapContentSlot?: (props: {
+    locations: BasicLocation[]
+    geojson: unknown
+    map: unknown
+    zoom: number
+    isMobile: boolean
+    hoveredId: string | null
+    selectedId: string | null
+    mobileControlsTarget: HTMLDivElement | null
+    onHover: (id: string) => void
+    onHoverEnd: () => void
+    onSelect: (loc: unknown) => void
+  }) => unknown
+}>()
 
 const mapRef = ref<ComponentPublicInstance | null>(null)
 const zoom = ref(props.config?.zoom ?? 14)
@@ -64,9 +59,9 @@ const slotProps = computed(() => ({
   hoveredId: props.hoveredId ?? null,
   selectedId: props.selectedId ?? null,
   mobileControlsTarget: props.mobileControlsTarget ?? null,
-  onHover: props.onHover ?? (() => {}),
-  onHoverEnd: props.onHoverEnd ?? (() => {}),
-  onSelect: props.onSelect ?? (() => {}),
+  onHover: props.onHover ?? (() => null),
+  onHoverEnd: props.onHoverEnd ?? (() => null),
+  onSelect: props.onSelect ?? (() => null),
 }))
 
 const SlotRenderer = defineComponent({

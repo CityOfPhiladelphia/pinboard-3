@@ -24,13 +24,16 @@ import { Search } from '@phila/phila-ui-search'
 // pinboard component imports
 import LocationFilter from './LocationFilter.vue'
 import SortPanel, { type SortPanelOption } from './SortPanel.vue'
+import SearchSuggestions from './SearchSuggestions.vue'
 
 // pinboard composables imports
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 
 // type imports
-import type { LocationFilterOption, SortLocationsOptions } from '../types'
-// import { StreetAddress, Zipcode } from '../types'
+import type {
+  LocationFilterOption,
+  SortLocationsOptions,
+} from '../types'
 
 // props
 const props = defineProps<{
@@ -41,9 +44,10 @@ const props = defineProps<{
 }>()
 
 // emits
+
 const emit = defineEmits<{
+  search: []
   searchString: [search: string]
-  search: [search: void]
   selectedFilter: [filter: string]
   sortOption: [sort: string]
 }>()
@@ -51,7 +55,9 @@ const emit = defineEmits<{
 // refs
 const appliedSort = ref<string | null>(null)
 const searchString = ref<string>('')
-const { searchSuggestions, searchSuggestionsError } =
+const searchWrapperRef = ref<HTMLElement | null>(null)
+const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
+const { searchSuggestions, searchSuggestionsError, dismissSuggestions } =
   useSearchSuggestions(searchString)
 
 // computed refs
@@ -75,25 +81,64 @@ function handleSearchChange(search: string) {
   searchString.value = search
 }
 
+function handleSuggestionSelect(suggestion: string) {
+  dismissSuggestions()
+  searchString.value = suggestion
+  emit('searchString', suggestion)
+  emit('search')
+  focusSearchInput()
+}
+
+function handleSearchKeydown(event: KeyboardEvent) {
+  const target = event.target as HTMLElement
+  if (
+    event.key === 'ArrowDown' &&
+    searchSuggestions.value.length &&
+    target.tagName === 'INPUT'
+  ) {
+    event.preventDefault()
+    suggestionsRef.value?.focusFirst()
+  }
+}
+
+function handleSuggestionDismiss() {
+  focusSearchInput()
+}
+
+function focusSearchInput() {
+  const input = searchWrapperRef.value?.querySelector<HTMLElement>('input')
+  input?.focus()
+}
+
 // utility functions
 </script>
 
 <template>
   <div class="location-search-filter-sort">
-    <Search
+    <div
       v-if="searchPlaceholder"
+      ref="searchWrapperRef"
       class="location-search"
-      :placeholder="searchPlaceholder"
-      @update:modelValue="handleSearchChange"
-      @search="emit('search')"
-    />
-    <div v-if="searchSuggestions"></div>
-    <div v-if="searchSuggestionsError"></div>
+      @keydown="handleSearchKeydown"
+    >
+      <Search
+        v-model="searchString"
+        :placeholder="searchPlaceholder"
+        @update:model-value="handleSearchChange"
+        @search="emit('search')"
+      />
+      <SearchSuggestions
+        ref="suggestionsRef"
+        :suggestions="searchSuggestions"
+        @select="handleSuggestionSelect"
+        @dismiss="handleSuggestionDismiss"
+      />
+    </div>
     <LocationFilter
       v-if="filterOptions"
       class="location-filters"
-      :filterOptions="filterOptions"
-      @selectedFilter="handleFilterChange"
+      :filter-options="filterOptions"
+      @selected-filter="handleFilterChange"
     />
     <div v-if="sortOptions" class="location-sort">
       <SortPanel
@@ -118,6 +163,10 @@ function handleSearchChange(search: string) {
 .location-search {
   grid-area: search;
   padding: 1rem 1rem 0rem 1rem;
+  width: 100%;
+}
+
+.location-search :deep(.search) {
   width: 100%;
 }
 

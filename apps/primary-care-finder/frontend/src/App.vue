@@ -7,8 +7,8 @@ import {
   MapNavigationControl,
   GeolocationButton,
   BasemapToggle,
-  useUserLocation,
-  useHaversineDistance,
+  PinboardComposables,
+  PinboardUtilities,
 } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import { useLocations } from './composables/useLocations'
@@ -19,18 +19,17 @@ import type { PrimaryCareLocation } from './types'
 const searchPlaceholderText = 'Search by address or keyword...'
 
 const { locations, isLoading, errorMessage, geojson } = useLocations()
-const { userLocation } = useUserLocation()
+const { userLocation } = PinboardComposables.useUserLocation()
 const searchString = ref('')
 
 const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   const { latitude, longitude } = userLocation.value
-  const hasUserLocation = !Number.isNaN(latitude) && !Number.isNaN(longitude)
   return locations.value.map((loc) => ({
     ...loc,
     locationCardInfo: {
       ...loc.locationCardInfo,
-      subheader: hasUserLocation
-        ? `${useHaversineDistance(
+      subheader: PinboardUtilities.hasLocationData(userLocation.value)
+        ? `${PinboardUtilities.getHaversineDistance(
             { latitude: loc.latitude, longitude: loc.longitude },
             { latitude, longitude },
             1
@@ -113,11 +112,14 @@ function getCardDetails(loc: { name: string; [key: string]: unknown }) {
       @search="handleSearchSubmit"
     >
       <template #location-card="{ location }">
-        <LocationCard :location="location as PrimaryCareLocation" />
+        <LocationCard :location="location" />
       </template>
 
-      <template #location-detail="{ location }">
-        <LocationDetail :location="location as PrimaryCareLocation" />
+      <template #location-detail="{ location, onClose }">
+        <LocationDetail
+          :location="location as PrimaryCareLocation"
+          :on-close="onClose"
+        />
       </template>
 
       <template
