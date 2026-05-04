@@ -129,16 +129,22 @@ function handleSearchSubmit(locationSearchString: string) {
     case PinboardUtilities.StreetIntersection.test(locationSearchString): {
       locationSearchMode.value = 'address'
       addressForSearch.value = locationSearchString
+      zipcodeForSearch.value = ''
+      keywordsForSearch.value = ''
       break
     }
     case PinboardUtilities.Zipcode.test(locationSearchString): {
       locationSearchMode.value = 'zipcode'
       zipcodeForSearch.value = locationSearchString
+      addressForSearch.value = ''
+      keywordsForSearch.value = ''
       break
     }
     case locationSearchString !== '': {
       locationSearchMode.value = 'keyword'
       keywordsForSearch.value = locationSearchString
+      addressForSearch.value = ''
+      zipcodeForSearch.value = ''
       break
     }
     default: {
