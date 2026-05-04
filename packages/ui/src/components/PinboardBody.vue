@@ -178,10 +178,10 @@ function handleLocationSortChange(sortLocationsOption: string) {
 }
 
 function handleSearchChange(search: string) {
-  if (searchSuggestions.value.length) {
-    console.log('locationSearchChange:', searchSuggestions.value)
-  }
   searchString.value = search
+  if (!searchString.value) {
+    emit('search', '')
+  }
 }
 
 function handleSuggestionSelect(suggestion: string) {
