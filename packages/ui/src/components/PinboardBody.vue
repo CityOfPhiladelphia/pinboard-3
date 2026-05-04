@@ -15,7 +15,7 @@ import { faMap } from '@fortawesome/pro-solid-svg-icons'
 
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
-import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css' // what does this need to be imported for?
+import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
 import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Search } from '@phila/phila-ui-search'

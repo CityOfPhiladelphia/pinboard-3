@@ -51,7 +51,7 @@ const locationSortMode = ref<SortMode>(
   PinboardUtilities.hasLocationData(userLocation) ? 'DistAsc' : '',
 )
 
-// conputed refs
+// computed refs
 const currentLocation = computed(() => {
   switch (locationSearchMode.value) {
     case 'address': {
