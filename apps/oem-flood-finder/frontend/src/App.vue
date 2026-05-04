@@ -70,14 +70,6 @@ const alertBanner: ComputedRef<AlertBanner | null> = computed(() => {
   box-sizing: border-box;
 }
 
-html,
-body {
-  height: 100%;
-  overflow: hidden;
-  touch-action: none;
-  overscroll-behavior: none;
-}
-
 #app {
   height: 100dvh;
 }

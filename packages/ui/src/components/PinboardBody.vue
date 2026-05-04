@@ -426,7 +426,7 @@ const effectiveMapConfig = (() => {
 .phila-navbar .phila-mobile-nav .nav-flyout {
   flex: 0 0 25rem;
   max-width: 25rem;
-  height: calc(100vh - var(--nav-bottom));
+  height: calc(100dvh - var(--nav-bottom));
 }
 
 .phila-navbar .phila-mobile-nav .nav-flyout .p-4 {
