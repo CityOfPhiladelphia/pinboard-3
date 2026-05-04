@@ -32,8 +32,6 @@ export interface Flood {
 type DeviceType = 'Aware' | 'Usgs' | 'Camera'
 
 export type LocationPanelDTO = {
-  id: string
-  name: string
   lastUpdated: Date
   gaugeHeight: number
   gaugeHeightUnit: string
@@ -44,7 +42,7 @@ export type LocationPanelDTO = {
   minorStage: number
   moderateStage: number
   majorStage: number
-} & PinboardTypes.LatLon
+} & PinboardTypes.BasicLocation
 
 export interface OemFields {
   deviceType: DeviceType

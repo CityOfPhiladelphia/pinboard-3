@@ -91,7 +91,9 @@ const currentLocations = computed(() => {
   const searchedLocations = keywordsForSearch.value
     ? searchLocations(filteredLocations, keywordsForSearch)
     : filteredLocations
-  return sortLocations(searchedLocations, currentLocation, locationSortMode)
+  const gotSearchMatches = typeof searchedLocations !== 'string'
+  if (!gotSearchMatches) console.log(searchedLocations)
+  return gotSearchMatches ? sortLocations(searchedLocations, currentLocation, locationSortMode) : []
 })
 
 // watchers
@@ -127,16 +129,22 @@ function handleSearchSubmit(locationSearchString: string) {
     case PinboardUtilities.StreetIntersection.test(locationSearchString): {
       locationSearchMode.value = 'address'
       addressForSearch.value = locationSearchString
+      zipcodeForSearch.value = ''
+      keywordsForSearch.value = ''
       break
     }
     case PinboardUtilities.Zipcode.test(locationSearchString): {
       locationSearchMode.value = 'zipcode'
       zipcodeForSearch.value = locationSearchString
+      addressForSearch.value = ''
+      keywordsForSearch.value = ''
       break
     }
     case locationSearchString !== '': {
       locationSearchMode.value = 'keyword'
       keywordsForSearch.value = locationSearchString
+      addressForSearch.value = ''
+      zipcodeForSearch.value = ''
       break
     }
     default: {
@@ -149,7 +157,6 @@ function handleSearchSubmit(locationSearchString: string) {
 }
 
 function handleGeolocate(locationData: PinboardTypes.LatLon & { accuracy: number }) {
-  console.log('Geolocation Accuracy: ', locationData.accuracy)
   userLocation.value = {
     latitude: locationData.latitude,
     longitude: locationData.longitude,

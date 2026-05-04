@@ -5,7 +5,9 @@
   "scripts": {
     "cdk": "cdk",
     "lint": "eslint",
-    "lint:fix": "eslint --fix"
+    "lint:fix": "eslint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@phila/constructs": "^0.8.0",
