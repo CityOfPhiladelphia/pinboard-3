@@ -27,6 +27,7 @@ import { PINBOARD_CONFIG_KEY } from '../plugin'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
+import SearchSuggestions from './SearchSuggestions.vue'
 
 // pinboard composables imports
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
@@ -108,8 +109,12 @@ const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
   null
 )
 const searchString = ref<string>('')
-const { searchSuggestions, searchSuggestionsError } =
+const { searchSuggestions, searchSuggestionsError, dismissSuggestions } =
   useSearchSuggestions(searchString)
+const mobileSearchWrapperRef = ref<HTMLElement | null>(null)
+const mobileSuggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(
+  null
+)
 
 // computed refs
 const bottomSheetPercent = computed(
@@ -177,6 +182,35 @@ function handleSearchChange(search: string) {
     console.log('locationSearchChange:', searchSuggestions.value)
   }
   searchString.value = search
+}
+
+function handleSuggestionSelect(suggestion: string) {
+  dismissSuggestions()
+  searchString.value = suggestion
+  emit('search', suggestion)
+  focusMobileSearchInput()
+}
+
+function handleMobileSearchKeydown(event: KeyboardEvent) {
+  const target = event.target as HTMLElement
+  if (
+    event.key === 'ArrowDown' &&
+    searchSuggestions.value.length &&
+    target.tagName === 'INPUT'
+  ) {
+    event.preventDefault()
+    mobileSuggestionsRef.value?.focusFirst()
+  }
+}
+
+function handleSuggestionDismiss() {
+  focusMobileSearchInput()
+}
+
+function focusMobileSearchInput() {
+  const input =
+    mobileSearchWrapperRef.value?.querySelector<HTMLElement>('input')
+  input?.focus()
 }
 
 function handleSearchSubmit() {
@@ -297,16 +331,25 @@ const effectiveMapConfig = (() => {
         class="mobile-controls-float"
         :style="mobileControlsStyle"
       />
-      <div class="mobile-map-search-filter">
+      <div
+        ref="mobileSearchWrapperRef"
+        class="mobile-map-search-filter"
+        @keydown="handleMobileSearchKeydown"
+      >
         <Search
           v-if="locationPanelSearch"
+          v-model="searchString"
           class-name="mobile-search"
           :placeholder="locationPanelSearch"
           @update:model-value="handleSearchChange"
           @search="handleSearchSubmit"
         />
-        <div v-if="searchSuggestions"></div>
-        <div v-if="searchSuggestionsError"></div>
+        <SearchSuggestions
+          ref="mobileSuggestionsRef"
+          :suggestions="searchSuggestions"
+          @select="handleSuggestionSelect"
+          @dismiss="handleSuggestionDismiss"
+        />
         <LocationSearchFilterPanel
           v-if="locationPanelFilter"
           :filter-options="locationPanelFilter"
