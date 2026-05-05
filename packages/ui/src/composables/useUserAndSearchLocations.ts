@@ -5,9 +5,9 @@ import type { LatLon, ZipcodePolygon } from '../types'
 export function userUserAndSearchLocations(
   userLocation: Ref<LatLon>,
   addressCoordinates: Ref<LatLon>,
-  finishedAddressFetch: Ref<Boolean>,
+  finishedAddressFetch: Ref<boolean>,
   zipcodePolygon: Ref<ZipcodePolygon>,
-  finishedZipFetch: Ref<Boolean>
+  finishedZipFetch: Ref<boolean>
 ) {
   const searchOrUserLocation = ref<LatLon>(userLocation.value)
 

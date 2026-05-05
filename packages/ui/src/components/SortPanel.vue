@@ -5,7 +5,7 @@ import { Radio } from '@phila/phila-ui-radio'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faArrowUpArrowDown, faXmark } from '@fortawesome/pro-solid-svg-icons'
 
-export type SortPanelOption = {
+export interface SortPanelOption {
   value: string
   label: string
 }
@@ -163,9 +163,9 @@ onBeforeUnmount(() => {
               name="sort-panel-radio"
               :value="option.value"
               :text="option.label"
-              :modelValue="pendingSelection ?? undefined"
+              :model-value="pendingSelection ?? undefined"
               :disabled="option.value === 'DistAsc' && !locationAvailable"
-              @update:modelValue="pendingSelection = $event"
+              @update:model-value="pendingSelection = $event"
             />
             <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
               {{
@@ -202,9 +202,9 @@ onBeforeUnmount(() => {
             name="sort-panel-radio"
             :value="option.value"
             :text="option.label"
-            :modelValue="pendingSelection ?? undefined"
+            :model-value="pendingSelection ?? undefined"
             :disabled="option.value === 'DistAsc' && !locationAvailable"
-            @update:modelValue="pendingSelection = $event"
+            @update:model-value="pendingSelection = $event"
           />
           <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
             {{

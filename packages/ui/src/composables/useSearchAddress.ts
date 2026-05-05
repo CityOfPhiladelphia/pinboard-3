@@ -6,7 +6,7 @@ export function useSearchAddress(address: string | Ref<string>) {
     latitude: NaN,
     longitude: NaN,
   })
-  const finishedAddressFetch = ref<Boolean>(false)
+  const finishedAddressFetch = ref<boolean>(false)
 
   function clearAddress() {
     addressCoordinates.value.longitude = NaN

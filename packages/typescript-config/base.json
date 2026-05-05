@@ -31,8 +31,8 @@
     "noEmit": true,
     "erasableSyntaxOnly": true,
     "noUncheckedSideEffectImports": true,
-    "typeRoots": ["./node_modules/@types"],
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "typeRoots": ["./node_modules/@types"],
     "types": ["node"]
   },
   "include": ["src/**/*.ts", "eslint.config.mjs"],

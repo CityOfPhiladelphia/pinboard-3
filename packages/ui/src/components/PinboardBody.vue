@@ -156,10 +156,13 @@ watch(selectedLocation, (loc) => {
 watch(
   () => props.searchOrUserLocation,
   (newLocation) => {
-      if (hasLocationData(newLocation) && props.locationSearchMode && ['address', 'zipcode'].includes(props.locationSearchMode)) {
-        mapPanelRef.value?.panTo([newLocation.longitude, newLocation.latitude])
-      }
-
+    if (
+      hasLocationData(newLocation) &&
+      props.locationSearchMode &&
+      ['address', 'zipcode'].includes(props.locationSearchMode)
+    ) {
+      mapPanelRef.value?.panTo([newLocation.longitude, newLocation.latitude])
+    }
   }
 )
 

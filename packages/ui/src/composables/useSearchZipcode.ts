@@ -9,7 +9,7 @@ export function useSearchZipcode(zipcode: string | Ref<string>) {
     },
     nodes: [],
   })
-  const finishedZipFetch = ref<Boolean>(false)
+  const finishedZipFetch = ref<boolean>(false)
 
   function clearZipcode() {
     zipcodePolygon.value.centroid.longitude = NaN

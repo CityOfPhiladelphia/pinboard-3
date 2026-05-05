@@ -10,7 +10,6 @@ export const viteJsConfig = [
   globalIgnores(['node_modules/**', 'dist/**', 'cdk.out']),
   js.configs.recommended,
   ...tseslint.configs.strict,
-  ...tseslint.configs.stylistic,
   {
     files: ['**/*.{ts,vue}'],
     languageOptions: {
