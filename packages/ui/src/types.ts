@@ -67,7 +67,7 @@ export interface LocationFilterOption {
   readonly label: string
 }
 
-export type SearchMode = 'address' | 'zipcode' | 'keyword' | false
+export type SearchMode = 'address' | 'zipcode' | 'keyword' | undefined
 
 export interface MenuOption {
   text: string

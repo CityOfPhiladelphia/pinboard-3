@@ -1,19 +1,28 @@
 import { type Ref, ref, toValue, watchEffect } from 'vue'
 import type { ZipcodePolygon } from '../types'
 
-const zipcodePolygon = ref<ZipcodePolygon>({
-  centroid: {
-    latitude: NaN,
-    longitude: NaN,
-  },
-  nodes: [],
-})
-
 export function useSearchZipcode(zipcode: string | Ref<string>) {
+  const zipcodePolygon = ref<ZipcodePolygon>({
+    centroid: {
+      latitude: NaN,
+      longitude: NaN,
+    },
+    nodes: [],
+  })
+  const finishedZipFetch = ref<Boolean>(false)
+
+  function clearZipcode() {
+    zipcodePolygon.value.centroid.longitude = NaN
+    zipcodePolygon.value.centroid.latitude = NaN
+    zipcodePolygon.value.nodes = []
+  }
+
   async function getZipcodeCentroidAndPolygon() {
+    finishedZipFetch.value = false
     const zipcodeDeref = toValue(zipcode).replace(/-\d{4}/, '')
     if (!zipcodeDeref) {
       clearZipcode()
+      finishedZipFetch.value = true
       return
     }
 
@@ -31,9 +40,11 @@ export function useSearchZipcode(zipcode: string | Ref<string>) {
       zipcodePolygon.value.centroid.longitude = response.features[0].centroid.x
       zipcodePolygon.value.centroid.latitude = response.features[0].centroid.y
       zipcodePolygon.value.nodes = response.features[0].geometry.rings
+      finishedZipFetch.value = true
     } catch (err) {
       console.error('Failed to get response from ArcGIS: ', err)
       clearZipcode()
+      finishedZipFetch.value = true
     }
   }
 
@@ -41,11 +52,5 @@ export function useSearchZipcode(zipcode: string | Ref<string>) {
     getZipcodeCentroidAndPolygon()
   })
 
-  return { zipcodePolygon }
-}
-
-function clearZipcode() {
-  zipcodePolygon.value.centroid.longitude = NaN
-  zipcodePolygon.value.centroid.latitude = NaN
-  zipcodePolygon.value.nodes = []
+  return { zipcodePolygon, finishedZipFetch }
 }

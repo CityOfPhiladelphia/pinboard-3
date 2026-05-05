@@ -37,6 +37,7 @@ import type {
   BasicLocation,
   LatLon,
   LocationFilterOption,
+  SearchMode,
   SortLocationsOptions,
 } from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
@@ -73,6 +74,7 @@ const props = defineProps<{
   locationPanelFilter?: LocationFilterOption[]
   locationPanelSearch?: string
   locationPanelSort?: SortLocationsOptions
+  locationSearchMode?: SearchMode
   geojson?: unknown
 }>()
 
@@ -150,23 +152,15 @@ watch(selectedLocation, (loc) => {
   }
 })
 
-// watch(props.searchOrUserLocation, (loc) => {
-//   console.log("LOCATION CHANGED: ", loc)
-//   if (hasLocationData(loc)) {
-//     mapPanelRef.value?.panTo([loc.longitude, loc.latitude])
-//   }
-// })
-
 watch(
   () => props.searchOrUserLocation,
-  (newValue, oldValue) => {
-    console.log(`Prop changed from ${oldValue} to ${newValue.latitude}`);
-      if (hasLocationData(newValue)) {
-        mapPanelRef.value?.panTo([newValue.longitude, newValue.latitude])
+  (newLocation) => {
+      if (hasLocationData(newLocation) && props.locationSearchMode && ['address', 'zipcode'].includes(props.locationSearchMode)) {
+        mapPanelRef.value?.panTo([newLocation.longitude, newLocation.latitude])
       }
 
   }
-);
+)
 
 // event handlers
 function handleHover(id: string) {

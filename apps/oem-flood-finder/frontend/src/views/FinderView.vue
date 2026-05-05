@@ -49,30 +49,30 @@ const sortLocationsOptionsAll: PinboardTypes.SortLocationsOptions = {
 
 // refs
 const addressForSearch = ref<string>('')
-const { addressCoordinates } = PinboardComposables.useSearchAddress(addressForSearch)
+const { addressCoordinates, finishedAddressFetch } = PinboardComposables.useSearchAddress(addressForSearch)
 const zipcodeForSearch = ref<string>('')
-const { zipcodePolygon } = PinboardComposables.useSearchZipcode(zipcodeForSearch)
+const { zipcodePolygon, finishedZipFetch } = PinboardComposables.useSearchZipcode(zipcodeForSearch)
 const keywordsForSearch = ref<string>('')
-const locationSearchMode = ref<PinboardTypes.SearchMode>(false)
+const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
 const locationFilterMode = ref<Filters>('all')
 const visitedIds = ref(new Set<string>())
 const { oemLocations, userLocation, isLoading, errorMessage } = useLocations()
 const locationSortMode = ref<SortMode>(
   PinboardUtilities.hasLocationData(userLocation) ? 'DistAsc' : '',
 )
+const { searchOrUserLocation } = PinboardComposables.userUserAndSearchLocations(userLocation, addressCoordinates, finishedAddressFetch, zipcodePolygon, finishedZipFetch)
 
 // conputed refs
-const searchOrUserLocation = computed(() => {
+const searchPinText = computed(() => {
   switch (locationSearchMode.value) {
-    case 'address': {
-      return addressCoordinates.value
+    case ('address'): {
+      return `Address: ${addressForSearch.value}`
     }
-    case 'zipcode': {
-      return zipcodePolygon.value.centroid
+    case ('zipcode'): {
+      return `Zipcode: ${zipcodeForSearch.value}`
     }
-    case 'keyword':
     default: {
-      return userLocation.value
+      return 'YOUR LOCATION'
     }
   }
 })
@@ -99,20 +99,19 @@ const currentLocations = computed(() => {
 })
 
 // watchers
-watch(searchOrUserLocation.value, () => {
+watch(() => searchOrUserLocation.value,
+  (newLocation) => {
   // watch for changes in searchOrUserLocation to handle changes to sort mode
-  const newLocHasLoc = PinboardUtilities.hasLocationData(searchOrUserLocation.value)
+  const newLocHasLoc = PinboardUtilities.hasLocationData(newLocation)
   switch (true) {
     case newLocHasLoc && !locationSortMode.value: {
       // if new location matches type of LatLon and no sort mode has been selected, set sort mode to distance-ascending
       locationSortMode.value = 'DistAsc'
-      console.log("ASCENDING!!!!")
       break
     }
     case !newLocHasLoc && Object.keys(sortLocationsOptionsDist).includes(locationSortMode.value): {
       // if new location does not match type LatLon and a distance sort is selected, set sort mode to default sort
       locationSortMode.value = ''
-      console.log("BLANK!!!")
       break
     }
   }
@@ -152,7 +151,7 @@ function handleSearchSubmit(locationSearchString: string) {
       break
     }
     default: {
-      locationSearchMode.value = false
+      locationSearchMode.value = undefined
       addressForSearch.value = locationSearchString
       zipcodeForSearch.value = locationSearchString
       keywordsForSearch.value = locationSearchString
@@ -189,6 +188,7 @@ function handleDeselect(id: string) {
     :location-panel-search="searchPlaceholderText"
     :location-panel-filter="filterOptions"
     :location-panel-sort="sortLocationsOptions"
+    :location-search-mode="locationSearchMode"
     @search="handleSearchSubmit"
     @selected-locations-filter="handleLocationFilterChange"
     @sort-locations-option="handleLocationSortChange"
@@ -253,7 +253,7 @@ function handleDeselect(id: string) {
           <MapIconTextPin
             :zoom="zoom"
             :icon="faCamera"
-            text="YOUR LOCATION"
+            :text="searchPinText"
           />
         </MapMarker>
       </div>
