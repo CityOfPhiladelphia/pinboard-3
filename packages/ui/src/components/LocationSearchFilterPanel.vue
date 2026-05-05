@@ -20,10 +20,10 @@ import { ref, computed } from 'vue'
 // 3rd party imports
 // philly ui imports
 import { Search } from '@phila/phila-ui-search'
-import { Menu } from '@phila/phila-ui-menu'
 
 // pinboard component imports
 import LocationFilter from './LocationFilter.vue'
+import SortPanel, { type SortPanelOption } from './SortPanel.vue'
 import SearchSuggestions from './SearchSuggestions.vue'
 
 // pinboard composables imports
@@ -33,7 +33,6 @@ import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 import type {
   LocationFilterOption,
   SortLocationsOptions,
-  MenuOption,
 } from '../types'
 
 // props
@@ -41,6 +40,7 @@ const props = defineProps<{
   searchPlaceholder?: string
   filterOptions?: LocationFilterOption[]
   sortOptions?: SortLocationsOptions
+  locationAvailable?: boolean
 }>()
 
 // emits
@@ -53,7 +53,7 @@ const emit = defineEmits<{
 }>()
 
 // refs
-const sortOption = ref<string>('')
+const appliedSort = ref<string | null>(null)
 const searchString = ref<string>('')
 const searchWrapperRef = ref<HTMLElement | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
@@ -61,18 +61,9 @@ const { searchSuggestions, searchSuggestionsError, dismissSuggestions } =
   useSearchSuggestions(searchString)
 
 // computed refs
-const sortChoices = computed(() => {
-  const sortOptions = props.sortOptions ?? {}
-  const choices: MenuOption[] = Array.from(
-    Object.keys(sortOptions),
-    (option, i) => {
-      return {
-        text: Object.values(sortOptions)[i],
-        value: option,
-      }
-    }
-  )
-  return choices
+const sortChoices = computed<SortPanelOption[]>(() => {
+  const opts = props.sortOptions ?? {}
+  return Object.entries(opts).map(([value, label]) => ({ value, label }))
 })
 
 // event handlers
@@ -80,10 +71,9 @@ function handleFilterChange(option: string) {
   emit('selectedFilter', option)
 }
 
-function handleSortChange(value: string | string[]) {
-  value = Array.isArray(value) ? (value[0] ?? '') : value
-  sortOption.value = value ?? ''
-  emit('sortOption', sortOption.value)
+function handleSortChange(value: string | null) {
+  appliedSort.value = value
+  emit('sortOption', value ?? '')
 }
 
 function handleSearchChange(search: string) {
@@ -150,12 +140,12 @@ function focusSearchInput() {
       :filter-options="filterOptions"
       @selected-filter="handleFilterChange"
     />
-    <div class="location-sort">
-      <Menu
-        v-if="sortOptions"
-        :choices="sortChoices"
-        placeholder="Sort"
-        @update:model-value="handleSortChange"
+    <div v-if="sortOptions" class="location-sort">
+      <SortPanel
+        :sort-options="sortChoices"
+        :applied-sort="appliedSort"
+        :location-available="locationAvailable ?? false"
+        @update:applied-sort="handleSortChange"
       />
     </div>
   </div>
@@ -164,9 +154,10 @@ function focusSearchInput() {
 <style scoped>
 .location-search-filter-sort {
   display: grid;
-  grid-template:
+  grid-template-areas:
     'search search'
     'filters sort';
+  grid-template-columns: 1fr auto;
 }
 
 .location-search {
@@ -186,6 +177,6 @@ function focusSearchInput() {
 .location-sort {
   grid-area: sort;
   margin-left: auto;
-  padding-right: 1rem;
+  padding: 0.75rem 1rem;
 }
 </style>

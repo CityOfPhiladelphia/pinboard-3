@@ -86,4 +86,4 @@ export interface UsgsReadingDTO {
 
 export type Filters = 'all' | 'gauges' | 'cameras'
 
-export type SortMode = 'AlphaAsc' | 'AlphaDes' | 'DistAsc' | 'DistDes' | ''
+export type SortMode = 'AlphaAsc' | 'DistAsc' | ''

@@ -32,19 +32,9 @@ const filterOptions: PinboardTypes.LocationFilterOption[] = [
   { value: 'gauges' satisfies Filters, label: 'Gauge' },
   { value: 'cameras' satisfies Filters, label: 'Camera' },
 ]
-const sortLocationsOptionsAlpha: PinboardTypes.SortLocationsOptions = {
-  AlphaAsc: 'Alpha-Asc',
-  AlphaDes: 'Alpha-Des',
-}
-
-const sortLocationsOptionsDist: PinboardTypes.SortLocationsOptions = {
-  DistAsc: 'Dist-Asc',
-  DistDes: 'Dist-Des',
-}
-
-const sortLocationsOptionsAll: PinboardTypes.SortLocationsOptions = {
-  ...sortLocationsOptionsAlpha,
-  ...sortLocationsOptionsDist,
+const sortLocationsOptions: PinboardTypes.SortLocationsOptions = {
+  DistAsc: 'Distance',
+  AlphaAsc: 'Alphabetical',
 }
 
 // refs
@@ -77,11 +67,9 @@ const searchPinText = computed(() => {
   }
 })
 
-const sortLocationsOptions = computed(() => {
-  return PinboardUtilities.hasLocationData(searchOrUserLocation.value)
-    ? sortLocationsOptionsAll
-    : sortLocationsOptionsAlpha
-})
+const hasCurrentLocation = computed(() =>
+  PinboardUtilities.hasLocationData(searchOrUserLocation.value),
+)
 
 const currentLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
@@ -109,7 +97,7 @@ watch(() => searchOrUserLocation.value,
       locationSortMode.value = 'DistAsc'
       break
     }
-    case !newLocHasLoc && Object.keys(sortLocationsOptionsDist).includes(locationSortMode.value): {
+    case !newLocHasLoc && locationSortMode.value === 'DistAsc': {
       // if new location does not match type LatLon and a distance sort is selected, set sort mode to default sort
       locationSortMode.value = ''
       break
@@ -189,6 +177,7 @@ function handleDeselect(id: string) {
     :location-panel-filter="filterOptions"
     :location-panel-sort="sortLocationsOptions"
     :location-search-mode="locationSearchMode"
+    :location-panel-location-available="hasCurrentLocation"
     @search="handleSearchSubmit"
     @selected-locations-filter="handleLocationFilterChange"
     @sort-locations-option="handleLocationSortChange"

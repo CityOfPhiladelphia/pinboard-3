@@ -15,7 +15,7 @@ import { faMap } from '@fortawesome/pro-solid-svg-icons'
 
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
-import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css' // what does this need to be imported for?
+import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
 import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Search } from '@phila/phila-ui-search'
@@ -75,6 +75,7 @@ const props = defineProps<{
   locationPanelSearch?: string
   locationPanelSort?: SortLocationsOptions
   locationSearchMode?: SearchMode
+  locationPanelLocationAvailable?: boolean
   geojson?: unknown
 }>()
 
@@ -312,6 +313,7 @@ const effectiveMapConfig = (() => {
         :location-filter="locationPanelFilter"
         :location-search="locationPanelSearch"
         :location-sort="locationPanelSort"
+        :location-available="locationPanelLocationAvailable"
         :hovered-id="hoveredLocationId"
         :selected-id="selectedLocationId"
         @select="handleSelect"
@@ -368,6 +370,7 @@ const effectiveMapConfig = (() => {
         <LocationSearchFilterPanel
           v-if="locationPanelFilter"
           :filter-options="locationPanelFilter"
+          :location-available="locationPanelLocationAvailable"
           @selected-filter="handleLocationFilterChange"
         />
       </div>
@@ -392,6 +395,7 @@ const effectiveMapConfig = (() => {
           <LocationSearchFilterPanel
             v-if="locationPanelSort"
             :sort-options="locationPanelSort"
+            :location-available="locationPanelLocationAvailable"
             @sort-option="handleLocationSortChange"
           />
         </div>
@@ -437,7 +441,7 @@ const effectiveMapConfig = (() => {
 .phila-navbar .phila-mobile-nav .nav-flyout {
   flex: 0 0 25rem;
   max-width: 25rem;
-  height: calc(100vh - var(--nav-bottom));
+  height: calc(100dvh - var(--nav-bottom));
 }
 
 .phila-navbar .phila-mobile-nav .nav-flyout .p-4 {
@@ -484,8 +488,13 @@ const effectiveMapConfig = (() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem 0;
+  padding: 0 1rem;
   font-family: var(--Body-Default-font-body-default-family);
+  font-weight: 700;
+}
+
+.bottom-sheet-list-scroll :deep(.location-list) {
+  padding-top: 0.5rem;
 }
 
 .mobile-bottom-sheet {
@@ -519,7 +528,7 @@ const effectiveMapConfig = (() => {
   height: 100%;
   width: 100%;
   max-width: 100%;
-  background: var(--Schemes-Surface-Bright, white);
+  background: transparent;
 }
 
 .bottom-sheet-list-scroll {
@@ -527,6 +536,11 @@ const effectiveMapConfig = (() => {
   inset: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.bottom-sheet-list-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .bottom-sheet-list-scroll.is-hidden {
@@ -536,7 +550,7 @@ const effectiveMapConfig = (() => {
 .bottom-sheet-detail {
   position: absolute;
   inset: 0;
-  background: var(--Schemes-Surface-Bright, white);
+  background: transparent;
   overflow: hidden;
   display: flex;
   flex-direction: column;
