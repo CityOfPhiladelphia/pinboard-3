@@ -27,10 +27,10 @@ export function useLocationDetail(
     readingState.value = { kind: 'Loading' }
 
     const myHeaders = new Headers()
-    myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
+    myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY_PROD || '')
 
     const response = await fetch(
-      `${import.meta.env.VITE_FLOOD_API_BASE_URL}/${toValue(deviceType).toLowerCase()}/reading/${toValue(gaugeId)}`,
+      `${import.meta.env.VITE_FLOOD_API_BASE_URL_PROD}/${toValue(deviceType).toLowerCase()}/reading/${toValue(gaugeId)}`,
       {
         method: 'GET',
         headers: myHeaders,
