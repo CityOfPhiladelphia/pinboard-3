@@ -77,5 +77,4 @@ const alertBanner: ComputedRef<AlertBanner | null> = computed(() => {
 .sub-footer-link {
   font-weight: 400;
 }
-
 </style>

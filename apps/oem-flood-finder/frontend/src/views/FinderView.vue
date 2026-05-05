@@ -39,7 +39,8 @@ const sortLocationsOptions: PinboardTypes.SortLocationsOptions = {
 
 // refs
 const addressForSearch = ref<string>('')
-const { addressCoordinates, finishedAddressFetch } = PinboardComposables.useSearchAddress(addressForSearch)
+const { addressCoordinates, finishedAddressFetch } =
+  PinboardComposables.useSearchAddress(addressForSearch)
 const zipcodeForSearch = ref<string>('')
 const { zipcodePolygon, finishedZipFetch } = PinboardComposables.useSearchZipcode(zipcodeForSearch)
 const keywordsForSearch = ref<string>('')
@@ -50,15 +51,21 @@ const { oemLocations, userLocation, isLoading, errorMessage } = useLocations()
 const locationSortMode = ref<SortMode>(
   PinboardUtilities.hasLocationData(userLocation) ? 'DistAsc' : '',
 )
-const { searchOrUserLocation } = PinboardComposables.userUserAndSearchLocations(userLocation, addressCoordinates, finishedAddressFetch, zipcodePolygon, finishedZipFetch)
+const { searchOrUserLocation } = PinboardComposables.userUserAndSearchLocations(
+  userLocation,
+  addressCoordinates,
+  finishedAddressFetch,
+  zipcodePolygon,
+  finishedZipFetch,
+)
 
 // conputed refs
 const searchPinText = computed(() => {
   switch (locationSearchMode.value) {
-    case ('address'): {
+    case 'address': {
       return `Address: ${addressForSearch.value}`
     }
-    case ('zipcode'): {
+    case 'zipcode': {
       return `Zipcode: ${zipcodeForSearch.value}`
     }
     default: {
@@ -87,23 +94,25 @@ const currentLocations = computed(() => {
 })
 
 // watchers
-watch(() => searchOrUserLocation.value,
+watch(
+  () => searchOrUserLocation.value,
   (newLocation) => {
-  // watch for changes in searchOrUserLocation to handle changes to sort mode
-  const newLocHasLoc = PinboardUtilities.hasLocationData(newLocation)
-  switch (true) {
-    case newLocHasLoc && !locationSortMode.value: {
-      // if new location matches type of LatLon and no sort mode has been selected, set sort mode to distance-ascending
-      locationSortMode.value = 'DistAsc'
-      break
+    // watch for changes in searchOrUserLocation to handle changes to sort mode
+    const newLocHasLoc = PinboardUtilities.hasLocationData(newLocation)
+    switch (true) {
+      case newLocHasLoc && !locationSortMode.value: {
+        // if new location matches type of LatLon and no sort mode has been selected, set sort mode to distance-ascending
+        locationSortMode.value = 'DistAsc'
+        break
+      }
+      case !newLocHasLoc && locationSortMode.value === 'DistAsc': {
+        // if new location does not match type LatLon and a distance sort is selected, set sort mode to default sort
+        locationSortMode.value = ''
+        break
+      }
     }
-    case !newLocHasLoc && locationSortMode.value === 'DistAsc': {
-      // if new location does not match type LatLon and a distance sort is selected, set sort mode to default sort
-      locationSortMode.value = ''
-      break
-    }
-  }
-})
+  },
+)
 
 // event handlers
 function handleLocationFilterChange(selectedFilter: string) {
@@ -239,11 +248,7 @@ function handleDeselect(id: string) {
           key="searchOrUserLocation"
           :lng-lat="[searchOrUserLocation.longitude, searchOrUserLocation.latitude]"
         >
-          <MapIconTextPin
-            :zoom="zoom"
-            :icon="faCamera"
-            :text="searchPinText"
-          />
+          <MapIconTextPin :zoom="zoom" :icon="faCamera" :text="searchPinText" />
         </MapMarker>
       </div>
     </template>
