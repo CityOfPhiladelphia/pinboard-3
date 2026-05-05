@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { useUserLocationPermission } from './useUserLocationPermission'
 import type { LatLon } from '../types'
 
@@ -10,12 +10,18 @@ const userLocation = ref<LatLon>({
 })
 
 export function useUserLocation() {
-  if (userLocationPermission.value === 'granted' && navigator.geolocation) {
-    navigator.geolocation.watchPosition((pos) => {
-      userLocation.value.latitude = pos.coords.latitude
-      userLocation.value.longitude = pos.coords.longitude
-    })
+  function watchUserPosition() {
+    if (userLocationPermission.value === 'granted' && navigator.geolocation) {
+      navigator.geolocation.watchPosition((pos) => {
+        userLocation.value.latitude = pos.coords.latitude
+        userLocation.value.longitude = pos.coords.longitude
+      })
+    }
   }
+
+  watchEffect(() => {
+    watchUserPosition()
+  })
 
   return { userLocation, userLocationPermission }
 }

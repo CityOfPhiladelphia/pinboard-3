@@ -10,6 +10,7 @@ export function useUserLocationPermission() {
       userLocationPermission.value = permissionStatus.state
       permissionStatus.onchange = () => {
         userLocationPermission.value = permissionStatus.state
+        console.log('Permission changed: ', permissionStatus.state)
       }
     })
 

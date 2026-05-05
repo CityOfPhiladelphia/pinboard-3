@@ -104,6 +104,7 @@ function getCardDetails(loc: { name: string; [key: string]: unknown }) {
 
     <Pinboard
       :locations="filteredLocations"
+      :search-or-user-location="userLocation"
       :get-card-details="getCardDetails"
       :is-loading="isLoading"
       :error-message="errorMessage"

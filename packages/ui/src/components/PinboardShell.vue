@@ -60,7 +60,7 @@ defineSlots<{
 .pinboard {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100dvh;
   /* width: min(100vw, 1450px); */
   margin: auto;
 }
