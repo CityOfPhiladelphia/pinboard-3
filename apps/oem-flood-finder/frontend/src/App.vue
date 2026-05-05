@@ -70,7 +70,12 @@ const alertBanner: ComputedRef<AlertBanner | null> = computed(() => {
   box-sizing: border-box;
 }
 
+#app {
+  height: 100dvh;
+}
+
 .sub-footer-link {
   font-weight: 400;
 }
+
 </style>

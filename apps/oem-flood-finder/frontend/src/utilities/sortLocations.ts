@@ -30,23 +30,11 @@ export function sortLocations(
       locations.sort((a, b) => a.name.localeCompare(b.name))
       break
     }
-    case 'AlphaDes': {
-      locations.sort((a, b) => b.name.localeCompare(a.name))
-      break
-    }
     case 'DistAsc': {
       locations.sort(
         (a, b) =>
           Number(a.locationCardInfo.subheader?.replace(' mi', '')) -
           Number(b.locationCardInfo.subheader?.replace(' mi', '')),
-      )
-      break
-    }
-    case 'DistDes': {
-      locations.sort(
-        (a, b) =>
-          Number(b.locationCardInfo.subheader?.replace(' mi', '')) -
-          Number(a.locationCardInfo.subheader?.replace(' mi', '')),
       )
       break
     }
