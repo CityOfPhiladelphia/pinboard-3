@@ -37,9 +37,6 @@ export function userUserAndSearchLocations(
     (newState) => {
       if (newState && hasLocationData(zipcodePolygon.value.centroid)) {
         searchOrUserLocation.value = zipcodePolygon.value.centroid
-        console.log(
-          `LOC: ${searchOrUserLocation.value.latitude}, ${searchOrUserLocation.value.longitude}`
-        )
       }
     }
   )
