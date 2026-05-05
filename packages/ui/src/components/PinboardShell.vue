@@ -8,8 +8,6 @@ import type { NavbarBrand } from '@phila/phila-ui-app-header'
 defineProps<{
   title: string
   logo?: NavbarBrand['logo']
-  infoTitle?: string
-  infoMessage?: string
   bannerTitle?: string
   bannerMessage?: string
 }>()
@@ -17,7 +15,7 @@ defineProps<{
 defineSlots<{
   default(): VNode[]
   'mobile-nav'(): VNode[]
-  'info-body'?(): VNode[]
+  'navbar-end'?(): VNode[]
   'sub-footer'?(): VNode[]
 }>()
 </script>
@@ -35,16 +33,14 @@ defineSlots<{
       }"
       :banner-title="bannerTitle"
       :banner-message="bannerMessage"
-      :info-title="infoTitle"
-      :info-message="infoMessage"
     >
       <template v-if="$slots['mobile-nav']" #mobile-nav>
         <MobileNavPanel>
           <slot name="mobile-nav" />
         </MobileNavPanel>
       </template>
-      <template v-if="$slots['info-body']" #info-body>
-        <slot name="info-body" />
+      <template v-if="$slots['navbar-end']" #navbar-end>
+        <slot name="navbar-end" />
       </template>
     </AppHeader>
 

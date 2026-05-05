@@ -1,3 +1,14 @@
+<script setup lang="ts">
+import { ref, onUnmounted } from 'vue'
+import { Logo } from '@phila/phila-ui-logo'
+
+const mq = window.matchMedia('(max-width: 768px)')
+const isMobile = ref(mq.matches)
+const onMqChange = (e: MediaQueryListEvent) => (isMobile.value = e.matches)
+mq.addEventListener('change', onMqChange)
+onUnmounted(() => mq.removeEventListener('change', onMqChange))
+</script>
+
 <template>
   <div class="layout content">
     <div class="inner-container">
@@ -14,14 +25,14 @@
 
           <div class="content-container">
             <div class="subsection-container">
-              <h5>How to use this data</h5>
+              <component :is="isMobile ? 'h6' : 'h5'">How to use this data</component>
               This website allows residents to keep an eye on water levels in parts of the city.
               They can use this information and resources to make informed decisions prior to,
               during, and after a flooding event.
             </div>
 
             <div class="subsection-container">
-              <h5>Why we measure this data</h5>
+              <component :is="isMobile ? 'h6' : 'h5'">Why we measure this data</component>
               <div>
                 Philadelphia sits between two major rivers: the Delaware River and the Schuylkill
                 River. Much of the city lies in low-elevation watershed areas. As a result, large
@@ -37,14 +48,14 @@
               </div>
             </div>
             <div class="subsection-container">
-              <h5>What data is being collected</h5>
+              <component :is="isMobile ? 'h6' : 'h5'">What data is being collected</component>
               Flood gauges and cameras were placed in areas at high risk. They collect a wide range
               of data, including information on water levels, rain amount, flooding risk rates,
               depth, and water temperature. This technology allows us to better watch the condition
               of our floodways.
             </div>
             <div class="subsection-container">
-              <h5>Why are so many gauges and cameras in Eastwick?</h5>
+              <component :is="isMobile ? 'h6' : 'h5'">Why are so many gauges and cameras in Eastwick?</component>
               <div>
                 To better inform residents of flooding, the City established a pilot program for
                 Eastwick.
@@ -57,7 +68,7 @@
               </div>
             </div>
             <div class="subsection-container">
-              <h5>Resources and key terms</h5>
+              <component :is="isMobile ? 'h6' : 'h5'">Resources and key terms</component>
               <ul class="subsection-content" style="margin: 0; padding-left: 1rem">
                 <li style="margin: 0">
                   <a href="https://forecast.weather.gov/glossary.php?word=FLOOD">
@@ -82,6 +93,30 @@
                   <a href="https://www.phila.gov/departments/oem/">
                     Office of Emergency Management
                   </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="subsection-container mobile-footer-links">
+              <div class="mobile-footer-heading">
+                <Logo bell-only />
+                <component :is="isMobile ? 'h6' : 'h5'">About phila.gov</component>
+              </div>
+              <ul class="subsection-content" style="margin: 0; padding-left: 1rem">
+                <li style="margin: 0">
+                  <a href="https://www.phila.gov/terms-of-use/">Terms of use</a>
+                </li>
+                <li style="margin: 0">
+                  <a href="https://www.phila.gov/open-records-policy/">Right to know</a>
+                </li>
+                <li style="margin: 0">
+                  <a href="https://www.phila.gov/privacypolicy/">Privacy Policy</a>
+                </li>
+                <li style="margin: 0">
+                  <a href="https://www.phila.gov/accessibility-policy/">Accessibility</a>
+                </li>
+                <li style="margin: 0">
+                  <a href="mailto:oem@phila.gov">Feedback</a>
                 </li>
               </ul>
             </div>
@@ -119,6 +154,8 @@
 
 .section {
   display: flex;
+  width: 100%;
+  max-width: 45rem;
   padding-bottom: var(--spacing-4xl, 4rem);
   flex-direction: column;
   align-items: flex-start;
@@ -136,7 +173,6 @@
 .content-container {
   display: flex;
   width: 100%;
-  max-width: 45rem;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--spacing-3xl, 3rem);
@@ -157,7 +193,17 @@
 .main-description {
   font-weight: 600;
   width: 100%;
-  max-width: 59.5rem;
+}
+
+.mobile-footer-links {
+  display: none;
+}
+
+.mobile-footer-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1.25rem;
 }
 
 @media (max-width: 768px) {
@@ -168,6 +214,10 @@
   .section {
     gap: var(--spacing-2xl, 2rem);
     padding-bottom: var(--spacing-2xl, 2rem);
+  }
+
+  .mobile-footer-links {
+    display: flex;
   }
 }
 </style>
