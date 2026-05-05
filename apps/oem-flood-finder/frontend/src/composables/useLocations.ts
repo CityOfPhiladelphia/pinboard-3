@@ -1,13 +1,17 @@
-import { ref, computed, onBeforeMount } from 'vue'
+import { ref, computed, onBeforeMount, type Ref, type ComputedRef } from 'vue'
 import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
-import type { TagsProps } from '@phila/phila-ui-tags'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 import type { LocationPanelDTO, OemLocation } from '@/types'
-import { PinboardComposables, PinboardUtilities } from '@pinboard/ui'
+import { PinboardComposables, PinboardUtilities, type PinboardTypes } from '@pinboard/ui'
 
 const { userLocation, userLocationPermission } = PinboardComposables.useUserLocation()
 
-export function useLocations() {
+export function useLocations(): {
+  oemLocations: Ref<OemLocation[]>
+  userLocation: Ref<PinboardTypes.LatLon>
+  isLoading: ComputedRef<boolean>
+  errorMessage: Ref<string | null>
+} {
   const oemLocations = ref<OemLocation[]>([])
   const errorMessage = ref<string | null>(null)
   const hasData = ref<boolean>(false)
@@ -67,7 +71,7 @@ export function useLocations() {
   return { oemLocations, userLocation, isLoading, errorMessage }
 }
 
-function getLocationTags(loc: LocationPanelDTO): TagsProps[] {
+function getLocationTags(loc: LocationPanelDTO): NonNullable<MapCardProps['tags']> {
   if (loc.deviceType === 'Camera') {
     return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
   }

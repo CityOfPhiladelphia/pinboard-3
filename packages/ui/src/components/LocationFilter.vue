@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Tags } from '@phila/phila-ui-tags'
+import { computed, ref } from 'vue'
+import { TagGroup } from '@phila/phila-ui-tags'
+import type { TagGroupChoice } from '@phila/phila-ui-tags'
 import type { LocationFilterOption } from '../types'
 
 const props = defineProps<{
@@ -11,48 +12,38 @@ const emit = defineEmits<{
   selectedFilter: [filter: string]
 }>()
 
-const selectedFilter = ref<string>(props.filterOptions[0]?.value ?? '')
+const choices = computed<TagGroupChoice[]>(() =>
+  props.filterOptions.map((opt) => ({ text: opt.label, value: opt.value }))
+)
 
-function handleFilterChange(option: string) {
-  if (selectedFilter.value === option) {
-    return
+const selected = ref<Array<string | number>>([
+  props.filterOptions[0]?.value ?? '',
+])
+
+function handleChange(values: Array<string | number>) {
+  selected.value = values
+  if (values[0] !== undefined) {
+    emit('selectedFilter', String(values[0]))
   }
-  selectedFilter.value = option
-  emit('selectedFilter', selectedFilter.value)
 }
 </script>
 
 <template>
   <div class="location-filters">
-    <Tags
-      v-for="opt in filterOptions"
-      :key="`filter-${opt.value}`"
+    <TagGroup
+      :choices="choices"
+      :model-value="selected"
       variant="action"
       size="large"
-      color="grey"
-      :text="opt.label"
-      :selected="selectedFilter === opt.value"
-      @update:selected="handleFilterChange(opt.value)"
+      color="white"
+      :multiple="false"
+      @update:model-value="handleChange"
     />
   </div>
 </template>
 
 <style scoped>
 .location-filters {
-  display: flex;
-  gap: 0.5rem;
   padding: 0.75rem 1rem;
-}
-
-:deep(.phila-tag.phila-tag--grey:not(.is-selected)) {
-  background: #ffffff;
-}
-
-:deep(
-  .phila-tag.phila-tag--grey:not(.is-selected):not(
-      .phila-tag--readonly
-    ):hover:not(:disabled)
-) {
-  background: #f5f5f5;
 }
 </style>

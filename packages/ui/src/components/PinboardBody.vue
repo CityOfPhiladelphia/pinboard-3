@@ -115,7 +115,7 @@ const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
   null
 )
 const searchString = ref<string>('')
-const { searchSuggestions, searchSuggestionsError, dismissSuggestions } =
+const { searchSuggestions, dismissSuggestions } =
   useSearchSuggestions(searchString)
 const mobileSearchWrapperRef = ref<HTMLElement | null>(null)
 const mobileSuggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(

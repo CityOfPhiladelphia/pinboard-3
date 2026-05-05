@@ -4,8 +4,7 @@ import type { OemLocation } from '@/types'
 import GaugeReadings from './GaugeReadings.vue'
 import CameraVideoPlayer from './CameraVideoPlayer.vue'
 import { useLocationDetail } from '@/composables/useLocationDetail'
-import { PhilaButton } from '@phila/phila-ui-button'
-import { faXmark } from '@fortawesome/pro-solid-svg-icons'
+import { CloseButton } from '@phila/phila-ui-button'
 
 const props = defineProps<{
   location: OemLocation
@@ -45,15 +44,7 @@ const lastUpdatedDate = computed(() => {
         {{ location.name }}
       </h4>
       <h2 v-else-if="location.deviceType === 'Camera'">{{ location.name }}</h2>
-      <PhilaButton
-        :icon-definition="faXmark"
-        :icon-only="true"
-        variant="standard"
-        size="small"
-        class="detail-close-btn"
-        aria-label="Close details"
-        @click="onClose"
-      />
+      <CloseButton size="small" class="detail-close-btn" @click="onClose" />
     </div>
 
     <div class="detail-body">
