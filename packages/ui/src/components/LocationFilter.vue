@@ -13,10 +13,12 @@ const emit = defineEmits<{
 }>()
 
 const choices = computed<TagGroupChoice[]>(() =>
-  props.filterOptions.map(opt => ({ text: opt.label, value: opt.value })),
+  props.filterOptions.map((opt) => ({ text: opt.label, value: opt.value }))
 )
 
-const selected = ref<Array<string | number>>([props.filterOptions[0]?.value ?? ''])
+const selected = ref<Array<string | number>>([
+  props.filterOptions[0]?.value ?? '',
+])
 
 function handleChange(values: Array<string | number>) {
   selected.value = values

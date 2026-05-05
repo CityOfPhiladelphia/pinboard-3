@@ -63,7 +63,9 @@ onMounted(async () => {
       <a class="sub-footer-link" href="https://www.phila.gov/terms-of-use/">Terms of use</a>
       <a class="sub-footer-link" href="https://www.phila.gov/open-records-policy/">Right to know</a>
       <a class="sub-footer-link" href="https://www.phila.gov/privacypolicy/">Privacy Policy</a>
-      <a class="sub-footer-link" href="https://www.phila.gov/accessibility-policy/">Accessibility</a>
+      <a class="sub-footer-link" href="https://www.phila.gov/accessibility-policy/"
+        >Accessibility</a
+      >
       <a class="sub-footer-link" href="mailto:oem@phila.gov">Feedback</a>
     </template>
 

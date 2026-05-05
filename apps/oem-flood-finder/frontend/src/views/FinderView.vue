@@ -4,6 +4,7 @@ import { computed, ref, watch } from 'vue'
 
 // 3rd party imports
 import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
+import { faLocationDot } from '@fortawesome/pro-solid-svg-icons'
 
 // philly ui imports
 // pinboard imports
@@ -60,20 +61,6 @@ const { searchOrUserLocation } = PinboardComposables.userUserAndSearchLocations(
 )
 
 // conputed refs
-const searchPinText = computed(() => {
-  switch (locationSearchMode.value) {
-    case 'address': {
-      return `Address: ${addressForSearch.value}`
-    }
-    case 'zipcode': {
-      return `Zipcode: ${zipcodeForSearch.value}`
-    }
-    default: {
-      return 'YOUR LOCATION'
-    }
-  }
-})
-
 const hasCurrentLocation = computed(() =>
   PinboardUtilities.hasLocationData(searchOrUserLocation.value),
 )
@@ -248,7 +235,7 @@ function handleDeselect(id: string) {
           key="searchOrUserLocation"
           :lng-lat="[searchOrUserLocation.longitude, searchOrUserLocation.latitude]"
         >
-          <MapIconTextPin :zoom="zoom" :icon="faCamera" :text="searchPinText" />
+          <MapIconTextPin :zoom="zoom" :icon="faLocationDot" color-theme="light-tertiary" />
         </MapMarker>
       </div>
     </template>

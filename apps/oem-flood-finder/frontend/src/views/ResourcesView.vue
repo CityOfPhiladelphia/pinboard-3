@@ -55,7 +55,9 @@ onUnmounted(() => mq.removeEventListener('change', onMqChange))
               of our floodways.
             </div>
             <div class="subsection-container">
-              <component :is="isMobile ? 'h6' : 'h5'">Why are so many gauges and cameras in Eastwick?</component>
+              <component :is="isMobile ? 'h6' : 'h5'"
+                >Why are so many gauges and cameras in Eastwick?</component
+              >
               <div>
                 To better inform residents of flooding, the City established a pilot program for
                 Eastwick.
@@ -94,6 +96,9 @@ onUnmounted(() => mq.removeEventListener('change', onMqChange))
                     Office of Emergency Management
                   </a>
                 </li>
+                <li style="margin: 0">
+                  <a href="mailto:oem@phila.gov">Send feedback about this map</a>
+                </li>
               </ul>
             </div>
 
@@ -114,9 +119,6 @@ onUnmounted(() => mq.removeEventListener('change', onMqChange))
                 </li>
                 <li style="margin: 0">
                   <a href="https://www.phila.gov/accessibility-policy/">Accessibility</a>
-                </li>
-                <li style="margin: 0">
-                  <a href="mailto:oem@phila.gov">Feedback</a>
                 </li>
               </ul>
             </div>

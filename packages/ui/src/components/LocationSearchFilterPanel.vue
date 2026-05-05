@@ -54,7 +54,7 @@ const appliedSort = ref<string | null>(null)
 const searchString = ref<string>('')
 const searchWrapperRef = ref<HTMLElement | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
-const { searchSuggestions, searchSuggestionsError, dismissSuggestions } =
+const { searchSuggestions, dismissSuggestions } =
   useSearchSuggestions(searchString)
 
 // computed refs

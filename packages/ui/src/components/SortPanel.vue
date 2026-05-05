@@ -2,8 +2,9 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Radio } from '@phila/phila-ui-radio'
+import { PhilaButton, CloseButton } from '@phila/phila-ui-button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faArrowUpArrowDown, faXmark } from '@fortawesome/pro-solid-svg-icons'
+import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
 
 export interface SortPanelOption {
   value: string
@@ -145,14 +146,7 @@ onBeforeUnmount(() => {
       "
     >
       <div ref="formEl" class="sort-panel-form sort-panel-form--mobile">
-        <button
-          type="button"
-          class="sort-panel-close"
-          aria-label="Close"
-          @click="closePanel"
-        >
-          <FontAwesomeIcon :icon="faXmark" />
-        </button>
+        <CloseButton class="sort-panel-close" @click="closePanel" />
         <ul class="sort-panel-options">
           <li
             v-for="option in sortOptions"
@@ -177,12 +171,12 @@ onBeforeUnmount(() => {
           </li>
         </ul>
         <div class="sort-panel-actions">
-          <button type="button" class="sort-panel-reset" @click="resetSort">
-            Reset
-          </button>
-          <button type="button" class="sort-panel-apply" @click="applySort">
-            Apply
-          </button>
+          <PhilaButton variant="text" size="extra-small" @click="resetSort"
+            >Reset</PhilaButton
+          >
+          <PhilaButton variant="primary" size="small" @click="applySort"
+            >Apply</PhilaButton
+          >
         </div>
       </div>
     </BottomSheet>
@@ -216,12 +210,12 @@ onBeforeUnmount(() => {
         </li>
       </ul>
       <div class="sort-panel-actions">
-        <button type="button" class="sort-panel-reset" @click="resetSort">
-          Reset
-        </button>
-        <button type="button" class="sort-panel-apply" @click="applySort">
-          Apply
-        </button>
+        <PhilaButton variant="text" size="extra-small" @click="resetSort"
+          >Reset</PhilaButton
+        >
+        <PhilaButton variant="primary" size="small" @click="applySort"
+          >Apply</PhilaButton
+        >
       </div>
     </div>
   </Teleport>
@@ -300,24 +294,6 @@ onBeforeUnmount(() => {
   border-top: 1px solid var(--Schemes-Outline-Variant, #e0e0e0);
 }
 
-.sort-panel-reset {
-  background: none;
-  border: none;
-  color: var(--Schemes-Primary, #1976d2);
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.sort-panel-apply {
-  background: var(--Schemes-Primary, #1976d2);
-  color: white;
-  border: none;
-  border-radius: 999px;
-  padding: 0.5rem 1.25rem;
-  cursor: pointer;
-  font-weight: 600;
-}
-
 .sort-panel-form--mobile {
   width: 100%;
   background: transparent;
@@ -336,20 +312,5 @@ onBeforeUnmount(() => {
   position: absolute;
   top: 8px;
   right: 12px;
-  width: 32px;
-  height: 32px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  border-radius: 50%;
-  font-size: 1.125rem;
-  color: var(--Schemes-On-Surface, #333);
-  cursor: pointer;
-}
-
-.sort-panel-close:hover {
-  background: rgba(0, 0, 0, 0.06);
 }
 </style>
