@@ -10,16 +10,15 @@ export const viteJsConfig = [
   globalIgnores(['node_modules/**', 'dist/**', 'cdk.out']),
   js.configs.recommended,
   ...tseslint.configs.strict,
-  ...tseslint.configs.stylistic,
   {
-    files: ['**/*.{ts,vue}'],
+    files: ['**/*.{js,ts,vue}'],
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: 'module',
       globals: {
         ...globals.browser,
         ...globals.node,
-        ...globals.es2022,
+        ...globals.es2024,
       },
       parserOptions: {
         parser: tseslint.parser,
@@ -27,7 +26,6 @@ export const viteJsConfig = [
       },
     },
     rules: {
-      'vue/multi-word-component-names': 'off',
       '@typescript-eslint/no-unused-vars': [
         'error',
         { argsIgnorePattern: '^_' },

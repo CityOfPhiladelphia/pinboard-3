@@ -30,10 +30,7 @@ import SearchSuggestions from './SearchSuggestions.vue'
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 
 // type imports
-import type {
-  LocationFilterOption,
-  SortLocationsOptions,
-} from '../types'
+import type { LocationFilterOption, SortLocationsOptions } from '../types'
 
 // props
 const props = defineProps<{

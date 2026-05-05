@@ -39,36 +39,43 @@ const sortLocationsOptions: PinboardTypes.SortLocationsOptions = {
 
 // refs
 const addressForSearch = ref<string>('')
-const { addressCoordinates } = PinboardComposables.useSearchAddress(addressForSearch)
+const { addressCoordinates, finishedAddressFetch } =
+  PinboardComposables.useSearchAddress(addressForSearch)
 const zipcodeForSearch = ref<string>('')
-const { zipcodePolygon } = PinboardComposables.useSearchZipcode(zipcodeForSearch)
+const { zipcodePolygon, finishedZipFetch } = PinboardComposables.useSearchZipcode(zipcodeForSearch)
 const keywordsForSearch = ref<string>('')
-const locationSearchMode = ref<PinboardTypes.SearchMode>(false)
+const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
 const locationFilterMode = ref<Filters>('all')
 const visitedIds = ref(new Set<string>())
 const { oemLocations, userLocation, isLoading, errorMessage } = useLocations()
 const locationSortMode = ref<SortMode>(
   PinboardUtilities.hasLocationData(userLocation) ? 'DistAsc' : '',
 )
+const { searchOrUserLocation } = PinboardComposables.userUserAndSearchLocations(
+  userLocation,
+  addressCoordinates,
+  finishedAddressFetch,
+  zipcodePolygon,
+  finishedZipFetch,
+)
 
-// computed refs
-const currentLocation = computed(() => {
+// conputed refs
+const searchPinText = computed(() => {
   switch (locationSearchMode.value) {
     case 'address': {
-      return addressCoordinates.value
+      return `Address: ${addressForSearch.value}`
     }
     case 'zipcode': {
-      return zipcodePolygon.value.centroid
+      return `Zipcode: ${zipcodeForSearch.value}`
     }
-    case 'keyword':
     default: {
-      return userLocation.value
+      return 'YOUR LOCATION'
     }
   }
 })
 
 const hasCurrentLocation = computed(() =>
-  PinboardUtilities.hasLocationData(currentLocation.value),
+  PinboardUtilities.hasLocationData(searchOrUserLocation.value),
 )
 
 const currentLocations = computed(() => {
@@ -81,26 +88,31 @@ const currentLocations = computed(() => {
     : filteredLocations
   const gotSearchMatches = typeof searchedLocations !== 'string'
   if (!gotSearchMatches) console.log(searchedLocations)
-  return gotSearchMatches ? sortLocations(searchedLocations, currentLocation, locationSortMode) : []
+  return gotSearchMatches
+    ? sortLocations(searchedLocations, searchOrUserLocation, locationSortMode)
+    : []
 })
 
 // watchers
-watch(currentLocation, () => {
-  // watch for changes in currentLocation to handle changes to sort mode
-  const newLocHasLoc = PinboardUtilities.hasLocationData(currentLocation.value)
-  switch (true) {
-    case newLocHasLoc && !locationSortMode.value: {
-      // if new location matches type of LatLon and no sort mode has been selected, set sort mode to distance-ascending
-      locationSortMode.value = 'DistAsc'
-      break
+watch(
+  () => searchOrUserLocation.value,
+  (newLocation) => {
+    // watch for changes in searchOrUserLocation to handle changes to sort mode
+    const newLocHasLoc = PinboardUtilities.hasLocationData(newLocation)
+    switch (true) {
+      case newLocHasLoc && !locationSortMode.value: {
+        // if new location matches type of LatLon and no sort mode has been selected, set sort mode to distance-ascending
+        locationSortMode.value = 'DistAsc'
+        break
+      }
+      case !newLocHasLoc && locationSortMode.value === 'DistAsc': {
+        // if new location does not match type LatLon and a distance sort is selected, set sort mode to default sort
+        locationSortMode.value = ''
+        break
+      }
     }
-    case !newLocHasLoc && locationSortMode.value === 'DistAsc': {
-      // if new location does not match type LatLon and a distance sort is selected, set sort mode to default sort
-      locationSortMode.value = ''
-      break
-    }
-  }
-})
+  },
+)
 
 // event handlers
 function handleLocationFilterChange(selectedFilter: string) {
@@ -136,7 +148,7 @@ function handleSearchSubmit(locationSearchString: string) {
       break
     }
     default: {
-      locationSearchMode.value = false
+      locationSearchMode.value = undefined
       addressForSearch.value = locationSearchString
       zipcodeForSearch.value = locationSearchString
       keywordsForSearch.value = locationSearchString
@@ -167,11 +179,13 @@ function handleDeselect(id: string) {
 <template>
   <Pinboard
     :locations="currentLocations"
+    :search-or-user-location="searchOrUserLocation"
     :is-loading="isLoading"
     :error-message="errorMessage"
     :location-panel-search="searchPlaceholderText"
     :location-panel-filter="filterOptions"
     :location-panel-sort="sortLocationsOptions"
+    :location-search-mode="locationSearchMode"
     :location-panel-location-available="hasCurrentLocation"
     @search="handleSearchSubmit"
     @selected-locations-filter="handleLocationFilterChange"
@@ -228,6 +242,13 @@ function handleDeselect(id: string) {
             @mouseleave="onHoverEnd()"
             @click="handleSelect(loc, onSelect)"
           />
+        </MapMarker>
+        <MapMarker
+          v-if="PinboardUtilities.hasLocationData(searchOrUserLocation)"
+          key="searchOrUserLocation"
+          :lng-lat="[searchOrUserLocation.longitude, searchOrUserLocation.latitude]"
+        >
+          <MapIconTextPin :zoom="zoom" :icon="faCamera" :text="searchPinText" />
         </MapMarker>
       </div>
     </template>

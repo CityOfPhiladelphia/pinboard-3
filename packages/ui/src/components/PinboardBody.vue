@@ -35,9 +35,12 @@ import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 // type imports
 import type {
   BasicLocation,
+  LatLon,
   LocationFilterOption,
+  SearchMode,
   SortLocationsOptions,
 } from '../types'
+import { hasLocationData } from '../utilities/hasLocationData'
 
 // slots
 defineSlots<{
@@ -65,11 +68,13 @@ defineSlots<{
 // props
 const props = defineProps<{
   locations: BasicLocation[]
+  searchOrUserLocation: LatLon
   isLoading: boolean
   errorMessage: string | null
   locationPanelFilter?: LocationFilterOption[]
   locationPanelSearch?: string
   locationPanelSort?: SortLocationsOptions
+  locationSearchMode?: SearchMode
   locationPanelLocationAvailable?: boolean
   geojson?: unknown
 }>()
@@ -147,6 +152,19 @@ watch(selectedLocation, (loc) => {
     bottomSheetRef.value?.snapTo(snapPoints.length - 1)
   }
 })
+
+watch(
+  () => props.searchOrUserLocation,
+  (newLocation) => {
+    if (
+      hasLocationData(newLocation) &&
+      props.locationSearchMode &&
+      ['address', 'zipcode'].includes(props.locationSearchMode)
+    ) {
+      mapPanelRef.value?.panTo([newLocation.longitude, newLocation.latitude])
+    }
+  }
+)
 
 // event handlers
 function handleHover(id: string) {
