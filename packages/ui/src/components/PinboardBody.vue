@@ -177,8 +177,17 @@ function handleHoverEnd() {
   hoveredLocationId.value = null
 }
 
-function handleSelect(location: BasicLocation) {
+function selectLocation(location: BasicLocation) {
+  // Swapping to a different location counts as "viewing" the outgoing one —
+  // emit deselect so consumers can mark it as visited.
+  if (selectedLocation.value && selectedLocation.value.id !== location.id) {
+    emit('deselect', selectedLocation.value.id)
+  }
   selectedLocation.value = location
+}
+
+function handleSelect(location: BasicLocation) {
+  selectLocation(location)
   mapPanelRef.value?.panTo([location.longitude, location.latitude])
 }
 
@@ -186,7 +195,7 @@ function handleMapSelect(location: BasicLocation) {
   if (selectedLocation.value?.id === location.id) {
     handleCloseLocationDetail()
   } else {
-    selectedLocation.value = location
+    selectLocation(location)
   }
 }
 
