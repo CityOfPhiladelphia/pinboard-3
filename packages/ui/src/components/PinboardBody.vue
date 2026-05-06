@@ -133,10 +133,17 @@ const bottomSheetDragging = computed(
   () => bottomSheetRef.value?.isDragging ?? false
 )
 
-const mobileControlsStyle = computed(() => ({
-  bottom: `calc(${bottomSheetPercent.value}% + 10px)`,
-  transition: bottomSheetDragging.value ? 'none' : 'bottom 0.3s ease-out',
-}))
+const mobileControlsStyle = computed(() => {
+  const percent = bottomSheetPercent.value
+  const opacity = percent <= 50 ? 1 : Math.max(0, 1 - (percent - 50) / 20)
+  return {
+    bottom: `calc(${percent}% + 10px)`,
+    opacity,
+    transition: bottomSheetDragging.value
+      ? 'none'
+      : 'bottom 0.3s ease-out, opacity 0.3s ease-out',
+  }
+})
 
 const selectedLocationId = computed(() =>
   selectedLocation.value === null ? null : selectedLocation.value.id
