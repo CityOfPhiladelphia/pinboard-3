@@ -24,8 +24,6 @@ export function useLocations() {
     const myHeaders = new Headers()
     myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY_PROD || '')
 
-    console.log(import.meta.env.VITE_FLOOD_API_BASE_TEST);
-
     const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL_PROD}/location/all`, {
       method: 'GET',
       headers: myHeaders,
