@@ -22,9 +22,9 @@ export function useLocations() {
 
   onBeforeMount(async () => {
     const myHeaders = new Headers()
-    myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY_PROD || '')
+    myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
 
-    const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL_PROD}/location/all`, {
+    const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/location/all`, {
       method: 'GET',
       headers: myHeaders,
       redirect: 'follow',

@@ -6,9 +6,9 @@ export function useEverbridgeNotifications(limit: MaybeRefOrGetter<number>) {
 
   async function fetchLatestAlerts() {
     const myHeaders = new Headers()
-    myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY_PROD || '')
+    myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
 
-    const url = new URL(`${import.meta.env.VITE_FLOOD_API_BASE_URL_PROD}/everbridge/notifications`)
+    const url = new URL(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/everbridge/notifications`)
     url.searchParams.set('limit', toValue(limit).toString())
 
     const response = await fetch(url, {
