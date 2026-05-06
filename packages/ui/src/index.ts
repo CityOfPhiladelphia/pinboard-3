@@ -17,7 +17,9 @@ export {
   MapNavigationControl,
   GeolocationButton,
   BasemapToggle,
+  MapCheckboxLegend,
 } from '@phila/phila-ui-map-core'
+export type { LegendItem } from '@phila/phila-ui-map-core'
 
 export { NavbarInfo } from '@phila/phila-ui-app-header'
 export { PinboardShell, PinboardBody as Pinboard }

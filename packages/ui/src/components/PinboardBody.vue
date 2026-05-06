@@ -59,6 +59,7 @@ defineSlots<{
     hoveredId: string | null
     selectedId: string | null
     mobileControlsTarget: HTMLDivElement | null
+    mobileControlsTargetLeft: HTMLDivElement | null
     onHover: (id: string) => void
     onHoverEnd: () => void
     onSelect: (loc: BasicLocation) => void
@@ -108,6 +109,7 @@ const bottomSheetRef = ref<{
   isDragging: boolean
 } | null>(null)
 const mobileControlsTarget = ref<HTMLDivElement | null>(null)
+const mobileControlsTargetLeft = ref<HTMLDivElement | null>(null)
 const locationsPanelRef = ref<{
   scrollToCard: (id: string, behavior?: ScrollBehavior) => void
 } | null>(null)
@@ -340,6 +342,7 @@ const effectiveMapConfig = (() => {
         :hovered-id="hoveredLocationId"
         :selected-id="selectedLocationId"
         :mobile-controls-target="mobileControlsTarget"
+        :mobile-controls-target-left="mobileControlsTargetLeft"
         :map-content-slot="slots['map-content']"
         :on-hover="handleHover"
         :on-hover-end="handleHoverEnd"
@@ -349,6 +352,12 @@ const effectiveMapConfig = (() => {
         v-if="isMobile"
         ref="mobileControlsTarget"
         class="mobile-controls-float"
+        :style="mobileControlsStyle"
+      />
+      <div
+        v-if="isMobile"
+        ref="mobileControlsTargetLeft"
+        class="mobile-controls-float-left"
         :style="mobileControlsStyle"
       />
       <div
@@ -383,8 +392,8 @@ const effectiveMapConfig = (() => {
     ref="bottomSheetRef"
     v-model="bottomSheetOpen"
     :snap-points="snapPoints"
-    collapse-label="Map view"
-    :collapse-icon="faMap"
+    :collapse-label="selectedLocation ? undefined : 'Map view'"
+    :collapse-icon="selectedLocation ? undefined : faMap"
     class="mobile-bottom-sheet"
   >
     <div class="bottom-sheet-stack">
@@ -600,6 +609,21 @@ const effectiveMapConfig = (() => {
   }
 
   .mobile-controls-float > :deep(*) {
+    pointer-events: auto;
+  }
+
+  .mobile-controls-float-left {
+    position: absolute;
+    left: 10px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    pointer-events: none;
+  }
+
+  .mobile-controls-float-left > :deep(*) {
     pointer-events: auto;
   }
 
