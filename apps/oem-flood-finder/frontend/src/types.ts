@@ -36,6 +36,7 @@ export type LocationPanelDTO = {
   gaugeHeight: number
   gaugeHeightUnit: string
   thumbnailUrl: string
+  pictureTimestampUTC: Date
   cameraStreamUrl: string
   deviceType: DeviceType
   actionStage: number
@@ -52,6 +53,8 @@ export interface OemFields {
   moderateStage: number
   majorStage: number
   cameraStreamUrl: string
+  pictureTimestampUTC: Date
+
 }
 
 export type OemLocation = PinboardTypes.BasicLocation & OemFields

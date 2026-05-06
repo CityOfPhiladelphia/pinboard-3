@@ -55,7 +55,7 @@ export function useLocations(): {
         lastUpdated: loc.lastUpdated,
         gaugeHeight: loc.gaugeHeight,
         gaugeHeightUnit: loc.gaugeHeightUnit,
-        thumbnailUrl: loc.thumbnailUrl,
+        pictureTimestampUTC: loc.pictureTimestampUTC,
         cameraStreamUrl: loc.cameraStreamUrl,
         deviceType: loc.deviceType,
         actionStage: loc.actionStage,
