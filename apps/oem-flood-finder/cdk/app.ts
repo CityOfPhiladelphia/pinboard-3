@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-import 'source-map-support/register'
 import { App, Aspects, Stack } from 'aws-cdk-lib'
 import { AwsSolutionsChecks, NIST80053R5Checks } from 'cdk-nag'
 import {
   StaticSite,
   Confidentiality,
   type Environment,
+  PhilaLogBucket,
 } from '@phila/constructs'
 import {
   Certificate,
@@ -65,12 +65,21 @@ const dnsValidatedCertificate = new Certificate(stack, 'Certificate', {
   validation: CertificateValidation.fromDns(hostedZone),
 })
 
+const accessLogBucket = new PhilaLogBucket(stack, 'AccessLogs', {
+  ...context,
+  logBucketId: 'access-logs',
+  logRetentionDays: 1096,
+  s3ManagedEncryption: true,
+});
+
+
 // Scope as any so linked @phila/constructs resolves to a single Construct type at runtime.
 new StaticSite(stack, 'StaticSite', {
   ...context,
   assetDir: '../frontend/dist',
   certificate: dnsValidatedCertificate,
   hostedZone,
+  logBucket: accessLogBucket.bucket
 })
 
 // Apply compliance checks
