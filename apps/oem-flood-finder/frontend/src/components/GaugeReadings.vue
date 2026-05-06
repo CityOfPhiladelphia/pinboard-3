@@ -17,10 +17,7 @@ const chartData: Ref<ChartData[]> = computed(() => {
     return props.readingState.data
       .map((reading) => {
         const x = new Date(new Date(reading.validTimeUTC).getTime() - offset).toString()
-        let y = reading.gaugeHeight === -9999.9 ? undefined : reading.gaugeHeight
-        if (reading.gaugeHeightUnit === 'in' && y !== undefined) {
-          y = Math.ceil((y / 12) * 100) / 100
-        }
+        const y = reading.gaugeHeight === -9999.9 ? undefined : reading.gaugeHeight
         return { x, y }
       })
       .reverse()
@@ -78,7 +75,7 @@ const tableData = computed((): Record<string, unknown>[] => {
     </div>
 
     <div v-show="location.deviceType !== 'Aware' || activeTab === 'graph'">
-      <LineChart :data="chartData" :y-label="`Stage (ft)`" />
+      <LineChart :data="chartData" :y-label="`Stage (in)`" />
     </div>
 
     <div v-if="location.deviceType === 'Aware'" v-show="activeTab === 'table'">
