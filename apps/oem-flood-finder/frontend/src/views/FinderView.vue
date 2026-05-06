@@ -27,7 +27,7 @@ import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation, SortMode } from '@/types'
 
 // app variables
-const searchPlaceholderText = 'Search by address or keyword...'
+const searchPlaceholderText = 'Search by address, zipcode, or keyword...'
 const filterOptions: PinboardTypes.LocationFilterOption[] = [
   { value: 'all' satisfies Filters, label: 'All' },
   { value: 'gauges' satisfies Filters, label: 'Gauge' },

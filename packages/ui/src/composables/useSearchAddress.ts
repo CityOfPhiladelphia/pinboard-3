@@ -26,8 +26,8 @@ export function useSearchAddress(address: string | Ref<string>) {
 
     try {
       const result: LatLon = await (await fetch(url)).json()
-      addressCoordinates.value.longitude = result.longitude
-      addressCoordinates.value.latitude = result.latitude
+      addressCoordinates.value.longitude = result.longitude ?? NaN
+      addressCoordinates.value.latitude = result.latitude ?? NaN
       finishedAddressFetch.value = true
     } catch (err) {
       console.error('Failed to get response from AIS: ', err)
