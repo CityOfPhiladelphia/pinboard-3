@@ -80,6 +80,17 @@ onMounted(async () => {
   box-sizing: border-box;
 }
 
+/*
+ * Shim for design-token rename: the locally-linked map-core bundles CSS that
+ * references --dimension-core-600 (post-revamp name), but the published
+ * phila-ui-core consumed by @pinboard/ui only defines --scale-600. Without
+ * this shim, .phila-input .content's height collapses to auto and the search
+ * bar squishes. Remove once phila-ui-core ships with the renamed token.
+ */
+:root {
+  --dimension-core-600: 3rem;
+}
+
 #app {
   height: 100dvh;
 }
