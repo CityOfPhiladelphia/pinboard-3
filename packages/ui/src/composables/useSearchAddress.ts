@@ -1,5 +1,5 @@
 import { type Ref, ref, toValue, watchEffect } from 'vue'
-import type { AisAddressSearchResponse, LatLon } from '../types'
+import type { LatLon } from '../types'
 
 export function useSearchAddress(address: string | Ref<string>) {
   const addressCoordinates = ref<LatLon>({
@@ -22,14 +22,12 @@ export function useSearchAddress(address: string | Ref<string>) {
       return
     }
 
-    const url = `https://api.phila.gov/ais/v1/search/${encodeURIComponent(addressDeref)}`
+    const url = `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/queryAisAddress?address=${encodeURIComponent(addressDeref)}`
 
     try {
-      const result: AisAddressSearchResponse = await (await fetch(url)).json()
-      addressCoordinates.value.longitude =
-        result.features[0].geometry.coordinates[0]
-      addressCoordinates.value.latitude =
-        result.features[0].geometry.coordinates[1]
+      const result: LatLon = await (await fetch(url)).json()
+      addressCoordinates.value.longitude = result.longitude
+      addressCoordinates.value.latitude = result.latitude
       finishedAddressFetch.value = true
     } catch (err) {
       console.error('Failed to get response from AIS: ', err)

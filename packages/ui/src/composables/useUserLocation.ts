@@ -11,7 +11,11 @@ const userLocation = ref<LatLon>({
 
 export function useUserLocation() {
   function watchUserPosition() {
-    if (userLocationPermission.value === 'granted' && navigator.geolocation) {
+    if (
+      (userLocationPermission.value === 'granted' ||
+        userLocationPermission.value === 'prompt') &&
+      navigator.geolocation
+    ) {
       navigator.geolocation.watchPosition((pos) => {
         userLocation.value.latitude = pos.coords.latitude
         userLocation.value.longitude = pos.coords.longitude

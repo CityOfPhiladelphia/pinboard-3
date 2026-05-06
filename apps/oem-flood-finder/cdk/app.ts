@@ -61,7 +61,7 @@ const hostedZone = HostedZone.fromLookup(stack, 'HostedZone', {
 
 const dnsValidatedCertificate = new Certificate(stack, 'Certificate', {
   domainName,
-  certificateName: `phila-gov-dns-cert-frontend-${environment}`, // is this right?
+  certificateName: `phila-gov-dns-cert-frontend-${environment}`,
   validation: CertificateValidation.fromDns(hostedZone),
 })
 

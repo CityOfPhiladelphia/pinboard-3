@@ -20,7 +20,8 @@ export function useLocations(): {
     // if has has location services active, isLoading will remain true while resolving user location
     return !(
       hasData.value &&
-      (userLocationPermission.value === 'denied' || PinboardUtilities.hasLocationData(userLocation))
+      (userLocationPermission.value !== 'granted' ||
+        PinboardUtilities.hasLocationData(userLocation))
     )
   })
 
