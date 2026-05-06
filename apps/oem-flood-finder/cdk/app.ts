@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// import 'source-map-support/register'
 import { App, Aspects, Stack } from 'aws-cdk-lib'
 import { AwsSolutionsChecks, NIST80053R5Checks } from 'cdk-nag'
 import {
