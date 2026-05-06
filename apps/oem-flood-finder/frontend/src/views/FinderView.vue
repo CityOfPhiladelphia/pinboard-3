@@ -15,11 +15,22 @@ import {
   MapNavigationControl,
   GeolocationButton,
   BasemapToggle,
+  FillLayer,
+  MapCheckboxLegend,
   PinboardComposables,
   PinboardUtilities,
   type PinboardTypes,
 } from '@pinboard/ui'
-import { filterLocations, isGauge, searchLocations, sortLocations } from '@/utilities/_index'
+import {
+  filterLocations,
+  isGauge,
+  searchLocations,
+  sortLocations,
+  FLOOD_LAYER_IDS,
+  FLOOD_LAYER_CONFIG,
+  FLOOD_LEGEND_ITEMS,
+  type FloodLayerId,
+} from '@/utilities/_index'
 
 // app imports
 import LocationDetail from '@/components/LocationDetail.vue'
@@ -48,6 +59,7 @@ const keywordsForSearch = ref<string>('')
 const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
 const locationFilterMode = ref<Filters>('all')
 const visitedIds = ref(new Set<string>())
+const visibleFloodLayers = ref<FloodLayerId[]>([])
 const { oemLocations, userLocation, isLoading, errorMessage } = useLocations()
 const locationSortMode = ref<SortMode>(
   PinboardUtilities.hasLocationData(userLocation) ? 'DistAsc' : '',
@@ -190,6 +202,7 @@ function handleDeselect(id: string) {
         zoom,
         isMobile,
         mobileControlsTarget,
+        mobileControlsTargetLeft,
         onHover,
         onHoverEnd,
         onSelect,
@@ -205,6 +218,23 @@ function handleDeselect(id: string) {
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
         @located="handleGeolocate"
         @error="handleGeolocateError"
+      />
+
+      <FillLayer
+        v-for="id in FLOOD_LAYER_IDS"
+        :key="id"
+        :id="`fema-flood-${id}`"
+        :source="{ type: 'geojson', data: FLOOD_LAYER_CONFIG[id].url }"
+        :paint="{ 'fill-color': FLOOD_LAYER_CONFIG[id].color, 'fill-opacity': 0.35 }"
+        :layout="{ visibility: visibleFloodLayers.includes(id) ? 'visible' : 'none' }"
+      />
+      <MapCheckboxLegend
+        v-model="visibleFloodLayers"
+        title="Flood Plains"
+        :items="FLOOD_LEGEND_ITEMS"
+        position="bottom-left"
+        :leave-room-for-controls="false"
+        :teleport-to="isMobile ? mobileControlsTargetLeft : undefined"
       />
 
       <div v-if="!isLoading">
@@ -248,4 +278,5 @@ function handleDeselect(id: string) {
   padding: 0;
   box-sizing: border-box;
 }
+
 </style>

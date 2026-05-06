@@ -59,6 +59,7 @@ defineSlots<{
     hoveredId: string | null
     selectedId: string | null
     mobileControlsTarget: HTMLDivElement | null
+    mobileControlsTargetLeft: HTMLDivElement | null
     onHover: (id: string) => void
     onHoverEnd: () => void
     onSelect: (loc: BasicLocation) => void
@@ -108,6 +109,7 @@ const bottomSheetRef = ref<{
   isDragging: boolean
 } | null>(null)
 const mobileControlsTarget = ref<HTMLDivElement | null>(null)
+const mobileControlsTargetLeft = ref<HTMLDivElement | null>(null)
 const locationsPanelRef = ref<{
   scrollToCard: (id: string, behavior?: ScrollBehavior) => void
 } | null>(null)
@@ -131,10 +133,17 @@ const bottomSheetDragging = computed(
   () => bottomSheetRef.value?.isDragging ?? false
 )
 
-const mobileControlsStyle = computed(() => ({
-  bottom: `calc(${bottomSheetPercent.value}% + 10px)`,
-  transition: bottomSheetDragging.value ? 'none' : 'bottom 0.3s ease-out',
-}))
+const mobileControlsStyle = computed(() => {
+  const percent = bottomSheetPercent.value
+  const opacity = percent <= 50 ? 1 : Math.max(0, 1 - (percent - 50) / 20)
+  return {
+    bottom: `calc(${percent}% + 10px)`,
+    opacity,
+    transition: bottomSheetDragging.value
+      ? 'none'
+      : 'bottom 0.3s ease-out, opacity 0.3s ease-out',
+  }
+})
 
 const selectedLocationId = computed(() =>
   selectedLocation.value === null ? null : selectedLocation.value.id
@@ -176,8 +185,17 @@ function handleHoverEnd() {
   hoveredLocationId.value = null
 }
 
-function handleSelect(location: BasicLocation) {
+function selectLocation(location: BasicLocation) {
+  // Swapping to a different location counts as "viewing" the outgoing one —
+  // emit deselect so consumers can mark it as visited.
+  if (selectedLocation.value && selectedLocation.value.id !== location.id) {
+    emit('deselect', selectedLocation.value.id)
+  }
   selectedLocation.value = location
+}
+
+function handleSelect(location: BasicLocation) {
+  selectLocation(location)
   mapPanelRef.value?.panTo([location.longitude, location.latitude])
 }
 
@@ -185,7 +203,7 @@ function handleMapSelect(location: BasicLocation) {
   if (selectedLocation.value?.id === location.id) {
     handleCloseLocationDetail()
   } else {
-    selectedLocation.value = location
+    selectLocation(location)
   }
 }
 
@@ -341,6 +359,7 @@ const effectiveMapConfig = (() => {
         :hovered-id="hoveredLocationId"
         :selected-id="selectedLocationId"
         :mobile-controls-target="mobileControlsTarget"
+        :mobile-controls-target-left="mobileControlsTargetLeft"
         :map-content-slot="slots['map-content']"
         :on-hover="handleHover"
         :on-hover-end="handleHoverEnd"
@@ -350,6 +369,12 @@ const effectiveMapConfig = (() => {
         v-if="isMobile"
         ref="mobileControlsTarget"
         class="mobile-controls-float"
+        :style="mobileControlsStyle"
+      />
+      <div
+        v-if="isMobile"
+        ref="mobileControlsTargetLeft"
+        class="mobile-controls-float-left"
         :style="mobileControlsStyle"
       />
       <div
@@ -384,8 +409,8 @@ const effectiveMapConfig = (() => {
     ref="bottomSheetRef"
     v-model="bottomSheetOpen"
     :snap-points="snapPoints"
-    collapse-label="Map view"
-    :collapse-icon="faMap"
+    :collapse-label="selectedLocation ? undefined : 'Map view'"
+    :collapse-icon="selectedLocation ? undefined : faMap"
     class="mobile-bottom-sheet"
   >
     <div class="bottom-sheet-stack">
@@ -601,6 +626,21 @@ const effectiveMapConfig = (() => {
   }
 
   .mobile-controls-float > :deep(*) {
+    pointer-events: auto;
+  }
+
+  .mobile-controls-float-left {
+    position: absolute;
+    left: 10px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    pointer-events: none;
+  }
+
+  .mobile-controls-float-left > :deep(*) {
     pointer-events: auto;
   }
 

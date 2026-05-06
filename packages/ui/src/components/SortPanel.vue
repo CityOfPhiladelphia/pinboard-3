@@ -137,6 +137,7 @@ onBeforeUnmount(() => {
       v-if="panelOpen && isMobile"
       :model-value="true"
       :snap-points="[35]"
+      :show-handle="false"
       :style="{ zIndex: 101 }"
       class="sort-panel-sheet"
       @update:model-value="
