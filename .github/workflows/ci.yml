@@ -120,8 +120,8 @@ jobs:
         working-directory: apps/oem-flood-finder
         env:
           CI: 'true'
-          VITE_FLOOD_API_KEY: ${{ secrets.FLOOD_API_KEY }}
-          VITE_FLOOD_API_BASE_URL: ${{ secrets.FLOOD_API_BASE_URL }}
+          VITE_FLOOD_API_KEY: ${{ secrets.FLOOD_API_KEY_TEST }}
+          VITE_FLOOD_API_BASE_URL: ${{ secrets.FLOOD_API_BASE_URL_TEST }}
         run: city ship test --web
 
   deploy-test-primary-care-finder:
