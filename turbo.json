@@ -21,6 +21,7 @@
   "globalPassThroughEnv": [
     "CDK_DEFAULT_ACCOUNT",
     "CDK_DEFAULT_REGION",
-    "BASE_URL"
+    "BASE_URL",
+    "DEV"
   ]
 }
