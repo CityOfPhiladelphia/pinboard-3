@@ -18,10 +18,11 @@ export function useLocations(): {
 
   const isLoading = computed(() => {
     // if has has location services active, isLoading will remain true while resolving user location
-    return !(
-      hasData.value &&
-      (userLocationPermission.value === 'denied' || PinboardUtilities.hasLocationData(userLocation))
-    )
+    // return !(
+    //   hasData.value &&
+    //   (userLocationPermission.value === 'denied' || PinboardUtilities.hasLocationData(userLocation))
+    // )
+    return false
   })
 
   onBeforeMount(async () => {
