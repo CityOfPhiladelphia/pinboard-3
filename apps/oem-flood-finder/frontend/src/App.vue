@@ -101,19 +101,10 @@ onBeforeUnmount(() => {
     :banner-message="alertBanner?.body"
   >
     <template #navbar-end>
-      <div
-        v-if="isMobile"
-        class="navbar-info-mobile-wrap"
-        @click.capture.stop="openInfoSheet"
-      >
+      <div v-if="isMobile" class="navbar-info-mobile-wrap" @click.capture.stop="openInfoSheet">
         <NavbarInfo info-title="About this tool" label="About this tool" />
       </div>
-      <NavbarInfo
-        v-else
-        ref="navbarInfo"
-        info-title="About this tool"
-        label="About this tool"
-      >
+      <NavbarInfo v-else ref="navbarInfo" info-title="About this tool" label="About this tool">
         <span class="has-text-body-small">
           This map allows residents to keep an eye on water levels in parts of the city and make
           informed decisions prior to, during, and after a flooding event.

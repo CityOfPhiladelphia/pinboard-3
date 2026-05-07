@@ -8,8 +8,7 @@ export type FloodLayerId = (typeof FLOOD_LAYER_IDS)[number]
 /* Legend display order: most-severe (smallest, most frequent) first. */
 const FLOOD_LEGEND_ORDER: FloodLayerId[] = ['100-year', '500-year']
 
-const FEMA_FLOODPLAIN_BASE =
-  'https://services.arcgis.com/fLeGjb7u4uXqeF9q/arcgis/rest/services'
+const FEMA_FLOODPLAIN_BASE = 'https://services.arcgis.com/fLeGjb7u4uXqeF9q/arcgis/rest/services'
 const featureQuery = 'where=1%3D1&outFields=OBJECTID&f=geojson&outSR=4326'
 
 interface FloodLayerSpec {
@@ -39,7 +38,7 @@ const hexToRgba = (hex: string, alpha: number): string => {
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`
 }
 
-export const FLOOD_LEGEND_ITEMS: LegendItem[] = FLOOD_LEGEND_ORDER.map(id => ({
+export const FLOOD_LEGEND_ITEMS: LegendItem[] = FLOOD_LEGEND_ORDER.map((id) => ({
   value: id,
   label: FLOOD_LAYER_CONFIG[id].label,
   color: hexToRgba(FLOOD_LAYER_CONFIG[id].color, LEGEND_SWATCH_OPACITY),
