@@ -225,7 +225,7 @@ function handleDeselect(id: string) {
         :key="id"
         :id="`fema-flood-${id}`"
         :source="{ type: 'geojson', data: FLOOD_LAYER_CONFIG[id].url }"
-        :paint="{ 'fill-color': FLOOD_LAYER_CONFIG[id].color, 'fill-opacity': 0.35 }"
+        :paint="{ 'fill-color': FLOOD_LAYER_CONFIG[id].color, 'fill-opacity': 0.28 }"
         :layout="{ visibility: visibleFloodLayers.includes(id) ? 'visible' : 'none' }"
       />
       <MapCheckboxLegend
