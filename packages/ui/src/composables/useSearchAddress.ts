@@ -22,7 +22,7 @@ export function useSearchAddress(address: string | Ref<string>) {
       return
     }
 
-    const url = `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/queryAisAddress?address=${encodeURIComponent(addressDeref)}`
+    const url = `${import.meta.env.DEV ? import.meta.env.VITE_AIS_URL : 'https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/queryAisAddress?address='}${encodeURIComponent(addressDeref)}`
 
     try {
       const result: LatLon = await (await fetch(url)).json()

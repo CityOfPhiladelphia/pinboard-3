@@ -34,11 +34,20 @@ async function getUserLocation() {
       (position) => {
         userLocation.value.latitude = position.coords.latitude
         userLocation.value.longitude = position.coords.longitude
-        userLocationPermission.value = 'granted'
       },
-      () => {
-        userLocationPermission.value = 'denied'
-      }
+      (error) => {
+        switch (error.code) {
+          case error.PERMISSION_DENIED: {
+            userLocationPermission.value = 'denied'
+            break
+          }
+          case error.TIMEOUT: {
+            userLocationPermission.value = 'denied'
+            break
+          }
+        }
+      },
+      { timeout: 15_000 }
     )
   })
 }
