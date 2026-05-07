@@ -32,11 +32,11 @@ export interface Flood {
 type DeviceType = 'Aware' | 'Usgs' | 'Camera'
 
 export type LocationPanelDTO = {
-  lastUpdated: Date
+  lastUpdated: string
   gaugeHeight: number
   gaugeHeightUnit: string
   thumbnailUrl: string
-  pictureTimestampUTC: Date
+  pictureTimestampUTC: string
   cameraStreamUrl: string
   deviceType: DeviceType
   actionStage: number
@@ -59,7 +59,7 @@ export interface OemFields {
 export type OemLocation = PinboardTypes.BasicLocation & OemFields
 
 export interface AwareReadingDTO {
-  validTimeUTC: Date
+  validTimeUTC: string
   gaugeId: string
   flashFloodIndicator: boolean
   flashFloodThreshold: number
@@ -77,7 +77,7 @@ export interface AwareReadingDTO {
 }
 
 export interface UsgsReadingDTO {
-  validTimeUTC: Date
+  validTimeUTC: string
   gaugeId: string
   isFlooding: boolean
   gaugeHeight: number

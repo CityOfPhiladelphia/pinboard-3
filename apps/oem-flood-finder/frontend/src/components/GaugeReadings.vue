@@ -70,7 +70,7 @@ const snapshotTimestamp = computed(() => {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
-  }).format(new Date(timestamp!))
+  }).format(timestamp!)
 })
 
 // 2026-02-12T16:40:23z

@@ -40,22 +40,21 @@ export function useLocations(): {
     }
 
     const locations: LocationPanelDTO[] = await response.json()
-    oemLocations.value = Array.from(locations, (loc) => {
+    oemLocations.value = locations.map(loc => {
       const cardInfo: MapCardProps = {
         heading: loc.name,
         subheader: undefined,
         tags: getLocationTags(loc),
         src: loc.thumbnailUrl,
       }
-      return {
+
+      const oemLocation: OemLocation = {
         id: loc.id,
         name: loc.name,
         latitude: loc.latitude,
         longitude: loc.longitude,
-        lastUpdated: loc.lastUpdated,
-        gaugeHeight: loc.gaugeHeight,
-        gaugeHeightUnit: loc.gaugeHeightUnit,
-        pictureTimestampUTC: loc.pictureTimestampUTC,
+        lastUpdated: new Date(loc.lastUpdated),
+        pictureTimestampUTC: new Date(loc.pictureTimestampUTC),
         cameraStreamUrl: loc.cameraStreamUrl,
         deviceType: loc.deviceType,
         actionStage: loc.actionStage,
@@ -64,6 +63,8 @@ export function useLocations(): {
         majorStage: loc.majorStage,
         locationCardInfo: cardInfo,
       }
+
+      return oemLocation
     })
     hasData.value = true
   })
