@@ -53,8 +53,7 @@ export interface OemFields {
   moderateStage: number
   majorStage: number
   cameraStreamUrl: string
-  pictureTimestampUTC: Date
-
+  pictureTimestampUTC: Date | null
 }
 
 export type OemLocation = PinboardTypes.BasicLocation & OemFields
