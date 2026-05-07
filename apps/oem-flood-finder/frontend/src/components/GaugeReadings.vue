@@ -60,18 +60,17 @@ const tableData = computed((): Record<string, unknown>[] => {
 })
 
 const snapshotTimestamp = computed(() => {
+  const timestamp = props.location.pictureTimestampUTC
 
-  const timestamp = props.location.pictureTimestampUTC;
-
-  return new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/New_York",
-    month: "numeric",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    month: 'numeric',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
     hour12: true,
-  }).format(new Date(timestamp!));
+  }).format(new Date(timestamp!))
 })
 
 // 2026-02-12T16:40:23z
@@ -101,7 +100,7 @@ const snapshotTimestamp = computed(() => {
     <template v-if="location.deviceType === 'Aware' && 0 in readingState.data">
       <h6>Current Snapshot</h6>
       <img :src="location.locationCardInfo.src" />
-      <p> Timestamp: {{ snapshotTimestamp }}</p>
+      <p>Timestamp: {{ snapshotTimestamp }}</p>
     </template>
   </div>
 
