@@ -20,7 +20,12 @@ onUnmounted(() => mq.removeEventListener('change', onMqChange))
       <div class="content-area">
         <div class="section">
           <div class="intro-text-container">
-            <PhilaLink href="/" text="Back to map" :icon-definition="faChevronLeft" />
+            <PhilaLink
+              href="/"
+              text="Back to map"
+              :icon-definition="faChevronLeft"
+              @click.prevent="router.push('/')"
+            />
             <h1>Flood information and resources</h1>
 
             <div class="main-description">
