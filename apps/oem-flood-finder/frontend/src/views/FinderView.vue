@@ -222,8 +222,8 @@ function handleDeselect(id: string) {
 
       <FillLayer
         v-for="id in FLOOD_LAYER_IDS"
-        :key="id"
         :id="`fema-flood-${id}`"
+        :key="id"
         :source="{ type: 'geojson', data: FLOOD_LAYER_CONFIG[id].url }"
         :paint="{ 'fill-color': FLOOD_LAYER_CONFIG[id].color, 'fill-opacity': 0.35 }"
         :layout="{ visibility: visibleFloodLayers.includes(id) ? 'visible' : 'none' }"

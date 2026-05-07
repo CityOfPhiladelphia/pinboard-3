@@ -6,13 +6,16 @@ const userLocation = ref<LatLon>({
   latitude: NaN,
   longitude: NaN,
 })
+let awaitingUserResponse: boolean = true
+let numGetLocationAttempts = 3
 
 export function useUserLocation() {
-  getGeolocatePermissionState()
-  if (userLocationPermission.value !== 'denied') {
-    getUserLocation()
-  }
-
+  getGeolocatePermissionState().then(() => {
+    awaitingUserResponse = userLocationPermission.value !== 'denied'
+    if (awaitingUserResponse) {
+      awaitUserPermissionResponse()
+    }
+  })
   return { userLocation, userLocationPermission }
 }
 
@@ -28,26 +31,43 @@ async function getGeolocatePermissionState() {
   }
 }
 
+async function awaitUserPermissionResponse() {
+  while (awaitingUserResponse) {
+    awaitingUserResponse = await getUserLocation()
+  }
+}
+
 async function getUserLocation() {
-  await new Promise(() => {
+  return new Promise<boolean>((resolve) => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         userLocation.value.latitude = position.coords.latitude
         userLocation.value.longitude = position.coords.longitude
+        userLocationPermission.value = 'granted'
+        resolve(false)
       },
       (error) => {
         switch (error.code) {
-          case error.PERMISSION_DENIED: {
+          case error.PERMISSION_DENIED:
+          case error.POSITION_UNAVAILABLE: {
             userLocationPermission.value = 'denied'
+            resolve(false)
             break
           }
           case error.TIMEOUT: {
-            userLocationPermission.value = 'denied'
+            numGetLocationAttempts--
+            if (numGetLocationAttempts) {
+              userLocationPermission.value = 'prompt'
+              resolve(true)
+            } else {
+              userLocationPermission.value = 'denied'
+              resolve(false)
+            }
             break
           }
         }
       },
-      { timeout: 15_000 }
+      { timeout: 7_000 }
     )
   })
 }
