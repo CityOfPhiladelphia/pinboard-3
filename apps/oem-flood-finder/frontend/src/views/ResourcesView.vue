@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { Logo } from '@phila/phila-ui-logo'
+import { PhilaLink } from '@phila/phila-ui-link'
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+
+const router = useRouter()
 
 const mq = window.matchMedia('(max-width: 768px)')
 const isMobile = ref(mq.matches)
@@ -15,6 +20,7 @@ onUnmounted(() => mq.removeEventListener('change', onMqChange))
       <div class="content-area">
         <div class="section">
           <div class="intro-text-container">
+            <PhilaLink href="/" text="Back to map" :icon-definition="faChevronLeft" />
             <h1>Flood information and resources</h1>
 
             <div class="main-description">
@@ -61,7 +67,9 @@ onUnmounted(() => mq.removeEventListener('change', onMqChange))
               <div>
                 To better inform residents of flooding, the City established a pilot program for
                 Eastwick.
-                <a href="https://www.phila.gov/programs/eastwick-from-recovery-to-resilience/">
+                <a
+                  href="https://www.phila.gov/programs/eastwick-from-recovery-to-resilience/resources-for-residents/eastwick-emergency-alerts/"
+                >
                   <span>ReadyPhiladelphia: Eastwick Alerts</span>
                 </a>
                 is a combination of gauge and camera access and emergency alerts. Subscribers are
@@ -86,7 +94,7 @@ onUnmounted(() => mq.removeEventListener('change', onMqChange))
                 </li>
                 <li style="margin: 0">
                   <a
-                    href="https://www.phila.gov/services/safety-emergency-preparedness/sign-up-for-emergency-alerts/"
+                    href="https://www.phila.gov/programs/eastwick-from-recovery-to-resilience/resources-for-residents/eastwick-emergency-alerts/"
                   >
                     Sign up for emergency alerts
                   </a>
@@ -97,7 +105,7 @@ onUnmounted(() => mq.removeEventListener('change', onMqChange))
                   </a>
                 </li>
                 <li style="margin: 0">
-                  <a href="mailto:oem@phila.gov">Send feedback about this map</a>
+                  <a href="mailto:oem@phila.gov">Send feedback about this program</a>
                 </li>
               </ul>
             </div>
