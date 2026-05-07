@@ -6,14 +6,14 @@ const userLocation = ref<LatLon>({
   latitude: NaN,
   longitude: NaN,
 })
-let awaitingUserResponse: boolean = true
-let numGetLocationAttempts = 3
 
 export function useUserLocation() {
   getGeolocatePermissionState().then(() => {
-    awaitingUserResponse = userLocationPermission.value !== 'denied'
-    if (awaitingUserResponse) {
-      awaitUserPermissionResponse()
+    if (userLocationPermission.value !== 'denied') {
+      awaitUserPermissionResponse().catch(() => {
+        userLocationPermission.value = 'denied'
+        getUserLocation()
+      })
     }
   })
   return { userLocation, userLocationPermission }
@@ -32,9 +32,15 @@ async function getGeolocatePermissionState() {
 }
 
 async function awaitUserPermissionResponse() {
-  while (awaitingUserResponse) {
-    awaitingUserResponse = await getUserLocation()
-  }
+  await Promise.race([getUserLocation(), waitForUserTimeout()])
+}
+
+function waitForUserTimeout() {
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error('Request took too long!'))
+    }, 5_000)
+  })
 }
 
 async function getUserLocation() {
@@ -55,19 +61,12 @@ async function getUserLocation() {
             break
           }
           case error.TIMEOUT: {
-            numGetLocationAttempts--
-            if (numGetLocationAttempts) {
-              userLocationPermission.value = 'prompt'
-              resolve(true)
-            } else {
-              userLocationPermission.value = 'denied'
-              resolve(false)
-            }
+            userLocationPermission.value = 'prompt'
+            resolve(true)
             break
           }
         }
-      },
-      { timeout: 7_000 }
+      }
     )
   })
 }
