@@ -22,5 +22,6 @@
       "vpc": "ProdCityNetVpc"
     }
   },
-  "frontendBuildCommand": "build-only"
+  "frontendBuildCommand": "build-only",
+  "allowCiProdShip": true
 }
