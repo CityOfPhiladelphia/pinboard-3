@@ -7,7 +7,7 @@ import { useLocationDetail } from '@/composables/useLocationDetail'
 import { CloseButton } from '@phila/phila-ui-button'
 import { Tags } from '@phila/phila-ui-tags'
 import { Icon } from '@phila/phila-ui-core'
-import { faGear, faWrench } from '@fortawesome/pro-solid-svg-icons'
+import { faClock, faCompass } from '@fortawesome/pro-solid-svg-icons'
 
 const props = defineProps<{
   location: OemLocation
@@ -73,7 +73,7 @@ const lastUpdatedDate = computed(() => {
 
         <div class="gauge-information" style="padding: var(--spacing-s) 0 0 0">
           <div>
-            <Icon :iconDefinition="faGear" size="extra-small" />
+            <Icon :iconDefinition="faClock" size="extra-small" />
             <div style="margin-left: var(--spacing-s)">
               <div class="has-text-label-small" style="color: #666">Last Updated</div>
               <div class="has-text-body-small">{{ lastUpdatedDate }}</div>
@@ -81,7 +81,7 @@ const lastUpdatedDate = computed(() => {
           </div>
 
           <div>
-            <Icon :iconDefinition="faWrench" size="extra-small" />
+            <Icon :iconDefinition="faCompass" size="extra-small" />
             <div style="margin-left: var(--spacing-s)">
               <div class="has-text-label-small" style="color: #666">Coordinates</div>
               <div class="has-text-body-small">
