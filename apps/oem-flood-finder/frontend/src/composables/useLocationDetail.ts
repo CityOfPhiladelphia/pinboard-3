@@ -47,10 +47,15 @@ export function useLocationDetail(
 //   readingStateRef: Ref,
 //   abortController: AbortController,
 // ) {
-
+//   const params = new URLSearchParams({
+//     kind: toValue(deviceType).toLowerCase(),
+//     gaugeId: toValue(id),
+//   })
 //   const response = await fetch(
-//     `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/getOemReadings/?kind=${toValue(deviceType).toLowerCase()}/reading/${toValue(id)}`,
-
+//     `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/getOemReadings??${params.toString()}`,
+//     {
+//       signal: abortController.signal,
+//     },
 //   )
 
 //   if (!response.ok) {
