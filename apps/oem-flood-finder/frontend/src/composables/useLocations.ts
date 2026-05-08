@@ -26,9 +26,10 @@ export function useLocations(): {
   })
 
   onBeforeMount(async () => {
-    const locations: LocationPanelDTO[] = import.meta.env.DEV
-      ? await getLocationsDev(errorMessage)
-      : await getLocationsProxy(errorMessage)
+    const locations: LocationPanelDTO[] =
+      import.meta.env.DEV || true
+        ? await getLocationsDev(errorMessage)
+        : await getLocationsProxy(errorMessage)
     oemLocations.value = Array.from(locations, (loc) => {
       const cardInfo: MapCardProps = {
         heading: loc.name,
