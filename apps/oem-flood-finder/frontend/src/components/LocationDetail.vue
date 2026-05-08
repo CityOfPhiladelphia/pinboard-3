@@ -5,6 +5,9 @@ import GaugeReadings from './GaugeReadings.vue'
 import CameraVideoPlayer from './CameraVideoPlayer.vue'
 import { useLocationDetail } from '@/composables/useLocationDetail'
 import { CloseButton } from '@phila/phila-ui-button'
+import { Tags } from '@phila/phila-ui-tags'
+import { Icon } from '@phila/phila-ui-core'
+import { faGear, faWrench } from '@fortawesome/pro-solid-svg-icons'
 
 const props = defineProps<{
   location: OemLocation
@@ -15,6 +18,14 @@ const readingState = useLocationDetail(
   () => props.location.id,
   () => props.location.deviceType,
 )
+
+// we could get gauge height out of location but this updates onWatch with graph
+const gaugeHeight = computed(() => {
+  if (readingState.value.kind === 'Loaded' && readingState.value.data[0].gaugeHeight !== -9999.9) {
+    return `${readingState.value.data[0].gaugeHeight} ${readingState.value.data[0].gaugeHeightUnit}`
+  }
+  return null
+})
 
 const lastUpdatedDate = computed(() => {
   if (readingState.value.kind !== 'Loaded') return 'Loading...'
@@ -40,10 +51,14 @@ const lastUpdatedDate = computed(() => {
 <template>
   <div class="location-detail content">
     <div class="detail-header">
-      <h4 v-if="location.deviceType === 'Aware' || location.deviceType === 'Usgs'">
-        {{ location.name }}
-      </h4>
-      <h2 v-else-if="location.deviceType === 'Camera'">{{ location.name }}</h2>
+      <div style="display: flex; align-items: center; gap: var(--spacing-m)">
+        <h4 v-if="location.deviceType === 'Aware' || location.deviceType === 'Usgs'">
+          {{ location.name }}
+        </h4>
+        <h2 v-else-if="location.deviceType === 'Camera'">{{ location.name }}</h2>
+        <Tags v-if="gaugeHeight" size="large" color="blue" variant="readonly" :text="gaugeHeight" />
+      </div>
+
       <CloseButton size="small" class="detail-close-btn" @click="onClose" />
     </div>
 
@@ -52,21 +67,29 @@ const lastUpdatedDate = computed(() => {
         <!-- Gauge detail -->
         <GaugeReadings :reading-state="readingState" :location="location" />
 
-        <h6>Gauge Information</h6>
-        <table>
-          <thead>
-            <tr>
-              <th>Last Updated</th>
-              <th>Coordinates</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{{ lastUpdatedDate }}</td>
-              <td>{{ location.latitude }}, {{ location.longitude }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="has-text-label-default" style="padding: var(--spacing-xxl) 0 0 0">
+          Gauge Information
+        </div>
+
+        <div class="gauge-information" style="padding: var(--spacing-s) 0 0 0">
+          <div>
+            <Icon :iconDefinition="faGear" size="extra-small" />
+            <div style="margin-left: var(--spacing-s)">
+              <div class="has-text-label-small" style="color: #666">Last Updated</div>
+              <div class="has-text-body-small">{{ lastUpdatedDate }}</div>
+            </div>
+          </div>
+
+          <div>
+            <Icon :iconDefinition="faWrench" size="extra-small" />
+            <div style="margin-left: var(--spacing-s)">
+              <div class="has-text-label-small" style="color: #666">Coordinates</div>
+              <div class="has-text-body-small">
+                {{ location.latitude }}, {{ location.longitude }}
+              </div>
+            </div>
+          </div>
+        </div>
       </template>
 
       <!-- this will be part of new Location Detail query on backend -->
@@ -89,6 +112,16 @@ const lastUpdatedDate = computed(() => {
 </template>
 
 <style scoped>
+.gauge-information {
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+.gauge-information > div {
+  text-align: left;
+  display: flex;
+}
+
 .location-detail {
   display: flex;
   flex-direction: column;

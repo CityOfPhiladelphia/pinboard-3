@@ -5,6 +5,14 @@ import { LineChart, type ChartData } from '@phila/phila-ui-charts'
 import { ClientTable, type ColumnDef } from '@phila/phila-ui-table'
 import { PhlTabNav, PhlTab } from '@phila/phila-ui-tabs'
 import { computed, ref, type Ref } from 'vue'
+import { Icon } from '@phila/phila-ui-core'
+import {
+  faRaindrops,
+  faDropletDegree,
+  faCloudDrizzle,
+  faTemperatureFull,
+  faGauge,
+} from '@fortawesome/pro-solid-svg-icons'
 
 const props = defineProps<{
   readingState: ReadingState
@@ -81,7 +89,7 @@ const snapshotTimestamp = computed(() => {
 
   <div v-else-if="readingState.kind === 'Loaded'" class="gauge-readings">
     <div class="gauge-readings__header">
-      <h6>Gauge Reading</h6>
+      <div class="has-text-label-default">Gauge Reading</div>
       <PhlTabNav v-if="location.deviceType === 'Aware'" v-model="activeTab" variant="primary">
         <PhlTab id="graph" label="Graph" />
         <PhlTab id="table" label="Table" />
@@ -96,11 +104,62 @@ const snapshotTimestamp = computed(() => {
       <ClientTable :columns="tableColumns" :data="tableData" :page-size="8" />
     </div>
 
+    <div v-if="readingState.gaugeType === 'Aware'" style="padding: var(--spacing-l) 0 0 0">
+      <div style="font-weight: bold">Weather details</div>
+      <div class="weather-details">
+        <div>
+          <Icon :iconDefinition="faRaindrops" size="extra-small" />
+          <div style="margin-left: var(--spacing-s)">
+            <div class="has-text-label-small" style="color: #666">Rainfall</div>
+            <div class="has-text-body-small">{{ readingState.data[0].rainfall }} in</div>
+          </div>
+        </div>
+
+        <div>
+          <Icon :iconDefinition="faDropletDegree" size="extra-small" />
+          <div style="margin-left: var(--spacing-s)">
+            <div class="has-text-label-small" style="color: #666">Water Temperature</div>
+            <div class="has-text-body-small">
+              {{ `${Math.round((readingState.data[0].waterTemperature * 9) / 5 + 32)} \u00B0F` }}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <Icon :iconDefinition="faCloudDrizzle" size="extra-small" />
+          <div style="margin-left: var(--spacing-s)">
+            <div class="has-text-label-small" style="color: #666">Rain Intensity</div>
+            <div class="has-text-body-small">{{ readingState.data[0].rainIntensity }} in/hr</div>
+          </div>
+        </div>
+
+        <div>
+          <Icon :iconDefinition="faTemperatureFull" size="extra-small" />
+          <div style="margin-left: var(--spacing-s)">
+            <div class="has-text-label-small" style="color: #666">Air Temperature</div>
+            <div class="has-text-body-small">
+              {{ `${Math.round((readingState.data[0].airTemperature * 9) / 5 + 32)} \u00B0F` }}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <Icon :iconDefinition="faGauge" size="extra-small" />
+          <div style="margin-left: var(--spacing-s)">
+            <div class="has-text-label-small" style="color: #666">Barometric Pressure</div>
+            <div class="has-text-body-small">
+              {{ readingState.data[0].barometricPressure }} mbar
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Snapshot -->
     <template v-if="location.deviceType === 'Aware' && 0 in readingState.data">
-      <h6>Current Snapshot</h6>
-      <img :src="location.locationCardInfo.src" />
-      <p>Timestamp: {{ snapshotTimestamp }}</p>
+      <h6 style="padding: var(--spacing-xxl) 0 0 0">Current Snapshot</h6>
+      <img style="padding: 1rem 0 0 0" :src="location.locationCardInfo.src" width="400px" />
+      <div class="has-text-body-extra-small">Timestamp: {{ snapshotTimestamp }}</div>
     </template>
   </div>
 
@@ -110,6 +169,17 @@ const snapshotTimestamp = computed(() => {
 </template>
 
 <style scoped>
+.weather-details {
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+.weather-details > div {
+  text-align: left;
+  display: flex;
+  margin: var(--spacing-m) 0 0 0;
+}
+
 .gauge-readings__header {
   display: flex;
   align-items: center;
