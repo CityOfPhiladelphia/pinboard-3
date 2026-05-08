@@ -67,6 +67,12 @@ const tableData = computed((): Record<string, unknown>[] => {
   return props.readingState.data as unknown as Record<string, unknown>[]
 })
 
+function formatTemperature(celsius: number): string {
+  const fahrenheit = Math.round((celsius * 9) / 5 + 32)
+  if (fahrenheit < -100 || fahrenheit > 200) return 'Error'
+  return `${fahrenheit} °F`
+}
+
 const snapshotTimestamp = computed(() => {
   const timestamp = props.location.pictureTimestampUTC
 
@@ -119,9 +125,7 @@ const snapshotTimestamp = computed(() => {
           <Icon :iconDefinition="faDropletDegree" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Water Temperature</div>
-            <div class="has-text-body-small">
-              {{ `${Math.round((readingState.data[0].waterTemperature * 9) / 5 + 32)} \u00B0F` }}
-            </div>
+            <div class="has-text-body-small">{{ formatTemperature(readingState.data[0].waterTemperature) }}</div>
           </div>
         </div>
 
@@ -138,7 +142,7 @@ const snapshotTimestamp = computed(() => {
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Air Temperature</div>
             <div class="has-text-body-small">
-              {{ `${Math.round((readingState.data[0].airTemperature * 9) / 5 + 32)} \u00B0F` }}
+              {{ formatTemperature(readingState.data[0].airTemperature) }}
             </div>
           </div>
         </div>
