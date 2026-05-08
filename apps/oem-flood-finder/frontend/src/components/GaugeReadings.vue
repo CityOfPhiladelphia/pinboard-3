@@ -103,7 +103,6 @@ const snapshotTimestamp = computed(() => {
     <div v-if="location.deviceType === 'Aware'" v-show="activeTab === 'table'">
       <ClientTable :columns="tableColumns" :data="tableData" :page-size="8" />
     </div>
-
     <div v-if="readingState.gaugeType === 'Aware'" style="padding: var(--spacing-l) 0 0 0">
       <div style="font-weight: bold">Weather details</div>
       <div class="weather-details">
@@ -120,7 +119,11 @@ const snapshotTimestamp = computed(() => {
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Water Temperature</div>
             <div class="has-text-body-small">
-              {{ `${Math.round((readingState.data[0].waterTemperature * 9) / 5 + 32)} \u00B0F` }}
+              {{ 
+                readingState.data[0].waterTemperature === -9999.9 ? 
+                'No data' : 
+                `${Math.round((readingState.data[0].waterTemperature * 9) / 5 + 32)} \u00B0F` 
+              }}
             </div>
           </div>
         </div>
@@ -138,7 +141,11 @@ const snapshotTimestamp = computed(() => {
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Air Temperature</div>
             <div class="has-text-body-small">
-              {{ `${Math.round((readingState.data[0].airTemperature * 9) / 5 + 32)} \u00B0F` }}
+              {{ 
+                readingState.data[0].airTemperature === -9999.9 ?
+                'No data' :
+                `${Math.round((readingState.data[0].airTemperature * 9) / 5 + 32)} \u00B0F` 
+              }}
             </div>
           </div>
         </div>
@@ -148,7 +155,11 @@ const snapshotTimestamp = computed(() => {
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Barometric Pressure</div>
             <div class="has-text-body-small">
-              {{ readingState.data[0].barometricPressure }} mbar
+              {{ 
+                readingState.data[0].barometricPressure === -9999.9 ?
+                'No data' :
+                readingState.data[0].barometricPressure 
+              }} mbar
             </div>
           </div>
         </div>
