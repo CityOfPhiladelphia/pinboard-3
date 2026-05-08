@@ -61,6 +61,44 @@ function openInfoSheet(event: Event) {
 
 function closeInfoSheet() {
   infoSheetOpen.value = false
+  dragY.value = 0
+}
+
+/* Drag-down-to-dismiss. BottomSheet's built-in drag is snap-point based
+ * and a single snap point ([60]) clamps it to no movement, so we layer
+ * our own pointer tracking on top: translate the sheet to follow the
+ * pointer, dismiss past DRAG_DISMISS_THRESHOLD on release, otherwise
+ * spring back. Clicks (zero delta) pass through. */
+const DRAG_DISMISS_THRESHOLD = 160
+const dragY = ref(0)
+const isDraggingSheet = ref(false)
+let dragStartY = 0
+
+function onSheetPointerDown(e: PointerEvent) {
+  dragStartY = e.clientY
+  dragY.value = 0
+  isDraggingSheet.value = true
+  document.addEventListener('pointermove', onSheetPointerMove)
+  document.addEventListener('pointerup', onSheetPointerUp)
+  document.addEventListener('pointercancel', onSheetPointerUp)
+}
+
+function onSheetPointerMove(e: PointerEvent) {
+  if (!isDraggingSheet.value) return
+  dragY.value = Math.max(0, e.clientY - dragStartY)
+}
+
+function onSheetPointerUp() {
+  if (!isDraggingSheet.value) return
+  isDraggingSheet.value = false
+  document.removeEventListener('pointermove', onSheetPointerMove)
+  document.removeEventListener('pointerup', onSheetPointerUp)
+  document.removeEventListener('pointercancel', onSheetPointerUp)
+  if (dragY.value > DRAG_DISMISS_THRESHOLD) {
+    closeInfoSheet()
+  } else {
+    dragY.value = 0
+  }
 }
 
 watch(isMobile, (mobile) => {
@@ -84,6 +122,9 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   mql?.removeEventListener('change', handleMqlChange)
+  document.removeEventListener('pointermove', onSheetPointerMove)
+  document.removeEventListener('pointerup', onSheetPointerUp)
+  document.removeEventListener('pointercancel', onSheetPointerUp)
 })
 </script>
 
@@ -128,13 +169,14 @@ onBeforeUnmount(() => {
 
   <Teleport to="body">
     <template v-if="infoSheetOpen">
-      <div class="info-sheet-scrim" />
+      <div class="info-sheet-scrim" @click="closeInfoSheet" />
       <BottomSheet
         v-model="infoSheetOpen"
         class="info-sheet"
-        :style="{ zIndex: 101 }"
+        :class="{ 'info-sheet--dragging': isDraggingSheet }"
+        :style="{ zIndex: 101, '--drag-y': `${dragY}px` }"
         :snap-points="[60]"
-        :show-handle="false"
+        @pointerdown="onSheetPointerDown"
       >
         <CloseButton class="info-sheet-close" @click="closeInfoSheet" />
         <h2 class="has-text-heading-5">About this tool</h2>
@@ -185,12 +227,20 @@ onBeforeUnmount(() => {
   background: rgba(0, 0, 0, 0.25);
 }
 
-/* Sheet sizes to its content; snap-points value is ignored visually. */
+/* Sheet sizes to its content; snap-points value is ignored visually.
+ * --drag-y is set inline by the drag handler; transform-only transition
+ * springs the sheet back when the user releases under threshold, while
+ * keeping height static (animating to auto doesn't work cleanly). */
 .info-sheet .bottom-sheet {
   height: auto !important;
   max-height: 90dvh;
-  transition: none !important;
   padding: var(--spacing-m) var(--spacing-m) 50px;
+  transform: translateY(var(--drag-y, 0px));
+  transition: transform 0.25s ease-out !important;
+}
+
+.info-sheet.info-sheet--dragging .bottom-sheet {
+  transition: none !important;
 }
 
 .info-sheet-close {
