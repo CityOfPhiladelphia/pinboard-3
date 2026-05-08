@@ -168,25 +168,26 @@ onBeforeUnmount(() => {
   </PinboardShell>
 
   <Teleport to="body">
-    <template v-if="infoSheetOpen">
-      <div class="info-sheet-scrim" @click="closeInfoSheet" />
-      <BottomSheet
-        v-model="infoSheetOpen"
-        class="info-sheet"
-        :class="{ 'info-sheet--dragging': isDraggingSheet }"
-        :style="{ zIndex: 101, '--drag-y': `${dragY}px` }"
-        :snap-points="[60]"
-        @pointerdown="onSheetPointerDown"
-      >
-        <CloseButton class="info-sheet-close" @click="closeInfoSheet" />
-        <h2 class="has-text-heading-5">About this tool</h2>
-        <span class="has-text-body-small">
-          This map allows residents to keep an eye on water levels in parts of the city and make
-          informed decisions prior to, during, and after a flooding event.
-          <a href="/resources">Learn more</a>
-        </span>
-      </BottomSheet>
-    </template>
+    <Transition name="scrim-fade">
+      <div v-if="infoSheetOpen" class="info-sheet-scrim" @click="closeInfoSheet" />
+    </Transition>
+    <BottomSheet
+      v-if="infoSheetOpen"
+      v-model="infoSheetOpen"
+      class="info-sheet"
+      :class="{ 'info-sheet--dragging': isDraggingSheet }"
+      :style="{ zIndex: 101, '--drag-y': `${dragY}px` }"
+      :snap-points="[60]"
+      @pointerdown="onSheetPointerDown"
+    >
+      <CloseButton class="info-sheet-close" @click="closeInfoSheet" />
+      <h2 class="has-text-heading-5">About this tool</h2>
+      <span class="has-text-body-small">
+        This map allows residents to keep an eye on water levels in parts of the city and make
+        informed decisions prior to, during, and after a flooding event.
+        <a href="/resources">Learn more</a>
+      </span>
+    </BottomSheet>
   </Teleport>
 </template>
 
@@ -234,13 +235,22 @@ onBeforeUnmount(() => {
 .info-sheet .bottom-sheet {
   height: auto !important;
   max-height: 90dvh;
-  padding: var(--spacing-m) var(--spacing-m) 50px;
+  padding: 0 var(--spacing-m) 50px;
   transform: translateY(var(--drag-y, 0px));
   transition: transform 0.25s ease-out !important;
 }
 
 .info-sheet.info-sheet--dragging .bottom-sheet {
   transition: none !important;
+}
+
+.scrim-fade-leave-active {
+  transition: opacity 0.5s ease-out;
+  pointer-events: none;
+}
+
+.scrim-fade-leave-to {
+  opacity: 0;
 }
 
 .info-sheet-close {
