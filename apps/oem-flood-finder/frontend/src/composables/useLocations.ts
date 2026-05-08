@@ -26,7 +26,7 @@ export function useLocations(): {
   })
 
   onBeforeMount(async () => {
-    const locations: LocationPanelDTO[] = await getLocationDev(errorMessage)
+    const locations: LocationPanelDTO[] = await getLocationsDev(errorMessage)
     oemLocations.value = Array.from(locations, (loc) => {
       const cardInfo: MapCardProps = {
         heading: loc.name,
@@ -69,7 +69,18 @@ function getLocationTags(loc: LocationPanelDTO): NonNullable<MapCardProps['tags'
   return [{ text: 'Gauge', color: 'blue' as const, iconDefinition: faWater }, { text: gaugeValue }]
 }
 
-async function getLocationDev(errorMessageRef: Ref) {
+async function getLocationsProxy(errorMessageRef: Ref) {
+  const response = await fetch(
+    'https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/getOemLocations',
+  )
+  if (!response.ok) {
+    errorMessageRef.value = 'Error retrieving gauges'
+    return
+  }
+  return response.json()
+}
+
+async function getLocationsDev(errorMessageRef: Ref) {
   const myHeaders = new Headers()
   myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
 
