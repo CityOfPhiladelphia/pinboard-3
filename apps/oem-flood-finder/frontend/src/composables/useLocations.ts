@@ -40,7 +40,7 @@ export function useLocations(): {
     }
 
     const locations: LocationPanelDTO[] = await response.json()
-    oemLocations.value = locations.map(loc => {
+    oemLocations.value = locations.map((loc) => {
       const cardInfo: MapCardProps = {
         heading: loc.name,
         subheader: undefined,
