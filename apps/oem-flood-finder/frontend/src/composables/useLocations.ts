@@ -18,18 +18,16 @@ export function useLocations(): {
 
   const isLoading = computed(() => {
     // if has has location services active, isLoading will remain true while resolving user location
-    // return !(
-    //   hasData.value &&
-    //   (userLocationPermission.value === 'denied' || PinboardUtilities.hasLocationData(userLocation))
-    // )
-    return false
+    return !(
+      hasData.value &&
+      (userLocationPermission.value === 'denied' || PinboardUtilities.hasLocationData(userLocation))
+    )
   })
 
   onBeforeMount(async () => {
-    const locations: LocationPanelDTO[] =
-      import.meta.env.DEV || true
-        ? await getLocationsDev(errorMessage)
-        : await getLocationsProxy(errorMessage)
+    const locations: LocationPanelDTO[] = import.meta.env.DEV
+      ? await getLocationsDev(errorMessage)
+      : await getLocationsProxy(errorMessage)
     oemLocations.value = Array.from(locations, (loc) => {
       const cardInfo: MapCardProps = {
         heading: loc.name,

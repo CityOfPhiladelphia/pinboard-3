@@ -25,12 +25,9 @@ export function useLocationDetail(
     }
 
     readingState.value = { kind: 'Loading' }
-    const data: AwareReadingDTO[] = await getGaugeReadingsDev(
-      gaugeId,
-      deviceType,
-      readingState,
-      abortController,
-    )
+    const data: AwareReadingDTO[] = import.meta.env.DEV
+      ? await getGaugeReadingsDev(gaugeId, deviceType, readingState, abortController)
+      : await getGaugeReadingsProxy(gaugeId, deviceType, readingState, abortController)
 
     readingState.value =
       toValue(deviceType) === 'Aware'
@@ -41,30 +38,30 @@ export function useLocationDetail(
   return readingState
 }
 
-// async function getGaugeReadingsProxy(
-//   id: MaybeRefOrGetter<string>,
-//   deviceType: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
-//   readingStateRef: Ref,
-//   abortController: AbortController,
-// ) {
-//   const params = new URLSearchParams({
-//     kind: toValue(deviceType).toLowerCase(),
-//     gaugeId: toValue(id),
-//   })
-//   const response = await fetch(
-//     `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/getOemReadings??${params.toString()}`,
-//     {
-//       signal: abortController.signal,
-//     },
-//   )
+async function getGaugeReadingsProxy(
+  id: MaybeRefOrGetter<string>,
+  deviceType: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
+  readingStateRef: Ref,
+  abortController: AbortController,
+) {
+  const params = new URLSearchParams({
+    kind: toValue(deviceType).toLowerCase(),
+    gaugeId: toValue(id),
+  })
+  const response = await fetch(
+    `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/getOemReadings?${params.toString()}`,
+    {
+      signal: abortController.signal,
+    },
+  )
 
-//   if (!response.ok) {
-//     readingStateRef.value = { kind: 'Error', message: 'Readings API response error' }
-//     return
-//   }
+  if (!response.ok) {
+    readingStateRef.value = { kind: 'Error', message: 'Readings API response error' }
+    return
+  }
 
-//   return response.json()
-// }
+  return response.json()
+}
 
 async function getGaugeReadingsDev(
   id: MaybeRefOrGetter<string>,
