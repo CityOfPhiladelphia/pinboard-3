@@ -25,7 +25,7 @@ export function useSearchAddress(address: string | Ref<string>) {
     // const url = `${import.meta.env.DEV ? import.meta.env.VITE_AIS_URL : 'https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/queryAisAddress?address='}${encodeURIComponent(addressDeref)}`
     const url = import.meta.env.VITE_AIS_URL
 
-    if (import.meta.env.DEV) {
+    if (import.meta.env.DEV || true) {
       try {
         const result: AisAddressSearchResponse = await (await fetch(url)).json()
         addressCoordinates.value.longitude =

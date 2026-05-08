@@ -41,6 +41,26 @@ export function useLocationDetail(
   return readingState
 }
 
+// async function getGaugeReadingsProxy(
+//   id: MaybeRefOrGetter<string>,
+//   deviceType: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
+//   readingStateRef: Ref,
+//   abortController: AbortController,
+// ) {
+
+//   const response = await fetch(
+//     `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/getOemReadings/?kind=${toValue(deviceType).toLowerCase()}/reading/${toValue(id)}`,
+
+//   )
+
+//   if (!response.ok) {
+//     readingStateRef.value = { kind: 'Error', message: 'Readings API response error' }
+//     return
+//   }
+
+//   return response.json()
+// }
+
 async function getGaugeReadingsDev(
   id: MaybeRefOrGetter<string>,
   deviceType: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
