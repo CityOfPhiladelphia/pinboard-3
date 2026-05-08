@@ -25,33 +25,70 @@ export function useLocationDetail(
     }
 
     readingState.value = { kind: 'Loading' }
-
-    const myHeaders = new Headers()
-    myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
-
-    const response = await fetch(
-      `${import.meta.env.VITE_FLOOD_API_BASE_URL}/${toValue(deviceType).toLowerCase()}/reading/${toValue(gaugeId)}`,
-      {
-        method: 'GET',
-        headers: myHeaders,
-        redirect: 'follow',
-        signal: abortController.signal,
-      },
+    const data: AwareReadingDTO[] = await getGaugeReadingsDev(
+      gaugeId,
+      deviceType,
+      readingState,
+      abortController,
     )
 
-    if (!response.ok) {
-      readingState.value = { kind: 'Error', message: 'Readings API response error' }
-      return
-    }
-
-    if (toValue(deviceType) === 'Aware') {
-      const data: AwareReadingDTO[] = await response.json()
-      readingState.value = { kind: 'Loaded', gaugeType: 'Aware', data: data }
-    } else {
-      const data: UsgsReadingDTO[] = await response.json()
-      readingState.value = { kind: 'Loaded', gaugeType: 'Usgs', data: data }
-    }
+    readingState.value =
+      toValue(deviceType) === 'Aware'
+        ? { kind: 'Loaded', gaugeType: 'Aware', data: data }
+        : (readingState.value = { kind: 'Loaded', gaugeType: 'Usgs', data: data })
   })
 
   return readingState
+}
+
+// async function getGaugeReadingsProxy(
+//   id: MaybeRefOrGetter<string>,
+//   deviceType: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
+//   readingStateRef: Ref,
+//   abortController: AbortController,
+// ) {
+//   const params = new URLSearchParams({
+//     kind: toValue(deviceType).toLowerCase(),
+//     gaugeId: toValue(id),
+//   })
+//   const response = await fetch(
+//     `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/getOemReadings??${params.toString()}`,
+//     {
+//       signal: abortController.signal,
+//     },
+//   )
+
+//   if (!response.ok) {
+//     readingStateRef.value = { kind: 'Error', message: 'Readings API response error' }
+//     return
+//   }
+
+//   return response.json()
+// }
+
+async function getGaugeReadingsDev(
+  id: MaybeRefOrGetter<string>,
+  deviceType: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
+  readingStateRef: Ref,
+  abortController: AbortController,
+) {
+  const myHeaders = new Headers()
+  myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
+
+  const response = await fetch(
+    `${import.meta.env.VITE_FLOOD_API_BASE_URL}/${toValue(deviceType).toLowerCase()}/reading/${toValue(id)}`,
+    {
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow',
+      signal: abortController.signal,
+    },
+  )
+
+  if (!response.ok) {
+    readingStateRef.value = { kind: 'Error', message: 'Readings API response error' }
+    return
+  }
+
+  return response.json()
 }

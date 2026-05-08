@@ -61,7 +61,7 @@ const hostedZone = HostedZone.fromLookup(stack, 'HostedZone', {
 
 const dnsValidatedCertificate = new Certificate(stack, 'Certificate', {
   domainName,
-  certificateName: `phila-gov-dns-cert-frontend-${environment}`, // is this right?
+  certificateName: `phila-gov-dns-cert-frontend-${environment}`,
   validation: CertificateValidation.fromDns(hostedZone),
 })
 
@@ -70,8 +70,7 @@ const accessLogBucket = new PhilaLogBucket(stack, 'AccessLogs', {
   logBucketId: 'access-logs',
   logRetentionDays: 1096,
   s3ManagedEncryption: true,
-});
-
+})
 
 // Scope as any so linked @phila/constructs resolves to a single Construct type at runtime.
 new StaticSite(stack, 'StaticSite', {
@@ -79,7 +78,7 @@ new StaticSite(stack, 'StaticSite', {
   assetDir: '../frontend/dist',
   certificate: dnsValidatedCertificate,
   hostedZone,
-  logBucket: accessLogBucket.bucket
+  logBucket: accessLogBucket.bucket,
 })
 
 // Apply compliance checks
