@@ -34,15 +34,14 @@ export function useLocations(): {
         tags: getLocationTags(loc),
         src: loc.thumbnailUrl,
       }
-      return {
+
+      const oemLocation: OemLocation = {
         id: loc.id,
         name: loc.name,
         latitude: loc.latitude,
         longitude: loc.longitude,
-        lastUpdated: loc.lastUpdated,
-        gaugeHeight: loc.gaugeHeight,
-        gaugeHeightUnit: loc.gaugeHeightUnit,
-        thumbnailUrl: loc.thumbnailUrl,
+        lastUpdated: new Date(loc.lastUpdated),
+        pictureTimestampUTC: new Date(loc.pictureTimestampUTC),
         cameraStreamUrl: loc.cameraStreamUrl,
         deviceType: loc.deviceType,
         actionStage: loc.actionStage,
@@ -51,6 +50,7 @@ export function useLocations(): {
         majorStage: loc.majorStage,
         locationCardInfo: cardInfo,
       }
+      return oemLocation
     })
     hasData.value = true
   })

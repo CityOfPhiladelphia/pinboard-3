@@ -61,6 +61,29 @@ Some dependencies require FontAwesome Pro icons. You need a `.npmrc` file (at th
 
 Do not commit this file — it is gitignored.
 
+## Branch strategy
+
+```
+feature/* → test → main
+```
+
+| Branch | Environment | Trigger |
+| ------ | ----------- | ------- |
+| `test` | Test | Push to `test` |
+| `main` | Production | Push to `main` |
+
+Feature branches should be opened as PRs against `test`. Once changes are validated in the test environment, open a PR from `test` → `main` to promote to production. Both branches are protected and require a passing CI check before merging.
+
+## CI / deployment
+
+On push to `test` or `main`, the pipeline:
+
+1. Lints, type-checks, and builds all packages
+2. Detects which apps changed (by file path — `apps/<name>/`, `packages/`, or `ci.yml`)
+3. Deploys only the affected apps to the appropriate environment using `city ship`
+
+Deployments use AWS OIDC — no long-lived credentials. Each app/environment pair has its own IAM role scoped to its S3 bucket and CloudFront distribution.
+
 ## Tooling
 
 - **pnpm** — package manager and workspace management
