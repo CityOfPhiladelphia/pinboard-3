@@ -47,8 +47,16 @@ async function getUserLocation() {
   return new Promise<boolean>((resolve) => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        userLocation.value.latitude = position.coords.latitude
-        userLocation.value.longitude = position.coords.longitude
+        userLocation.value.latitude = checkLatitudeInRange(
+          position.coords.latitude
+        )
+          ? position.coords.latitude
+          : NaN
+        userLocation.value.longitude = checkLongitudeInRange(
+          position.coords.longitude
+        )
+          ? position.coords.longitude
+          : NaN
         userLocationPermission.value = 'granted'
         resolve(false)
       },
@@ -69,4 +77,12 @@ async function getUserLocation() {
       }
     )
   })
+}
+
+function checkLatitudeInRange(latitude: number) {
+  return 39.84911 < latitude && latitude < 40.175
+}
+
+function checkLongitudeInRange(longitude: number) {
+  return -75.35227 < longitude && longitude < -74.91583
 }

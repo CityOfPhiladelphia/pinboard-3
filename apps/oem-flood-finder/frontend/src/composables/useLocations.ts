@@ -26,21 +26,7 @@ export function useLocations(): {
   })
 
   onBeforeMount(async () => {
-    const myHeaders = new Headers()
-    myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
-
-    const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/location/all`, {
-      method: 'GET',
-      headers: myHeaders,
-      redirect: 'follow',
-    })
-
-    if (!response.ok) {
-      errorMessage.value = 'Error retrieving gauges'
-      return
-    }
-
-    const locations: LocationPanelDTO[] = await response.json()
+    const locations: LocationPanelDTO[] = await getLocationDev(errorMessage)
     oemLocations.value = Array.from(locations, (loc) => {
       const cardInfo: MapCardProps = {
         heading: loc.name,
@@ -81,4 +67,21 @@ function getLocationTags(loc: LocationPanelDTO): NonNullable<MapCardProps['tags'
       ? 'No data'
       : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
   return [{ text: 'Gauge', color: 'blue' as const, iconDefinition: faWater }, { text: gaugeValue }]
+}
+
+async function getLocationDev(errorMessageRef: Ref) {
+  const myHeaders = new Headers()
+  myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
+
+  const response = await fetch(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/location/all`, {
+    method: 'GET',
+    headers: myHeaders,
+    redirect: 'follow',
+  })
+
+  if (!response.ok) {
+    errorMessageRef.value = 'Error retrieving gauges'
+    return
+  }
+  return response.json()
 }
