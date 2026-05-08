@@ -17,10 +17,7 @@ const chartData: Ref<ChartData[]> = computed(() => {
     return props.readingState.data
       .map((reading) => {
         const x = new Date(new Date(reading.validTimeUTC).getTime() - offset).toString()
-        let y = reading.gaugeHeight === -9999.9 ? undefined : reading.gaugeHeight
-        if (reading.gaugeHeightUnit === 'in' && y !== undefined) {
-          y = Math.ceil((y / 12) * 100) / 100
-        }
+        const y = reading.gaugeHeight === -9999.9 ? undefined : reading.gaugeHeight
         return { x, y }
       })
       .reverse()
@@ -62,6 +59,20 @@ const tableData = computed((): Record<string, unknown>[] => {
   return props.readingState.data as unknown as Record<string, unknown>[]
 })
 
+const snapshotTimestamp = computed(() => {
+  const timestamp = props.location.pictureTimestampUTC
+
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    month: 'numeric',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).format(timestamp!)
+})
+
 // 2026-02-12T16:40:23z
 </script>
 
@@ -78,7 +89,7 @@ const tableData = computed((): Record<string, unknown>[] => {
     </div>
 
     <div v-show="location.deviceType !== 'Aware' || activeTab === 'graph'">
-      <LineChart :data="chartData" :y-label="`Stage (ft)`" />
+      <LineChart :data="chartData" :y-label="`Stage (in)`" />
     </div>
 
     <div v-if="location.deviceType === 'Aware'" v-show="activeTab === 'table'">
@@ -89,6 +100,7 @@ const tableData = computed((): Record<string, unknown>[] => {
     <template v-if="location.deviceType === 'Aware' && 0 in readingState.data">
       <h6>Current Snapshot</h6>
       <img :src="location.locationCardInfo.src" />
+      <p>Timestamp: {{ snapshotTimestamp }}</p>
     </template>
   </div>
 
