@@ -54,8 +54,12 @@ const appliedSort = ref<string | null>(null)
 const searchString = ref<string>('')
 const searchWrapperRef = ref<HTMLElement | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
-const { searchSuggestions, dismissSuggestions } =
-  useSearchSuggestions(searchString)
+const {
+  searchSuggestions,
+  dismissSuggestions,
+  hideSuggestions,
+  refetchSuggestions,
+} = useSearchSuggestions(searchString)
 
 // computed refs
 const sortChoices = computed<SortPanelOption[]>(() => {
@@ -102,6 +106,20 @@ function handleSuggestionDismiss() {
   focusSearchInput()
 }
 
+function handleSearchFocusOut(event: FocusEvent) {
+  const relatedTarget = event.relatedTarget as HTMLElement | null
+  if (!searchWrapperRef.value?.contains(relatedTarget)) {
+    hideSuggestions()
+  }
+}
+
+function handleSearchFocusIn(event: FocusEvent) {
+  const relatedTarget = event.relatedTarget as HTMLElement | null
+  if (!searchWrapperRef.value?.contains(relatedTarget)) {
+    refetchSuggestions()
+  }
+}
+
 function focusSearchInput() {
   const input = searchWrapperRef.value?.querySelector<HTMLElement>('input')
   input?.focus()
@@ -117,6 +135,8 @@ function focusSearchInput() {
       ref="searchWrapperRef"
       class="location-search"
       @keydown="handleSearchKeydown"
+      @focusout="handleSearchFocusOut"
+      @focusin="handleSearchFocusIn"
     >
       <Search
         v-model="searchString"
