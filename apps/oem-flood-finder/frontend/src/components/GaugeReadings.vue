@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { ReadingState } from '@/composables/useLocationDetail'
-import type { OemLocation } from '@/types'
+import type { OemLocation, ReadingState } from '@/types'
 import { LineChart, type ChartData } from '@phila/phila-ui-charts'
 import { ClientTable, type ColumnDef } from '@phila/phila-ui-table'
 import { PhlTabNav, PhlTab } from '@phila/phila-ui-tabs'
@@ -78,7 +77,7 @@ const snapshotTimestamp = computed(() => {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
-  }).format(timestamp!)
+  }).format(timestamp ?? undefined)
 })
 
 // 2026-02-12T16:40:23z
@@ -119,10 +118,10 @@ const snapshotTimestamp = computed(() => {
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Water Temperature</div>
             <div class="has-text-body-small">
-              {{ 
-                readingState.data[0].waterTemperature === -9999.9 ? 
-                'No data' : 
-                `${Math.round((readingState.data[0].waterTemperature * 9) / 5 + 32)} \u00B0F` 
+              {{
+                readingState.data[0].waterTemperature === -9999.9 ?
+                'No data' :
+                `${Math.round((readingState.data[0].waterTemperature * 9) / 5 + 32)} \u00B0F`
               }}
             </div>
           </div>
@@ -141,10 +140,10 @@ const snapshotTimestamp = computed(() => {
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Air Temperature</div>
             <div class="has-text-body-small">
-              {{ 
+              {{
                 readingState.data[0].airTemperature === -9999.9 ?
                 'No data' :
-                `${Math.round((readingState.data[0].airTemperature * 9) / 5 + 32)} \u00B0F` 
+                `${Math.round((readingState.data[0].airTemperature * 9) / 5 + 32)} \u00B0F`
               }}
             </div>
           </div>
@@ -155,10 +154,10 @@ const snapshotTimestamp = computed(() => {
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Barometric Pressure</div>
             <div class="has-text-body-small">
-              {{ 
+              {{
                 readingState.data[0].barometricPressure === -9999.9 ?
                 'No data' :
-                readingState.data[0].barometricPressure 
+                readingState.data[0].barometricPressure
               }} mbar
             </div>
           </div>

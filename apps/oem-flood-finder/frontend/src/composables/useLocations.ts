@@ -78,7 +78,7 @@ async function getLocationsProxy(errorMessageRef: Ref) {
     errorMessageRef.value = 'Error retrieving gauges'
     return
   }
-  return response.json()
+  return await response.json()
 }
 
 async function getLocationsDev(errorMessageRef: Ref) {
@@ -95,5 +95,5 @@ async function getLocationsDev(errorMessageRef: Ref) {
     errorMessageRef.value = 'Error retrieving gauges'
     return
   }
-  return response.json()
+  return await response.json()
 }

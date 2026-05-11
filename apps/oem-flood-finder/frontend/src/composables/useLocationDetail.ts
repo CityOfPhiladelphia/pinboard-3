@@ -1,12 +1,5 @@
 import { ref, toValue, watchEffect, type MaybeRefOrGetter, type Ref } from 'vue'
-import type { AwareReadingDTO, UsgsReadingDTO } from '@/types'
-
-export type ReadingState =
-  | { kind: 'Loading' }
-  | { kind: 'Loaded'; gaugeType: 'Aware'; data: AwareReadingDTO[] }
-  | { kind: 'Loaded'; gaugeType: 'Usgs'; data: UsgsReadingDTO[] }
-  | { kind: 'Error'; message: string }
-  | { kind: 'No Call Needed' }
+import type { AwareReadingDTO, ReadingState } from '@/types'
 
 export function useLocationDetail(
   gaugeId: MaybeRefOrGetter<string>,
@@ -60,7 +53,7 @@ async function getGaugeReadingsProxy(
     return
   }
 
-  return response.json()
+  return await response.json()
 }
 
 async function getGaugeReadingsDev(
@@ -87,5 +80,5 @@ async function getGaugeReadingsDev(
     return
   }
 
-  return response.json()
+  return await response.json()
 }
