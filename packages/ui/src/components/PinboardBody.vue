@@ -117,8 +117,12 @@ const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
   null
 )
 const searchString = ref<string>('')
-const { searchSuggestions, dismissSuggestions } =
-  useSearchSuggestions(searchString)
+const {
+  searchSuggestions,
+  dismissSuggestions,
+  hideSuggestions,
+  refetchSuggestions,
+} = useSearchSuggestions(searchString)
 const mobileSearchWrapperRef = ref<HTMLElement | null>(null)
 const mobileSuggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(
   null
@@ -243,6 +247,20 @@ function handleMobileSearchKeydown(event: KeyboardEvent) {
 
 function handleSuggestionDismiss() {
   focusMobileSearchInput()
+}
+
+function handleMobileSearchFocusOut(event: FocusEvent) {
+  const relatedTarget = event.relatedTarget as HTMLElement | null
+  if (!mobileSearchWrapperRef.value?.contains(relatedTarget)) {
+    hideSuggestions()
+  }
+}
+
+function handleMobileSearchFocusIn(event: FocusEvent) {
+  const relatedTarget = event.relatedTarget as HTMLElement | null
+  if (!mobileSearchWrapperRef.value?.contains(relatedTarget)) {
+    refetchSuggestions()
+  }
 }
 
 function focusMobileSearchInput() {
@@ -381,6 +399,8 @@ const effectiveMapConfig = (() => {
         ref="mobileSearchWrapperRef"
         class="mobile-map-search-filter"
         @keydown="handleMobileSearchKeydown"
+        @focusout="handleMobileSearchFocusOut"
+        @focusin="handleMobileSearchFocusIn"
       >
         <Search
           v-if="locationPanelSearch"
