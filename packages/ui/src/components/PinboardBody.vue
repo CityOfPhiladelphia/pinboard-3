@@ -306,7 +306,7 @@ const effectiveMapConfig = (() => {
 </script>
 
 <template>
-  <div v-if="selectedLocation !== null" class="detail-overlay">
+  <div v-if="selectedLocation !== null && !isMobile" class="detail-overlay">
     <slot
       name="location-detail"
       :location="selectedLocation"
@@ -405,6 +405,7 @@ const effectiveMapConfig = (() => {
     </div>
   </div>
   <BottomSheet
+    v-if="isMobile"
     ref="bottomSheetRef"
     v-model="bottomSheetOpen"
     :snap-points="snapPoints"
