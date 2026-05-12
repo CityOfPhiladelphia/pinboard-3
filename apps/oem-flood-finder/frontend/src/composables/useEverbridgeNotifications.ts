@@ -4,7 +4,11 @@ import { onMounted, ref, toValue, type MaybeRefOrGetter } from 'vue'
 export function useEverbridgeNotifications(limit: MaybeRefOrGetter<number>) {
   const everbridgeNotifications = ref<EverbridgeNotification[]>([])
 
-  import.meta.env.DEV ? onMounted(fetchLatestAlertsDev) : onMounted(fetchLatestAlertsProxy)
+  if (import.meta.env.DEV) {
+    onMounted(fetchLatestAlertsDev)
+  } else {
+    onMounted(fetchLatestAlertsProxy)
+  }
 
   return { everbridgeNotifications }
 
@@ -14,7 +18,13 @@ export function useEverbridgeNotifications(limit: MaybeRefOrGetter<number>) {
     )
     url.searchParams.set('limit', toValue(limit).toString())
 
-    everbridgeNotifications.value = await (await fetch(url)).json()
+    try {
+      const response = await fetch(url)
+      everbridgeNotifications.value = await response.json()
+    } catch (err) {
+      console.log(err)
+      everbridgeNotifications.value = []
+    }
   }
 
   async function fetchLatestAlertsDev() {
@@ -24,12 +34,16 @@ export function useEverbridgeNotifications(limit: MaybeRefOrGetter<number>) {
     const url = new URL(`${import.meta.env.VITE_FLOOD_API_BASE_URL}/everbridge/notifications`)
     url.searchParams.set('limit', toValue(limit).toString())
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: myHeaders,
-      redirect: 'follow',
-    })
-
-    everbridgeNotifications.value = await response.json()
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow',
+      })
+      everbridgeNotifications.value = await response.json()
+    } catch (err) {
+      console.log(err)
+      everbridgeNotifications.value = []
+    }
   }
 }

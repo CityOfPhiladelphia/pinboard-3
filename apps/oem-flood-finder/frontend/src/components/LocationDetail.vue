@@ -73,7 +73,7 @@ const lastUpdatedDate = computed(() => {
 
         <div class="gauge-information" style="padding: var(--spacing-s) 0 0 0">
           <div>
-            <Icon :iconDefinition="faClock" size="extra-small" />
+            <Icon :icon-definition="faClock" size="extra-small" />
             <div style="margin-left: var(--spacing-s)">
               <div class="has-text-label-small" style="color: #666">Last Updated</div>
               <div class="has-text-body-small">{{ lastUpdatedDate }}</div>
@@ -81,7 +81,7 @@ const lastUpdatedDate = computed(() => {
           </div>
 
           <div>
-            <Icon :iconDefinition="faCompass" size="extra-small" />
+            <Icon :icon-definition="faCompass" size="extra-small" />
             <div style="margin-left: var(--spacing-s)">
               <div class="has-text-label-small" style="color: #666">Coordinates</div>
               <div class="has-text-body-small">

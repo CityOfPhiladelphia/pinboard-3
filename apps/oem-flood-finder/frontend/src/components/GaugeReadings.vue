@@ -106,7 +106,7 @@ const snapshotTimestamp = computed(() => {
       <div style="font-weight: bold">Weather details</div>
       <div class="weather-details">
         <div>
-          <Icon :iconDefinition="faRaindrops" size="extra-small" />
+          <Icon :icon-definition="faRaindrops" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Rainfall</div>
             <div class="has-text-body-small">{{ readingState.data[0].rainfall }} in</div>
@@ -114,7 +114,7 @@ const snapshotTimestamp = computed(() => {
         </div>
 
         <div>
-          <Icon :iconDefinition="faDropletDegree" size="extra-small" />
+          <Icon :icon-definition="faDropletDegree" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Water Temperature</div>
             <div class="has-text-body-small">
@@ -128,7 +128,7 @@ const snapshotTimestamp = computed(() => {
         </div>
 
         <div>
-          <Icon :iconDefinition="faCloudDrizzle" size="extra-small" />
+          <Icon :icon-definition="faCloudDrizzle" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Rain Intensity</div>
             <div class="has-text-body-small">{{ readingState.data[0].rainIntensity }} in/hr</div>
@@ -136,7 +136,7 @@ const snapshotTimestamp = computed(() => {
         </div>
 
         <div>
-          <Icon :iconDefinition="faTemperatureFull" size="extra-small" />
+          <Icon :icon-definition="faTemperatureFull" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Air Temperature</div>
             <div class="has-text-body-small">
@@ -150,7 +150,7 @@ const snapshotTimestamp = computed(() => {
         </div>
 
         <div>
-          <Icon :iconDefinition="faGauge" size="extra-small" />
+          <Icon :icon-definition="faGauge" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Barometric Pressure</div>
             <div class="has-text-body-small">
