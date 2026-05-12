@@ -22,7 +22,7 @@
     "strictNullChecks": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": false,
+    "noFallthroughCasesInSwitch": true,
     "strictPropertyInitialization": false,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,

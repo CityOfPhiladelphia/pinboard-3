@@ -4,7 +4,11 @@ import { onMounted, ref, toValue, type MaybeRefOrGetter } from 'vue'
 export function useEverbridgeNotifications(limit: MaybeRefOrGetter<number>) {
   const everbridgeNotifications = ref<EverbridgeNotification[]>([])
 
-  async function fetchLatestAlerts() {
+  import.meta.env.DEV ? onMounted(fetchLatestAlertsDev) : onMounted(fetchLatestAlertsDev)
+
+  return { everbridgeNotifications }
+
+  async function fetchLatestAlertsDev() {
     const myHeaders = new Headers()
     myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
 
@@ -19,8 +23,4 @@ export function useEverbridgeNotifications(limit: MaybeRefOrGetter<number>) {
 
     everbridgeNotifications.value = await response.json()
   }
-
-  onMounted(fetchLatestAlerts)
-
-  return { everbridgeNotifications }
 }

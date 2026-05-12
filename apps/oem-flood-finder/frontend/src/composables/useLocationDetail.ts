@@ -42,7 +42,7 @@ async function getGaugeReadingsProxy(
     gaugeId: toValue(id),
   })
   const response = await fetch(
-    `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/getOemReadings?${params.toString()}`,
+    `https://haydr3k097.execute-api.us-east-1.amazonaws.com/getOemReadings?${params.toString()}`,
     {
       signal: abortController.signal,
     },

@@ -72,7 +72,7 @@ function getLocationTags(loc: LocationPanelDTO): NonNullable<MapCardProps['tags'
 
 async function getLocationsProxy(errorMessageRef: Ref) {
   const response = await fetch(
-    'https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/getOemLocations',
+    'https://haydr3k097.execute-api.us-east-1.amazonaws.com/getOemLocations',
   )
   if (!response.ok) {
     errorMessageRef.value = 'Error retrieving gauges'
