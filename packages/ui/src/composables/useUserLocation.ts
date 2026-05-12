@@ -7,24 +7,33 @@ const userLocation = ref<LatLon>({
   longitude: NaN,
 })
 
+let timeoutOrWait = 'waiting'
+
 export function useUserLocation() {
-  getGeolocatePermissionState().then(() => {
-    if (userLocationPermission.value !== 'denied') {
-      awaitUserPermissionResponse().catch(() => {
-        userLocationPermission.value = 'denied'
-        getUserLocation()
-      })
-    }
-  })
+  navigator.permissions
+    .query({ name: 'geolocation' })
+    .then((permissionStatus) => {
+      userLocationPermission.value = permissionStatus.state
+      console.log(`geolocation permission status is ${permissionStatus.state}`)
+      permissionStatus.onchange = () => {
+        userLocationPermission.value = permissionStatus.state
+        console.log(
+          `geolocation permission status has changed to ${permissionStatus.state}`
+        )
+      }
+    })
+
+  awaitUserPermissionResponse()
+
   return { userLocation, userLocationPermission }
 }
 
 async function getGeolocatePermissionState() {
   try {
-    const permissionState = await navigator.permissions.query({
-      name: 'geolocation',
-    })
-    userLocationPermission.value = permissionState.state
+    // const permissionState = await navigator.permissions.query({
+    //   name: 'geolocation',
+    // })
+    // userLocationPermission.value = permissionState.state
   } catch (err) {
     console.log(err)
     userLocationPermission.value = 'denied'
@@ -32,19 +41,33 @@ async function getGeolocatePermissionState() {
 }
 
 async function awaitUserPermissionResponse() {
-  await Promise.race([getUserLocation(), waitForUserTimeout()])
+  try {
+    if (userLocationPermission.value !== 'denied') {
+      await getUserLocation()
+      while (userLocationPermission.value === 'prompt') {
+        userLocationPermission.value = (
+          await navigator.permissions.query({
+            name: 'geolocation',
+          })
+        ).state
+        await getUserLocation()
+      }
+    }
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 function waitForUserTimeout() {
   return new Promise((_, reject) => {
     setTimeout(() => {
       reject(new Error('Request took too long!'))
-    }, 5_000)
+    }, 25_000)
   })
 }
 
-function getUserLocation() {
-  return new Promise<boolean>((resolve) => {
+async function getUserLocation() {
+  return await new Promise<boolean>(async (resolve) => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         userLocation.value.latitude = checkLatitudeInRange(
@@ -61,6 +84,7 @@ function getUserLocation() {
         resolve(false)
       },
       (error) => {
+        console.log(error.message)
         switch (error.code) {
           case error.PERMISSION_DENIED:
           case error.POSITION_UNAVAILABLE: {
@@ -69,12 +93,12 @@ function getUserLocation() {
             break
           }
           case error.TIMEOUT: {
-            userLocationPermission.value = 'prompt'
             resolve(true)
             break
           }
         }
-      }
+      },
+      { timeout: 10_000 }
     )
   })
 }

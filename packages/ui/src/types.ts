@@ -21,6 +21,7 @@ export type LocationPermissionState =
   | 'prompt'
   | 'denied'
   | 'waiting'
+  | 'timeout'
   | null
 
 export type MapControlPosition =
