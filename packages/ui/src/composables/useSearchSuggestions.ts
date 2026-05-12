@@ -34,6 +34,14 @@ export function useSearchSuggestions(search: string | Ref<string>) {
     searchSuggestions.value = []
   }
 
+  function hideSuggestions() {
+    searchSuggestions.value = []
+  }
+
+  function refetchSuggestions() {
+    getSearchSuggestions(toValue(search))
+  }
+
   watch(
     () => toValue(search),
     (value) => {
@@ -45,5 +53,11 @@ export function useSearchSuggestions(search: string | Ref<string>) {
     }
   )
 
-  return { searchSuggestions, searchSuggestionsError, dismissSuggestions }
+  return {
+    searchSuggestions,
+    searchSuggestionsError,
+    dismissSuggestions,
+    hideSuggestions,
+    refetchSuggestions,
+  }
 }

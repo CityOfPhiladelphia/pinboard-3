@@ -16,7 +16,12 @@ export interface ZipcodePolygon {
   nodes: LocationCoordinate[]
 }
 
-export type LocationPermissionState = 'granted' | 'prompt' | 'denied'
+export type LocationPermissionState =
+  | 'granted'
+  | 'prompt'
+  | 'denied'
+  | 'waiting'
+  | null
 
 export type MapControlPosition =
   | 'top-left'

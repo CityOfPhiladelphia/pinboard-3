@@ -122,6 +122,7 @@ jobs:
           CI: 'true'
           VITE_FLOOD_API_KEY: ${{ secrets.FLOOD_API_KEY_TEST }}
           VITE_FLOOD_API_BASE_URL: ${{ secrets.FLOOD_API_BASE_URL_TEST }}
+          VITE_AIS_URL: ${{ secrets.AIS_URL }}
         run: city ship test --web
 
   deploy-test-primary-care-finder:
@@ -247,6 +248,7 @@ jobs:
           CI: 'true'
           VITE_FLOOD_API_KEY: ${{ secrets.FLOOD_API_KEY_PROD }}
           VITE_FLOOD_API_BASE_URL: ${{ secrets.FLOOD_API_BASE_URL_PROD }}
+          VITE_AIS_URL: ${{ secrets.AIS_URL }}
         run: city ship prod --web
 
   deploy-prod-primary-care-finder:

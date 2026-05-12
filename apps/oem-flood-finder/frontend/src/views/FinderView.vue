@@ -38,7 +38,7 @@ import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation, SortMode } from '@/types'
 
 // app variables
-const searchPlaceholderText = 'Search by address or keyword...'
+const searchPlaceholderText = 'Search by address, zipcode, or keyword...'
 const filterOptions: PinboardTypes.LocationFilterOption[] = [
   { value: 'all' satisfies Filters, label: 'All' },
   { value: 'gauges' satisfies Filters, label: 'Gauge' },
@@ -222,10 +222,10 @@ function handleDeselect(id: string) {
 
       <FillLayer
         v-for="id in FLOOD_LAYER_IDS"
-        :key="id"
         :id="`fema-flood-${id}`"
+        :key="id"
         :source="{ type: 'geojson', data: FLOOD_LAYER_CONFIG[id].url }"
-        :paint="{ 'fill-color': FLOOD_LAYER_CONFIG[id].color, 'fill-opacity': 0.35 }"
+        :paint="{ 'fill-color': FLOOD_LAYER_CONFIG[id].color, 'fill-opacity': 0.28 }"
         :layout="{ visibility: visibleFloodLayers.includes(id) ? 'visible' : 'none' }"
       />
       <MapCheckboxLegend
