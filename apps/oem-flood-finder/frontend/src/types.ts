@@ -86,6 +86,13 @@ export interface UsgsReadingDTO {
   floodEvents: Flood[]
 }
 
+export type ReadingState =
+  | { kind: 'Loading' }
+  | { kind: 'Loaded'; gaugeType: 'Aware'; data: AwareReadingDTO[] }
+  | { kind: 'Loaded'; gaugeType: 'Usgs'; data: UsgsReadingDTO[] }
+  | { kind: 'Error'; message: string }
+  | { kind: 'No Call Needed' }
+
 export type Filters = 'all' | 'gauges' | 'cameras'
 
 export type SortMode = 'AlphaAsc' | 'DistAsc' | ''

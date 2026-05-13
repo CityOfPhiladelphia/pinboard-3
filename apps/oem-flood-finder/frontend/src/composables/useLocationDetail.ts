@@ -1,12 +1,5 @@
 import { ref, toValue, watchEffect, type MaybeRefOrGetter, type Ref } from 'vue'
-import type { AwareReadingDTO, UsgsReadingDTO } from '@/types'
-
-export type ReadingState =
-  | { kind: 'Loading' }
-  | { kind: 'Loaded'; gaugeType: 'Aware'; data: AwareReadingDTO[] }
-  | { kind: 'Loaded'; gaugeType: 'Usgs'; data: UsgsReadingDTO[] }
-  | { kind: 'Error'; message: string }
-  | { kind: 'No Call Needed' }
+import type { AwareReadingDTO, ReadingState } from '@/types'
 
 export function useLocationDetail(
   gaugeId: MaybeRefOrGetter<string>,
@@ -25,12 +18,9 @@ export function useLocationDetail(
     }
 
     readingState.value = { kind: 'Loading' }
-    const data: AwareReadingDTO[] = await getGaugeReadingsDev(
-      gaugeId,
-      deviceType,
-      readingState,
-      abortController,
-    )
+    const data: AwareReadingDTO[] = import.meta.env.DEV
+      ? await getGaugeReadingsDev(gaugeId, deviceType, readingState, abortController)
+      : await getGaugeReadingsProxy(gaugeId, deviceType, readingState, abortController)
 
     readingState.value =
       toValue(deviceType) === 'Aware'
@@ -41,30 +31,30 @@ export function useLocationDetail(
   return readingState
 }
 
-// async function getGaugeReadingsProxy(
-//   id: MaybeRefOrGetter<string>,
-//   deviceType: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
-//   readingStateRef: Ref,
-//   abortController: AbortController,
-// ) {
-//   const params = new URLSearchParams({
-//     kind: toValue(deviceType).toLowerCase(),
-//     gaugeId: toValue(id),
-//   })
-//   const response = await fetch(
-//     `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/getOemReadings??${params.toString()}`,
-//     {
-//       signal: abortController.signal,
-//     },
-//   )
+async function getGaugeReadingsProxy(
+  id: MaybeRefOrGetter<string>,
+  deviceType: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
+  readingStateRef: Ref,
+  abortController: AbortController,
+) {
+  const params = new URLSearchParams({
+    kind: toValue(deviceType).toLowerCase(),
+    gaugeId: toValue(id),
+  })
+  const response = await fetch(
+    `https://haydr3k097.execute-api.us-east-1.amazonaws.com/getOemReadings?${params.toString()}`,
+    {
+      signal: abortController.signal,
+    },
+  )
 
-//   if (!response.ok) {
-//     readingStateRef.value = { kind: 'Error', message: 'Readings API response error' }
-//     return
-//   }
+  if (!response.ok) {
+    readingStateRef.value = { kind: 'Error', message: 'Readings API response error' }
+    return
+  }
 
-//   return response.json()
-// }
+  return await response.json()
+}
 
 async function getGaugeReadingsDev(
   id: MaybeRefOrGetter<string>,
@@ -90,5 +80,5 @@ async function getGaugeReadingsDev(
     return
   }
 
-  return response.json()
+  return await response.json()
 }

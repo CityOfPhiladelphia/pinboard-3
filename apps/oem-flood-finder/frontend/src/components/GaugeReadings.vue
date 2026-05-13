@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { ReadingState } from '@/composables/useLocationDetail'
-import type { OemLocation } from '@/types'
+import type { OemLocation, ReadingState } from '@/types'
 import { LineChart, type ChartData } from '@phila/phila-ui-charts'
 import { ClientTable, type ColumnDef } from '@phila/phila-ui-table'
 import { PhlTabNav, PhlTab } from '@phila/phila-ui-tabs'
@@ -78,7 +77,7 @@ const snapshotTimestamp = computed(() => {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
-  }).format(timestamp!)
+  }).format(timestamp ?? undefined)
 })
 
 // 2026-02-12T16:40:23z
@@ -107,7 +106,7 @@ const snapshotTimestamp = computed(() => {
       <div style="font-weight: bold">Weather details</div>
       <div class="weather-details">
         <div>
-          <Icon :iconDefinition="faRaindrops" size="extra-small" />
+          <Icon :icon-definition="faRaindrops" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Rainfall</div>
             <div class="has-text-body-small">{{ readingState.data[0].rainfall }} in</div>
@@ -115,21 +114,21 @@ const snapshotTimestamp = computed(() => {
         </div>
 
         <div>
-          <Icon :iconDefinition="faDropletDegree" size="extra-small" />
+          <Icon :icon-definition="faDropletDegree" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Water Temperature</div>
             <div class="has-text-body-small">
-              {{ 
-                readingState.data[0].waterTemperature === -9999.9 ? 
-                'No data' : 
-                `${Math.round((readingState.data[0].waterTemperature * 9) / 5 + 32)} \u00B0F` 
+              {{
+                readingState.data[0].waterTemperature === -9999.9 ?
+                'No data' :
+                `${Math.round((readingState.data[0].waterTemperature * 9) / 5 + 32)} \u00B0F`
               }}
             </div>
           </div>
         </div>
 
         <div>
-          <Icon :iconDefinition="faCloudDrizzle" size="extra-small" />
+          <Icon :icon-definition="faCloudDrizzle" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Rain Intensity</div>
             <div class="has-text-body-small">{{ readingState.data[0].rainIntensity }} in/hr</div>
@@ -137,28 +136,28 @@ const snapshotTimestamp = computed(() => {
         </div>
 
         <div>
-          <Icon :iconDefinition="faTemperatureFull" size="extra-small" />
+          <Icon :icon-definition="faTemperatureFull" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Air Temperature</div>
             <div class="has-text-body-small">
-              {{ 
+              {{
                 readingState.data[0].airTemperature === -9999.9 ?
                 'No data' :
-                `${Math.round((readingState.data[0].airTemperature * 9) / 5 + 32)} \u00B0F` 
+                `${Math.round((readingState.data[0].airTemperature * 9) / 5 + 32)} \u00B0F`
               }}
             </div>
           </div>
         </div>
 
         <div>
-          <Icon :iconDefinition="faGauge" size="extra-small" />
+          <Icon :icon-definition="faGauge" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Barometric Pressure</div>
             <div class="has-text-body-small">
-              {{ 
+              {{
                 readingState.data[0].barometricPressure === -9999.9 ?
                 'No data' :
-                readingState.data[0].barometricPressure 
+                readingState.data[0].barometricPressure
               }} mbar
             </div>
           </div>

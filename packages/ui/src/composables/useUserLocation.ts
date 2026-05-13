@@ -43,7 +43,7 @@ function waitForUserTimeout() {
   })
 }
 
-async function getUserLocation() {
+function getUserLocation() {
   return new Promise<boolean>((resolve) => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
