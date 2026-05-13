@@ -1,69 +1,52 @@
-import { ref } from 'vue'
-import type { LatLon, LocationPermissionState } from '../types'
+import { ref, watch } from 'vue'
+import { useBrowserType } from './useBrowserType'
+import { type LatLon, type LocationPermissionState, Browsers } from '../types'
 
 const userLocationPermission = ref<LocationPermissionState>(null)
 const userLocation = ref<LatLon>({
   latitude: NaN,
   longitude: NaN,
 })
-
-let timeoutOrWait = 'waiting'
+const { browserType } = useBrowserType()
 
 export function useUserLocation() {
-  navigator.permissions
-    .query({ name: 'geolocation' })
-    .then((permissionStatus) => {
-      userLocationPermission.value = permissionStatus.state
-      console.log(`geolocation permission status is ${permissionStatus.state}`)
-      permissionStatus.onchange = () => {
-        userLocationPermission.value = permissionStatus.state
-        console.log(
-          `geolocation permission status has changed to ${permissionStatus.state}`
-        )
-      }
-    })
-
   awaitUserPermissionResponse()
+
+  watch(
+    userLocationPermission,
+    async (newPermissionState, oldPermissionState) => {
+      if (
+        (newPermissionState === 'granted' && oldPermissionState !== 'prompt') ||
+        newPermissionState === 'prompt'
+      ) {
+        await getUserLocation()
+      }
+    }
+  )
 
   return { userLocation, userLocationPermission }
 }
 
-async function getGeolocatePermissionState() {
-  try {
-    // const permissionState = await navigator.permissions.query({
-    //   name: 'geolocation',
-    // })
-    // userLocationPermission.value = permissionState.state
-  } catch (err) {
-    console.log(err)
-    userLocationPermission.value = 'denied'
-  }
+async function awaitUserPermissionResponse() {
+  await getGeolocatePermissionState()
+  await getUserLocation()
 }
 
-async function awaitUserPermissionResponse() {
+async function getGeolocatePermissionState() {
   try {
-    if (userLocationPermission.value !== 'denied') {
-      await getUserLocation()
-      while (userLocationPermission.value === 'prompt') {
-        userLocationPermission.value = (
-          await navigator.permissions.query({
-            name: 'geolocation',
-          })
-        ).state
-        await getUserLocation()
+    const useLocationPermission = await navigator.permissions.query({
+      name: 'geolocation',
+    })
+    userLocationPermission.value = useLocationPermission.state
+    if (browserType.value !== Browsers.SAFARI) {
+      useLocationPermission.onchange = () => {
+        userLocationPermission.value = useLocationPermission.state
       }
     }
   } catch (err) {
     console.log(err)
+    userLocationPermission.value = 'denied'
   }
-}
-
-function waitForUserTimeout() {
-  return new Promise((_, reject) => {
-    setTimeout(() => {
-      reject(new Error('Request took too long!'))
-    }, 25_000)
-  })
 }
 
 async function getUserLocation() {
@@ -84,21 +67,17 @@ async function getUserLocation() {
         resolve(false)
       },
       (error) => {
-        console.log(error.message)
         switch (error.code) {
           case error.PERMISSION_DENIED:
-          case error.POSITION_UNAVAILABLE: {
+          case error.POSITION_UNAVAILABLE:
+          case error.TIMEOUT: {
             userLocationPermission.value = 'denied'
             resolve(false)
             break
           }
-          case error.TIMEOUT: {
-            resolve(true)
-            break
-          }
         }
       },
-      { timeout: 10_000 }
+      { timeout: Infinity, maximumAge: 0 }
     )
   })
 }

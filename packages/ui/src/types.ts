@@ -16,13 +16,7 @@ export interface ZipcodePolygon {
   nodes: LocationCoordinate[]
 }
 
-export type LocationPermissionState =
-  | 'granted'
-  | 'prompt'
-  | 'denied'
-  | 'waiting'
-  | 'timeout'
-  | null
+export type LocationPermissionState = 'granted' | 'prompt' | 'denied' | null
 
 export type MapControlPosition =
   | 'top-left'
@@ -226,3 +220,17 @@ export interface AisAddressSearchResponse {
     },
   ]
 }
+
+export const Browsers = {
+  EDGE: 'EDGE',
+  IE: 'IE',
+  FIREFOX: 'FIREFOX',
+  OPERA: 'OPERA',
+  UC: 'UC',
+  SAMSUNG: 'SAMSUNG',
+  CHROME: 'CHROME',
+  SAFARI: 'SAFARI',
+  UNKNOWN: 'UNKNOWN',
+} as const
+
+export type BrowserType = (typeof Browsers)[keyof typeof Browsers]
