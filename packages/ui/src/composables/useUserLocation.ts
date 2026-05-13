@@ -9,6 +9,7 @@ const userLocation = ref<LatLon>({
   longitude: NaN,
 })
 
+// call getUserLocation() whenever userLocationPermission changes and is not 'denied'
 watch(userLocationPermission, async (newPermissionState) => {
   if (newPermissionState !== 'denied') {
     await getUserLocation()
@@ -16,6 +17,7 @@ watch(userLocationPermission, async (newPermissionState) => {
 })
 
 export function useUserLocation() {
+  // set userLocationPermission to navigator.permissions.state, watcher calls getUserLocation() if not 'denied'
   getGeolocatePermissionState()
   return { userLocation, userLocationPermission }
 }
@@ -27,6 +29,8 @@ async function getGeolocatePermissionState() {
     })
     userLocationPermission.value = useLocationPermission.state
     if (getBrowserType() !== Browsers.SAFARI) {
+      // set userLocationPermission to change whenever navigator.permissions.state changes
+      // skip this if browser is Safari because Safari has a known bug that keeps this from working (https://bugs.webkit.org/show_bug.cgi?id=259432)
       useLocationPermission.onchange = () => {
         userLocationPermission.value = useLocationPermission.state
       }
@@ -48,6 +52,7 @@ async function getUserLocation() {
           ? position.coords.longitude
           : NaN
         if (hasLocationData(userLocation)) {
+          // if navigator.permissions is 'prompt' and user responds to allow location services, change userLocationPermission to 'granted'
           userLocationPermission.value = 'granted'
         } else {
           userLocationPermission.value = 'denied'
@@ -63,6 +68,7 @@ async function getUserLocation() {
   })
 }
 
+// verify location is in or near enough to Philadelphia
 function checkLatitudeInRange(latitude: number) {
   return 39.84911 < latitude && latitude < 40.175
 }
