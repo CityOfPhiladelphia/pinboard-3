@@ -70,7 +70,7 @@ defineSlots<{
 const props = defineProps<{
   locations: BasicLocation[]
   searchOrUserLocation: LatLon
-  isLoading: boolean
+  isLoading: string | false
   errorMessage: string | null
   locationPanelFilter?: LocationFilterOption[]
   locationPanelSearch?: string

@@ -50,7 +50,7 @@ async function getGeolocatePermissionState() {
 }
 
 async function getUserLocation() {
-  return await new Promise<boolean>(async (resolve) => {
+  return await new Promise<boolean>(async () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         userLocation.value.latitude = checkLatitudeInRange(
@@ -64,7 +64,6 @@ async function getUserLocation() {
           ? position.coords.longitude
           : NaN
         userLocationPermission.value = 'granted'
-        resolve(false)
       },
       (error) => {
         switch (error.code) {
@@ -72,7 +71,6 @@ async function getUserLocation() {
           case error.POSITION_UNAVAILABLE:
           case error.TIMEOUT: {
             userLocationPermission.value = 'denied'
-            resolve(false)
             break
           }
         }

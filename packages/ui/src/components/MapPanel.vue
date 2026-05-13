@@ -15,7 +15,7 @@ const props = defineProps<{
   geojson?: unknown
   hoveredId?: string | null
   selectedId?: string | null
-  isLoading?: boolean
+  isLoading?: string | false
   isMobile?: boolean
   onHover?: (id: string) => void
   onHoverEnd?: () => void
@@ -92,7 +92,7 @@ const SlotRenderer = defineComponent({
 
     <div v-if="isLoading" class="map-loading-overlay">
       <div class="map-loading-spinner" />
-      <span class="map-loading-text">Loading data...</span>
+      <span class="map-loading-text" v-text="isLoading"></span>
     </div>
   </div>
 </template>
