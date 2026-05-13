@@ -27,12 +27,12 @@ function isVisible(feature: RawFeature): boolean {
 
 export function useLocations(): {
   locations: Ref<PrimaryCareLocation[]>
-  isLoading: Ref<boolean>
+  isLoading: Ref<string | false>
   errorMessage: Ref<string | null>
   geojson: Ref<unknown>
 } {
   const locations = ref<PrimaryCareLocation[]>([])
-  const isLoading = ref(true)
+  const isLoading = ref<string | false>('Loading data...')
   const errorMessage = ref<string | null>(null)
   const geojson = ref<unknown>(null)
 

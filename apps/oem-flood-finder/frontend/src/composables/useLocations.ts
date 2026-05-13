@@ -16,20 +16,10 @@ export function useLocations(): {
   const errorMessage = ref<string | null>(null)
   const hasData = ref<boolean>(false)
 
-  // const isLoading = computed(() => {
-  //   // if has has location services active, isLoading will remain true while resolving user location
-  //   return !(
-  //     hasData.value &&
-  //     (userLocationPermission.value === 'denied' || PinboardUtilities.hasLocationData(userLocation))
-  //   )
-  // })
-
   const isLoading = computed(() => {
-    // if has has location services active, isLoading will remain true while resolving user location
     if (!hasData.value) {
       return 'Loading data...'
     }
-
     if (
       userLocationPermission.value !== 'denied' &&
       !PinboardUtilities.hasLocationData(userLocation)
