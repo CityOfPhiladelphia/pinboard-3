@@ -1,28 +1,23 @@
 import { ref, watch } from 'vue'
 import { getBrowserType } from '../utilities/getBrowserType'
 import { type LatLon, type LocationPermissionState, Browsers } from '../types'
+import { hasLocationData } from '../utilities/hasLocationData'
 
-const userLocationPermission = ref<LocationPermissionState>(null)
+const userLocationPermission = ref<LocationPermissionState>('denied')
 const userLocation = ref<LatLon>({
   latitude: NaN,
   longitude: NaN,
 })
 
+watch(userLocationPermission, async (newPermissionState) => {
+  if (newPermissionState !== 'denied') {
+    await getUserLocation()
+  }
+})
+
 export function useUserLocation() {
-  awaitUserPermissionResponse()
-
-  watch(userLocationPermission, async (newPermissionState) => {
-    if (newPermissionState === 'granted' || newPermissionState === 'prompt') {
-      await getUserLocation()
-    }
-  })
-
+  getGeolocatePermissionState()
   return { userLocation, userLocationPermission }
-}
-
-async function awaitUserPermissionResponse() {
-  await getGeolocatePermissionState()
-  await getUserLocation()
 }
 
 async function getGeolocatePermissionState() {
@@ -36,8 +31,8 @@ async function getGeolocatePermissionState() {
         userLocationPermission.value = useLocationPermission.state
       }
     }
-  } catch (err) {
-    console.log(err)
+  } catch (error) {
+    console.error(error)
     userLocationPermission.value = 'denied'
   }
 }
@@ -52,17 +47,16 @@ async function getUserLocation() {
         userLocation.value.longitude = checkLongitudeInRange(position.coords.longitude)
           ? position.coords.longitude
           : NaN
-        userLocationPermission.value = 'granted'
+        if (hasLocationData(userLocation)) {
+          userLocationPermission.value = 'granted'
+        } else {
+          userLocationPermission.value = 'denied'
+          console.error(`Location not in range`)
+        }
       },
       (error) => {
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-          case error.POSITION_UNAVAILABLE:
-          case error.TIMEOUT: {
-            userLocationPermission.value = 'denied'
-            break
-          }
-        }
+        userLocationPermission.value = 'denied'
+        console.error(error)
       },
       { timeout: Infinity, maximumAge: 0 }
     )

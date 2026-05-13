@@ -16,13 +16,9 @@ export interface ZipcodePolygon {
   nodes: LocationCoordinate[]
 }
 
-export type LocationPermissionState = 'granted' | 'prompt' | 'denied' | null
+export type LocationPermissionState = 'granted' | 'prompt' | 'denied'
 
-export type MapControlPosition =
-  | 'top-left'
-  | 'top-right'
-  | 'bottom-left'
-  | 'bottom-right'
+export type MapControlPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
 export interface MapConfig {
   center?: LocationCoordinate
@@ -222,12 +218,10 @@ export interface AisAddressSearchResponse {
 }
 
 export const Browsers = {
-  EDGE: 'EDGE',
-  IE: 'IE',
   FIREFOX: 'FIREFOX',
-  OPERA: 'OPERA',
-  UC: 'UC',
   SAMSUNG: 'SAMSUNG',
+  OPERA: 'OPERA',
+  EDGE: 'EDGE',
   CHROME: 'CHROME',
   SAFARI: 'SAFARI',
   UNKNOWN: 'UNKNOWN',
