@@ -1,4 +1,3 @@
-import { ref } from 'vue'
 import { Browsers, type BrowserType } from '../types'
 
 type WebBrowser = Exclude<BrowserType, 'UNKNOWN'>
@@ -13,16 +12,15 @@ const browserRegex: Record<WebBrowser, RegExp> = {
   SAFARI: /safari/,
 } as const
 
-const browserType = ref<BrowserType>('UNKNOWN')
-
-export function useBrowserType() {
+export function getBrowserType() {
+  let browserType: BrowserType = 'UNKNOWN'
   const userAgent = window.navigator.userAgent.toLowerCase()
   for (const browser of Object.keys(browserRegex) as WebBrowser[]) {
     if (browserRegex[browser].test(userAgent)) {
-      browserType.value = Browsers[browser]
+      browserType = Browsers[browser]
       break
     }
   }
 
-  return { browserType }
+  return browserType
 }

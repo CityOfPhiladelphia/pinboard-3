@@ -1,5 +1,5 @@
 import { ref, watch } from 'vue'
-import { useBrowserType } from './useBrowserType'
+import { getBrowserType } from '../utilities/getBrowserType'
 import { type LatLon, type LocationPermissionState, Browsers } from '../types'
 
 const userLocationPermission = ref<LocationPermissionState>(null)
@@ -7,22 +7,18 @@ const userLocation = ref<LatLon>({
   latitude: NaN,
   longitude: NaN,
 })
-const { browserType } = useBrowserType()
 
 export function useUserLocation() {
   awaitUserPermissionResponse()
 
-  watch(
-    userLocationPermission,
-    async (newPermissionState, oldPermissionState) => {
-      if (
-        (newPermissionState === 'granted' && oldPermissionState !== 'prompt') ||
-        newPermissionState === 'prompt'
-      ) {
-        await getUserLocation()
-      }
+  watch(userLocationPermission, async (newPermissionState, oldPermissionState) => {
+    if (
+      (newPermissionState === 'granted' && oldPermissionState !== 'prompt') ||
+      newPermissionState === 'prompt'
+    ) {
+      await getUserLocation()
     }
-  )
+  })
 
   return { userLocation, userLocationPermission }
 }
@@ -38,7 +34,7 @@ async function getGeolocatePermissionState() {
       name: 'geolocation',
     })
     userLocationPermission.value = useLocationPermission.state
-    if (browserType.value !== Browsers.SAFARI) {
+    if (getBrowserType() !== Browsers.SAFARI) {
       useLocationPermission.onchange = () => {
         userLocationPermission.value = useLocationPermission.state
       }
@@ -53,14 +49,10 @@ async function getUserLocation() {
   return await new Promise<boolean>(async () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        userLocation.value.latitude = checkLatitudeInRange(
-          position.coords.latitude
-        )
+        userLocation.value.latitude = checkLatitudeInRange(position.coords.latitude)
           ? position.coords.latitude
           : NaN
-        userLocation.value.longitude = checkLongitudeInRange(
-          position.coords.longitude
-        )
+        userLocation.value.longitude = checkLongitudeInRange(position.coords.longitude)
           ? position.coords.longitude
           : NaN
         userLocationPermission.value = 'granted'
