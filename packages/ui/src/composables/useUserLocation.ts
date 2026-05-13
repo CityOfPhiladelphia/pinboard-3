@@ -11,11 +11,8 @@ const userLocation = ref<LatLon>({
 export function useUserLocation() {
   awaitUserPermissionResponse()
 
-  watch(userLocationPermission, async (newPermissionState, oldPermissionState) => {
-    if (
-      (newPermissionState === 'granted' && oldPermissionState !== 'prompt') ||
-      newPermissionState === 'prompt'
-    ) {
+  watch(userLocationPermission, async (newPermissionState) => {
+    if (newPermissionState === 'granted' || newPermissionState === 'prompt') {
       await getUserLocation()
     }
   })
