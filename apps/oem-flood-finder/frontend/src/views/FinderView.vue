@@ -13,7 +13,6 @@ import {
   MapMarker,
   MapIconTextPin,
   MapNavigationControl,
-  GeolocationButton,
   BasemapToggle,
   FillLayer,
   MapCheckboxLegend,
@@ -158,17 +157,6 @@ function handleSearchSubmit(locationSearchString: string) {
   }
 }
 
-function handleGeolocate(locationData: PinboardTypes.LatLon & { accuracy: number }) {
-  userLocation.value = {
-    latitude: locationData.latitude,
-    longitude: locationData.longitude,
-  }
-}
-
-function handleGeolocateError(error: Error | GeolocationPositionError) {
-  console.log(error)
-}
-
 function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
   onSelect(loc)
 }
@@ -220,12 +208,6 @@ function asOemLocation(location: BasicLocation) {
       <BasemapToggle
         position="top-right"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
-      />
-      <GeolocationButton
-        :position="isMobile ? 'top-right' : 'bottom-right'"
-        :teleport-to="isMobile ? mobileControlsTarget : undefined"
-        @located="handleGeolocate"
-        @error="handleGeolocateError"
       />
 
       <FillLayer

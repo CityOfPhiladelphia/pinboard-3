@@ -18,18 +18,18 @@ export function useLocations(): {
 
   const isLoading = computed(() => {
     // if has has location services active, isLoading will remain true while resolving user location
-    // return !(
-    //   hasData.value &&
-    //   (userLocationPermission.value === 'denied' || PinboardUtilities.hasLocationData(userLocation))
-    // )
-    return false
+    return !(
+      hasData.value &&
+      (true || // remove to re-enable loading waiting for user location
+        userLocationPermission.value === 'denied' ||
+        PinboardUtilities.hasLocationData(userLocation))
+    )
   })
 
   onBeforeMount(async () => {
-    const locations: LocationPanelDTO[] =
-      import.meta.env.DEV || true
-        ? await getLocationsDev(errorMessage)
-        : await getLocationsProxy(errorMessage)
+    const locations: LocationPanelDTO[] = import.meta.env.DEV
+      ? await getLocationsDev(errorMessage)
+      : await getLocationsProxy(errorMessage)
     oemLocations.value = Array.from(locations, (loc) => {
       const cardInfo: MapCardProps = {
         heading: loc.name,
@@ -74,13 +74,13 @@ function getLocationTags(loc: LocationPanelDTO): NonNullable<MapCardProps['tags'
 
 async function getLocationsProxy(errorMessageRef: Ref) {
   const response = await fetch(
-    'https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/getOemLocations',
+    'https://haydr3k097.execute-api.us-east-1.amazonaws.com/getOemLocations',
   )
   if (!response.ok) {
     errorMessageRef.value = 'Error retrieving gauges'
     return
   }
-  return response.json()
+  return await response.json()
 }
 
 async function getLocationsDev(errorMessageRef: Ref) {
@@ -97,5 +97,5 @@ async function getLocationsDev(errorMessageRef: Ref) {
     errorMessageRef.value = 'Error retrieving gauges'
     return
   }
-  return response.json()
+  return await response.json()
 }
