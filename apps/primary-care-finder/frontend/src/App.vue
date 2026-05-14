@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, toRaw } from 'vue'
 import {
-  Pinboard,
+  PinboardBody,
   PinboardShell,
   CircleLayer,
   MapNavigationControl,
@@ -102,7 +102,7 @@ function getCardDetails(loc: { name: string; [key: string]: unknown }) {
       </span>
     </template>
 
-    <Pinboard
+    <PinboardBody
       :locations="filteredLocations"
       :search-or-user-location="userLocation"
       :get-card-details="getCardDetails"
@@ -185,7 +185,7 @@ function getCardDetails(loc: { name: string; [key: string]: unknown }) {
           "
         />
       </template>
-    </Pinboard>
+    </PinboardBody>
   </PinboardShell>
 </template>
 
