@@ -109,7 +109,7 @@ watch(
         break
       }
     }
-  },
+  }
 )
 
 // event handlers

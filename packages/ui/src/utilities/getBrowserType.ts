@@ -14,10 +14,8 @@ const browserRegex: Record<WebBrowser, RegExp> = {
 
 export function getBrowserType() {
   let browserType: BrowserType = 'UNKNOWN'
-  const userAgent = window.navigator.userAgent
-  console.log(userAgent)
   for (const browser of Object.keys(browserRegex) as WebBrowser[]) {
-    if (browserRegex[browser].test(userAgent)) {
+    if (browserRegex[browser].test(window.navigator.userAgent)) {
       browserType = Browsers[browser]
       break
     }

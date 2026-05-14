@@ -72,7 +72,7 @@ export interface MenuOption {
 
 export type SortLocationsOptions = Record<string, string>
 
-export type AisAutocompleteResult = Readonly<{
+export interface AisAutocompleteResult {
   query: string
   query_type: string
   count: number
@@ -84,7 +84,7 @@ export type AisAutocompleteResult = Readonly<{
       has_opa: boolean
     }>[]
   }>
-}>
+}
 
 export interface AisAddressSearchResponse {
   search_type: string
