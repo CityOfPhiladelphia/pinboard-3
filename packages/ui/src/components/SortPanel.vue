@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Radio } from '@phila/phila-ui-radio'
 import { PhilaButton, CloseButton } from '@phila/phila-ui-button'

@@ -1,5 +1,7 @@
 import { onMounted, onUnmounted, ref, type Ref } from 'vue'
 
+export const mobileMaxWidth = 1064
+
 export function useIsMobile(): Ref<boolean> {
   const mql = matchMedia('(max-width: 1064px) and (max-height: 915px)')
 
