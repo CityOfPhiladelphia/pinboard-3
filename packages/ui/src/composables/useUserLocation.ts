@@ -10,26 +10,31 @@ const userLocation = ref<LatLon>({
   longitude: NaN,
 })
 
-const geolocationOptions = { timeout: Infinity, maximumAge: 10_000, enableHighAccuracy: false }
+const gotFirstLocation = ref<boolean>(false)
+
+const geolocationOptions = { timeout: Infinity, maximumAge: 0, enableHighAccuracy: false }
 let watchId: number | null = null
+
+watch(gotFirstLocation, () => {
+  navigator.geolocation.watchPosition(locationSuccess, locationError, geolocationOptions)
+})
 
 watch(userLocationPermission, async (newPermissionState) => {
   switch (newPermissionState) {
     case 'granted': {
-      watchId = navigator.geolocation.watchPosition(
-        locationSuccess,
-        (error) => {
-          console.error(error)
-        },
-        geolocationOptions
-      )
+      if (gotFirstLocation.value) {
+        watchId = !watchId
+          ? navigator.geolocation.watchPosition(locationSuccess, locationError, geolocationOptions)
+          : watchId
+      }
       break
     }
     case 'denied': {
+      console.log('denied')
+      clearUserLocation()
       if (watchId) {
         navigator.geolocation.clearWatch(watchId)
       }
-      clearUserLocation()
       watchId = null
     }
   }
@@ -70,13 +75,15 @@ async function getGeolocatePermissionState() {
             break
           }
           case 'denied': {
-            clearUserLocation()
             userLocationPermission.value = 'denied'
             break
           }
           case 'prompt': {
-            userLocationPermission.value = 'denied'
-            await getUserLocation()
+            if (hasLocationData(userLocation)) {
+              userLocationPermission.value = 'denied'
+            } else {
+              getUserLocation()
+            }
             break
           }
         }
@@ -88,17 +95,8 @@ async function getGeolocatePermissionState() {
   }
 }
 
-async function getUserLocation() {
-  return await new Promise<boolean>(async () => {
-    navigator.geolocation.getCurrentPosition(
-      locationSuccess,
-      (error) => {
-        userLocationPermission.value = 'denied'
-        console.error(error)
-      },
-      geolocationOptions
-    )
-  })
+function getUserLocation() {
+  navigator.geolocation.getCurrentPosition(locationSuccess, locationError, geolocationOptions)
 }
 
 // verify location is in or near enough to Philadelphia
@@ -110,6 +108,9 @@ function checkLatitudeInRange(latitude: number) {
 }
 
 function locationSuccess(position: GeolocationPosition) {
+  if (!gotFirstLocation.value) {
+    gotFirstLocation.value = true
+  }
   // only show location on map if user is in or near Philly
   userLocation.value.latitude = checkLatitudeInRange(position.coords.latitude)
     ? position.coords.latitude
@@ -123,6 +124,12 @@ function locationSuccess(position: GeolocationPosition) {
 
   // if navigator.permissions is 'prompt' or 'granted' resolve both to 'granted' if user allows location services
   userLocationPermission.value = 'granted'
+}
+
+function locationError(error: GeolocationPositionError) {
+  clearUserLocation()
+  userLocationPermission.value = 'denied'
+  console.error(error)
 }
 
 function clearUserLocation() {
