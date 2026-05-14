@@ -89,7 +89,7 @@ function onSheetPointerUp() {
   }
 }
 
-const isMobile = PinboardComposables.useIsMobile();
+const isMobile = PinboardComposables.useIsMobile()
 
 watch(isMobile, (mobile) => {
   if (!mobile) infoSheetOpen.value = false
@@ -116,7 +116,6 @@ onBeforeUnmount(() => {
   document.removeEventListener('pointerup', onSheetPointerUp)
   document.removeEventListener('pointercancel', onSheetPointerUp)
 })
-
 </script>
 
 <template>

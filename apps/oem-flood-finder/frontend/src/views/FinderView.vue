@@ -72,7 +72,7 @@ const { searchOrUserLocation } = PinboardComposables.userUserAndSearchLocations(
   finishedZipFetch,
 )
 
-const isMobile = PinboardComposables.useIsMobile();
+const isMobile = PinboardComposables.useIsMobile()
 
 // computed refs
 const hasCurrentLocation = computed(() =>
@@ -168,7 +168,6 @@ function handleDeselect(id: string) {
 function asOemLocation(location: BasicLocation) {
   return location as OemLocation
 }
-
 </script>
 
 <template>
@@ -201,7 +200,7 @@ function asOemLocation(location: BasicLocation) {
         mobileControlsTargetLeft,
         onHover,
         onHoverEnd,
-        onSelect
+        onSelect,
       }"
     >
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />

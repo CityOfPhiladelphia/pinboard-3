@@ -67,10 +67,10 @@ Do not commit this file — it is gitignored.
 feature/* → test → main
 ```
 
-| Branch | Environment | Trigger |
-| ------ | ----------- | ------- |
-| `test` | Test | Push to `test` |
-| `main` | Production | Push to `main` |
+| Branch | Environment | Trigger        |
+| ------ | ----------- | -------------- |
+| `test` | Test        | Push to `test` |
+| `main` | Production  | Push to `main` |
 
 Feature branches should be opened as PRs against `test`. Once changes are validated in the test environment, open a PR from `test` → `main` to promote to production. Both branches are protected and require a passing CI check before merging.
 

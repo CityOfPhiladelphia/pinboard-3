@@ -94,7 +94,6 @@ watch(panelOpen, (isOpen) => {
     window.removeEventListener('scroll', recomputeAnchor, true)
   }
 })
-
 </script>
 
 <template>

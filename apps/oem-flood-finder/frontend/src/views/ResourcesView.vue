@@ -7,8 +7,7 @@ import { PinboardComposables } from '@pinboard/ui'
 
 const router = useRouter()
 
-const isMobile = PinboardComposables.useIsMobile();
-
+const isMobile = PinboardComposables.useIsMobile()
 </script>
 
 <template>

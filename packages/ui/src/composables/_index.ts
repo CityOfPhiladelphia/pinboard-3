@@ -15,5 +15,5 @@ export {
   useSearchZipcode,
   useUserLocation,
   userUserAndSearchLocations,
-  useIsMobile
+  useIsMobile,
 }

@@ -1,12 +1,6 @@
 <script setup lang="ts">
 // vue imports
-import {
-  useSlots,
-  inject,
-  ref,
-  computed,
-  watch,
-} from 'vue'
+import { useSlots, inject, ref, computed, watch } from 'vue'
 
 // 3rd party imports
 import { faMap } from '@fortawesome/pro-solid-svg-icons'
