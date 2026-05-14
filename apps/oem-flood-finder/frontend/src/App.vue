@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PinboardShell, NavbarInfo } from '@pinboard/ui'
+import { PinboardShell, NavbarInfo, PinboardComposables } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { CloseButton } from '@phila/phila-ui-button'
@@ -35,18 +35,6 @@ const alertBanner: ComputedRef<AlertBanner | null> = computed(() => {
   }
   return null
 })
-
-const route = useRoute()
-const router = useRouter()
-const navbarInfo = useTemplateRef<InstanceType<typeof NavbarInfo>>('navbarInfo')
-
-const isMobile = ref(
-  typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches,
-)
-let mql: MediaQueryList | undefined
-function handleMqlChange(e: MediaQueryListEvent) {
-  isMobile.value = e.matches
-}
 
 const infoSheetOpen = ref(false)
 
@@ -101,15 +89,18 @@ function onSheetPointerUp() {
   }
 }
 
+const isMobile = PinboardComposables.useIsMobile();
+
 watch(isMobile, (mobile) => {
   if (!mobile) infoSheetOpen.value = false
 })
 
+const route = useRoute()
+const router = useRouter()
+const navbarInfo = useTemplateRef<InstanceType<typeof NavbarInfo>>('navbarInfo')
+
 onMounted(async () => {
   await router.isReady()
-  mql = window.matchMedia('(max-width: 768px)')
-  isMobile.value = mql.matches
-  mql.addEventListener('change', handleMqlChange)
 
   if (route.path === '/') {
     if (isMobile.value) {
@@ -121,11 +112,11 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
-  mql?.removeEventListener('change', handleMqlChange)
   document.removeEventListener('pointermove', onSheetPointerMove)
   document.removeEventListener('pointerup', onSheetPointerUp)
   document.removeEventListener('pointercancel', onSheetPointerUp)
 })
+
 </script>
 
 <template>

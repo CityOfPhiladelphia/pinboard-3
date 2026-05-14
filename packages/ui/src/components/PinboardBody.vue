@@ -5,8 +5,6 @@ import {
   inject,
   ref,
   computed,
-  onMounted,
-  onUnmounted,
   watch,
 } from 'vue'
 
@@ -55,7 +53,6 @@ defineSlots<{
     geojson: unknown
     map: unknown
     zoom: number
-    isMobile: boolean
     hoveredId: string | null
     selectedId: string | null
     mobileControlsTarget: HTMLDivElement | null
@@ -78,6 +75,7 @@ const props = defineProps<{
   locationSearchMode?: SearchMode
   locationPanelLocationAvailable?: boolean
   geojson?: unknown
+  isMobile: boolean
 }>()
 
 // emits to parent app to handle
@@ -90,16 +88,13 @@ const emit = defineEmits<{
 
 // component variables
 const snapPoints = [15, 50, 100]
-let mql: MediaQueryList | null = null
+// let mql: MediaQueryList | null = null
 const config = inject(PINBOARD_CONFIG_KEY)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const slots: Record<string, any> = useSlots()
 
 // refs
-const isMobile = ref(
-  typeof window !== 'undefined' &&
-    window.matchMedia('(max-width: 768px)').matches
-)
+
 const hoveredLocationId = ref<string | null>(null)
 const selectedLocation = ref<BasicLocation | null>(null)
 const bottomSheetOpen = ref(true)
@@ -161,7 +156,7 @@ const locationCountLabel = computed(() => {
 
 // watchers
 watch(selectedLocation, (loc) => {
-  if (loc && isMobile.value) {
+  if (loc && props.isMobile) {
     bottomSheetRef.value?.snapTo(snapPoints.length - 1)
   }
 })
@@ -279,7 +274,7 @@ function handleCloseLocationDetail() {
     emit('deselect', closedId)
   }
 
-  if (isMobile.value && closedId) {
+  if (props.isMobile && closedId) {
     bottomSheetRef.value?.snapTo(1)
     // Re-center the card in the shrunken list viewport AFTER the sheet
     // snap animation finishes. Keep the list hidden (selectedLocation
@@ -294,21 +289,6 @@ function handleCloseLocationDetail() {
   }
 }
 
-function handleMediaChange(e: MediaQueryListEvent) {
-  isMobile.value = e.matches
-}
-
-// lifecycle functions
-onMounted(() => {
-  mql = window.matchMedia('(max-width: 768px)')
-  isMobile.value = mql.matches
-  mql.addEventListener('change', handleMediaChange)
-})
-
-onUnmounted(() => {
-  mql?.removeEventListener('change', handleMediaChange)
-})
-
 // utility functions
 const effectiveMapConfig = (() => {
   // Merge mobile overrides into the map config ONCE at setup — not reactively.
@@ -317,7 +297,7 @@ const effectiveMapConfig = (() => {
   const map = config?.map
   if (!map) return map
   const { mobile, ...base } = map
-  if (isMobile.value && mobile) {
+  if (props.isMobile && mobile) {
     return { ...base, ...mobile }
   }
   return base
@@ -363,6 +343,7 @@ const effectiveMapConfig = (() => {
         @search="handleSearchSubmit"
         @selected-filter="handleLocationFilterChange"
         @sort-option="handleLocationSortChange"
+        :is-mobile="isMobile"
       />
     </div>
 
@@ -421,6 +402,7 @@ const effectiveMapConfig = (() => {
           :filter-options="locationPanelFilter"
           :location-available="locationPanelLocationAvailable"
           @selected-filter="handleLocationFilterChange"
+          :is-mobile="isMobile"
         />
       </div>
     </div>
@@ -447,6 +429,7 @@ const effectiveMapConfig = (() => {
             :sort-options="locationPanelSort"
             :location-available="locationPanelLocationAvailable"
             @sort-option="handleLocationSortChange"
+            :is-mobile="isMobile"
           />
         </div>
 
@@ -473,6 +456,7 @@ const effectiveMapConfig = (() => {
           @hover="handleHover"
           @hover-end="handleHoverEnd"
           @selected-filter="handleLocationFilterChange"
+          :is-mobile="isMobile"
         />
       </div>
 
@@ -616,7 +600,7 @@ const effectiveMapConfig = (() => {
   height: auto;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1064px) {
   .finder-panel {
     position: relative;
     display: block;

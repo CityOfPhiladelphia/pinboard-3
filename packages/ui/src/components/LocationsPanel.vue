@@ -24,6 +24,7 @@ const props = defineProps<{
   locationAvailable?: boolean
   hoveredId?: string | null
   selectedId?: string | null
+  isMobile: boolean
   locationCardSlot?: (props: {
     location: BasicLocation
     isHovered: boolean
@@ -103,6 +104,7 @@ defineExpose({ scrollToCard })
     @sort-option="handleSortChange"
     @search-string="handleSearchChange"
     @search="emit('search')"
+    :is-mobile="isMobile"
   />
   <div ref="listRef" class="location-list content">
     <MapCard

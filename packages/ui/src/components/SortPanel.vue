@@ -15,6 +15,7 @@ const props = defineProps<{
   sortOptions: SortPanelOption[]
   appliedSort: string | null
   locationAvailable: boolean
+  isMobile: boolean
 }>()
 
 const emit = defineEmits<{
@@ -53,19 +54,6 @@ const formEl = ref<HTMLElement | null>(null)
 const triggerEl = ref<HTMLElement | null>(null)
 const anchorStyle = ref<Record<string, string>>({})
 
-const isMobile = ref(false)
-let mql: MediaQueryList | null = null
-
-function handleMediaChange(e: MediaQueryListEvent) {
-  isMobile.value = e.matches
-}
-
-onMounted(() => {
-  mql = window.matchMedia('(max-width: 768px)')
-  isMobile.value = mql.matches
-  mql.addEventListener('change', handleMediaChange)
-})
-
 function recomputeAnchor() {
   const rect = triggerEl.value?.getBoundingClientRect()
   if (!rect) return
@@ -78,7 +66,7 @@ function recomputeAnchor() {
 }
 
 function handleDocumentClick(e: MouseEvent) {
-  if (!panelOpen.value || isMobile.value) return
+  if (!panelOpen.value || props.isMobile) return
   const target = e.target as Node
   if (formEl.value?.contains(target) || triggerEl.value?.contains(target)) {
     return
@@ -107,13 +95,6 @@ watch(panelOpen, (isOpen) => {
   }
 })
 
-onBeforeUnmount(() => {
-  document.removeEventListener('mousedown', handleDocumentClick)
-  document.removeEventListener('keydown', handleKeydown)
-  window.removeEventListener('resize', recomputeAnchor)
-  window.removeEventListener('scroll', recomputeAnchor, true)
-  mql?.removeEventListener('change', handleMediaChange)
-})
 </script>
 
 <template>

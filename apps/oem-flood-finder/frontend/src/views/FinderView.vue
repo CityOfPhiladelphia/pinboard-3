@@ -9,7 +9,7 @@ import { faLocationDot } from '@fortawesome/pro-solid-svg-icons'
 // philly ui imports
 // pinboard imports
 import {
-  Pinboard,
+  PinboardBody,
   MapMarker,
   MapIconTextPin,
   MapNavigationControl,
@@ -36,6 +36,7 @@ import {
 import LocationDetail from '@/components/LocationDetail.vue'
 import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation, SortMode } from '@/types'
+import type { BasicLocation } from '../../../../../packages/ui/src/types'
 
 // app variables
 const searchPlaceholderText = 'Search by address, zipcode, or keyword...'
@@ -72,7 +73,9 @@ const { searchOrUserLocation } = PinboardComposables.userUserAndSearchLocations(
   finishedZipFetch,
 )
 
-// conputed refs
+const isMobile = PinboardComposables.useIsMobile();
+
+// computed refs
 const hasCurrentLocation = computed(() =>
   PinboardUtilities.hasLocationData(searchOrUserLocation.value),
 )
@@ -173,10 +176,15 @@ function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
 function handleDeselect(id: string) {
   visitedIds.value.add(id)
 }
+
+function asOemLocation(location: BasicLocation) {
+  return location as OemLocation
+}
+
 </script>
 
 <template>
-  <Pinboard
+  <PinboardBody
     :locations="currentLocations"
     :search-or-user-location="searchOrUserLocation"
     :is-loading="isLoading"
@@ -186,13 +194,14 @@ function handleDeselect(id: string) {
     :location-panel-sort="sortLocationsOptions"
     :location-search-mode="locationSearchMode"
     :location-panel-location-available="hasCurrentLocation"
+    :is-mobile="isMobile"
     @search="handleSearchSubmit"
     @selected-locations-filter="handleLocationFilterChange"
     @sort-locations-option="handleLocationSortChange"
     @deselect="handleDeselect"
   >
     <template #location-detail="{ location, onClose }">
-      <LocationDetail :location="location as OemLocation" :on-close="onClose" />
+      <LocationDetail :on-close="onClose" :location="asOemLocation(location)" />
     </template>
 
     <template
@@ -200,12 +209,11 @@ function handleDeselect(id: string) {
         hoveredId,
         selectedId,
         zoom,
-        isMobile,
         mobileControlsTarget,
         mobileControlsTargetLeft,
         onHover,
         onHoverEnd,
-        onSelect,
+        onSelect
       }"
     >
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />
@@ -269,7 +277,7 @@ function handleDeselect(id: string) {
         </MapMarker>
       </div>
     </template>
-  </Pinboard>
+  </PinboardBody>
 </template>
 
 <style scoped>

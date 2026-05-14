@@ -7,6 +7,7 @@ import { useSearchSuggestions } from './useSearchSuggestions'
 import { useSearchZipcode } from './useSearchZipcode'
 import { useUserLocation } from './useUserLocation'
 import { userUserAndSearchLocations } from './useUserAndSearchLocations'
+import { useIsMobile } from './useIsMobile'
 
 export {
   useSearchAddress,
@@ -14,4 +15,5 @@ export {
   useSearchZipcode,
   useUserLocation,
   userUserAndSearchLocations,
+  useIsMobile
 }
