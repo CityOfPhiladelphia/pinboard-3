@@ -117,8 +117,8 @@ function asPrimaryCareLocation(location: BasicLocation) {
       :error-message="errorMessage"
       :location-panel-search="searchPlaceholderText"
       :geojson="geojson"
-      @search="handleSearchSubmit"
       :is-mobile="isMobile"
+      @search="handleSearchSubmit"
     >
       <template #location-card="{ location }">
         <LocationCard :location="location" />

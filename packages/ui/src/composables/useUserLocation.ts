@@ -63,7 +63,6 @@ async function getGeolocatePermissionState() {
       }
       case 'prompt': {
         // if useLocationPermission.state is 'prompt' remain in whatever state resulted from getUserLocation()
-        userLocationPermission.value = userLocationPermission.value
         break
       }
     }

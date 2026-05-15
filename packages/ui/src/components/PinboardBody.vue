@@ -329,6 +329,7 @@ const effectiveMapConfig = (() => {
         :location-available="locationPanelLocationAvailable"
         :hovered-id="hoveredLocationId"
         :selected-id="selectedLocationId"
+        :is-mobile="isMobile"
         @select="handleSelect"
         @hover="handleHover"
         @hover-end="handleHoverEnd"
@@ -336,7 +337,6 @@ const effectiveMapConfig = (() => {
         @search="handleSearchSubmit"
         @selected-filter="handleLocationFilterChange"
         @sort-option="handleLocationSortChange"
-        :is-mobile="isMobile"
       />
     </div>
 
@@ -394,8 +394,8 @@ const effectiveMapConfig = (() => {
           v-if="locationPanelFilter"
           :filter-options="locationPanelFilter"
           :location-available="locationPanelLocationAvailable"
-          @selected-filter="handleLocationFilterChange"
           :is-mobile="isMobile"
+          @selected-filter="handleLocationFilterChange"
         />
       </div>
     </div>
@@ -421,8 +421,8 @@ const effectiveMapConfig = (() => {
             v-if="locationPanelSort"
             :sort-options="locationPanelSort"
             :location-available="locationPanelLocationAvailable"
-            @sort-option="handleLocationSortChange"
             :is-mobile="isMobile"
+            @sort-option="handleLocationSortChange"
           />
         </div>
 
@@ -445,11 +445,11 @@ const effectiveMapConfig = (() => {
           :location-search="locationPanelSearch"
           :hovered-id="hoveredLocationId"
           :selected-id="selectedLocationId"
+          :is-mobile="isMobile"
           @select="handleSelect"
           @hover="handleHover"
           @hover-end="handleHoverEnd"
           @selected-filter="handleLocationFilterChange"
-          :is-mobile="isMobile"
         />
       </div>
 

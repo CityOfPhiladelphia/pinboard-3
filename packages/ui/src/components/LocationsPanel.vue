@@ -100,11 +100,11 @@ defineExpose({ scrollToCard })
     :filter-options="locationFilter"
     :sort-options="locationSort"
     :location-available="locationAvailable"
+    :is-mobile="isMobile"
     @selected-filter="handleFilterChange"
     @sort-option="handleSortChange"
     @search-string="handleSearchChange"
     @search="emit('search')"
-    :is-mobile="isMobile"
   />
   <div ref="listRef" class="location-list content">
     <MapCard

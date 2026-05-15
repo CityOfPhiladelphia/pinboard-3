@@ -163,8 +163,8 @@ function focusSearchInput() {
         :sort-options="sortChoices"
         :applied-sort="appliedSort"
         :location-available="locationAvailable ?? false"
-        @update:applied-sort="handleSortChange"
         :is-mobile="isMobile"
+        @update:applied-sort="handleSortChange"
       />
     </div>
   </div>
