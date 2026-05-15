@@ -1,17 +1,13 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Logo } from '@phila/phila-ui-logo'
 import { PhilaLink } from '@phila/phila-ui-link'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import { PinboardComposables } from '@pinboard/ui'
 
 const router = useRouter()
 
-const mq = window.matchMedia('(max-width: 768px)')
-const isMobile = ref(mq.matches)
-const onMqChange = (e: MediaQueryListEvent) => (isMobile.value = e.matches)
-mq.addEventListener('change', onMqChange)
-onUnmounted(() => mq.removeEventListener('change', onMqChange))
+const isMobile = PinboardComposables.useIsMobile()
 </script>
 
 <template>
