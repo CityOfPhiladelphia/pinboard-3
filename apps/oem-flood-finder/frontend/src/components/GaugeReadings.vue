@@ -119,9 +119,9 @@ const snapshotTimestamp = computed(() => {
             <div class="has-text-label-small" style="color: #666">Water Temperature</div>
             <div class="has-text-body-small">
               {{
-                readingState.data[0].waterTemperature === -9999.9 ?
-                'No data' :
-                `${Math.round((readingState.data[0].waterTemperature * 9) / 5 + 32)} \u00B0F`
+                readingState.data[0].waterTemperature === -9999.9
+                  ? 'No data'
+                  : `${Math.round((readingState.data[0].waterTemperature * 9) / 5 + 32)} \u00B0F`
               }}
             </div>
           </div>
@@ -141,9 +141,9 @@ const snapshotTimestamp = computed(() => {
             <div class="has-text-label-small" style="color: #666">Air Temperature</div>
             <div class="has-text-body-small">
               {{
-                readingState.data[0].airTemperature === -9999.9 ?
-                'No data' :
-                `${Math.round((readingState.data[0].airTemperature * 9) / 5 + 32)} \u00B0F`
+                readingState.data[0].airTemperature === -9999.9
+                  ? 'No data'
+                  : `${Math.round((readingState.data[0].airTemperature * 9) / 5 + 32)} \u00B0F`
               }}
             </div>
           </div>
@@ -155,10 +155,11 @@ const snapshotTimestamp = computed(() => {
             <div class="has-text-label-small" style="color: #666">Barometric Pressure</div>
             <div class="has-text-body-small">
               {{
-                readingState.data[0].barometricPressure === -9999.9 ?
-                'No data' :
-                readingState.data[0].barometricPressure
-              }} mbar
+                readingState.data[0].barometricPressure === -9999.9
+                  ? 'No data'
+                  : readingState.data[0].barometricPressure
+              }}
+              mbar
             </div>
           </div>
         </div>

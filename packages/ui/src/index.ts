@@ -22,4 +22,4 @@ export {
 export type { LegendItem } from '@phila/phila-ui-map-core'
 
 export { NavbarInfo } from '@phila/phila-ui-app-header'
-export { PinboardShell, PinboardBody as Pinboard }
+export { PinboardShell, PinboardBody }

@@ -38,6 +38,7 @@ const props = defineProps<{
   filterOptions?: LocationFilterOption[]
   sortOptions?: SortLocationsOptions
   locationAvailable?: boolean
+  isMobile: boolean
 }>()
 
 // emits
@@ -163,6 +164,7 @@ function focusSearchInput() {
         :applied-sort="appliedSort"
         :location-available="locationAvailable ?? false"
         @update:applied-sort="handleSortChange"
+        :is-mobile="isMobile"
       />
     </div>
   </div>

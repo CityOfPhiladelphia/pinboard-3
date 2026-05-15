@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, toRaw } from 'vue'
 import {
-  Pinboard,
+  PinboardBody,
   PinboardShell,
   CircleLayer,
   MapNavigationControl,
@@ -15,6 +15,7 @@ import { useLocations } from './composables/useLocations'
 import LocationCard from './components/LocationCard.vue'
 import LocationDetail from './components/LocationDetail.vue'
 import type { PrimaryCareLocation } from './types'
+import type { BasicLocation } from '../../../../packages/ui/src/types'
 
 const searchPlaceholderText = 'Search by address or keyword...'
 
@@ -75,6 +76,12 @@ function handleGeolocateError(error: Error | GeolocationPositionError) {
 function getCardDetails(loc: { name: string; [key: string]: unknown }) {
   return { heading: loc.name, isLoading: false }
 }
+
+const isMobile = PinboardComposables.useIsMobile()
+
+function asPrimaryCareLocation(location: BasicLocation) {
+  return location as PrimaryCareLocation
+}
 </script>
 
 <template>
@@ -102,7 +109,7 @@ function getCardDetails(loc: { name: string; [key: string]: unknown }) {
       </span>
     </template>
 
-    <Pinboard
+    <PinboardBody
       :locations="filteredLocations"
       :search-or-user-location="userLocation"
       :get-card-details="getCardDetails"
@@ -111,6 +118,7 @@ function getCardDetails(loc: { name: string; [key: string]: unknown }) {
       :location-panel-search="searchPlaceholderText"
       :geojson="geojson"
       @search="handleSearchSubmit"
+      :is-mobile="isMobile"
     >
       <template #location-card="{ location }">
         <LocationCard :location="location" />
@@ -118,7 +126,7 @@ function getCardDetails(loc: { name: string; [key: string]: unknown }) {
 
       <template #location-detail="{ location, onClose }">
         <LocationDetail
-          :location="location as PrimaryCareLocation"
+          :location="asPrimaryCareLocation(location)"
           :on-close="onClose"
         />
       </template>
@@ -128,7 +136,6 @@ function getCardDetails(loc: { name: string; [key: string]: unknown }) {
           geojson,
           hoveredId,
           selectedId,
-          isMobile,
           mobileControlsTarget,
           onHover,
           onHoverEnd,
@@ -185,7 +192,7 @@ function getCardDetails(loc: { name: string; [key: string]: unknown }) {
           "
         />
       </template>
-    </Pinboard>
+    </PinboardBody>
   </PinboardShell>
 </template>
 
