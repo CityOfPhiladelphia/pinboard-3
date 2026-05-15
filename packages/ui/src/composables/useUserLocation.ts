@@ -10,30 +10,35 @@ const userLocation = ref<LatLon>({
   longitude: NaN,
 })
 const gotFirstLocation = ref<boolean>(false)
-
+const watchId = ref<number | null>(null)
 const geolocationOptions = { timeout: Infinity, maximumAge: 0, enableHighAccuracy: false }
-let watchId: number | null = null
 
-watch(gotFirstLocation, () => {
-  watchId = navigator.geolocation.watchPosition(locationSuccess, locationError, geolocationOptions)
+watch(gotFirstLocation, (newState) => {
+  if (newState) {
+    watchId.value = navigator.geolocation.watchPosition(
+      locationSuccess,
+      locationError,
+      geolocationOptions
+    )
+  }
 })
 
 watch(userLocationPermission, (newPermissionState) => {
   switch (newPermissionState) {
     case 'granted': {
       if (gotFirstLocation.value) {
-        watchId = !watchId
+        watchId.value = !watchId.value
           ? navigator.geolocation.watchPosition(locationSuccess, locationError, geolocationOptions)
-          : watchId
+          : watchId.value
       }
       break
     }
     case 'denied': {
-      clearUserLocation()
-      if (watchId) {
-        navigator.geolocation.clearWatch(watchId)
+      if (watchId.value) {
+        navigator.geolocation.clearWatch(watchId.value)
       }
-      watchId = null
+      watchId.value = null
+      clearUserLocation()
     }
   }
 })
@@ -66,7 +71,7 @@ async function getGeolocatePermissionState() {
     if (getBrowserType() !== Browsers.SAFARI) {
       // set userLocationPermission to change whenever navigator.permissions.state changes
       // skip this if browser is Safari because Safari has a known bug that keeps this from working (https://bugs.webkit.org/show_bug.cgi?id=259432)
-      useLocationPermission.onchange = async () => {
+      useLocationPermission.onchange = () => {
         switch (useLocationPermission.state) {
           case 'granted': {
             userLocationPermission.value = 'granted'
@@ -77,7 +82,8 @@ async function getGeolocatePermissionState() {
             break
           }
           case 'prompt': {
-            if (hasLocationData(userLocation)) {
+            if (gotFirstLocation.value) {
+              gotFirstLocation.value = false
               userLocationPermission.value = 'denied'
             } else {
               getUserLocation()
