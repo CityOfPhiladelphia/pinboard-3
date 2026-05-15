@@ -9,17 +9,16 @@ const userLocation = ref<LatLon>({
   latitude: NaN,
   longitude: NaN,
 })
-
 const gotFirstLocation = ref<boolean>(false)
 
 const geolocationOptions = { timeout: Infinity, maximumAge: 0, enableHighAccuracy: false }
 let watchId: number | null = null
 
 watch(gotFirstLocation, () => {
-  navigator.geolocation.watchPosition(locationSuccess, locationError, geolocationOptions)
+  watchId = navigator.geolocation.watchPosition(locationSuccess, locationError, geolocationOptions)
 })
 
-watch(userLocationPermission, async (newPermissionState) => {
+watch(userLocationPermission, (newPermissionState) => {
   switch (newPermissionState) {
     case 'granted': {
       if (gotFirstLocation.value) {
@@ -30,7 +29,6 @@ watch(userLocationPermission, async (newPermissionState) => {
       break
     }
     case 'denied': {
-      console.log('denied')
       clearUserLocation()
       if (watchId) {
         navigator.geolocation.clearWatch(watchId)
