@@ -18,12 +18,12 @@ import type {
 // props
 const props = defineProps<{
   locations: BasicLocation[]
-  locationSearch?: string
-  locationFilter?: LocationFilterOption[]
-  locationSort?: SortLocationsOptions
-  locationAvailable?: boolean
-  hoveredId?: string | null
-  selectedId?: string | null
+  locationSearch?: string | undefined
+  locationFilter?: LocationFilterOption[] | undefined
+  locationSort?: SortLocationsOptions | undefined
+  locationAvailable?: boolean | undefined
+  hoveredId?: string | undefined
+  selectedId?: string | undefined
   isMobile: boolean
   locationCardSlot?: (props: {
     location: BasicLocation

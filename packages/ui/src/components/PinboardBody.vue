@@ -79,8 +79,8 @@ const config = inject(PINBOARD_CONFIG_KEY)
 const slots = useSlots()
 
 // refs
-const hoveredLocationId = ref<string | null>(null)
-const selectedLocation = ref<BasicLocation | null>(null)
+const hoveredLocationId = ref<string | undefined>(undefined)
+const selectedLocation = ref<BasicLocation | undefined>(undefined)
 const bottomSheetOpen = ref(true)
 const bottomSheetRef = ref<{
   snapTo: (index: number) => void
@@ -111,7 +111,7 @@ const mobileControlsStyle = computed(() => {
 })
 
 const selectedLocationId = computed(() =>
-  selectedLocation.value === null ? null : selectedLocation.value.id
+  selectedLocation.value === undefined ? undefined : selectedLocation.value.id
 )
 
 const locationCountLabel = computed(() => {
@@ -146,7 +146,7 @@ function handleHover(id: string) {
 }
 
 function handleHoverEnd() {
-  hoveredLocationId.value = null
+  hoveredLocationId.value = undefined
 }
 
 function selectLocation(location: BasicLocation) {
@@ -204,10 +204,10 @@ function handleCloseLocationDetail() {
     // drift, then reveal at the correct position via an instant scroll.
     setTimeout(() => {
       locationsPanelRef.value?.scrollToCard(closedId, 'instant')
-      selectedLocation.value = null
+      selectedLocation.value = undefined
     }, 350)
   } else {
-    selectedLocation.value = null
+    selectedLocation.value = undefined
   }
 }
 
@@ -227,7 +227,7 @@ const effectiveMapConfig = (() => {
 </script>
 
 <template>
-  <div v-if="selectedLocation !== null && !isMobile" class="detail-overlay">
+  <div v-if="selectedLocation !== undefined && !isMobile" class="detail-overlay">
     <slot
       name="location-detail"
       :location="selectedLocation"

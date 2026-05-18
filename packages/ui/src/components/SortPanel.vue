@@ -23,7 +23,7 @@ const emit = defineEmits<{
 }>()
 
 const panelOpen = ref(false)
-const pendingSelection = ref<string | null>(null)
+const pendingSelection = ref<string | undefined>(undefined)
 
 const triggerLabel = computed(() => {
   if (!props.appliedSort) return 'Sort'
@@ -32,7 +32,7 @@ const triggerLabel = computed(() => {
 })
 
 function openPanel() {
-  pendingSelection.value = props.appliedSort
+  pendingSelection.value = props.appliedSort ?? undefined
   panelOpen.value = true
 }
 
@@ -41,7 +41,7 @@ function closePanel() {
 }
 
 function applySort() {
-  emit('update:appliedSort', pendingSelection.value)
+  emit('update:appliedSort', pendingSelection.value ?? null)
   closePanel()
 }
 
@@ -138,7 +138,7 @@ watch(panelOpen, (isOpen) => {
               name="sort-panel-radio"
               :value="option.value"
               :text="option.label"
-              :model-value="pendingSelection ?? undefined"
+              :model-value="pendingSelection ?? ''"
               :disabled="option.value === 'DistAsc' && !locationAvailable"
               @update:model-value="pendingSelection = $event"
             />
@@ -177,7 +177,7 @@ watch(panelOpen, (isOpen) => {
             name="sort-panel-radio"
             :value="option.value"
             :text="option.label"
-            :model-value="pendingSelection ?? undefined"
+            :model-value="pendingSelection ?? ''"
             :disabled="option.value === 'DistAsc' && !locationAvailable"
             @update:model-value="pendingSelection = $event"
           />
