@@ -308,7 +308,7 @@ const effectiveMapConfig = (() => {
     ref="bottomSheetRef"
     v-model="bottomSheetOpen"
     :snap-points="snapPoints"
-    :collapse-label="selectedLocation ? undefined : 'Map view'"
+    :collapse-label="selectedLocation ? '' : 'Map view'"
     :collapse-icon="selectedLocation ? undefined : faMap"
     class="mobile-bottom-sheet"
   >
