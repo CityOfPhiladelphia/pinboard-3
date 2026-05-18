@@ -17,7 +17,6 @@ import { PINBOARD_CONFIG_KEY } from '../plugin'
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
-import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 
 // pinboard composables imports
 
@@ -239,32 +238,38 @@ const effectiveMapConfig = (() => {
     <div class="finder-panel-locations">
       <slot name="locations-header" />
 
-      <div v-if="isLoading" class="location-list">
-        <MapCard v-for="n in 5" :key="n" :is-loading="true" />
-      </div>
-
-      <div v-else-if="errorMessage" class="status-message status-message--error">
+      <div v-if="errorMessage" class="status-message status-message--error">
         {{ errorMessage }}
       </div>
 
-      <LocationsPanel
-        v-else-if="!isLoading"
-        :locations="locations"
-        :location-filter="locationPanelFilter"
-        :location-search="locationPanelSearch"
-        :location-sort="locationPanelSort"
-        :location-available="locationPanelLocationAvailable"
-        :hovered-id="hoveredLocationId"
-        :selected-id="selectedLocationId"
-        :is-mobile="isMobile"
-        @select="handleSelect"
-        @hover="handleHover"
-        @hover-end="handleHoverEnd"
-        @search-string="handleSearchChange"
-        @search="handleSearchSubmit"
-        @selected-filter="handleLocationFilterChange"
-        @sort-option="handleLocationSortChange"
-      />
+      <div v-else-if="isLoading">
+        <MapCard
+          v-for="n in 5"
+          :key="n"
+          :is-loading="true"
+          :style="{ display: isMobile ? 'none' : 'block' }"
+        />
+      </div>
+
+      <Teleport v-else to="#locations-panel-mobile" :disabled="!isMobile">
+        <LocationsPanel
+          :locations="locations"
+          :location-filter="locationPanelFilter"
+          :location-search="locationPanelSearch"
+          :location-sort="locationPanelSort"
+          :location-available="locationPanelLocationAvailable"
+          :hovered-id="hoveredLocationId"
+          :selected-id="selectedLocationId"
+          :is-mobile="isMobile"
+          @select="handleSelect"
+          @hover="handleHover"
+          @hover-end="handleHoverEnd"
+          @search-string="handleSearchChange"
+          @search="handleSearchSubmit"
+          @selected-filter="handleLocationFilterChange"
+          @sort-option="handleLocationSortChange"
+        />
+      </Teleport>
     </div>
 
     <div class="finder-panel-map">
@@ -296,11 +301,10 @@ const effectiveMapConfig = (() => {
         class="mobile-controls-float-left"
         :style="mobileControlsStyle"
       />
-      <div id="mmsf" class="mobile-map-search-filter"></div>
+      <div id="mobile-map-search-filter" class="mobile-map-search-filter"></div>
     </div>
   </div>
   <BottomSheet
-    v-if="isMobile"
     ref="bottomSheetRef"
     v-model="bottomSheetOpen"
     :snap-points="snapPoints"
@@ -311,39 +315,12 @@ const effectiveMapConfig = (() => {
     <div class="bottom-sheet-stack">
       <div class="bottom-sheet-list-scroll" :class="{ 'is-hidden': selectedLocation }">
         <slot name="locations-header" />
-        <div v-if="!isLoading && !errorMessage" class="location-sheet-header">
+        <div class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
-          <LocationSearchFilterPanel
-            v-if="locationPanelSort"
-            :sort-options="locationPanelSort"
-            :location-available="locationPanelLocationAvailable"
-            :is-mobile="isMobile"
-            @sort-option="handleLocationSortChange"
-          />
+          <div id="bottom-sheet-sort"></div>
         </div>
 
-        <div v-if="isLoading" class="location-list">
-          <MapCard v-for="n in 5" :key="n" :is-loading="true" />
-        </div>
-
-        <div v-else-if="errorMessage" class="status-message status-message--error">
-          {{ errorMessage }}
-        </div>
-
-        <LocationsPanel
-          v-else
-          ref="locationsPanelRef"
-          :locations="locations"
-          :location-filter="locationPanelFilter"
-          :location-search="locationPanelSearch"
-          :hovered-id="hoveredLocationId"
-          :selected-id="selectedLocationId"
-          :is-mobile="isMobile"
-          @select="handleSelect"
-          @hover="handleHover"
-          @hover-end="handleHoverEnd"
-          @selected-filter="handleLocationFilterChange"
-        />
+        <div id="locations-panel-mobile"></div>
       </div>
 
       <div v-if="selectedLocation" class="bottom-sheet-detail">
@@ -356,20 +333,6 @@ const effectiveMapConfig = (() => {
     </div>
   </BottomSheet>
 </template>
-
-<style>
-.phila-navbar .phila-mobile-nav .nav-flyout {
-  flex: 0 0 25rem;
-  max-width: 25rem;
-  height: calc(100dvh - var(--nav-bottom));
-}
-
-.phila-navbar .phila-mobile-nav .nav-flyout .p-4 {
-  display: flex;
-  flex-direction: column;
-  row-gap: var(--spacing-m);
-}
-</style>
 
 <style scoped>
 .finder-panel {
@@ -390,16 +353,6 @@ const effectiveMapConfig = (() => {
   color: var(--Schemes-Error, #b3261e);
 }
 
-.finder-panel-locations > :deep(.location-list),
-.finder-panel-locations > .location-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
 .finder-panel-map {
   overflow: hidden;
 }
@@ -411,10 +364,6 @@ const effectiveMapConfig = (() => {
   padding: 0 1rem;
   font-family: var(--Body-Default-font-body-default-family);
   font-weight: 700;
-}
-
-.bottom-sheet-list-scroll :deep(.location-list) {
-  padding-top: 0.5rem;
 }
 
 .detail-overlay {
@@ -431,8 +380,8 @@ const effectiveMapConfig = (() => {
   overflow: hidden;
 }
 
-.mobile-bottom-sheet :deep(.bottom-sheet-content) {
-  overflow-x: hidden;
+.mobile-bottom-sheet {
+  display: none;
 }
 
 .bottom-sheet-stack {
@@ -473,19 +422,10 @@ const effectiveMapConfig = (() => {
   max-width: 100%;
 }
 
-.bottom-sheet-detail :deep(img) {
-  max-width: 100%;
-  height: auto;
-}
-
 @media (max-width: 1064px) {
   .finder-panel {
     position: relative;
     display: block;
-  }
-
-  .finder-panel-locations {
-    display: none;
   }
 
   .finder-panel-map {

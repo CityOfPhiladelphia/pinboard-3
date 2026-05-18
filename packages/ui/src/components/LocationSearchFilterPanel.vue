@@ -121,8 +121,8 @@ function focusSearchInput() {
 </script>
 
 <template>
-  <div class="location-sfs">
-    <Teleport to="#mmsf" :disabled="!isMobile">
+  <div class="location-search-filter-sort">
+    <Teleport to="#mobile-map-search-filter" :disabled="!isMobile">
       <div
         v-if="searchPlaceholder"
         ref="searchWrapperRef"
@@ -152,20 +152,22 @@ function focusSearchInput() {
       />
     </Teleport>
 
-    <div v-if="sortOptions" class="location-sort">
-      <SortPanel
-        :sort-options="sortChoices"
-        :applied-sort="appliedSort"
-        :location-available="locationAvailable ?? false"
-        :is-mobile="isMobile"
-        @update:applied-sort="handleSortChange"
-      />
-    </div>
+    <Teleport to="#bottom-sheet-sort" :disabled="!isMobile">
+      <div v-if="sortOptions" class="location-sort">
+        <SortPanel
+          :sort-options="sortChoices"
+          :applied-sort="appliedSort"
+          :location-available="locationAvailable ?? false"
+          :is-mobile="isMobile"
+          @update:applied-sort="handleSortChange"
+        />
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <style scoped>
-.location-sfs {
+.location-search-filter-sort {
   display: grid;
   grid-template-areas:
     'search search'
@@ -190,6 +192,6 @@ function focusSearchInput() {
 .location-sort {
   grid-area: sort;
   margin-left: auto;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1rem 0rem 0rem;
 }
 </style>
