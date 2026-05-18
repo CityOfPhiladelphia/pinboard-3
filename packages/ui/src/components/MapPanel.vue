@@ -42,8 +42,7 @@ const mapRef = ref<ComponentPublicInstance | null>(null)
 const zoom = ref(props.config?.zoom ?? 14)
 
 function panTo(lngLat: [number, number]) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapInstance = (mapRef.value as any)?.map
+  const mapInstance = (mapRef.value)?.map
   if (mapInstance) {
     mapInstance.setCenter(lngLat)
     mapInstance.setZoom(14)

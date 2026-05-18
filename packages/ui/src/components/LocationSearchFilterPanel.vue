@@ -42,7 +42,6 @@ const props = defineProps<{
 }>()
 
 // emits
-
 const emit = defineEmits<{
   search: []
   searchString: [search: string]
@@ -55,12 +54,8 @@ const appliedSort = ref<string | null>(null)
 const searchString = ref<string>('')
 const searchWrapperRef = ref<HTMLElement | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
-const {
-  searchSuggestions,
-  dismissSuggestions,
-  hideSuggestions,
-  refetchSuggestions,
-} = useSearchSuggestions(searchString)
+const { searchSuggestions, dismissSuggestions, hideSuggestions, refetchSuggestions } =
+  useSearchSuggestions(searchString)
 
 // computed refs
 const sortChoices = computed<SortPanelOption[]>(() => {
@@ -93,11 +88,7 @@ function handleSuggestionSelect(suggestion: string) {
 
 function handleSearchKeydown(event: KeyboardEvent) {
   const target = event.target as HTMLElement
-  if (
-    event.key === 'ArrowDown' &&
-    searchSuggestions.value.length &&
-    target.tagName === 'INPUT'
-  ) {
+  if (event.key === 'ArrowDown' && searchSuggestions.value.length && target.tagName === 'INPUT') {
     event.preventDefault()
     suggestionsRef.value?.focusFirst()
   }
@@ -130,34 +121,37 @@ function focusSearchInput() {
 </script>
 
 <template>
-  <div class="location-search-filter-sort">
-    <div
-      v-if="searchPlaceholder"
-      ref="searchWrapperRef"
-      class="location-search"
-      @keydown="handleSearchKeydown"
-      @focusout="handleSearchFocusOut"
-      @focusin="handleSearchFocusIn"
-    >
-      <Search
-        v-model="searchString"
-        :placeholder="searchPlaceholder"
-        @update:model-value="handleSearchChange"
-        @search="emit('search')"
+  <div class="location-sfs">
+    <Teleport to="#mmsf" :disabled="!isMobile">
+      <div
+        v-if="searchPlaceholder"
+        ref="searchWrapperRef"
+        class="location-search"
+        @keydown="handleSearchKeydown"
+        @focusout="handleSearchFocusOut"
+        @focusin="handleSearchFocusIn"
+      >
+        <Search
+          v-model="searchString"
+          :placeholder="searchPlaceholder"
+          @update:model-value="handleSearchChange"
+          @search="emit('search')"
+        />
+        <SearchSuggestions
+          ref="suggestionsRef"
+          :suggestions="searchSuggestions"
+          @select="handleSuggestionSelect"
+          @dismiss="handleSuggestionDismiss"
+        />
+      </div>
+      <LocationFilter
+        v-if="filterOptions"
+        class="location-filters"
+        :filter-options="filterOptions"
+        @selected-filter="handleFilterChange"
       />
-      <SearchSuggestions
-        ref="suggestionsRef"
-        :suggestions="searchSuggestions"
-        @select="handleSuggestionSelect"
-        @dismiss="handleSuggestionDismiss"
-      />
-    </div>
-    <LocationFilter
-      v-if="filterOptions"
-      class="location-filters"
-      :filter-options="filterOptions"
-      @selected-filter="handleFilterChange"
-    />
+    </Teleport>
+
     <div v-if="sortOptions" class="location-sort">
       <SortPanel
         :sort-options="sortChoices"
@@ -171,7 +165,7 @@ function focusSearchInput() {
 </template>
 
 <style scoped>
-.location-search-filter-sort {
+.location-sfs {
   display: grid;
   grid-template-areas:
     'search search'

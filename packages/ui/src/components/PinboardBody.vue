@@ -10,7 +10,6 @@ import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
 import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
-import { Search } from '@phila/phila-ui-search'
 
 // import pinboard config
 import { PINBOARD_CONFIG_KEY } from '../plugin'
@@ -19,10 +18,8 @@ import { PINBOARD_CONFIG_KEY } from '../plugin'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
-import SearchSuggestions from './SearchSuggestions.vue'
 
 // pinboard composables imports
-import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 
 // type imports
 import type {
@@ -38,10 +35,7 @@ import { hasLocationData } from '../utilities/hasLocationData'
 defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
-  'location-detail'?(props: {
-    location: BasicLocation
-    onClose: () => void
-  }): unknown
+  'location-detail'?(props: { location: BasicLocation; onClose: () => void }): unknown
   'map-content'?(props: {
     locations: BasicLocation[]
     geojson: unknown
@@ -82,13 +76,10 @@ const emit = defineEmits<{
 
 // component variables
 const snapPoints = [15, 50, 100]
-// let mql: MediaQueryList | null = null
 const config = inject(PINBOARD_CONFIG_KEY)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const slots: Record<string, any> = useSlots()
+const slots = useSlots()
 
 // refs
-
 const hoveredLocationId = ref<string | null>(null)
 const selectedLocation = ref<BasicLocation | null>(null)
 const bottomSheetOpen = ref(true)
@@ -102,29 +93,13 @@ const mobileControlsTargetLeft = ref<HTMLDivElement | null>(null)
 const locationsPanelRef = ref<{
   scrollToCard: (id: string, behavior?: ScrollBehavior) => void
 } | null>(null)
-const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
-  null
-)
+const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(null)
 const searchString = ref<string>('')
-const {
-  searchSuggestions,
-  dismissSuggestions,
-  hideSuggestions,
-  refetchSuggestions,
-} = useSearchSuggestions(searchString)
-const mobileSearchWrapperRef = ref<HTMLElement | null>(null)
-const mobileSuggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(
-  null
-)
 
 // computed refs
-const bottomSheetPercent = computed(
-  () => bottomSheetRef.value?.displayPercent ?? snapPoints[0]
-)
+const bottomSheetPercent = computed(() => bottomSheetRef.value?.displayPercent ?? snapPoints[0])
 
-const bottomSheetDragging = computed(
-  () => bottomSheetRef.value?.isDragging ?? false
-)
+const bottomSheetDragging = computed(() => bottomSheetRef.value?.isDragging ?? false)
 
 const mobileControlsStyle = computed(() => {
   const percent = bottomSheetPercent.value
@@ -132,9 +107,7 @@ const mobileControlsStyle = computed(() => {
   return {
     bottom: `calc(${percent}% + 10px)`,
     opacity,
-    transition: bottomSheetDragging.value
-      ? 'none'
-      : 'bottom 0.3s ease-out, opacity 0.3s ease-out',
+    transition: bottomSheetDragging.value ? 'none' : 'bottom 0.3s ease-out, opacity 0.3s ease-out',
   }
 })
 
@@ -214,49 +187,6 @@ function handleSearchChange(search: string) {
   }
 }
 
-function handleSuggestionSelect(suggestion: string) {
-  dismissSuggestions()
-  searchString.value = suggestion
-  emit('search', suggestion)
-  focusMobileSearchInput()
-}
-
-function handleMobileSearchKeydown(event: KeyboardEvent) {
-  const target = event.target as HTMLElement
-  if (
-    event.key === 'ArrowDown' &&
-    searchSuggestions.value.length &&
-    target.tagName === 'INPUT'
-  ) {
-    event.preventDefault()
-    mobileSuggestionsRef.value?.focusFirst()
-  }
-}
-
-function handleSuggestionDismiss() {
-  focusMobileSearchInput()
-}
-
-function handleMobileSearchFocusOut(event: FocusEvent) {
-  const relatedTarget = event.relatedTarget as HTMLElement | null
-  if (!mobileSearchWrapperRef.value?.contains(relatedTarget)) {
-    hideSuggestions()
-  }
-}
-
-function handleMobileSearchFocusIn(event: FocusEvent) {
-  const relatedTarget = event.relatedTarget as HTMLElement | null
-  if (!mobileSearchWrapperRef.value?.contains(relatedTarget)) {
-    refetchSuggestions()
-  }
-}
-
-function focusMobileSearchInput() {
-  const input =
-    mobileSearchWrapperRef.value?.querySelector<HTMLElement>('input')
-  input?.focus()
-}
-
 function handleSearchSubmit() {
   emit('search', searchString.value)
 }
@@ -313,10 +243,7 @@ const effectiveMapConfig = (() => {
         <MapCard v-for="n in 5" :key="n" :is-loading="true" />
       </div>
 
-      <div
-        v-else-if="errorMessage"
-        class="status-message status-message--error"
-      >
+      <div v-else-if="errorMessage" class="status-message status-message--error">
         {{ errorMessage }}
       </div>
 
@@ -369,35 +296,7 @@ const effectiveMapConfig = (() => {
         class="mobile-controls-float-left"
         :style="mobileControlsStyle"
       />
-      <div
-        ref="mobileSearchWrapperRef"
-        class="mobile-map-search-filter"
-        @keydown="handleMobileSearchKeydown"
-        @focusout="handleMobileSearchFocusOut"
-        @focusin="handleMobileSearchFocusIn"
-      >
-        <Search
-          v-if="locationPanelSearch"
-          v-model="searchString"
-          class-name="mobile-search"
-          :placeholder="locationPanelSearch"
-          @update:model-value="handleSearchChange"
-          @search="handleSearchSubmit"
-        />
-        <SearchSuggestions
-          ref="mobileSuggestionsRef"
-          :suggestions="searchSuggestions"
-          @select="handleSuggestionSelect"
-          @dismiss="handleSuggestionDismiss"
-        />
-        <LocationSearchFilterPanel
-          v-if="locationPanelFilter"
-          :filter-options="locationPanelFilter"
-          :location-available="locationPanelLocationAvailable"
-          :is-mobile="isMobile"
-          @selected-filter="handleLocationFilterChange"
-        />
-      </div>
+      <div id="mmsf" class="mobile-map-search-filter"></div>
     </div>
   </div>
   <BottomSheet
@@ -410,10 +309,7 @@ const effectiveMapConfig = (() => {
     class="mobile-bottom-sheet"
   >
     <div class="bottom-sheet-stack">
-      <div
-        class="bottom-sheet-list-scroll"
-        :class="{ 'is-hidden': selectedLocation }"
-      >
+      <div class="bottom-sheet-list-scroll" :class="{ 'is-hidden': selectedLocation }">
         <slot name="locations-header" />
         <div v-if="!isLoading && !errorMessage" class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
@@ -430,10 +326,7 @@ const effectiveMapConfig = (() => {
           <MapCard v-for="n in 5" :key="n" :is-loading="true" />
         </div>
 
-        <div
-          v-else-if="errorMessage"
-          class="status-message status-message--error"
-        >
+        <div v-else-if="errorMessage" class="status-message status-message--error">
           {{ errorMessage }}
         </div>
 
@@ -522,14 +415,6 @@ const effectiveMapConfig = (() => {
 
 .bottom-sheet-list-scroll :deep(.location-list) {
   padding-top: 0.5rem;
-}
-
-.mobile-bottom-sheet {
-  display: none;
-}
-
-.mobile-map-search-filter {
-  display: none;
 }
 
 .detail-overlay {
@@ -643,47 +528,10 @@ const effectiveMapConfig = (() => {
   }
 
   .mobile-map-search-filter {
-    display: block;
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 2;
-    padding: 10px 24px;
-  }
-
-  .mobile-map-search-filter :deep(.mobile-search) {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .mobile-map-search-filter :deep(.mobile-search .state-layer),
-  .mobile-map-search-filter :deep(.mobile-search .content) {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
-  .mobile-map-search-filter :deep(.mobile-search .phila-text-field) {
-    padding: 0 var(--scale-small, 0.5rem) !important;
-  }
-
-  .mobile-map-search-filter :deep(.location-filters) {
-    padding: 0.25rem 0 0;
-    padding-left: 2px;
-    gap: 0.25rem;
-  }
-
-  .mobile-map-search-filter :deep(.location-sort) {
-    display: none;
-  }
-
-  .mobile-bottom-sheet :deep(.location-filters),
-  .mobile-bottom-sheet :deep(.location-search) {
-    display: none;
-  }
-
-  .detail-overlay {
-    display: none;
   }
 }
 </style>
