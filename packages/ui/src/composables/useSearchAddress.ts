@@ -27,10 +27,8 @@ export function useSearchAddress(address: string | Ref<string>) {
     if (import.meta.env.DEV) {
       try {
         const result: AisAddressSearchResponse = await (await fetch(url)).json()
-        addressCoordinates.value.longitude =
-          result.features[0].geometry.coordinates[0] ?? NaN
-        addressCoordinates.value.latitude =
-          result.features[0].geometry.coordinates[1] ?? NaN
+        addressCoordinates.value.longitude = result.features[0].geometry.coordinates[0] ?? NaN
+        addressCoordinates.value.latitude = result.features[0].geometry.coordinates[1] ?? NaN
         finishedAddressFetch.value = true
       } catch (err) {
         console.error('Failed to get response from AIS: ', err)
@@ -40,8 +38,8 @@ export function useSearchAddress(address: string | Ref<string>) {
     } else {
       try {
         const result: LatLon = await (await fetch(url)).json()
-        addressCoordinates.value.longitude = result.longitude ?? NaN
-        addressCoordinates.value.latitude = result.latitude ?? NaN
+        addressCoordinates.value.longitude = result?.longitude ?? NaN
+        addressCoordinates.value.latitude = result?.latitude ?? NaN
         finishedAddressFetch.value = true
       } catch (err) {
         console.error('Failed to get response from AIS: ', err)
