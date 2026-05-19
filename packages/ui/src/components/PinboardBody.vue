@@ -337,24 +337,35 @@ const effectiveMapConfig = (() => {
 <style scoped>
 .finder-panel {
   display: grid;
+  grid-template-areas:
+      'locations map';
   grid-template-columns: 1fr 2fr;
   width: 100%;
   height: 100%;
 }
 
 .finder-panel-locations {
-  display: flex;
-  flex-direction: column;
+  grid-area: locations;
   border-right: 1px solid #ccc;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scrollbar-width: none;
+}
+
+.finder-panel-locations::-webkit-scrollbar {
+  display: none;
+}
+
+.finder-panel-locations.is-hidden {
+  visibility: hidden;
+}
+
+.finder-panel-map {
+  grid-area: map;
 }
 
 .status-message--error {
   color: var(--Schemes-Error, #b3261e);
-}
-
-.finder-panel-map {
-  overflow: hidden;
 }
 
 .location-sheet-header {
@@ -395,8 +406,8 @@ const effectiveMapConfig = (() => {
 .bottom-sheet-list-scroll {
   position: absolute;
   inset: 0;
-  overflow-y: auto;
   overflow-x: hidden;
+  overflow-y: scroll;
   scrollbar-width: none;
 }
 

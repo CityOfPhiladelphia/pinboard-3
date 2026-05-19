@@ -2,8 +2,7 @@
 import {
   ref,
   computed,
-  defineComponent,
-  type ComponentPublicInstance,
+  defineComponent
 } from 'vue'
 import { Map as PhilaMap } from '@phila/phila-ui-map-core'
 import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css' // shouldn't the style be bundled with the component?
@@ -38,7 +37,7 @@ const props = defineProps<{
   }) => unknown
 }>()
 
-const mapRef = ref<ComponentPublicInstance | null>(null)
+const mapRef = ref<typeof PhilaMap | null>(null)
 const zoom = ref(props.config?.zoom ?? 14)
 
 function panTo(lngLat: [number, number]) {

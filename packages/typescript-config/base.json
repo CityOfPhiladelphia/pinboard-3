@@ -13,7 +13,6 @@
     "jsxImportSource": "vue",
     "noImplicitThis": true,
     "strict": true,
-    "exactOptionalPropertyTypes": true,
     "verbatimModuleSyntax": true,
     "useDefineForClassFields": true,
     "esModuleInterop": true,
@@ -36,6 +35,7 @@
     "strictPropertyInitialization": false,
     "erasableSyntaxOnly": true,
     "noUncheckedSideEffectImports": true,
+    "exactOptionalPropertyTypes": false,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "typeRoots": ["./node_modules/@types"],
     "types": ["node"]
