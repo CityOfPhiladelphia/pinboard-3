@@ -1,5 +1,5 @@
 import { type Ref, ref, toValue, watch } from 'vue'
-import type { AisAutocompleteResult } from '../types'
+import type { AisAutocompleteResult, ProxyAutocompleteResult } from '../types'
 
 export function useSearchSuggestions(search: string | Ref<string>) {
   const searchSuggestions = ref<string[]>([])
@@ -7,25 +7,15 @@ export function useSearchSuggestions(search: string | Ref<string>) {
   let skipNextFetch = false
 
   async function getSearchSuggestions(stringValue: string) {
-    if (!stringValue || stringValue.length < 3) {
+    if (!stringValue || !/^(?:\d{1,5}(?:-\d{1,5})?[A-Za-z]{0,3} \w+)/.test(stringValue)) {
       searchSuggestions.value = []
       return
     }
 
-    try {
-      const response = await fetch(
-        `https://ais-autocomplete.citygeo.phila.city/autocomplete?q=${stringValue.replace(/ /, '+')}`
-      )
-      const suggestions: AisAutocompleteResult = await response.json()
-      const suggestedAddresses = suggestions.count
-        ? Array.from(
-            suggestions.results.addresses,
-            (suggestion) => suggestion.address
-          )
-        : []
-      searchSuggestions.value = suggestedAddresses
-    } catch (err) {
-      searchSuggestionsError.value = err
+    if (import.meta.env.DEV) {
+      await getSearchSuggestionsDev(stringValue, searchSuggestions, searchSuggestionsError)
+    } else {
+      await getSearchSuggestionsProd(stringValue, searchSuggestions, searchSuggestionsError)
     }
   }
 
@@ -59,5 +49,46 @@ export function useSearchSuggestions(search: string | Ref<string>) {
     dismissSuggestions,
     hideSuggestions,
     refetchSuggestions,
+  }
+}
+
+async function getSearchSuggestionsDev(
+  stringValue: string,
+  searchSuggestions: Ref<string[]>,
+  searchSuggestionsError: Ref<unknown>
+) {
+  try {
+    const response = await fetch(
+      `https://ais-autocomplete.citygeo.phila.city/autocomplete?q=${stringValue.replace(/ /, '+')}`
+    )
+    const suggestions: AisAutocompleteResult = await response.json()
+    const suggestedAddresses = suggestions.count
+      ? Array.from(suggestions.results.addresses, (suggestion) => suggestion.address)
+      : []
+    searchSuggestions.value = suggestedAddresses
+  } catch (err) {
+    searchSuggestionsError.value = err
+  }
+}
+
+async function getSearchSuggestionsProd(
+  stringValue: string,
+  searchSuggestions: Ref<string[]>,
+  searchSuggestionsError: Ref<unknown>
+) {
+  try {
+    const response = await fetch(
+      `https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAisAddress?address=${encodeURIComponent(stringValue)}&searchType=autocomplete`
+    )
+
+    if (response.ok) {
+      const suggestions: ProxyAutocompleteResult = await response.json()
+      searchSuggestions.value = suggestions
+      return
+    }
+
+    searchSuggestionsError.value = response
+  } catch (err) {
+    searchSuggestionsError.value = err
   }
 }

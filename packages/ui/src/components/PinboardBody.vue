@@ -334,38 +334,51 @@ const effectiveMapConfig = (() => {
   </BottomSheet>
 </template>
 
+<style>
+.phila-navbar .phila-mobile-nav .nav-flyout {
+  flex: 0 0 25rem;
+  max-width: 25rem;
+  height: calc(100dvh - var(--nav-bottom));
+}
+
+.phila-navbar .phila-mobile-nav .nav-flyout .p-4 {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--spacing-m);
+}
+</style>
+
 <style scoped>
 .finder-panel {
   display: grid;
-  grid-template-areas:
-      'locations map';
   grid-template-columns: 1fr 2fr;
   width: 100%;
   height: 100%;
 }
 
 .finder-panel-locations {
-  grid-area: locations;
+  display: flex;
+  flex-direction: column;
   border-right: 1px solid #ccc;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  scrollbar-width: none;
-}
-
-.finder-panel-locations::-webkit-scrollbar {
-  display: none;
-}
-
-.finder-panel-locations.is-hidden {
-  visibility: hidden;
-}
-
-.finder-panel-map {
-  grid-area: map;
+  overflow: hidden;
 }
 
 .status-message--error {
   color: var(--Schemes-Error, #b3261e);
+}
+
+.finder-panel-locations> :deep(.location-list),
+.finder-panel-locations>.location-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.finder-panel-map {
+  overflow: hidden;
 }
 
 .location-sheet-header {
@@ -375,6 +388,14 @@ const effectiveMapConfig = (() => {
   padding: 0 1rem;
   font-family: var(--Body-Default-font-body-default-family);
   font-weight: 700;
+}
+
+.bottom-sheet-list-scroll :deep(.location-list) {
+  padding-top: 0.5rem;
+}
+
+.mobile-bottom-sheet {
+  display: none;
 }
 
 .detail-overlay {
@@ -391,8 +412,8 @@ const effectiveMapConfig = (() => {
   overflow: hidden;
 }
 
-.mobile-bottom-sheet {
-  display: none;
+.mobile-bottom-sheet :deep(.bottom-sheet-content) {
+  overflow-x: hidden;
 }
 
 .bottom-sheet-stack {
@@ -406,8 +427,8 @@ const effectiveMapConfig = (() => {
 .bottom-sheet-list-scroll {
   position: absolute;
   inset: 0;
+  overflow-y: auto;
   overflow-x: hidden;
-  overflow-y: scroll;
   scrollbar-width: none;
 }
 
@@ -429,11 +450,16 @@ const effectiveMapConfig = (() => {
   z-index: 2;
 }
 
-.bottom-sheet-detail > * {
+.bottom-sheet-detail>* {
   max-width: 100%;
 }
 
-@media (max-width: 1064px) {
+.bottom-sheet-detail :deep(img) {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
   .finder-panel {
     position: relative;
     display: block;
@@ -459,7 +485,7 @@ const effectiveMapConfig = (() => {
     pointer-events: none;
   }
 
-  .mobile-controls-float > :deep(*) {
+  .mobile-controls-float> :deep(*) {
     pointer-events: auto;
   }
 
@@ -474,15 +500,39 @@ const effectiveMapConfig = (() => {
     pointer-events: none;
   }
 
-  .mobile-controls-float-left > :deep(*) {
+  .mobile-controls-float-left> :deep(*) {
     pointer-events: auto;
   }
 
   .mobile-map-search-filter {
+    display: block;
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
+    z-index: 2;
+    padding: 10px 24px;
+  }
+
+  .mobile-map-search-filter :deep(.mobile-search) {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .mobile-map-search-filter :deep(.mobile-search .state-layer),
+  .mobile-map-search-filter :deep(.mobile-search .content) {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .mobile-map-search-filter :deep(.mobile-search .phila-text-field) {
+    padding: 0 var(--scale-small, 0.5rem) !important;
+  }
+
+  .mobile-map-search-filter :deep(.location-filters) {
+    padding: 0.25rem 0 0;
+    padding-left: 2px;
+    gap: 0.25rem;
   }
 }
 </style>

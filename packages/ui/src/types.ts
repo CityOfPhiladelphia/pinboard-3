@@ -86,6 +86,8 @@ export interface AisAutocompleteResult {
   }>
 }
 
+export type ProxyAutocompleteResult = string[]
+
 export interface AisAddressSearchResponse {
   search_type: string
   search_params: Record<string, string>
