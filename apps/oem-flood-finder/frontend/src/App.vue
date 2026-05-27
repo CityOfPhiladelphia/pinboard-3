@@ -151,7 +151,7 @@ onBeforeUnmount(() => {
       <a class="sub-footer-link" href="https://www.phila.gov/accessibility-policy/"
         >Accessibility</a
       >
-      <a class="sub-footer-link" href="mailto:oem@phila.gov">Feedback</a>
+      <a class="sub-footer-link" target="_blank" href="https://phila.formstack.com/forms/oem_flood_monitoring_map_feedback">Feedback</a>
     </template>
 
     <RouterView />
