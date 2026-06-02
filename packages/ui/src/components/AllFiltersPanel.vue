@@ -110,7 +110,7 @@ function apply() {
       </button>
     </header>
 
-    <Search v-model="search" placeholder="Search" />
+    <Search v-model="search" placeholder="Search" class-name="all-filters-search" />
 
     <div class="all-filters-sections">
       <section v-for="f in visibleSections" :key="f.key" class="filter-section">
@@ -164,11 +164,28 @@ function apply() {
   align-items: center;
   justify-content: space-between;
 }
+/* Teleported to <body> on mobile, so set the font explicitly (var, then
+   Montserrat) instead of relying on the inherited app font. */
+.all-filters-header h2 {
+  margin: 0;
+  font-family: var(--Body-Default-font-body-default-family, 'Montserrat', sans-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
 .icon-button {
   background: none;
   border: none;
   cursor: pointer;
   font-size: 1.25rem;
+}
+/* Search has an intrinsic width and overflows otherwise; constrain it to the panel. */
+.all-filters-panel :deep(.all-filters-search) {
+  width: 100%;
+  box-sizing: border-box;
+}
+.all-filters-panel :deep(.all-filters-search input) {
+  width: 100%;
+  box-sizing: border-box;
 }
 .all-filters-sections {
   display: flex;
@@ -188,13 +205,26 @@ function apply() {
   cursor: pointer;
   font-size: inherit;
   font-weight: 700;
-  font-family: var(--Body-Default-font-body-default-family);
+  font-family: var(--Body-Default-font-body-default-family, 'Montserrat', sans-serif);
 }
 .section-toggle .collapsed {
   transform: rotate(-90deg);
 }
 .section-body {
   padding-top: 0.75rem;
+}
+/* The section header already names each filter, so hide the option group's own
+   (redundant) label visually while keeping it for assistive tech. */
+.section-body :deep(.labels-container) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 .all-filters-footer {
   display: flex;
