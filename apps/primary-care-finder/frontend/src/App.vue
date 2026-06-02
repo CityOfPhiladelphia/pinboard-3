@@ -11,6 +11,8 @@ import {
   PinboardUtilities,
 } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
+import { faArrowsUpDown } from '@fortawesome/pro-solid-svg-icons'
+import type { FilterDefinition, FilterValues } from '@pinboard/ui'
 import { useLocations } from './composables/useLocations'
 import LocationCard from './components/LocationCard.vue'
 import LocationDetail from './components/LocationDetail.vue'
@@ -22,6 +24,96 @@ const searchPlaceholderText = 'Search by address or keyword...'
 const { locations, isLoading, errorMessage, geojson } = useLocations()
 const { userLocation } = PinboardComposables.useUserLocation()
 const searchString = ref('')
+
+const filterValues = ref<FilterValues>({})
+
+const filterDefinitions: FilterDefinition[] = [
+  {
+    key: 'sort',
+    label: 'Sort',
+    multiple: false,
+    excludeFromCount: true,
+    iconDefinition: faArrowsUpDown,
+    // TODO(teammate): finalize sort options + ordering logic.
+    choices: [
+      { text: 'Distance', value: 'distance' },
+      { text: 'Name (A–Z)', value: 'name' },
+    ],
+  },
+  {
+    key: 'ageGroup',
+    label: 'Age Group',
+    multiple: true,
+    choices: [
+      { text: 'Adult', value: 'adult' },
+      { text: 'Children', value: 'children' },
+    ],
+  },
+  {
+    key: 'waitTime',
+    label: 'Wait time (Primary Care)',
+    multiple: true,
+    choices: [
+      { text: 'Same day or walk in', value: 'sameDay' },
+      { text: '<1 week (well visit)', value: 'weekWell' },
+      { text: '<1 week (sick visit)', value: 'weekSick' },
+      { text: '<2 months (all primary care)', value: 'twoMonths' },
+    ],
+  },
+  {
+    key: 'speciality',
+    label: 'Speciality services',
+    multiple: true,
+    choices: [
+      { text: 'Mental health', value: 'mental' },
+      { text: 'Dental', value: 'dental' },
+      { text: 'Eye care', value: 'eye' },
+      { text: 'Podiatry', value: 'podiatry' },
+      { text: 'MAT', value: 'mat' },
+      { text: 'Nutrition', value: 'nutrition' },
+      { text: 'Tobacco cessation', value: 'tobacco' },
+      { text: 'Pharmacy', value: 'pharmacy' },
+    ],
+  },
+  {
+    key: 'tests',
+    label: 'Tests and imaging',
+    multiple: true,
+    choices: [
+      { text: 'Blood', value: 'blood' },
+      { text: 'STI', value: 'sti' },
+      { text: 'COVID', value: 'covid' },
+      { text: 'Mammography', value: 'mammo' },
+      { text: 'X-ray', value: 'xray' },
+    ],
+  },
+  {
+    key: 'languages',
+    label: 'Languages spoken by staff',
+    multiple: true,
+    // TODO(teammate): replace with real `language` field values.
+    choices: [
+      { text: 'Spanish', value: 'spanish' },
+      { text: 'Mandarin', value: 'mandarin' },
+      { text: 'Vietnamese', value: 'vietnamese' },
+    ],
+  },
+]
+
+// SEAM: data wiring belongs to the teammate. Returns locations unfiltered for now.
+// TODO(teammate): map filterValues → PrimaryCareProperties predicates.
+//   ageGroup   → *_ad / *_ch suffixed fields
+//   waitTime   → wait_* fields
+//   speciality → special_* fields
+//   tests      → tests_* fields
+//   languages  → language field
+//   sort       → ordering (apply after filtering; not a predicate)
+function applyFilters(
+  locations: PrimaryCareLocation[],
+  _values: FilterValues
+): PrimaryCareLocation[] {
+  return locations
+}
 
 const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   const { latitude, longitude } = userLocation.value
@@ -41,16 +133,21 @@ const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
 })
 
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
-  if (!searchString.value) return locationsWithDistance.value
-  const terms = searchString.value
-    .replace(/\W+/g, ' ')
-    .toLowerCase()
-    .split(' ')
-    .filter(Boolean)
-  return locationsWithDistance.value.filter((loc) => {
-    const haystack = JSON.stringify(Object.values(loc)).toLowerCase()
-    return terms.some((term) => haystack.includes(term))
-  })
+  let result = applyFilters(locationsWithDistance.value, filterValues.value)
+
+  if (searchString.value) {
+    const terms = searchString.value
+      .replace(/\W+/g, ' ')
+      .toLowerCase()
+      .split(' ')
+      .filter(Boolean)
+    result = result.filter((loc) => {
+      const haystack = JSON.stringify(Object.values(loc)).toLowerCase()
+      return terms.some((term) => haystack.includes(term))
+    })
+  }
+
+  return result
 })
 
 function handleSearchSubmit(s: string) {
@@ -119,6 +216,8 @@ function asPrimaryCareLocation(location: BasicLocation) {
       :geojson="geojson"
       @search="handleSearchSubmit"
       :is-mobile="isMobile"
+      :filters="filterDefinitions"
+      v-model:filter-values="filterValues"
     >
       <template #location-card="{ location }">
         <LocationCard :location="location" />
