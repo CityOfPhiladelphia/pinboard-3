@@ -78,7 +78,7 @@ async function getSearchSuggestionsProd(
 ) {
   try {
     const response = await fetch(
-      `https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/autocomplete?address=${encodeURIComponent(stringValue)}`
+      `https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/autocomplete?q=${encodeURIComponent(stringValue)}`
     )
 
     if (response.ok) {
