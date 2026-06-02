@@ -434,6 +434,19 @@ const effectiveMapConfig = (() => {
         />
       </div>
     </div>
+
+    <div
+      v-if="filters"
+      class="all-filters-overlay"
+      :class="{ open: allFiltersOpen }"
+    >
+      <AllFiltersPanel
+        v-model:open="allFiltersOpen"
+        :filters="filters"
+        :model-value="filterValues ?? {}"
+        @update:model-value="onFilterValues"
+      />
+    </div>
   </div>
   <BottomSheet
     v-if="isMobile"
@@ -498,14 +511,6 @@ const effectiveMapConfig = (() => {
       </div>
     </div>
   </BottomSheet>
-  <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
-    <AllFiltersPanel
-      v-model:open="allFiltersOpen"
-      :filters="filters"
-      :model-value="filterValues ?? {}"
-      @update:model-value="onFilterValues"
-    />
-  </div>
   <Teleport v-if="filters && isMobile" :to="mobileFilterSelector">
     <FilterChipBar
       :filters="filters"
@@ -536,6 +541,7 @@ const effectiveMapConfig = (() => {
   grid-template-columns: 1fr 2fr;
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
 .finder-panel-locations {
