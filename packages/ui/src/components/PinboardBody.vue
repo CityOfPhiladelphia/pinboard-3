@@ -8,6 +8,7 @@ import { faMap } from '@fortawesome/pro-solid-svg-icons'
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
+import '@phila/phila-ui-filter-chip/dist/index.css'
 import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Search } from '@phila/phila-ui-search'
@@ -20,6 +21,9 @@ import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 import SearchSuggestions from './SearchSuggestions.vue'
+import FilterChipBar from './FilterChipBar.vue'
+import AllFiltersPanel from './AllFiltersPanel.vue'
+import type { FilterDefinition, FilterValues } from '@phila/phila-ui-filter-chip'
 
 // pinboard composables imports
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
@@ -70,6 +74,9 @@ const props = defineProps<{
   locationPanelLocationAvailable?: boolean
   geojson?: unknown
   isMobile: boolean
+  filters?: FilterDefinition[]
+  filterValues?: FilterValues
+  mobileFilterPlacement?: 'map' | 'sheet'
 }>()
 
 // emits to parent app to handle
@@ -78,7 +85,16 @@ const emit = defineEmits<{
   selectedLocationsFilter: [filter: string]
   sortLocationsOption: [sort: string]
   deselect: [locationId: string]
+  'update:filterValues': [value: FilterValues]
 }>()
+
+// filter state
+const allFiltersOpen = ref(false)
+const filterPlacement = computed(() => props.mobileFilterPlacement ?? 'map')
+
+function onFilterValues(value: FilterValues) {
+  emit('update:filterValues', value)
+}
 
 // component variables
 const snapPoints = [15, 50, 100]
@@ -99,6 +115,13 @@ const bottomSheetRef = ref<{
 } | null>(null)
 const mobileControlsTarget = ref<HTMLDivElement | null>(null)
 const mobileControlsTargetLeft = ref<HTMLDivElement | null>(null)
+const mobileFilterMapTarget = ref<HTMLDivElement | null>(null)
+const mobileFilterSheetTarget = ref<HTMLDivElement | null>(null)
+const mobileFilterTarget = computed(() =>
+  filterPlacement.value === 'sheet'
+    ? mobileFilterSheetTarget.value
+    : mobileFilterMapTarget.value
+)
 const locationsPanelRef = ref<{
   scrollToCard: (id: string, behavior?: ScrollBehavior) => void
 } | null>(null)
@@ -308,6 +331,13 @@ const effectiveMapConfig = (() => {
   </div>
   <div class="finder-panel">
     <div class="finder-panel-locations">
+      <FilterChipBar
+        v-if="filters && !isMobile"
+        :filters="filters"
+        :model-value="filterValues ?? {}"
+        @update:model-value="onFilterValues"
+        @open-filters="allFiltersOpen = true"
+      />
       <slot name="locations-header" />
 
       <div v-if="isLoading" class="location-list">
@@ -385,6 +415,7 @@ const effectiveMapConfig = (() => {
           @update:model-value="handleSearchChange"
           @search="handleSearchSubmit"
         />
+        <div ref="mobileFilterMapTarget" class="mobile-filter-target"></div>
         <SearchSuggestions
           ref="mobileSuggestionsRef"
           :suggestions="searchSuggestions"
@@ -400,6 +431,14 @@ const effectiveMapConfig = (() => {
         />
       </div>
     </div>
+    <Teleport v-if="filters && isMobile && mobileFilterTarget" :to="mobileFilterTarget">
+      <FilterChipBar
+        :filters="filters"
+        :model-value="filterValues ?? {}"
+        @update:model-value="onFilterValues"
+        @open-filters="allFiltersOpen = true"
+      />
+    </Teleport>
   </div>
   <BottomSheet
     v-if="isMobile"
@@ -415,6 +454,7 @@ const effectiveMapConfig = (() => {
         class="bottom-sheet-list-scroll"
         :class="{ 'is-hidden': selectedLocation }"
       >
+        <div ref="mobileFilterSheetTarget" class="mobile-filter-target"></div>
         <slot name="locations-header" />
         <div v-if="!isLoading && !errorMessage" class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
@@ -463,6 +503,14 @@ const effectiveMapConfig = (() => {
       </div>
     </div>
   </BottomSheet>
+  <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
+    <AllFiltersPanel
+      v-model:open="allFiltersOpen"
+      :filters="filters"
+      :model-value="filterValues ?? {}"
+      @update:model-value="onFilterValues"
+    />
+  </div>
 </template>
 
 <style>
@@ -685,6 +733,32 @@ const effectiveMapConfig = (() => {
 
   .detail-overlay {
     display: none;
+  }
+}
+
+.mobile-filter-target {
+  width: 100%;
+}
+
+.all-filters-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 40%;
+  z-index: 12;
+  background: #fff;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  display: none;
+}
+
+.all-filters-overlay.open {
+  display: block;
+}
+
+@media (max-width: 1064px) {
+  .all-filters-overlay {
+    width: 100%;
   }
 }
 </style>
