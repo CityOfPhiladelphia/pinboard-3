@@ -31,8 +31,10 @@ watch(
     if (isOpen) {
       draft.value = structuredClone(props.modelValue)
       search.value = ''
+      collapsed.value = {}
     }
-  }
+  },
+  { immediate: true }
 )
 
 // Sections are checkbox/radio filters only (skip toggle-only filters with no choices).
@@ -58,9 +60,9 @@ const activeCount = computed(() =>
   }, 0)
 )
 
-function checkboxModel(key: string): Array<string | number | boolean> {
+function checkboxModel(key: string): string[] {
   const v = draft.value[key]
-  return Array.isArray(v) ? v : []
+  return Array.isArray(v) ? (v as string[]) : []
 }
 function setCheckbox(key: string, value: Array<string | number | boolean>) {
   draft.value = { ...draft.value, [key]: value as string[] }
@@ -173,6 +175,7 @@ function apply() {
   background: none;
   border: none;
   cursor: pointer;
+  font-size: inherit;
   font-weight: 700;
   font-family: var(--Body-Default-font-body-default-family);
 }
