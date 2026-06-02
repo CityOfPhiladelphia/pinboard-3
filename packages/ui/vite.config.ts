@@ -4,14 +4,6 @@ import dts from 'vite-plugin-dts'
 import { resolve } from 'path'
 
 export default defineConfig({
-  resolve: {
-    alias: {
-      '@phila/phila-ui-filter-chip/dist/index.css': resolve(
-        __dirname,
-        'node_modules/@phila/phila-ui-filter-chip/dist/index.css'
-      ),
-    },
-  },
   plugins: [
     vue(),
     dts({
