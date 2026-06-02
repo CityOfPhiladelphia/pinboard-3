@@ -118,11 +118,6 @@ const bottomSheetRef = ref<{
 } | null>(null)
 const mobileControlsTarget = ref<HTMLDivElement | null>(null)
 const mobileControlsTargetLeft = ref<HTMLDivElement | null>(null)
-const mobileFilterSelector = computed(() =>
-  filterPlacement.value === 'sheet'
-    ? '.mobile-filter-target--sheet'
-    : '.mobile-filter-target--map'
-)
 const locationsPanelRef = ref<{
   scrollToCard: (id: string, behavior?: ScrollBehavior) => void
 } | null>(null)
@@ -418,7 +413,14 @@ const effectiveMapConfig = (() => {
           @update:model-value="handleSearchChange"
           @search="handleSearchSubmit"
         />
-        <div v-if="filters" class="mobile-filter-target mobile-filter-target--map"></div>
+        <FilterChipBar
+          v-if="filters && isMobile && filterPlacement === 'map'"
+          class="mobile-filter-bar"
+          :filters="filters"
+          :model-value="filterValues ?? {}"
+          @update:model-value="onFilterValues"
+          @open-filters="allFiltersOpen = true"
+        />
         <SearchSuggestions
           ref="mobileSuggestionsRef"
           :suggestions="searchSuggestions"
@@ -462,7 +464,13 @@ const effectiveMapConfig = (() => {
         class="bottom-sheet-list-scroll"
         :class="{ 'is-hidden': selectedLocation }"
       >
-        <div v-if="filters" class="mobile-filter-target mobile-filter-target--sheet"></div>
+        <FilterChipBar
+          v-if="filters && isMobile && filterPlacement === 'sheet'"
+          :filters="filters"
+          :model-value="filterValues ?? {}"
+          @update:model-value="onFilterValues"
+          @open-filters="allFiltersOpen = true"
+        />
         <slot name="locations-header" />
         <div v-if="!isLoading && !errorMessage" class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
@@ -511,14 +519,6 @@ const effectiveMapConfig = (() => {
       </div>
     </div>
   </BottomSheet>
-  <Teleport v-if="filters && isMobile" :to="mobileFilterSelector">
-    <FilterChipBar
-      :filters="filters"
-      :model-value="filterValues ?? {}"
-      @update:model-value="onFilterValues"
-      @open-filters="allFiltersOpen = true"
-    />
-  </Teleport>
 </template>
 
 <style>
@@ -712,7 +712,7 @@ const effectiveMapConfig = (() => {
 
   /* Full-bleed the chip row out of the search container's horizontal padding so
      the chips scroll edge-to-edge. */
-  .mobile-map-search-filter .mobile-filter-target {
+  .mobile-map-search-filter .mobile-filter-bar {
     width: calc(100% + 48px);
     margin-left: -24px;
   }
@@ -750,10 +750,6 @@ const effectiveMapConfig = (() => {
   .detail-overlay {
     display: none;
   }
-}
-
-.mobile-filter-target {
-  width: 100%;
 }
 
 .all-filters-overlay {
