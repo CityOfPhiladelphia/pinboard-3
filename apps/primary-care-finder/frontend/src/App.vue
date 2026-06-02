@@ -61,7 +61,7 @@ const filterDefinitions: FilterDefinition[] = [
     ],
   },
   {
-    key: 'speciality',
+    key: 'specialty',
     label: 'Speciality services',
     multiple: true,
     choices: [
@@ -102,9 +102,9 @@ const filterDefinitions: FilterDefinition[] = [
 
 // SEAM: data wiring belongs to the teammate. Returns locations unfiltered for now.
 // TODO(teammate): map filterValues → PrimaryCareProperties predicates.
-//   ageGroup   → *_ad / *_ch suffixed fields
+//   ageGroup   → cross-cutting: match *_ad / *_ch fields per selection
 //   waitTime   → wait_* fields
-//   speciality → special_* fields
+//   specialty  → special_* fields
 //   tests      → tests_* fields
 //   languages  → language field
 //   sort       → ordering (apply after filtering; not a predicate)
@@ -207,6 +207,7 @@ function asPrimaryCareLocation(location: BasicLocation) {
     </template>
 
     <PinboardBody
+      v-model:filter-values="filterValues"
       :locations="filteredLocations"
       :search-or-user-location="userLocation"
       :get-card-details="getCardDetails"
@@ -214,10 +215,9 @@ function asPrimaryCareLocation(location: BasicLocation) {
       :error-message="errorMessage"
       :location-panel-search="searchPlaceholderText"
       :geojson="geojson"
-      @search="handleSearchSubmit"
       :is-mobile="isMobile"
       :filters="filterDefinitions"
-      v-model:filter-values="filterValues"
+      @search="handleSearchSubmit"
     >
       <template #location-card="{ location }">
         <LocationCard :location="location" />
