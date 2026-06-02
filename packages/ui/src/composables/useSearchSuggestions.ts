@@ -11,12 +11,7 @@ export function useSearchSuggestions(search: string | Ref<string>) {
       searchSuggestions.value = []
       return
     }
-
-    if (import.meta.env.DEV) {
-      await getSearchSuggestionsDev(stringValue, searchSuggestions, searchSuggestionsError)
-    } else {
-      await getSearchSuggestionsProd(stringValue, searchSuggestions, searchSuggestionsError)
-    }
+    await queryAisAutocomplete(stringValue, searchSuggestions, searchSuggestionsError)
   }
 
   function dismissSuggestions() {
@@ -52,33 +47,14 @@ export function useSearchSuggestions(search: string | Ref<string>) {
   }
 }
 
-async function getSearchSuggestionsDev(
+async function queryAisAutocomplete(
   stringValue: string,
   searchSuggestions: Ref<string[]>,
   searchSuggestionsError: Ref<unknown>
 ) {
   try {
     const response = await fetch(
-      `https://ais-autocomplete.citygeo.phila.city/autocomplete?q=${stringValue.replace(/ /, '+')}`
-    )
-    const suggestions: AisAutocompleteResult = await response.json()
-    const suggestedAddresses = suggestions.count
-      ? Array.from(suggestions.results.addresses, (suggestion) => suggestion.address)
-      : []
-    searchSuggestions.value = suggestedAddresses
-  } catch (err) {
-    searchSuggestionsError.value = err
-  }
-}
-
-async function getSearchSuggestionsProd(
-  stringValue: string,
-  searchSuggestions: Ref<string[]>,
-  searchSuggestionsError: Ref<unknown>
-) {
-  try {
-    const response = await fetch(
-      `https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/autocomplete?q=${encodeURIComponent(stringValue)}`
+      `https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/autocomplete?q=${encodeURIComponent(stringValue)}&client_id=${import.meta.env.DEV ? import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD : ''}`
     )
 
     if (response.ok) {
