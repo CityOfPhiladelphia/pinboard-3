@@ -24,12 +24,23 @@ const draft = ref<FilterValues>({})
 const search = ref('')
 const collapsed = ref<Record<string, boolean>>({})
 
+// Shape-aware copy of the flat filter values (string | string[] | boolean).
+// structuredClone is avoided here: it throws on the reactive value graph.
+function cloneValues(values: FilterValues): FilterValues {
+  const out: FilterValues = {}
+  for (const key of Object.keys(values)) {
+    const value = values[key]
+    out[key] = Array.isArray(value) ? [...value] : value
+  }
+  return out
+}
+
 // Re-seed the draft each time the panel opens.
 watch(
   () => props.open,
   (isOpen) => {
     if (isOpen) {
-      draft.value = structuredClone(props.modelValue)
+      draft.value = cloneValues(props.modelValue)
       search.value = ''
       collapsed.value = {}
     }
@@ -85,7 +96,7 @@ function reset() {
   draft.value = {}
 }
 function apply() {
-  emit('update:modelValue', structuredClone(draft.value))
+  emit('update:modelValue', cloneValues(draft.value))
   close()
 }
 </script>
