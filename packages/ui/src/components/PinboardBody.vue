@@ -8,10 +8,6 @@ import { faMap } from '@fortawesome/pro-solid-svg-icons'
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
-// filter-chip's package.json exports only '.', so its CSS isn't reachable by a
-// bare specifier. Apps consume this lib from source, so import the file via a
-// relative path (which bypasses the exports gate) to keep it resolvable everywhere.
-import '../../node_modules/@phila/phila-ui-filter-chip/dist/index.css'
 import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Search } from '@phila/phila-ui-search'

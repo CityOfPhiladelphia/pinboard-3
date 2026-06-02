@@ -25,8 +25,6 @@ export default defineConfig({
           return false
         if (id.includes('@phila/phila-ui-bottom-sheet') && id.endsWith('.css'))
           return false
-        if (id.includes('@phila/phila-ui-filter-chip') && id.endsWith('.css'))
-          return false
         return [
           'vue',
           'vue-router',
