@@ -106,6 +106,7 @@ defineExpose({ scrollToCard })
     @search="emit('search')"
     :is-mobile="isMobile"
   />
+  <slot name="below-search" />
   <div ref="listRef" class="location-list content">
     <MapCard
       v-for="location in locations"

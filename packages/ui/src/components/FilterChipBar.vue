@@ -22,6 +22,7 @@ function onUpdate(value: FilterValues) {
     <FilterChipGroup
       :filters="props.filters"
       :model-value="props.modelValue"
+      color="white"
       filter-button
       @update:model-value="onUpdate"
       @open-filters="emit('open-filters')"
@@ -31,6 +32,6 @@ function onUpdate(value: FilterValues) {
 
 <style scoped>
 .filter-chip-bar {
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0;
 }
 </style>

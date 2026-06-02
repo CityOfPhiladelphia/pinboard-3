@@ -332,13 +332,6 @@ const effectiveMapConfig = (() => {
   </div>
   <div class="finder-panel">
     <div class="finder-panel-locations">
-      <FilterChipBar
-        v-if="filters && !isMobile"
-        :filters="filters"
-        :model-value="filterValues ?? {}"
-        @update:model-value="onFilterValues"
-        @open-filters="allFiltersOpen = true"
-      />
       <slot name="locations-header" />
 
       <div v-if="isLoading" class="location-list">
@@ -369,7 +362,16 @@ const effectiveMapConfig = (() => {
         @selected-filter="handleLocationFilterChange"
         @sort-option="handleLocationSortChange"
         :is-mobile="isMobile"
-      />
+      >
+        <template v-if="filters && !isMobile" #below-search>
+          <FilterChipBar
+            :filters="filters"
+            :model-value="filterValues ?? {}"
+            @update:model-value="onFilterValues"
+            @open-filters="allFiltersOpen = true"
+          />
+        </template>
+      </LocationsPanel>
     </div>
 
     <div class="finder-panel-map">
@@ -700,6 +702,13 @@ const effectiveMapConfig = (() => {
     right: 0;
     z-index: 2;
     padding: 10px 24px;
+  }
+
+  /* Full-bleed the chip row out of the search container's horizontal padding so
+     the chips scroll edge-to-edge. */
+  .mobile-map-search-filter .mobile-filter-target {
+    width: calc(100% + 48px);
+    margin-left: -24px;
   }
 
   .mobile-map-search-filter :deep(.mobile-search) {
