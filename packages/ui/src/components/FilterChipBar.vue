@@ -34,4 +34,12 @@ function onUpdate(value: FilterValues) {
 .filter-chip-bar {
   padding: 0.5rem 0;
 }
+
+/* Put the leading/trailing space inside the scroll track so it scrolls away with
+   the chips: space before the first chip at scroll-start (and after the last at
+   the end), but none once the row has been scrolled past it. */
+.filter-chip-bar :deep(.phila-filter-chip-group__row) {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
 </style>
