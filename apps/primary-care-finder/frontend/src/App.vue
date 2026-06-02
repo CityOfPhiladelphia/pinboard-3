@@ -11,7 +11,7 @@ import {
   PinboardUtilities,
 } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
-import { faArrowsUpDown } from '@fortawesome/pro-solid-svg-icons'
+import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
 import type { FilterDefinition, FilterValues } from '@pinboard/ui'
 import { useLocations } from './composables/useLocations'
 import LocationCard from './components/LocationCard.vue'
@@ -33,7 +33,7 @@ const filterDefinitions: FilterDefinition[] = [
     label: 'Sort',
     multiple: false,
     excludeFromCount: true,
-    iconDefinition: faArrowsUpDown,
+    iconDefinition: faArrowUpArrowDown,
     // TODO(teammate): finalize sort options + ordering logic.
     choices: [
       { text: 'Distance', value: 'distance' },
