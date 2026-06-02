@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import 'source-map-support/register'
 import { App, CfnOutput, Fn, Stack } from 'aws-cdk-lib'
 import * as acm from 'aws-cdk-lib/aws-certificatemanager'
 import * as route53 from 'aws-cdk-lib/aws-route53'
@@ -8,6 +7,7 @@ import {
   Confidentiality,
   applyStandardTags,
   applyNagChecks,
+  PhilaLogBucket,
   type Environment,
 } from '@phila/constructs'
 
@@ -71,12 +71,20 @@ if (frontendDomain && certificate) {
   }
 }
 
+const accessLogBucket = new PhilaLogBucket(stack, 'AccessLogs', {
+  ...context,
+  logBucketId: 'access-logs',
+  logRetentionDays: 1096,
+  s3ManagedEncryption: true,
+})
+
 // Scope as any so linked @phila/constructs resolves to a single Construct type at runtime.
 new StaticSite(stack, 'primary-care-finderSite', {
   ...context,
   assetDir: '../frontend/dist',
   ...(certificate ? { certificate } : {}),
   ...(frontendZone ? { hostedZone: frontendZone } : {}),
+  logBucket: accessLogBucket.bucket,
 })
 
 applyStandardTags(app, context)
