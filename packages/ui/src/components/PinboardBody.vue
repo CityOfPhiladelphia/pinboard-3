@@ -115,12 +115,10 @@ const bottomSheetRef = ref<{
 } | null>(null)
 const mobileControlsTarget = ref<HTMLDivElement | null>(null)
 const mobileControlsTargetLeft = ref<HTMLDivElement | null>(null)
-const mobileFilterMapTarget = ref<HTMLDivElement | null>(null)
-const mobileFilterSheetTarget = ref<HTMLDivElement | null>(null)
-const mobileFilterTarget = computed(() =>
+const mobileFilterSelector = computed(() =>
   filterPlacement.value === 'sheet'
-    ? mobileFilterSheetTarget.value
-    : mobileFilterMapTarget.value
+    ? '.mobile-filter-target--sheet'
+    : '.mobile-filter-target--map'
 )
 const locationsPanelRef = ref<{
   scrollToCard: (id: string, behavior?: ScrollBehavior) => void
@@ -415,7 +413,7 @@ const effectiveMapConfig = (() => {
           @update:model-value="handleSearchChange"
           @search="handleSearchSubmit"
         />
-        <div ref="mobileFilterMapTarget" class="mobile-filter-target"></div>
+        <div v-if="filters" class="mobile-filter-target mobile-filter-target--map"></div>
         <SearchSuggestions
           ref="mobileSuggestionsRef"
           :suggestions="searchSuggestions"
@@ -431,14 +429,6 @@ const effectiveMapConfig = (() => {
         />
       </div>
     </div>
-    <Teleport v-if="filters && isMobile && mobileFilterTarget" :to="mobileFilterTarget">
-      <FilterChipBar
-        :filters="filters"
-        :model-value="filterValues ?? {}"
-        @update:model-value="onFilterValues"
-        @open-filters="allFiltersOpen = true"
-      />
-    </Teleport>
   </div>
   <BottomSheet
     v-if="isMobile"
@@ -454,7 +444,7 @@ const effectiveMapConfig = (() => {
         class="bottom-sheet-list-scroll"
         :class="{ 'is-hidden': selectedLocation }"
       >
-        <div ref="mobileFilterSheetTarget" class="mobile-filter-target"></div>
+        <div v-if="filters" class="mobile-filter-target mobile-filter-target--sheet"></div>
         <slot name="locations-header" />
         <div v-if="!isLoading && !errorMessage" class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
@@ -511,6 +501,14 @@ const effectiveMapConfig = (() => {
       @update:model-value="onFilterValues"
     />
   </div>
+  <Teleport v-if="filters && isMobile" :to="mobileFilterSelector">
+    <FilterChipBar
+      :filters="filters"
+      :model-value="filterValues ?? {}"
+      @update:model-value="onFilterValues"
+      @open-filters="allFiltersOpen = true"
+    />
+  </Teleport>
 </template>
 
 <style>
@@ -747,7 +745,7 @@ const effectiveMapConfig = (() => {
   bottom: 0;
   width: 40%;
   z-index: 12;
-  background: #fff;
+  background: var(--Schemes-Surface-Bright, #fff);
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
   display: none;
 }

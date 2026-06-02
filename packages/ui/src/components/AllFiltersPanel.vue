@@ -94,7 +94,7 @@ function apply() {
   <div v-if="props.open" class="all-filters-panel">
     <header class="all-filters-header">
       <h2>All Filters</h2>
-      <button class="icon-button" aria-label="Close filters" @click="close">
+      <button type="button" class="icon-button" aria-label="Close filters" @click="close">
         <FontAwesomeIcon :icon="faXmark" />
       </button>
     </header>
@@ -103,7 +103,7 @@ function apply() {
 
     <div class="all-filters-sections">
       <section v-for="f in visibleSections" :key="f.key" class="filter-section">
-        <button class="section-toggle" @click="toggleSection(f.key)">
+        <button type="button" class="section-toggle" @click="toggleSection(f.key)">
           <span>{{ f.label }}</span>
           <FontAwesomeIcon
             :icon="faChevronDown"
