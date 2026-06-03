@@ -38,7 +38,6 @@ watch(userLocationPermission, (newPermissionState, oldPermissionState) => {
             : watchId.value
         }
         getUserLocation()
-
         break
       }
       case 'denied': {
