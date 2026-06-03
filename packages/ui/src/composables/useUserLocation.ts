@@ -9,11 +9,11 @@ const userLocation = ref<LatLon>({
   latitude: NaN,
   longitude: NaN,
 })
-const gotFirstLocation = ref<boolean>(false)
+const gotInitialLocation = ref<boolean>(false)
 const watchId = ref<number | null>(null)
 const geolocationOptions = { timeout: Infinity, maximumAge: 0, enableHighAccuracy: false }
 
-watch(gotFirstLocation, (newState) => {
+watch(gotInitialLocation, (newState) => {
   if (newState) {
     watchId.value = navigator.geolocation.watchPosition(
       locationSuccess,
@@ -28,15 +28,6 @@ watch(userLocationPermission, (newPermissionState, oldPermissionState) => {
     switch (newPermissionState) {
       case 'granted':
       case 'prompt': {
-        if (gotFirstLocation.value) {
-          watchId.value = !watchId.value
-            ? navigator.geolocation.watchPosition(
-                locationSuccess,
-                locationError,
-                geolocationOptions
-              )
-            : watchId.value
-        }
         getUserLocation()
         break
       }
@@ -44,7 +35,6 @@ watch(userLocationPermission, (newPermissionState, oldPermissionState) => {
         if (watchId.value) {
           navigator.geolocation.clearWatch(watchId.value)
         }
-        watchId.value = null
         clearUserLocation()
         if (oldPermissionState === 'granted') {
           userLocationPermission.value = 'prompt'
@@ -93,8 +83,7 @@ async function getGeolocatePermissionState() {
             break
           }
           case 'prompt': {
-            if (gotFirstLocation.value) {
-              gotFirstLocation.value = false
+            if (gotInitialLocation.value) {
               userLocationPermission.value = 'denied'
             } else {
               getUserLocation()
@@ -123,8 +112,8 @@ function checkLatitudeInRange(latitude: number) {
 }
 
 function locationSuccess(position: GeolocationPosition) {
-  if (!gotFirstLocation.value) {
-    gotFirstLocation.value = true
+  if (!gotInitialLocation.value) {
+    gotInitialLocation.value = true
   }
   // only show location on map if user is in or near Philly
   userLocation.value.latitude = checkLatitudeInRange(position.coords.latitude)
@@ -135,6 +124,8 @@ function locationSuccess(position: GeolocationPosition) {
     : NaN
   if (!hasLocationData(userLocation)) {
     console.error(`Location not in range`)
+    userLocation.value.latitude = NaN
+    userLocation.value.longitude = NaN
   }
 
   // if navigator.permissions is 'prompt' or 'granted' resolve both to 'granted' if user allows location services
@@ -142,12 +133,13 @@ function locationSuccess(position: GeolocationPosition) {
 }
 
 function locationError(error: GeolocationPositionError) {
-  clearUserLocation()
   userLocationPermission.value = 'denied'
   console.error(error)
 }
 
 function clearUserLocation() {
+  watchId.value = null
+  gotInitialLocation.value = false
   userLocation.value.latitude = NaN
   userLocation.value.longitude = NaN
 }
