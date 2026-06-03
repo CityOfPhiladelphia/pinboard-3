@@ -5,6 +5,7 @@ import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 const props = defineProps<{
   filters: FilterDefinition[]
   modelValue: FilterValues
+  elevated?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -24,6 +25,7 @@ function onUpdate(value: FilterValues) {
       :model-value="props.modelValue"
       color="white"
       filter-button
+      :elevated="props.elevated"
       @update:model-value="onUpdate"
       @open-filters="emit('open-filters')"
     />
