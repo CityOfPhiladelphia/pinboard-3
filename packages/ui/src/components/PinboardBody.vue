@@ -92,7 +92,7 @@ const mobileControlsTargetLeft = ref<HTMLDivElement | null>(null)
 const locationsPanelRef = ref<{
   scrollToCard: (id: string, behavior?: ScrollBehavior) => void
 } | null>(null)
-const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(null)
+const mapPanelRef = ref<{ panTo: (coordinates: LatLon) => void } | null>(null)
 const searchString = ref<string>('')
 
 // computed refs
@@ -127,18 +127,16 @@ watch(selectedLocation, (loc) => {
   }
 })
 
-watch(
-  () => props.searchOrUserLocation,
+watch(props.searchOrUserLocation,
   (newLocation) => {
     if (
       hasLocationData(newLocation) &&
       props.locationSearchMode &&
       ['address', 'zipcode'].includes(props.locationSearchMode)
     ) {
-      mapPanelRef.value?.panTo([newLocation.longitude, newLocation.latitude])
+      mapPanelRef.value?.panTo(newLocation)
     }
-  },
-  { deep: true }
+  }
 )
 
 // event handlers
@@ -161,7 +159,7 @@ function selectLocation(location: BasicLocation) {
 
 function handleSelect(location: BasicLocation) {
   selectLocation(location)
-  mapPanelRef.value?.panTo([location.longitude, location.latitude])
+  mapPanelRef.value?.panTo(location)
 }
 
 function handleMapSelect(location: BasicLocation) {
@@ -368,8 +366,8 @@ const effectiveMapConfig = (() => {
   color: var(--Schemes-Error, #b3261e);
 }
 
-.finder-panel-locations> :deep(.location-list),
-.finder-panel-locations>.location-list {
+.finder-panel-locations > :deep(.location-list),
+.finder-panel-locations > .location-list {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
@@ -451,7 +449,7 @@ const effectiveMapConfig = (() => {
   z-index: 2;
 }
 
-.bottom-sheet-detail>* {
+.bottom-sheet-detail > * {
   max-width: 100%;
 }
 
@@ -486,7 +484,7 @@ const effectiveMapConfig = (() => {
     pointer-events: none;
   }
 
-  .mobile-controls-float> :deep(*) {
+  .mobile-controls-float > :deep(*) {
     pointer-events: auto;
   }
 
@@ -501,7 +499,7 @@ const effectiveMapConfig = (() => {
     pointer-events: none;
   }
 
-  .mobile-controls-float-left> :deep(*) {
+  .mobile-controls-float-left > :deep(*) {
     pointer-events: auto;
   }
 

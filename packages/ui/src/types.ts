@@ -4,7 +4,7 @@ import type { MapCardProps } from '@phila/phila-ui-cards'
 export type Latitude = number
 export type Longitude = number
 
-export type LocationCoordinate = [Longitude, Latitude]
+export type LongitudeLatitude = [Longitude, Latitude]
 
 export interface LatLon {
   latitude: Latitude
@@ -13,7 +13,7 @@ export interface LatLon {
 
 export interface ZipcodePolygon {
   centroid: LatLon
-  nodes: LocationCoordinate[]
+  nodes: LongitudeLatitude[]
 }
 
 export type LocationPermissionState = 'granted' | 'prompt' | 'denied'
@@ -21,7 +21,7 @@ export type LocationPermissionState = 'granted' | 'prompt' | 'denied'
 export type MapControlPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
 export interface MapConfig {
-  center?: LocationCoordinate
+  center?: LongitudeLatitude
   zoom?: number
   pitch?: number
   bearing?: number
@@ -37,7 +37,7 @@ export interface MapConfig {
   mapSearchControl?: { position?: MapControlPosition; placeholder?: string }
   ariaLabel?: string
   mobile?: {
-    center?: LocationCoordinate
+    center?: LongitudeLatitude
     zoom?: number
   }
 }
@@ -213,7 +213,7 @@ export interface AisAddressSearchResponse {
       geometry: {
         geocode_type: string
         type: string
-        coordinates: LocationCoordinate
+        coordinates: LongitudeLatitude
       }
     },
   ]

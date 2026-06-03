@@ -6,7 +6,7 @@ import {
 } from 'vue'
 import { Map as PhilaMap } from '@phila/phila-ui-map-core'
 import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css' // shouldn't the style be bundled with the component?
-import type { MapConfig, BasicLocation } from '../types'
+import type { MapConfig, BasicLocation, LatLon } from '../types'
 
 const props = defineProps<{
   config?: MapConfig
@@ -40,10 +40,10 @@ const props = defineProps<{
 const mapRef = ref<typeof PhilaMap | null>(null)
 const zoom = ref(props.config?.zoom ?? 14)
 
-function panTo(lngLat: [number, number]) {
+function panTo(coordinates: LatLon) {
   const mapInstance = (mapRef.value)?.map
   if (mapInstance) {
-    mapInstance.setCenter(lngLat)
+    mapInstance.setCenter([coordinates.longitude, coordinates.latitude])
     mapInstance.setZoom(14)
   }
 }
