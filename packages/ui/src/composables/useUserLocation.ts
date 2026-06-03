@@ -4,7 +4,7 @@ import { type LatLon, type LocationPermissionState, Browsers } from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
 // excluding 'prompt' to ensure behavior of Firefox and similarly behaving browsers are coerced into behaving like Chrome
-const userLocationPermission = ref<Exclude<LocationPermissionState, 'prompt'> | null>(null)
+const userLocationPermission = ref<LocationPermissionState | null>(null)
 const userLocation = ref<LatLon>({
   latitude: NaN,
   longitude: NaN,
@@ -23,22 +23,35 @@ watch(gotFirstLocation, (newState) => {
   }
 })
 
-watch(userLocationPermission, (newPermissionState) => {
-  switch (newPermissionState) {
-    case 'granted': {
-      if (gotFirstLocation.value) {
-        watchId.value = !watchId.value
-          ? navigator.geolocation.watchPosition(locationSuccess, locationError, geolocationOptions)
-          : watchId.value
+watch(userLocationPermission, (newPermissionState, oldPermissionState) => {
+  if (oldPermissionState) {
+    switch (newPermissionState) {
+      case 'granted':
+      case 'prompt': {
+        if (gotFirstLocation.value) {
+          watchId.value = !watchId.value
+            ? navigator.geolocation.watchPosition(
+                locationSuccess,
+                locationError,
+                geolocationOptions
+              )
+            : watchId.value
+        }
+        getUserLocation()
+
+        break
       }
-      break
-    }
-    case 'denied': {
-      if (watchId.value) {
-        navigator.geolocation.clearWatch(watchId.value)
+      case 'denied': {
+        if (watchId.value) {
+          navigator.geolocation.clearWatch(watchId.value)
+        }
+        watchId.value = null
+        clearUserLocation()
+        if (oldPermissionState === 'granted') {
+          userLocationPermission.value = 'prompt'
+        }
+        break
       }
-      watchId.value = null
-      clearUserLocation()
     }
   }
 })
