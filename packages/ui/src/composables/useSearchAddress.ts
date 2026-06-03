@@ -22,30 +22,28 @@ export function useSearchAddress(address: string | Ref<string>) {
       return
     }
 
-    const url = `${import.meta.env.DEV ? `${import.meta.env.VITE_AIS_URL}/addresses/` : 'https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/addresslocation/'}${encodeURIComponent(addressDeref)}?client_id=${import.meta.env.DEV ? import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD : ''}`
-
-    if (import.meta.env.DEV) {
-      try {
-        const result: AisAddressSearchResponse = await (await fetch(url)).json()
+    try {
+      const url = `${import.meta.env.DEV ? `${import.meta.env.VITE_AIS_URL}/addresses/` : 'https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/addresslocation/'}${encodeURIComponent(addressDeref)}?client_id=${import.meta.env.DEV ? import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD : ''}`
+      const response = await fetch(url)
+      if (!response.ok) {
+        clearAddress()
+        console.error({ status: response.status, message: response.body })
+        return
+      }
+      if (import.meta.env.DEV) {
+        const result: AisAddressSearchResponse = await response.json()
         addressCoordinates.value.longitude = result.features[0].geometry.coordinates[0] ?? NaN
         addressCoordinates.value.latitude = result.features[0].geometry.coordinates[1] ?? NaN
-        finishedAddressFetch.value = true
-      } catch (err) {
-        console.error('Failed to get response from AIS: ', err)
-        clearAddress()
-        finishedAddressFetch.value = true
-      }
-    } else {
-      try {
-        const result: LatLon = await (await fetch(url)).json()
+      } else {
+        const result: LatLon = await response.json()
         addressCoordinates.value.longitude = result?.longitude ?? NaN
         addressCoordinates.value.latitude = result?.latitude ?? NaN
-        finishedAddressFetch.value = true
-      } catch (err) {
-        console.error('Failed to get response from AIS: ', err)
-        clearAddress()
-        finishedAddressFetch.value = true
       }
+      finishedAddressFetch.value = true
+    } catch (err) {
+      console.error('Failed to get response from AIS: ', err)
+      clearAddress()
+      finishedAddressFetch.value = true
     }
   }
 
