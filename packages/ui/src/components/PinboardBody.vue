@@ -115,9 +115,8 @@ const selectedLocationId = computed(() =>
 )
 
 const locationCountLabel = computed(() => {
-  const n = props.locations.length
-  if (n === 0) return 'No locations match'
-  return `${n} item${n > 1 ? 's' : ''}`
+  const message = props.locations.length ? `${props.locations.length} item${props.locations.length > 1 ? 's' : ''}` : 'No locations match'
+  return props.isLoading || message
 })
 
 // watchers
