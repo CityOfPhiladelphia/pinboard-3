@@ -112,7 +112,7 @@ watch(
         break
       }
     }
-  }
+  },
 )
 
 // event handlers
@@ -204,10 +204,7 @@ function asOemLocation(location: BasicLocation) {
       }"
     >
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />
-      <BasemapToggle
-        position="top-right"
-        :teleport-to="isMobile ? mobileControlsTarget : null"
-      />
+      <BasemapToggle position="top-right" :teleport-to="isMobile ? mobileControlsTarget : null" />
 
       <FillLayer
         v-for="id in FLOOD_LAYER_IDS"
@@ -237,7 +234,7 @@ function asOemLocation(location: BasicLocation) {
             :icon="isGauge(loc) ? faGauge : faCamera"
             :text="
               loc.locationCardInfo.tags?.[1]?.text !== 'No data'
-                ? loc.locationCardInfo.tags?.[1]?.text ?? ''
+                ? (loc.locationCardInfo.tags?.[1]?.text ?? '')
                 : ''
             "
             :color-theme="isGauge(loc) ? 'light-primary' : 'light-purple'"

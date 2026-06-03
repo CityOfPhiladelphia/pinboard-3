@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import {
-  ref,
-  computed,
-  defineComponent
-} from 'vue'
+import { ref, computed, defineComponent } from 'vue'
 import { Map as PhilaMap } from '@phila/phila-ui-map-core'
 import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css' // shouldn't the style be bundled with the component?
 import type { MapConfig, BasicLocation, LatLon } from '../types'
@@ -41,7 +37,7 @@ const mapRef = ref<typeof PhilaMap | null>(null)
 const zoom = ref(props.config?.zoom ?? 14)
 
 function panTo(coordinates: LatLon) {
-  const mapInstance = (mapRef.value)?.map
+  const mapInstance = mapRef.value?.map
   if (mapInstance) {
     mapInstance.setCenter([coordinates.longitude, coordinates.latitude])
     mapInstance.setZoom(14)
@@ -71,9 +67,7 @@ const SlotRenderer = defineComponent({
     renderProps: { type: Object, required: true },
   },
   render() {
-    return (this.renderFn as (props: Record<string, unknown>) => unknown)(
-      this.renderProps
-    )
+    return (this.renderFn as (props: Record<string, unknown>) => unknown)(this.renderProps)
   },
 })
 </script>
@@ -81,11 +75,7 @@ const SlotRenderer = defineComponent({
 <template>
   <div class="map-panel">
     <PhilaMap ref="mapRef" v-bind="config" @zoom="zoom = $event">
-      <SlotRenderer
-        v-if="mapContentSlot"
-        :render-fn="mapContentSlot"
-        :render-props="slotProps"
-      />
+      <SlotRenderer v-if="mapContentSlot" :render-fn="mapContentSlot" :render-props="slotProps" />
     </PhilaMap>
 
     <div v-if="isLoading" class="map-loading-overlay">

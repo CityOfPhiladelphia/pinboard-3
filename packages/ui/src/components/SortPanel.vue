@@ -98,16 +98,8 @@ watch(panelOpen, (isOpen) => {
 
 <template>
   <div class="sort-panel-root">
-    <button
-      ref="triggerEl"
-      type="button"
-      class="sort-panel-trigger"
-      @click="openPanel"
-    >
-      <FontAwesomeIcon
-        :icon="faArrowUpArrowDown"
-        class="sort-panel-trigger-icon"
-      />
+    <button ref="triggerEl" type="button" class="sort-panel-trigger" @click="openPanel">
+      <FontAwesomeIcon :icon="faArrowUpArrowDown" class="sort-panel-trigger-icon" />
       <span>{{ triggerLabel }}</span>
     </button>
   </div>
@@ -129,11 +121,7 @@ watch(panelOpen, (isOpen) => {
       <div ref="formEl" class="sort-panel-form sort-panel-form--mobile">
         <CloseButton class="sort-panel-close" @click="closePanel" />
         <ul class="sort-panel-options">
-          <li
-            v-for="option in sortOptions"
-            :key="option.value"
-            class="sort-panel-option"
-          >
+          <li v-for="option in sortOptions" :key="option.value" class="sort-panel-option">
             <Radio
               name="sort-panel-radio"
               :value="option.value"
@@ -152,27 +140,14 @@ watch(panelOpen, (isOpen) => {
           </li>
         </ul>
         <div class="sort-panel-actions">
-          <PhilaButton variant="text" size="extra-small" @click="resetSort"
-            >Reset</PhilaButton
-          >
-          <PhilaButton variant="primary" size="small" @click="applySort"
-            >Apply</PhilaButton
-          >
+          <PhilaButton variant="text" size="extra-small" @click="resetSort">Reset</PhilaButton>
+          <PhilaButton variant="primary" size="small" @click="applySort">Apply</PhilaButton>
         </div>
       </div>
     </BottomSheet>
-    <div
-      v-else-if="panelOpen"
-      ref="formEl"
-      class="sort-panel-form"
-      :style="anchorStyle"
-    >
+    <div v-else-if="panelOpen" ref="formEl" class="sort-panel-form" :style="anchorStyle">
       <ul class="sort-panel-options">
-        <li
-          v-for="option in sortOptions"
-          :key="option.value"
-          class="sort-panel-option"
-        >
+        <li v-for="option in sortOptions" :key="option.value" class="sort-panel-option">
           <Radio
             name="sort-panel-radio"
             :value="option.value"
@@ -183,20 +158,14 @@ watch(panelOpen, (isOpen) => {
           />
           <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
             {{
-              locationAvailable
-                ? 'Closest to furthest'
-                : 'Share your location to sort by distance'
+              locationAvailable ? 'Closest to furthest' : 'Share your location to sort by distance'
             }}
           </p>
         </li>
       </ul>
       <div class="sort-panel-actions">
-        <PhilaButton variant="text" size="extra-small" @click="resetSort"
-          >Reset</PhilaButton
-        >
-        <PhilaButton variant="primary" size="small" @click="applySort"
-          >Apply</PhilaButton
-        >
+        <PhilaButton variant="text" size="extra-small" @click="resetSort">Reset</PhilaButton>
+        <PhilaButton variant="primary" size="small" @click="applySort">Apply</PhilaButton>
       </div>
     </div>
   </Teleport>

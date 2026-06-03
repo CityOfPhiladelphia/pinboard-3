@@ -155,19 +155,16 @@ export default {
       'New patients should call on the first Wednesday of the month to make an appointment.',
     'The pharmacy is currently closed for construction':
       'The pharmacy is currently closed for construction.',
-    'Services only offered for patients ages 14+':
-      'Services only offered for patients ages 14+',
+    'Services only offered for patients ages 14+': 'Services only offered for patients ages 14+',
   },
   exceptions: {
-    'Open first and third Saturday of each month':
-      'Open on first and third Saturdays of the month',
+    'Open first and third Saturday of each month': 'Open on first and third Saturdays of the month',
     'Patients seen by appointment only from 4:30 p.m. - 8 p.m.':
       'Patients seen by appointment only from 4:30 p.m. - 8 p.m.',
     'Telehealth visits only': 'Telehealth visits only',
     'On first Wednesday of the month, clinic opens at 1 p.m.':
       'On first Wednesday of the month, clinic opens at 1 p.m.',
-    'Open until 8 p.m. by appointment only ':
-      'Open until 8 p.m. by appointment only',
+    'Open until 8 p.m. by appointment only ': 'Open until 8 p.m. by appointment only',
     'Closed noon - 1 p.m.': 'Closed noon - 1 p.m.',
     'Closed at noon for lunch': 'Closed at noon for lunch',
     'Urgent care available from 10:30 a.m. - 2 p.m.':
@@ -180,10 +177,8 @@ export default {
       'Patients seen by appointment only until 7:30 p.m. on the first and third Thursdays of the month',
     'Open first and third Thursday of each month from 5 p.m. - 7:30 p.m. (appointment only)':
       'Open first and third Thursday of each month from 5 p.m. - 7:30 p.m. (appointment only)',
-    'Open on second Saturday of the month':
-      'Open on second Saturday of the month',
-    'Telehealth available 5 p.m. - 7 p.m.':
-      'Telehealth available 5 p.m. - 7 p.m.',
+    'Open on second Saturday of the month': 'Open on second Saturday of the month',
+    'Telehealth available 5 p.m. - 7 p.m.': 'Telehealth available 5 p.m. - 7 p.m.',
     'Closes at noon on the third Thursday of every month, Telehealth available 5 p.m. - 7 p.m.':
       'Closes at noon on the third Thursday of every month, Telehealth available 5 p.m. - 7 p.m.',
     'Dental available 8:30 a.m. - 1 p.m. every third Saturday':
@@ -215,12 +210,10 @@ export default {
       'On 2nd Friday of the month, clinic is open from 1:30 p.m. - 5 p.m.',
     'On second and fourth Saturday of the month, clinic is open from 8:30 a.m. - 1 p.m. for dental services':
       'On second and fourth Saturday of the month, clinic is open from 8:30 a.m. - 1 p.m. for dental services',
-    'Evening telehealth services 5 p.m. - 8 p.m.':
-      'Evening telehealth services 5 p.m. - 8 p.m.',
+    'Evening telehealth services 5 p.m. - 8 p.m.': 'Evening telehealth services 5 p.m. - 8 p.m.',
     'Evening telehealth services available 5 p.m. - 8 p.m.':
       'Evening telehealth services 5 p.m. - 8 p.m.',
-    'Evening Telehealth service 5 p.m. to 7 p.m.':
-      'Evening Telehealth service 5 p.m. to 7 p.m.',
+    'Evening Telehealth service 5 p.m. to 7 p.m.': 'Evening Telehealth service 5 p.m. to 7 p.m.',
     'Evening telehealth services 5 p.m. - 8 p.m. Open every fourth Saturday of the month for primary care and podiatry':
       'Evening telehealth services 5 p.m. - 8 p.m. Open every fourth Saturday of the month for primary care and podiatry',
     'On third Thursday of the month, clinic is closed':
@@ -229,22 +222,17 @@ export default {
       'Closed noon - 1 p.m.  On second Friday of the month, clinic closes at noon',
     'On second Friday of the month, clinic closes at noon':
       'On second Friday of the month, clinic closes at noon',
-    'Open 5 p.m. - 8 p.m. by appointment only':
-      'Open 5 p.m. to 8 p.m. by appointment only',
-    'Select Saturdays by appointment only':
-      'By appointment only on some Saturdays',
-    'Open until 7 p.m. by appointment only ':
-      'Open until 7 p.m. by appointment only',
+    'Open 5 p.m. - 8 p.m. by appointment only': 'Open 5 p.m. to 8 p.m. by appointment only',
+    'Select Saturdays by appointment only': 'By appointment only on some Saturdays',
+    'Open until 7 p.m. by appointment only ': 'Open until 7 p.m. by appointment only',
     'On first and third Thursday of the month, clinic is open until 7:30 p.m.':
       'On first and third Thursday of the month, clinic is open until 7:30 p.m.',
     'Evening telehealth services available 5 p.m. - 6 p.m.':
       'Evening telehealth services available 5 p.m. - 6 p.m.',
-    'Dental services available 8:30 a.m. - 1 p.m.':
-      'Dental services available 8:30 a.m. - 1 p.m.',
+    'Dental services available 8:30 a.m. - 1 p.m.': 'Dental services available 8:30 a.m. - 1 p.m.',
     'Evening telehealth services available 5 p.m. - 7 p.m.':
       'Evening telehealth services available 5 p.m. - 7 p.m.',
-    'Evening telehealth services 5 p.m. to 7 p.m.':
-      'Evening telehealth services 5 p.m. to 7 p.m.',
+    'Evening telehealth services 5 p.m. to 7 p.m.': 'Evening telehealth services 5 p.m. to 7 p.m.',
     'Open every first and third Saturday of the month':
       'Open every first and third Saturday of the month',
     'Medical services are provided Thursday evenings only':
@@ -259,8 +247,7 @@ export default {
       'On 1st and 3rd Saturday of the month, clinic is open for dental services',
     'On 2nd Saturday of the month, clinic is open from 10 a.m. - 2 p.m.':
       'On 2nd Saturday of the month, clinic is open from 10 a.m. - 2 p.m.',
-    'Telehealth visits only from 9 a.m. - 3 p.m.':
-      'Telehealth visits only from 9 a.m. - 3 p.m.',
+    'Telehealth visits only from 9 a.m. - 3 p.m.': 'Telehealth visits only from 9 a.m. - 3 p.m.',
   },
   hours: 'Hours',
   daysOfTheWeek: 'Day',

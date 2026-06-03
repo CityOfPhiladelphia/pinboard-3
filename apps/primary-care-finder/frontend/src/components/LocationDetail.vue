@@ -25,11 +25,9 @@ const fullAddress = computed(() => {
 function siteName(): string {
   let value = p.value.record
   if (
-    value ===
-    'Delaware Valley Community Health (DVCH) Maria de los Santos Womens Health Center'
+    value === 'Delaware Valley Community Health (DVCH) Maria de los Santos Womens Health Center'
   ) {
-    value =
-      "Delaware Valley Community Health (DVCH) Maria de los Santos Women's Health Center"
+    value = "Delaware Valley Community Health (DVCH) Maria de los Santos Women's Health Center"
   }
   return value
 }
@@ -153,10 +151,7 @@ function parseTimeRange(day: string): string {
 
 function parseException(exception: string, index: number): string {
   const stars = '*'.repeat(index)
-  const msgs = messages.value[locale.value] as Record<
-    string,
-    Record<string, string>
-  >
+  const msgs = messages.value[locale.value] as Record<string, Record<string, string>>
   const translated = msgs?.exceptions?.[exception]
   return stars + ' ' + (translated ?? exception)
 }
@@ -174,18 +169,12 @@ const languagesSpoken = computed<string[]>(() => {
 })
 
 function translateLanguage(lang: string): string {
-  const msgs = messages.value[locale.value] as Record<
-    string,
-    Record<string, string>
-  >
+  const msgs = messages.value[locale.value] as Record<string, Record<string, string>>
   return msgs?.languages?.[lang.toLowerCase()] ?? lang
 }
 
 function translateWarning(warning: string): string {
-  const msgs = messages.value[locale.value] as Record<
-    string,
-    Record<string, string>
-  >
+  const msgs = messages.value[locale.value] as Record<string, Record<string, string>>
   return msgs?.warnings?.[warning] ?? warning
 }
 

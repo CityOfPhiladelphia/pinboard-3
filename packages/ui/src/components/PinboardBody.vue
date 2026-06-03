@@ -115,7 +115,9 @@ const selectedLocationId = computed(() =>
 )
 
 const locationCountLabel = computed(() => {
-  const message = props.locations.length ? `${props.locations.length} item${props.locations.length > 1 ? 's' : ''}` : 'No locations match'
+  const message = props.locations.length
+    ? `${props.locations.length} item${props.locations.length > 1 ? 's' : ''}`
+    : 'No locations match'
   return props.isLoading || message
 })
 
@@ -126,17 +128,15 @@ watch(selectedLocation, (loc) => {
   }
 })
 
-watch(props.searchOrUserLocation,
-  (newLocation) => {
-    if (
-      hasLocationData(newLocation) &&
-      props.locationSearchMode &&
-      ['address', 'zipcode'].includes(props.locationSearchMode)
-    ) {
-      mapPanelRef.value?.panTo(newLocation)
-    }
+watch(props.searchOrUserLocation, (newLocation) => {
+  if (
+    hasLocationData(newLocation) &&
+    props.locationSearchMode &&
+    ['address', 'zipcode'].includes(props.locationSearchMode)
+  ) {
+    mapPanelRef.value?.panTo(newLocation)
   }
-)
+})
 
 // event handlers
 function handleHover(id: string) {

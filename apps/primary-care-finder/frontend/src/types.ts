@@ -5,8 +5,7 @@ export interface PrimaryCareLocationInfo {
   geometry: { type: string; coordinates: [number, number, ...number[]] }
 }
 
-export type PrimaryCareLocation = PinboardTypes.BasicLocation &
-  PrimaryCareLocationInfo
+export type PrimaryCareLocation = PinboardTypes.BasicLocation & PrimaryCareLocationInfo
 
 export interface PrimaryCareProperties {
   objectid: number

@@ -9,11 +9,7 @@ import { MapCard } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 
 // type imports
-import type {
-  BasicLocation,
-  LocationFilterOption,
-  SortLocationsOptions,
-} from '../types'
+import type { BasicLocation, LocationFilterOption, SortLocationsOptions } from '../types'
 
 // props
 const props = defineProps<{
