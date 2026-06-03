@@ -59,7 +59,7 @@ async function getSearchSuggestionsDev(
 ) {
   try {
     const response = await fetch(
-      `https://ais-autocomplete.citygeo.phila.city/autocomplete?q=${stringValue.replace(/ /, '+')}`
+      `https://ais-autocomplete.citygeo.phila.city/autocomplete?q=${encodeURIComponent(stringValue)}&client_id=${import.meta.env.DEV ? import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD : ''}`
     )
     const suggestions: AisAutocompleteResult = await response.json()
     const suggestedAddresses = suggestions.count
@@ -78,7 +78,7 @@ async function getSearchSuggestionsProd(
 ) {
   try {
     const response = await fetch(
-      `https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/autocomplete?q=${encodeURIComponent(stringValue)}&client_id=${import.meta.env.DEV ? import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD : ''}`
+      `https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/autocomplete?q=${encodeURIComponent(stringValue)}&simple=true&client_id=${import.meta.env.DEV ? import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD : ''}`
     )
 
     if (response.ok) {
@@ -87,7 +87,7 @@ async function getSearchSuggestionsProd(
       return
     }
 
-    searchSuggestionsError.value = response
+    searchSuggestionsError.value = { status: response.status, message: response.body }
   } catch (err) {
     searchSuggestionsError.value = err
   }
