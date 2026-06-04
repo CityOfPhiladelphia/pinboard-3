@@ -139,7 +139,7 @@ watch(
       mapPanelRef.value?.panTo(newLocation)
     }
   },
-  { deep: true }
+  { deep: 1 }
 )
 
 // event handlers
