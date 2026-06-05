@@ -1,5 +1,5 @@
 import { type Ref, ref, toValue, watch } from 'vue'
-import type { AisAutocompleteResult, ProxyAutocompleteResult } from '../types'
+import type { ProxyAutocompleteResult } from '../types'
 
 export function useSearchSuggestions(search: string | Ref<string>) {
   const searchSuggestions = ref<string[]>([])
@@ -13,20 +13,13 @@ export function useSearchSuggestions(search: string | Ref<string>) {
     }
     try {
       const response = await fetch(
-        `${import.meta.env.DEV ? 'https://ais-autocomplete.citygeo.phila.city' : 'https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis'}/autocomplete?q=${encodeURIComponent(stringValue)}&simple=true&client_id=${import.meta.env.DEV ? import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD : ''}`
+        `https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/autocomplete?q=${encodeURIComponent(stringValue)}&simple=true${import.meta.env.DEV ? `&client_id=${import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD}` : ''}`
       )
       if (!response.ok) {
         searchSuggestionsError.value = { status: response.status, message: response.body }
         return
       }
-      if (import.meta.env.DEV) {
-        const data: AisAutocompleteResult = await response.json()
-        searchSuggestions.value = data.count
-          ? Array.from(data.results.addresses, (suggestion) => suggestion.address)
-          : []
-      } else {
-        searchSuggestions.value = (await response.json()) as ProxyAutocompleteResult
-      }
+      searchSuggestions.value = (await response.json()) as ProxyAutocompleteResult
     } catch (err) {
       searchSuggestionsError.value = err
     }

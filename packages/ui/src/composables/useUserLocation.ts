@@ -1,6 +1,12 @@
 import { ref, watch } from 'vue'
 import { getBrowserType } from '../utilities/getBrowserType'
-import { type LatLon, type LocationPermissionState, Browsers } from '../types'
+import {
+  type Latitude,
+  type LatLon,
+  type LocationPermissionState,
+  type Longitude,
+  Browsers,
+} from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
 // excluding 'prompt' to ensure behavior of Firefox and similarly behaving browsers are coerced into behaving like Chrome
@@ -104,10 +110,10 @@ function getUserLocation() {
 }
 
 // verify location is in or near enough to Philadelphia
-function checkLongitudeInRange(longitude: number) {
+function checkLongitudeInRange(longitude: Longitude) {
   return -75.35227 < longitude && longitude < -74.91583
 }
-function checkLatitudeInRange(latitude: number) {
+function checkLatitudeInRange(latitude: Latitude) {
   return 39.84911 < latitude && latitude < 40.175
 }
 
