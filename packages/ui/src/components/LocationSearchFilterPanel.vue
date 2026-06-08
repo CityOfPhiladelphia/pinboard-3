@@ -34,10 +34,10 @@ import type { LocationFilterOption, SortLocationsOptions } from '../types'
 
 // props
 const props = defineProps<{
-  searchPlaceholder?: string | undefined
-  filterOptions?: LocationFilterOption[] | undefined
-  sortOptions?: SortLocationsOptions | undefined
-  locationAvailable?: boolean | undefined
+  searchPlaceholder: string | undefined
+  filterOptions: LocationFilterOption[] | undefined
+  sortOptions: SortLocationsOptions | undefined
+  locationAvailable: boolean | undefined
   isMobile: boolean
 }>()
 

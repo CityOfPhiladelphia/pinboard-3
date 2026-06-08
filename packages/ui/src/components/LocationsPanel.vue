@@ -14,18 +14,13 @@ import type { BasicLocation, LocationFilterOption, SortLocationsOptions } from '
 // props
 const props = defineProps<{
   locations: BasicLocation[]
-  locationSearch?: string | undefined
-  locationFilter?: LocationFilterOption[] | undefined
-  locationSort?: SortLocationsOptions | undefined
-  locationAvailable?: boolean | undefined
-  hoveredId?: string | undefined
-  selectedId?: string | undefined
   isMobile: boolean
-  locationCardSlot?: (props: {
-    location: BasicLocation
-    isHovered: boolean
-    isSelected: boolean
-  }) => unknown
+  hoveredId: string | undefined
+  selectedId: string | undefined
+  locationAvailable: boolean
+  locationSearch: string | undefined
+  locationFilter: LocationFilterOption[] | undefined
+  locationSort: SortLocationsOptions | undefined
 }>()
 
 // emits

@@ -51,19 +51,28 @@ defineSlots<{
 }>()
 
 // props
-const props = defineProps<{
-  locations: BasicLocation[]
-  searchOrUserLocation: LatLon
-  isLoading: string | false
-  errorMessage: string | null
-  locationPanelFilter?: LocationFilterOption[]
-  locationPanelSearch?: string
-  locationPanelSort?: SortLocationsOptions
-  locationSearchMode?: SearchMode
-  locationPanelLocationAvailable?: boolean
-  geojson?: unknown
-  isMobile: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    locations: BasicLocation[]
+    searchOrUserLocation: LatLon
+    isLoading: string | false
+    errorMessage: string | null
+    isMobile: boolean
+    locationPanelLocationAvailable: boolean
+    locationPanelFilter?: LocationFilterOption[]
+    locationPanelSearch?: string
+    locationPanelSort?: SortLocationsOptions
+    locationSearchMode?: SearchMode
+    geojson?: unknown
+  }>(),
+  {
+    locationPanelFilter: undefined,
+    locationPanelSearch: undefined,
+    locationPanelSort: undefined,
+    locationSearchMode: undefined,
+    geojson: undefined,
+  }
+)
 
 // emits to parent app to handle
 const emit = defineEmits<{
