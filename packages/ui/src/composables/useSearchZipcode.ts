@@ -1,28 +1,34 @@
 import { type Ref, ref, toValue, watchEffect } from 'vue'
-import type { ZipcodePolygon } from '../types'
+import type { ZipcodeLocation } from '../types'
 
 export function useSearchZipcode(zipcode: string | Ref<string>) {
-  const zipcodePolygon = ref<ZipcodePolygon>({
+  const zipcodePolygon = ref<ZipcodeLocation>({
+    type: 'zipcode',
     centroid: {
       latitude: NaN,
       longitude: NaN,
     },
-    nodes: [],
+    borderNodes: [],
+    fetchComplete: false,
   })
-  const finishedZipFetch = ref<boolean>(false)
 
-  function clearZipcode() {
-    zipcodePolygon.value.centroid.longitude = NaN
-    zipcodePolygon.value.centroid.latitude = NaN
-    zipcodePolygon.value.nodes = []
+  function clearZipcode(fetchCompleteFlag: boolean) {
+    zipcodePolygon.value = {
+      type: 'zipcode',
+      centroid: {
+        latitude: NaN,
+        longitude: NaN,
+      },
+      borderNodes: [],
+      fetchComplete: fetchCompleteFlag,
+    }
   }
 
   async function getZipcodeCentroidAndPolygon() {
-    finishedZipFetch.value = false
+    zipcodePolygon.value.fetchComplete = false
     const zipcodeDeref = toValue(zipcode).replace(/-\d{4}/, '')
     if (!zipcodeDeref) {
-      clearZipcode()
-      finishedZipFetch.value = true
+      clearZipcode(true)
       return
     }
 
@@ -39,19 +45,22 @@ export function useSearchZipcode(zipcode: string | Ref<string>) {
       const response = await fetch(`${url}?${params}`)
       if (!response.ok) {
         console.error({ status: response.status, message: response.body })
-        clearZipcode()
-        finishedZipFetch.value = true
+        clearZipcode(true)
         return
       }
       const data = await response.json()
-      zipcodePolygon.value.centroid.longitude = data.features[0].centroid.x
-      zipcodePolygon.value.centroid.latitude = data.features[0].centroid.y
-      zipcodePolygon.value.nodes = data.features[0].geometry.rings
-      finishedZipFetch.value = true
+      zipcodePolygon.value = {
+        type: 'zipcode',
+        centroid: {
+          latitude: data.features[0].centroid.y,
+          longitude: data.features[0].centroid.x,
+        },
+        borderNodes: data.features[0].geometry.rings,
+        fetchComplete: true,
+      }
     } catch (err) {
       console.error('Failed to get response from ArcGIS: ', err)
-      clearZipcode()
-      finishedZipFetch.value = true
+      clearZipcode(true)
     }
   }
 
@@ -59,5 +68,5 @@ export function useSearchZipcode(zipcode: string | Ref<string>) {
     getZipcodeCentroidAndPolygon()
   })
 
-  return { zipcodePolygon, finishedZipFetch }
+  return { zipcodePolygon }
 }

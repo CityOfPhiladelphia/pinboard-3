@@ -4,28 +4,28 @@ import type { MapCardProps } from '@phila/phila-ui-cards'
 import type { LocationPanelDTO, OemLocation } from '@/types'
 import { PinboardComposables, PinboardUtilities, type PinboardTypes } from '@pinboard/ui'
 
-const { userLocation, userLocationPermission } = PinboardComposables.useUserLocation()
+// const { userLocation, userLocationPermission } = PinboardComposables.useUserLocation()
 
 export function useLocations(): {
   oemLocations: Ref<OemLocation[]>
-  userLocation: Ref<PinboardTypes.LatLon>
-  isLoading: ComputedRef<string | false>
+  // userLocation: Ref<PinboardTypes.LatLon>
+  isLoadingData: ComputedRef<string | false>
   errorMessage: Ref<string | null>
 } {
   const oemLocations = ref<OemLocation[]>([])
   const errorMessage = ref<string | null>(null)
   const hasData = ref<boolean>(false)
 
-  const isLoading = computed(() => {
+  const isLoadingData = computed(() => {
     if (!hasData.value) {
       return 'Loading data...'
     }
-    if (
-      userLocationPermission.value !== 'denied' &&
-      !PinboardUtilities.hasLocationData(userLocation)
-    ) {
-      return 'Getting location...'
-    }
+    // if (
+    //   userLocationPermission.value !== 'denied' &&
+    //   !PinboardUtilities.hasLocationData(userLocation)
+    // ) {
+    //   return 'Getting location...'
+    // }
     return false
   })
 
@@ -61,7 +61,7 @@ export function useLocations(): {
     hasData.value = true
   })
 
-  return { oemLocations, userLocation, isLoading, errorMessage }
+  return { oemLocations, isLoadingData, errorMessage }
 }
 
 function getLocationTags(loc: LocationPanelDTO): NonNullable<MapCardProps['tags']> {

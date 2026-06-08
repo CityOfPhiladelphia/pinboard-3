@@ -51,19 +51,30 @@ defineSlots<{
 }>()
 
 // props
-const props = defineProps<{
-  locations: BasicLocation[]
-  searchOrUserLocation: LatLon
-  isLoading: string | false
-  errorMessage: string | null
-  locationPanelFilter?: LocationFilterOption[]
-  locationPanelSearch?: string
-  locationPanelSort?: SortLocationsOptions
-  locationSearchMode?: SearchMode
-  locationPanelLocationAvailable?: boolean
-  geojson?: unknown
-  isMobile: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    locations: BasicLocation[]
+    searchOrUserLocation: LatLon
+    isLoadingData: false | string
+    errorMessage: string | null
+    isMobile: boolean
+    isFindingLocation?: false | string
+    locationPanelLocationAvailable?: boolean
+    locationPanelFilter?: LocationFilterOption[]
+    locationPanelSearch?: string
+    locationPanelSort?: SortLocationsOptions
+    locationSearchMode?: SearchMode
+    geojson?: unknown
+  }>(),
+  {
+    isFindingLocation: false,
+    locationPanelFilter: undefined,
+    locationPanelSearch: undefined,
+    locationPanelSort: undefined,
+    locationSearchMode: undefined,
+    geojson: undefined,
+  }
+)
 
 // emits to parent app to handle
 const emit = defineEmits<{
@@ -118,7 +129,7 @@ const locationCountLabel = computed(() => {
   const message = props.locations.length
     ? `${props.locations.length} item${props.locations.length > 1 ? 's' : ''}`
     : 'No locations match'
-  return props.isLoading || message
+  return props.isLoadingData || message
 })
 
 // watchers
@@ -244,7 +255,7 @@ const effectiveMapConfig = (() => {
         {{ errorMessage }}
       </div>
 
-      <div v-else-if="isLoading">
+      <div v-else-if="isLoadingData">
         <MapCard
           v-for="n in 5"
           :key="n"
@@ -278,7 +289,7 @@ const effectiveMapConfig = (() => {
       <MapPanel
         ref="mapPanelRef"
         :config="effectiveMapConfig"
-        :is-loading="isLoading"
+        :is-loading="isLoadingData"
         :is-mobile="isMobile"
         :locations="locations"
         :geojson="geojson"
@@ -336,20 +347,6 @@ const effectiveMapConfig = (() => {
   </BottomSheet>
 </template>
 
-<style>
-.phila-navbar .phila-mobile-nav .nav-flyout {
-  flex: 0 0 25rem;
-  max-width: 25rem;
-  height: calc(100dvh - var(--nav-bottom));
-}
-
-.phila-navbar .phila-mobile-nav .nav-flyout .p-4 {
-  display: flex;
-  flex-direction: column;
-  row-gap: var(--spacing-m);
-}
-</style>
-
 <style scoped>
 .finder-panel {
   display: grid;
@@ -369,16 +366,6 @@ const effectiveMapConfig = (() => {
   color: var(--Schemes-Error, #b3261e);
 }
 
-.finder-panel-locations > :deep(.location-list),
-.finder-panel-locations > .location-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
 .finder-panel-map {
   overflow: hidden;
 }
@@ -390,10 +377,6 @@ const effectiveMapConfig = (() => {
   padding: 0 1rem;
   font-family: var(--Body-Default-font-body-default-family);
   font-weight: 700;
-}
-
-.bottom-sheet-list-scroll :deep(.location-list) {
-  padding-top: 0.5rem;
 }
 
 .mobile-bottom-sheet {

@@ -14,18 +14,13 @@ import type { BasicLocation, LocationFilterOption, SortLocationsOptions } from '
 // props
 const props = defineProps<{
   locations: BasicLocation[]
-  locationSearch?: string | undefined
-  locationFilter?: LocationFilterOption[] | undefined
-  locationSort?: SortLocationsOptions | undefined
-  locationAvailable?: boolean | undefined
-  hoveredId?: string | undefined
-  selectedId?: string | undefined
+  locationSearch: string | undefined
+  locationFilter: LocationFilterOption[] | undefined
+  locationSort: SortLocationsOptions | undefined
+  locationAvailable: boolean | undefined
+  hoveredId: string | undefined
+  selectedId: string | undefined
   isMobile: boolean
-  locationCardSlot?: (props: {
-    location: BasicLocation
-    isHovered: boolean
-    isSelected: boolean
-  }) => unknown
 }>()
 
 // emits
@@ -127,11 +122,13 @@ defineExpose({ scrollToCard })
 
 <style scoped>
 .location-list {
-  padding: 1rem;
+  scrollbar-width: none;
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 1rem 1rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  scrollbar-width: none;
 }
 
 .location-card {
