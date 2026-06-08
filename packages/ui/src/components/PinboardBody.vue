@@ -128,7 +128,7 @@ watch(selectedLocation, (loc) => {
   }
 })
 
-watch(props.searchOrUserLocation, (newLocation) => {
+watch(() => props.searchOrUserLocation, (newLocation) => {
   if (
     hasLocationData(newLocation) &&
     props.locationSearchMode &&
@@ -136,7 +136,7 @@ watch(props.searchOrUserLocation, (newLocation) => {
   ) {
     mapPanelRef.value?.panTo(newLocation)
   }
-})
+}, { deep: true })
 
 // event handlers
 function handleHover(id: string) {
@@ -251,6 +251,7 @@ const effectiveMapConfig = (() => {
 
       <Teleport v-else to="#locations-panel-mobile" :disabled="!isMobile">
         <LocationsPanel
+          ref="locationsPanelRef"
           :locations="locations"
           :location-filter="locationPanelFilter"
           :location-search="locationPanelSearch"
@@ -457,7 +458,8 @@ const effectiveMapConfig = (() => {
   height: auto;
 }
 
-@media (max-width: 768px) {
+/* Keep in sync with mobileMaxWidth in useIsMobile.ts */
+@media (max-width: 1064px) {
   .finder-panel {
     position: relative;
     display: block;
