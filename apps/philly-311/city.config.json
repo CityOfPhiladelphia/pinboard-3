@@ -1,0 +1,10 @@
+{
+  "appName": "philly-311",
+  "applicationType": "static-site",
+  "department": "4-oit",
+  "team": "Software Engineering",
+  "contact": "websupport@phila.gov",
+  "compliance": [],
+  "confidentiality": "medium",
+  "packageManager": "pnpm"
+}
