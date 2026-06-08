@@ -1,41 +1,42 @@
 import { type Ref, ref, watch } from 'vue'
 import { hasLocationData } from '../utilities/hasLocationData'
-import type { AddressLocation, LatLon, UserLocation, ZipcodeLocation } from '../types'
+import type { LatLon, ZipcodePolygon } from '../types'
 
 export function useUserAndSearchLocations(
-  userLocation: Ref<UserLocation>,
-  addressLocation: Ref<AddressLocation>,
-  zipcodeLocation: Ref<ZipcodeLocation>
+  userLocation: Ref<LatLon>,
+  addressCoordinates: Ref<LatLon>,
+  finishedAddressFetch: Ref<boolean>,
+  zipcodePolygon: Ref<ZipcodePolygon>,
+  finishedZipFetch: Ref<boolean>
 ) {
-  const searchOrUserLocation = ref<LatLon>(userLocation.value.location)
-  console.log(searchOrUserLocation.value)
+  const searchOrUserLocation = ref<LatLon>(userLocation.value)
 
-  watch(zipcodeLocation.value.centroid, (newLoc) => {
+  watch(zipcodePolygon.value.centroid, (newLoc) => {
     if (!hasLocationData(newLoc)) {
-      searchOrUserLocation.value = userLocation.value.location
+      searchOrUserLocation.value = userLocation.value
     }
   })
 
-  watch(addressLocation.value.location, (newLoc) => {
+  watch(addressCoordinates.value, (newLoc) => {
     if (!hasLocationData(newLoc)) {
-      searchOrUserLocation.value = userLocation.value.location
+      searchOrUserLocation.value = userLocation.value
     }
   })
 
   watch(
-    () => addressLocation.value.fetchComplete,
+    () => finishedAddressFetch.value,
     (newState) => {
-      if (newState && hasLocationData(addressLocation.value.location)) {
-        searchOrUserLocation.value = addressLocation.value.location
+      if (newState && hasLocationData(addressCoordinates.value)) {
+        searchOrUserLocation.value = addressCoordinates.value
       }
     }
   )
 
   watch(
-    () => zipcodeLocation.value.fetchComplete,
+    () => finishedZipFetch.value,
     (newState) => {
-      if (newState && hasLocationData(zipcodeLocation.value.centroid)) {
-        searchOrUserLocation.value = zipcodeLocation.value.centroid
+      if (newState && hasLocationData(zipcodePolygon.value.centroid)) {
+        searchOrUserLocation.value = zipcodePolygon.value.centroid
       }
     }
   )

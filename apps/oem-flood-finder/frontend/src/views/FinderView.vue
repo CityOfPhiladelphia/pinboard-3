@@ -35,6 +35,7 @@ import {
 import LocationDetail from '@/components/LocationDetail.vue'
 import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation, SortMode } from '@/types'
+import type { BasicLocation } from '../../../../../packages/ui/src/types'
 
 // app variables
 const searchPlaceholderText = 'Search by address, zipcode, or keyword...'
@@ -50,24 +51,25 @@ const sortLocationsOptions: PinboardTypes.SortLocationsOptions = {
 
 // refs
 const addressForSearch = ref<string>('')
-const { addressCoordinates } =
+const { addressCoordinates, finishedAddressFetch } =
   PinboardComposables.useSearchAddress(addressForSearch)
 const zipcodeForSearch = ref<string>('')
-const { zipcodePolygon } = PinboardComposables.useSearchZipcode(zipcodeForSearch)
+const { zipcodePolygon, finishedZipFetch } = PinboardComposables.useSearchZipcode(zipcodeForSearch)
 const keywordsForSearch = ref<string>('')
 const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
 const locationFilterMode = ref<Filters>('all')
 const visitedIds = ref(new Set<string>())
 const visibleFloodLayers = ref<FloodLayerId[]>([])
-const { oemLocations, isLoadingData, errorMessage } = useLocations()
-const { userLocation } = PinboardComposables.useUserLocation()
+const { oemLocations, userLocation, isLoading, errorMessage } = useLocations()
 const locationSortMode = ref<SortMode>(
-  PinboardUtilities.hasLocationData(userLocation.value.location) ? 'DistAsc' : '',
+  PinboardUtilities.hasLocationData(userLocation) ? 'DistAsc' : '',
 )
 const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
   userLocation,
   addressCoordinates,
+  finishedAddressFetch,
   zipcodePolygon,
+  finishedZipFetch,
 )
 
 const isMobile = PinboardComposables.useIsMobile()
@@ -78,7 +80,7 @@ const hasCurrentLocation = computed(() =>
 )
 
 const currentLocations = computed(() => {
-  if (isLoadingData.value || errorMessage.value) {
+  if (isLoading.value || errorMessage.value) {
     return []
   }
   const filteredLocations = filterLocations(oemLocations, locationFilterMode)
@@ -163,7 +165,7 @@ function handleDeselect(id: string) {
   visitedIds.value.add(id)
 }
 
-function asOemLocation(location: PinboardTypes.BasicLocation) {
+function asOemLocation(location: BasicLocation) {
   return location as OemLocation
 }
 </script>
@@ -172,7 +174,7 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
   <PinboardBody
     :locations="currentLocations"
     :search-or-user-location="searchOrUserLocation"
-    :is-loading-data="isLoadingData"
+    :is-loading="isLoading"
     :error-message="errorMessage"
     :location-panel-search="searchPlaceholderText"
     :location-panel-filter="filterOptions"
@@ -221,7 +223,7 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
         :teleport-to="isMobile ? mobileControlsTargetLeft : null"
       />
 
-      <div v-if="!isLoadingData">
+      <div v-if="!isLoading">
         <MapMarker
           v-for="loc in [...currentLocations].sort((a, b) => b.latitude - a.latitude)"
           :key="loc.id"

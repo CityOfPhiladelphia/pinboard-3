@@ -11,43 +11,12 @@ export interface LatLon {
   longitude: Longitude
 }
 
-export interface AddressLocation {
-  type: 'address'
-  location: LatLon
-  fetchComplete: boolean
-}
-
-export interface ZipcodeLocation {
-  type: 'zipcode'
+export interface ZipcodePolygon {
   centroid: LatLon
-  borderNodes: LongitudeLatitude[]
-  fetchComplete: boolean
+  nodes: LongitudeLatitude[]
 }
+
 export type LocationPermissionState = 'granted' | 'prompt' | 'denied'
-
-export interface UserLocationUnknown {
-  permissionState: Exclude<LocationPermissionState, 'granted'> | null
-  waitingMessage: null
-  location: LatLon
-}
-
-export interface UserLocationFinding {
-  permissionState: Exclude<LocationPermissionState, 'denied'>
-  waitingMessage: string
-  location: LatLon
-}
-
-export interface UserLocationFound {
-  permissionState: Extract<LocationPermissionState, 'granted'>
-  waitingMessage: false
-  location: LatLon
-}
-
-export type UserLocation = (UserLocationUnknown | UserLocationFinding | UserLocationFound) & {
-  type: 'user'
-}
-
-export type UserOrSearchLocation = UserLocation | ZipcodeLocation | AddressLocation
 
 export type MapControlPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 

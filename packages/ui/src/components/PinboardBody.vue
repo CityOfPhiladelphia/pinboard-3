@@ -51,30 +51,19 @@ defineSlots<{
 }>()
 
 // props
-const props = withDefaults(
-  defineProps<{
-    locations: BasicLocation[]
-    searchOrUserLocation: LatLon
-    isLoadingData: false | string
-    errorMessage: string | null
-    isMobile: boolean
-    isFindingLocation?: false | string
-    locationPanelLocationAvailable?: boolean
-    locationPanelFilter?: LocationFilterOption[]
-    locationPanelSearch?: string
-    locationPanelSort?: SortLocationsOptions
-    locationSearchMode?: SearchMode
-    geojson?: unknown
-  }>(),
-  {
-    isFindingLocation: false,
-    locationPanelFilter: undefined,
-    locationPanelSearch: undefined,
-    locationPanelSort: undefined,
-    locationSearchMode: undefined,
-    geojson: undefined,
-  }
-)
+const props = defineProps<{
+  locations: BasicLocation[]
+  searchOrUserLocation: LatLon
+  isLoading: string | false
+  errorMessage: string | null
+  locationPanelFilter?: LocationFilterOption[]
+  locationPanelSearch?: string
+  locationPanelSort?: SortLocationsOptions
+  locationSearchMode?: SearchMode
+  locationPanelLocationAvailable?: boolean
+  geojson?: unknown
+  isMobile: boolean
+}>()
 
 // emits to parent app to handle
 const emit = defineEmits<{
@@ -129,7 +118,7 @@ const locationCountLabel = computed(() => {
   const message = props.locations.length
     ? `${props.locations.length} item${props.locations.length > 1 ? 's' : ''}`
     : 'No locations match'
-  return props.isLoadingData || message
+  return props.isLoading || message
 })
 
 // watchers
@@ -255,7 +244,7 @@ const effectiveMapConfig = (() => {
         {{ errorMessage }}
       </div>
 
-      <div v-else-if="isLoadingData">
+      <div v-else-if="isLoading">
         <MapCard
           v-for="n in 5"
           :key="n"
@@ -289,7 +278,7 @@ const effectiveMapConfig = (() => {
       <MapPanel
         ref="mapPanelRef"
         :config="effectiveMapConfig"
-        :is-loading="isLoadingData"
+        :is-loading="isLoading"
         :is-mobile="isMobile"
         :locations="locations"
         :geojson="geojson"

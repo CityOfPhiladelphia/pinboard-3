@@ -14,13 +14,18 @@ import type { BasicLocation, LocationFilterOption, SortLocationsOptions } from '
 // props
 const props = defineProps<{
   locations: BasicLocation[]
-  locationSearch: string | undefined
-  locationFilter: LocationFilterOption[] | undefined
-  locationSort: SortLocationsOptions | undefined
-  locationAvailable: boolean | undefined
-  hoveredId: string | undefined
-  selectedId: string | undefined
+  locationSearch?: string | undefined
+  locationFilter?: LocationFilterOption[] | undefined
+  locationSort?: SortLocationsOptions | undefined
+  locationAvailable?: boolean | undefined
+  hoveredId?: string | undefined
+  selectedId?: string | undefined
   isMobile: boolean
+  locationCardSlot?: (props: {
+    location: BasicLocation
+    isHovered: boolean
+    isSelected: boolean
+  }) => unknown
 }>()
 
 // emits
@@ -122,13 +127,13 @@ defineExpose({ scrollToCard })
 
 <style scoped>
 .location-list {
-  scrollbar-width: none;
-  flex: 1;
-  overflow-y: auto;
-  padding: 0.5rem 1rem 1rem 1rem;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
   gap: 0.75rem;
+  padding: 0.5rem 1rem 1rem 1rem;
+  scrollbar-width: none;
 }
 
 .location-card {
@@ -144,5 +149,11 @@ defineExpose({ scrollToCard })
 .location-card--selected {
   background-color: var(--Schemes-Surface-Container, #eee);
   outline: 2px solid var(--Schemes-Primary, #1976d2);
+}
+
+@media (max-width: 768px) {
+  .location-list {
+    padding-top: 1rem;
+  }
 }
 </style>
