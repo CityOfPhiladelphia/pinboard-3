@@ -1,0 +1,12 @@
+[
+  { "slug": "pothole_repair", "title": "Pothole Repair", "iconName": "road" },
+  { "slug": "illegal_dumping", "title": "Illegal Dumping", "iconName": "dumpster" },
+  { "slug": "street_light_outage", "title": "Street Light Outage", "iconName": "lightbulb" },
+  { "slug": "graffiti_removal", "title": "Graffiti Removal", "iconName": "spray-can" },
+  { "slug": "abandoned_vehicle", "title": "Abandoned Vehicle", "iconName": "car" },
+  { "slug": "rubbish_collection", "title": "Rubbish Collection", "iconName": "trash" },
+  { "slug": "recyclables_collection", "title": "Recyclables Collection", "iconName": "recycle" },
+  { "slug": "tree_maintenance", "title": "Tree Maintenance", "iconName": "tree" },
+  { "slug": "dangerous_sidewalk", "title": "Dangerous Sidewalk", "iconName": "person-walking" },
+  { "slug": "inlet_cleaning", "title": "Inlet Cleaning", "iconName": "water" }
+]

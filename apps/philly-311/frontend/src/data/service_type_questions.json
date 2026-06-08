@@ -1,0 +1,3123 @@
+{
+  "serviceTypes": [
+    {
+      "serviceType": "Abandoned Vehicle",
+      "caseType": "Abandoned Vehicle",
+      "description": "Car, truck, or motorcycle left unattended on street for extended period",
+      "questions": [
+        {
+          "field": "Body_Style__c",
+          "label": "Body Style",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "2-Door Coupe",
+            "4-Door Sedan",
+            "Boat",
+            "Bus",
+            "Camper",
+            "Convertible",
+            "Food Cart",
+            "Hatchback",
+            "Large Truck",
+            "Mobile Home",
+            "Motorcycle",
+            "Pickup Truck",
+            "Rental Truck",
+            "Sport Utility",
+            "Station_Wagon",
+            "Tractor Trailer",
+            "Trailer",
+            "Unknown",
+            "Van",
+            "Other"
+          ]
+        },
+        {
+          "field": "General_Condition__c",
+          "label": "General Condition",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Appears Broken Down/Disabled",
+            "Appears Drivable",
+            "Appears Involved in Accident",
+            "Car Fire"
+          ]
+        },
+        {
+          "field": "Color__c",
+          "label": "Color",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Beige",
+            "Black",
+            "Blue",
+            "Bronze",
+            "Brown",
+            "Burgundy",
+            "Cream",
+            "Dark Blue",
+            "Dark Brown",
+            "Dark Gray",
+            "Dark Green",
+            "Gold",
+            "Green",
+            "Grey",
+            "Light Blue",
+            "Light Green",
+            "Light Grey",
+            "Light Yellow",
+            "Maroon",
+            "None",
+            "Orange",
+            "Pink",
+            "Purple",
+            "Red",
+            "Silver",
+            "Tan",
+            "Teal",
+            "White",
+            "Yellow"
+          ]
+        },
+        {
+          "field": "Abandoned_How_Long__c",
+          "label": "Abandoned How Long",
+          "type": "picklist",
+          "required": false,
+          "options": ["30 to 90 Days", "Less Than 30 Days", "More than 90 Days"]
+        },
+        {
+          "field": "Make__c",
+          "label": "Make",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Acura",
+            "AMC",
+            "Audi",
+            "BMW",
+            "Buick",
+            "Cadillac",
+            "Chevrolet",
+            "Chrysler",
+            "Cole",
+            "Daewood",
+            "Daihatsu",
+            "Datsun",
+            "Dodge",
+            "Eagle",
+            "Ezloader",
+            "Fiat",
+            "Ford",
+            "Freightliner",
+            "GEO",
+            "GMC",
+            "Harley Davidson",
+            "Honda",
+            "Hummer",
+            "Hyundai",
+            "Infiniti",
+            "International",
+            "Isuzu",
+            "Jaguar",
+            "Jeep",
+            "Kawasaki",
+            "Kenworth",
+            "KIA",
+            "Land Rover",
+            "Lexus",
+            "Lincoln",
+            "Loadrite",
+            "Mazda",
+            "Mercedes",
+            "Mercury",
+            "Merkur",
+            "Mitsubishi",
+            "Nissan",
+            "None",
+            "Oldsmobile",
+            "Peterbilt",
+            "Peugeot",
+            "Phoenix",
+            "Piaggio",
+            "Plymouth",
+            "Pontiac",
+            "Porsche",
+            "Renault",
+            "Saab",
+            "Saturn",
+            "Seahawk",
+            "Sterling",
+            "Subaru",
+            "Suzuki",
+            "Toyota",
+            "Triumph",
+            "Venture",
+            "Victory",
+            "Volkswagon",
+            "Volvo",
+            "Yamaha",
+            "Yugo",
+            "Other"
+          ]
+        },
+        {
+          "field": "Other_Make__c",
+          "label": "Other Make",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Interior_Fire_Exterior_Fire_Shell__c",
+          "label": "Interior Fire, Exterior Fire, Shell",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "field": "Model__c",
+          "label": "Model",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "X10_Day_Notice_Given__c",
+          "label": "10 Day Notice Given",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "field": "License_Plate__c",
+          "label": "License Plate",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "License_Plate_State__c",
+          "label": "License Plate State",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "AK",
+            "AL",
+            "AR",
+            "AZ",
+            "CA",
+            "CO",
+            "CT",
+            "DE",
+            "FL",
+            "GA",
+            "HI",
+            "IA",
+            "ID",
+            "IL",
+            "IN",
+            "KS",
+            "KY",
+            "LA",
+            "MA",
+            "MD",
+            "ME",
+            "MI",
+            "MN",
+            "MO",
+            "MS",
+            "MT",
+            "NC",
+            "ND",
+            "NE",
+            "NH",
+            "NJ",
+            "NM",
+            "None",
+            "NV",
+            "NY",
+            "OH",
+            "OK",
+            "OR",
+            "PA",
+            "RI",
+            "SC",
+            "SD",
+            "TN",
+            "TX",
+            "UT",
+            "VA",
+            "VT",
+            "WA",
+            "WI",
+            "WV",
+            "WY",
+            "Other"
+          ]
+        }
+      ]
+    },
+    {
+      "serviceType": "Abandoned Bike",
+      "caseType": "Abandoned Bike",
+      "description": "Bicycle left unattended, often locked to pole or rack for extended period",
+      "questions": [
+        {
+          "field": "Tagged_With_Yellow_Alert_Notice__c",
+          "label": "Tagged With Yellow Alert Notice",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "LockedTo__c",
+          "label": "Locked To",
+          "type": "picklist",
+          "required": false,
+          "options": ["Meter-Rack", "Other Post", "Sign Post", "U-Rack", "Other"]
+        },
+        {
+          "field": "Unusable__c",
+          "label": "Unusable",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Locked_to_Other__c",
+          "label": "Locked to Other",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Missing_Damaged_Parts__c",
+          "label": "Missing or Damaged Parts",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Color__c",
+          "label": "Color",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Beige",
+            "Black",
+            "Blue",
+            "Bronze",
+            "Brown",
+            "Burgundy",
+            "Cream",
+            "Dark Blue",
+            "Dark Brown",
+            "Dark Gray",
+            "Dark Green",
+            "Gold",
+            "Green",
+            "Grey",
+            "Light Blue",
+            "Light Green",
+            "Light Grey",
+            "Light Yellow",
+            "Maroon",
+            "None",
+            "Orange",
+            "Pink",
+            "Purple",
+            "Red",
+            "Silver",
+            "Tan",
+            "Teal",
+            "White",
+            "Yellow"
+          ]
+        },
+        {
+          "field": "Time_Locked_in_Same_Location__c",
+          "label": "Time Locked in Same Location",
+          "type": "picklist",
+          "required": false,
+          "options": ["Less than One Month", "Not Locked", "One Month or More"]
+        },
+        {
+          "field": "First_Noticedbyk__c",
+          "label": "First Noticed",
+          "type": "date",
+          "required": false
+        }
+      ]
+    },
+    {
+      "serviceType": "Illegal Dumping",
+      "caseType": "Illegal Dumping",
+      "description": "Trash, furniture, or debris illegally dumped on sidewalk, vacant lot, or street",
+      "questions": [
+        {
+          "field": "Trash_Include_Household_Hazardous_Waste__c",
+          "label": "Includes Household Hazardous Waste",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Condition_of_Materials__c",
+          "label": "Condition of Materials",
+          "type": "picklist",
+          "required": false,
+          "options": ["Bagged", "Construction Debris", "Container", "Litter"]
+        },
+        {
+          "field": "Trash_Include_Commercial_Hazardous_Waste__c",
+          "label": "Is there commercial hazardous Waste?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "How_May_Bags_of_Trash_If_Bagged__c",
+          "label": "How Many Bags of Trash (If Bagged)",
+          "type": "double",
+          "required": false
+        },
+        {
+          "field": "Is_Trash_on_Street_or_Sidewalk__c",
+          "label": "Trash on Street or Sidewalk",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Type_of_Materials__c",
+          "label": "Type of Materials",
+          "type": "multipicklist",
+          "required": false,
+          "options": [
+            "Construction Material",
+            "Appliances",
+            "TV’s and Monitors",
+            "Mattress/Furniture",
+            "Other",
+            "Tires"
+          ]
+        },
+        {
+          "field": "Trash_in_Bike_Lane__c",
+          "label": "Trash in Bike Lane?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Description_of_Vehicle_Involved_in_Dumpi__c",
+          "label": "Description of Vehicle/Person Involved",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Large_Crew_Heavy_Machinery_To_Clean_Up__c",
+          "label": "Large Crew&Heavy Machinery To Clean Up?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Rubbish Collection",
+      "caseType": "Rubbish/Recyclable Material Collection",
+      "description": "Missed trash pickup or overflowing trash containers",
+      "questions": [
+        {
+          "field": "Type_of_Rubbish_Missed__c",
+          "label": "Type of Collection Missed",
+          "type": "picklist",
+          "required": false,
+          "options": ["Recycling", "Rubbish", "Both"]
+        },
+        {
+          "field": "Are_Materials_Hazardous__c",
+          "label": "Includes Household Hazardous Waste",
+          "type": "picklist",
+          "required": false,
+          "options": ["Commercial Hazardous Waste", "Household Hazardous Waste", "None"]
+        },
+        {
+          "field": "Single_Address_or_Whole_Block__c",
+          "label": "Single Address or Whole Block",
+          "type": "picklist",
+          "required": false,
+          "options": ["Block", "Single Address"]
+        },
+        {
+          "field": "Proper_Recycling_Container__c",
+          "label": "Proper Recycling Container",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Set_Out_in_Time__c",
+          "label": "Set Out in Time",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Pickup_Day__c",
+          "label": "Pickup Day",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Where_Was_Trash_Set_Out__c",
+          "label": "Where Was Trash Set Out",
+          "type": "picklist",
+          "required": false,
+          "options": ["Alley", "Common Driveway", "Curbside"]
+        },
+        {
+          "field": "Not_More_than_Maximum_Number_of_Receptac__c",
+          "label": "Is it more than Max Num of Cans/Bags?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Not_More_than_Maximum_Weight__c",
+          "label": "Is it more than the allowed weight?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Recyclables Collection",
+      "caseType": "Rubbish/Recyclable Material Collection",
+      "description": "Missed recycling pickup or recycling container issues",
+      "questions": [
+        {
+          "field": "Type_of_Rubbish_Missed__c",
+          "label": "Type of Collection Missed",
+          "type": "picklist",
+          "required": false,
+          "options": ["Recycling", "Rubbish", "Both"]
+        },
+        {
+          "field": "Are_Materials_Hazardous__c",
+          "label": "Includes Household Hazardous Waste",
+          "type": "picklist",
+          "required": false,
+          "options": ["Commercial Hazardous Waste", "Household Hazardous Waste", "None"]
+        },
+        {
+          "field": "Single_Address_or_Whole_Block__c",
+          "label": "Single Address or Whole Block",
+          "type": "picklist",
+          "required": false,
+          "options": ["Block", "Single Address"]
+        },
+        {
+          "field": "Proper_Recycling_Container__c",
+          "label": "Proper Recycling Container",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Set_Out_in_Time__c",
+          "label": "Set Out in Time",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Pickup_Day__c",
+          "label": "Pickup Day",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Where_Was_Trash_Set_Out__c",
+          "label": "Where Was Trash Set Out",
+          "type": "picklist",
+          "required": false,
+          "options": ["Alley", "Common Driveway", "Curbside"]
+        },
+        {
+          "field": "Not_More_than_Maximum_Number_of_Receptac__c",
+          "label": "Is it more than Max Num of Cans/Bags?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Not_More_than_Maximum_Weight__c",
+          "label": "Is it more than the allowed weight?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Sanitation Violation",
+      "caseType": "Sanitation Violation",
+      "description": "Property with excessive trash, debris, or unsanitary conditions",
+      "questions": [
+        {
+          "field": "How_Long_Has_Trash_Been_There__c",
+          "label": "How Long Has Trash Been There",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "How_May_Bags_of_Trash_If_Bagged__c",
+          "label": "How Many Bags of Trash (If Bagged)",
+          "type": "double",
+          "required": false
+        },
+        {
+          "field": "Reporting_a_Neighbor_Not_Recycling__c",
+          "label": "Reporting a Neighbor Not Recycling",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Active_Construction__c",
+          "label": "Active Construction",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Construction_Material__c",
+          "label": "Construction Material",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Dumpster Violation",
+      "caseType": "Dumpster Violation",
+      "description": "Overflowing dumpster, dumpster blocking sidewalk, or improperly placed dumpster",
+      "questions": [
+        {
+          "field": "Dumpster_Overflowing__c",
+          "label": "Dumpster Overflowing",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Dumpster_Blocking_Street__c",
+          "label": "Dumpster Blocking Street",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Right_of_Way_Permit__c",
+          "label": "Right of Way Permit",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Dumpster_Blocking_Sidewalk__c",
+          "label": "Dumpster Blocking Sidewalk",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Dumpster_Public_Right_of_Way_License__c",
+          "label": "Dumpster–Public Right of Way License",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Dumpster_Enclosed_in_Fence__c",
+          "label": "Dumpster Enclosed in Fence",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Dumpster_Type__c",
+          "label": "Dumpster Type",
+          "type": "picklist",
+          "required": false,
+          "options": ["Construction", "Rubbish/Recycling"]
+        },
+        {
+          "field": "Dumpster_Leaking__c",
+          "label": "Dumpster Leaking",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Pothole Repair",
+      "caseType": "Street Defect",
+      "description": "Hole or depression in street surface from pavement deterioration",
+      "questions": [
+        {
+          "field": "Crack_in_Street_Depression_or_a_Hole_i__c",
+          "label": "Defect Type",
+          "type": "picklist",
+          "required": false,
+          "options": ["Crack", "Depression", "Hole", "Push-Up"]
+        },
+        {
+          "field": "Utility_Company__c",
+          "label": "Utility Company",
+          "type": "picklist",
+          "required": false,
+          "options": ["Not Known", "PECO", "PGW", "PWD"]
+        },
+        {
+          "field": "Gas_Escaping_from_the_Hole__c",
+          "label": "Gas Escaping from the Hole",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Parking_or_Driving_Lane__c",
+          "label": "Driving or Parking Lane",
+          "type": "picklist",
+          "required": false,
+          "options": ["Driving", "Parking"]
+        },
+        {
+          "field": "Running_Water__c",
+          "label": "Running Water from hole",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Shape__c",
+          "label": "Shape",
+          "type": "picklist",
+          "required": false,
+          "options": ["Bowl-Shaped", "Irregular-Shaped", "Rectangular or Square"]
+        },
+        {
+          "field": "On_State_Highway__c",
+          "label": "On Interstate Highway",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Is_the_Hole_in_Bike_Lane__c",
+          "label": "Is the Hole in Bike Lane",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Has_a_Utility_Company_Worked_at_Location__c",
+          "label": "Has a Utility Company been recently work",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Cave-In Repair",
+      "caseType": "Street Defect",
+      "description": "Street surface collapsed inward, often near utility infrastructure",
+      "questions": [
+        {
+          "field": "Crack_in_Street_Depression_or_a_Hole_i__c",
+          "label": "Defect Type",
+          "type": "picklist",
+          "required": false,
+          "options": ["Crack", "Depression", "Hole", "Push-Up"]
+        },
+        {
+          "field": "Utility_Company__c",
+          "label": "Utility Company",
+          "type": "picklist",
+          "required": false,
+          "options": ["Not Known", "PECO", "PGW", "PWD"]
+        },
+        {
+          "field": "Gas_Escaping_from_the_Hole__c",
+          "label": "Gas Escaping from the Hole",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Parking_or_Driving_Lane__c",
+          "label": "Driving or Parking Lane",
+          "type": "picklist",
+          "required": false,
+          "options": ["Driving", "Parking"]
+        },
+        {
+          "field": "Running_Water__c",
+          "label": "Running Water from hole",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Shape__c",
+          "label": "Shape",
+          "type": "picklist",
+          "required": false,
+          "options": ["Bowl-Shaped", "Irregular-Shaped", "Rectangular or Square"]
+        },
+        {
+          "field": "On_State_Highway__c",
+          "label": "On Interstate Highway",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Is_the_Hole_in_Bike_Lane__c",
+          "label": "Is the Hole in Bike Lane",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Has_a_Utility_Company_Worked_at_Location__c",
+          "label": "Has a Utility Company been recently work",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Depression",
+      "caseType": "Street Defect",
+      "description": "Sunken area in street surface causing pooling water or uneven driving",
+      "questions": [
+        {
+          "field": "Crack_in_Street_Depression_or_a_Hole_i__c",
+          "label": "Defect Type",
+          "type": "picklist",
+          "required": false,
+          "options": ["Crack", "Depression", "Hole", "Push-Up"]
+        },
+        {
+          "field": "Utility_Company__c",
+          "label": "Utility Company",
+          "type": "picklist",
+          "required": false,
+          "options": ["Not Known", "PECO", "PGW", "PWD"]
+        },
+        {
+          "field": "Gas_Escaping_from_the_Hole__c",
+          "label": "Gas Escaping from the Hole",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Parking_or_Driving_Lane__c",
+          "label": "Driving or Parking Lane",
+          "type": "picklist",
+          "required": false,
+          "options": ["Driving", "Parking"]
+        },
+        {
+          "field": "Running_Water__c",
+          "label": "Running Water from hole",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Shape__c",
+          "label": "Shape",
+          "type": "picklist",
+          "required": false,
+          "options": ["Bowl-Shaped", "Irregular-Shaped", "Rectangular or Square"]
+        },
+        {
+          "field": "On_State_Highway__c",
+          "label": "On Interstate Highway",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Is_the_Hole_in_Bike_Lane__c",
+          "label": "Is the Hole in Bike Lane",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Has_a_Utility_Company_Worked_at_Location__c",
+          "label": "Has a Utility Company been recently work",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Ditch Repair",
+      "caseType": "Street Defect",
+      "description": "Damaged or clogged roadside drainage ditch needing repair",
+      "questions": [
+        {
+          "field": "Crack_in_Street_Depression_or_a_Hole_i__c",
+          "label": "Defect Type",
+          "type": "picklist",
+          "required": false,
+          "options": ["Crack", "Depression", "Hole", "Push-Up"]
+        },
+        {
+          "field": "Utility_Company__c",
+          "label": "Utility Company",
+          "type": "picklist",
+          "required": false,
+          "options": ["Not Known", "PECO", "PGW", "PWD"]
+        },
+        {
+          "field": "Gas_Escaping_from_the_Hole__c",
+          "label": "Gas Escaping from the Hole",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Parking_or_Driving_Lane__c",
+          "label": "Driving or Parking Lane",
+          "type": "picklist",
+          "required": false,
+          "options": ["Driving", "Parking"]
+        },
+        {
+          "field": "Running_Water__c",
+          "label": "Running Water from hole",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Shape__c",
+          "label": "Shape",
+          "type": "picklist",
+          "required": false,
+          "options": ["Bowl-Shaped", "Irregular-Shaped", "Rectangular or Square"]
+        },
+        {
+          "field": "On_State_Highway__c",
+          "label": "On Interstate Highway",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Is_the_Hole_in_Bike_Lane__c",
+          "label": "Is the Hole in Bike Lane",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Has_a_Utility_Company_Worked_at_Location__c",
+          "label": "Has a Utility Company been recently work",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Push-Up",
+      "caseType": "Street Defect",
+      "description": "Buckling or heaving pavement pushed up from underneath",
+      "questions": [
+        {
+          "field": "Crack_in_Street_Depression_or_a_Hole_i__c",
+          "label": "Defect Type",
+          "type": "picklist",
+          "required": false,
+          "options": ["Crack", "Depression", "Hole", "Push-Up"]
+        },
+        {
+          "field": "Utility_Company__c",
+          "label": "Utility Company",
+          "type": "picklist",
+          "required": false,
+          "options": ["Not Known", "PECO", "PGW", "PWD"]
+        },
+        {
+          "field": "Gas_Escaping_from_the_Hole__c",
+          "label": "Gas Escaping from the Hole",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Parking_or_Driving_Lane__c",
+          "label": "Driving or Parking Lane",
+          "type": "picklist",
+          "required": false,
+          "options": ["Driving", "Parking"]
+        },
+        {
+          "field": "Running_Water__c",
+          "label": "Running Water from hole",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Shape__c",
+          "label": "Shape",
+          "type": "picklist",
+          "required": false,
+          "options": ["Bowl-Shaped", "Irregular-Shaped", "Rectangular or Square"]
+        },
+        {
+          "field": "On_State_Highway__c",
+          "label": "On Interstate Highway",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Is_the_Hole_in_Bike_Lane__c",
+          "label": "Is the Hole in Bike Lane",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Has_a_Utility_Company_Worked_at_Location__c",
+          "label": "Has a Utility Company been recently work",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Dangerous Sidewalk",
+      "caseType": "Dangerous Sidewalk",
+      "description": "Cracked, raised, or broken sidewalk creating trip hazard",
+      "questions": [
+        {
+          "field": "Sidewalk_Curb_Problem__c",
+          "label": "Sidewalk Curb Problem",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Broken Sidewalk",
+            "Missing Sidewalk",
+            "Raised Sidewalk",
+            "Wheelchair Ramp",
+            "Other"
+          ]
+        },
+        {
+          "field": "Intersection_Ramp_for_Crossing_Street__c",
+          "label": "Intersection Ramp for Crossing Street",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes", "Both"]
+        }
+      ]
+    },
+    {
+      "serviceType": "ADA Curb Ramp",
+      "caseType": "Dangerous Sidewalk",
+      "description": "Missing, damaged, or non-compliant wheelchair curb ramp at intersection",
+      "questions": [
+        {
+          "field": "Sidewalk_Curb_Problem__c",
+          "label": "Sidewalk Curb Problem",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Broken Sidewalk",
+            "Missing Sidewalk",
+            "Raised Sidewalk",
+            "Wheelchair Ramp",
+            "Other"
+          ]
+        },
+        {
+          "field": "Intersection_Ramp_for_Crossing_Street__c",
+          "label": "Intersection Ramp for Crossing Street",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes", "Both"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Line Striping",
+      "caseType": "Line Striping",
+      "description": "Faded or missing road markings including crosswalks, lane lines, or parking lines",
+      "questions": [
+        {
+          "field": "Pavement_Marking_Type__c",
+          "label": "Pavement Marking Type",
+          "type": "picklist",
+          "required": false,
+          "options": ["Arrow", "Bike Lanes", "Center Line", "Cross Walk", "Lane Divider", "Other"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Street Light Outage",
+      "caseType": "Street Light Outage",
+      "description": "Street light not working, flickering, or staying on during day",
+      "questions": [
+        {
+          "field": "Problem_Type__c",
+          "label": "Problem Type",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "All Out",
+            "All-Way Stop Request",
+            "Area Around the Manhole",
+            "Blanks Out",
+            "Blocked by Tree Branches or Foliage",
+            "Bulb Hanging",
+            "Bulb Out",
+            "Cave-In",
+            "Commercial",
+            "Ditch",
+            "Do Not Enter Sign Missing",
+            "Driveway X Box App",
+            "Flashing",
+            "Highway",
+            "Icy Road Surface",
+            "Knocked Down",
+            "Leaning",
+            "Light On/Off",
+            "Light Out",
+            "Loose Manhole",
+            "Metal Pole Down",
+            "Metal Pole Leaning",
+            "Missing Base",
+            "Missing Lid",
+            "Modify Signal Operation",
+            "New Traffic Signal",
+            "On 24 Hours",
+            "On All the Time",
+            "On and Off",
+            "On During Day",
+            "One-Way Sign Missing",
+            "Other Issue",
+            "Other Pole Down",
+            "Other Pole Leaning",
+            "Other Problem",
+            "Other Signs",
+            "Out All the Time",
+            "Parking Related Signs",
+            "Pick Up Sign",
+            "Pole Down",
+            "Pole Leaning",
+            "Pothole",
+            "Request for New Lighting",
+            "Residential",
+            "Salting or Plowing a Street",
+            "Sanitation",
+            "School Related Signs",
+            "Shoveling Sidewalk",
+            "Sign Pole Problem",
+            "Snow Removal",
+            "Street Name Sign Request",
+            "Street Permit",
+            "Stuck",
+            "Traffic Inquiry",
+            "Traffic Signal",
+            "Turned",
+            "Wire Down",
+            "Wire Sparking",
+            "Wires Sparking",
+            "Wood Pole Down",
+            "Wood Pole Leaning",
+            "Other"
+          ]
+        },
+        {
+          "field": "Hazardous__c",
+          "label": "Hazardous",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Alley Light Outage",
+      "caseType": "Alley Light Outage",
+      "description": "Light in alleyway not working or damaged",
+      "questions": [
+        {
+          "field": "Alley_Passable__c",
+          "label": "Alley Passable",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Problem_Type__c",
+          "label": "Problem Type",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "All Out",
+            "All-Way Stop Request",
+            "Area Around the Manhole",
+            "Blanks Out",
+            "Blocked by Tree Branches or Foliage",
+            "Bulb Hanging",
+            "Bulb Out",
+            "Cave-In",
+            "Commercial",
+            "Ditch",
+            "Do Not Enter Sign Missing",
+            "Driveway X Box App",
+            "Flashing",
+            "Highway",
+            "Icy Road Surface",
+            "Knocked Down",
+            "Leaning",
+            "Light On/Off",
+            "Light Out",
+            "Loose Manhole",
+            "Metal Pole Down",
+            "Metal Pole Leaning",
+            "Missing Base",
+            "Missing Lid",
+            "Modify Signal Operation",
+            "New Traffic Signal",
+            "On 24 Hours",
+            "On All the Time",
+            "On and Off",
+            "On During Day",
+            "One-Way Sign Missing",
+            "Other Issue",
+            "Other Pole Down",
+            "Other Pole Leaning",
+            "Other Problem",
+            "Other Signs",
+            "Out All the Time",
+            "Parking Related Signs",
+            "Pick Up Sign",
+            "Pole Down",
+            "Pole Leaning",
+            "Pothole",
+            "Request for New Lighting",
+            "Residential",
+            "Salting or Plowing a Street",
+            "Sanitation",
+            "School Related Signs",
+            "Shoveling Sidewalk",
+            "Sign Pole Problem",
+            "Snow Removal",
+            "Street Name Sign Request",
+            "Street Permit",
+            "Stuck",
+            "Traffic Inquiry",
+            "Traffic Signal",
+            "Turned",
+            "Wire Down",
+            "Wire Sparking",
+            "Wires Sparking",
+            "Wood Pole Down",
+            "Wood Pole Leaning",
+            "Other"
+          ]
+        },
+        {
+          "field": "How_can_access_to_the_alley_be_obtained__c",
+          "label": "How can access be obtained",
+          "type": "picklist",
+          "required": false,
+          "options": ["Key", "No access", "Open"]
+        },
+        {
+          "field": "Hazardous__c",
+          "label": "Hazardous",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Key_location_or_passcode__c",
+          "label": "Key location or passcode",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "serviceType": "Street Light(Other)",
+      "caseType": "Street Light Outage",
+      "description": "Street light issue not covered by standard outage report",
+      "questions": [
+        {
+          "field": "Problem_Type__c",
+          "label": "Problem Type",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "All Out",
+            "All-Way Stop Request",
+            "Area Around the Manhole",
+            "Blanks Out",
+            "Blocked by Tree Branches or Foliage",
+            "Bulb Hanging",
+            "Bulb Out",
+            "Cave-In",
+            "Commercial",
+            "Ditch",
+            "Do Not Enter Sign Missing",
+            "Driveway X Box App",
+            "Flashing",
+            "Highway",
+            "Icy Road Surface",
+            "Knocked Down",
+            "Leaning",
+            "Light On/Off",
+            "Light Out",
+            "Loose Manhole",
+            "Metal Pole Down",
+            "Metal Pole Leaning",
+            "Missing Base",
+            "Missing Lid",
+            "Modify Signal Operation",
+            "New Traffic Signal",
+            "On 24 Hours",
+            "On All the Time",
+            "On and Off",
+            "On During Day",
+            "One-Way Sign Missing",
+            "Other Issue",
+            "Other Pole Down",
+            "Other Pole Leaning",
+            "Other Problem",
+            "Other Signs",
+            "Out All the Time",
+            "Parking Related Signs",
+            "Pick Up Sign",
+            "Pole Down",
+            "Pole Leaning",
+            "Pothole",
+            "Request for New Lighting",
+            "Residential",
+            "Salting or Plowing a Street",
+            "Sanitation",
+            "School Related Signs",
+            "Shoveling Sidewalk",
+            "Sign Pole Problem",
+            "Snow Removal",
+            "Street Name Sign Request",
+            "Street Permit",
+            "Stuck",
+            "Traffic Inquiry",
+            "Traffic Signal",
+            "Turned",
+            "Wire Down",
+            "Wire Sparking",
+            "Wires Sparking",
+            "Wood Pole Down",
+            "Wood Pole Leaning",
+            "Other"
+          ]
+        },
+        {
+          "field": "Hazardous__c",
+          "label": "Hazardous",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Traffic Signal Emergency",
+      "caseType": "Traffic Signal Emergency",
+      "description": "Traffic light malfunctioning, knocked down, or completely out",
+      "questions": [
+        {
+          "field": "Signal_Type__c",
+          "label": "Signal Type",
+          "type": "picklist",
+          "required": false,
+          "options": ["Traffic Signal"]
+        },
+        {
+          "field": "Blocked_by_Tree_Branches_or_Foliage__c",
+          "label": "Blocked by Tree Branches or Foliage",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Problem_Type__c",
+          "label": "Problem Type",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "All Out",
+            "All-Way Stop Request",
+            "Area Around the Manhole",
+            "Blanks Out",
+            "Blocked by Tree Branches or Foliage",
+            "Bulb Hanging",
+            "Bulb Out",
+            "Cave-In",
+            "Commercial",
+            "Ditch",
+            "Do Not Enter Sign Missing",
+            "Driveway X Box App",
+            "Flashing",
+            "Highway",
+            "Icy Road Surface",
+            "Knocked Down",
+            "Leaning",
+            "Light On/Off",
+            "Light Out",
+            "Loose Manhole",
+            "Metal Pole Down",
+            "Metal Pole Leaning",
+            "Missing Base",
+            "Missing Lid",
+            "Modify Signal Operation",
+            "New Traffic Signal",
+            "On 24 Hours",
+            "On All the Time",
+            "On and Off",
+            "On During Day",
+            "One-Way Sign Missing",
+            "Other Issue",
+            "Other Pole Down",
+            "Other Pole Leaning",
+            "Other Problem",
+            "Other Signs",
+            "Out All the Time",
+            "Parking Related Signs",
+            "Pick Up Sign",
+            "Pole Down",
+            "Pole Leaning",
+            "Pothole",
+            "Request for New Lighting",
+            "Residential",
+            "Salting or Plowing a Street",
+            "Sanitation",
+            "School Related Signs",
+            "Shoveling Sidewalk",
+            "Sign Pole Problem",
+            "Snow Removal",
+            "Street Name Sign Request",
+            "Street Permit",
+            "Stuck",
+            "Traffic Inquiry",
+            "Traffic Signal",
+            "Turned",
+            "Wire Down",
+            "Wire Sparking",
+            "Wires Sparking",
+            "Wood Pole Down",
+            "Wood Pole Leaning",
+            "Other"
+          ]
+        },
+        {
+          "field": "Signal_Bulb_Out__c",
+          "label": "Signal Bulb Out",
+          "type": "multipicklist",
+          "required": false,
+          "options": ["Red", "Yellow", "Green", "White", "Orange", "Hand", "Person Walking"]
+        },
+        {
+          "field": "Emergency__c",
+          "label": "Emergency",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Stop Sign Repair",
+      "caseType": "Stop Sign Repair",
+      "description": "Stop sign damaged, missing, knocked down, or obscured",
+      "questions": [
+        {
+          "field": "Stop_Sign_Type__c",
+          "label": "Stop Sign Type",
+          "type": "picklist",
+          "required": false,
+          "options": ["One Way", "Red and White", "Street Name"]
+        },
+        {
+          "field": "Issue__c",
+          "label": "Problem Type",
+          "type": "picklist",
+          "required": false,
+          "options": ["Damaged", "Knocked Down", "Missing", "Pole Remnants"]
+        },
+        {
+          "field": "Not_Visible__c",
+          "label": "Not Visible",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Property Maintenance Exterior",
+      "caseType": "Maintenance Complaint",
+      "description": "Building exterior issues: peeling paint, broken windows, damaged facade",
+      "questions": [
+        {
+          "field": "Specific_Location__c",
+          "label": "Specific Location",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Is_the_problem_in_the_rear_of_the_proper__c",
+          "label": "Is problem in the rear of the property?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Large_Crew_Heavy_Machinery_To_Clean_Up__c",
+          "label": "Large Crew&Heavy Machinery To Clean Up?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "How_do_you_access_rear__c",
+          "label": "How do you access rear?",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "serviceType": "Property Maintenance Interior",
+      "caseType": "Maintenance Residential or Commercial",
+      "description": "Building interior issues visible from outside or reported by occupant",
+      "questions": [
+        {
+          "field": "Is_this_a_donation_bin__c",
+          "label": "Is this a donation bin",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Residential_or_Commerical__c",
+          "label": "Residential or Commerical",
+          "type": "picklist",
+          "required": false,
+          "options": ["Commercial", "Residential"]
+        },
+        {
+          "field": "On_private_property__c",
+          "label": "On private property",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Bin_location__c",
+          "label": "Bin location",
+          "type": "picklist",
+          "required": false,
+          "options": ["Sidewalk", "Street", "Other"]
+        },
+        {
+          "field": "Exterior_or_Interior__c",
+          "label": "Exterior or Interior",
+          "type": "picklist",
+          "required": false,
+          "options": ["Exterior", "Interior"]
+        },
+        {
+          "field": "Property_Owner_Name__c",
+          "label": "Property Owner Name",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Residential_Property_Type__c",
+          "label": "Residential Property Type",
+          "type": "picklist",
+          "required": false,
+          "options": ["Apartment", "Condo", "House"]
+        },
+        {
+          "field": "Property_Owner_Contact_Information__c",
+          "label": "Property Owner Contact Information",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Drainage_Problem__c",
+          "label": "Drainage Problem",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Unit_Number__c",
+          "label": "Unit Number",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Flooded_Residential_Basement__c",
+          "label": "Flooded Residential Basement",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Problem_Location_at_House_or_Unit__c",
+          "label": "Problem Location at House or Unit",
+          "type": "multipicklist",
+          "required": false,
+          "options": ["Front", "Rear", "Public Right of Way", "Side of Property"]
+        },
+        {
+          "field": "Adult_Present_to_Provide_Access_to_Inspe__c",
+          "label": "Provide Access to Inspector",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Is_Customer_the_Property_Owner__c",
+          "label": "Is Customer the Property Owner",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Exterior High Weeds",
+      "caseType": "Maintenance Complaint",
+      "description": "Overgrown weeds or vegetation on property exterior",
+      "questions": [
+        {
+          "field": "Specific_Location__c",
+          "label": "Specific Location",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Is_the_problem_in_the_rear_of_the_proper__c",
+          "label": "Is problem in the rear of the property?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Large_Crew_Heavy_Machinery_To_Clean_Up__c",
+          "label": "Large Crew&Heavy Machinery To Clean Up?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "How_do_you_access_rear__c",
+          "label": "How do you access rear?",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "serviceType": "Building Structurally Dangerous (Occupied)",
+      "caseType": "Dangerous Building Complaint",
+      "description": "Occupied building with visible structural damage like leaning walls or cracked foundation",
+      "questions": [
+        {
+          "field": "Specific_Location__c",
+          "label": "Specific Location",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "serviceType": "Building Structurally Dangerous (Vacant)",
+      "caseType": "Dangerous Building Complaint",
+      "description": "Vacant building with visible structural damage, potential collapse risk",
+      "questions": [
+        {
+          "field": "Specific_Location__c",
+          "label": "Specific Location",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "serviceType": "Vacant Lot",
+      "caseType": "Vacant House or Commercial",
+      "description": "Empty lot with overgrown weeds, debris, or illegal dumping",
+      "questions": [
+        {
+          "field": "Residential_or_Commerical__c",
+          "label": "Residential or Commerical",
+          "type": "picklist",
+          "required": false,
+          "options": ["Commercial", "Residential"]
+        },
+        {
+          "field": "Access_to_Rear_of_Property_for_Inspectio__c",
+          "label": "Inspection Access to Rear of Property",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Unsafe_Violations__c",
+          "label": "Are there any unsafe conditions?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "How_to_Access_Rear_of_Property__c",
+          "label": "How to Access Rear of Property",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Valid_License__c",
+          "label": "Valid License",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Property_Open_to_Trespass_on_First_or_Gr__c",
+          "label": "Open to Trespass",
+          "type": "picklist",
+          "required": false,
+          "options": ["Both", "Front", "Neither", "Rear"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Vacant Property",
+      "caseType": "Vacant House or Commercial",
+      "description": "Abandoned property with maintenance issues or safety hazards",
+      "questions": [
+        {
+          "field": "Residential_or_Commerical__c",
+          "label": "Residential or Commerical",
+          "type": "picklist",
+          "required": false,
+          "options": ["Commercial", "Residential"]
+        },
+        {
+          "field": "Access_to_Rear_of_Property_for_Inspectio__c",
+          "label": "Inspection Access to Rear of Property",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Unsafe_Violations__c",
+          "label": "Are there any unsafe conditions?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "How_to_Access_Rear_of_Property__c",
+          "label": "How to Access Rear of Property",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Valid_License__c",
+          "label": "Valid License",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Property_Open_to_Trespass_on_First_or_Gr__c",
+          "label": "Open to Trespass",
+          "type": "picklist",
+          "required": false,
+          "options": ["Both", "Front", "Neither", "Rear"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Tree Maintenance",
+      "caseType": "Street Trees",
+      "description": "Street tree needing pruning, trimming, or general maintenance",
+      "questions": [
+        {
+          "field": "Tree_Down__c",
+          "label": "Tree Down",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Property_Owner_Street_Trees__c",
+          "label": "Property Owner",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Blocked_Traffic__c",
+          "label": "Blocked Traffic",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Request_for_Tree_Maintenance__c",
+          "label": "Request for Tree Maintenance",
+          "type": "multipicklist",
+          "required": false,
+          "options": ["New Tree", "Pruning", "Removal", "Other"]
+        },
+        {
+          "field": "Blocked_Sidewalk_or_Home_Access__c",
+          "label": "Blocked Sidewalk or Home Access",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Tree_on_State_Owned_Highway__c",
+          "label": "Tree on State-Owned Highway",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Tree_on_Power_Lines__c",
+          "label": "Tree on Power Lines",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Tree_Location__c",
+          "label": "Tree Location",
+          "type": "picklist",
+          "required": false,
+          "options": ["Between Sidewalk and Curb", "From Private Property", "In Median", "Other"]
+        },
+        {
+          "field": "Tree_in_Alley_Frontyard_or_Backyard__c",
+          "label": "Tree in Alley, Frontyard or Backyard",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "How_Many_Trees__c",
+          "label": "How Many Trees",
+          "type": "double",
+          "required": false
+        }
+      ]
+    },
+    {
+      "serviceType": "Street Trees",
+      "caseType": "Street Trees",
+      "description": "Issues with city-owned trees along streets or sidewalks",
+      "questions": [
+        {
+          "field": "Tree_Down__c",
+          "label": "Tree Down",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Property_Owner_Street_Trees__c",
+          "label": "Property Owner",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Blocked_Traffic__c",
+          "label": "Blocked Traffic",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Request_for_Tree_Maintenance__c",
+          "label": "Request for Tree Maintenance",
+          "type": "multipicklist",
+          "required": false,
+          "options": ["New Tree", "Pruning", "Removal", "Other"]
+        },
+        {
+          "field": "Blocked_Sidewalk_or_Home_Access__c",
+          "label": "Blocked Sidewalk or Home Access",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Tree_on_State_Owned_Highway__c",
+          "label": "Tree on State-Owned Highway",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Tree_on_Power_Lines__c",
+          "label": "Tree on Power Lines",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Tree_Location__c",
+          "label": "Tree Location",
+          "type": "picklist",
+          "required": false,
+          "options": ["Between Sidewalk and Curb", "From Private Property", "In Median", "Other"]
+        },
+        {
+          "field": "Tree_in_Alley_Frontyard_or_Backyard__c",
+          "label": "Tree in Alley, Frontyard or Backyard",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "How_Many_Trees__c",
+          "label": "How Many Trees",
+          "type": "double",
+          "required": false
+        }
+      ]
+    },
+    {
+      "serviceType": "Graffiti Removal",
+      "caseType": "Graffiti Removal",
+      "description": "Spray paint, markers, or other vandalism on buildings, signs, or infrastructure",
+      "questions": [
+        {
+          "field": "Floor__c",
+          "label": "Floor",
+          "type": "picklist",
+          "required": false,
+          "options": ["1st", "2nd", "3rd or above", "N/A"]
+        },
+        {
+          "field": "Property_Type__c",
+          "label": "Property Type",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Alleyway",
+            "Bridge",
+            "Building",
+            "Cinderblock",
+            "Cobble Wall",
+            "Concrete Wall",
+            "Door",
+            "Dumpster",
+            "Elect Control Box",
+            "Fence",
+            "Garage",
+            "House",
+            "Pole",
+            "Rented Apartment",
+            "Rented House",
+            "Security Gate",
+            "Sidewalk",
+            "Steps",
+            "Stop Sign",
+            "Street",
+            "Street Sign",
+            "Stucco Wall",
+            "Traffic Control Box",
+            "Under/Overpass",
+            "Window",
+            "Wood Telephone Pole",
+            "Other"
+          ]
+        },
+        {
+          "field": "Painted_Surface__c",
+          "label": "Painted Surface",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Location_on_Property__c",
+          "label": "Location on Property",
+          "type": "picklist",
+          "required": false,
+          "options": ["Alleyway", "Back", "Driveway", "Front", "Not Known", "Side", "Other"]
+        },
+        {
+          "field": "Surface_Type__c",
+          "label": "Surface Type",
+          "type": "picklist",
+          "required": false,
+          "options": ["Brick", "Concrete", "Marble", "Metal", "Not Known", "Stone", "Other"]
+        },
+        {
+          "field": "Property_Owner__c",
+          "label": "Property Owner",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Powerwash__c",
+          "label": "Powerwash",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Blight_Pamphlet__c",
+          "label": "Blight Pamphlet",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Paint_Color__c",
+          "label": "Paint Color",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Black",
+            "Blue (Dark)",
+            "Blue (Light)",
+            "Brick Red",
+            "Brown",
+            "Cement",
+            "Eley Cement",
+            "Forest Green",
+            "Gray (Dark)",
+            "Gray (Light)",
+            "Unknown",
+            "White"
+          ]
+        }
+      ]
+    },
+    {
+      "serviceType": "Dead Animal in Street",
+      "caseType": "Dead Animal in Street",
+      "description": "Dead animal carcass on street, sidewalk, or public area",
+      "questions": [
+        {
+          "field": "Animal_Type__c",
+          "label": "Animal Type",
+          "type": "picklist",
+          "required": false,
+          "options": ["Cat", "Deer", "Dog", "Possum", "Raccoon", "Other"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Residential Fire Safety Complaint",
+      "caseType": "Fire Safety Complaint",
+      "description": "Fire hazard or safety violation in residential building",
+      "questions": [
+        {
+          "field": "What_Type_of_Fire_Safety_Complaint__c",
+          "label": "What Type of Fire Safety Complaint",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "High Rise Complaint",
+            "Multi-Family (3 or more) Dwelling Complaint",
+            "Residential Fire Safety Complaint",
+            "Restaurant or Commercial Complaint"
+          ]
+        },
+        {
+          "field": "Specific_Location__c",
+          "label": "Specific Location",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Is_this_a_nuisance_bar_club_deli__c",
+          "label": "Is this a nuisance bar/club/deli?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Smoke Detector",
+      "caseType": "Smoke Detector",
+      "description": "Request for smoke detector installation or battery replacement",
+      "questions": [
+        {
+          "field": "New_Request__c",
+          "label": "New Request",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Access_Provided_by_Adult__c",
+          "label": "Access Provided by Adult",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Residence_Type__c",
+          "label": "Residence Type",
+          "type": "picklist",
+          "required": false,
+          "options": ["Apartment", "Single Family House"]
+        },
+        {
+          "field": "Disabilities_Language_Information__c",
+          "label": "Disabilities/Language Information",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Apartment_Building__c",
+          "label": "Apartment/Building/Unit Number",
+          "type": "double",
+          "required": false
+        },
+        {
+          "field": "Req_a_Hearing_Impaired_Smoke_Detector__c",
+          "label": "Req a Hearing Impaired Smoke Detector?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Owner_Occupied_Property__c",
+          "label": "Owner Occupied Property",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Installation_Time__c",
+          "label": "Installation Time",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Front_or_Back__c",
+          "label": "Front or Back",
+          "type": "picklist",
+          "required": false,
+          "options": ["Back", "Front"]
+        },
+        {
+          "field": "FloorSmokeDetector__c",
+          "label": "Floor",
+          "type": "double",
+          "required": false
+        }
+      ]
+    },
+    {
+      "serviceType": "Inlet Cleaning",
+      "caseType": "Inlet Cleaning",
+      "description": "Storm drain or street inlet clogged with debris causing flooding",
+      "questions": [
+        {
+          "field": "Intersection_or_Mid_Block__c",
+          "label": "Intersection or Mid-Block",
+          "type": "picklist",
+          "required": false,
+          "options": ["Intersection", "Mid-block"]
+        },
+        {
+          "field": "Inlet_Location__c",
+          "label": "Inlet Location",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "serviceType": "Hydrant Knocked Down",
+      "caseType": "Hydrant Request",
+      "description": "Fire hydrant damaged, leaking, or knocked over by vehicle",
+      "questions": [
+        {
+          "field": "Intersection_or_Mid_Block__c",
+          "label": "Intersection or Mid-Block",
+          "type": "picklist",
+          "required": false,
+          "options": ["Intersection", "Mid-block"]
+        },
+        {
+          "field": "Owner__c",
+          "label": "Owner",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "serviceType": "Manhole Cover Missing",
+      "caseType": "Manhole Cover",
+      "description": "Open manhole in street or sidewalk creating safety hazard",
+      "questions": [
+        {
+          "field": "Position__c",
+          "label": "Position",
+          "type": "picklist",
+          "required": false,
+          "options": ["Intersection", "Parking Lane", "Sidewalk", "Travel Lane"]
+        },
+        {
+          "field": "Problem_Type__c",
+          "label": "Problem Type",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "All Out",
+            "All-Way Stop Request",
+            "Area Around the Manhole",
+            "Blanks Out",
+            "Blocked by Tree Branches or Foliage",
+            "Bulb Hanging",
+            "Bulb Out",
+            "Cave-In",
+            "Commercial",
+            "Ditch",
+            "Do Not Enter Sign Missing",
+            "Driveway X Box App",
+            "Flashing",
+            "Highway",
+            "Icy Road Surface",
+            "Knocked Down",
+            "Leaning",
+            "Light On/Off",
+            "Light Out",
+            "Loose Manhole",
+            "Metal Pole Down",
+            "Metal Pole Leaning",
+            "Missing Base",
+            "Missing Lid",
+            "Modify Signal Operation",
+            "New Traffic Signal",
+            "On 24 Hours",
+            "On All the Time",
+            "On and Off",
+            "On During Day",
+            "One-Way Sign Missing",
+            "Other Issue",
+            "Other Pole Down",
+            "Other Pole Leaning",
+            "Other Problem",
+            "Other Signs",
+            "Out All the Time",
+            "Parking Related Signs",
+            "Pick Up Sign",
+            "Pole Down",
+            "Pole Leaning",
+            "Pothole",
+            "Request for New Lighting",
+            "Residential",
+            "Salting or Plowing a Street",
+            "Sanitation",
+            "School Related Signs",
+            "Shoveling Sidewalk",
+            "Sign Pole Problem",
+            "Snow Removal",
+            "Street Name Sign Request",
+            "Street Permit",
+            "Stuck",
+            "Traffic Inquiry",
+            "Traffic Signal",
+            "Turned",
+            "Wire Down",
+            "Wire Sparking",
+            "Wires Sparking",
+            "Wood Pole Down",
+            "Wood Pole Leaning",
+            "Other"
+          ]
+        }
+      ]
+    },
+    {
+      "serviceType": "Manhole Other Problem",
+      "caseType": "Manhole Cover",
+      "description": "Manhole issue other than missing cover — raised, sunken, or damaged",
+      "questions": [
+        {
+          "field": "Position__c",
+          "label": "Position",
+          "type": "picklist",
+          "required": false,
+          "options": ["Intersection", "Parking Lane", "Sidewalk", "Travel Lane"]
+        },
+        {
+          "field": "Problem_Type__c",
+          "label": "Problem Type",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "All Out",
+            "All-Way Stop Request",
+            "Area Around the Manhole",
+            "Blanks Out",
+            "Blocked by Tree Branches or Foliage",
+            "Bulb Hanging",
+            "Bulb Out",
+            "Cave-In",
+            "Commercial",
+            "Ditch",
+            "Do Not Enter Sign Missing",
+            "Driveway X Box App",
+            "Flashing",
+            "Highway",
+            "Icy Road Surface",
+            "Knocked Down",
+            "Leaning",
+            "Light On/Off",
+            "Light Out",
+            "Loose Manhole",
+            "Metal Pole Down",
+            "Metal Pole Leaning",
+            "Missing Base",
+            "Missing Lid",
+            "Modify Signal Operation",
+            "New Traffic Signal",
+            "On 24 Hours",
+            "On All the Time",
+            "On and Off",
+            "On During Day",
+            "One-Way Sign Missing",
+            "Other Issue",
+            "Other Pole Down",
+            "Other Pole Leaning",
+            "Other Problem",
+            "Other Signs",
+            "Out All the Time",
+            "Parking Related Signs",
+            "Pick Up Sign",
+            "Pole Down",
+            "Pole Leaning",
+            "Pothole",
+            "Request for New Lighting",
+            "Residential",
+            "Salting or Plowing a Street",
+            "Sanitation",
+            "School Related Signs",
+            "Shoveling Sidewalk",
+            "Sign Pole Problem",
+            "Snow Removal",
+            "Street Name Sign Request",
+            "Street Permit",
+            "Stuck",
+            "Traffic Inquiry",
+            "Traffic Signal",
+            "Turned",
+            "Wire Down",
+            "Wire Sparking",
+            "Wires Sparking",
+            "Wood Pole Down",
+            "Wood Pole Leaning",
+            "Other"
+          ]
+        }
+      ]
+    },
+    {
+      "serviceType": "Homeless Encampment",
+      "caseType": "Homeless Encampment Request",
+      "description": "Homeless camp with tents, belongings, or debris in public area",
+      "questions": []
+    },
+    {
+      "serviceType": "Parks and Rec Safety and Maintenance",
+      "caseType": "Parks and Rec Safety and Maintenance",
+      "description": "Damaged playground equipment, broken benches, or park safety hazards",
+      "questions": [
+        {
+          "field": "Problem_Category__c",
+          "label": "Problem Category",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Emergency",
+            "Grounds",
+            "Janitorial Maintenance",
+            "Mechanical Maintenance",
+            "Programs",
+            "Trees"
+          ]
+        },
+        {
+          "field": "Tree_Between_Sidewalk_and_Curb__c",
+          "label": "Tree Between Sidewalk and Curb",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Problem__c",
+          "label": "Problem",
+          "type": "multipicklist",
+          "required": false,
+          "options": [
+            "Air Conditioning",
+            "Carpentry",
+            "Drain",
+            "Electrical Wires",
+            "Heat",
+            "Light",
+            "Lock",
+            "Masonry",
+            "Other",
+            "Painting",
+            "Pavement",
+            "Plaster",
+            "Playground Equipment",
+            "Roof",
+            "Sidewalk",
+            "Toilet",
+            "Wall",
+            "Floor",
+            "Glass",
+            "Grafitti",
+            "Odor",
+            "Trash",
+            "Spill",
+            "Snow",
+            "Water",
+            "Ballfield",
+            "Grass",
+            "Landscape",
+            "Litter",
+            "Restroom",
+            "Sinkhole",
+            "Special Event",
+            "Trail",
+            "Vegetation",
+            "Disease",
+            "Fallen Branches",
+            "Fallen Trees",
+            "Insects",
+            "Planting",
+            "Pruning",
+            "Removal",
+            "Closed",
+            "Field Permit",
+            "Inadequate",
+            "League",
+            "Fire",
+            "Paramedic Response",
+            "Building Burglarized",
+            "Theft",
+            "Vandalism",
+            "Loss of life",
+            "Major Injury",
+            "Unauthorized Swimming in Pool",
+            "HVAC"
+          ]
+        },
+        {
+          "field": "Location_Name__c",
+          "label": "Location Name",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Unsafe_Condition__c",
+          "label": "Unsafe Condition",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Specific_Problem_Location__c",
+          "label": "Specific Problem Location",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Location_Type__c",
+          "label": "Location Type",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Cultural Instituion",
+            "Not Parks Related",
+            "Other Parks",
+            "Park",
+            "Playground",
+            "Recreation Center"
+          ]
+        },
+        {
+          "field": "Rec_Center_Leader_Notified__c",
+          "label": "Facility Manager Notified",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Date_and_Time__c",
+          "label": "Date and Time",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Large_Crew_Heavy_Machinery_To_Clean_Up__c",
+          "label": "Large Crew&Heavy Machinery To Clean Up?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Demolition Complaint",
+      "caseType": "Construction Complaints",
+      "description": "Complaint about demolition work or improper demolition practices",
+      "questions": [
+        {
+          "field": "What_Type_of_Construction_Complaint__c",
+          "label": "What Type of Construction Complaint",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Demolition Complaint",
+            "Work Underway in violation of permit requirements",
+            "Work Underway without Permits"
+          ]
+        },
+        {
+          "field": "Specific_Location__c",
+          "label": "Specific Location",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "serviceType": "Work Underway without Permits",
+      "caseType": "Construction Complaints",
+      "description": "Construction or renovation work being done without required permits",
+      "questions": [
+        {
+          "field": "What_Type_of_Construction_Complaint__c",
+          "label": "What Type of Construction Complaint",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Demolition Complaint",
+            "Work Underway in violation of permit requirements",
+            "Work Underway without Permits"
+          ]
+        },
+        {
+          "field": "Specific_Location__c",
+          "label": "Specific Location",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "serviceType": "Work Underway in violation of permit requirements",
+      "caseType": "Construction Complaints",
+      "description": "Construction work not following approved permit specifications",
+      "questions": [
+        {
+          "field": "What_Type_of_Construction_Complaint__c",
+          "label": "What Type of Construction Complaint",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Demolition Complaint",
+            "Work Underway in violation of permit requirements",
+            "Work Underway without Permits"
+          ]
+        },
+        {
+          "field": "Specific_Location__c",
+          "label": "Specific Location",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "serviceType": "Salting",
+      "caseType": "Salting",
+      "description": "Icy road surface needing salt treatment",
+      "questions": [
+        {
+          "field": "Problem_Type__c",
+          "label": "Problem Type",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "All Out",
+            "All-Way Stop Request",
+            "Area Around the Manhole",
+            "Blanks Out",
+            "Blocked by Tree Branches or Foliage",
+            "Bulb Hanging",
+            "Bulb Out",
+            "Cave-In",
+            "Commercial",
+            "Ditch",
+            "Do Not Enter Sign Missing",
+            "Driveway X Box App",
+            "Flashing",
+            "Highway",
+            "Icy Road Surface",
+            "Knocked Down",
+            "Leaning",
+            "Light On/Off",
+            "Light Out",
+            "Loose Manhole",
+            "Metal Pole Down",
+            "Metal Pole Leaning",
+            "Missing Base",
+            "Missing Lid",
+            "Modify Signal Operation",
+            "New Traffic Signal",
+            "On 24 Hours",
+            "On All the Time",
+            "On and Off",
+            "On During Day",
+            "One-Way Sign Missing",
+            "Other Issue",
+            "Other Pole Down",
+            "Other Pole Leaning",
+            "Other Problem",
+            "Other Signs",
+            "Out All the Time",
+            "Parking Related Signs",
+            "Pick Up Sign",
+            "Pole Down",
+            "Pole Leaning",
+            "Pothole",
+            "Request for New Lighting",
+            "Residential",
+            "Salting or Plowing a Street",
+            "Sanitation",
+            "School Related Signs",
+            "Shoveling Sidewalk",
+            "Sign Pole Problem",
+            "Snow Removal",
+            "Street Name Sign Request",
+            "Street Permit",
+            "Stuck",
+            "Traffic Inquiry",
+            "Traffic Signal",
+            "Turned",
+            "Wire Down",
+            "Wire Sparking",
+            "Wires Sparking",
+            "Wood Pole Down",
+            "Wood Pole Leaning",
+            "Other"
+          ]
+        }
+      ]
+    },
+    {
+      "serviceType": "Shoveling",
+      "caseType": "Shoveling",
+      "description": "Unshoveled sidewalk creating pedestrian hazard after snowfall",
+      "questions": [
+        {
+          "field": "Problem_Type__c",
+          "label": "Problem Type",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "All Out",
+            "All-Way Stop Request",
+            "Area Around the Manhole",
+            "Blanks Out",
+            "Blocked by Tree Branches or Foliage",
+            "Bulb Hanging",
+            "Bulb Out",
+            "Cave-In",
+            "Commercial",
+            "Ditch",
+            "Do Not Enter Sign Missing",
+            "Driveway X Box App",
+            "Flashing",
+            "Highway",
+            "Icy Road Surface",
+            "Knocked Down",
+            "Leaning",
+            "Light On/Off",
+            "Light Out",
+            "Loose Manhole",
+            "Metal Pole Down",
+            "Metal Pole Leaning",
+            "Missing Base",
+            "Missing Lid",
+            "Modify Signal Operation",
+            "New Traffic Signal",
+            "On 24 Hours",
+            "On All the Time",
+            "On and Off",
+            "On During Day",
+            "One-Way Sign Missing",
+            "Other Issue",
+            "Other Pole Down",
+            "Other Pole Leaning",
+            "Other Problem",
+            "Other Signs",
+            "Out All the Time",
+            "Parking Related Signs",
+            "Pick Up Sign",
+            "Pole Down",
+            "Pole Leaning",
+            "Pothole",
+            "Request for New Lighting",
+            "Residential",
+            "Salting or Plowing a Street",
+            "Sanitation",
+            "School Related Signs",
+            "Shoveling Sidewalk",
+            "Sign Pole Problem",
+            "Snow Removal",
+            "Street Name Sign Request",
+            "Street Permit",
+            "Stuck",
+            "Traffic Inquiry",
+            "Traffic Signal",
+            "Turned",
+            "Wire Down",
+            "Wire Sparking",
+            "Wires Sparking",
+            "Wood Pole Down",
+            "Wood Pole Leaning",
+            "Other"
+          ]
+        }
+      ]
+    },
+    {
+      "serviceType": "Icy Road Surface",
+      "caseType": "Shoveling",
+      "description": "Ice on road surface needing treatment",
+      "questions": [
+        {
+          "field": "Problem_Type__c",
+          "label": "Problem Type",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "All Out",
+            "All-Way Stop Request",
+            "Area Around the Manhole",
+            "Blanks Out",
+            "Blocked by Tree Branches or Foliage",
+            "Bulb Hanging",
+            "Bulb Out",
+            "Cave-In",
+            "Commercial",
+            "Ditch",
+            "Do Not Enter Sign Missing",
+            "Driveway X Box App",
+            "Flashing",
+            "Highway",
+            "Icy Road Surface",
+            "Knocked Down",
+            "Leaning",
+            "Light On/Off",
+            "Light Out",
+            "Loose Manhole",
+            "Metal Pole Down",
+            "Metal Pole Leaning",
+            "Missing Base",
+            "Missing Lid",
+            "Modify Signal Operation",
+            "New Traffic Signal",
+            "On 24 Hours",
+            "On All the Time",
+            "On and Off",
+            "On During Day",
+            "One-Way Sign Missing",
+            "Other Issue",
+            "Other Pole Down",
+            "Other Pole Leaning",
+            "Other Problem",
+            "Other Signs",
+            "Out All the Time",
+            "Parking Related Signs",
+            "Pick Up Sign",
+            "Pole Down",
+            "Pole Leaning",
+            "Pothole",
+            "Request for New Lighting",
+            "Residential",
+            "Salting or Plowing a Street",
+            "Sanitation",
+            "School Related Signs",
+            "Shoveling Sidewalk",
+            "Sign Pole Problem",
+            "Snow Removal",
+            "Street Name Sign Request",
+            "Street Permit",
+            "Stuck",
+            "Traffic Inquiry",
+            "Traffic Signal",
+            "Turned",
+            "Wire Down",
+            "Wire Sparking",
+            "Wires Sparking",
+            "Wood Pole Down",
+            "Wood Pole Leaning",
+            "Other"
+          ]
+        }
+      ]
+    },
+    {
+      "serviceType": "Snow Removal",
+      "caseType": "Salting",
+      "description": "Snow-covered street or sidewalk needing plowing or clearing",
+      "questions": [
+        {
+          "field": "Problem_Type__c",
+          "label": "Problem Type",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "All Out",
+            "All-Way Stop Request",
+            "Area Around the Manhole",
+            "Blanks Out",
+            "Blocked by Tree Branches or Foliage",
+            "Bulb Hanging",
+            "Bulb Out",
+            "Cave-In",
+            "Commercial",
+            "Ditch",
+            "Do Not Enter Sign Missing",
+            "Driveway X Box App",
+            "Flashing",
+            "Highway",
+            "Icy Road Surface",
+            "Knocked Down",
+            "Leaning",
+            "Light On/Off",
+            "Light Out",
+            "Loose Manhole",
+            "Metal Pole Down",
+            "Metal Pole Leaning",
+            "Missing Base",
+            "Missing Lid",
+            "Modify Signal Operation",
+            "New Traffic Signal",
+            "On 24 Hours",
+            "On All the Time",
+            "On and Off",
+            "On During Day",
+            "One-Way Sign Missing",
+            "Other Issue",
+            "Other Pole Down",
+            "Other Pole Leaning",
+            "Other Problem",
+            "Other Signs",
+            "Out All the Time",
+            "Parking Related Signs",
+            "Pick Up Sign",
+            "Pole Down",
+            "Pole Leaning",
+            "Pothole",
+            "Request for New Lighting",
+            "Residential",
+            "Salting or Plowing a Street",
+            "Sanitation",
+            "School Related Signs",
+            "Shoveling Sidewalk",
+            "Sign Pole Problem",
+            "Snow Removal",
+            "Street Name Sign Request",
+            "Street Permit",
+            "Stuck",
+            "Traffic Inquiry",
+            "Traffic Signal",
+            "Turned",
+            "Wire Down",
+            "Wire Sparking",
+            "Wires Sparking",
+            "Wood Pole Down",
+            "Wood Pole Leaning",
+            "Other"
+          ]
+        }
+      ]
+    },
+    {
+      "serviceType": "Complaint (Streets)",
+      "caseType": "Complaint (Streets)",
+      "description": "General streets department complaint not fitting other categories",
+      "questions": [
+        {
+          "field": "Previous_Case__c",
+          "label": "Previous Case",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Rubbish_Issue__c",
+          "label": "Rubbish Issue",
+          "type": "picklist",
+          "required": false,
+          "options": ["Missed", "No", "Noise", "Other"]
+        },
+        {
+          "field": "Previous_Case_found__c",
+          "label": "Previous Case found",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        },
+        {
+          "field": "Type_of_Feedback_Comments__c",
+          "label": "Type of Feedback (Comments)",
+          "type": "picklist",
+          "required": false,
+          "options": ["Complaint", "Compliment"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Other (Streets)",
+      "caseType": "Other (Streets)",
+      "description": "Miscellaneous streets issue not covered by specific categories",
+      "questions": [
+        {
+          "field": "Problem_Type__c",
+          "label": "Problem Type",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "All Out",
+            "All-Way Stop Request",
+            "Area Around the Manhole",
+            "Blanks Out",
+            "Blocked by Tree Branches or Foliage",
+            "Bulb Hanging",
+            "Bulb Out",
+            "Cave-In",
+            "Commercial",
+            "Ditch",
+            "Do Not Enter Sign Missing",
+            "Driveway X Box App",
+            "Flashing",
+            "Highway",
+            "Icy Road Surface",
+            "Knocked Down",
+            "Leaning",
+            "Light On/Off",
+            "Light Out",
+            "Loose Manhole",
+            "Metal Pole Down",
+            "Metal Pole Leaning",
+            "Missing Base",
+            "Missing Lid",
+            "Modify Signal Operation",
+            "New Traffic Signal",
+            "On 24 Hours",
+            "On All the Time",
+            "On and Off",
+            "On During Day",
+            "One-Way Sign Missing",
+            "Other Issue",
+            "Other Pole Down",
+            "Other Pole Leaning",
+            "Other Problem",
+            "Other Signs",
+            "Out All the Time",
+            "Parking Related Signs",
+            "Pick Up Sign",
+            "Pole Down",
+            "Pole Leaning",
+            "Pothole",
+            "Request for New Lighting",
+            "Residential",
+            "Salting or Plowing a Street",
+            "Sanitation",
+            "School Related Signs",
+            "Shoveling Sidewalk",
+            "Sign Pole Problem",
+            "Snow Removal",
+            "Street Name Sign Request",
+            "Street Permit",
+            "Stuck",
+            "Traffic Inquiry",
+            "Traffic Signal",
+            "Turned",
+            "Wire Down",
+            "Wire Sparking",
+            "Wires Sparking",
+            "Wood Pole Down",
+            "Wood Pole Leaning",
+            "Other"
+          ]
+        },
+        {
+          "field": "Noise_from_a_trash_hauler__c",
+          "label": "Noise from a trash hauler",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Vendor Complaint",
+      "caseType": "License Complaint",
+      "description": "Street vendor operating illegally or causing obstruction",
+      "questions": [
+        {
+          "field": "What_Type_of_License_Complaint__c",
+          "label": "What Type of License Complaint",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Short Term Rental Complaint",
+            "Unlicensed Business Complaint",
+            "Vendor Complaint"
+          ]
+        },
+        {
+          "field": "Specific_Location__c",
+          "label": "Specific Location",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Is_this_a_nuisance_bar_club_deli__c",
+          "label": "Is this a nuisance bar/club/deli?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Unlicensed Business Complaint",
+      "caseType": "License Complaint",
+      "description": "Business operating without required licenses or permits",
+      "questions": [
+        {
+          "field": "What_Type_of_License_Complaint__c",
+          "label": "What Type of License Complaint",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Short Term Rental Complaint",
+            "Unlicensed Business Complaint",
+            "Vendor Complaint"
+          ]
+        },
+        {
+          "field": "Specific_Location__c",
+          "label": "Specific Location",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Is_this_a_nuisance_bar_club_deli__c",
+          "label": "Is this a nuisance bar/club/deli?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Short Term Rental Complaint",
+      "caseType": "License Complaint",
+      "description": "Short-term rental property operating without proper licensing",
+      "questions": [
+        {
+          "field": "What_Type_of_License_Complaint__c",
+          "label": "What Type of License Complaint",
+          "type": "picklist",
+          "required": false,
+          "options": [
+            "Short Term Rental Complaint",
+            "Unlicensed Business Complaint",
+            "Vendor Complaint"
+          ]
+        },
+        {
+          "field": "Specific_Location__c",
+          "label": "Specific Location",
+          "type": "string",
+          "required": false
+        },
+        {
+          "field": "Is_this_a_nuisance_bar_club_deli__c",
+          "label": "Is this a nuisance bar/club/deli?",
+          "type": "picklist",
+          "required": false,
+          "options": ["No", "Yes"]
+        }
+      ]
+    },
+    {
+      "serviceType": "Plastic Bag Complaint",
+      "caseType": "Plastic Bag Complaint",
+      "description": "Business distributing prohibited plastic bags",
+      "questions": []
+    },
+    {
+      "serviceType": "Needle Collection",
+      "caseType": "Opioid Response Unit",
+      "description": "Used needles or syringes found in public area needing safe disposal",
+      "questions": []
+    }
+  ]
+}
