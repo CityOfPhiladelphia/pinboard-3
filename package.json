@@ -15,6 +15,7 @@
     "dev:oem:fresh": "pnpm --filter @pinboard/oem-flood-finder dev:fresh",
     "dev:pc": "pnpm --filter @pinboard/primary-care-finder dev",
     "dev:pc:fresh": "pnpm --filter @pinboard/primary-care-finder dev:fresh",
+    "dev:311": "pnpm --filter @pinboard/philly-311 dev",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
     "format": "prettier --write .",

@@ -13,6 +13,10 @@
     "type-check": {
       "dependsOn": ["^build"]
     },
+    "test:run": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
     "format": {
       "cache": false
     },
