@@ -128,15 +128,19 @@ watch(selectedLocation, (loc) => {
   }
 })
 
-watch(() => props.searchOrUserLocation, (newLocation) => {
-  if (
-    hasLocationData(newLocation) &&
-    props.locationSearchMode &&
-    ['address', 'zipcode'].includes(props.locationSearchMode)
-  ) {
-    mapPanelRef.value?.panTo(newLocation)
-  }
-}, { deep: true })
+watch(
+  () => props.searchOrUserLocation,
+  (newLocation) => {
+    if (
+      hasLocationData(newLocation) &&
+      props.locationSearchMode &&
+      ['address', 'zipcode'].includes(props.locationSearchMode)
+    ) {
+      mapPanelRef.value?.panTo(newLocation)
+    }
+  },
+  { deep: 1 }
+)
 
 // event handlers
 function handleHover(id: string) {
