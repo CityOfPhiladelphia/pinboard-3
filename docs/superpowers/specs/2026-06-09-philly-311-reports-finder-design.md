@@ -70,19 +70,28 @@ lives in `useReportFinder`; the view only binds props/slots. This mirrors
 
 ### Files (one responsibility each)
 
-- **`composables/useReportFinder.ts`** — finder state. Owns `region` (seeded from
-  `useGeolocation`, fallback default Philly center), the selected category filter, and the
-  derived outputs the view binds: `locations: BasicLocation[]`, `searchOrUserLocation: LatLon`,
-  `isLoading`, `errorMessage`. Loads via `useNearbyReports.load(region)`. Exposes handlers
-  for filter change and for a **debounced region reload** (called on map `moveend`). Unit-tested
-  with `useNearbyReports` / `useGeolocation` mocked.
+- **`composables/useReportFinder.ts`** — finder state. Owns `region` (seeded by calling the
+  ported `getCurrentPosition(): Promise<{lat,lng}|null>` from `composables/useGeolocation`,
+  falling back to a default Philly center), the selected category filter, and the derived
+  outputs the view binds: `locations: BasicLocation[]`, `searchOrUserLocation: LatLon`,
+  `isLoading`, `errorMessage`. Loads via `useNearbyReports.load(region)`. Exposes handlers for
+  filter change and for a **debounced region reload** (called on map `moveend`). Unit-tested
+  with `useNearbyReports` / `getCurrentPosition` mocked.
 - **`utils/reportCard.ts`** — pure `reportToLocation(report: Report): BasicLocation`. Builds
   `{ id, name, latitude, longitude, locationCardInfo }` where `locationCardInfo: MapCardProps`
-  carries title (service type), subtitle (address), image (`mediaUrl`), a status tag, and the
-  distance label. Unit-tested.
+  uses the real `MapCardProps` fields: `heading` (service type), `subheader` (address — the
+  distance label, via `formatDistance` from the ported `distance.ts`, goes here or as a tag),
+  `src` (`mediaUrl`), optional `body`, and `tags: TagsProps[]` (the status pill, e.g.
+  "In Progress"). Unit-tested. (Mirror oem's `useLocations` `MapCardProps` construction.)
 - **`utils/reportIcon.ts`** — pure `serviceTypeVisual(serviceType: string): { icon, color }`.
-  Color from `serviceTypeMeta`; Fontawesome icon via the matching `common_categories.iconName`,
-  with a neutral fallback for unmapped types. Unit-tested.
+  Color from `serviceTypeMeta`; the Fontawesome **icon object** resolved from the matching
+  `common_categories.iconName` *string* via a small static import map (the `iconName` values
+  like `"road"`/`"dumpster"` are FA name strings, not icon objects, so `MapIconTextPin` needs
+  the resolved `IconDefinition`). Neutral fallback for unmapped types. Unit-tested.
+- **`utils/mapRegion.ts`** — pure helper to derive `{ lat, lng, radius }` from a maplibre
+  center + bounds (great-circle distance from center to a bounds corner → radius in meters).
+  This math does **not** exist in the ported utils (`bounds.ts` is only `isInPhilly`,
+  `distance.ts` is only `formatDistance`), so it is new. Unit-tested.
 - **`components/ReportDetail.vue`** — the `location-detail` slot body: photo, status, service
   type, address, timestamp, description, close button. Mirrors oem's `LocationDetail.vue`.
 - **`pages/LandingPage.vue`** — thin view. Binds `useReportFinder` to `<Pinboard>`; the
@@ -112,13 +121,14 @@ panel and chip-over-map placement are a later slice.
 
 ### Region & reload-on-pan
 
-On mount, `useReportFinder` requests geolocation (`useGeolocation`); on success the region
+On mount, `useReportFinder` calls `getCurrentPosition()`; on a non-null result the region
 centers there, otherwise a default Philly center (`[-75.1652, 39.9526]`). It loads nearby
-reports for that region. In the view, the maplibre instance from the `map-content` slot gets a
-`moveend` listener that reads `map.getCenter()` + `map.getBounds()`, derives `{ lat, lng, radius }`
-(radius from the bounds via the ported `bounds`/`distance` utils), and calls a **debounced**
-reload (≈300–500ms) so dragging doesn't spam the API. `searchOrUserLocation` is set to the
-user/region center so Pinboard's distance affordances work.
+reports for that region. In the view, the maplibre instance from the `map-content` slot (typed
+`unknown` by the slot, so cast to the maplibre `Map`) gets a `moveend` listener that reads
+`map.getCenter()` + `map.getBounds()`, passes them to `mapRegion.ts` to derive
+`{ lat, lng, radius }`, and calls a **debounced** reload (≈300–500ms) so dragging doesn't spam
+the API. The listener is removed on unmount. `searchOrUserLocation` is set to the user/region
+center so Pinboard's distance affordances work.
 
 ### Report detail
 
@@ -133,10 +143,12 @@ Empty results use Pinboard's built-in count label ("No locations match").
 
 ## Testing strategy (TDD)
 
-- **Pure utils** — `reportCard.test.ts`, `reportIcon.test.ts`: exhaustive mapping/format tests
-  (title/subtitle/image/tags/distance; icon+color incl. fallback).
-- **`useReportFinder.test.ts`** — region seeding (geolocation success + fallback), load via mocked
-  `useNearbyReports`, filter application, debounced pan-reload (fake timers), error propagation.
+- **Pure utils** — `reportCard.test.ts`, `reportIcon.test.ts`, `mapRegion.test.ts`: exhaustive
+  mapping/format tests (heading/subheader/src/tags/distance; icon+color incl. fallback;
+  center+bounds → radius).
+- **`useReportFinder.test.ts`** — region seeding (`getCurrentPosition` success + null fallback),
+  load via mocked `useNearbyReports`, filter application, debounced pan-reload (fake timers),
+  error propagation.
 - **Component** — `ReportDetail.test.ts` (renders all fields, close); `LandingPage.test.ts` (light):
   add a `@pinboard/ui` stub to `__test__/setup.ts` so we assert `<Pinboard>` receives the mapped
   `locations` + filter options and the slots wire up, **without** booting maplibre.
@@ -158,11 +170,12 @@ existing `@pinboard/ui` dep (re-exported map-core).
    (`/private/key/nearby-issues?lat=39.95&lng=-75.16`, key from `.env.test`, anonymous-ok) during
    planning and key the matching/normalization off real values. Fallback: case-insensitive /
    normalized matching with a neutral icon+color default (already the design).
-2. **Exact `MapCardProps` fields.** Confirm the `@phila/phila-ui-cards` `MapCardProps` shape
-   (title/subtitle/image/tags/detail) and where the distance label belongs; mirror oem's usage.
-3. **Reload-on-pan via the slot's map instance.** Confirm the `map-content` slot's `map` exposes
-   `getCenter()`/`getBounds()` + `on('moveend')` (maplibre) and that listeners are cleaned up on
-   unmount. oem does not reload-on-pan, so this integration is new.
+2. **`MapCardProps` fields (resolved).** The real fields are `heading`, `subheader`, `src`,
+   `body`, and `tags: TagsProps[]` (not title/subtitle/image). `reportToLocation` maps to these;
+   the distance label lives in `subheader` or as a tag. Mirror oem's `useLocations` usage.
+3. **Reload-on-pan via the slot's map instance.** The `map-content` slot types `map` as
+   `unknown`; cast to the maplibre `Map` to call `getCenter()`/`getBounds()`/`on('moveend')`, and
+   remove the listener on unmount. oem does not reload-on-pan, so this integration is new.
 4. **`@pinboard/ui` test stub.** Stubbing `Pinboard` in `setup.ts` must not break the foundation
    tests already relying on that file; add narrowly.
 5. **Icon system.** `serviceTypeMeta` carries Material-Symbol names (native parity) but the web
