@@ -9,14 +9,21 @@ import { MapCard } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 
 // type imports
-import type { BasicLocation, LocationFilterOption, SortLocationsOptions, UserLocationState } from '../types'
+import type {
+  BasicLocation,
+  LocationFilterOption,
+  SortLocationsOptions,
+  UserLocationState,
+} from '../types'
 
 // props
 const props = defineProps<{
   locations: BasicLocation[]
   isMobile: boolean
+  isLoading: false | string
   hoveredId: string | undefined
   selectedId: string | undefined
+  waitForUserLocation: boolean
   userLocationState: UserLocationState
   locationSearch: string | undefined
   locationFilter: LocationFilterOption[] | undefined
@@ -97,26 +104,40 @@ defineExpose({ scrollToCard })
     @search-string="handleSearchChange"
     @search="emit('search')"
   />
-  <div ref="listRef" class="location-list content">
-    <MapCard
-      v-for="location in locations"
-      :key="location.id"
-      :data-location-id="location.id"
-      v-bind="location.locationCardInfo"
-      :class="[
-        'location-card',
-        {
-          'location-card--hovered': hoveredId === location.id,
-          'location-card--selected': selectedId === location.id,
-        },
-      ]"
-      tabindex="0"
-      @click="emit('select', location)"
-      @mouseenter="emit('hover', location.id)"
-      @mouseleave="emit('hover-end')"
-      @keydown.enter="pendingKeydown = true"
-      @keyup.enter="handleCardKeyup(location)"
-    />
+  <div ref="listRef">
+    <div
+      v-if="isLoading || (waitForUserLocation && userLocationState === 'acquiring')"
+      class="location-list content"
+    >
+      <MapCard
+        v-for="n in 5"
+        :key="n"
+        :is-loading="true"
+        :style="{ display: isMobile ? 'none' : 'block' }"
+      />
+    </div>
+
+    <div v-else class="location-list content">
+      <MapCard
+        v-for="location in locations"
+        :key="location.id"
+        :data-location-id="location.id"
+        v-bind="location.locationCardInfo"
+        :class="[
+          'location-card',
+          {
+            'location-card--hovered': hoveredId === location.id,
+            'location-card--selected': selectedId === location.id,
+          },
+        ]"
+        tabindex="0"
+        @click="emit('select', location)"
+        @mouseenter="emit('hover', location.id)"
+        @mouseleave="emit('hover-end')"
+        @keydown.enter="pendingKeydown = true"
+        @keyup.enter="handleCardKeyup(location)"
+      />
+    </div>
   </div>
 </template>
 

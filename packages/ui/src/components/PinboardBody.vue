@@ -8,7 +8,6 @@ import { faMap } from '@fortawesome/pro-solid-svg-icons'
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
-import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 
 // import pinboard config
@@ -59,6 +58,7 @@ const props = withDefaults(
     errorMessage: string | null
     searchOrUserLocation: LatLon
     isLoading: string | false
+    waitForUserLocation?: boolean
     userLocationState?: UserLocationState
     locationPanelFilter?: LocationFilterOption[]
     locationPanelSearch?: string
@@ -67,6 +67,7 @@ const props = withDefaults(
     geojson?: unknown
   }>(),
   {
+    waitForUserLocation: false,
     userLocationState: 'unknown',
     locationPanelFilter: undefined,
     locationPanelSearch: undefined,
@@ -255,26 +256,19 @@ const effectiveMapConfig = (() => {
         {{ errorMessage }}
       </div>
 
-      <div v-else-if="isLoading || props.userLocationState === 'acquiring'">
-        <MapCard
-          v-for="n in 5"
-          :key="n"
-          :is-loading="true"
-          :style="{ display: isMobile ? 'none' : 'block' }"
-        />
-      </div>
-
-      <Teleport v-else to="#locations-panel-mobile" :disabled="!isMobile">
+      <Teleport v-else-if="!isLoading" to="#locations-panel-mobile" :disabled="!isMobile">
         <LocationsPanel
           ref="locationsPanelRef"
           :locations="locations"
           :location-filter="locationPanelFilter"
           :location-search="locationPanelSearch"
           :location-sort="locationPanelSort"
-          :user-location-state="props.userLocationState"
+          :user-location-state="userLocationState"
+          :wait-for-user-location="waitForUserLocation"
           :hovered-id="hoveredLocationId"
           :selected-id="selectedLocationId"
           :is-mobile="isMobile"
+          :is-loading="isLoading"
           @select="handleSelect"
           @hover="handleHover"
           @hover-end="handleHoverEnd"
@@ -499,6 +493,5 @@ const effectiveMapConfig = (() => {
     right: 0;
     z-index: 2;
   }
-
 }
 </style>

@@ -176,6 +176,7 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
     :location-panel-filter="filterOptions"
     :location-panel-sort="sortLocationsOptions"
     :location-search-mode="locationSearchMode"
+    :wait-for-user-location="false"
     :user-location-state="userLocationState"
     :is-mobile="isMobile"
     @search="handleSearchSubmit"
