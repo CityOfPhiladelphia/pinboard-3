@@ -75,6 +75,18 @@ defineSlots<{
   column-gap: var(--spacing-s);
 }
 
+.phila-navbar .phila-mobile-nav .nav-flyout {
+  flex: 0 0 25rem;
+  max-width: 25rem;
+  height: calc(100dvh - var(--nav-bottom));
+}
+
+.phila-navbar .phila-mobile-nav .nav-flyout .p-4 {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--spacing-m);
+}
+
 @media (max-width: 1064px) {
   .pinboard > :deep(footer) {
     display: none;

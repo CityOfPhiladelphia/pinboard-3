@@ -16,8 +16,7 @@ function isVisible(feature: RawFeature): boolean {
   if (props.data_complete !== '2') return false
 
   // Exclude test records
-  if (['3', '5', '6', '7', '8', '9'].includes(props.record as string))
-    return false
+  if (['3', '5', '6', '7', '8', '9'].includes(props.record as string)) return false
 
   // Exclude test addresses
   if (props.address === 'Test') return false
@@ -27,12 +26,12 @@ function isVisible(feature: RawFeature): boolean {
 
 export function useLocations(): {
   locations: Ref<PrimaryCareLocation[]>
-  isLoading: Ref<boolean>
+  isLoading: Ref<string | false>
   errorMessage: Ref<string | null>
   geojson: Ref<unknown>
 } {
   const locations = ref<PrimaryCareLocation[]>([])
-  const isLoading = ref(true)
+  const isLoading = ref<string | false>('Loading data...')
   const errorMessage = ref<string | null>(null)
   const geojson = ref<unknown>(null)
 
@@ -58,17 +57,13 @@ export function useLocations(): {
         (feature: RawFeature) =>
           ({
             id: String(feature.properties.objectid),
-            name: String(
-              feature.properties.record ?? feature.properties.address ?? ''
-            ),
+            name: String(feature.properties.record ?? feature.properties.address ?? ''),
             latitude: feature.geometry.coordinates[1],
             longitude: feature.geometry.coordinates[0],
             properties: feature.properties as PrimaryCareProperties,
             geometry: feature.geometry,
             locationCardInfo: {
-              heading: String(
-                feature.properties.record ?? feature.properties.address ?? ''
-              ),
+              heading: String(feature.properties.record ?? feature.properties.address ?? ''),
               body: String(feature.properties.address ?? ''),
             },
           }) satisfies PrimaryCareLocation

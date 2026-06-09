@@ -19,5 +19,8 @@
       "attr_quotes": "single"
     }
   },
-  "editor.formatOnPaste": true
+  "editor.formatOnPaste": true,
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

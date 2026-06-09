@@ -9,7 +9,7 @@ const { userLocation, userLocationPermission } = PinboardComposables.useUserLoca
 export function useLocations(): {
   oemLocations: Ref<OemLocation[]>
   userLocation: Ref<PinboardTypes.LatLon>
-  isLoading: ComputedRef<boolean>
+  isLoading: ComputedRef<string | false>
   errorMessage: Ref<string | null>
 } {
   const oemLocations = ref<OemLocation[]>([])
@@ -17,13 +17,16 @@ export function useLocations(): {
   const hasData = ref<boolean>(false)
 
   const isLoading = computed(() => {
-    // if has has location services active, isLoading will remain true while resolving user location
-    return !(
-      hasData.value &&
-      (true || // remove to re-enable loading waiting for user location
-        userLocationPermission.value === 'denied' ||
-        PinboardUtilities.hasLocationData(userLocation))
-    )
+    if (!hasData.value) {
+      return 'Loading data...'
+    }
+    if (
+      userLocationPermission.value !== 'denied' &&
+      !PinboardUtilities.hasLocationData(userLocation)
+    ) {
+      return 'Getting location...'
+    }
+    return false
   })
 
   onBeforeMount(async () => {

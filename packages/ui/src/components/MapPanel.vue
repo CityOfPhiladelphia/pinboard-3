@@ -1,13 +1,8 @@
 <script setup lang="ts">
-import {
-  ref,
-  computed,
-  defineComponent,
-  type ComponentPublicInstance,
-} from 'vue'
+import { ref, computed, defineComponent } from 'vue'
 import { Map as PhilaMap } from '@phila/phila-ui-map-core'
 import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css' // shouldn't the style be bundled with the component?
-import type { MapConfig, BasicLocation } from '../types'
+import type { MapConfig, BasicLocation, LatLon } from '../types'
 
 const props = defineProps<{
   config?: MapConfig
@@ -15,7 +10,7 @@ const props = defineProps<{
   geojson?: unknown
   hoveredId?: string | null
   selectedId?: string | null
-  isLoading?: boolean
+  isLoading?: string | false
   isMobile?: boolean
   onHover?: (id: string) => void
   onHoverEnd?: () => void
@@ -38,14 +33,13 @@ const props = defineProps<{
   }) => unknown
 }>()
 
-const mapRef = ref<ComponentPublicInstance | null>(null)
+const mapRef = ref<typeof PhilaMap | null>(null)
 const zoom = ref(props.config?.zoom ?? 14)
 
-function panTo(lngLat: [number, number]) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapInstance = (mapRef.value as any)?.map
+function panTo(coordinates: LatLon) {
+  const mapInstance = mapRef.value?.map
   if (mapInstance) {
-    mapInstance.setCenter(lngLat)
+    mapInstance.setCenter([coordinates.longitude, coordinates.latitude])
     mapInstance.setZoom(14)
   }
 }
@@ -73,9 +67,7 @@ const SlotRenderer = defineComponent({
     renderProps: { type: Object, required: true },
   },
   render() {
-    return (this.renderFn as (props: Record<string, unknown>) => unknown)(
-      this.renderProps
-    )
+    return (this.renderFn as (props: Record<string, unknown>) => unknown)(this.renderProps)
   },
 })
 </script>
@@ -83,16 +75,12 @@ const SlotRenderer = defineComponent({
 <template>
   <div class="map-panel">
     <PhilaMap ref="mapRef" v-bind="config" @zoom="zoom = $event">
-      <SlotRenderer
-        v-if="mapContentSlot"
-        :render-fn="mapContentSlot"
-        :render-props="slotProps"
-      />
+      <SlotRenderer v-if="mapContentSlot" :render-fn="mapContentSlot" :render-props="slotProps" />
     </PhilaMap>
 
     <div v-if="isLoading" class="map-loading-overlay">
       <div class="map-loading-spinner" />
-      <span class="map-loading-text">Loading data...</span>
+      <span class="map-loading-text" v-text="isLoading"></span>
     </div>
   </div>
 </template>

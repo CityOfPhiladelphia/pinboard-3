@@ -21,8 +21,7 @@ watch(
 )
 
 function focusItem(index: number) {
-  const items =
-    listRef.value?.querySelectorAll<HTMLElement>('.search-suggestion')
+  const items = listRef.value?.querySelectorAll<HTMLElement>('.search-suggestion')
   items?.[index]?.focus()
 }
 
@@ -73,12 +72,7 @@ defineExpose({ focusFirst })
 
 <template>
   <div v-if="suggestions.length" class="search-suggestions-anchor">
-    <ul
-      ref="listRef"
-      class="search-suggestions"
-      role="listbox"
-      @keydown="handleKeydown"
-    >
+    <ul ref="listRef" class="search-suggestions" role="listbox" @keydown="handleKeydown">
       <li
         v-for="(suggestion, index) in suggestions"
         :key="suggestion"
