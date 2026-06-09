@@ -87,7 +87,7 @@ defineSlots<{
   row-gap: var(--spacing-m);
 }
 
-@media (max-width: 1064px) {
+@media (max-width: 768px) {
   .pinboard > :deep(footer) {
     display: none;
   }

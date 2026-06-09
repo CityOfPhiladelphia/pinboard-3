@@ -515,7 +515,7 @@ const effectiveMapConfig = (() => {
 }
 
 /* Keep in sync with mobileMaxWidth in useIsMobile.ts */
-@media (max-width: 1064px) {
+@media (max-width: 768px) {
   .finder-panel {
     position: relative;
     display: block;
