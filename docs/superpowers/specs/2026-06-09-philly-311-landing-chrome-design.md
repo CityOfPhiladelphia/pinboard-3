@@ -85,40 +85,35 @@ Pinboard's built-in panel search + the `locations-header` slot — no `@pinboard
 Stock `Pinboard` owns the panel search box: bind `:location-panel-search="<placeholder>"` and
 handle `@search`. A resolved location must (a) recenter the map and (b) reload nearby reports.
 
-- **`composables/useAddressSearch.ts`** — wraps Pinboard's `useSearchAddress` / `useSearchZipcode`,
-  which are **reactive** (each takes a `Ref<string>` and runs a `watchEffect`; the result lives in
-  `addressCoordinates` (a `LatLon` whose lat/lng are `NaN` until resolved) + a `finishedAddressFetch`
-  flag — there is no nullable return). The composable owns two internal refs (address, zipcode),
-  constructs `useSearchAddress(addressRef)` / `useSearchZipcode(zipRef)` once, and exposes:
-  - `submit(query: string)` — classifies the query (address vs zipcode, mirroring oem's
-    `handleSearchSubmit`) and **sets the matching ref** (clearing the other), which reactively
-    triggers the underlying composable. (Imperative on the surface, reactive underneath.)
-  - `resolvedLocation: Ref<LatLon | null>` — derived (a `watch`/`computed`) that becomes non-null
-    only when `finishedAddressFetch`/`finishedZipFetch` flips `true` AND
-    `PinboardUtilities.hasLocationData(...)` is true for the coordinates (zip uses the polygon
-    centroid); a finished fetch with `NaN` coordinates leaves it `null`.
+**Resolver: the ported `useAis`, not Pinboard's search composables.** Pinboard's
+`useSearchAddress` fetches `import.meta.env.VITE_AIS_URL` and appends the query with **no
+gatekeeper key** — it expects an app-specific AIS *proxy* (oem's was its own `0spy4bb9w1` proxy)
+that philly-311 does not have. The ported `@/composables/useAis` already resolves addresses
+correctly against philly's AIS using `VITE_AIS_BASE_URL` + the gatekeeper key (already in
+`.env.*`), via a simple, already-tested async function:
+`searchAddress(query): Promise<AisFeature | null>` where `AisFeature = { streetAddress, zipCode?,
+lat, lng }`. AIS `/search/{query}` resolves addresses, intersections, and zips uniformly, so **no
+classification regexes and no `useSearchAddress`/`useSearchZipcode` are needed**.
 
-  One job: turn a search string into coordinates. Unit-tested with the Pinboard search composables
-  mocked (drive the mocked coords + finished flags, assert `resolvedLocation`).
 - **`useReportFinder` (additive change)** — gains `setCenter(loc: LatLon)`: sets
   `searchOrUserLocation` and reloads nearby reports for that center (reusing the existing load
   path). The 2a geolocation `init()` and `setFilter`/`reportById`/filter logic are unchanged; the
-  composable still owns `searchOrUserLocation`. This is additive — 2a tests are extended, not
-  rewritten.
-- **`pages/LandingPage.vue`** — binds `:location-panel-search` + `@search="addressSearch.submit"`;
-  watches `addressSearch.resolvedLocation` → on a non-null value, calls `finder.setCenter(loc)`.
-  Adds the `#locations-header` slot rendering `ReportCallout` + `TrendingArticles` (and calls
-  `useTrendingArticles().init()` on mount).
+  composable still owns `searchOrUserLocation`. Additive — 2a tests are extended, not rewritten.
+- **`pages/LandingPage.vue`** — binds `:location-panel-search="<placeholder>"` + `@search="onSearch"`,
+  where `onSearch(query)` calls `searchAddress(query)` (from `@/composables/useAis`) and, on a
+  non-null `AisFeature`, calls `finder.setCenter({ latitude: feature.lat, longitude: feature.lng })`
+  (null → no-op, map holds). Also adds the `#locations-header` slot rendering `ReportCallout` +
+  `TrendingArticles` and calls `useTrendingArticles().init()` on mount. The search wiring is small
+  enough to live in the view (3 lines) and is covered by the LandingPage test (mock `searchAddress`).
 
 > Ownership note: the finder remains the single source of the map center (`searchOrUserLocation`).
-> We use `useSearchAddress`/`useSearchZipcode` only to resolve coordinates; we do NOT use
-> `userUserAndSearchLocations` (which would create a competing center source).
+> `useAis.searchAddress` only resolves coordinates; we do NOT use `userUserAndSearchLocations`.
 
 ## Data flow
 
 ```
 geolocation (2a init)  ─┐
-search query → useAddressSearch.submit → AIS → resolvedLocation ─┘→ finder.setCenter(loc)
+search query → useAis.searchAddress(query) → AisFeature(lat,lng) ─┘→ finder.setCenter(loc)
   → searchOrUserLocation (recenter map) + useNearbyReports.load(region) (reload list + pins)
 
 knowledge-articles top-N → useTrendingArticles → TrendingArticles cards → /answers/:id
@@ -137,22 +132,22 @@ knowledge-articles top-N → useTrendingArticles → TrendingArticles cards → 
 - **`TrendingArticles.test.ts`** — renders a card per article with a `/answers/:id` link; renders
   nothing when the list is empty.
 - **`ReportCallout.test.ts`** — renders heading/CTA; the CTA links to `/report`.
-- **`useAddressSearch.test.ts`** — address vs zipcode classification routes to the right Pinboard
-  composable (mocked); `resolvedLocation` updates when the mock resolves; unresolved stays null.
 - **`useReportFinder.test.ts` (extended)** — `setCenter` updates `searchOrUserLocation` and reloads
   for the new center; existing 2a cases stay green.
 - **`LandingPage.test.ts` (extended)** — the `locations-header` slot renders ReportCallout +
-  TrendingArticles; `@search` is wired; a resolved search location triggers `finder.setCenter`.
-  (`@pinboard/ui` stubbed locally as in 2a.)
+  TrendingArticles; the `@search` handler calls `searchAddress` (mocked) and a resolved
+  `AisFeature` triggers `finder.setCenter`; a `null` result is a no-op. (`@pinboard/ui` and
+  `@/composables/useAis` stubbed locally; `searchAddress` is already unit-tested in `useAis.test.ts`.)
 - **Placeholder pages** — `ReportPage` / `AnswerDetailPage` render their stub text (+ id).
 - Router tests: `/report` and `/answers/:id` resolve to the placeholders.
 
 ## Risks / watch-items (resolve during planning)
 
-1. **Pinboard search composable shapes (resolved — see `useAddressSearch` above).** They are
-   reactive (`Ref<string>` + `watchEffect`); resolution is detected via `finishedAddressFetch`/
-   `finishedZipFetch` + `PinboardUtilities.hasLocationData` (coords are `NaN`, never `null`, until
-   resolved). The plan should still cross-check exact field names against oem's `FinderView.vue`.
+1. **Search resolver = `useAis.searchAddress`** (not Pinboard's `useSearchAddress`, which needs an
+   AIS proxy + `VITE_AIS_URL` philly-311 lacks). `searchAddress` is already wired to philly's AIS
+   (`VITE_AIS_BASE_URL` + gatekeeper, already in `.env.*`) and already unit-tested. Confirm during
+   planning that AIS `/search/{query}` resolves a bare zip and an intersection (it should — same
+   endpoint); if a zip needs special handling, add it, but the address path is the primary case.
 2. **Extending `useReportFinder` without regressing 2a.** `setCenter` reuses the existing load
    path; keep `init()`/filter/`reportById` behavior identical and update the test file additively.
 3. **Article `url` is a slug, not a link.** Cards route to `/answers/:id` (the id), not `url`. The
