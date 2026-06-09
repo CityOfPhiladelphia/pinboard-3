@@ -18,6 +18,8 @@ export interface ZipcodePolygon {
 
 export type LocationPermissionState = 'granted' | 'prompt' | 'denied'
 
+export type UserLocationState = 'unknown' | 'acquiring' | 'located' | 'watching'
+
 export type MapControlPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
 export interface MapConfig {
