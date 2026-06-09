@@ -264,6 +264,7 @@ const effectiveMapConfig = (() => {
 
       <Teleport v-else to="#locations-panel-mobile" :disabled="!isMobile">
         <LocationsPanel
+          ref="locationsPanelRef"
           :locations="locations"
           :location-filter="locationPanelFilter"
           :location-search="locationPanelSearch"
@@ -442,7 +443,8 @@ const effectiveMapConfig = (() => {
   height: auto;
 }
 
-@media (max-width: 768px) {
+/* Keep in sync with mobileMaxWidth in useIsMobile.ts */
+@media (max-width: 1064px) {
   .finder-panel {
     position: relative;
     display: block;
