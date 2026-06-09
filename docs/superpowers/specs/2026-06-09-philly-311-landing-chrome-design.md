@@ -59,13 +59,17 @@ Pinboard's built-in panel search + the `locations-header` slot — no `@pinboard
   `<router-link to="/report">` styled as a button (phila-ui button class, as the 2a placeholder
   used). One job: the report-callout header block.
 - **`pages/ReportPage.vue`** — minimal placeholder ("Report a problem — coming soon"); the report
-  wizard replaces it in Increment 3. **Route** `/report` added to `router/index.ts`.
+  wizard replaces it in Increment 3. **Route** `/report` added to `router/index.ts`. The existing
+  `wizardGuard` only intercepts `/report/*` sub-paths and explicitly carves out `/report` itself
+  (`if (to.path === '/report' || !to.path.startsWith('/report/')) return true`), so the placeholder
+  at `/report` renders without redirect — no guard change needed.
 
 ### Trending articles
 
 - **`composables/useTrendingArticles.ts`** — loads the top-N articles via the ported
-  `useKnowledgeArticles().loadArticles({ pageSize: N })` (N≈5). Exposes `articles`, `isLoading`,
-  `error`; an `init()` that fetches once. Failures resolve to an empty list (the strip hides).
+  `useKnowledgeArticles().loadArticles({ pageSize: N })` (N≈5). Note `loadArticles` returns
+  `{ items: Article[]; nextPageToken? }`, so `init()` unwraps `.items` into the exposed `articles`
+  ref (plus `isLoading`, `error`). Failures resolve to an empty list (the strip hides).
   Knowledge-articles loads **anonymously** (verified — API-key only), so the strip works signed-out.
 - **`components/TrendingArticles.vue`** — a horizontal strip of article cards; each card is a
   `<router-link :to="/answers/${article.id}">` showing the title. Renders nothing when the list is
@@ -81,11 +85,21 @@ Pinboard's built-in panel search + the `locations-header` slot — no `@pinboard
 Stock `Pinboard` owns the panel search box: bind `:location-panel-search="<placeholder>"` and
 handle `@search`. A resolved location must (a) recenter the map and (b) reload nearby reports.
 
-- **`composables/useAddressSearch.ts`** — wraps Pinboard's `useSearchAddress` / `useSearchZipcode`
-  + a classifier (address vs zipcode, mirroring oem's `handleSearchSubmit`). Exposes
-  `submit(query: string)` and a `resolvedLocation` ref (`LatLon | null`) that updates when AIS
-  resolves the query. One job: turn a search string into coordinates. Unit-tested with the Pinboard
-  search composables mocked.
+- **`composables/useAddressSearch.ts`** — wraps Pinboard's `useSearchAddress` / `useSearchZipcode`,
+  which are **reactive** (each takes a `Ref<string>` and runs a `watchEffect`; the result lives in
+  `addressCoordinates` (a `LatLon` whose lat/lng are `NaN` until resolved) + a `finishedAddressFetch`
+  flag — there is no nullable return). The composable owns two internal refs (address, zipcode),
+  constructs `useSearchAddress(addressRef)` / `useSearchZipcode(zipRef)` once, and exposes:
+  - `submit(query: string)` — classifies the query (address vs zipcode, mirroring oem's
+    `handleSearchSubmit`) and **sets the matching ref** (clearing the other), which reactively
+    triggers the underlying composable. (Imperative on the surface, reactive underneath.)
+  - `resolvedLocation: Ref<LatLon | null>` — derived (a `watch`/`computed`) that becomes non-null
+    only when `finishedAddressFetch`/`finishedZipFetch` flips `true` AND
+    `PinboardUtilities.hasLocationData(...)` is true for the coordinates (zip uses the polygon
+    centroid); a finished fetch with `NaN` coordinates leaves it `null`.
+
+  One job: turn a search string into coordinates. Unit-tested with the Pinboard search composables
+  mocked (drive the mocked coords + finished flags, assert `resolvedLocation`).
 - **`useReportFinder` (additive change)** — gains `setCenter(loc: LatLon)`: sets
   `searchOrUserLocation` and reloads nearby reports for that center (reusing the existing load
   path). The 2a geolocation `init()` and `setFilter`/`reportById`/filter logic are unchanged; the
@@ -135,9 +149,10 @@ knowledge-articles top-N → useTrendingArticles → TrendingArticles cards → 
 
 ## Risks / watch-items (resolve during planning)
 
-1. **Pinboard search composable shapes.** Confirm `useSearchAddress(ref)` / `useSearchZipcode(ref)`
-   return shapes + the "finished fetch" flags against oem's `FinderView.vue` + the composable
-   sources; `useAddressSearch` must mirror oem's classification + resolution exactly.
+1. **Pinboard search composable shapes (resolved — see `useAddressSearch` above).** They are
+   reactive (`Ref<string>` + `watchEffect`); resolution is detected via `finishedAddressFetch`/
+   `finishedZipFetch` + `PinboardUtilities.hasLocationData` (coords are `NaN`, never `null`, until
+   resolved). The plan should still cross-check exact field names against oem's `FinderView.vue`.
 2. **Extending `useReportFinder` without regressing 2a.** `setCenter` reuses the existing load
    path; keep `init()`/filter/`reportById` behavior identical and update the test file additively.
 3. **Article `url` is a slug, not a link.** Cards route to `/answers/:id` (the id), not `url`. The
