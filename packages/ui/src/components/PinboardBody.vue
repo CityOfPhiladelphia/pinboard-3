@@ -27,6 +27,7 @@ import type {
   LocationFilterOption,
   SearchMode,
   SortLocationsOptions,
+  UserLocationState,
 } from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
@@ -54,11 +55,11 @@ defineSlots<{
 const props = withDefaults(
   defineProps<{
     locations: BasicLocation[]
+    isMobile: boolean
+    errorMessage: string | null
     searchOrUserLocation: LatLon
     isLoading: string | false
-    errorMessage: string | null
-    isMobile: boolean
-    locationPanelLocationAvailable: boolean
+    userLocationState?: UserLocationState
     locationPanelFilter?: LocationFilterOption[]
     locationPanelSearch?: string
     locationPanelSort?: SortLocationsOptions
@@ -66,6 +67,7 @@ const props = withDefaults(
     geojson?: unknown
   }>(),
   {
+    userLocationState: 'unknown',
     locationPanelFilter: undefined,
     locationPanelSearch: undefined,
     locationPanelSort: undefined,
@@ -253,7 +255,7 @@ const effectiveMapConfig = (() => {
         {{ errorMessage }}
       </div>
 
-      <div v-else-if="isLoading">
+      <div v-else-if="isLoading || props.userLocationState === 'acquiring'">
         <MapCard
           v-for="n in 5"
           :key="n"
@@ -269,7 +271,7 @@ const effectiveMapConfig = (() => {
           :location-filter="locationPanelFilter"
           :location-search="locationPanelSearch"
           :location-sort="locationPanelSort"
-          :location-available="locationPanelLocationAvailable"
+          :user-location-state="props.userLocationState"
           :hovered-id="hoveredLocationId"
           :selected-id="selectedLocationId"
           :is-mobile="isMobile"

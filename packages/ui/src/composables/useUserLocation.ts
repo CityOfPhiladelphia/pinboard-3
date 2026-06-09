@@ -1,13 +1,20 @@
 import { ref, watch } from 'vue'
-import { type Latitude, type LatLon, type LocationPermissionState, type Longitude } from '../types'
+import type {
+  Latitude,
+  LatLon,
+  LocationPermissionState,
+  Longitude,
+  UserLocationState,
+} from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
 export function useUserLocation() {
-  const userLocationPermission = ref<LocationPermissionState | null>(null)
   const userLocation = ref<LatLon>({
     latitude: NaN,
     longitude: NaN,
   })
+  const userLocationPermissionState = ref<LocationPermissionState | null>(null)
+  const userLocationState = ref<UserLocationState>('unknown')
   const gotInitialLocation = ref<boolean>(false)
   const watchId = ref<number | null>(null)
   const geolocationOptions = { timeout: Infinity, maximumAge: 0, enableHighAccuracy: false }
@@ -19,10 +26,11 @@ export function useUserLocation() {
         locationError,
         geolocationOptions
       )
+      userLocationState.value = 'watching'
     }
   })
 
-  watch(userLocationPermission, (newPermissionState, oldPermissionState) => {
+  watch(userLocationPermissionState, (newPermissionState, oldPermissionState) => {
     if (oldPermissionState) {
       switch (newPermissionState) {
         case 'granted':
@@ -36,14 +44,14 @@ export function useUserLocation() {
           }
           clearUserLocation()
           if (oldPermissionState === 'granted') {
-            userLocationPermission.value = 'prompt'
+            userLocationPermissionState.value = 'prompt'
           }
           break
         }
       }
     }
   })
-  // set userLocationPermission to navigator.permissions.state, watcher calls getUserLocation() if not 'denied'
+
   getUserLocation()
   getGeolocatePermissionState()
 
@@ -55,7 +63,7 @@ export function useUserLocation() {
       switch (useLocationPermission.state) {
         case 'granted':
         case 'denied': {
-          userLocationPermission.value = useLocationPermission.state
+          userLocationPermissionState.value = useLocationPermission.state
           break
         }
         case 'prompt': {
@@ -64,21 +72,21 @@ export function useUserLocation() {
         }
       }
 
-      // set userLocationPermission to change whenever navigator.permissions.state changes
+      // set userLocationPermissionState to change whenever navigator.permissions.state changes
       // Safari has a known bug that keeps this from working (https://bugs.webkit.org/show_bug.cgi?id=259432)
       useLocationPermission.onchange = () => {
         switch (useLocationPermission.state) {
           case 'granted': {
-            userLocationPermission.value = 'granted'
+            userLocationPermissionState.value = 'granted'
             break
           }
           case 'denied': {
-            userLocationPermission.value = 'denied'
+            userLocationPermissionState.value = 'denied'
             break
           }
           case 'prompt': {
             if (gotInitialLocation.value) {
-              userLocationPermission.value = 'denied'
+              userLocationPermissionState.value = 'denied'
             } else {
               getUserLocation()
             }
@@ -88,11 +96,12 @@ export function useUserLocation() {
       }
     } catch (error) {
       console.error(error)
-      userLocationPermission.value = 'denied'
+      userLocationPermissionState.value = 'denied'
     }
   }
 
   function getUserLocation() {
+    userLocationState.value = 'acquiring'
     navigator.geolocation.getCurrentPosition(locationSuccess, locationError, geolocationOptions)
   }
 
@@ -114,11 +123,13 @@ export function useUserLocation() {
     }
 
     // if navigator.permissions is 'prompt' or 'granted' resolve both to 'granted' if user allows location services
-    userLocationPermission.value = 'granted'
+    userLocationPermissionState.value = 'granted'
+    userLocationState.value = 'located'
   }
 
   function locationError(error: GeolocationPositionError) {
-    userLocationPermission.value = 'denied'
+    userLocationPermissionState.value = 'denied'
+    userLocationState.value = 'unknown'
     console.error(error)
   }
 
@@ -127,9 +138,10 @@ export function useUserLocation() {
     gotInitialLocation.value = false
     userLocation.value.latitude = NaN
     userLocation.value.longitude = NaN
+    userLocationState.value = 'unknown'
   }
 
-  return { userLocation, userLocationPermission }
+  return { userLocation, userLocationPermissionState, userLocationState }
 }
 
 // verify location is in or near enough to Philadelphia

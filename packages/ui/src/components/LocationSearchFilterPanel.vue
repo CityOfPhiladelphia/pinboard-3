@@ -30,14 +30,14 @@ import SearchSuggestions from './SearchSuggestions.vue'
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 
 // type imports
-import type { LocationFilterOption, SortLocationsOptions } from '../types'
+import type { LocationFilterOption, SortLocationsOptions, UserLocationState } from '../types'
 
 // props
 const props = defineProps<{
   searchPlaceholder: string | undefined
   filterOptions: LocationFilterOption[] | undefined
   sortOptions: SortLocationsOptions | undefined
-  locationAvailable: boolean | undefined
+  userLocationState: UserLocationState
   isMobile: boolean
 }>()
 
@@ -158,7 +158,7 @@ function focusSearchInput() {
         <SortPanel
           :sort-options="sortChoices"
           :applied-sort="appliedSort"
-          :location-available="locationAvailable ?? false"
+          :user-location-state="props.userLocationState"
           :is-mobile="isMobile"
           @update:applied-sort="handleSortChange"
         />

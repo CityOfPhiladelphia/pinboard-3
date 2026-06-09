@@ -35,7 +35,6 @@ import {
 import LocationDetail from '@/components/LocationDetail.vue'
 import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation, SortMode } from '@/types'
-import type { BasicLocation } from '../../../../../packages/ui/src/types'
 
 // app variables
 const searchPlaceholderText = 'Search by address, zipcode, or keyword...'
@@ -60,9 +59,10 @@ const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
 const locationFilterMode = ref<Filters>('all')
 const visitedIds = ref(new Set<string>())
 const visibleFloodLayers = ref<FloodLayerId[]>([])
-const { oemLocations, userLocation, isLoading, errorMessage } = useLocations()
+const { oemLocations, isLoading, errorMessage } = useLocations()
+const { userLocation, userLocationState } = PinboardComposables.useUserLocation()
 const locationSortMode = ref<SortMode>(
-  PinboardUtilities.hasLocationData(userLocation) ? 'DistAsc' : '',
+  ['located', 'watching'].includes(userLocationState.value) ? 'DistAsc' : '',
 )
 const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
   userLocation,
@@ -75,10 +75,6 @@ const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
 const isMobile = PinboardComposables.useIsMobile()
 
 // computed refs
-const hasCurrentLocation = computed(() =>
-  PinboardUtilities.hasLocationData(searchOrUserLocation.value),
-)
-
 const currentLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
@@ -165,7 +161,7 @@ function handleDeselect(id: string) {
   visitedIds.value.add(id)
 }
 
-function asOemLocation(location: BasicLocation) {
+function asOemLocation(location: PinboardTypes.BasicLocation) {
   return location as OemLocation
 }
 </script>
@@ -180,7 +176,7 @@ function asOemLocation(location: BasicLocation) {
     :location-panel-filter="filterOptions"
     :location-panel-sort="sortLocationsOptions"
     :location-search-mode="locationSearchMode"
-    :location-panel-location-available="hasCurrentLocation"
+    :user-location-state="userLocationState"
     :is-mobile="isMobile"
     @search="handleSearchSubmit"
     @selected-locations-filter="handleLocationFilterChange"

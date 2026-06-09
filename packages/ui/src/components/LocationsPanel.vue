@@ -9,7 +9,7 @@ import { MapCard } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 
 // type imports
-import type { BasicLocation, LocationFilterOption, SortLocationsOptions } from '../types'
+import type { BasicLocation, LocationFilterOption, SortLocationsOptions, UserLocationState } from '../types'
 
 // props
 const props = defineProps<{
@@ -17,7 +17,7 @@ const props = defineProps<{
   isMobile: boolean
   hoveredId: string | undefined
   selectedId: string | undefined
-  locationAvailable: boolean
+  userLocationState: UserLocationState
   locationSearch: string | undefined
   locationFilter: LocationFilterOption[] | undefined
   locationSort: SortLocationsOptions | undefined
@@ -90,7 +90,7 @@ defineExpose({ scrollToCard })
     :search-placeholder="locationSearch"
     :filter-options="locationFilter"
     :sort-options="locationSort"
-    :location-available="locationAvailable"
+    :user-location-state="props.userLocationState"
     :is-mobile="isMobile"
     @selected-filter="handleFilterChange"
     @sort-option="handleSortChange"
