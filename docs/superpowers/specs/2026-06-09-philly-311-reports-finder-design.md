@@ -25,7 +25,11 @@ wizard or any new API. The other landing pieces are later slices.
 
 ### Slice roadmap (context, not scope)
 
-- **2a — Core reports finder** ← this spec
+- **2a — Core reports finder (geolocate + load-once)** ← this spec
+- 2a.1 — Reload-on-pan: reload nearby reports as the map moves. **Requires a small,
+  deliberate `@pinboard/ui` enhancement** — the shared `MapPanel` currently hands `map: null`
+  to the `map-content` slot, so the maplibre instance must be exposed there (via a ready
+  event/ref) before an app can read `getCenter()`/`getBounds()`. Benefits oem/pc too.
 - 2b — Left-panel header: "Report an Issue" CTA (targets the wizard, Increment 3) + trending articles
 - 2c — AIS header search; Figma-faithful chip-over-map placement + "All Filters" panel
 - 2d — Alert / inspector bottom sheet (pending a data-source decision; 311 has no Everbridge equivalent yet)
@@ -37,7 +41,7 @@ wizard or any new API. The other landing pieces are later slices.
 | Slice scope | Core finder only (map + list + filter chips + inline detail) |
 | Filter UX | Pinboard's built-in `location-panel-filter` — single-select chips in the left panel (not the Figma's chip-over-map placement, which is a later polish slice) |
 | Filter source | The 10 `common_categories` (each a common service type), filtering by `serviceType` |
-| Nearby region | Geolocate (fallback to a default Philly center) + **reload nearby reports on map pan** |
+| Nearby region | Geolocate (fallback to a default Philly center) + **load once** for that region. Reload-on-pan is deferred to slice 2a.1 (needs the `@pinboard/ui` map-exposure enhancement). |
 | Report detail | Inline summary in the `location-detail` slot; the full `/reports/:id` page stays deferred |
 | Report CTA / header / search / alerts | Deferred to later slices |
 
@@ -46,7 +50,8 @@ wizard or any new API. The other landing pieces are later slices.
 - `/` renders a working `Pinboard` finder: nearby 311 reports as map pins **and** a
   left-panel list of report cards, sourced from the ported `useNearbyReports`.
 - Single-select service-type filter chips (the 10 `common_categories`) in the panel.
-- Region seeded from geolocation (default Philly center fallback) and reloaded as the map pans.
+- Region seeded from geolocation (default Philly center fallback); nearby reports loaded once
+  for that region (reload-on-pan is slice 2a.1).
 - Marker / card click opens an inline `ReportDetail` in the `location-detail` slot.
 - Finder logic lives in a unit-tested composable + pure mapping utils; the view is thin.
 - Tests green; no regression to other apps; `@pinboard/ui` source not modified.
@@ -70,13 +75,13 @@ lives in `useReportFinder`; the view only binds props/slots. This mirrors
 
 ### Files (one responsibility each)
 
-- **`composables/useReportFinder.ts`** — finder state. Owns `region` (seeded by calling the
-  ported `getCurrentPosition(): Promise<{lat,lng}|null>` from `composables/useGeolocation`,
-  falling back to a default Philly center), the selected category filter, and the derived
-  outputs the view binds: `locations: BasicLocation[]`, `searchOrUserLocation: LatLon`,
-  `isLoading`, `errorMessage`. Loads via `useNearbyReports.load(region)`. Exposes handlers for
-  filter change and for a **debounced region reload** (called on map `moveend`). Unit-tested
-  with `useNearbyReports` / `getCurrentPosition` mocked.
+- **`composables/useReportFinder.ts`** — finder state. On `init()`, seeds the region by calling
+  the ported `getCurrentPosition(): Promise<{lat,lng}|null>` from `composables/useGeolocation`
+  (fallback to a default Philly center) and loads once via `useNearbyReports.load(region)`. Owns
+  the selected category filter and exposes the derived outputs the view binds:
+  `locations: BasicLocation[]`, `searchOrUserLocation: LatLon`, `isLoading`, `errorMessage`,
+  `setFilter`, and `reportById(id)`. Unit-tested with `useNearbyReports` / `getCurrentPosition`
+  mocked. (The debounced reload-on-pan handler is slice 2a.1.)
 - **`utils/reportCard.ts`** — pure `reportToLocation(report: Report): BasicLocation`. Builds
   `{ id, name, latitude, longitude, locationCardInfo }` where `locationCardInfo: MapCardProps`
   uses the real `MapCardProps` fields: `heading` (service type), `subheader` (address — the
@@ -88,22 +93,19 @@ lives in `useReportFinder`; the view only binds props/slots. This mirrors
   `common_categories.iconName` *string* via a small static import map (the `iconName` values
   like `"road"`/`"dumpster"` are FA name strings, not icon objects, so `MapIconTextPin` needs
   the resolved `IconDefinition`). Neutral fallback for unmapped types. Unit-tested.
-- **`utils/mapRegion.ts`** — pure helper to derive `{ lat, lng, radius }` from a maplibre
-  center + bounds (great-circle distance from center to a bounds corner → radius in meters).
-  This math does **not** exist in the ported utils (`bounds.ts` is only `isInPhilly`,
-  `distance.ts` is only `formatDistance`), so it is new. Unit-tested.
 - **`components/ReportDetail.vue`** — the `location-detail` slot body: photo, status, service
   type, address, timestamp, description, close button. Mirrors oem's `LocationDetail.vue`.
 - **`pages/LandingPage.vue`** — thin view. Binds `useReportFinder` to `<Pinboard>`; the
-  `#map-content` slot renders a `MapMarker` + `MapIconTextPin` per report (icon/color from
-  `reportIcon`) plus `MapNavigationControl` / `GeolocationButton` / `BasemapToggle`, and attaches
-  `map.on('moveend', …)` to drive the debounced region reload; the `#location-detail` slot renders
-  `ReportDetail`. Filter options come from `common_categories`.
+  `#map-content` slot renders a `MapMarker` + `MapIconTextPin` per report (icon from
+  `reportIcon`) plus `MapNavigationControl` / `GeolocationButton` / `BasemapToggle`; the
+  `#location-detail` slot looks up the full report via `reportById(location.id)` and renders
+  `ReportDetail`. Filter options come from `common_categories`. (No map-instance access / pan
+  listener — that's slice 2a.1.)
 
 ### Data flow
 
 ```
-geolocation / map center+bounds → region
+geolocation (or default Philly center) → region (loaded once)
   → useNearbyReports.load(region) → reports: Report[]
   → filter by selected service type (or all)
   → reports.map(reportToLocation) → BasicLocation[]
@@ -123,16 +125,15 @@ Figma's short chip labels ("Pothole") are design hand-waving and are not used. S
 Pinboard's model. The "All Filters" multi-select panel and chip-over-map placement are a later
 slice.
 
-### Region & reload-on-pan
+### Region (load-once)
 
-On mount, `useReportFinder` calls `getCurrentPosition()`; on a non-null result the region
-centers there, otherwise a default Philly center (`[-75.1652, 39.9526]`). It loads nearby
-reports for that region. In the view, the maplibre instance from the `map-content` slot (typed
-`unknown` by the slot, so cast to the maplibre `Map`) gets a `moveend` listener that reads
-`map.getCenter()` + `map.getBounds()`, passes them to `mapRegion.ts` to derive
-`{ lat, lng, radius }`, and calls a **debounced** reload (≈300–500ms) so dragging doesn't spam
-the API. The listener is removed on unmount. `searchOrUserLocation` is set to the user/region
-center so Pinboard's distance affordances work.
+On `init()` (called from the view's `onMounted`), `useReportFinder` calls `getCurrentPosition()`;
+on a non-null result the region centers there, otherwise a default Philly center
+(`{ lat: 39.9526, lng: -75.1652 }`). It loads nearby reports once for that region (default radius
+~1600m) via `useNearbyReports.load`. `searchOrUserLocation` is set to that center so Pinboard's
+distance affordances work. The `GeolocationButton` in the map slot can re-center; a full
+reload-as-you-pan flow is slice 2a.1 (it needs the `@pinboard/ui` enhancement to expose the map
+instance in the `map-content` slot, which today is `null`).
 
 ### Report detail
 
@@ -147,12 +148,10 @@ Empty results use Pinboard's built-in count label ("No locations match").
 
 ## Testing strategy (TDD)
 
-- **Pure utils** — `reportCard.test.ts`, `reportIcon.test.ts`, `mapRegion.test.ts`: exhaustive
-  mapping/format tests (heading/subheader/src/tags/distance; icon+color incl. fallback;
-  center+bounds → radius).
+- **Pure utils** — `reportCard.test.ts`, `reportIcon.test.ts`: exhaustive mapping/format tests
+  (heading/subheader/src/tags/distance; icon incl. fallback).
 - **`useReportFinder.test.ts`** — region seeding (`getCurrentPosition` success + null fallback),
-  load via mocked `useNearbyReports`, filter application, debounced pan-reload (fake timers),
-  error propagation.
+  load via mocked `useNearbyReports`, filter application, `reportById` lookup, error propagation.
 - **Component** — `ReportDetail.test.ts` (renders all fields, close); `LandingPage.test.ts` (light):
   add a `@pinboard/ui` stub to `__test__/setup.ts` so we assert `<Pinboard>` receives the mapped
   `locations` + filter options and the slots wire up, **without** booting maplibre.
@@ -178,20 +177,23 @@ existing `@pinboard/ui` dep (re-exported map-core).
 2. **`MapCardProps` fields (resolved).** The real fields are `heading`, `subheader`, `src`,
    `body`, and `tags: TagsProps[]` (not title/subtitle/image). `reportToLocation` maps to these;
    the distance label lives in `subheader` or as a tag. Mirror oem's `useLocations` usage.
-3. **Reload-on-pan via the slot's map instance.** The `map-content` slot types `map` as
-   `unknown`; cast to the maplibre `Map` to call `getCenter()`/`getBounds()`/`on('moveend')`, and
-   remove the listener on unmount. oem does not reload-on-pan, so this integration is new.
-4. **`@pinboard/ui` test stub.** Stubbing `Pinboard` in `setup.ts` must not break the foundation
-   tests already relying on that file; add narrowly.
-5. **Icon system.** `serviceTypeMeta` carries Material-Symbol names (native parity) but the web
-   pins/cards use Fontawesome; `reportIcon` bridges via `common_categories.iconName` + a fallback,
-   so a per-service-type Fontawesome map is not required for this slice.
+3. **`@pinboard/ui` test stub.** `LandingPage.test.ts` mocks `@pinboard/ui` **locally** (a
+   `vi.mock` at the top of the test) rather than editing the global `__test__/setup.ts`, so it
+   can't break the foundation tests. The local stub renders the slots and exposes the bound props.
+4. **Icon system.** `serviceTypeMeta` carries Material-Symbol names (native parity) but the web
+   pins use Fontawesome; `reportIcon` bridges via `common_categories.iconName` + a fallback, so a
+   per-service-type Fontawesome map is not required for this slice. `MapIconTextPin` uses a
+   `color-theme` enum (not hex), so pins use a constant brand theme; status differentiation lives
+   in the card's status tag.
+5. **Map instance not in the slot (deferred).** `MapPanel` hands `map: null` to `map-content`;
+   reload-on-pan (slice 2a.1) will expose it via a small `@pinboard/ui` enhancement. Slice 2a does
+   not touch the map instance.
 
 ## Definition of Done
 
 1. `/` renders the Pinboard finder: nearby reports as pins + panel list cards.
 2. Single-select service-type filter chips filter both list and pins.
-3. Region seeds from geolocation (default fallback) and reloads on map pan.
+3. Region seeds from geolocation (default fallback) and loads once.
 4. Marker/card click opens `ReportDetail` inline.
 5. `pnpm --filter @pinboard/philly-311 test:run` green (new units + component tests);
    `type-check`, `build`, and `lint` clean.
@@ -199,5 +201,6 @@ existing `@pinboard/ui` dep (re-exported map-core).
 
 ## Out of scope / next
 
-Slices 2b (header CTA + trending), 2c (AIS search + Figma-faithful chips), 2d (alert sheet); the
-report wizard is Increment 3. The old `311-mobile-app/web/webportal` stays until the redesign lands.
+Slice 2a.1 (reload-on-pan + the `@pinboard/ui` map-exposure enhancement), 2b (header CTA +
+trending), 2c (AIS search + Figma-faithful chips), 2d (alert sheet); the report wizard is
+Increment 3. The old `311-mobile-app/web/webportal` stays until the redesign lands.
