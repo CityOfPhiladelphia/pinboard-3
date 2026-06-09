@@ -69,4 +69,15 @@ describe('useReportFinder', () => {
     await f.init()
     expect(f.errorMessage.value).toBe('boom')
   })
+  it('setCenter recenters and reloads for the new center', async () => {
+    getCurrentPosition.mockResolvedValue(null)
+    const f = useReportFinder()
+    await f.init()
+    load.mockClear()
+    await f.setCenter({ latitude: 40.1, longitude: -75.2 })
+    expect(f.searchOrUserLocation.value).toEqual({ latitude: 40.1, longitude: -75.2 })
+    expect(load).toHaveBeenCalledWith(
+      expect.objectContaining({ lat: 40.1, lng: -75.2, radius: 1600 }),
+    )
+  })
 })

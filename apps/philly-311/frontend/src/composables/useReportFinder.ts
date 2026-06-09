@@ -17,6 +17,7 @@ export interface UseReportFinder {
   errorMessage: ComputedRef<string | null>
   filter: Ref<string>
   init: () => Promise<void>
+  setCenter: (loc: PinboardTypes.LatLon) => Promise<void>
   setFilter: (value: string) => void
   reportById: (id: string) => Report | undefined
 }
@@ -43,11 +44,15 @@ export function useReportFinder(): UseReportFinder {
     return reports.value.find((r) => r.id === id)
   }
 
+  async function setCenter(loc: PinboardTypes.LatLon) {
+    searchOrUserLocation.value = { latitude: loc.latitude, longitude: loc.longitude }
+    await load({ lat: loc.latitude, lng: loc.longitude, radius: DEFAULT_RADIUS })
+  }
+
   async function init() {
     const pos = await getCurrentPosition()
     const center = pos ?? DEFAULT_CENTER
-    searchOrUserLocation.value = { latitude: center.lat, longitude: center.lng }
-    await load({ lat: center.lat, lng: center.lng, radius: DEFAULT_RADIUS })
+    await setCenter({ latitude: center.lat, longitude: center.lng })
   }
 
   function setFilter(value: string) {
@@ -61,6 +66,7 @@ export function useReportFinder(): UseReportFinder {
     errorMessage,
     filter,
     init,
+    setCenter,
     setFilter,
     reportById,
   }
