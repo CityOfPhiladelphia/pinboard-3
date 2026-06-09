@@ -15,14 +15,29 @@ import commonCategories from '@/data/common_categories.json'
 import { useReportFinder } from '@/composables/useReportFinder'
 import { serviceTypeIconDefinition } from '@/utils/reportIcon'
 import ReportDetail from '@/components/ReportDetail.vue'
+import { searchAddress } from '@/composables/useAis'
+import { useTrendingArticles } from '@/composables/useTrendingArticles'
+import ReportCallout from '@/components/ReportCallout.vue'
+import TrendingArticles from '@/components/TrendingArticles.vue'
 
 const finder = useReportFinder()
-onMounted(() => void finder.init())
+const trending = useTrendingArticles()
+const searchPlaceholder = 'Search by address or ZIP'
+
+onMounted(() => {
+  void finder.init()
+  void trending.init()
+})
 
 const filterOptions: PinboardTypes.LocationFilterOption[] = [
   { value: 'all', label: 'All' },
   ...commonCategories.map((c) => ({ value: c.title, label: c.title })),
 ]
+
+async function onSearch(query: string) {
+  const feature = await searchAddress(query)
+  if (feature) finder.setCenter({ latitude: feature.lat, longitude: feature.lng })
+}
 </script>
 
 <template>
@@ -32,8 +47,15 @@ const filterOptions: PinboardTypes.LocationFilterOption[] = [
     :is-loading="finder.isLoading.value"
     :error-message="finder.errorMessage.value"
     :location-panel-filter="filterOptions"
+    :location-panel-search="searchPlaceholder"
     @selected-locations-filter="finder.setFilter"
+    @search="onSearch"
   >
+    <template #locations-header>
+      <ReportCallout />
+      <TrendingArticles :articles="trending.articles.value" />
+    </template>
+
     <template #location-detail="{ location, onClose }">
       <ReportDetail
         v-if="finder.reportById(location.id)"
