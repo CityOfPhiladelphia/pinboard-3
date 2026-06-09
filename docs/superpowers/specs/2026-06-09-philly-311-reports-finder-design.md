@@ -114,10 +114,14 @@ geolocation / map center+bounds → region
 ### Filtering
 
 `location-panel-filter` is built from `common_categories` →
-`LocationFilterOption[] = [{ value: 'all', label: 'All' }, …{ value: <serviceType>, label }]`.
-On `selectedLocationsFilter`, `useReportFinder` filters the loaded reports to the chosen
-service type (`'all'` clears). Single-select — Pinboard's model. The "All Filters" multi-select
-panel and chip-over-map placement are a later slice.
+`LocationFilterOption[] = [{ value: 'all', label: 'All' }, …{ value: <category.title>, label: category.title }]`.
+On `selectedLocationsFilter`, `useReportFinder` filters the loaded reports to those whose
+`serviceType` matches the chosen category's title (`'all'` clears). The match keys off the
+**full data display name** (`common_categories.title`, which equals the `serviceType` /
+`serviceTypeMeta` key, e.g. "Pothole Repair") — per the data-over-Figma decision below, the
+Figma's short chip labels ("Pothole") are design hand-waving and are not used. Single-select —
+Pinboard's model. The "All Filters" multi-select panel and chip-over-map placement are a later
+slice.
 
 ### Region & reload-on-pan
 
@@ -163,13 +167,14 @@ existing `@pinboard/ui` dep (re-exported map-core).
 
 ## Risks / watch-items (resolve during planning)
 
-1. **Live `serviceType` string format (highest).** `nearby-issues` returns a `serviceType` string;
-   the Figma card titles show short forms ("Pothole") while `serviceTypeMeta` / `common_categories`
-   use full names ("Pothole Repair"). The filter match key and the color/icon lookup depend on this.
-   **Resolve empirically**: curl the test endpoint
-   (`/private/key/nearby-issues?lat=39.95&lng=-75.16`, key from `.env.test`, anonymous-ok) during
-   planning and key the matching/normalization off real values. Fallback: case-insensitive /
-   normalized matching with a neutral icon+color default (already the design).
+1. **Live `serviceType` string format (resolved — data over Figma).** Decision: trust the data,
+   not the Figma. The API's `serviceType` is assumed to be the **full display name** matching our
+   `service_types.json` keys / `serviceTypeMeta` keys / `common_categories.title` (e.g.
+   "Pothole Repair"); the Figma's short labels ("Pothole") are hand-waved design copy and are not
+   used. Filter-matching, card `heading`, and icon/color all key off that full name, with a
+   neutral icon+color fallback for any unmapped value. The plan should still curl the test endpoint
+   (`/private/key/nearby-issues?lat=39.95&lng=-75.16`, key from `.env.test`, anonymous-ok) once as
+   a sanity check, but builds on the data-name assumption.
 2. **`MapCardProps` fields (resolved).** The real fields are `heading`, `subheader`, `src`,
    `body`, and `tags: TagsProps[]` (not title/subtitle/image). `reportToLocation` maps to these;
    the distance label lives in `subheader` or as a tag. Mirror oem's `useLocations` usage.
