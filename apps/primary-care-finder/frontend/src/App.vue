@@ -136,11 +136,7 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
   let result = applyFilters(locationsWithDistance.value, filterValues.value)
 
   if (searchString.value) {
-    const terms = searchString.value
-      .replace(/\W+/g, ' ')
-      .toLowerCase()
-      .split(' ')
-      .filter(Boolean)
+    const terms = searchString.value.replace(/\W+/g, ' ').toLowerCase().split(' ').filter(Boolean)
     result = result.filter((loc) => {
       const haystack = JSON.stringify(Object.values(loc)).toLowerCase()
       return terms.some((term) => haystack.includes(term))
