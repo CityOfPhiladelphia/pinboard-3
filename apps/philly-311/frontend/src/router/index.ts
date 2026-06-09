@@ -13,6 +13,8 @@ import { useReportSubmissionStore } from '@/stores/reportSubmission'
 
 export const routes: RouteRecordRaw[] = [
   { path: '/', component: () => import('@/pages/LandingPage.vue') },
+  { path: '/report', component: () => import('@/pages/ReportPage.vue') },
+  { path: '/answers/:id', component: () => import('@/pages/AnswerDetailPage.vue') },
   { path: '/auth/redirect', component: () => import('@/pages/AuthRedirectPage.vue') },
 ]
 
