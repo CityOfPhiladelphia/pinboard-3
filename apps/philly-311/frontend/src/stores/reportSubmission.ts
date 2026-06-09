@@ -56,7 +56,9 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     },
     setQuestion(field: string, value: string) {
       if (value === '' || value === undefined || value === null) {
-        delete this.customFields[field]
+        this.customFields = Object.fromEntries(
+          Object.entries(this.customFields).filter(([key]) => key !== field),
+        )
       } else {
         this.customFields = { ...this.customFields, [field]: value }
       }

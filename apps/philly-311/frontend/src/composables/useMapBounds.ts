@@ -16,11 +16,6 @@ export const PHILLY_MAP_BOUNDS: [[number, number], [number, number]] = [
   [-74.92, 40.16], // NE corner [lng, lat]
 ]
 
-interface PhilaMapInstance {
-  map: Ref<{ setMaxBounds: (bounds: [[number, number], [number, number]]) => void } | null>
-  isLoaded: Ref<boolean>
-}
-
 interface MapVMComponent {
   map?: { value?: { setMaxBounds: (bounds: [[number, number], [number, number]]) => void } | null }
   isLoaded?: { value?: boolean }

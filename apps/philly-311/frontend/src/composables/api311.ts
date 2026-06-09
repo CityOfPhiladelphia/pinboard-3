@@ -22,7 +22,7 @@ function apiKey(): string {
 export function buildUrl(base: string, path: string, query?: QueryParams): string {
   const b = (base ?? '').replace(/\/$/, '')
   const p = path.startsWith('/') ? path : `/${path}`
-  let url = b + p
+  const url = b + p
   if (!query) return url
   const sp = new URLSearchParams()
   for (const [k, v] of Object.entries(query)) {
@@ -93,7 +93,8 @@ export async function api311Fetch(opts: Api311FetchOptions): Promise<Response> {
     return { response, sentBearer }
   }
 
-  let { response, sentBearer } = await send(false)
+  const { response: firstResponse, sentBearer } = await send(false)
+  let response = firstResponse
   if (response.status === 401 && sentBearer) {
     ;({ response } = await send(true))
   }

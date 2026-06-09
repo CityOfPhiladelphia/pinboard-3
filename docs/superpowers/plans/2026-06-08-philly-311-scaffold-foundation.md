@@ -795,12 +795,19 @@ Deviations from the plan as written, all green and reviewed:
 4. **Test files excluded from `vue-tsc`** via the app tsconfig (matches the POC, which also
    excluded tests from type-checking; vitest transpiles without type-checking).
 
-### Open follow-up
+### Lint cleanup (resolved)
 
-- **`pnpm lint` is red (4 errors) in the new app** — all inherited verbatim from the POC,
-  newly surfaced because the monorepo adds eslint (the POC had none): two `prefer-const`
-  (`api311.ts:25,96`), one unused interface (`useMapBounds.ts:19` `PhilaMapInstance`), one
-  `no-dynamic-delete` (`reportSubmission.ts:59`). Lint was not in this increment's DoD and
-  the files are faithful ports, so they were left unmodified. Decide: fix-in-place now vs.
-  defer to the wizard-port increment (when these files get real edits). Track in `bd` once
-  the beads DB location for pinboard-3 is settled.
+The monorepo's eslint (the POC had none) surfaced 4 errors in verbatim-ported code; all
+fixed in a behavior-preserving way (`pnpm --filter @pinboard/philly-311 lint` now exits 0):
+
+- `api311.ts` — two `prefer-const`: `let url` → `const`; the `let { response, sentBearer }`
+  destructure split so `sentBearer` is `const` while `response` stays `let` (it's reassigned
+  on 401-retry).
+- `useMapBounds.ts` — removed the unused `PhilaMapInstance` interface (the code uses
+  `MapVMComponent`); the `Ref` import stays (still used).
+- `reportSubmission.ts` — `no-dynamic-delete`: replaced `delete this.customFields[field]`
+  with `this.customFields = Object.fromEntries(Object.entries(...).filter(([k]) => k !== field))`,
+  removing the key without a dynamic delete. Store tests stay green.
+
+Remaining: 5 `vue/one-component-per-file` *warnings* in test-stub files (`setup.ts`, an inline
+test component) — inherent to inline test stubs, eslint exits 0 on warnings, left as-is.
