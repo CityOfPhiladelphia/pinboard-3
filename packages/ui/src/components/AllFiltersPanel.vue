@@ -116,10 +116,7 @@ function apply() {
       <section v-for="f in visibleSections" :key="f.key" class="filter-section">
         <button type="button" class="section-toggle" @click="toggleSection(f.key)">
           <span>{{ f.label }}</span>
-          <FontAwesomeIcon
-            :icon="faChevronDown"
-            :class="{ collapsed: collapsed[f.key] }"
-          />
+          <FontAwesomeIcon :icon="faChevronDown" :class="{ collapsed: collapsed[f.key] }" />
         </button>
         <div v-show="!collapsed[f.key]" class="section-body">
           <CheckboxGroup

@@ -331,11 +331,7 @@ const effectiveMapConfig = (() => {
     </div>
 
     <Teleport to="body" :disabled="!isMobile">
-      <div
-        v-if="filters"
-        class="all-filters-overlay"
-        :class="{ open: allFiltersOpen }"
-      >
+      <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
         <AllFiltersPanel
           v-model:open="allFiltersOpen"
           :filters="filters"

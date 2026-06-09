@@ -24,8 +24,4 @@ export type { LegendItem } from '@phila/phila-ui-map-core'
 export { NavbarInfo } from '@phila/phila-ui-app-header'
 export { PinboardShell, PinboardBody }
 
-export type {
-  FilterDefinition,
-  FilterValues,
-  FilterChoice,
-} from '@phila/phila-ui-filter-chip'
+export type { FilterDefinition, FilterValues, FilterChoice } from '@phila/phila-ui-filter-chip'
