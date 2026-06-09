@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Status: IMPLEMENTED** on branch `feat/philly-311-scaffold`. All 7 tasks complete; 200 tests green; `turbo run build/type-check/test:run` green with no oem/pc/ui regressions. See "Implementation notes" at the bottom for deviations from this plan as written.
+
 **Goal:** Stand up `apps/philly-311` in the pinboard-3 monorepo on its native conventions (Vite 7, vue-router 5, `@repo/*` configs, `@pinboard/ui`) and port the framework-light foundation (data/types/utils/composables/store/router/auth) across with its tests green.
 
 **Architecture:** Fresh-scaffold an app cloned from the `oem-flood-finder` template, then copy the keep-worthy, UI-agnostic modules from the POC at `311-mobile-app/web/webportal/frontend/src` verbatim (adjusting only import paths + formatting), re-homing routing onto vue-router 5. The app boots inside a minimal `PinboardShell`; no redesign UI in this increment.
@@ -772,3 +774,33 @@ From `pinboard-3/` root, with `NPM_FONTAWESOME_SECRET` available:
 ## Out of scope (next increments)
 
 Landing/browse redesign (Inc 2), wizard + answers + profile + your-reports port (Inc 3), CDK/deploy (Inc 4). The old `311-mobile-app/web/webportal` stays in place until the redesign lands.
+
+---
+
+## Implementation notes (post-merge record)
+
+Deviations from the plan as written, all green and reviewed:
+
+1. **`noUncheckedIndexedAccess` dropped** (Task 1 Step 3 showed it `true`). Because the
+   `@pinboard/ui` path alias points at UI *source*, enabling the flag forced type errors
+   in the shared `@pinboard/ui` package (not in philly-311's own code). To avoid editing
+   shared code as a side effect, the flag was removed — which also makes the app's tsconfig
+   match `oem-flood-finder` / `primary-care-finder` exactly (no app sets it). philly-311's
+   own ported code is clean under the stricter flag; only `@pinboard/ui` source isn't.
+2. **`useApiError.ts`** — constructor parameter-properties expanded to explicit fields,
+   required by the shared base tsconfig's `erasableSyntaxOnly: true`. Behavior identical.
+3. **`useApi.ts`** — `data` switched `ref` → `shallowRef` plus an explicit `UseApiReturn<T>`
+   return interface, to make the generic return type nameable for declaration emit (TS2883).
+   Sound: `data` is assigned wholesale (`data.value = json`); no deep reactivity is relied on.
+4. **Test files excluded from `vue-tsc`** via the app tsconfig (matches the POC, which also
+   excluded tests from type-checking; vitest transpiles without type-checking).
+
+### Open follow-up
+
+- **`pnpm lint` is red (4 errors) in the new app** — all inherited verbatim from the POC,
+  newly surfaced because the monorepo adds eslint (the POC had none): two `prefer-const`
+  (`api311.ts:25,96`), one unused interface (`useMapBounds.ts:19` `PhilaMapInstance`), one
+  `no-dynamic-delete` (`reportSubmission.ts:59`). Lint was not in this increment's DoD and
+  the files are faithful ports, so they were left unmodified. Decide: fix-in-place now vs.
+  defer to the wizard-port increment (when these files get real edits). Track in `bd` once
+  the beads DB location for pinboard-3 is settled.
