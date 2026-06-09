@@ -55,7 +55,7 @@ const lastUpdatedDate = computed(() => {
         <h4 v-if="location.deviceType === 'Aware' || location.deviceType === 'Usgs'">
           {{ location.name }}
         </h4>
-        <h2 v-else-if="location.deviceType === 'Camera'">{{ location.name }}</h2>
+        <h4 v-else-if="location.deviceType === 'Camera'">{{ location.name }}</h4>
         <Tags v-if="gaugeHeight" size="large" color="blue" variant="readonly" :text="gaugeHeight" />
       </div>
 

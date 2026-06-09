@@ -11,9 +11,7 @@ export default defineConfig({
       '@pinboard/ui/style.css': fileURLToPath(
         new URL('../../../packages/ui/dist/ui.css', import.meta.url)
       ),
-      '@pinboard/ui': fileURLToPath(
-        new URL('../../../packages/ui/src/index.ts', import.meta.url)
-      ),
+      '@pinboard/ui': fileURLToPath(new URL('../../../packages/ui/src/index.ts', import.meta.url)),
     },
   },
 })

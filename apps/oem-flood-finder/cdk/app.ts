@@ -1,16 +1,8 @@
 #!/usr/bin/env node
 import { App, Aspects, Stack } from 'aws-cdk-lib'
 import { AwsSolutionsChecks, NIST80053R5Checks } from 'cdk-nag'
-import {
-  StaticSite,
-  Confidentiality,
-  type Environment,
-  PhilaLogBucket,
-} from '@phila/constructs'
-import {
-  Certificate,
-  CertificateValidation,
-} from 'aws-cdk-lib/aws-certificatemanager'
+import { StaticSite, Confidentiality, type Environment, PhilaLogBucket } from '@phila/constructs'
+import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager'
 import { HostedZone } from 'aws-cdk-lib/aws-route53'
 const app = new App()
 
@@ -18,9 +10,7 @@ const app = new App()
 const environment = app.node.tryGetContext('environment') as Environment
 
 if (!environment) {
-  throw new Error(
-    'Environment must be specified via context. Use: cdk deploy -c environment=test'
-  )
+  throw new Error('Environment must be specified via context. Use: cdk deploy -c environment=test')
 }
 
 if (environment === 'dev') {

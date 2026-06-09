@@ -8,11 +8,9 @@ defineProps<{
 function siteName(location: PrimaryCareLocation): string {
   let value = location.properties.record
   if (
-    value ===
-    'Delaware Valley Community Health (DVCH) Maria de los Santos Womens Health Center'
+    value === 'Delaware Valley Community Health (DVCH) Maria de los Santos Womens Health Center'
   ) {
-    value =
-      "Delaware Valley Community Health (DVCH) Maria de los Santos Women's Health Center"
+    value = "Delaware Valley Community Health (DVCH) Maria de los Santos Women's Health Center"
   }
   return value
 }

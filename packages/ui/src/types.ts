@@ -4,7 +4,7 @@ import type { MapCardProps } from '@phila/phila-ui-cards'
 export type Latitude = number
 export type Longitude = number
 
-export type LocationCoordinate = [Longitude, Latitude]
+export type LongitudeLatitude = [Longitude, Latitude]
 
 export interface LatLon {
   latitude: Latitude
@@ -13,24 +13,15 @@ export interface LatLon {
 
 export interface ZipcodePolygon {
   centroid: LatLon
-  nodes: LocationCoordinate[]
+  nodes: LongitudeLatitude[]
 }
 
-export type LocationPermissionState =
-  | 'granted'
-  | 'prompt'
-  | 'denied'
-  | 'waiting'
-  | null
+export type LocationPermissionState = 'granted' | 'prompt' | 'denied'
 
-export type MapControlPosition =
-  | 'top-left'
-  | 'top-right'
-  | 'bottom-left'
-  | 'bottom-right'
+export type MapControlPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
 export interface MapConfig {
-  center?: LocationCoordinate
+  center?: LongitudeLatitude
   zoom?: number
   pitch?: number
   bearing?: number
@@ -46,7 +37,7 @@ export interface MapConfig {
   mapSearchControl?: { position?: MapControlPosition; placeholder?: string }
   ariaLabel?: string
   mobile?: {
-    center?: LocationCoordinate
+    center?: LongitudeLatitude
     zoom?: number
   }
 }
@@ -81,7 +72,7 @@ export interface MenuOption {
 
 export type SortLocationsOptions = Record<string, string>
 
-export type AisAutocompleteResult = Readonly<{
+export interface AisAutocompleteResult {
   query: string
   query_type: string
   count: number
@@ -93,7 +84,9 @@ export type AisAutocompleteResult = Readonly<{
       has_opa: boolean
     }>[]
   }>
-}>
+}
+
+export type ProxyAutocompleteResult = string[]
 
 export interface AisAddressSearchResponse {
   search_type: string
@@ -220,8 +213,20 @@ export interface AisAddressSearchResponse {
       geometry: {
         geocode_type: string
         type: string
-        coordinates: LocationCoordinate
+        coordinates: LongitudeLatitude
       }
     },
   ]
 }
+
+export const Browsers = {
+  FIREFOX: 'FIREFOX',
+  SAMSUNG: 'SAMSUNG',
+  OPERA: 'OPERA',
+  EDGE: 'EDGE',
+  CHROME: 'CHROME',
+  SAFARI: 'SAFARI',
+  UNKNOWN: 'UNKNOWN',
+} as const
+
+export type BrowserType = (typeof Browsers)[keyof typeof Browsers]

@@ -204,10 +204,7 @@ function asOemLocation(location: BasicLocation) {
       }"
     >
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />
-      <BasemapToggle
-        position="top-right"
-        :teleport-to="isMobile ? mobileControlsTarget : undefined"
-      />
+      <BasemapToggle position="top-right" :teleport-to="isMobile ? mobileControlsTarget : null" />
 
       <FillLayer
         v-for="id in FLOOD_LAYER_IDS"
@@ -223,7 +220,7 @@ function asOemLocation(location: BasicLocation) {
         :items="FLOOD_LEGEND_ITEMS"
         position="bottom-left"
         :leave-room-for-controls="false"
-        :teleport-to="isMobile ? mobileControlsTargetLeft : undefined"
+        :teleport-to="isMobile ? mobileControlsTargetLeft : null"
       />
 
       <div v-if="!isLoading">
@@ -237,8 +234,8 @@ function asOemLocation(location: BasicLocation) {
             :icon="isGauge(loc) ? faGauge : faCamera"
             :text="
               loc.locationCardInfo.tags?.[1]?.text !== 'No data'
-                ? loc.locationCardInfo.tags?.[1]?.text
-                : undefined
+                ? (loc.locationCardInfo.tags?.[1]?.text ?? '')
+                : ''
             "
             :color-theme="isGauge(loc) ? 'light-primary' : 'light-purple'"
             :hovered="hoveredId === loc.id"

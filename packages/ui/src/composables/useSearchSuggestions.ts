@@ -1,5 +1,5 @@
 import { type Ref, ref, toValue, watch } from 'vue'
-import type { AisAutocompleteResult } from '../types'
+import type { AisAutocompleteResult, ProxyAutocompleteResult } from '../types'
 
 export function useSearchSuggestions(search: string | Ref<string>) {
   const searchSuggestions = ref<string[]>([])
@@ -7,23 +7,26 @@ export function useSearchSuggestions(search: string | Ref<string>) {
   let skipNextFetch = false
 
   async function getSearchSuggestions(stringValue: string) {
-    if (!stringValue || stringValue.length < 3) {
+    if (!stringValue || !/^(?:\d{1,5}(?:-\d{1,5})?[A-Za-z]{0,3} \w+)/.test(stringValue)) {
       searchSuggestions.value = []
       return
     }
-
     try {
       const response = await fetch(
-        `https://ais-autocomplete.citygeo.phila.city/autocomplete?q=${stringValue.replace(/ /, '+')}`
+        `${import.meta.env.DEV ? 'https://ais-autocomplete.citygeo.phila.city' : 'https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis'}/autocomplete?q=${encodeURIComponent(stringValue)}&simple=true&client_id=${import.meta.env.DEV ? import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD : ''}`
       )
-      const suggestions: AisAutocompleteResult = await response.json()
-      const suggestedAddresses = suggestions.count
-        ? Array.from(
-            suggestions.results.addresses,
-            (suggestion) => suggestion.address
-          )
-        : []
-      searchSuggestions.value = suggestedAddresses
+      if (!response.ok) {
+        searchSuggestionsError.value = { status: response.status, message: response.body }
+        return
+      }
+      if (import.meta.env.DEV) {
+        const data: AisAutocompleteResult = await response.json()
+        searchSuggestions.value = data.count
+          ? Array.from(data.results.addresses, (suggestion) => suggestion.address)
+          : []
+      } else {
+        searchSuggestions.value = (await response.json()) as ProxyAutocompleteResult
+      }
     } catch (err) {
       searchSuggestionsError.value = err
     }

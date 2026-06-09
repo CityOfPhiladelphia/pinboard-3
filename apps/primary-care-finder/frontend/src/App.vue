@@ -154,11 +154,7 @@ function handleSearchSubmit(s: string) {
   searchString.value = s
 }
 
-function handleGeolocate(locationData: {
-  latitude: number
-  longitude: number
-  accuracy: number
-}) {
+function handleGeolocate(locationData: { latitude: number; longitude: number; accuracy: number }) {
   console.log('Geolocation Accuracy: ', locationData.accuracy)
   userLocation.value = {
     latitude: locationData.latitude,
@@ -200,9 +196,9 @@ function asPrimaryCareLocation(location: BasicLocation) {
 
     <template #info-body>
       <span class="has-text-body-small">
-        This tool helps Philadelphia residents find free and low-cost primary
-        care providers near them. Search by location, filter by services, and
-        view details like hours, transit options, and available tests.
+        This tool helps Philadelphia residents find free and low-cost primary care providers near
+        them. Search by location, filter by services, and view details like hours, transit options,
+        and available tests.
       </span>
     </template>
 
@@ -224,10 +220,7 @@ function asPrimaryCareLocation(location: BasicLocation) {
       </template>
 
       <template #location-detail="{ location, onClose }">
-        <LocationDetail
-          :location="asPrimaryCareLocation(location)"
-          :on-close="onClose"
-        />
+        <LocationDetail :location="asPrimaryCareLocation(location)" :on-close="onClose" />
       </template>
 
       <template
@@ -283,9 +276,7 @@ function asPrimaryCareLocation(location: BasicLocation) {
             (e: any) => {
               const feature = e.features?.[0]
               if (!feature) return
-              const loc = locationsWithDistance.find(
-                (l) => l.id === feature.properties?.id
-              )
+              const loc = locationsWithDistance.find((l) => l.id === feature.properties?.id)
               if (loc) onSelect(loc)
             }
           "
