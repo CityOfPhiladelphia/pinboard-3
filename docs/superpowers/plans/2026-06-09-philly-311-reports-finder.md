@@ -37,11 +37,26 @@
 ## Task 1: `reportIcon` — service type → Fontawesome pin icon
 
 **Files:**
-- Modify: `APP/package.json` (add `@fortawesome/pro-solid-svg-icons`)
+- Modify: `APP/package.json` (add the slice's new direct deps)
 - Create: `APP/src/utils/reportIcon.ts`
 - Test: `APP/src/utils/reportIcon.test.ts`
 
-- [ ] **Step 1: Add the dependency.** In `APP/package.json` dependencies add `"@fortawesome/pro-solid-svg-icons": "^7.2.0"` (oem's version). From repo root run `pnpm install` (prefix `NPM_FONTAWESOME_SECRET=54AC7138-FFDC-4F82-BD32-332A9F91091A` if it errors against the fontawesome registry).
+- [ ] **Step 1: Add ALL new direct dependencies for this slice.** philly-311 currently does NOT
+  declare these (they only reach it transitively via `@pinboard/ui`, which pnpm won't resolve as
+  direct imports), yet later tasks import them: `reportIcon.ts` uses `@fortawesome/pro-solid-svg-icons`
+  + `@fortawesome/fontawesome-svg-core` (`IconDefinition`), and `reportCard.ts` (Task 2) uses
+  `@phila/phila-ui-cards` (`MapCardProps`) + `@phila/phila-ui-tags` (`TagsProps`). Add all four to
+  `APP/package.json` dependencies now so every task's `type-check` resolves:
+
+  ```json
+  "@fortawesome/fontawesome-svg-core": "^7.1.0",
+  "@fortawesome/pro-solid-svg-icons": "^7.2.0",
+  "@phila/phila-ui-cards": "0.2.0-beta.5",
+  "@phila/phila-ui-tags": "0.1.0-beta.3",
+  ```
+  (Pinned-beta versions match what `@pinboard/ui` / oem already use, avoiding duplicate copies.)
+  From repo root run `pnpm install` (prefix `NPM_FONTAWESOME_SECRET=54AC7138-FFDC-4F82-BD32-332A9F91091A`
+  if it errors against the fontawesome registry).
 
 - [ ] **Step 2: Write the failing test** (`reportIcon.test.ts`)
 
