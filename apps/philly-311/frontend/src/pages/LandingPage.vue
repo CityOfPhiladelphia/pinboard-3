@@ -1,16 +1,84 @@
-<!-- ABOUTME: Increment-1 landing placeholder. Replaced by the Pinboard map+list
-     finder in Increment 2. -->
-<script setup lang="ts"></script>
+<!-- ABOUTME: The 311 reports finder — Pinboard map + list of nearby reports with
+     service-type filter chips, geolocation-seeded load, and inline report detail. -->
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import {
+  Pinboard,
+  MapMarker,
+  MapIconTextPin,
+  MapNavigationControl,
+  GeolocationButton,
+  BasemapToggle,
+  type PinboardTypes,
+} from '@pinboard/ui'
+import commonCategories from '@/data/common_categories.json'
+import { useReportFinder } from '@/composables/useReportFinder'
+import { serviceTypeIconDefinition } from '@/utils/reportIcon'
+import ReportDetail from '@/components/ReportDetail.vue'
+
+const finder = useReportFinder()
+onMounted(() => void finder.init())
+
+const filterOptions: PinboardTypes.LocationFilterOption[] = [
+  { value: 'all', label: 'All' },
+  ...commonCategories.map((c) => ({ value: c.title, label: c.title })),
+]
+</script>
 
 <template>
-  <section class="landing-placeholder">
-    <h1>Philly 311</h1>
-    <p>Reports nearby — coming soon.</p>
-  </section>
-</template>
+  <Pinboard
+    :locations="finder.locations.value"
+    :search-or-user-location="finder.searchOrUserLocation.value"
+    :is-loading="finder.isLoading.value"
+    :error-message="finder.errorMessage.value"
+    :location-panel-filter="filterOptions"
+    @selected-locations-filter="finder.setFilter"
+  >
+    <template #location-detail="{ location, onClose }">
+      <ReportDetail
+        v-if="finder.reportById(location.id)"
+        :report="finder.reportById(location.id)!"
+        :on-close="onClose"
+      />
+    </template>
 
-<style scoped>
-.landing-placeholder {
-  padding: var(--spacing-l, 2rem);
-}
-</style>
+    <template
+      #map-content="{
+        zoom,
+        isMobile,
+        hoveredId,
+        selectedId,
+        mobileControlsTarget,
+        onHover,
+        onHoverEnd,
+        onSelect,
+      }"
+    >
+      <MapNavigationControl v-if="!isMobile" position="bottom-right" />
+      <BasemapToggle
+        position="top-right"
+        :teleport-to="isMobile ? mobileControlsTarget : undefined"
+      />
+      <GeolocationButton
+        :position="isMobile ? 'top-right' : 'bottom-right'"
+        :teleport-to="isMobile ? mobileControlsTarget : undefined"
+      />
+      <MapMarker
+        v-for="loc in finder.locations.value"
+        :key="loc.id"
+        :lng-lat="[loc.longitude, loc.latitude]"
+      >
+        <MapIconTextPin
+          :zoom="zoom"
+          :icon="serviceTypeIconDefinition(loc.name)"
+          color-theme="light-primary"
+          :hovered="hoveredId === loc.id"
+          :selected="selectedId === loc.id"
+          @mouseenter="onHover(loc.id)"
+          @mouseleave="onHoverEnd()"
+          @click="onSelect(loc)"
+        />
+      </MapMarker>
+    </template>
+  </Pinboard>
+</template>
