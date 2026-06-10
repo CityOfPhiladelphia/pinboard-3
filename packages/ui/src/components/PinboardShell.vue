@@ -3,11 +3,11 @@ import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader } from '@phila/phila-ui-app-header'
 import MobileNavPanel from './MobileNavPanel.vue'
 import type { VNode } from 'vue'
-import type { NavbarBrand } from '@phila/phila-ui-app-header'
+import type { NavbarBrandProps } from '@phila/phila-ui-app-header'
 
 defineProps<{
   title: string
-  logo?: NavbarBrand['logo']
+  logo?: NavbarBrandProps['logo']
   bannerTitle?: string
   bannerMessage?: string
 }>()

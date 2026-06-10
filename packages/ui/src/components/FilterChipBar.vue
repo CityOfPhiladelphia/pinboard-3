@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { FilterChipGroup } from '@phila/phila-ui-filter-chip'
-import type { FilterDefinition, FilterValues } from '@phila/phila-ui-filter-chip'
+import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 
 const props = defineProps<{
   filters: FilterDefinition[]

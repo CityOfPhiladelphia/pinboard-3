@@ -30,7 +30,7 @@ import type {
   SearchMode,
   SortLocationsOptions,
 } from '../types'
-import type { FilterDefinition, FilterValues } from '@phila/phila-ui-filter-chip'
+import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 import { hasLocationData } from '../utilities/hasLocationData'
 
 // slots
