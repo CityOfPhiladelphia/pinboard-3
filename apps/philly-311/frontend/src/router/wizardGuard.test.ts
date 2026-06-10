@@ -69,6 +69,7 @@ describe('wizardGuard', () => {
     store.setCategory('Pothole Repair')
     wizardGuard(makeRoute('/report/location', { lat: 'x', lng: '-75.16' }))
     wizardGuard(makeRoute('/report/location', { lat: '39.95' }))
+    wizardGuard(makeRoute('/report/location', { lat: '39.95', lng: 'x' }))
     expect(store.location).toBeNull()
   })
   it('does not overwrite an existing location with query params', () => {
