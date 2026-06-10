@@ -36,6 +36,7 @@ function makePreview(file: File): string | undefined {
 }
 
 async function onFile(e: Event) {
+  if (classifying.value) return
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
   classifying.value = true
@@ -54,10 +55,11 @@ async function onFile(e: Event) {
       result.classifications.map((c) => ({ serviceType: c.serviceType, confidence: c.confidence })),
     )
   } catch (err) {
-    errorMessage.value = (err as Error).message ?? 'Photo processing failed.'
+    errorMessage.value = (err as Error).message || 'Photo processing failed.'
     if (previewUrl) URL.revokeObjectURL?.(previewUrl)
   } finally {
     classifying.value = false
+    ;(e.target as HTMLInputElement).value = ''
   }
 }
 </script>
@@ -88,9 +90,11 @@ async function onFile(e: Event) {
       </label>
     </div>
 
-    <p v-if="classifying" class="image-step__status">Analyzing your photo…</p>
-    <p v-if="store.photo" class="image-step__status">Photo added.</p>
-    <p v-if="errorMessage" class="image-step__error">{{ errorMessage }}</p>
+    <div role="status">
+      <p v-if="classifying" class="image-step__status">Analyzing your photo…</p>
+      <p v-if="store.photo" class="image-step__status">Photo added.</p>
+    </div>
+    <p v-if="errorMessage" role="alert" class="image-step__error">{{ errorMessage }}</p>
   </div>
 </template>
 
@@ -129,6 +133,10 @@ async function onFile(e: Event) {
   width: 1px;
   height: 1px;
   opacity: 0;
+}
+.image-step__zone:focus-within {
+  outline: 2px solid var(--ui-color-primary, #0f4d90);
+  outline-offset: 2px;
 }
 .image-step__error {
   color: var(--ui-color-red, #c0392b);

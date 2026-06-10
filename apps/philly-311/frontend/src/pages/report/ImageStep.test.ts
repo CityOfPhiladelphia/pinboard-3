@@ -68,4 +68,70 @@ describe('ImageStep', () => {
     expect(w.text()).toContain('Classification failed.')
     expect(useReportSubmissionStore().photo).toBeNull()
   })
+
+  it('shows fallback error text and leaves photo null when processForClassify rejects', async () => {
+    ;(processForClassify as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error(''),
+    )
+    const w = mount(ImageStep)
+    await selectFile(w)
+    await flushPromises()
+    expect(w.text()).toContain('Photo processing failed.')
+    expect(useReportSubmissionStore().photo).toBeNull()
+  })
+
+  it('clears input value after a failed classify so same-file reselect fires change', async () => {
+    ;(processForClassify as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error('oops'),
+    )
+    const w = mount(ImageStep)
+    await selectFile(w)
+    await flushPromises()
+    const input = w.find('input[type="file"]')
+    expect((input.element as HTMLInputElement).value).toBe('')
+  })
+
+  it('has role="status" while classifying and after success', async () => {
+    let resolve!: (v: unknown) => void
+    fetchData.mockReturnValueOnce(
+      new Promise((r) => {
+        resolve = r
+      }),
+    )
+    const w = mount(ImageStep)
+    await selectFile(w)
+    await flushPromises()
+    expect(w.find('[role="status"]').exists()).toBe(true)
+    resolve({ imageUrl: 'https://cdn.test/p.jpg', classifications: [] })
+    await flushPromises()
+    expect(w.find('[role="status"]').exists()).toBe(true)
+  })
+
+  it('has role="alert" containing error text on failure', async () => {
+    ;(processForClassify as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error('something failed'),
+    )
+    const w = mount(ImageStep)
+    await selectFile(w)
+    await flushPromises()
+    const alertEl = w.find('[role="alert"]')
+    expect(alertEl.exists()).toBe(true)
+    expect(alertEl.text()).toContain('something failed')
+  })
+
+  it('disables inputs while classification is in flight', async () => {
+    let resolve!: (v: unknown) => void
+    fetchData.mockReturnValueOnce(
+      new Promise((r) => {
+        resolve = r
+      }),
+    )
+    const w = mount(ImageStep)
+    await selectFile(w)
+    await flushPromises()
+    const inputs = w.findAll('input[type="file"]')
+    expect(inputs.every((i) => (i.element as HTMLInputElement).disabled)).toBe(true)
+    resolve({ imageUrl: 'https://cdn.test/p.jpg', classifications: [] })
+    await flushPromises()
+  })
 })
