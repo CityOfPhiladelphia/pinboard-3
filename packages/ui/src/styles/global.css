@@ -4,3 +4,13 @@
 body {
   font-family: var(--Body-Default-font-body-default-family, 'Montserrat', sans-serif);
 }
+
+/* Form controls don't inherit font-family by default, so raw buttons/inputs
+   (e.g. panel section toggles) would fall back to the browser default. */
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+}
