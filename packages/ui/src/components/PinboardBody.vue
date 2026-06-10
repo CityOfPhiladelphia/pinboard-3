@@ -17,7 +17,7 @@ import { PINBOARD_CONFIG_KEY } from '../plugin'
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
-import FilterChipBar from './FilterChipBar.vue'
+import { FilterChipGroup } from '@phila/phila-ui-filter-chip'
 import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
 // pinboard composables imports
@@ -290,12 +290,17 @@ const effectiveMapConfig = (() => {
         >
           <template v-if="filters" #below-search>
             <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
-              <FilterChipBar
-                :filters="filters"
-                :model-value="filterValues ?? {}"
-                @update:model-value="onFilterValues"
-                @open-filters="allFiltersOpen = true"
-              />
+              <div class="filter-chip-bar">
+                <FilterChipGroup
+                  :filters="filters"
+                  :model-value="filterValues ?? {}"
+                  color="white"
+                  filter-button
+                  :elevated="isMobile && chipsOnMap"
+                  @update:model-value="onFilterValues"
+                  @open-filters="allFiltersOpen = true"
+                />
+              </div>
             </Teleport>
           </template>
         </LocationsPanel>
@@ -502,6 +507,10 @@ const effectiveMapConfig = (() => {
   height: auto;
 }
 
+.filter-chip-bar {
+  padding: 0.5rem 0;
+}
+
 .all-filters-overlay {
   position: absolute;
   top: 0;
@@ -598,7 +607,7 @@ const effectiveMapConfig = (() => {
 
   .mobile-map-search-filter :deep(.location-filters) {
     padding: 0.25rem 0 0;
-    padding-left: 2px;
+    padding-left: 19px;
     gap: 0.25rem;
   }
 

@@ -15,7 +15,7 @@ To render a feature:
 
 <script setup lang="ts">
 // vue imports
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 
 // 3rd party imports
 // philly ui imports
@@ -28,6 +28,7 @@ import SearchSuggestions from './SearchSuggestions.vue'
 
 // pinboard composables imports
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
+import { PINBOARD_CONFIG_KEY } from '../plugin'
 
 // type imports
 import type { LocationFilterOption, SortLocationsOptions } from '../types'
@@ -56,6 +57,10 @@ const searchWrapperRef = ref<HTMLElement | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
 const { searchSuggestions, dismissSuggestions, hideSuggestions, refetchSuggestions } =
   useSearchSuggestions(searchString)
+
+const config = inject(PINBOARD_CONFIG_KEY)
+// Elevate the floating search only when the cluster sits over the map (mobile + map placement).
+const elevatedSearch = computed(() => props.isMobile && config?.mobileFilterPlacement === 'map')
 
 // computed refs
 const sortChoices = computed<SortPanelOption[]>(() => {
@@ -134,6 +139,7 @@ function focusSearchInput() {
         <Search
           v-model="searchString"
           :placeholder="searchPlaceholder"
+          :elevated="elevatedSearch"
           @update:model-value="handleSearchChange"
           @search="emit('search')"
         />
