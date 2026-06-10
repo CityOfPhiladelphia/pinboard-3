@@ -57,8 +57,9 @@ export function wizardGuard(to: RouteLocationNormalized): true | string {
   if (to.path === '/report' || !to.path.startsWith('/report/')) return true
   const store = useReportSubmissionStore()
 
-  // Apply deep-link query params before checking emptiness. A category
-  // in the URL always wins over whatever's in the store — this is the
+  // Apply deep-link query params before the category gate so deep links
+  // can satisfy it. A category in the URL always wins over whatever's in
+  // the store — this is the
   // path HeaderSearch takes when the user picks a different service
   // type mid-flow. setCategory clears customFields when the category
   // actually changes, so old answers don't leak into the new questions.

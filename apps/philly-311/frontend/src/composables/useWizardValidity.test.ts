@@ -1,5 +1,5 @@
 // ABOUTME: Tests useWizardValidity — mirrors a computed into wizard:canAdvance,
-// ABOUTME: resets to true on unmount, and is a no-op when not provided.
+// ABOUTME: resets to true before unmount, and is a no-op when not provided.
 import { describe, expect, it } from 'vitest'
 import { computed, defineComponent, h, provide, ref, type Ref } from 'vue'
 import { mount, flushPromises } from '@vue/test-utils'
