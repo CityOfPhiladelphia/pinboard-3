@@ -4,8 +4,9 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import { setActivePinia, createPinia } from 'pinia'
-import { defineComponent } from 'vue'
+import { defineComponent, inject, type Ref } from 'vue'
 import ReportPage from './ReportPage.vue'
+import { WIZARD_CAN_ADVANCE_KEY } from '@/composables/useWizardValidity'
 
 const Stub = (text: string) =>
   defineComponent({ setup: () => () => text, template: `<div>${text}</div>` })
@@ -64,5 +65,37 @@ describe('ReportPage shell', () => {
     await w.find('[data-test="wizard-next"]').trigger('click')
     await flushPromises()
     expect(w.text()).toContain('issue-step')
+  })
+
+  it('disables Next when the active step sets canAdvance to false', async () => {
+    const BlockingStep = defineComponent({
+      setup() {
+        const canAdvance = inject<Ref<boolean>>(WIZARD_CAN_ADVANCE_KEY)
+        if (canAdvance) canAdvance.value = false
+        return {}
+      },
+      template: '<div>blocking-step</div>',
+    })
+
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        {
+          path: '/report',
+          component: ReportPage,
+          children: [
+            { path: '', component: BlockingStep },
+            { path: 'issue-type', component: Stub('issue-step') },
+          ],
+        },
+      ],
+    })
+
+    router.push('/report')
+    await router.isReady()
+    const w = mount(ReportPage, { global: { plugins: [router] } })
+    await flushPromises()
+
+    expect(w.find('[data-test="wizard-next"]').attributes('disabled')).toBeDefined()
   })
 })

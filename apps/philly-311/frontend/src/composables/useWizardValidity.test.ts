@@ -1,9 +1,10 @@
 // ABOUTME: Tests useWizardValidity — mirrors a computed into wizard:canAdvance,
 // ABOUTME: resets to true on unmount, and is a no-op when not provided.
 import { describe, expect, it } from 'vitest'
-import { computed, defineComponent, h, ref, type Ref } from 'vue'
-import { mount } from '@vue/test-utils'
-import { useWizardValidity } from './useWizardValidity'
+import { computed, defineComponent, h, provide, ref, type Ref } from 'vue'
+import { mount, flushPromises } from '@vue/test-utils'
+import { createRouter, createMemoryHistory, RouterView } from 'vue-router'
+import { useWizardValidity, WIZARD_CAN_ADVANCE_KEY } from './useWizardValidity'
 
 function harness(canAdvance: Ref<boolean>, validityFn: () => boolean) {
   const Child = defineComponent({
@@ -60,5 +61,54 @@ describe('useWizardValidity', () => {
       render: () => h('div'),
     })
     expect(() => mount(Child)).not.toThrow()
+  })
+
+  it('preserves incoming step validity after navigation (no clobber on step transition)', async () => {
+    const canAdvance = ref(true)
+
+    const StepA = defineComponent({
+      setup() {
+        useWizardValidity(computed(() => true))
+        return {}
+      },
+      render: () => h('div', 'step-a'),
+    })
+
+    const StepB = defineComponent({
+      setup() {
+        useWizardValidity(computed(() => false))
+        return {}
+      },
+      render: () => h('div', 'step-b'),
+    })
+
+    const Shell = defineComponent({
+      setup() {
+        provide(WIZARD_CAN_ADVANCE_KEY, canAdvance)
+        return {}
+      },
+      render: () => h(RouterView),
+    })
+
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: '/a', component: StepA },
+        { path: '/b', component: StepB },
+      ],
+    })
+
+    router.push('/a')
+    await router.isReady()
+
+    mount(Shell, { global: { plugins: [router] } })
+    await flushPromises()
+
+    // StepA has validity=true; navigate to StepB which has validity=false
+    router.push('/b')
+    await flushPromises()
+
+    // StepB's canAdvance=false must not be clobbered by StepA's unmount reset
+    expect(canAdvance.value).toBe(false)
   })
 })

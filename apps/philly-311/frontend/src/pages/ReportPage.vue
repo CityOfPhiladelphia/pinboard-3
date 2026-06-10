@@ -1,6 +1,6 @@
 <!-- ABOUTME: Report-wizard shell. Renders a breadcrumb, the StepIndicator, the active
      child step via <router-view>, and contextual Reset/Skip/Back/Next controls.
-     canAdvance is provided to children; Next is disabled until a step sets it. -->
+     canAdvance is provided to children; Next is disabled while the active step reports it cannot advance. -->
 <script setup lang="ts">
 import { provide, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -49,7 +49,7 @@ function resetWizard() {
 </script>
 
 <template>
-  <main class="wizard">
+  <div class="wizard">
     <nav class="wizard__crumb" aria-label="Breadcrumb">
       <RouterLink to="/">Home</RouterLink> / <span>Report an issue</span>
     </nav>
@@ -108,7 +108,7 @@ function resetWizard() {
         </button>
       </div>
     </footer>
-  </main>
+  </div>
 </template>
 
 <style scoped>
