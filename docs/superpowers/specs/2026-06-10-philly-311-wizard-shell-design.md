@@ -121,7 +121,9 @@ Matches the Figma "Image" frame:
 Add to `reportSubmission` store: a `photoSuggestions: PhotoSuggestion[]` state field
 (`PhotoSuggestion = { serviceType: string; confidence: number }`) plus a `setPhotoSuggestions`
 action, and clear it in `reset()`. This persists the Image step's classification across the route
-change so the Issue type step (3b) can pre-select. (Type added to `types/wizard.ts`.)
+change so the Issue type step (3b) can pre-select. (Type added to `types/wizard.ts`.) The classify
+API also returns `caseType` per suggestion; it is intentionally dropped here (unused in 3a/3b) —
+add it to `PhotoSuggestion` later if a step needs it for service-type matching.
 
 ### Placeholder steps 2–5
 
@@ -153,7 +155,10 @@ Shell: STEPS table + route → StepIndicator state + Back/Next routing; canAdvan
 - **`ImageStep.test.ts`** — selecting a file calls `processForClassify` (mocked) then the classify
   API (mocked via `useApi`/fetch), and on success calls `store.setPhoto` + `store.setPhotoSuggestions`;
   Skip/Next advance; a classify error shows the inline message and does not throw.
-- **`router/routes.test.ts` (extended)** — the five `/report/*` routes resolve.
+- **`router/routes.test.ts` (extended)** — the five `/report/*` routes resolve. NOTE: making
+  `/report` a parent-with-index-child changes `r.resolve('/report').matched` from length 1 to 2
+  (parent + index child); update that existing assertion (e.g. assert the last matched record's
+  component, or `toHaveLength(2)`).
 - **`router/wizardGuard.test.ts` (reworked)** — Image + Issue type allowed when the store is empty;
   Location and beyond redirect to `/report` without a category; allowed with a category. (Extend
   the already-ported guard test.)
