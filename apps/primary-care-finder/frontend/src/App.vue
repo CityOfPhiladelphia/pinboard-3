@@ -17,12 +17,18 @@ import { useLocations } from './composables/useLocations'
 import LocationCard from './components/LocationCard.vue'
 import LocationDetail from './components/LocationDetail.vue'
 import type { PrimaryCareLocation } from './types'
-import type { BasicLocation } from '../../../../packages/ui/src/types'
+import type { BasicLocation, LatLon } from '../../../../packages/ui/src/types'
 
 const searchPlaceholderText = 'Search by address or keyword...'
 
 const { locations, isLoading, errorMessage, geojson } = useLocations()
-const { userLocation } = PinboardComposables.useUserLocation()
+// Location is requested only when the user clicks the geolocation button, which
+// emits to handleGeolocate. The shared useUserLocation composable prompts on load,
+// which the primary care finder intentionally avoids.
+const userLocation = ref<LatLon>({
+  latitude: NaN,
+  longitude: NaN,
+})
 const searchString = ref('')
 
 const filterValues = ref<FilterValues>({})
@@ -162,10 +168,6 @@ function handleGeolocateError(error: Error | GeolocationPositionError) {
   console.log(error)
 }
 
-function getCardDetails(loc: { name: string; [key: string]: unknown }) {
-  return { heading: loc.name, isLoading: false }
-}
-
 const isMobile = PinboardComposables.useIsMobile()
 
 function asPrimaryCareLocation(location: BasicLocation) {
@@ -202,7 +204,6 @@ function asPrimaryCareLocation(location: BasicLocation) {
       v-model:filter-values="filterValues"
       :locations="filteredLocations"
       :search-or-user-location="userLocation"
-      :get-card-details="getCardDetails"
       :is-loading="isLoading"
       :error-message="errorMessage"
       :location-panel-search="searchPlaceholderText"
