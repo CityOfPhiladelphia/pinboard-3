@@ -590,21 +590,6 @@ const effectiveMapConfig = (() => {
     padding: 0 1rem;
   }
 
-  .mobile-map-search-filter :deep(.mobile-search) {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .mobile-map-search-filter :deep(.mobile-search .state-layer),
-  .mobile-map-search-filter :deep(.mobile-search .content) {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
-  .mobile-map-search-filter :deep(.mobile-search .phila-text-field) {
-    padding: 0 var(--scale-small, 0.5rem) !important;
-  }
-
   .mobile-map-search-filter :deep(.location-filters) {
     padding: 0.25rem 0 0;
     padding-left: 19px;
