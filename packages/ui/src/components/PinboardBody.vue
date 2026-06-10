@@ -18,7 +18,7 @@ import { PINBOARD_CONFIG_KEY } from '../plugin'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 import FilterChipBar from './FilterChipBar.vue'
-import AllFiltersPanel from './AllFiltersPanel.vue'
+import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
 // pinboard composables imports
 
@@ -89,6 +89,8 @@ function onFilterValues(value: FilterValues) {
 // component variables
 const snapPoints = [15, 50, 100]
 const config = inject(PINBOARD_CONFIG_KEY)
+// Mobile: chips render under the on-map search bar when 'map', else in the bottom sheet.
+const chipsOnMap = computed(() => config?.mobileFilterPlacement === 'map')
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const slots: Record<string, any> = useSlots()
 
@@ -287,12 +289,14 @@ const effectiveMapConfig = (() => {
           @sort-option="handleLocationSortChange"
         >
           <template v-if="filters" #below-search>
-            <FilterChipBar
-              :filters="filters"
-              :model-value="filterValues ?? {}"
-              @update:model-value="onFilterValues"
-              @open-filters="allFiltersOpen = true"
-            />
+            <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
+              <FilterChipBar
+                :filters="filters"
+                :model-value="filterValues ?? {}"
+                @update:model-value="onFilterValues"
+                @open-filters="allFiltersOpen = true"
+              />
+            </Teleport>
           </template>
         </LocationsPanel>
       </Teleport>
@@ -332,11 +336,12 @@ const effectiveMapConfig = (() => {
 
     <Teleport to="body" :disabled="!isMobile">
       <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
-        <AllFiltersPanel
-          v-model:open="allFiltersOpen"
+        <FilterPanel
+          v-if="allFiltersOpen"
           :filters="filters"
           :model-value="filterValues ?? {}"
           @update:model-value="onFilterValues"
+          @close="allFiltersOpen = false"
         />
       </div>
     </Teleport>
@@ -567,7 +572,18 @@ const effectiveMapConfig = (() => {
     left: 0;
     right: 0;
     z-index: 2;
-    padding: 10px 24px;
+    padding: 10px 0;
+  }
+
+  /* Container spans edge to edge; the search bar and chip row each get a 1rem
+     side inset so they align. The chip row's inset sits inside the scroll track,
+     so it scrolls away with the chips. */
+  .mobile-map-search-filter :deep(.location-search) {
+    padding: 0 1rem;
+  }
+  .mobile-map-search-filter :deep(.filter-chip-bar .phila-filter-chip-group__row) {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 
   .mobile-map-search-filter :deep(.mobile-search) {

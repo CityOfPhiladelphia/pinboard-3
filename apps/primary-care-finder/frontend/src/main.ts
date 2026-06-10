@@ -9,6 +9,7 @@ app.use(i18n)
 app.use(
   createPinboard({
     title: 'Primary Care Finder',
+    mobileFilterPlacement: 'map',
     map: {
       center: [-75.16, 39.95],
       zoom: 12,
