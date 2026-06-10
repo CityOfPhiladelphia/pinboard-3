@@ -1,3 +1,4 @@
+import './styles/global.css'
 import PinboardShell from './components/PinboardShell.vue'
 import PinboardBody from './components/PinboardBody.vue'
 export * as PinboardComposables from './composables/_index'
