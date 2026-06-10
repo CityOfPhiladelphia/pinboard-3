@@ -148,9 +148,9 @@ git commit -m "feat(philly-311): StepIndicator — 5-step wizard progress"
 
 - [ ] **Step 1: Create the five step pages.** Each placeholder injects `canAdvance` and sets it true so the shell's Next works:
 
-`ImageStep.vue` (temporary placeholder body — replaced in Task 6):
+`ImageStep.vue` (placeholder body for now; Task 6 replaces the whole file):
 ```vue
-<!-- ABOUTME: Wizard step 1 — optional image upload + ML classify (real body in Task 6). -->
+<!-- ABOUTME: Wizard step 1 — optional photo upload placeholder. -->
 <script setup lang="ts">
 import { inject, onMounted, type Ref } from 'vue'
 const canAdvance = inject<Ref<boolean>>('wizard:canAdvance')
@@ -160,9 +160,12 @@ onMounted(() => { if (canAdvance) canAdvance.value = true })
   <div class="wizard-step"><p>Image step — coming soon.</p></div>
 </template>
 ```
-Create `IssueTypeStep.vue`, `LocationStep.vue`, `DetailsStep.vue`, `ReviewStep.vue` identically, changing the ABOUTME + the placeholder text ("Issue type — coming soon.", etc.). ABOUTME for each, e.g.:
+Create `IssueTypeStep.vue`, `LocationStep.vue`, `DetailsStep.vue`, `ReviewStep.vue` identically,
+changing the ABOUTME + the placeholder text ("Issue type — coming soon.", etc.). Keep each ABOUTME
+**evergreen** (describe the file as it is — a placeholder — with no reference to future tasks/slices),
+e.g.:
 ```vue
-<!-- ABOUTME: Wizard step 2 — issue type + conditional questions (placeholder; built in slice 3b). -->
+<!-- ABOUTME: Wizard step 2 — issue type + conditional questions placeholder. -->
 ```
 
 - [ ] **Step 2: Restructure the routes.** In `router/index.ts`, replace the flat `/report` entry with a parent + children:
