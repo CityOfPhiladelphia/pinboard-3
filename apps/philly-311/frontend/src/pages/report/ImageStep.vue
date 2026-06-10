@@ -46,7 +46,7 @@ async function onFile(e: Event) {
     classifyBody.imgB64 = await processForClassify(file)
     const result = await classify.fetchData()
     if (!result || classify.error.value) {
-      errorMessage.value = classify.error.value?.message ?? 'Classification failed.'
+      errorMessage.value = classify.error.value?.message || 'Classification failed.'
       if (previewUrl) URL.revokeObjectURL?.(previewUrl)
       return
     }

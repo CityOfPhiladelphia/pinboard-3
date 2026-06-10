@@ -69,6 +69,16 @@ describe('ImageStep', () => {
     expect(useReportSubmissionStore().photo).toBeNull()
   })
 
+  it('shows fallback text when API error message is an empty string', async () => {
+    apiError.value = { message: '' }
+    fetchData.mockResolvedValue(null)
+    const w = mount(ImageStep)
+    await selectFile(w)
+    await flushPromises()
+    expect(w.text()).toContain('Classification failed.')
+    expect(useReportSubmissionStore().photo).toBeNull()
+  })
+
   it('shows fallback error text and leaves photo null when processForClassify rejects', async () => {
     ;(processForClassify as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
       new Error(''),
