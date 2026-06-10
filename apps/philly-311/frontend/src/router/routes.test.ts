@@ -9,9 +9,21 @@ function makeRouter() {
 }
 
 describe('routes', () => {
-  it('resolves the report placeholder', () => {
+  it('resolves the report wizard shell + index (image) step', () => {
     const r = makeRouter()
-    expect(r.resolve('/report').matched).toHaveLength(1)
+    const resolved = r.resolve('/report')
+    expect(resolved.matched).toHaveLength(2) // parent ReportPage + index ImageStep
+  })
+  it('resolves the wizard sub-steps', () => {
+    const r = makeRouter()
+    for (const p of [
+      '/report/issue-type',
+      '/report/location',
+      '/report/details',
+      '/report/review',
+    ]) {
+      expect(r.resolve(p).matched.length).toBeGreaterThanOrEqual(2)
+    }
   })
   it('resolves an answer placeholder with an id param', () => {
     const r = makeRouter()

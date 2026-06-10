@@ -13,7 +13,17 @@ import { useReportSubmissionStore } from '@/stores/reportSubmission'
 
 export const routes: RouteRecordRaw[] = [
   { path: '/', component: () => import('@/pages/LandingPage.vue') },
-  { path: '/report', component: () => import('@/pages/ReportPage.vue') },
+  {
+    path: '/report',
+    component: () => import('@/pages/ReportPage.vue'),
+    children: [
+      { path: '', component: () => import('@/pages/report/ImageStep.vue') },
+      { path: 'issue-type', component: () => import('@/pages/report/IssueTypeStep.vue') },
+      { path: 'location', component: () => import('@/pages/report/LocationStep.vue') },
+      { path: 'details', component: () => import('@/pages/report/DetailsStep.vue') },
+      { path: 'review', component: () => import('@/pages/report/ReviewStep.vue') },
+    ],
+  },
   { path: '/answers/:id', component: () => import('@/pages/AnswerDetailPage.vue') },
   { path: '/auth/redirect', component: () => import('@/pages/AuthRedirectPage.vue') },
 ]
