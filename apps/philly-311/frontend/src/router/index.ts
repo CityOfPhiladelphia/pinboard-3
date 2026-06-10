@@ -77,7 +77,10 @@ export function wizardGuard(to: RouteLocationNormalized): true | string {
     store.setLocation({ address: '', lat, lng })
   }
 
-  if (store.isEmpty) return '/report'
+  // Issue type is always reachable (it's where a category is chosen); Image is optional.
+  if (to.path === '/report/issue-type') return true
+  // Deeper steps require a chosen category.
+  if (!store.category) return '/report'
   return true
 }
 

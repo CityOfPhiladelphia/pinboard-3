@@ -21,90 +21,65 @@ function makeRoute(path: string, query: Record<string, string> = {}): RouteLocat
 }
 
 describe('wizardGuard', () => {
-  beforeEach(() => {
-    setActivePinia(createPinia())
-  })
+  beforeEach(() => setActivePinia(createPinia()))
 
-  it('redirects to /report when store is empty and navigating to a wizard sub-step', () => {
-    const result = wizardGuard(makeRoute('/report/questions'))
-    expect(result).toBe('/report')
+  it('allows /report exactly without checking the store', () => {
+    expect(wizardGuard(makeRoute('/report'))).toBe(true)
   })
-
-  it('seeds category from query param and returns true', () => {
-    const result = wizardGuard(makeRoute('/report/questions', { category: 'Pothole Repair' }))
+  it('allows /report/issue-type even when the store is empty', () => {
+    expect(wizardGuard(makeRoute('/report/issue-type'))).toBe(true)
+  })
+  it('redirects deep steps to /report when no category is chosen', () => {
+    expect(wizardGuard(makeRoute('/report/location'))).toBe('/report')
+    expect(wizardGuard(makeRoute('/report/details'))).toBe('/report')
+  })
+  it('allows deep steps once a category is set', () => {
+    useReportSubmissionStore().setCategory('Pothole Repair')
+    expect(wizardGuard(makeRoute('/report/location'))).toBe(true)
+  })
+  it('seeds category from a query param and allows', () => {
+    const result = wizardGuard(makeRoute('/report/issue-type', { category: 'Pothole Repair' }))
     expect(result).toBe(true)
-    const store = useReportSubmissionStore()
-    expect(store.category).toBe('Pothole Repair')
+    expect(useReportSubmissionStore().category).toBe('Pothole Repair')
   })
-
-  it('seeds location from lat/lng query params and returns true', () => {
-    const result = wizardGuard(makeRoute('/report/location', { lat: '39.95', lng: '-75.16' }))
-    expect(result).toBe(true)
-    const store = useReportSubmissionStore()
-    expect(store.location).toEqual({ address: '', lat: 39.95, lng: -75.16 })
-  })
-
-  it('does not seed location when lat is invalid', () => {
-    wizardGuard(makeRoute('/report/location', { lat: 'invalid', lng: '-75.16' }))
-    const store = useReportSubmissionStore()
-    expect(store.location).toBeNull()
-  })
-
-  it('does not seed location when lng is invalid', () => {
-    wizardGuard(makeRoute('/report/location', { lat: '39.95', lng: 'invalid' }))
-    const store = useReportSubmissionStore()
-    expect(store.location).toBeNull()
-  })
-
-  it('does not seed location when only lat is present', () => {
-    wizardGuard(makeRoute('/report/location', { lat: '39.95' }))
-    const store = useReportSubmissionStore()
-    expect(store.location).toBeNull()
-  })
-
-  it('allows navigation when store is non-empty', () => {
-    const store = useReportSubmissionStore()
-    store.setCategory('Pothole Repair')
-    const result = wizardGuard(makeRoute('/report/details'))
-    expect(result).toBe(true)
-  })
-
-  it('does not modify the store when navigating to a non-wizard route', () => {
-    wizardGuard(makeRoute('/'))
-    const store = useReportSubmissionStore()
-    expect(store.isEmpty).toBe(true)
-  })
-
-  it('allows navigation to /report exactly without checking the store', () => {
-    const result = wizardGuard(makeRoute('/report'))
-    expect(result).toBe(true)
-  })
-
-  it('overwrites the store category when the query carries a different one', () => {
+  it('overwrites a different query category and clears custom fields', () => {
     const store = useReportSubmissionStore()
     store.setCategory('Graffiti Removal')
     store.setQuestion('Color__c', 'Red')
-    wizardGuard(makeRoute('/report/questions', { category: 'Pothole Repair' }))
+    wizardGuard(makeRoute('/report/issue-type', { category: 'Pothole Repair' }))
     expect(store.category).toBe('Pothole Repair')
-    // Custom fields are tied to the previous category and must reset.
     expect(store.customFields).toEqual({})
   })
-
-  it('leaves the store category alone when the query category matches', () => {
+  it('preserves custom fields when the query category matches', () => {
     const store = useReportSubmissionStore()
     store.setCategory('Pothole Repair')
     store.setQuestion('Severity__c', 'Deep')
-    wizardGuard(makeRoute('/report/questions', { category: 'Pothole Repair' }))
-    expect(store.category).toBe('Pothole Repair')
-    // No category change → custom fields preserved.
+    wizardGuard(makeRoute('/report/issue-type', { category: 'Pothole Repair' }))
     expect(store.customFields).toEqual({ Severity__c: 'Deep' })
   })
-
-  it('does not overwrite location in store with query params when location already set', () => {
+  it('seeds location from lat/lng (with a category present) and allows', () => {
+    const store = useReportSubmissionStore()
+    store.setCategory('Pothole Repair')
+    const result = wizardGuard(makeRoute('/report/location', { lat: '39.95', lng: '-75.16' }))
+    expect(result).toBe(true)
+    expect(store.location).toEqual({ address: '', lat: 39.95, lng: -75.16 })
+  })
+  it('does not seed location when lat/lng are invalid or partial', () => {
+    const store = useReportSubmissionStore()
+    store.setCategory('Pothole Repair')
+    wizardGuard(makeRoute('/report/location', { lat: 'x', lng: '-75.16' }))
+    wizardGuard(makeRoute('/report/location', { lat: '39.95' }))
+    expect(store.location).toBeNull()
+  })
+  it('does not overwrite an existing location with query params', () => {
     const store = useReportSubmissionStore()
     store.setCategory('Pothole Repair')
     store.setLocation({ address: '1234 Main St', lat: 39.95, lng: -75.16 })
-    wizardGuard(makeRoute('/report/location', { lat: '40.00', lng: '-76.00' }))
+    wizardGuard(makeRoute('/report/location', { lat: '40.0', lng: '-76.0' }))
     expect(store.location).toEqual({ address: '1234 Main St', lat: 39.95, lng: -75.16 })
+  })
+  it('does not modify the store on a non-wizard route', () => {
+    wizardGuard(makeRoute('/'))
+    expect(useReportSubmissionStore().isEmpty).toBe(true)
   })
 })
