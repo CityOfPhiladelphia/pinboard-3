@@ -1,5 +1,5 @@
 // ABOUTME: Tests for the wizardGuard route guard.
-// ABOUTME: Verifies deep-link seeding, empty-store redirect, and pass-through behaviour.
+// ABOUTME: Verifies deep-link seeding, category-gated redirects, and pass-through behaviour.
 import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { type RouteLocationNormalized } from 'vue-router'
@@ -32,6 +32,7 @@ describe('wizardGuard', () => {
   it('redirects deep steps to /report when no category is chosen', () => {
     expect(wizardGuard(makeRoute('/report/location'))).toBe('/report')
     expect(wizardGuard(makeRoute('/report/details'))).toBe('/report')
+    expect(wizardGuard(makeRoute('/report/review'))).toBe('/report')
   })
   it('allows deep steps once a category is set', () => {
     useReportSubmissionStore().setCategory('Pothole Repair')
