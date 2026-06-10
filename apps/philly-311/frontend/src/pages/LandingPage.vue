@@ -36,7 +36,7 @@ const filterOptions: PinboardTypes.LocationFilterOption[] = [
 
 async function onSearch(query: string) {
   const feature = await searchAddress(query)
-  if (feature) finder.setCenter({ latitude: feature.lat, longitude: feature.lng })
+  if (feature) void finder.setCenter({ latitude: feature.lat, longitude: feature.lng })
 }
 </script>
 
