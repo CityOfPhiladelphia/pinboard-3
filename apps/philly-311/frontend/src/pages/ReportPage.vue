@@ -1,13 +1,165 @@
-<!-- ABOUTME: Placeholder for the report flow; replaced by the report wizard in Increment 3. -->
-<script setup lang="ts"></script>
+<!-- ABOUTME: Report-wizard shell. Renders a breadcrumb, the StepIndicator, the active
+     child step via <router-view>, and contextual Reset/Skip/Back/Next controls.
+     canAdvance is provided to children; Next is disabled until a step sets it. -->
+<script setup lang="ts">
+import { provide, ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import StepIndicator from '@/components/wizard/StepIndicator.vue'
+import { useReportSubmissionStore } from '@/stores/reportSubmission'
+import { WIZARD_CAN_ADVANCE_KEY } from '@/composables/useWizardValidity'
+
+const router = useRouter()
+const route = useRoute()
+const store = useReportSubmissionStore()
+
+const STEPS = [
+  { title: 'Image', path: '/report' },
+  { title: 'Issue type', path: '/report/issue-type' },
+  { title: 'Location', path: '/report/location' },
+  { title: 'Details', path: '/report/details' },
+  { title: 'Review', path: '/report/review' },
+]
+
+const canAdvance = ref(true)
+provide(WIZARD_CAN_ADVANCE_KEY, canAdvance)
+
+const currentStep = computed(() => {
+  const idx = STEPS.findIndex((s) => s.path === route.path)
+  return idx === -1 ? 1 : idx + 1
+})
+const completedThrough = computed(() => Math.max(0, currentStep.value - 1))
+const isImageStep = computed(() => currentStep.value === 1)
+const isLast = computed(() => currentStep.value === STEPS.length)
+const prevPath = computed(() => STEPS[currentStep.value - 2]?.path ?? null)
+const nextPath = computed(() => STEPS[currentStep.value]?.path ?? null)
+
+function goPrev() {
+  if (prevPath.value) router.push(prevPath.value)
+}
+function goNext() {
+  if (canAdvance.value && nextPath.value) router.push(nextPath.value)
+}
+function jumpTo(path: string) {
+  router.push(path)
+}
+function resetWizard() {
+  store.reset()
+  router.push('/report')
+}
+</script>
+
 <template>
-  <section class="report-page">
-    <h1>Report a problem</h1>
-    <p>The report flow is coming soon.</p>
-  </section>
+  <main class="wizard">
+    <nav class="wizard__crumb" aria-label="Breadcrumb">
+      <RouterLink to="/">Home</RouterLink> / <span>Report an issue</span>
+    </nav>
+
+    <StepIndicator
+      :steps="STEPS"
+      :current-step="currentStep"
+      :completed-through="completedThrough"
+      @navigate="jumpTo"
+    />
+
+    <section class="wizard__content">
+      <RouterView />
+    </section>
+
+    <footer class="wizard__nav">
+      <button
+        v-if="isImageStep"
+        type="button"
+        class="wizard__reset"
+        data-test="wizard-reset"
+        @click="resetWizard"
+      >
+        Reset
+      </button>
+      <button
+        v-else
+        type="button"
+        class="wizard__btn wizard__btn--secondary"
+        data-test="wizard-back"
+        :disabled="!prevPath"
+        @click="goPrev"
+      >
+        Back
+      </button>
+
+      <div class="wizard__nav-right">
+        <button
+          v-if="isImageStep"
+          type="button"
+          class="wizard__btn wizard__btn--secondary"
+          data-test="wizard-skip"
+          @click="goNext"
+        >
+          Skip
+        </button>
+        <button
+          v-if="!isLast"
+          type="button"
+          class="wizard__btn wizard__btn--primary"
+          data-test="wizard-next"
+          :disabled="!canAdvance || !nextPath"
+          @click="goNext"
+        >
+          Next
+        </button>
+      </div>
+    </footer>
+  </main>
 </template>
+
 <style scoped>
-.report-page {
-  padding: var(--spacing-l, 2rem);
+.wizard {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: var(--spacing-m, 1rem);
+}
+.wizard__crumb {
+  font-size: 0.875rem;
+  margin-bottom: var(--spacing-s, 0.75rem);
+}
+.wizard__content {
+  padding: var(--spacing-l, 2rem) 0;
+  min-height: 320px;
+}
+.wizard__nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--spacing-m, 1rem);
+  border-top: 1px solid var(--ui-color-grey-300, #d6d6d6);
+}
+.wizard__nav-right {
+  display: flex;
+  gap: var(--spacing-s, 0.75rem);
+}
+.wizard__btn {
+  padding: var(--spacing-s, 0.5rem) var(--spacing-l, 1.5rem);
+  border-radius: 9999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.wizard__btn--primary {
+  background: var(--ui-color-primary, #0f4d90);
+  color: #fff;
+  border: none;
+}
+.wizard__btn--secondary {
+  background: #fff;
+  color: var(--ui-color-primary, #0f4d90);
+  border: 1px solid var(--ui-color-primary, #0f4d90);
+}
+.wizard__btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.wizard__reset {
+  background: none;
+  border: none;
+  color: var(--ui-color-primary, #0f4d90);
+  cursor: pointer;
 }
 </style>
