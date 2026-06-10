@@ -11,7 +11,8 @@ vi.mock('@/utils/photo', () => ({
 }))
 const fetchData = vi.fn()
 const apiError = ref<{ message: string } | null>(null)
-vi.mock('@/composables/useApi', () => ({ useApi: () => ({ fetchData, error: apiError }) }))
+const useApiMock = vi.fn(() => ({ fetchData, error: apiError }))
+vi.mock('@/composables/useApi', () => ({ useApi: (...args: unknown[]) => useApiMock(...args) }))
 
 import ImageStep from './ImageStep.vue'
 import { processForClassify } from '@/utils/photo'
@@ -27,6 +28,7 @@ beforeEach(() => {
   setActivePinia(createPinia())
   fetchData.mockReset()
   apiError.value = null
+  useApiMock.mockClear()
   ;(processForClassify as unknown as ReturnType<typeof vi.fn>).mockClear()
   if (typeof URL.createObjectURL !== 'function') {
     Object.defineProperty(URL, 'createObjectURL', { value: () => 'blob:x', configurable: true })
@@ -35,14 +37,23 @@ beforeEach(() => {
 })
 
 describe('ImageStep', () => {
+  it('creates the classify api during setup, not in the change handler', () => {
+    mount(ImageStep)
+    expect(useApiMock).toHaveBeenCalledTimes(1)
+  })
   it('classifies a chosen photo and stores mediaUrl + suggestions', async () => {
     fetchData.mockResolvedValue({
       imageUrl: 'https://cdn.test/p.jpg',
       classifications: [{ serviceType: 'Pothole Repair', confidence: 0.9, caseType: 'X' }],
     })
     const w = mount(ImageStep)
+    expect(useApiMock).toHaveBeenCalledWith(
+      expect.objectContaining({ url: '/private/key/classify', method: 'POST' }),
+    )
+    const body = useApiMock.mock.calls[0][0].body as { imgB64: string }
     await selectFile(w)
     await flushPromises()
+    expect(body.imgB64).toBe('data:image/jpeg;base64,xxx')
     expect(processForClassify).toHaveBeenCalled()
     const store = useReportSubmissionStore()
     expect(store.photo?.mediaUrl).toBe('https://cdn.test/p.jpg')

@@ -20,6 +20,15 @@ if (canAdvance) canAdvance.value = true // the step is optional
 const classifying = ref(false)
 const errorMessage = ref('')
 
+// classifyBody.imgB64 is mutated before each fetchData() call; useApi reads
+// opts.body lazily so the latest value is always sent.
+const classifyBody = { imgB64: '' }
+const classify = useApi<ClassifyResponse>({
+  url: '/private/key/classify',
+  method: 'POST',
+  body: classifyBody,
+})
+
 // createObjectURL produces a short-lived preview URL; the browser holds
 // the underlying blob alive until revokeObjectURL is called or page unloads.
 function makePreview(file: File): string | undefined {
@@ -33,15 +42,10 @@ async function onFile(e: Event) {
   errorMessage.value = ''
   const previewUrl = makePreview(file)
   try {
-    const imgB64 = await processForClassify(file)
-    const api = useApi<ClassifyResponse>({
-      url: '/private/key/classify',
-      method: 'POST',
-      body: { imgB64 },
-    })
-    const result = await api.fetchData()
-    if (!result || api.error.value) {
-      errorMessage.value = api.error.value?.message ?? 'Classification failed.'
+    classifyBody.imgB64 = await processForClassify(file)
+    const result = await classify.fetchData()
+    if (!result || classify.error.value) {
+      errorMessage.value = classify.error.value?.message ?? 'Classification failed.'
       if (previewUrl) URL.revokeObjectURL?.(previewUrl)
       return
     }
