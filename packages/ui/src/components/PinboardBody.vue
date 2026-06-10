@@ -575,15 +575,10 @@ const effectiveMapConfig = (() => {
     padding: 10px 0;
   }
 
-  /* Container spans edge to edge; the search bar and chip row each get a 1rem
-     side inset so they align. The chip row's inset sits inside the scroll track,
-     so it scrolls away with the chips. */
+  /* Container spans edge to edge; give the search bar a 1rem side inset so it
+     aligns with the chip row (whose matching inset comes from FilterChipGroup). */
   .mobile-map-search-filter :deep(.location-search) {
     padding: 0 1rem;
-  }
-  .mobile-map-search-filter :deep(.filter-chip-bar .phila-filter-chip-group__row) {
-    padding-left: 1rem;
-    padding-right: 1rem;
   }
 
   .mobile-map-search-filter :deep(.mobile-search) {
