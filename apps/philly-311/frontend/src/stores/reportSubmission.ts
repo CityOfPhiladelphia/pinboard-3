@@ -3,7 +3,13 @@
 // ABOUTME: contact info, and privacy. Builds the API submit payload on demand.
 import { defineStore } from 'pinia'
 import { useApi } from '@/composables/useApi'
-import type { ContactInfo, PhotoAsset, SubmitPayload, WizardLocation } from '@/types/wizard'
+import type {
+  ContactInfo,
+  PhotoAsset,
+  PhotoSuggestion,
+  SubmitPayload,
+  WizardLocation,
+} from '@/types/wizard'
 
 interface SubmitResponse {
   id: string
@@ -21,6 +27,7 @@ interface State {
   /** When true, the report is publicly visible. Default false (matches mobile). */
   publicVisibility: boolean
   lastFieldErrors: Record<string, string> | null
+  photoSuggestions: PhotoSuggestion[]
 }
 
 const initial = (): State => ({
@@ -32,6 +39,7 @@ const initial = (): State => ({
   contact: {},
   publicVisibility: false,
   lastFieldErrors: null,
+  photoSuggestions: [],
 })
 
 export const useReportSubmissionStore = defineStore('reportSubmission', {
@@ -65,6 +73,9 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     },
     setLocation(location: WizardLocation | null) {
       this.location = location
+    },
+    setPhotoSuggestions(suggestions: PhotoSuggestion[]) {
+      this.photoSuggestions = suggestions
     },
     setPhoto(photo: PhotoAsset | null) {
       // Revoke the previous blob URL so the underlying File can be GC'd.

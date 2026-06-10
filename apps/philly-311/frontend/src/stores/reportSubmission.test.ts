@@ -356,6 +356,16 @@ describe('useReportSubmissionStore', () => {
     })
   })
 
+  it('stores and clears photo suggestions', () => {
+    setActivePinia(createPinia())
+    const store = useReportSubmissionStore()
+    expect(store.photoSuggestions).toEqual([])
+    store.setPhotoSuggestions([{ serviceType: 'Pothole Repair', confidence: 0.9 }])
+    expect(store.photoSuggestions).toEqual([{ serviceType: 'Pothole Repair', confidence: 0.9 }])
+    store.reset()
+    expect(store.photoSuggestions).toEqual([])
+  })
+
   describe('submit', () => {
     function filledStore() {
       const store = useReportSubmissionStore()

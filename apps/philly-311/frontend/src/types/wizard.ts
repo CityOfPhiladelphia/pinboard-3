@@ -26,6 +26,12 @@ export interface WizardLocation {
   lng: number
 }
 
+/** A photo-classification suggestion from /classify (caseType dropped — unused for now). */
+export interface PhotoSuggestion {
+  serviceType: string
+  confidence: number
+}
+
 /** Shape of the POST /private/key/submit body. */
 export interface SubmitPayload {
   serviceRequestType: string
