@@ -94,7 +94,10 @@ only (the catalog is ~53 entries, already in memory).
 Port `/web/webportal/frontend/src/components/wizard/QuestionField.vue` with its input-type
 mapping: `picklist` ≤4 options → phila-ui RadioGroup, >4 → native select; `multipicklist` →
 CheckboxGroup (values joined with `;`); `boolean` → Switch; `date` → DateField; `double`/number →
-TextField with numeric mask; `textarea` → native textarea; default → TextField. Required fields
+TextField with numeric mask; `textarea` → native textarea; default → TextField.
+**Dependency note:** the app already has `@phila/phila-ui-radio`, `-checkbox`, and `-text-field`
+but NOT `@phila/phila-ui-switch` or `@phila/phila-ui-date-field` — the port must add those two
+(npm 0.0.5 / 0.0.9; the POC uses both). Required fields
 get an asterisk in the label. Value changes emit to the parent which calls
 `store.setQuestion(field, value)` (empty values delete the key — existing store semantics).
 No "showError" machinery: the shell's disabled Next is the gate (plus the "* Required" legend).
@@ -136,6 +139,8 @@ validity:   category && required visible answered → useWizardValidity → shel
   `WIZARD_CAN_ADVANCE_KEY`), true for zero-question types; conditional follow-up appears when its
   controller is answered; catalog error → Retry re-calls load; suggestions panel only when
   `store.photo` and surviving suggestions exist.
+- A required `boolean` question counts as unanswered until first toggled (`customFields` key
+  absent) — if any catalog type has one, `IssueTypeStep.test.ts` covers it explicitly.
 - `useApi` is mocked in component tests (its own tests cover fetching); store is real Pinia.
 - Slice ends with a real-browser Playwright smoke (photo → suggestion → questions → Next, and a
   no-photo search → select → questions path).
