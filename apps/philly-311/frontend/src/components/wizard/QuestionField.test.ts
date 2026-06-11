@@ -38,6 +38,7 @@ describe('QuestionField rendering by type', () => {
     })
     expect(w.find('select').exists()).toBe(true)
     expect(w.findAll('option')).toHaveLength(6) // placeholder + 5
+    expect(w.find('option[value=""]').attributes('disabled')).toBeDefined()
     expect(w.findComponent(RadioGroup).exists()).toBe(false)
   })
 
@@ -63,6 +64,8 @@ describe('QuestionField rendering by type', () => {
       props: { question: make({ type: 'date' }), modelValue: '' },
     })
     expect(w.findComponent(DateField).exists()).toBe(true)
+    expect(w.findComponent(DateField).props('label')).toBe('F label')
+    expect(w.findComponent(DateField).props('modelValue')).toBe('')
   })
 
   it('boolean type renders Switch', () => {
@@ -70,6 +73,7 @@ describe('QuestionField rendering by type', () => {
       props: { question: make({ type: 'boolean' }), modelValue: 'false' },
     })
     expect(w.findComponent(Switch).exists()).toBe(true)
+    expect(w.findComponent(Switch).props('ariaLabel')).toBe('F label')
   })
 
   it('double/number/currency type renders TextField', () => {
