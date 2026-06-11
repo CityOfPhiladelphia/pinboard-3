@@ -93,7 +93,8 @@ Props change from required `lat`/`lng` to an optional `location: {lat, lng} | nu
   `isInPhilly`.
 
 Uses `@phila/phila-ui-map-core` `Map` + `MapMarker` (already mocked in the test setup) with
-`useMapBounds` and the shared basemap source from `utils/mapTiles.ts`. Marker styling: default
+`useMapBounds` — the bounds clamp keeps the default basemap inside its cached tile region, the
+POC-proven setup. Marker styling: default
 marker is acceptable; reuse the finder's marker look only if it drops in cheaply.
 
 ### Data flow
