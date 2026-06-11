@@ -55,6 +55,15 @@ describe('autocompleteAddresses', () => {
     expect(calledUrl.searchParams.get('q')).toBe('broad st')
     expect(calledUrl.pathname).toBe('/autocomplete')
   })
+
+  it('appends gatekeeperKey query param', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ results: { addresses: [] } }), { status: 200 }),
+    )
+    await autocompleteAddresses('broad st')
+    const calledUrl = new URL(fetchMock.mock.calls[0][0] as string)
+    expect(calledUrl.searchParams.get('gatekeeperKey')).toBe('test-gatekeeper')
+  })
 })
 
 describe('searchAddress', () => {
