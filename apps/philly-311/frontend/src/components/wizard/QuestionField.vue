@@ -1,0 +1,138 @@
+<!-- ABOUTME: Renders a single wizard question's input field by question.type using phila-ui components.
+     SelectField (large picklist) and textarea remain native HTML; all other types use phila-ui packages. -->
+<script setup lang="ts">
+import { computed } from 'vue'
+import { TextField } from '@phila/phila-ui-text-field'
+import { RadioGroup } from '@phila/phila-ui-radio'
+import { CheckboxGroup } from '@phila/phila-ui-checkbox'
+import { Switch } from '@phila/phila-ui-switch'
+import { DateField } from '@phila/phila-ui-date-field'
+import type { QuestionField } from '@/types/api'
+
+const props = defineProps<{
+  question: QuestionField
+  modelValue: string
+}>()
+const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
+
+const fieldId = computed(() => `q-${props.question.field}`)
+const labelText = computed(() =>
+  props.question.required ? `${props.question.label} *` : props.question.label,
+)
+const useRadioGroup = computed(
+  () => props.question.type === 'picklist' && (props.question.options?.length ?? 0) <= 4,
+)
+const isLargePicklist = computed(
+  () => props.question.type === 'picklist' && (props.question.options?.length ?? 0) > 4,
+)
+
+const radioChoices = computed(() =>
+  (props.question.options ?? []).map((o) => ({ text: o, value: o })),
+)
+const checkboxChoices = computed(() =>
+  (props.question.options ?? []).map((o) => ({ text: o, value: o })),
+)
+const checkboxValue = computed<string[]>(() =>
+  props.modelValue ? props.modelValue.split(';').filter(Boolean) : [],
+)
+
+function set(value: string) {
+  emit('update:modelValue', value)
+}
+function setCheckbox(values: Array<string | number | boolean>) {
+  set(values.map(String).join(';'))
+}
+</script>
+
+<template>
+  <div class="question-field" :data-type="question.type">
+    <!-- picklist (≤4): RadioGroup -->
+    <RadioGroup
+      v-if="useRadioGroup"
+      :group-label="labelText"
+      :choices="radioChoices"
+      :model-value="modelValue"
+      @update:model-value="set"
+    />
+
+    <!-- picklist (>4): native select (phila-ui SelectField is a stub) -->
+    <template v-else-if="isLargePicklist">
+      <label :for="fieldId" class="question-field__label">{{ labelText }}</label>
+      <select
+        :id="fieldId"
+        :value="modelValue"
+        @change="set(($event.target as HTMLSelectElement).value)"
+      >
+        <option value="" disabled>Select…</option>
+        <option v-for="opt in question.options" :key="opt" :value="opt">{{ opt }}</option>
+      </select>
+    </template>
+
+    <!-- multipicklist: CheckboxGroup -->
+    <CheckboxGroup
+      v-else-if="question.type === 'multipicklist'"
+      :group-label="labelText"
+      :choices="checkboxChoices"
+      :model-value="checkboxValue"
+      @update:model-value="setCheckbox"
+    />
+
+    <!-- textarea: native (phila-ui-textarea is a stub) -->
+    <template v-else-if="question.type === 'textarea'">
+      <label :for="fieldId" class="question-field__label">{{ labelText }}</label>
+      <textarea
+        :id="fieldId"
+        :value="modelValue"
+        rows="3"
+        @input="set(($event.target as HTMLTextAreaElement).value)"
+      ></textarea>
+    </template>
+
+    <!-- date: DateField -->
+    <DateField
+      v-else-if="question.type === 'date'"
+      :id="fieldId"
+      :label="labelText"
+      :model-value="modelValue"
+      @update:model-value="set"
+    />
+
+    <!-- boolean: Switch -->
+    <Switch
+      v-else-if="question.type === 'boolean'"
+      :id="fieldId"
+      :model-value="modelValue"
+      value="true"
+      off-value="false"
+      :aria-label="labelText"
+      @update:model-value="(v: string | number | boolean) => set(String(v))"
+    />
+
+    <!-- number / currency / double: TextField with numeric mask -->
+    <TextField
+      v-else-if="['number', 'currency', 'double'].includes(question.type)"
+      :id="fieldId"
+      :label="labelText"
+      :model-value="modelValue"
+      :imask-props="{ mask: Number }"
+      @update:model-value="set"
+    />
+
+    <!-- string / fallback: TextField -->
+    <TextField
+      v-else
+      :id="fieldId"
+      :label="labelText"
+      :model-value="modelValue"
+      @update:model-value="set"
+    />
+  </div>
+</template>
+
+<style scoped>
+.question-field__label {
+  display: block;
+  margin-bottom: var(--spacing-xs, 4px);
+  font-weight: 600;
+}
+</style>
