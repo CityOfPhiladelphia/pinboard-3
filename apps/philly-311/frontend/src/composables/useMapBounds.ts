@@ -16,9 +16,31 @@ export const PHILLY_MAP_BOUNDS: [[number, number], [number, number]] = [
   [-74.92, 40.16], // NE corner [lng, lat]
 ]
 
+interface MaplibreBounded {
+  setMaxBounds: (bounds: [[number, number], [number, number]]) => void
+}
+
+/**
+ * The <Map> component's exposed state as seen through a template ref. Vue
+ * auto-unwraps refs accessed through a child's expose() proxy, so `map` and
+ * `isLoaded` normally arrive unwrapped; the raw `{ value }` shape is admitted
+ * for callers that hold the refs directly.
+ */
 interface MapVMComponent {
-  map?: { value?: { setMaxBounds: (bounds: [[number, number], [number, number]]) => void } | null }
-  isLoaded?: { value?: boolean }
+  map?: MaplibreBounded | { value?: MaplibreBounded | null } | null
+  isLoaded?: boolean | { value?: boolean }
+}
+
+/**
+ * Read a value a child component exposed through a template ref, whether it
+ * arrives auto-unwrapped (expose proxy) or as a raw `{ value }` ref. Reading
+ * `.value` here keeps reactive tracking intact for the raw-ref shape.
+ */
+export function readExposed<T>(v: unknown): T | null {
+  if (v && typeof v === 'object' && 'value' in v) {
+    return (v as { value?: T }).value ?? null
+  }
+  return (v as T | null | undefined) ?? null
 }
 
 /**
@@ -28,15 +50,15 @@ interface MapVMComponent {
  *   useMapBounds(phila);
  *   <PhilaMap ref="phila" ... />
  */
-export function useMapBounds(
-  mapRef: Ref<MapVMComponent | null | undefined>,
+export function useMapBounds<T extends MapVMComponent | null | undefined>(
+  mapRef: Ref<T>,
   bounds: [[number, number], [number, number]] = PHILLY_MAP_BOUNDS,
 ) {
   watch(
     () => {
       const c = mapRef.value
-      const m = c?.map?.value ?? null
-      const loaded = c?.isLoaded?.value ?? false
+      const m = readExposed<MaplibreBounded>(c?.map)
+      const loaded = readExposed<boolean>(c?.isLoaded) ?? false
       return { m, loaded }
     },
     ({ m, loaded }) => {

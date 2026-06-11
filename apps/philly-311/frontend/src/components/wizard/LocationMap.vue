@@ -6,7 +6,7 @@ import { computed, ref, watch } from 'vue'
 import { Map as PhilaMap, MapMarker } from '@phila/phila-ui-map-core'
 import type { Map as MapLibreMap } from 'maplibre-gl'
 import { isInPhilly } from '@/utils/bounds'
-import { useMapBounds } from '@/composables/useMapBounds'
+import { readExposed, useMapBounds } from '@/composables/useMapBounds'
 
 const PHILLY_DEFAULT: [number, number] = [-75.163789, 39.952335] // City Hall [lng, lat]
 
@@ -16,12 +16,15 @@ const emit = defineEmits<{
   outOfBounds: []
 }>()
 
+// Vue auto-unwraps refs accessed through a child's expose() proxy, so the
+// template ref normally sees `map` as the maplibre instance itself; the raw
+// `{ value }` ref shape is admitted for direct (non-proxy) access.
 interface PhilaMapInstance {
-  map: { value: MapLibreMap | null }
-  isLoaded: { value: boolean }
+  map?: MapLibreMap | { value?: MapLibreMap | null } | null
+  isLoaded?: boolean | { value?: boolean }
 }
 const philaMap = ref<PhilaMapInstance | null>(null)
-useMapBounds(philaMap as never)
+useMapBounds(philaMap)
 
 const center = computed<[number, number]>(() =>
   props.location ? [props.location.lng, props.location.lat] : PHILLY_DEFAULT,
@@ -35,7 +38,7 @@ watch(
     if (!isInPhilly(loc.lat, loc.lng)) emit('outOfBounds')
     // The wrapper only honors :center at mount; recenter the live map ourselves.
     // Keep the user's zoom unless they're zoomed too far out to see the pin.
-    const m = philaMap.value?.map?.value
+    const m = readExposed<MapLibreMap>(philaMap.value?.map)
     if (m) m.flyTo({ center: [loc.lng, loc.lat], zoom: Math.max(m.getZoom(), 16) })
   },
   { immediate: true },

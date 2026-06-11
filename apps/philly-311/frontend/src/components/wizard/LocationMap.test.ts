@@ -1,7 +1,9 @@
 // ABOUTME: Tests for LocationMap — empty-state map without marker, marker render,
-// ABOUTME: dragend move emission, and outOfBounds emission for non-Philly points.
-import { describe, it, expect } from 'vitest'
+// ABOUTME: dragend move emission, outOfBounds emission for non-Philly points, and
+// ABOUTME: flyTo recentering through the map-core expose proxy.
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { defineComponent, h, nextTick } from 'vue'
 import { Map as PhilaMap, MapMarker } from '@phila/phila-ui-map-core'
 import LocationMap from './LocationMap.vue'
 
@@ -28,6 +30,39 @@ describe('LocationMap - in-bounds location', () => {
     const wrapper = mount(LocationMap, { props: { location: IN_PHILLY } })
     await wrapper.findComponent(MapMarker).vm.$emit('dragend', { lng: -75.16, lat: 39.95 })
     expect(wrapper.emitted('move')?.[0]).toEqual([{ lat: 39.95, lng: -75.16 }])
+  })
+})
+
+describe('LocationMap - recentering', () => {
+  // Mimics the real map-core <Map> expose: script-setup defineExpose wraps the
+  // exposed object in a proxy that auto-unwraps refs, so the template ref sees
+  // `map` as the maplibre instance itself and `isLoaded` as a plain boolean.
+  function mountWithExposedMap() {
+    const fakeMap = { flyTo: vi.fn(), getZoom: () => 12, setMaxBounds: vi.fn() }
+    const MapStub = defineComponent({
+      name: 'PhilaMapStub',
+      setup(_, { expose, slots }) {
+        expose({ map: fakeMap, isLoaded: true })
+        return () => h('div', slots.default?.())
+      },
+    })
+    const wrapper = mount(LocationMap, {
+      props: { location: null },
+      global: { stubs: { Map: MapStub } },
+    })
+    return { wrapper, fakeMap }
+  }
+
+  it('flies the exposed maplibre map to a newly selected location', async () => {
+    const { wrapper, fakeMap } = mountWithExposedMap()
+    await nextTick() // template ref lands, then the pre-flush bounds watcher runs
+    expect(fakeMap.setMaxBounds).toHaveBeenCalled() // proves the expose stub took effect
+    await wrapper.setProps({ location: IN_PHILLY })
+    await nextTick()
+    expect(fakeMap.flyTo).toHaveBeenCalledWith({
+      center: [IN_PHILLY.lng, IN_PHILLY.lat],
+      zoom: 16,
+    })
   })
 })
 
