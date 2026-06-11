@@ -123,6 +123,7 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
       const body: SubmitPayload = {
         serviceRequestType: this.category,
         description: this.description,
+        private: !this.publicVisibility,
         address: this.location.address,
         latitude: this.location.lat,
         longitude: this.location.lng,

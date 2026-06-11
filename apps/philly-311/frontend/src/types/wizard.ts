@@ -36,6 +36,8 @@ export interface PhotoSuggestion {
 export interface SubmitPayload {
   serviceRequestType: string
   description: string
+  /** Required by the API: true unless the user opted into public visibility. */
+  private: boolean
   address: string
   zipCode?: string
   latitude: number

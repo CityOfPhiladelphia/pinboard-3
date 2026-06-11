@@ -274,11 +274,29 @@ describe('useReportSubmissionStore', () => {
       expect(store.payload()).toEqual({
         serviceRequestType: 'Pothole Repair',
         description: 'Large pothole near the bus stop',
+        private: true,
         address: '1234 Main St',
         zipCode: '19107',
         latitude: 39.95,
         longitude: -75.16,
       })
+    })
+
+    it('includes private: true by default (reports are private unless made public)', () => {
+      const store = useReportSubmissionStore()
+      store.setCategory('Pothole Repair')
+      store.setLocation({ address: '1234 Main St', lat: 39.95, lng: -75.16 })
+      store.setDescription('A problem')
+      expect(store.payload().private).toBe(true)
+    })
+
+    it('includes private: false after the report is made public', () => {
+      const store = useReportSubmissionStore()
+      store.setCategory('Pothole Repair')
+      store.setLocation({ address: '1234 Main St', lat: 39.95, lng: -75.16 })
+      store.setDescription('A problem')
+      store.setPrivacy(true)
+      expect(store.payload().private).toBe(false)
     })
 
     it('throws when category is missing', () => {
