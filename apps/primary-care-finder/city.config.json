@@ -14,21 +14,21 @@
       "vpc": "Development-AWS",
       "certificateARN": "",
       "apiDomain": "",
-      "frontendDomain": ""
+      "frontendDomain": "dev-primary-care.phila.gov"
     },
     "test": {
       "profile": "oit-primary-care-cc",
       "vpc": "Development-AWS",
       "certificateARN": "",
       "apiDomain": "",
-      "frontendDomain": ""
+      "frontendDomain": "test-primary-care.phila.gov"
     },
     "prod": {
       "profile": "oit-primary-care-cc",
-      "vpc": "Default - Dont delete",
+      "vpc": "ProdCityNetVpc",
       "certificateARN": "",
       "apiDomain": "",
-      "frontendDomain": ""
+      "frontendDomain": "primary-care.phila.gov"
     }
   },
   "frontendBuildCommand": "build-only"
