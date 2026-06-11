@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import { App, CfnOutput, Fn, Stack } from 'aws-cdk-lib'
-import * as acm from 'aws-cdk-lib/aws-certificatemanager'
 import * as route53 from 'aws-cdk-lib/aws-route53'
 import {
   StaticSite,
