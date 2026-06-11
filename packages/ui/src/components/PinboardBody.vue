@@ -17,6 +17,8 @@ import { PINBOARD_CONFIG_KEY } from '../plugin'
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
+import FilterChipBar from './FilterChipBar.vue'
+import AllFiltersPanel from './AllFiltersPanel.vue'
 
 // pinboard composables imports
 
@@ -28,6 +30,7 @@ import type {
   SearchMode,
   SortLocationsOptions,
 } from '../types'
+import type { FilterDefinition, FilterValues } from '@phila/phila-ui-filter-chip'
 import { hasLocationData } from '../utilities/hasLocationData'
 
 // slots
@@ -63,6 +66,8 @@ const props = defineProps<{
   locationPanelLocationAvailable?: boolean
   geojson?: unknown
   isMobile: boolean
+  filters?: FilterDefinition[]
+  filterValues?: FilterValues
 }>()
 
 // emits to parent app to handle
@@ -71,12 +76,21 @@ const emit = defineEmits<{
   selectedLocationsFilter: [filter: string]
   sortLocationsOption: [sort: string]
   deselect: [locationId: string]
+  'update:filterValues': [value: FilterValues]
 }>()
+
+// filter state
+const allFiltersOpen = ref(false)
+
+function onFilterValues(value: FilterValues) {
+  emit('update:filterValues', value)
+}
 
 // component variables
 const snapPoints = [15, 50, 100]
 const config = inject(PINBOARD_CONFIG_KEY)
-const slots = useSlots()
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const slots: Record<string, any> = useSlots()
 
 // refs
 const hoveredLocationId = ref<string | undefined>(undefined)
@@ -271,7 +285,16 @@ const effectiveMapConfig = (() => {
           @search="handleSearchSubmit"
           @selected-filter="handleLocationFilterChange"
           @sort-option="handleLocationSortChange"
-        />
+        >
+          <template v-if="filters" #below-search>
+            <FilterChipBar
+              :filters="filters"
+              :model-value="filterValues ?? {}"
+              @update:model-value="onFilterValues"
+              @open-filters="allFiltersOpen = true"
+            />
+          </template>
+        </LocationsPanel>
       </Teleport>
     </div>
 
@@ -306,6 +329,17 @@ const effectiveMapConfig = (() => {
       />
       <div id="mobile-map-search-filter" class="mobile-map-search-filter"></div>
     </div>
+
+    <Teleport to="body" :disabled="!isMobile">
+      <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
+        <AllFiltersPanel
+          v-model:open="allFiltersOpen"
+          :filters="filters"
+          :model-value="filterValues ?? {}"
+          @update:model-value="onFilterValues"
+        />
+      </div>
+    </Teleport>
   </div>
   <BottomSheet
     ref="bottomSheetRef"
@@ -357,6 +391,7 @@ const effectiveMapConfig = (() => {
   grid-template-columns: 1fr 2fr;
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
 .finder-panel-locations {
@@ -462,8 +497,25 @@ const effectiveMapConfig = (() => {
   height: auto;
 }
 
-/* Keep in sync with mobileMaxWidth in useIsMobile.ts */
-@media (max-width: 1064px) {
+.all-filters-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  /* Match the locations panel: the 1fr of the finder's `1fr 2fr` grid = 1/3. */
+  width: calc(100% / 3);
+  z-index: 12;
+  background: var(--Schemes-Surface-Bright, #fff);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  display: none;
+}
+
+.all-filters-overlay.open {
+  display: block;
+}
+
+/* Keep in sync with the matchMedia query in useIsMobile.ts */
+@media (max-width: 768px), (max-width: 1064px) and (max-height: 600px) {
   .finder-panel {
     position: relative;
     display: block;
@@ -537,6 +589,16 @@ const effectiveMapConfig = (() => {
     padding: 0.25rem 0 0;
     padding-left: 2px;
     gap: 0.25rem;
+  }
+
+  /* Full-screen modal that covers the bottom sheet and map, rather than a
+     slide-over panel trapped inside the finder panel. */
+  .all-filters-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    z-index: 1100;
+    box-shadow: none;
   }
 }
 </style>
