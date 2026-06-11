@@ -76,14 +76,16 @@ Selection from either child does `store.setCategory(name)`; existing store seman
 Props: `suggestions: PhotoSuggestion[]`, `catalog: ServiceType[]`. Emits `select(serviceType)`.
 Internally: sort by `confidence` desc, keep entries whose `serviceType` exists in the catalog,
 take 3. Renders the Figma's recommendation panel ("AI generated recommendations" / "Based on
-objects in your photo") as buttons: icon (`serviceTypeIcon`/`serviceTypeColor`), type name,
-catalog description. Renders nothing when the filtered list is empty (parent also hides the
+objects in your photo") as buttons: icon + color disc (FontAwesome via
+`reportIcon.serviceTypeIconDefinition` + `serviceTypeMeta.serviceTypeColor` — the app's icon
+convention; Material Symbols is not loaded in this app), type name, catalog description. Renders nothing when the filtered list is empty (parent also hides the
 photo band).
 
 ### `components/wizard/TypeDirectory.vue`
 
 Props: `catalog: ServiceType[]`. Emits `select(serviceType)`. A search field filters across
-type name, description, and the keywords in `data/service_types.json`; below it the full list
+type name, description, and the keywords in `data/service_types.json` (reusing the existing
+`utils/fuzzy.ts` scorer); below it the full list
 grouped by `caseType` (groups A–Z, members A–Z), two-column rows of icon + name + description
 (stacking to one column on small screens). While searching, non-matching rows and emptied groups
 drop out; an all-empty result shows "No issue types match your search." Search is client-side
