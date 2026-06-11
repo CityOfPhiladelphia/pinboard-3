@@ -7,27 +7,29 @@
   "compliance": [],
   "confidentiality": "low",
   "cdkPath": "./cdk",
+  "packageManager": "pnpm",
   "environments": {
     "dev": {
-      "profile": "OITDevelopers",
+      "profile": "oit-primary-care-cc",
       "vpc": "Development-AWS",
       "certificateARN": "",
       "apiDomain": "",
       "frontendDomain": ""
     },
     "test": {
-      "profile": "OITDevelopers",
+      "profile": "oit-primary-care-cc",
       "vpc": "Development-AWS",
       "certificateARN": "",
       "apiDomain": "",
       "frontendDomain": ""
     },
     "prod": {
-      "profile": "OITDevelopers",
+      "profile": "oit-primary-care-cc",
       "vpc": "Default - Dont delete",
       "certificateARN": "",
       "apiDomain": "",
       "frontendDomain": ""
     }
-  }
+  },
+  "frontendBuildCommand": "build-only"
 }

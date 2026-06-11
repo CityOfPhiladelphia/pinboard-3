@@ -12,11 +12,14 @@ import {
   faTemperatureFull,
   faGauge,
 } from '@fortawesome/pro-solid-svg-icons'
+import { PinboardComposables } from '@pinboard/ui'
 
 const props = defineProps<{
   readingState: ReadingState
   location: OemLocation
 }>()
+
+const isMobile = PinboardComposables.useIsMobile()
 
 const chartData: Ref<ChartData[]> = computed(() => {
   if (props.readingState.kind === 'Loaded' && props.readingState.data) {
@@ -96,13 +99,13 @@ const snapshotTimestamp = computed(() => {
     </div>
 
     <div v-show="location.deviceType !== 'Aware' || activeTab === 'graph'">
-      <LineChart :data="chartData" :y-label="`Stage (in)`" />
+      <LineChart :data="chartData" :y-label="`Stage (in)`" :disable-scroll-zoom="isMobile" />
     </div>
 
     <div v-if="location.deviceType === 'Aware'" v-show="activeTab === 'table'">
       <ClientTable :columns="tableColumns" :data="tableData" :page-size="8" />
     </div>
-    <div v-if="readingState.gaugeType === 'Aware'" style="padding: var(--spacing-l) 0 0 0">
+    <div v-if="readingState.gaugeType === 'Aware'" style="padding: var(--spacing-xxl) 0 0 0">
       <div style="font-weight: bold">Weather details</div>
       <div class="weather-details">
         <div>
