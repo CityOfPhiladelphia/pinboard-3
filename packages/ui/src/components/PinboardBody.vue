@@ -339,7 +339,7 @@ const effectiveMapConfig = (() => {
       <div id="mobile-map-search-filter" class="mobile-map-search-filter"></div>
     </div>
 
-    <Teleport to="body" :disabled="!isMobile">
+    <Teleport to="#app" :disabled="!isMobile">
       <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
         <FilterPanel
           v-if="allFiltersOpen"
@@ -582,18 +582,6 @@ const effectiveMapConfig = (() => {
     right: 0;
     z-index: 2;
     padding: 10px 0;
-  }
-
-  /* Container spans edge to edge; give the search bar a 1rem side inset so it
-     aligns with the chip row (whose matching inset comes from FilterChipGroup). */
-  .mobile-map-search-filter :deep(.location-search) {
-    padding: 0 1rem;
-  }
-
-  .mobile-map-search-filter :deep(.location-filters) {
-    padding: 0.25rem 0 0;
-    padding-left: 19px;
-    gap: 0.25rem;
   }
 
   /* Full-screen modal that covers the bottom sheet and map, rather than a

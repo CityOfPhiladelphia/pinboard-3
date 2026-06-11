@@ -132,6 +132,7 @@ function focusSearchInput() {
         v-if="searchPlaceholder"
         ref="searchWrapperRef"
         class="location-search"
+        :class="{ mobile: isMobile }"
         @keydown="handleSearchKeydown"
         @focusout="handleSearchFocusOut"
         @focusin="handleSearchFocusIn"
@@ -153,6 +154,7 @@ function focusSearchInput() {
       <LocationFilter
         v-if="filterOptions"
         class="location-filters"
+        :class="{ mobile: isMobile }"
         :filter-options="filterOptions"
         @selected-filter="handleFilterChange"
       />
@@ -187,12 +189,25 @@ function focusSearchInput() {
   width: 100%;
 }
 
+/* Teleported onto the map (mobile): the container supplies the top inset, so
+   keep only the 1rem side inset that aligns the search bar with the chip row. */
+.location-search.mobile {
+  padding: 0 1rem;
+}
+
 .location-search :deep(.search) {
   width: 100%;
 }
 
 .location-filters {
   grid-area: filters;
+}
+
+/* 19px left inset aligns the filter chips with the search input on mobile. */
+.location-filters.mobile {
+  padding: 0.25rem 0 0;
+  padding-left: 19px;
+  gap: 0.25rem;
 }
 
 .location-sort {
