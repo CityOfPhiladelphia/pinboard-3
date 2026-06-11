@@ -50,6 +50,10 @@ describe('ContactInfo', () => {
     expect(inputValue(w, 'input[autocomplete="name"]')).toBe('Jane')
     expect(inputValue(w, 'input[autocomplete="email"]')).toBe('jane@phila.gov')
     expect(inputValue(w, 'input[autocomplete="tel"]')).toBe('')
+    await flushPromises()
+    const store = useReportSubmissionStore()
+    expect(store.contact.name).toBe('Jane')
+    expect(store.contact.email).toBe('jane@phila.gov')
   })
 
   it('seeds fields from existing store values and prefill does not overwrite them', async () => {
@@ -83,6 +87,20 @@ describe('ContactInfo', () => {
 
     expect(inputValue(w, 'input[autocomplete="name"]')).toBe('My Own Name')
     expect(useReportSubmissionStore().contact.name).toBe('My Own Name')
+  })
+
+  it('handles sign-out gracefully — no throw, values retained', async () => {
+    authState.isAuthenticated.value = true
+    authState.user.value = { name: 'Jane', username: 'jane@phila.gov' }
+    const w = mount(ContactInfo)
+    await flushPromises()
+
+    authState.isAuthenticated.value = false
+    authState.user.value = null
+    await flushPromises()
+
+    expect(inputValue(w, 'input[autocomplete="name"]')).toBe('Jane')
+    expect(inputValue(w, 'input[autocomplete="email"]')).toBe('jane@phila.gov')
   })
 
   it('clearing a field writes an empty string and isEmpty stays accurate', async () => {
