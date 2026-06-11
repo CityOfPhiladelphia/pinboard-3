@@ -17,6 +17,7 @@ const top = computed(() => {
     .sort((a, b) => b.confidence - a.confidence)
     .map((s) => byName.get(s.serviceType))
     .filter((s): s is ServiceType => s !== undefined)
+    .filter((s, i, arr) => arr.findIndex((x) => x.serviceType === s.serviceType) === i)
     .slice(0, 3)
 })
 </script>

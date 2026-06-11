@@ -34,7 +34,7 @@ describe('TypeSuggestions', () => {
       },
     })
     const items = w.findAll('button')
-    expect(items.map((b) => b.text())).toHaveLength(3)
+    expect(items).toHaveLength(3)
     expect(items[0].text()).toContain('Pothole Repair')
     expect(items[1].text()).toContain('Illegal Dumping')
     expect(items[2].text()).toContain('Graffiti Removal')
@@ -48,6 +48,22 @@ describe('TypeSuggestions', () => {
     })
     await w.find('button').trigger('click')
     expect(w.emitted('select')?.[0]).toEqual(['Pothole Repair'])
+  })
+  it('dedupes duplicate serviceTypes, keeping highest confidence order', () => {
+    const w = mount(TypeSuggestions, {
+      props: {
+        suggestions: [
+          { serviceType: 'Pothole Repair', confidence: 0.9 },
+          { serviceType: 'Pothole Repair', confidence: 0.7 },
+          { serviceType: 'Illegal Dumping', confidence: 0.8 },
+        ],
+        catalog,
+      },
+    })
+    const items = w.findAll('button')
+    expect(items).toHaveLength(2)
+    expect(items[0].text()).toContain('Pothole Repair')
+    expect(items[1].text()).toContain('Illegal Dumping')
   })
   it('renders nothing when no suggestion survives the catalog filter', () => {
     const w = mount(TypeSuggestions, {
