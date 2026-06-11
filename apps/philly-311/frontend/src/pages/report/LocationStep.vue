@@ -19,11 +19,16 @@ useWizardValidity(
   computed(() => !!store.location && isInPhilly(store.location.lat, store.location.lng)),
 )
 
+// Each location intent increments this counter so that stale async resolutions
+// (slow geocodes, late geolocation callbacks) never clobber a newer selection.
+let intent = 0
+
 const mapLocation = computed(() =>
   store.location ? { lat: store.location.lat, lng: store.location.lng } : null,
 )
 
 function onSelect(f: AisFeature) {
+  intent++
   store.setLocation({ address: f.streetAddress, zipCode: f.zipCode, lat: f.lat, lng: f.lng })
   if (isInPhilly(f.lat, f.lng)) error.value = null
 }
@@ -33,13 +38,16 @@ function onOutOfBounds() {
 }
 
 async function onMove({ lat, lng }: { lat: number; lng: number }) {
+  const my = ++intent
   try {
     const feature = await reverseGeocode(lat, lng)
+    if (my !== intent) return
     if (feature) {
       onSelect(feature)
       return
     }
   } catch {
+    if (my !== intent) return
     /* fall through to the coords-only update */
   }
   if (store.location) {
@@ -49,19 +57,22 @@ async function onMove({ lat, lng }: { lat: number; lng: number }) {
 }
 
 async function useMyLocation() {
+  const my = ++intent
   lookingUp.value = true
   error.value = null
-  const pos = await getCurrentPosition()
-  if (!pos) {
-    error.value = "We couldn't access your location. Type an address instead."
-    lookingUp.value = false
-    return
-  }
   try {
+    const pos = await getCurrentPosition()
+    if (my !== intent) return
+    if (!pos) {
+      error.value = "We couldn't access your location. Type an address instead."
+      return
+    }
     const feature = await reverseGeocode(pos.lat, pos.lng)
+    if (my !== intent) return
     if (feature) onSelect(feature)
     else error.value = "We couldn't resolve your location to an address."
   } catch {
+    if (my !== intent) return
     error.value = "We couldn't resolve your location to an address."
   } finally {
     lookingUp.value = false
