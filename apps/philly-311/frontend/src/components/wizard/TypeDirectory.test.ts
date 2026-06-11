@@ -32,6 +32,11 @@ describe('TypeDirectory', () => {
     expect(streetDefect.join(' ')).toContain('Cave-In Repair')
     expect(w.text()).toContain('Pothole Repair desc')
     expect(w.text()).toContain('Road surface dropped suddenly')
+    const names = w.findAll('li button').map((b) => b.text())
+    const caveIdx = names.findIndex((t) => t.includes('Cave-In Repair'))
+    const potholeIdx = names.findIndex((t) => t.includes('Pothole Repair'))
+    expect(caveIdx).toBeGreaterThanOrEqual(0)
+    expect(caveIdx).toBeLessThan(potholeIdx)
   })
   it('filters by fuzzy match on name and drops emptied groups', async () => {
     const w = mount(TypeDirectory, { props: { catalog } })
@@ -54,7 +59,10 @@ describe('TypeDirectory', () => {
   })
   it('shows an empty message when nothing matches', async () => {
     const w = mount(TypeDirectory, { props: { catalog } })
+    expect(w.find('[role="status"]').exists()).toBe(true)
+    expect(w.find('[role="status"]').text()).toBe('')
     await w.find('input[type="search"]').setValue('zzzzz')
+    expect(w.find('[role="status"]').exists()).toBe(true)
     expect(w.text()).toContain('No issue types match your search.')
     expect(w.findAll('h3')).toHaveLength(0)
   })

@@ -51,7 +51,9 @@ const groups = computed(() => {
       placeholder="Search"
     />
 
-    <p v-if="!groups.length" class="type-directory__empty">No issue types match your search.</p>
+    <p class="type-directory__empty" role="status">
+      {{ groups.length ? '' : 'No issue types match your search.' }}
+    </p>
 
     <section v-for="group in groups" :key="group.caseType" class="type-directory__group">
       <h3 class="type-directory__heading">{{ group.caseType }}</h3>
