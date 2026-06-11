@@ -969,8 +969,11 @@ Expected: all packages green; `@pinboard/ui` untouched (`git status` shows chang
   1. Navigate to `/report` → **Skip** the Image step.
   2. On Issue type: search the directory (e.g. "pothole"), select a type, answer any required questions → **Next**.
   3. On Location: Next is **disabled**; the map renders the Philly default view with no pin.
-  4. Type "1234 Market" in the address search → results list appears with "Philadelphia, PA" subtitles → pick a result.
-  5. The chosen-address line shows the resolved address, the pin appears on the map, the list stays closed, and **Next enables**.
+  4. Type an address **far from the City Hall default view** (e.g. "4641 Roosevelt Blvd") in the
+     address search → results list appears with "Philadelphia, PA" subtitles → pick a result.
+  5. The chosen-address line shows the resolved address, the list stays closed, **Next enables**,
+     and the map visibly recenters onto the pin at street-level zoom (screenshot check — this
+     asserts the `flyTo` path against the real map-core expose proxy, not just the pin render).
   6. Best-effort: drag the pin a block and confirm the chosen-address line updates after the reverse-geocode. (If dragging proves flaky under automation, verify the `move` path manually and note it.)
   7. Click **Next** → lands on `/report/details` placeholder.
   - Known/not-ours: a benign dev-only console error `Unexpected token '<'` from `@phila/phila-ui-map-core` (Pictometry). Any OTHER console error fails the smoke.
