@@ -23,6 +23,9 @@ const { query, results, loading, error } = useDebouncedSearch<AisAutocompleteRes
 // debounced autocomplete, and the list must not reopen until the user types.
 const open = ref(false)
 
+// True while searchAddress is resolving a picked result (open is false during this).
+const resolving = ref(false)
+
 function onInput(e: Event) {
   query.value = (e.target as HTMLInputElement).value
   open.value = true
@@ -30,7 +33,7 @@ function onInput(e: Event) {
 
 async function pick(r: AisAutocompleteResult) {
   open.value = false
-  loading.value = true
+  resolving.value = true
   error.value = null
   try {
     const feature = await searchAddress(r.searchAddress)
@@ -42,9 +45,9 @@ async function pick(r: AisAutocompleteResult) {
       error.value = "Couldn't resolve that address."
     }
   } catch (err) {
-    error.value = (err as Error).message
+    error.value = (err as Error).message ?? String(err)
   } finally {
-    loading.value = false
+    resolving.value = false
   }
 }
 </script>
@@ -63,7 +66,7 @@ async function pick(r: AisAutocompleteResult) {
       />
       <FontAwesomeIcon :icon="faMagnifyingGlass" class="address-search__icon" />
     </div>
-    <p v-if="open && loading" class="address-search__loading">Searching&hellip;</p>
+    <p v-if="(open && loading) || resolving" class="address-search__loading">Searching&hellip;</p>
     <p v-if="error" class="address-search__error">{{ error }}</p>
     <ul v-if="open && results.length" class="address-search__results" role="listbox">
       <li v-for="r in results" :key="r.searchAddress" role="option">

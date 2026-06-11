@@ -101,6 +101,33 @@ describe('AddressSearch - picking a result', () => {
     expect(wrapper.find('.address-search__loading').exists()).toBe(false)
   })
 
+  it('shows the searching line while a pick is resolving', async () => {
+    mockAutocompleteAddresses.mockResolvedValue([
+      { address: '1234 MARKET ST', searchAddress: '1234 MARKET ST' },
+    ])
+    let resolve!: (v: unknown) => void
+    mockSearchAddress.mockReturnValue(
+      new Promise((r) => {
+        resolve = r
+      }),
+    )
+
+    const wrapper = mount(AddressSearch)
+    await typeAndSettle(wrapper, '1234')
+
+    await wrapper.find('[role="listbox"] button').trigger('click')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find('.address-search__loading').exists()).toBe(true)
+
+    resolve(FEATURE)
+    await vi.advanceTimersByTimeAsync(0)
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find('.address-search__loading').exists()).toBe(false)
+    expect(wrapper.emitted('select')?.[0]).toEqual([FEATURE])
+  })
+
   it('shows an error and does not emit when searchAddress returns null', async () => {
     mockAutocompleteAddresses.mockResolvedValue([
       { address: '1234 MARKET ST', searchAddress: '1234 MARKET ST' },
