@@ -24,7 +24,7 @@
 - Store: `setCategory(cat: string|null)` clears `customFields` on change; `setQuestion(field, value)` deletes the key on empty value; `photoSuggestions: {serviceType, confidence}[]`; `photo: {mediaUrl, previewUrl?}|null`.
 - `visibleQuestions(questions, answers, serviceType)` in `utils/conditional.ts` (already tested).
 - `fuzzyScore(query, title, keywords): number` in `utils/fuzzy.ts` — 0 = no match.
-- `serviceTypeIconDefinition(name)` in `utils/reportIcon.ts` → FontAwesome `IconDefinition` (location-dot fallback); `serviceTypeColor(name)` in `utils/serviceTypeMeta.ts` → hex. Render icons with `<FontAwesomeIcon :icon="…" />` from `@fortawesome/vue-fontawesome` (see `LandingPage.vue`).
+- `serviceTypeIconDefinition(name)` in `utils/reportIcon.ts` → FontAwesome `IconDefinition` (location-dot fallback); `serviceTypeColor(name)` in `utils/serviceTypeMeta.ts` → hex. Render icons with `<FontAwesomeIcon :icon="…" />` from `@fortawesome/vue-fontawesome` — NOT yet an app dependency (only `packages/ui` has it); Task 1 adds it. It renders fine in jsdom, so tests need no stub for it.
 - `data/service_types.json`: `Record<serviceTypeName, { description, keywords: string[] }>`.
 - `__test__/setup.ts` ALREADY stubs `@phila/phila-ui-switch` (Switch) and `@phila/phila-ui-date-field` (DateField) plus RadioGroup/CheckboxGroup/TextField — but the app's `package.json` does NOT yet have the switch/date-field deps.
 - `WIZARD_CAN_ADVANCE_KEY` + `useWizardValidity(validity: ComputedRef<boolean>)` in `composables/useWizardValidity.ts`; the shell provides the ref. `useWizardValidity` resets the ref to true via `onBeforeUnmount`.
@@ -39,12 +39,14 @@
 - Modify: `apps/philly-311/frontend/package.json`
 - Modify: `pnpm-lock.yaml` (generated)
 
-- [ ] **Step 1: Add the deps.** In `APP/package.json` dependencies (alphabetical position, match the existing phila-ui pin style):
+- [ ] **Step 1: Add the deps.** In `APP/package.json` dependencies (alphabetical positions, match the existing pin style):
 
 ```json
+    "@fortawesome/vue-fontawesome": "^3.1.2",
     "@phila/phila-ui-date-field": "^0.0.8",
     "@phila/phila-ui-switch": "^0.0.4",
 ```
+(`vue-fontawesome` matches the `packages/ui` pin — the workspace already resolves it to 3.1.3.)
 
 - [ ] **Step 2: Install.**
 
@@ -53,12 +55,12 @@ NPM_FONTAWESOME_SECRET=54AC7138-FFDC-4F82-BD32-332A9F91091A pnpm install
 ```
 Expected: exits 0, lockfile updated.
 
-- [ ] **Step 3: Verify imports resolve.** Quick node probe (the packages export `Switch` / `DateField`):
+- [ ] **Step 3: Verify imports resolve.** Quick node probe — pnpm links the deps into the APP's node_modules, not the repo root:
 
 ```bash
-node -e "const s=require('./node_modules/@phila/phila-ui-switch/package.json');const d=require('./node_modules/@phila/phila-ui-date-field/package.json');console.log(s.version,d.version)"
+node -e "for (const p of ['@phila/phila-ui-switch','@phila/phila-ui-date-field','@fortawesome/vue-fontawesome']) console.log(p, require('./apps/philly-311/frontend/node_modules/' + p + '/package.json').version)"
 ```
-Expected: prints the two versions. Then `pnpm --filter @pinboard/philly-311 test:run` — still green (setup.ts module mocks keep applying regardless).
+Expected: prints the three versions. Then `pnpm --filter @pinboard/philly-311 test:run` — still green (setup.ts module mocks keep applying regardless).
 
 - [ ] **Step 4: Commit**
 
@@ -286,7 +288,7 @@ const top = computed(() => {
 </style>
 ```
 
-> Check `__test__/setup.ts` — if `@fortawesome/vue-fontawesome` is not already stubbed/available in tests, follow whatever `LandingPage.test.ts` does for FontAwesomeIcon (it mounts a component using it today). Do the same here rather than inventing a new mock.
+> `@fortawesome/vue-fontawesome` was added in Task 1 and renders fine in jsdom — no test stub needed. Do not add one to `setup.ts`.
 
 - [ ] **Step 4: Run — expect PASS.** Then full `test:run`, `type-check`, `lint`, `format`.
 - [ ] **Step 5: Commit**
@@ -348,6 +350,12 @@ describe('TypeDirectory', () => {
     const w = mount(TypeDirectory, { props: { catalog } })
     await w.find('input[type="search"]').setValue('wheelchair')
     expect(w.text()).toContain('ADA Curb Ramp')
+    expect(w.text()).not.toContain('Pothole Repair')
+  })
+  it('matches on description substrings', async () => {
+    const w = mount(TypeDirectory, { props: { catalog } })
+    await w.find('input[type="search"]').setValue('cave-in desc')
+    expect(w.text()).toContain('Cave-In Repair')
     expect(w.text()).not.toContain('Pothole Repair')
   })
   it('shows an empty message when nothing matches', async () => {
@@ -936,7 +944,7 @@ git diff --name-only 311-staging..HEAD -- . ':(exclude)apps/philly-311/**' ':(ex
 ```
 (`pnpm-lock.yaml` changes are expected from Task 1 — verify its diff only adds the two phila-ui packages.)
 
-- [ ] **Step 3: Real smoke** — `pnpm dev:311`, then in a real browser:
+- [ ] **Step 3: Real smoke (Playwright against the live dev server — satisfies spec DoD #4)** — `pnpm dev:311`, then drive a real browser:
   - No-photo path: `/report` → Skip → search "pothole" → select Pothole Repair → questions render → answer the required picklist → Next enables → Next lands on `/report/location`.
   - Photo path: `/report` → upload a photo → Next → recommendations panel shows (photo preview beside it) → click a card → questions view.
   - Change → back to pick view, answers cleared.
