@@ -84,6 +84,15 @@ describe('IssueTypeStep', () => {
     expect(w.text()).toContain('AI generated recommendations')
     expect(w.find('img').attributes('src')).toBe('blob:x')
   })
+  it('hides the photo band when no suggestion survives the catalog filter', () => {
+    const store = useReportSubmissionStore()
+    store.setPhoto({ mediaUrl: 'https://cdn.test/p.jpg', previewUrl: 'blob:x' })
+    store.setPhotoSuggestions([{ serviceType: 'Miscellaneous', confidence: 1 }])
+    const { w } = mountStep()
+    expect(w.find('img').exists()).toBe(false)
+    expect(w.text()).not.toContain('AI generated recommendations')
+    expect(w.text()).toContain('All issue types')
+  })
   it('selecting from the directory writes the store and swaps to questions', async () => {
     const { w } = mountStep()
     const rows = w.findAll('button').filter((b) => b.text().includes('Pothole Repair'))
@@ -125,11 +134,22 @@ describe('IssueTypeStep', () => {
     const store = useReportSubmissionStore()
     store.setCategory('Pothole Repair')
     store.setQuestion('Severity__c', 'Deep')
-    const { w } = mountStep()
+    const { w, canAdvance } = mountStep()
     await w.find('[data-test="change-type"]').trigger('click')
+    await flushPromises()
     expect(store.category).toBeNull()
     expect(store.customFields).toEqual({})
     expect(w.text()).toContain('All issue types')
+    expect(canAdvance.value).toBe(false)
+  })
+  it('keeps canAdvance false when the catalog load failed, even with a category', async () => {
+    list.value = null
+    error.value = { message: 'boom' }
+    const store = useReportSubmissionStore()
+    store.setCategory('Pothole Repair')
+    const { canAdvance } = mountStep(ref(true))
+    await flushPromises()
+    expect(canAdvance.value).toBe(false)
   })
   it('catalog error shows a retry that re-calls load', async () => {
     list.value = null

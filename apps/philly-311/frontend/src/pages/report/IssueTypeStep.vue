@@ -31,11 +31,15 @@ const visible = computed(() =>
     : [],
 )
 const hasRequired = computed(() => visible.value.some((q) => q.required))
+const hasSurvivingSuggestions = computed(() =>
+  store.photoSuggestions.some((s) => catalog.value.some((c) => c.serviceType === s.serviceType)),
+)
 
 useWizardValidity(
   computed(
     () =>
       !!store.category &&
+      !error.value &&
       visible.value.every((q) => !q.required || (store.customFields[q.field] ?? '') !== ''),
   ),
 )
@@ -63,7 +67,7 @@ function change() {
     </p>
 
     <template v-else-if="!store.category">
-      <div v-if="store.photo" class="issue-step__photo-band">
+      <div v-if="store.photo && hasSurvivingSuggestions" class="issue-step__photo-band">
         <img
           class="issue-step__photo"
           :src="store.photo.previewUrl ?? store.photo.mediaUrl"
