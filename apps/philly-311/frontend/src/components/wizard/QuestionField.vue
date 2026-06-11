@@ -55,7 +55,7 @@ function setCheckbox(values: Array<string | number | boolean>) {
       @update:model-value="set"
     />
 
-    <!-- picklist (>4): native select (phila-ui SelectField is a stub) -->
+    <!-- picklist (>4): native select -->
     <template v-else-if="isLargePicklist">
       <label :for="fieldId" class="question-field__label">{{ labelText }}</label>
       <select
@@ -77,7 +77,7 @@ function setCheckbox(values: Array<string | number | boolean>) {
       @update:model-value="setCheckbox"
     />
 
-    <!-- textarea: native (phila-ui-textarea is a stub) -->
+    <!-- textarea: native -->
     <template v-else-if="question.type === 'textarea'">
       <label :for="fieldId" class="question-field__label">{{ labelText }}</label>
       <textarea

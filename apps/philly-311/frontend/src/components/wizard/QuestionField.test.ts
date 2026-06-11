@@ -40,6 +40,7 @@ describe('QuestionField rendering by type', () => {
     expect(w.findAll('option')).toHaveLength(6) // placeholder + 5
     expect(w.find('option[value=""]').attributes('disabled')).toBeDefined()
     expect(w.findComponent(RadioGroup).exists()).toBe(false)
+    expect(w.find('label').attributes('for')).toBe(w.find('select').attributes('id'))
   })
 
   it('multipicklist renders CheckboxGroup', () => {
@@ -57,6 +58,7 @@ describe('QuestionField rendering by type', () => {
       props: { question: make({ type: 'textarea' }), modelValue: '' },
     })
     expect(w.find('textarea').exists()).toBe(true)
+    expect(w.find('label').attributes('for')).toBe(w.find('textarea').attributes('id'))
   })
 
   it('date type renders DateField', () => {
