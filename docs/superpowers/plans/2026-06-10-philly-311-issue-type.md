@@ -33,7 +33,7 @@
 
 ---
 
-## Task 1: Dependencies — phila-ui switch + date-field
+## Task 1: Dependencies — phila-ui switch + date-field, vue-fontawesome
 
 **Files:**
 - Modify: `apps/philly-311/frontend/package.json`
@@ -66,7 +66,7 @@ Expected: prints the three versions. Then `pnpm --filter @pinboard/philly-311 te
 
 ```bash
 git add apps/philly-311/frontend/package.json pnpm-lock.yaml
-git commit -m "chore(philly-311): add phila-ui switch + date-field for question inputs"
+git commit -m "chore(philly-311): add phila-ui switch + date-field and vue-fontawesome"
 ```
 
 ---
@@ -325,7 +325,7 @@ const st = (serviceType: string, caseType: string, description = `${serviceType}
 })
 const catalog = [
   st('Pothole Repair', 'Street Defect'),
-  st('Cave-In Repair', 'Street Defect'),
+  st('Cave-In Repair', 'Street Defect', 'Road surface dropped suddenly'),
   st('ADA Curb Ramp', 'Dangerous Sidewalk'),
   st('Graffiti Removal', 'Graffiti Removal'),
 ]
@@ -338,6 +338,7 @@ describe('TypeDirectory', () => {
     const streetDefect = w.findAll('li button').map((b) => b.text())
     expect(streetDefect.join(' ')).toContain('Cave-In Repair')
     expect(w.text()).toContain('Pothole Repair desc')
+    expect(w.text()).toContain('Road surface dropped suddenly')
   })
   it('filters by fuzzy match on name and drops emptied groups', async () => {
     const w = mount(TypeDirectory, { props: { catalog } })
@@ -354,7 +355,7 @@ describe('TypeDirectory', () => {
   })
   it('matches on description substrings', async () => {
     const w = mount(TypeDirectory, { props: { catalog } })
-    await w.find('input[type="search"]').setValue('cave-in desc')
+    await w.find('input[type="search"]').setValue('dropped suddenly')
     expect(w.text()).toContain('Cave-In Repair')
     expect(w.text()).not.toContain('Pothole Repair')
   })
@@ -942,7 +943,7 @@ pnpm --filter @pinboard/philly-311 build         # PASS
 pnpm build && pnpm type-check && pnpm exec turbo run test:run
 git diff --name-only 311-staging..HEAD -- . ':(exclude)apps/philly-311/**' ':(exclude)docs/**' ':(exclude)pnpm-lock.yaml'   # empty
 ```
-(`pnpm-lock.yaml` changes are expected from Task 1 — verify its diff only adds the two phila-ui packages.)
+(`pnpm-lock.yaml` changes are expected from Task 1 — verify its diff only reflects the three Task 1 packages, including the philly-311 importer entry for `@fortawesome/vue-fontawesome`.)
 
 - [ ] **Step 3: Real smoke (Playwright against the live dev server — satisfies spec DoD #4)** — `pnpm dev:311`, then drive a real browser:
   - No-photo path: `/report` → Skip → search "pothole" → select Pothole Repair → questions render → answer the required picklist → Next enables → Next lands on `/report/location`.
