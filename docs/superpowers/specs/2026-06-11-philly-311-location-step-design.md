@@ -113,7 +113,9 @@ validity: location && isInPhilly → useWizardValidity → shell Next
 - Geolocation denied/unavailable → "We couldn't access your location. Type an address instead."
 - Geolocate reverse-geocode miss → "We couldn't resolve your location to an address."
 - Pin dragged out of bounds (or deep-link seeds an out-of-bounds point) →
-  "311 only handles requests in Philadelphia."; Next disabled until back in bounds.
+  "311 only handles requests in Philadelphia."; Next disabled until back in bounds. The error
+  clears whenever a new in-bounds location is set (search select, geolocate, or dragging the
+  pin back in bounds).
 - Pin-drag reverse-geocode failure → coords update, address retained (no error shown; the
   selected-address line keeps the prior address).
 
