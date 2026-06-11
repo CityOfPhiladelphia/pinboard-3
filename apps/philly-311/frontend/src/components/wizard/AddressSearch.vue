@@ -14,6 +14,8 @@ import {
 
 const emit = defineEmits<{ select: [feature: AisFeature] }>()
 
+const RESOLVE_ERROR = "Couldn't resolve that address."
+
 const { query, results, loading, error } = useDebouncedSearch<AisAutocompleteResult[]>({
   initial: [],
   fetcher: (q, signal) => autocompleteAddresses(q, signal),
@@ -42,10 +44,10 @@ async function pick(r: AisAutocompleteResult) {
       query.value = feature.streetAddress
       results.value = []
     } else {
-      error.value = "Couldn't resolve that address."
+      error.value = RESOLVE_ERROR
     }
-  } catch (err) {
-    error.value = (err as Error).message ?? String(err)
+  } catch {
+    error.value = RESOLVE_ERROR
   } finally {
     resolving.value = false
   }

@@ -1,7 +1,7 @@
 # Philly 311 — Increment 3 / Slice 3c: Location Step
 
 - **Date:** 2026-06-11
-- **Status:** Draft (pending review)
+- **Status:** Approved (implemented on feat/philly-311-location)
 - **Repo:** `pinboard-3`
 - **Branch:** `feat/philly-311-location` (off `311-staging`)
 

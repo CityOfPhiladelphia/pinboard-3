@@ -26,7 +26,7 @@ interface MaplibreBounded {
  * `isLoaded` normally arrive unwrapped; the raw `{ value }` shape is admitted
  * for callers that hold the refs directly.
  */
-interface MapVMComponent {
+export interface MapVMComponent {
   map?: MaplibreBounded | { value?: MaplibreBounded | null } | null
   isLoaded?: boolean | { value?: boolean }
 }

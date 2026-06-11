@@ -143,6 +143,22 @@ describe('AddressSearch - picking a result', () => {
     expect(wrapper.emitted('select')).toBeFalsy()
     expect(wrapper.find('.address-search__error').text()).toContain("Couldn't resolve")
   })
+
+  it('shows "Couldn\'t resolve" and does not emit when searchAddress throws', async () => {
+    mockAutocompleteAddresses.mockResolvedValue([
+      { address: '1234 MARKET ST', searchAddress: '1234 MARKET ST' },
+    ])
+    mockSearchAddress.mockRejectedValue(new Error('AIS search failed: 500'))
+
+    const wrapper = mount(AddressSearch)
+    await typeAndSettle(wrapper, '1234')
+    await wrapper.find('[role="listbox"] button').trigger('click')
+    await vi.advanceTimersByTimeAsync(0)
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.emitted('select')).toBeFalsy()
+    expect(wrapper.find('.address-search__error').text()).toContain("Couldn't resolve")
+  })
 })
 
 describe('AddressSearch - error handling', () => {
