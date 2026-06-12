@@ -1,4 +1,9 @@
-import type { ComputedFilterGroup, DataFilterOptionsGroup } from './classes'
+import type {
+  ComputedFilterGroup,
+  DataFilterOptionsGroup,
+  FilterPanel,
+  FilterGroupSet,
+} from './classes'
 import type { BitWiseOperation } from './types'
 
 /*
@@ -8,7 +13,12 @@ export const getBufferSize = (dataLength: number) => {
   return Math.ceil(dataLength / 32)
 }
 
-export const findClassesInObject = (object, searchKey, classes, matched = []) => {
+export const findClassesInObject = (
+  object: FilterPanel | FilterGroupSet,
+  searchKey: string,
+  classes: [DataFilterOptionsGroup, ComputedFilterGroup],
+  matched = []
+) => {
   Object.keys(object[searchKey]).forEach((key, i) => {
     if (!classes.some((classes) => Object.values(object[searchKey])[i] instanceof classes)) {
       findClassesInObject(object[searchKey][key], searchKey, classes, matched)
@@ -22,15 +32,15 @@ export const findClassesInObject = (object, searchKey, classes, matched = []) =>
 /*
     // DATA STRUCTURING AND VALIDATION FUNCTIONS
     */
-export const validateArrayLengthsMatch = (args) => {
-  const lengths = new Set(Array.from(args.slice(0, 2), (arr) => arr.length))
-  args
-    .slice(2)
-    .forEach((arg) =>
-      lengths.add(!Array.isArray(arg) || !Array.isArray(arg[0]) ? args[0].length : arg.length)
-    )
-  return lengths.size === 1
-}
+// export const validateArrayLengthsMatch = (args) => {
+//   const lengths = new Set(Array.from(args.slice(0, 2), (arr) => arr.length))
+//   args
+//     .slice(2)
+//     .forEach((arg) =>
+//       lengths.add(!Array.isArray(arg) || !Array.isArray(arg[0]) ? args[0].length : arg.length)
+//     )
+//   return lengths.size === 1
+// }
 
 export const getAllUniqueValuesFromStringField = (
   dataProperties: Record<string, string>[],
@@ -87,7 +97,7 @@ export const bitarrayBitwiseOperator = (
   otherBitarrays = Array.isArray(otherBitarrays)
     ? otherBitarrays.filter(Boolean)
     : [otherBitarrays].filter(Boolean)
-  if (otherBitarrays === null || otherBitarrays.length === 0) {
+  if ((otherBitarrays === null || otherBitarrays.length === 0) && bitarrayIn1) {
     return bitarrayIn1
   }
   if (bitarrayIn1 === null && otherBitarrays.length === 1) {

@@ -4,7 +4,7 @@ import {
   findClassesInObject,
   getBufferSize,
   getUniformBitarray,
-  validateArrayLengthsMatch,
+  // validateArrayLengthsMatch,
 } from './functions'
 import type { BitWiseOperation, SelectionType } from './types'
 
@@ -18,7 +18,7 @@ class FilterOptionsGroupParams {
   operation: BitWiseOperation
   type: SelectionType
   groupToggle: string
-  checked: boolean | boolean[]
+  checked: boolean[]
   constructor(
     groupLabelText: string,
     optionLabels: string[],
@@ -39,35 +39,35 @@ class FilterOptionsGroupParams {
 }
 
 export class DataFilterOptionsGroupParams extends FilterOptionsGroupParams {
-  optionFields: string[] | string[][]
-  optionMatches: string[] | string[][]
-  optionBitSettingFunctions: Function | Function[]
+  optionFields: [string | string[]]
+  optionMatches: string[]
+  optionBitSettingFunctions: Function[]
   constructor(
     groupLabelText: string,
     optionLabels: string[],
     optionKeys: string[],
-    optionFields: string[] | string[][],
-    optionMatches: string[] | string[][],
+    optionFields: string | [string | string[]],
+    optionMatches: string | string[],
     optionBitSettingFunctions: Function | Function[],
     operation: BitWiseOperation = '|',
     type: SelectionType,
     groupToggle: string = '',
     checked: boolean = false
   ) {
-    if (
-      !validateArrayLengthsMatch([
-        optionLabels,
-        optionKeys,
-        optionFields,
-        optionMatches,
-        optionBitSettingFunctions,
-        checked,
-      ])
-    ) {
-      throw new Error(
-        `Arguments did not form valid params: ${optionLabels}, ${optionKeys}, ${optionFields}, ${optionMatches}, ${optionBitSettingFunctions}, ${checked}`
-      )
-    }
+    // if (
+    //   !validateArrayLengthsMatch([
+    //     optionLabels,
+    //     optionKeys,
+    //     optionFields,
+    //     optionMatches,
+    //     optionBitSettingFunctions,
+    //     checked,
+    //   ])
+    // ) {
+    //   throw new Error(
+    //     `Arguments did not form valid params: ${optionLabels}, ${optionKeys}, ${optionFields}, ${optionMatches}, ${optionBitSettingFunctions}, ${checked}`
+    //   )
+    // }
     super(groupLabelText, optionLabels, optionKeys, operation, type, groupToggle, checked)
     this.optionFields = typeof optionFields === 'string' ? [optionFields] : optionFields
     this.optionMatches = Array.isArray(optionMatches) ? optionMatches : [optionMatches]
@@ -89,27 +89,34 @@ export class ComputedFilterGroupParams extends FilterOptionsGroupParams {
     groupToggle: string = '',
     checked: boolean = false
   ) {
-    if (!validateArrayLengthsMatch([optionLabels, optionKeys, optionInputs, checked])) {
-      throw new Error(
-        `Arguments did not form valid params: ${optionLabels}, ${optionKeys}, ${optionInputs}, ${checked}`
-      )
-    }
+    // if (!validateArrayLengthsMatch([optionLabels, optionKeys, optionInputs, checked])) {
+    //   throw new Error(
+    //     `Arguments did not form valid params: ${optionLabels}, ${optionKeys}, ${optionInputs}, ${checked}`
+    //   )
+    // }
     super(groupLabelText, optionLabels, optionKeys, operation, type, groupToggle, checked)
     this.optionInputs = optionInputs
   }
 }
 
 class ComputedFilterGroupOptionParams {
-  filterGroupSet
-  filterGroupOptions
+  filterGroupSet: Record<
+    string,
+    | DataFilterOption
+    | ComputedFilterOption
+    | FilterGroupSet
+    | DataFilterOptionsGroup
+    | ComputedFilterGroup
+  >
+  filterGroupOptions: Record<string, Record<string, string>>
   constructor(
     filterGroupSet: FilterGroupSet,
     groupKeys: string[],
-    keyValueSets: Record<string, string>
+    keyValueSets: Record<string, string>[]
   ) {
-    if (!validateArrayLengthsMatch([groupKeys, keyValueSets])) {
-      throw new Error(`Arguments did not form valid params: ${groupKeys}, ${keyValueSets}`)
-    }
+    // if (!validateArrayLengthsMatch([groupKeys, keyValueSets])) {
+    //   throw new Error(`Arguments did not form valid params: ${groupKeys}, ${keyValueSets}`)
+    // }
     this.filterGroupSet = filterGroupSet['children']
     this.filterGroupOptions = Object.fromEntries(
       Array.from(groupKeys, (groupKey, i) => [groupKey, keyValueSets[i]])
@@ -132,14 +139,14 @@ class FilterOption {
 }
 
 class DataFilterOption extends FilterOption {
-  fields: string[] | string[][]
-  matches: string[] | string[][]
-  bitfields
+  fields: string[]
+  matches: string[]
+  bitfields: Record<string, Uint32Array>
   constructor(
     label: string,
     optionKey: string,
-    optionFields: string[] | string[][],
-    optionMatches: string[] | string[][],
+    optionFields: string | string[],
+    optionMatches: string[],
     bitSettingFunction: Function,
     operation: BitWiseOperation,
     type: SelectionType,
@@ -147,26 +154,32 @@ class DataFilterOption extends FilterOption {
     data: Record<string, unknown>[]
   ) {
     super(label, type, checked)
-    this.fields = optionFields
+    this.fields = Array.isArray(optionFields) ? optionFields : [optionFields]
     this.matches = optionMatches
     this.bitfields = Object.fromEntries(
-      Array.from(optionFields, (fieldName) => [
-        optionFields.length === 1 ? optionKey : fieldName,
+      Array.from(this.fields, (fieldName) => [
+        this.fields.length === 1 ? optionKey : fieldName,
         createOptionBitmask(data, fieldName, optionMatches, bitSettingFunction),
       ])
     )
-    this.bitfields[optionKey] =
-      optionFields.length > 1
-        ? bitarrayBitwiseOperator(null, Object.values(this.bitfields), operation)
-        : this.bitfields[optionKey]
+    this.bitfields?.[optionKey] ??
+      bitarrayBitwiseOperator(null, Object.values(this.bitfields), operation)
   }
 }
 
 class ComputedFilterOption extends FilterOption {
-  constructor(label, optionKey, computedOptionInputs, operation, type, checked) {
+  bitfields: Record<string, Uint32Array>
+  constructor(
+    label: string,
+    optionKey: string,
+    computedOptionInputs: ComputedFilterGroupOptionParams | ComputedFilterGroupOptionParams[],
+    operation: BitWiseOperation,
+    type: SelectionType,
+    checked: boolean
+  ) {
     super(label, type, checked)
-    this.bitfields = {}
-    this.bitfields[optionKey] = null
+    // this.bitfields = {}
+    // this.bitfields[optionKey] = null
     computedOptionInputs = Array.isArray(computedOptionInputs)
       ? computedOptionInputs
       : [computedOptionInputs]
@@ -190,10 +203,24 @@ class ComputedFilterOption extends FilterOption {
     // OPTION GROUP DATA STRUCTURES
     */
 class FilterGroup {
-  children: DataFilterOption | ComputedFilterOption
+  children: Record<
+    string,
+    | DataFilterOption
+    | DataFilterOptionsGroup
+    | ComputedFilterOption
+    | ComputedFilterGroup
+    | FilterGroupSet
+  >
   operation: BitWiseOperation
   constructor(
-    childrenObject: DataFilterOption | ComputedFilterOption,
+    childrenObject: Record<
+      string,
+      | DataFilterOption
+      | DataFilterOptionsGroup
+      | ComputedFilterOption
+      | ComputedFilterGroup
+      | FilterGroupSet
+    >,
     operation: BitWiseOperation
   ) {
     this.children = childrenObject
@@ -206,9 +233,16 @@ class FilterGroup {
   }
 }
 
-class FilterGroupSet extends FilterGroup {
+export class FilterGroupSet extends FilterGroup {
   constructor(
-    filterGroupsObject: DataFilterOption | ComputedFilterOption | ,
+    filterGroupsObject: Record<
+      string,
+      | DataFilterOption
+      | ComputedFilterOption
+      | DataFilterOptionsGroup
+      | ComputedFilterGroup
+      | FilterGroupSet
+    >,
     operation: BitWiseOperation = '|'
   ) {
     super(filterGroupsObject, operation)
@@ -222,7 +256,7 @@ class FilterGroupSet extends FilterGroup {
   }
 }
 
-class FilterPanel extends FilterGroupSet {
+export class FilterPanel extends FilterGroupSet {
   bufferLength: number
   filters: Record<string, FilterGroupSet>
   constructor(
@@ -246,7 +280,7 @@ class FilterOptionsGroup extends FilterGroup {
   groupToggle: string
   constructor(
     label: string,
-    optionsObject: DataFilterOptionsGroup | ComputedFilterGroup,
+    optionsObject: Record<string, DataFilterOption>,
     operation: BitWiseOperation,
     groupToggle: string
   ) {
