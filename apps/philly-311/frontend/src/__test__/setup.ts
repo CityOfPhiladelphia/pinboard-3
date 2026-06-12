@@ -39,6 +39,10 @@ vi.mock('@phila/phila-ui-map-core', () => ({
   RasterLayer: stub('RasterLayer', 'div'),
 }))
 
+vi.mock('@phila/phila-ui-tags', () => ({
+  Tags: stub('Tags', 'span'),
+}))
+
 vi.mock('@phila/phila-ui-button', () => ({
   CloseButton: stub('CloseButton', 'button'),
 }))
