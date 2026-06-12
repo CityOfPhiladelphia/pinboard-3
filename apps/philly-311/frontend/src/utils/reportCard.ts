@@ -1,9 +1,8 @@
 // ABOUTME: Maps a 311 Report to a Pinboard BasicLocation for the finder's map and list;
 // ABOUTME: provides tag-color utilities for report status display.
 import type { PinboardTypes } from '@pinboard/ui'
+import type { TagColor } from '@phila/phila-ui-tags'
 import type { Report } from '@/composables/useNearbyReports'
-
-type TagColor = 'blue' | 'green' | 'purple' | 'grey'
 
 const STATUS_COLORS: Record<string, TagColor> = {
   New: 'blue',
