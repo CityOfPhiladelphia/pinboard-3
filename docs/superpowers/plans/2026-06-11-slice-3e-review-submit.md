@@ -201,6 +201,7 @@ git -C /Users/darren.mcdowell/Projects/pinboard-3 commit -m "feat(philly-311): s
 **Files:**
 - Modify: `src/composables/useApiError.ts`
 - Test: `src/composables/useApiError.test.ts`
+- Test: `src/composables/useApi.test.ts` (one test references fieldErrors)
 
 The API returns `{ error: string }` for validation failures and `{ error: { message, detail } }` for Salesforce failures (see spec, Backend contract). `fieldErrors` does not exist anywhere in the API; the current parsing of it is dead code. The current `body.error ?? body.message` would set an **object** as the message for the Salesforce shape.
 
@@ -293,10 +294,20 @@ describe('parseError', () => {
 
 (The string/fallback/non-JSON tests are kept from the existing file; the fieldErrors tests are removed per the approved spec; the object-shape tests are new.)
 
+Also rewrite the one fieldErrors-coupled test in `src/composables/useApi.test.ts` —
+"parses non-OK responses as ApiError" (~lines 165-176) builds a response body containing
+`fieldErrors` and asserts `error.value?.fieldErrors?.Description`. Narrow it to the surviving
+contract: keep the test, body becomes `{ error: 'Validation failed' }`, assertions become
+`error.value?.status` and `error.value?.message` only. This rewrite (not deletion) of an
+existing test is authorized by the approved spec's "Dead code removal" section.
+
 - [ ] **Step 2: Run to verify the new tests fail**
 
-Run: `npm run test:run -- src/composables/useApiError.test.ts`
-Expected: FAIL — object-shape tests get `[object Object]`-ish messages; `ApiError` test fails on leftover behavior only if implementation changed first (it shouldn't have been).
+Run: `npm run test:run -- src/composables/useApiError.test.ts src/composables/useApi.test.ts`
+Expected: FAIL — the two object-shape tests get the statusText fallback instead of the
+Salesforce message (current code sets `body.error ?? body.message`, an object). The kept
+string/fallback tests and the rewritten useApi test still pass against the current code —
+that's fine; only the object-shape tests must be red here.
 
 - [ ] **Step 3: Implement**
 
@@ -798,12 +809,15 @@ describe('ReviewStep - setup and gating', () => {
 describe('ReviewStep - submit', () => {
   it('sends the store payload as the lazily-assigned body', async () => {
     const store = fillStore()
+    // Capture before the click — success runs recordSubmission, which clears
+    // the store, so payload() would throw afterwards.
+    const expected = store.payload()
     fetchData.mockResolvedValue({ id: 'a1' })
     const w = mount(ReviewStep)
     await w.find('[data-test="review-submit"]').trigger('click')
     await flushPromises()
     const opts = useApiMock.mock.calls[0][0] as { body: unknown }
-    expect(opts.body).toEqual(store.payload())
+    expect(opts.body).toEqual(expected)
     expect(fetchData).toHaveBeenCalledTimes(1)
   })
 
