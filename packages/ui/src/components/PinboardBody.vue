@@ -8,8 +8,8 @@ import { faMap } from '@fortawesome/pro-solid-svg-icons'
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
-import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
+import { MapCard } from '@phila/phila-ui-cards'
 
 // import pinboard config
 import { PINBOARD_CONFIG_KEY } from '../plugin'
@@ -29,6 +29,7 @@ import type {
   LocationFilterOption,
   SearchMode,
   SortLocationsOptions,
+  UserLocationState,
 } from '../types'
 import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 import { hasLocationData } from '../utilities/hasLocationData'
@@ -54,21 +55,35 @@ defineSlots<{
 }>()
 
 // props
-const props = defineProps<{
-  locations: BasicLocation[]
-  searchOrUserLocation: LatLon
-  isLoading: string | false
-  errorMessage: string | null
-  locationPanelFilter?: LocationFilterOption[]
-  locationPanelSearch?: string
-  locationPanelSort?: SortLocationsOptions
-  locationSearchMode?: SearchMode
-  locationPanelLocationAvailable?: boolean
-  geojson?: unknown
-  isMobile: boolean
-  filters?: FilterDefinition[]
-  filterValues?: FilterValues
-}>()
+const props = withDefaults(
+  defineProps<{
+    locations: BasicLocation[]
+    isMobile: boolean
+    errorMessage: string | null
+    searchOrUserLocation: LatLon
+    isLoading: string | false
+    waitForUserLocation?: boolean
+    userLocationState?: UserLocationState
+    locationPanelFilter?: LocationFilterOption[]
+    locationPanelSearch?: string
+    locationPanelSort?: SortLocationsOptions
+    locationSearchMode?: SearchMode
+    geojson?: unknown
+    filters?: FilterDefinition[]
+    filterValues?: FilterValues
+  }>(),
+  {
+    waitForUserLocation: false,
+    userLocationState: 'unknown',
+    locationPanelFilter: undefined,
+    locationPanelSearch: undefined,
+    locationPanelSort: undefined,
+    locationSearchMode: undefined,
+    geojson: undefined,
+    filters: undefined,
+    filterValues: undefined,
+  }
+)
 
 // emits to parent app to handle
 const emit = defineEmits<{
@@ -260,23 +275,19 @@ const effectiveMapConfig = (() => {
         {{ errorMessage }}
       </div>
 
-      <div v-else-if="isLoading">
-        <MapCard
-          v-for="n in 5"
-          :key="n"
-          :is-loading="true"
-          :style="{ display: isMobile ? 'none' : 'block' }"
-        />
+      <div v-if="isLoading" class="loading-list">
+        <MapCard v-for="n in 5" :key="n" :is-loading="true" />
       </div>
 
-      <Teleport v-else to="#locations-panel-mobile" :disabled="!isMobile">
+      <Teleport v-else-if="!isLoading" to="#locations-panel-mobile" :disabled="!isMobile">
         <LocationsPanel
           ref="locationsPanelRef"
           :locations="locations"
           :location-filter="locationPanelFilter"
           :location-search="locationPanelSearch"
           :location-sort="locationPanelSort"
-          :location-available="locationPanelLocationAvailable"
+          :user-location-state="userLocationState"
+          :wait-for-user-location="waitForUserLocation"
           :hovered-id="hoveredLocationId"
           :selected-id="selectedLocationId"
           :is-mobile="isMobile"
@@ -381,20 +392,6 @@ const effectiveMapConfig = (() => {
   </BottomSheet>
 </template>
 
-<style>
-.phila-navbar .phila-mobile-nav .nav-flyout {
-  flex: 0 0 25rem;
-  max-width: 25rem;
-  height: calc(100dvh - var(--nav-bottom));
-}
-
-.phila-navbar .phila-mobile-nav .nav-flyout .p-4 {
-  display: flex;
-  flex-direction: column;
-  row-gap: var(--spacing-m);
-}
-</style>
-
 <style scoped>
 .finder-panel {
   display: grid;
@@ -415,14 +412,14 @@ const effectiveMapConfig = (() => {
   color: var(--Schemes-Error, #b3261e);
 }
 
-.finder-panel-locations > :deep(.location-list),
-.finder-panel-locations > .location-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
+.loading-list {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
   gap: 0.75rem;
+  padding: 0.5rem 1rem 1rem 1rem;
+  scrollbar-width: none;
 }
 
 .finder-panel-map {
@@ -436,10 +433,6 @@ const effectiveMapConfig = (() => {
   padding: 0 1rem;
   font-family: var(--Body-Default-font-body-default-family);
   font-weight: 700;
-}
-
-.bottom-sheet-list-scroll :deep(.location-list) {
-  padding-top: 0.5rem;
 }
 
 .mobile-bottom-sheet {

@@ -1,90 +1,93 @@
 import { ref, watch } from 'vue'
-import { getBrowserType } from '../utilities/getBrowserType'
-import { type LatLon, type LocationPermissionState, Browsers } from '../types'
+import type {
+  Latitude,
+  LatLon,
+  LocationPermissionState,
+  Longitude,
+  UserLocationState,
+} from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
-// excluding 'prompt' to ensure behavior of Firefox and similarly behaving browsers are coerced into behaving like Chrome
-const userLocationPermission = ref<LocationPermissionState | null>(null)
-const userLocation = ref<LatLon>({
-  latitude: NaN,
-  longitude: NaN,
-})
-const gotInitialLocation = ref<boolean>(false)
-const watchId = ref<number | null>(null)
-const geolocationOptions = { timeout: Infinity, maximumAge: 0, enableHighAccuracy: false }
+export function useUserLocation(promptOnPageLoad: boolean = false) {
+  const userLocation = ref<LatLon>({
+    latitude: NaN,
+    longitude: NaN,
+  })
+  const userLocationPermissionState = ref<LocationPermissionState>('prompt')
+  const userLocationState = ref<UserLocationState>('unknown')
+  const gotInitialLocation = ref<boolean>(false)
+  const watchId = ref<number | null>(null)
+  const geolocationOptions = { timeout: Infinity, maximumAge: 0, enableHighAccuracy: false }
 
-watch(gotInitialLocation, (newState) => {
-  if (newState) {
-    watchId.value = navigator.geolocation.watchPosition(
-      locationSuccess,
-      locationError,
-      geolocationOptions
-    )
-  }
-})
-
-watch(userLocationPermission, (newPermissionState, oldPermissionState) => {
-  if (oldPermissionState) {
-    switch (newPermissionState) {
-      case 'granted':
-      case 'prompt': {
-        getUserLocation()
-        break
-      }
-      case 'denied': {
-        if (watchId.value) {
-          navigator.geolocation.clearWatch(watchId.value)
-        }
-        clearUserLocation()
-        if (oldPermissionState === 'granted') {
-          userLocationPermission.value = 'prompt'
-        }
-        break
-      }
+  watch(gotInitialLocation, (newState) => {
+    if (newState) {
+      watchId.value = navigator.geolocation.watchPosition(
+        locationSuccess,
+        locationError,
+        geolocationOptions
+      )
+      userLocationState.value = 'watching'
     }
-  }
-})
+  })
 
-export function useUserLocation() {
-  // set userLocationPermission to navigator.permissions.state, watcher calls getUserLocation() if not 'denied'
-  getUserLocation()
+  watch(
+    userLocationPermissionState,
+    (newPermissionState, oldPermissionState) => {
+      switch (newPermissionState) {
+        case 'granted':
+        case 'prompt': {
+          getUserLocation()
+          break
+        }
+        case 'denied': {
+          if (watchId.value) {
+            navigator.geolocation.clearWatch(watchId.value)
+          }
+          clearUserLocation()
+          if (oldPermissionState === 'granted') {
+            userLocationPermissionState.value = 'prompt'
+          }
+          break
+        }
+      }
+    },
+    { immediate: promptOnPageLoad }
+  )
+
   getGeolocatePermissionState()
-  return { userLocation, userLocationPermission }
-}
 
-async function getGeolocatePermissionState() {
-  try {
-    const useLocationPermission = await navigator.permissions.query({
-      name: 'geolocation',
-    })
-    switch (useLocationPermission.state) {
-      case 'granted':
-      case 'denied': {
-        userLocationPermission.value = useLocationPermission.state
-        break
+  async function getGeolocatePermissionState() {
+    try {
+      const useLocationPermission = await navigator.permissions.query({
+        name: 'geolocation',
+      })
+      switch (useLocationPermission.state) {
+        case 'granted':
+        case 'denied': {
+          userLocationPermissionState.value = useLocationPermission.state
+          break
+        }
+        case 'prompt': {
+          // if useLocationPermission.state is 'prompt' remain in whatever state resulted from getUserLocation()
+          break
+        }
       }
-      case 'prompt': {
-        // if useLocationPermission.state is 'prompt' remain in whatever state resulted from getUserLocation()
-        break
-      }
-    }
 
-    if (getBrowserType() !== Browsers.SAFARI) {
-      // set userLocationPermission to change whenever navigator.permissions.state changes
-      // skip this if browser is Safari because Safari has a known bug that keeps this from working (https://bugs.webkit.org/show_bug.cgi?id=259432)
+      // set userLocationPermissionState to change whenever navigator.permissions.state changes
+      // Safari has a known bug that keeps this from working (https://bugs.webkit.org/show_bug.cgi?id=259432)
       useLocationPermission.onchange = () => {
         switch (useLocationPermission.state) {
           case 'granted': {
-            userLocationPermission.value = 'granted'
+            userLocationPermissionState.value = 'granted'
             break
           }
           case 'denied': {
-            userLocationPermission.value = 'denied'
+            userLocationPermissionState.value = 'denied'
             break
           }
           case 'prompt': {
             if (gotInitialLocation.value) {
-              userLocationPermission.value = 'denied'
+              userLocationPermissionState.value = 'denied'
             } else {
               getUserLocation()
             }
@@ -92,54 +95,60 @@ async function getGeolocatePermissionState() {
           }
         }
       }
+    } catch (error) {
+      console.error(error)
+      userLocationPermissionState.value = 'denied'
     }
-  } catch (error) {
-    console.error(error)
-    userLocationPermission.value = 'denied'
   }
-}
 
-function getUserLocation() {
-  navigator.geolocation.getCurrentPosition(locationSuccess, locationError, geolocationOptions)
+  function getUserLocation() {
+    userLocationState.value = 'acquiring'
+    navigator.geolocation.getCurrentPosition(locationSuccess, locationError, geolocationOptions)
+  }
+
+  function locationSuccess(position: GeolocationPosition) {
+    if (!gotInitialLocation.value) {
+      gotInitialLocation.value = true
+    }
+    // only show location on map if user is in or near Philly
+    userLocation.value.latitude = checkLatitudeInRange(position.coords.latitude)
+      ? position.coords.latitude
+      : NaN
+    userLocation.value.longitude = checkLongitudeInRange(position.coords.longitude)
+      ? position.coords.longitude
+      : NaN
+    if (!hasLocationData(userLocation)) {
+      console.error(`Location not in range`)
+      userLocation.value.latitude = NaN
+      userLocation.value.longitude = NaN
+    }
+
+    // if navigator.permissions is 'prompt' or 'granted' resolve both to 'granted' if user allows location services
+    userLocationPermissionState.value = 'granted'
+    userLocationState.value = 'located'
+  }
+
+  function locationError(error: GeolocationPositionError) {
+    userLocationPermissionState.value = 'denied'
+    userLocationState.value = 'unknown'
+    console.error(error)
+  }
+
+  function clearUserLocation() {
+    watchId.value = null
+    gotInitialLocation.value = false
+    userLocation.value.latitude = NaN
+    userLocation.value.longitude = NaN
+    userLocationState.value = 'unknown'
+  }
+
+  return { userLocation, userLocationPermissionState, userLocationState, getUserLocation }
 }
 
 // verify location is in or near enough to Philadelphia
-function checkLongitudeInRange(longitude: number) {
+function checkLongitudeInRange(longitude: Longitude) {
   return -75.35227 < longitude && longitude < -74.91583
 }
-function checkLatitudeInRange(latitude: number) {
+function checkLatitudeInRange(latitude: Latitude) {
   return 39.84911 < latitude && latitude < 40.175
-}
-
-function locationSuccess(position: GeolocationPosition) {
-  if (!gotInitialLocation.value) {
-    gotInitialLocation.value = true
-  }
-  // only show location on map if user is in or near Philly
-  userLocation.value.latitude = checkLatitudeInRange(position.coords.latitude)
-    ? position.coords.latitude
-    : NaN
-  userLocation.value.longitude = checkLongitudeInRange(position.coords.longitude)
-    ? position.coords.longitude
-    : NaN
-  if (!hasLocationData(userLocation)) {
-    console.error(`Location not in range`)
-    userLocation.value.latitude = NaN
-    userLocation.value.longitude = NaN
-  }
-
-  // if navigator.permissions is 'prompt' or 'granted' resolve both to 'granted' if user allows location services
-  userLocationPermission.value = 'granted'
-}
-
-function locationError(error: GeolocationPositionError) {
-  userLocationPermission.value = 'denied'
-  console.error(error)
-}
-
-function clearUserLocation() {
-  watchId.value = null
-  gotInitialLocation.value = false
-  userLocation.value.latitude = NaN
-  userLocation.value.longitude = NaN
 }

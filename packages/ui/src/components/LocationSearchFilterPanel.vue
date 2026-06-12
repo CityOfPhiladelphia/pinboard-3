@@ -31,14 +31,14 @@ import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 import { PINBOARD_CONFIG_KEY } from '../plugin'
 
 // type imports
-import type { LocationFilterOption, SortLocationsOptions } from '../types'
+import type { LocationFilterOption, SortLocationsOptions, UserLocationState } from '../types'
 
 // props
 const props = defineProps<{
-  searchPlaceholder?: string | undefined
-  filterOptions?: LocationFilterOption[] | undefined
-  sortOptions?: SortLocationsOptions | undefined
-  locationAvailable?: boolean | undefined
+  searchPlaceholder: string | undefined
+  filterOptions: LocationFilterOption[] | undefined
+  sortOptions: SortLocationsOptions | undefined
+  userLocationState: UserLocationState
   isMobile: boolean
 }>()
 
@@ -165,7 +165,7 @@ function focusSearchInput() {
         <SortPanel
           :sort-options="sortChoices"
           :applied-sort="appliedSort"
-          :location-available="locationAvailable ?? false"
+          :user-location-state="props.userLocationState"
           :is-mobile="isMobile"
           @update:applied-sort="handleSortChange"
         />
@@ -185,7 +185,7 @@ function focusSearchInput() {
 
 .location-search {
   grid-area: search;
-  padding: 1rem 1rem 0rem 1rem;
+  padding: 1rem 0.9rem 0.75rem 0.9rem;
   width: 100%;
 }
 
@@ -201,6 +201,7 @@ function focusSearchInput() {
 
 .location-filters {
   grid-area: filters;
+  padding: 0rem 0rem 0rem 1rem;
 }
 
 /* 19px left inset aligns the filter chips with the search input on mobile. */
@@ -213,6 +214,25 @@ function focusSearchInput() {
 .location-sort {
   grid-area: sort;
   margin-left: auto;
-  padding: 0.75rem 1rem 0rem 0rem;
+  padding: 0rem 1rem 1.25rem 0rem;
+}
+
+@media (max-width: 768px) {
+  .location-search {
+    padding: 0.6rem 1.5rem 0.25rem 1.5rem;
+  }
+
+  .location-filters {
+    padding: 0rem 0rem 0rem 1.6rem;
+  }
+
+  .location-search :deep(.state-layer) {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .location-search :deep(.phila-text-field) {
+    padding: 0 var(--scale-small, 0.5rem);
+  }
 }
 </style>

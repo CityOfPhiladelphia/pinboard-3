@@ -12,12 +12,11 @@ import {
 } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
-import type { FilterDefinition, FilterValues } from '@pinboard/ui'
+import type { FilterDefinition, FilterValues, PinboardTypes } from '@pinboard/ui'
 import { useLocations } from './composables/useLocations'
 import LocationCard from './components/LocationCard.vue'
 import LocationDetail from './components/LocationDetail.vue'
 import type { PrimaryCareLocation } from './types'
-import type { BasicLocation, LatLon } from '../../../../packages/ui/src/types'
 
 const searchPlaceholderText = 'Search by address or keyword...'
 
@@ -25,7 +24,7 @@ const { locations, isLoading, errorMessage, geojson } = useLocations()
 // Location is requested only when the user clicks the geolocation button, which
 // emits to handleGeolocate. The shared useUserLocation composable prompts on load,
 // which the primary care finder intentionally avoids.
-const userLocation = ref<LatLon>({
+const userLocation = ref<PinboardTypes.LatLon>({
   latitude: NaN,
   longitude: NaN,
 })
@@ -170,7 +169,7 @@ function handleGeolocateError(error: Error | GeolocationPositionError) {
 
 const isMobile = PinboardComposables.useIsMobile()
 
-function asPrimaryCareLocation(location: BasicLocation) {
+function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
   return location as PrimaryCareLocation
 }
 </script>

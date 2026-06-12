@@ -5,6 +5,7 @@ import { Radio } from '@phila/phila-ui-radio'
 import { PhilaButton, CloseButton } from '@phila/phila-ui-button'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
+import type { UserLocationState } from '../types'
 
 export interface SortPanelOption {
   value: string
@@ -14,7 +15,7 @@ export interface SortPanelOption {
 const props = defineProps<{
   sortOptions: SortPanelOption[]
   appliedSort: string | null
-  locationAvailable: boolean
+  userLocationState: UserLocationState
   isMobile: boolean
 }>()
 
@@ -29,6 +30,10 @@ const triggerLabel = computed(() => {
   if (!props.appliedSort) return 'Sort'
   const match = props.sortOptions.find((o) => o.value === props.appliedSort)
   return match ? `Sort: ${match.label}` : 'Sort'
+})
+
+const locationAvailable = computed(() => {
+  return ['located', 'watching'].includes(props.userLocationState)
 })
 
 function openPanel() {

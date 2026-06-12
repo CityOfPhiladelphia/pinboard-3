@@ -2,7 +2,7 @@ import { type Ref, ref, watch } from 'vue'
 import { hasLocationData } from '../utilities/hasLocationData'
 import type { LatLon, ZipcodePolygon } from '../types'
 
-export function userUserAndSearchLocations(
+export function useUserAndSearchLocations(
   userLocation: Ref<LatLon>,
   addressCoordinates: Ref<LatLon>,
   finishedAddressFetch: Ref<boolean>,
