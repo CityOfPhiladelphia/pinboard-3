@@ -60,7 +60,6 @@ export function useUserLocation(promptOnPageLoad: boolean, watchLocation: boolea
         locationError,
         geolocationOptions
       )
-      userLocationState.value = 'watching'
     }
   })
 
@@ -70,7 +69,9 @@ export function useUserLocation(promptOnPageLoad: boolean, watchLocation: boolea
       switch (newPermissionState) {
         case 'granted':
         case 'prompt': {
-          getUserLocation()
+          if (!gotInitialLocation.value) {
+            getUserLocation()
+          }
           break
         }
         case 'denied': {
@@ -94,9 +95,6 @@ export function useUserLocation(promptOnPageLoad: boolean, watchLocation: boolea
   }
 
   function locationSuccess(position: GeolocationPosition) {
-    if (!gotInitialLocation.value) {
-      gotInitialLocation.value = true
-    }
     // only show location on map if user is in or near Philly
     userLocation.value.latitude = checkLatitudeInRange(position.coords.latitude)
       ? position.coords.latitude
@@ -110,9 +108,14 @@ export function useUserLocation(promptOnPageLoad: boolean, watchLocation: boolea
       userLocation.value.longitude = NaN
     }
 
-    // if navigator.permissions is 'prompt' or 'granted' resolve both to 'granted' if user allows location services
-    userLocationPermissionState.value = 'granted'
-    userLocationState.value = 'located'
+    if (!gotInitialLocation.value) {
+      // if navigator.permissions is 'prompt' or 'granted' resolve both to 'granted' if user allows location services
+      userLocationPermissionState.value = 'granted'
+      userLocationState.value = 'located'
+      gotInitialLocation.value = true
+    } else {
+      userLocationState.value = 'watching'
+    }
   }
 
   function locationError(error: GeolocationPositionError) {
