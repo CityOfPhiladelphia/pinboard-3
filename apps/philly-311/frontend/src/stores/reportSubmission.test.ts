@@ -202,6 +202,15 @@ describe('useReportSubmissionStore', () => {
       store.reset()
       expect(store.lastFieldErrors).toBeNull()
     })
+
+    it('clears customFields and contact', () => {
+      const store = useReportSubmissionStore()
+      store.setQuestion('Color__c', 'Red')
+      store.setContact({ name: 'Darren', email: 'd@example.com' })
+      store.reset()
+      expect(store.customFields).toEqual({})
+      expect(store.contact).toEqual({})
+    })
   })
 
   describe('isEmpty', () => {

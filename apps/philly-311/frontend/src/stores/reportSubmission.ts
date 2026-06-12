@@ -97,7 +97,11 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     },
     reset() {
       this.setPhoto(null)
-      this.$patch(initial())
+      // Function form: the object form deep-merges plain objects, which would
+      // leave customFields/contact entries behind.
+      this.$patch((state) => {
+        Object.assign(state, initial())
+      })
     },
     async submit(): Promise<SubmitResponse> {
       this.lastFieldErrors = null
