@@ -39,8 +39,8 @@
 
 - [ ] **Step 1: Verify the dead prop is unreferenced**
 
-Run: `grep -rn "locationCardSlot" /Users/darren.mcdowell/Projects/pinboard-3/apps /Users/darren.mcdowell/Projects/pinboard-3/packages`
-Expected: hits ONLY in `packages/ui/src/components/LocationsPanel.vue` (the dead prop declaration). If any app references it, STOP and report.
+Run: `grep -rn --exclude-dir={node_modules,dist,.vite} "locationCardSlot" /Users/darren.mcdowell/Projects/pinboard-3/apps /Users/darren.mcdowell/Projects/pinboard-3/packages`
+Expected: hits ONLY in `packages/ui/src/components/LocationsPanel.vue` (the dead prop declaration). Built bundles under `dist/` don't count. If any app SOURCE references it, STOP and report.
 
 - [ ] **Step 2: Add test infrastructure**
 
@@ -228,7 +228,7 @@ function cardBindings(location: BasicLocation) {
 }
 ```
 
-(`const props = defineProps<...>()` — the props are currently destructured-less via `defineProps` with no binding name; assign it: `const props = defineProps<{...}>()` and update the two template-only usages if any — the template uses `locations`/`hoveredId` etc. directly, which still works with a named binding.)
+(`const props = defineProps<{...}>()` already exists at line 19 — no change needed there.)
 
 2. Template — replace the `.location-list` block:
 
@@ -243,8 +243,10 @@ function cardBindings(location: BasicLocation) {
       <MapCard
         v-for="location in locations"
         :key="location.id"
-        v-bind="{ ...cardBindings(location), ...location.locationCardInfo }"
+        v-bind="{ ...location.locationCardInfo, ...cardBindings(location) }"
       />
+      <!-- cardBindings spread LAST so card-info keys can never clobber wrapper
+           bindings (class/handlers); MapCardProps keys are disjoint anyway. -->
     </template>
   </div>
 ```
@@ -406,7 +408,8 @@ function report(overrides: Partial<Report> = {}): Report {
     serviceType: 'Pothole Repair',
     status: 'In Progress',
     address: '1234 Market St',
-    distance: 160,
+    // 161 m ≈ 0.10006 mi — just over the feet/miles boundary in formatDistance.
+    distance: 161,
     mediaUrl: 'https://cdn.test/p.jpg',
     createdAt: new Date(2026, 9, 10, 10, 41).toISOString(),
     ...overrides,
