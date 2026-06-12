@@ -923,7 +923,7 @@ git -C /Users/darren.mcdowell/Projects/pinboard-3 commit -m "feat(philly-311): f
 
 - [ ] **Step 1: Whole-workspace gates**
 
-Run, each from its own directory: packages/ui `npm run test:run && npm run type-check && npm run lint && npm run build`; philly-311 `npm run test:run && npm run type-check && npm run lint`; primary-care-finder type-check.
+Run, each from its own directory: packages/ui `npm run test:run && npm run type-check && npm run lint && npm run build`; philly-311 `npm run test:run && npm run type-check && npm run lint`; primary-care-finder type-check; **oem-flood-finder type-check** (it reads `locationCardInfo` unguarded and its build gates on type-check — Task 1 review finding).
 Expected: all green.
 
 - [ ] **Step 2: Live Playwright smoke — philly-311 landing at 1440×900**
