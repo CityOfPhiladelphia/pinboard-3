@@ -29,12 +29,9 @@ export function useUserLocation(promptOnPageLoad: boolean, watchLocation: boolea
         // Safari has a known bug that keeps this from working (https://bugs.webkit.org/show_bug.cgi?id=259432)
         useLocationPermission.onchange = () => {
           switch (useLocationPermission.state) {
-            case 'granted': {
-              userLocationPermissionState.value = 'granted'
-              break
-            }
+            case 'granted':
             case 'denied': {
-              userLocationPermissionState.value = 'denied'
+              userLocationPermissionState.value = useLocationPermission.state
               break
             }
             case 'prompt': {
@@ -50,11 +47,12 @@ export function useUserLocation(promptOnPageLoad: boolean, watchLocation: boolea
       })
   } catch (error) {
     console.error(error)
+    clearUserLocation()
     userLocationPermissionState.value = 'denied'
   }
 
-  watch(gotInitialLocation, (newState) => {
-    if (newState && watchLocation) {
+  watch(gotInitialLocation, (gotLocation) => {
+    if (gotLocation && watchLocation) {
       watchId.value = navigator.geolocation.watchPosition(
         locationSuccess,
         locationError,
@@ -132,7 +130,14 @@ export function useUserLocation(promptOnPageLoad: boolean, watchLocation: boolea
     userLocationState.value = 'unknown'
   }
 
-  return { userLocation, userLocationState, getUserLocation }
+  function endWatch() {
+    if (watchId.value) {
+      navigator.geolocation.clearWatch(watchId.value)
+    }
+    clearUserLocation()
+  }
+
+  return { userLocation, userLocationState, getUserLocation, endWatch }
 }
 
 // verify location is in or near enough to Philadelphia
