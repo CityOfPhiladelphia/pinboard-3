@@ -142,7 +142,7 @@ export function useUserLocation(promptOnPageLoad: boolean = false) {
     userLocationState.value = 'unknown'
   }
 
-  return { userLocation, userLocationPermissionState, userLocationState }
+  return { userLocation, userLocationPermissionState, userLocationState, getUserLocation }
 }
 
 // verify location is in or near enough to Philadelphia
