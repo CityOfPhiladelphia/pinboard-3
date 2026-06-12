@@ -84,4 +84,11 @@ describe('wizardGuard', () => {
     wizardGuard(makeRoute('/'))
     expect(useReportSubmissionStore().isEmpty).toBe(true)
   })
+  it('redirects /report/confirmation to /report when nothing was submitted', () => {
+    expect(wizardGuard(makeRoute('/report/confirmation'))).toBe('/report')
+  })
+  it('allows /report/confirmation after a recorded submission, with no category set', () => {
+    useReportSubmissionStore().recordSubmission({ id: 'a1', caseNumber: '311-0042' })
+    expect(wizardGuard(makeRoute('/report/confirmation'))).toBe(true)
+  })
 })

@@ -24,6 +24,7 @@ export const routes: RouteRecordRaw[] = [
       { path: 'review', component: () => import('@/pages/report/ReviewStep.vue') },
     ],
   },
+  { path: '/report/confirmation', component: () => import('@/pages/ReportConfirmationPage.vue') },
   { path: '/answers/:id', component: () => import('@/pages/AnswerDetailPage.vue') },
   { path: '/auth/redirect', component: () => import('@/pages/AuthRedirectPage.vue') },
 ]
@@ -56,6 +57,9 @@ export const authGuard: NavigationGuard = async (to) => {
 export function wizardGuard(to: RouteLocationNormalized): true | string {
   if (to.path === '/report' || !to.path.startsWith('/report/')) return true
   const store = useReportSubmissionStore()
+
+  // Confirmation is post-wizard: requires a recorded submission, skips the category gate.
+  if (to.path === '/report/confirmation') return store.submitted ? true : '/report'
 
   // Apply deep-link query params before the category gate so deep links
   // can satisfy it. A category in the URL always wins over whatever's in

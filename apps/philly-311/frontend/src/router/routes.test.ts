@@ -31,4 +31,9 @@ describe('routes', () => {
     expect(resolved.matched).toHaveLength(1)
     expect(resolved.params.id).toBe('abc123')
   })
+  it('resolves the confirmation page outside the wizard shell', () => {
+    const r = makeRouter()
+    const resolved = r.resolve('/report/confirmation')
+    expect(resolved.matched).toHaveLength(1) // standalone — no ReportPage parent
+  })
 })
