@@ -145,6 +145,16 @@ describe('ReviewStep - submit', () => {
     expect(w.find('[role="alert"]').exists()).toBe(false)
   })
 
+  it('ignores re-entrant clicks while a submit is in flight', async () => {
+    fillStore()
+    fetchData.mockResolvedValue({ id: 'a1' })
+    const w = mount(ReviewStep)
+    isLoading.value = true
+    await w.find('[data-test="review-submit"]').trigger('click')
+    await flushPromises()
+    expect(fetchData).not.toHaveBeenCalled()
+  })
+
   it('surfaces a payload() throw in the alert instead of an unhandled rejection', async () => {
     const store = fillStore()
     vi.spyOn(store, 'payload').mockImplementation(() => {

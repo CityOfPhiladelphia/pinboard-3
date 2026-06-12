@@ -24,6 +24,7 @@ const canSubmit = computed(
 )
 
 async function submit() {
+  if (submitting.value) return
   errorMessage.value = null
   try {
     submitOpts.body = store.payload()
