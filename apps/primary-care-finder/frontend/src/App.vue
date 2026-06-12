@@ -283,4 +283,8 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
   padding: 0;
   box-sizing: border-box;
 }
+
+.phila-navbar-brand {
+  padding-left: var(--spacing-l);
+}
 </style>
