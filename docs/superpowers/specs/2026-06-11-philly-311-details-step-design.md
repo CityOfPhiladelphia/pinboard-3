@@ -1,7 +1,7 @@
 # Philly 311 — Increment 3 / Slice 3d: Details Step
 
 - **Date:** 2026-06-11
-- **Status:** Draft (pending review)
+- **Status:** Approved (implemented on feat/philly-311-details)
 - **Repo:** `pinboard-3`
 - **Branch:** `feat/philly-311-details` (off `311-staging`)
 
