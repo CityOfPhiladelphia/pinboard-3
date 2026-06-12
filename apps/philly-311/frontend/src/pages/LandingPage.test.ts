@@ -15,7 +15,7 @@ vi.mock('@pinboard/ui', () => {
       'locationPanelFilter',
       'locationPanelSearch',
     ],
-    emits: ['selectedLocationsFilter', 'search'],
+    emits: ['search'],
     setup:
       (props, { slots, emit }) =>
       () =>
@@ -104,11 +104,6 @@ vi.mock('@/composables/useNearbyReports', () => ({
 
 const searchAddress = vi.fn()
 vi.mock('@/composables/useAis', () => ({ searchAddress: (...a: unknown[]) => searchAddress(...a) }))
-const loadArticles = vi.fn().mockResolvedValue({ items: [{ id: 'a1', title: 'Pothole help' }] })
-vi.mock('@/composables/useKnowledgeArticles', () => ({
-  useKnowledgeArticles: () => ({ loadArticles }),
-}))
-
 import LandingPage from './LandingPage.vue'
 
 const globalStubs = {
@@ -141,7 +136,7 @@ describe('LandingPage', () => {
     const w = mount(LandingPage, { global: { stubs: globalStubs } })
     await flushPromises()
     const chips = w.find('.header').findAll('button.filter-chips__chip')
-    expect(chips.length).toBeGreaterThanOrEqual(11) // All Filters + 10 categories
+    expect(chips.length).toBeGreaterThanOrEqual(11) // All Filters + one per common category
     expect(chips[0].text()).toContain('All Filters')
     expect(chips[0].attributes('aria-pressed')).toBe('true')
     expect(chips.map((c) => c.text())).toEqual(expect.arrayContaining(['Pothole Repair']))
@@ -173,5 +168,26 @@ describe('LandingPage', () => {
     await flushPromises()
     expect(searchAddress).toHaveBeenCalledWith('1234 Market St')
     expect(load).toHaveBeenCalledWith(expect.objectContaining({ lat: 39.95, lng: -75.16 }))
+  })
+
+  it('selecting a category chip filters the location list; "All Filters" restores it', async () => {
+    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    await flushPromises()
+    expect(w.find('.count').text()).toBe('1')
+
+    const chips = w.find('.header').findAll('button.filter-chips__chip')
+    const graffitiChip = chips.find((c) => c.text().includes('Graffiti Removal'))
+    expect(graffitiChip).toBeDefined()
+    if (!graffitiChip) return
+    await graffitiChip.trigger('click')
+    await flushPromises()
+    expect(w.find('.count').text()).toBe('0')
+
+    const allFiltersChip = chips.find((c) => c.text().includes('All Filters'))
+    expect(allFiltersChip).toBeDefined()
+    if (!allFiltersChip) return
+    await allFiltersChip.trigger('click')
+    await flushPromises()
+    expect(w.find('.count').text()).toBe('1')
   })
 })
