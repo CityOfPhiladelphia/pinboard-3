@@ -9,6 +9,7 @@ import { faMap } from '@fortawesome/pro-solid-svg-icons'
 import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
+import { MapCard } from '@phila/phila-ui-cards'
 
 // import pinboard config
 import { PINBOARD_CONFIG_KEY } from '../plugin'
@@ -274,6 +275,10 @@ const effectiveMapConfig = (() => {
         {{ errorMessage }}
       </div>
 
+      <div v-if="isLoading" class="loading-list">
+        <MapCard v-for="n in 5" :key="n" :is-loading="true" />
+      </div>
+
       <Teleport v-else-if="!isLoading" to="#locations-panel-mobile" :disabled="!isMobile">
         <LocationsPanel
           ref="locationsPanelRef"
@@ -286,7 +291,6 @@ const effectiveMapConfig = (() => {
           :hovered-id="hoveredLocationId"
           :selected-id="selectedLocationId"
           :is-mobile="isMobile"
-          :is-loading="isLoading"
           @select="handleSelect"
           @hover="handleHover"
           @hover-end="handleHoverEnd"
@@ -406,6 +410,16 @@ const effectiveMapConfig = (() => {
 
 .status-message--error {
   color: var(--Schemes-Error, #b3261e);
+}
+
+.loading-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem 1rem 1rem;
+  scrollbar-width: none;
 }
 
 .finder-panel-map {

@@ -20,7 +20,6 @@ import type {
 const props = defineProps<{
   locations: BasicLocation[]
   isMobile: boolean
-  isLoading: false | string
   hoveredId: string | undefined
   selectedId: string | undefined
   waitForUserLocation: boolean
@@ -108,7 +107,7 @@ defineExpose({ scrollToCard })
   <slot name="below-search" />
 
   <div
-    v-if="isLoading || (waitForUserLocation && userLocationState === 'acquiring')"
+    v-if="waitForUserLocation && userLocationState === 'acquiring'"
     ref="listRef"
     class="location-list"
   >
