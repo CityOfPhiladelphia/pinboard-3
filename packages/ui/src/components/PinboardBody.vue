@@ -17,8 +17,8 @@ import { PINBOARD_CONFIG_KEY } from '../plugin'
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
-import FilterChipBar from './FilterChipBar.vue'
-import AllFiltersPanel from './AllFiltersPanel.vue'
+import { FilterChipGroup } from '@phila/phila-ui-filter-chip'
+import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
 // pinboard composables imports
 
@@ -30,7 +30,7 @@ import type {
   SearchMode,
   SortLocationsOptions,
 } from '../types'
-import type { FilterDefinition, FilterValues } from '@phila/phila-ui-filter-chip'
+import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 import { hasLocationData } from '../utilities/hasLocationData'
 
 // slots
@@ -89,6 +89,8 @@ function onFilterValues(value: FilterValues) {
 // component variables
 const snapPoints = [15, 50, 100]
 const config = inject(PINBOARD_CONFIG_KEY)
+// Mobile: chips render under the on-map search bar when 'map', else in the bottom sheet.
+const chipsOnMap = computed(() => config?.mobileFilterPlacement === 'map')
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const slots: Record<string, any> = useSlots()
 
@@ -287,12 +289,19 @@ const effectiveMapConfig = (() => {
           @sort-option="handleLocationSortChange"
         >
           <template v-if="filters" #below-search>
-            <FilterChipBar
-              :filters="filters"
-              :model-value="filterValues ?? {}"
-              @update:model-value="onFilterValues"
-              @open-filters="allFiltersOpen = true"
-            />
+            <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
+              <div class="filter-chip-bar">
+                <FilterChipGroup
+                  :filters="filters"
+                  :model-value="filterValues ?? {}"
+                  color="white"
+                  filter-button
+                  :elevated="isMobile && chipsOnMap"
+                  @update:model-value="onFilterValues"
+                  @open-filters="allFiltersOpen = true"
+                />
+              </div>
+            </Teleport>
           </template>
         </LocationsPanel>
       </Teleport>
@@ -330,13 +339,14 @@ const effectiveMapConfig = (() => {
       <div id="mobile-map-search-filter" class="mobile-map-search-filter"></div>
     </div>
 
-    <Teleport to="body" :disabled="!isMobile">
+    <Teleport to="#app" :disabled="!isMobile">
       <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
-        <AllFiltersPanel
-          v-model:open="allFiltersOpen"
+        <FilterPanel
+          v-if="allFiltersOpen"
           :filters="filters"
           :model-value="filterValues ?? {}"
           @update:model-value="onFilterValues"
+          @close="allFiltersOpen = false"
         />
       </div>
     </Teleport>
@@ -497,6 +507,10 @@ const effectiveMapConfig = (() => {
   height: auto;
 }
 
+.filter-chip-bar {
+  padding: 0.5rem 0;
+}
+
 .all-filters-overlay {
   position: absolute;
   top: 0;
@@ -567,28 +581,7 @@ const effectiveMapConfig = (() => {
     left: 0;
     right: 0;
     z-index: 2;
-    padding: 10px 24px;
-  }
-
-  .mobile-map-search-filter :deep(.mobile-search) {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .mobile-map-search-filter :deep(.mobile-search .state-layer),
-  .mobile-map-search-filter :deep(.mobile-search .content) {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
-  .mobile-map-search-filter :deep(.mobile-search .phila-text-field) {
-    padding: 0 var(--scale-small, 0.5rem) !important;
-  }
-
-  .mobile-map-search-filter :deep(.location-filters) {
-    padding: 0.25rem 0 0;
-    padding-left: 2px;
-    gap: 0.25rem;
+    padding: 10px 0;
   }
 
   /* Full-screen modal that covers the bottom sheet and map, rather than a
