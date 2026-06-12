@@ -120,10 +120,15 @@ informative). No lightbox/zoom — fidelity slice territory.
 - **Delete `lastFieldErrors`** from `State`/`initial`.
 - **Add `submitted: { id: string; caseNumber?: string } | null`** to state (`initial()`
   returns `null`).
+- **Pre-existing bug found during planning:** Pinia's object-form `$patch` deep-merges plain
+  objects, so `reset()`'s `$patch(initial())` never clears `customFields` or `contact`
+  (merging `{}` into a populated object is a no-op). Existing tests miss those two fields.
+  Fix in this slice (TDD: failing test first): use the function form,
+  `this.$patch((state) => Object.assign(state, initial()))`.
 - **Add `recordSubmission(result)`**: `setPhoto(null)` (blob revoke), then
-  `this.$patch({ ...initial(), submitted: result })` — `submitted` is set in the same patch,
-  never wiped by a reflexive `$patch(initial())`. `photoSuggestions` is a wizard field and is
-  cleared by this.
+  `this.$patch((state) => Object.assign(state, initial(), { submitted: result }))` —
+  function form for the same deep-merge reason; `submitted` is set in the same patch.
+  `photoSuggestions` is a wizard field and is cleared by this.
 - `reset()` (image-step "start over" path) now also clears `submitted` — starting a new
   report discards the old confirmation.
 - Move `SubmitResponse` to `types/wizard.ts` (ReviewStep needs it; keep one definition).
@@ -165,6 +170,8 @@ informative). No lightbox/zoom — fidelity slice territory.
 2. **POC dead field-error machinery** — `lastFieldErrors`, `ReviewStep.fieldErrorRoute`
    regex routing, and `useApiError` fieldErrors parsing have no API counterpart; remove or
    align with the single-string contract.
+3. **POC `reset()` `$patch(initial())` deep-merge** — verify the POC store uses the same
+   object-form `$patch` pattern; if so, `customFields`/`contact` survive reset there too.
 
 (Verified 2026-06-11: no existing bd issues mention these.)
 
