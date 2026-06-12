@@ -120,8 +120,10 @@ informative). No lightbox/zoom — fidelity slice territory.
 - **Delete `lastFieldErrors`** from `State`/`initial`.
 - **Add `submitted: { id: string; caseNumber?: string } | null`** to state (`initial()`
   returns `null`).
-- **Add `recordSubmission(result)`**: sets `submitted`, then resets the wizard fields
-  (`setPhoto(null)` + `$patch` of the wizard-field initials) while **preserving `submitted`**.
+- **Add `recordSubmission(result)`**: `setPhoto(null)` (blob revoke), then
+  `this.$patch({ ...initial(), submitted: result })` — `submitted` is set in the same patch,
+  never wiped by a reflexive `$patch(initial())`. `photoSuggestions` is a wizard field and is
+  cleared by this.
 - `reset()` (image-step "start over" path) now also clears `submitted` — starting a new
   report discards the old confirmation.
 - Move `SubmitResponse` to `types/wizard.ts` (ReviewStep needs it; keep one definition).
@@ -175,8 +177,9 @@ task). Unit tests use the existing conventions: vitest + @vue/test-utils, Pinia
 
 - **ReviewSummary:** renders all four sections from a populated store; em-dash fallbacks for
   missing photo/contact/category/location; coords fallback when address empty; question
-  labels from catalog with raw-key fallback (mock `useServiceTypes`); Edit links point at the
-  right routes; visibility Yes/No.
+  labels from catalog with raw-key fallback (mock `useServiceTypes`); question rows follow
+  catalog order with unknown keys last (one ordering test); Edit links point at the right
+  routes; visibility Yes/No.
 - **ReviewStep:** Submit disabled when store incomplete; click → `fetchData` with
   `store.payload()` as body; "Submitting…"/disabled while loading; API error message shown in
   `role="alert"` and user stays; generic fallback message; success → `recordSubmission`
@@ -189,10 +192,11 @@ task). Unit tests use the existing conventions: vitest + @vue/test-utils, Pinia
 - **Router/guard:** `/report/confirmation` redirects to `/report` without `submitted`,
   passes with it; existing wizard-guard tests still green.
 - **useApiError:** updated tests assert single-message parsing for both error shapes
-  (`{error: string}` and `{error: {message, detail}}` → message extraction) and no
-  fieldErrors field. NOTE: check current `parseError` against the Salesforce
-  `{ error: { message, detail } }` shape — `body.error ?? body.message` would yield an
-  **object** today; coerce to `body.error.message` + detail when `error` is an object.
+  (`{error: string}` and `{error: {message, detail}}`) and no fieldErrors field. The current
+  `parseError` (`body.error ?? body.message`) would yield an **object** for the Salesforce
+  shape; fix: when `body.error` is an object, message = `error.message`, with `error.detail`
+  appended after " — " when present (detail often carries the actionable Salesforce text);
+  `detail` is not stored separately on `ApiError`.
 - **Live Playwright smoke** (end of slice, real dev API): full wizard run — photo upload
   (classify), issue type + questions, location pick, details (description ≥10 chars,
   visibility), Review shows everything entered, Edit link round-trip preserves state,
