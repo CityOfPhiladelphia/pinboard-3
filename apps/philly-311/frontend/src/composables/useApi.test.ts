@@ -164,7 +164,7 @@ describe('useApi - 401 retry', () => {
 describe('useApi - errors', () => {
   it('parses non-OK responses as ApiError', async () => {
     fetchMock.mockResolvedValueOnce(
-      new Response(JSON.stringify({ error: 'Bad', fieldErrors: { Description: 'Required' } }), {
+      new Response(JSON.stringify({ error: 'Validation failed' }), {
         status: 400,
         headers: { 'content-type': 'application/json' },
       }),
@@ -172,7 +172,7 @@ describe('useApi - errors', () => {
     const { fetchData, error } = useApi({ url: '/x' })
     await fetchData()
     expect(error.value?.status).toBe(400)
-    expect(error.value?.fieldErrors?.Description).toBe('Required')
+    expect(error.value?.message).toBe('Validation failed')
   })
 
   it('surfaces network errors as ApiError(0, msg)', async () => {

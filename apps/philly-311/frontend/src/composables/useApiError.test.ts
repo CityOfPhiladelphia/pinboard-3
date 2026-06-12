@@ -1,34 +1,47 @@
-// ABOUTME: Verifies ApiError carries status, message, and Salesforce-style fieldErrors.
-// ABOUTME: Verifies parseError extracts the fields from JSON / falls back on non-JSON.
+// ABOUTME: Verifies ApiError carries status and message.
+// ABOUTME: Verifies parseError handles string and Salesforce object error shapes.
 import { describe, expect, it } from 'vitest'
 import { ApiError, parseError } from './useApiError'
 
 describe('ApiError', () => {
-  it('exposes status, message, and fieldErrors', () => {
-    const e = new ApiError(400, 'Validation failed', { Service_Request_Type__c: 'invalid' })
+  it('exposes status and message', () => {
+    const e = new ApiError(400, 'Validation failed')
     expect(e.status).toBe(400)
     expect(e.message).toBe('Validation failed')
-    expect(e.fieldErrors?.Service_Request_Type__c).toBe('invalid')
     expect(e.name).toBe('ApiError')
     expect(e instanceof Error).toBe(true)
-  })
-
-  it('omits fieldErrors when not provided', () => {
-    const e = new ApiError(500, 'boom')
-    expect(e.fieldErrors).toBeUndefined()
   })
 })
 
 describe('parseError', () => {
-  it('parses Salesforce-style JSON errors with fieldErrors', async () => {
+  it('parses string errors ({error: string})', async () => {
+    const r = new Response(JSON.stringify({ error: 'serviceRequestType is required' }), {
+      status: 400,
+      headers: { 'content-type': 'application/json' },
+    })
+    const e = await parseError(r)
+    expect(e.status).toBe(400)
+    expect(e.message).toBe('serviceRequestType is required')
+  })
+
+  it('parses Salesforce object errors ({error: {message, detail}}), joining detail', async () => {
     const r = new Response(
-      JSON.stringify({ error: 'Validation failed', fieldErrors: { Description: 'Required' } }),
+      JSON.stringify({
+        error: { message: 'Salesforce error', detail: 'Required fields are missing: [Street__c]' },
+      }),
       { status: 400, headers: { 'content-type': 'application/json' } },
     )
     const e = await parseError(r)
-    expect(e.status).toBe(400)
-    expect(e.message).toBe('Validation failed')
-    expect(e.fieldErrors?.Description).toBe('Required')
+    expect(e.message).toBe('Salesforce error — Required fields are missing: [Street__c]')
+  })
+
+  it('uses message alone when the object error has no detail', async () => {
+    const r = new Response(JSON.stringify({ error: { message: 'Salesforce error' } }), {
+      status: 502,
+      headers: { 'content-type': 'application/json' },
+    })
+    const e = await parseError(r)
+    expect(e.message).toBe('Salesforce error')
   })
 
   it('falls back to body.message when body.error is missing', async () => {

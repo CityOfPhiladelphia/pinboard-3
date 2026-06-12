@@ -1,16 +1,26 @@
-// ABOUTME: Typed error class for API responses + a parser that extracts status,
-// ABOUTME: message, and Salesforce-style fieldErrors from a Response object.
+// ABOUTME: Typed error class for API responses + a parser that extracts status and
+// ABOUTME: message from {error: string} and Salesforce {error: {message, detail}} bodies.
 
 export class ApiError extends Error {
   status: number
-  fieldErrors?: Record<string, string>
 
-  constructor(status: number, message: string, fieldErrors?: Record<string, string>) {
+  constructor(status: number, message: string) {
     super(message)
     this.name = 'ApiError'
     this.status = status
-    this.fieldErrors = fieldErrors
   }
+}
+
+/** API validation errors are `{error: string}`; Salesforce failures are `{error: {message, detail}}`. */
+function errorMessage(body: { error?: unknown; message?: unknown }): string | null {
+  const err = body.error
+  if (typeof err === 'string') return err
+  if (err && typeof err === 'object') {
+    const { message, detail } = err as { message?: string; detail?: string }
+    if (message && detail) return `${message} — ${detail}`
+    return message ?? detail ?? null
+  }
+  return typeof body.message === 'string' ? body.message : null
 }
 
 export async function parseError(r: Response): Promise<ApiError> {
@@ -18,8 +28,7 @@ export async function parseError(r: Response): Promise<ApiError> {
   if (ct.includes('application/json')) {
     try {
       const body = await r.json()
-      const message = body.error ?? body.message ?? r.statusText
-      return new ApiError(r.status, message, body.fieldErrors)
+      return new ApiError(r.status, errorMessage(body) ?? r.statusText)
     } catch {
       // fall through to text path
     }
