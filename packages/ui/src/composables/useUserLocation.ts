@@ -33,7 +33,6 @@ export function useUserLocation(promptOnPageLoad: boolean = false) {
   watch(
     userLocationPermissionState,
     (newPermissionState, oldPermissionState) => {
-      // if (oldPermissionState) {
       switch (newPermissionState) {
         case 'granted':
         case 'prompt': {
@@ -51,12 +50,10 @@ export function useUserLocation(promptOnPageLoad: boolean = false) {
           break
         }
       }
-      // }
     },
     { immediate: promptOnPageLoad }
   )
 
-  // getUserLocation()
   getGeolocatePermissionState()
 
   async function getGeolocatePermissionState() {
