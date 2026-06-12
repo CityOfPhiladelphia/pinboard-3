@@ -16,21 +16,13 @@ const base: Report = {
 }
 
 describe('reportToLocation', () => {
-  it('maps Report fields onto BasicLocation + MapCardProps', () => {
+  it('maps Report fields onto BasicLocation', () => {
     const loc = reportToLocation(base)
     expect(loc.id).toBe('12345678')
+    expect(loc.name).toBe('Pothole Repair')
     expect(loc.latitude).toBe(39.95)
     expect(loc.longitude).toBe(-75.16)
-    expect(loc.locationCardInfo.heading).toBe('Pothole Repair')
-    expect(loc.locationCardInfo.subheader).toBe('1234 Market St')
-    expect(loc.locationCardInfo.src).toBe('https://example.test/p.jpg')
-    const tags = loc.locationCardInfo.tags ?? []
-    expect(tags[0]?.text).toBe('In Progress')
-    expect(tags.some((t) => t.text === '0.1 mi')).toBe(true)
-  })
-  it('omits the distance tag when distance is missing', () => {
-    const tags = reportToLocation({ ...base, distance: NaN }).locationCardInfo.tags ?? []
-    expect(tags.some((t) => t.text?.endsWith('mi') || t.text?.endsWith('ft'))).toBe(false)
+    expect(loc).not.toHaveProperty('locationCardInfo')
   })
 })
 

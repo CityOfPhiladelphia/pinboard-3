@@ -8,6 +8,6 @@ describe('ReportCallout', () => {
     expect(w.text()).toContain('Report Issues Around You')
     const cta = w.findComponent(RouterLinkStub)
     expect(cta.props('to')).toBe('/report')
-    expect(cta.text()).toContain('Report an Issue')
+    expect(cta.text()).toContain('Start a report')
   })
 })

@@ -1,5 +1,5 @@
-// ABOUTME: Loads the top-N knowledge articles for the landing "Trending articles"
-// ABOUTME: strip; failures resolve to an empty list so the strip simply hides.
+// ABOUTME: Data layer for the Answers content section — loads the top-N knowledge articles
+// ABOUTME: from the backend; failures resolve to an empty list.
 import { ref, type Ref } from 'vue'
 import { useKnowledgeArticles, type Article } from '@/composables/useKnowledgeArticles'
 

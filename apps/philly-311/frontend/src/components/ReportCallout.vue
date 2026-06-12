@@ -1,5 +1,5 @@
-<!-- ABOUTME: Landing-header callout: heading + lede + the primary "Report an Issue" CTA,
-     which routes to /report (a placeholder until the report wizard lands in Increment 3). -->
+<!-- ABOUTME: Landing-header callout: heading + lede + the primary "Start a report" CTA
+     routing to /report. -->
 <script setup lang="ts"></script>
 
 <template>
@@ -9,7 +9,7 @@
       See something that needs attention? Report it and help improve neighborhoods across
       Philadelphia.
     </p>
-    <RouterLink to="/report" class="report-callout__cta">Report an Issue</RouterLink>
+    <RouterLink to="/report" class="report-callout__cta">Start a report</RouterLink>
   </section>
 </template>
 

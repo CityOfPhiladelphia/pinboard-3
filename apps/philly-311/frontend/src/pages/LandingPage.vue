@@ -9,30 +9,24 @@ import {
   MapNavigationControl,
   GeolocationButton,
   BasemapToggle,
-  type PinboardTypes,
 } from '@pinboard/ui'
 import commonCategories from '@/data/common_categories.json'
 import { useReportFinder } from '@/composables/useReportFinder'
 import { serviceTypeIconDefinition } from '@/utils/reportIcon'
 import ReportDetail from '@/components/ReportDetail.vue'
 import { searchAddress } from '@/composables/useAis'
-import { useTrendingArticles } from '@/composables/useTrendingArticles'
 import ReportCallout from '@/components/ReportCallout.vue'
-import TrendingArticles from '@/components/TrendingArticles.vue'
+import FilterChips from '@/components/FilterChips.vue'
+import ReportListingCard from '@/components/ReportListingCard.vue'
 
 const finder = useReportFinder()
-const trending = useTrendingArticles()
 const searchPlaceholder = 'Search by address or ZIP'
 
 onMounted(() => {
   void finder.init()
-  void trending.init()
 })
 
-const filterOptions: PinboardTypes.LocationFilterOption[] = [
-  { value: 'all', label: 'All' },
-  ...commonCategories.map((c) => ({ value: c.title, label: c.title })),
-]
+const categoryOptions = commonCategories.map((c) => ({ value: c.title, label: c.title }))
 
 async function onSearch(query: string) {
   const feature = await searchAddress(query)
@@ -46,14 +40,24 @@ async function onSearch(query: string) {
     :search-or-user-location="finder.searchOrUserLocation.value"
     :is-loading="finder.isLoading.value"
     :error-message="finder.errorMessage.value"
-    :location-panel-filter="filterOptions"
     :location-panel-search="searchPlaceholder"
-    @selected-locations-filter="finder.setFilter"
     @search="onSearch"
   >
     <template #locations-header>
       <ReportCallout />
-      <TrendingArticles :articles="trending.articles.value" />
+      <FilterChips
+        :options="categoryOptions"
+        :model-value="finder.filter.value"
+        @update:model-value="finder.setFilter"
+      />
+    </template>
+
+    <template #location-card="{ location }">
+      <ReportListingCard
+        v-if="finder.reportById(location.id)"
+        :report="finder.reportById(location.id)!"
+      />
+      <p v-else>{{ location.name }}</p>
     </template>
 
     <template #location-detail="{ location, onClose }">
