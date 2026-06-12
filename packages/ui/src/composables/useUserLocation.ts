@@ -8,12 +8,12 @@ import type {
 } from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
-export function useUserLocation() {
+export function useUserLocation(promptOnPageLoad: boolean = false) {
   const userLocation = ref<LatLon>({
     latitude: NaN,
     longitude: NaN,
   })
-  const userLocationPermissionState = ref<LocationPermissionState | null>(null)
+  const userLocationPermissionState = ref<LocationPermissionState>('prompt')
   const userLocationState = ref<UserLocationState>('unknown')
   const gotInitialLocation = ref<boolean>(false)
   const watchId = ref<number | null>(null)
@@ -30,8 +30,10 @@ export function useUserLocation() {
     }
   })
 
-  watch(userLocationPermissionState, (newPermissionState, oldPermissionState) => {
-    if (oldPermissionState) {
+  watch(
+    userLocationPermissionState,
+    (newPermissionState, oldPermissionState) => {
+      // if (oldPermissionState) {
       switch (newPermissionState) {
         case 'granted':
         case 'prompt': {
@@ -49,10 +51,12 @@ export function useUserLocation() {
           break
         }
       }
-    }
-  })
+      // }
+    },
+    { immediate: promptOnPageLoad }
+  )
 
-  getUserLocation()
+  // getUserLocation()
   getGeolocatePermissionState()
 
   async function getGeolocatePermissionState() {
