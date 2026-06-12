@@ -69,7 +69,7 @@ const props = withDefaults(
     locationSearchMode?: SearchMode
     geojson?: unknown
     filters?: FilterDefinition[]
-  filterValues?: FilterValues
+    filterValues?: FilterValues
   }>(),
   {
     waitForUserLocation: false,
@@ -80,7 +80,7 @@ const props = withDefaults(
     locationSearchMode: undefined,
     geojson: undefined,
     filters: undefined,
-    filterValues: undefined
+    filterValues: undefined,
   }
 )
 
