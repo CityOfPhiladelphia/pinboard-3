@@ -15,8 +15,10 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.1.0",
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
-    "@phila/phila-ui-button": "2.2.3-beta.2",
+    "@fortawesome/pro-solid-svg-icons": "^7.2.0",
+    "@phila/phila-ui-button": "2.2.3-beta.6",
     "@pinboard/ui": "workspace:*",
     "date-fns": "^4.1.0",
     "vue": "^3.5.33",
@@ -29,6 +31,7 @@
     "@vitejs/plugin-vue": "^6.0.3",
     "npm-run-all2": "^8.0.4",
     "typescript": "^6.0.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vite-plugin-vue-devtools": "^8.0.5"
   }
 }

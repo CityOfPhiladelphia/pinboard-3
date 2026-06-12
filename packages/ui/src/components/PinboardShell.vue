@@ -3,11 +3,11 @@ import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader } from '@phila/phila-ui-app-header'
 import MobileNavPanel from './MobileNavPanel.vue'
 import type { VNode } from 'vue'
-import type { NavbarBrand } from '@phila/phila-ui-app-header'
+import type { NavbarBrandProps } from '@phila/phila-ui-app-header'
 
 defineProps<{
   title: string
-  logo?: NavbarBrand['logo']
+  logo?: NavbarBrandProps['logo']
   bannerTitle?: string
   bannerMessage?: string
 }>()
@@ -24,6 +24,7 @@ defineSlots<{
   <div class="pinboard">
     <AppHeader
       id="pinboard-nav"
+      :compact-mobile="true"
       :show-trusted-site="true"
       :links="[]"
       :navbar-brand="{
@@ -34,6 +35,21 @@ defineSlots<{
       :banner-title="bannerTitle"
       :banner-message="bannerMessage"
     >
+      <!-- Suppress AppHeader's default search button: it renders by default but opens an
+           empty panel since we don't wire up search. Temporary until the upstream fix
+           (phila-ui-4 bead map-core-k8c) gates the default on a search-panel slot.
+           Must contain a real (non-comment) node: Vue renders the slot's default content
+           when an overriding slot is empty, so a hidden span is what actually suppresses it. -->
+      <template #navbar-search><span hidden /></template>
+
+      <!-- Only show the hamburger when the app provides a mobile nav. AppHeader renders
+           the burger by default; suppress it otherwise so apps without a mobile nav (e.g.
+           oem-flood-finder) don't get a stray hamburger. Restores the pre-slot-refactor
+           "burger only if mobile-nav" behavior; same root cause as bead map-core-k8c.
+           Hidden span (not empty) because Vue renders a slot's default content when the
+           overriding slot is empty. -->
+      <template v-if="!$slots['mobile-nav']" #navbar-toggle><span hidden /></template>
+
       <template v-if="$slots['mobile-nav']" #mobile-nav>
         <MobileNavPanel>
           <slot name="mobile-nav" />
@@ -87,7 +103,7 @@ defineSlots<{
   row-gap: var(--spacing-m);
 }
 
-@media (max-width: 1064px) {
+@media (max-width: 768px), (max-width: 1064px) and (max-height: 600px) {
   .pinboard > :deep(footer) {
     display: none;
   }
@@ -97,7 +113,7 @@ defineSlots<{
   }
 
   .pinboard :deep(.phila-navbar-logo.logo--single-line) {
-    font-size: 1.3rem;
+    font-size: 1rem;
     white-space: nowrap;
   }
 

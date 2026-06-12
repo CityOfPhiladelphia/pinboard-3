@@ -47,6 +47,8 @@ export interface MapConfig {
 export interface PinboardConfig {
   title: string
   map?: MapConfig
+  /** Where the filter chips sit on mobile: 'map' (under the search bar) or 'sheet' (in the bottom sheet). Defaults to 'sheet'. */
+  mobileFilterPlacement?: 'map' | 'sheet'
 }
 
 export interface AlertBanner {

@@ -190,7 +190,6 @@ watch(panelOpen, (isOpen) => {
   background: #ffffff;
   border: 1px solid #c2c2c2;
   border-radius: var(--border-radius-xs);
-  font-family: var(--Body-Default-font-body-default-family);
   font-size: 0.875rem;
   color: #454545;
   cursor: pointer;
@@ -219,7 +218,6 @@ watch(panelOpen, (isOpen) => {
     0 0 0 1px rgba(0, 0, 0, 0.06);
   border-radius: 8px;
   width: 280px;
-  font-family: var(--Body-Default-font-body-default-family);
   font-size: var(--Body-Default-font-body-default-size, 1rem);
   color: var(--Schemes-On-Surface, #333);
 }
