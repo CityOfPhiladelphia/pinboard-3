@@ -19,6 +19,8 @@ export interface ZipcodePolygon {
 
 export type LocationPermissionState = 'granted' | 'prompt' | 'denied'
 
+export type UserLocationState = 'unknown' | 'acquiring' | 'located' | 'watching'
+
 export type MapControlPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
 export interface MapConfig {
@@ -46,6 +48,8 @@ export interface MapConfig {
 export interface PinboardConfig {
   title: string
   map?: MapConfig
+  /** Where the filter chips sit on mobile: 'map' (under the search bar) or 'sheet' (in the bottom sheet). Defaults to 'sheet'. */
+  mobileFilterPlacement?: 'map' | 'sheet'
 }
 
 export interface AlertBanner {

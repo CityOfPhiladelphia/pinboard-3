@@ -8,8 +8,8 @@ import { faMap } from '@fortawesome/pro-solid-svg-icons'
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
-import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
+import { MapCard } from '@phila/phila-ui-cards'
 
 // import pinboard config
 import { PINBOARD_CONFIG_KEY } from '../plugin'
@@ -17,8 +17,8 @@ import { PINBOARD_CONFIG_KEY } from '../plugin'
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
-import FilterChipBar from './FilterChipBar.vue'
-import AllFiltersPanel from './AllFiltersPanel.vue'
+import { FilterChipGroup } from '@phila/phila-ui-filter-chip'
+import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
 // pinboard composables imports
 
@@ -29,8 +29,9 @@ import type {
   LocationFilterOption,
   SearchMode,
   SortLocationsOptions,
+  UserLocationState,
 } from '../types'
-import type { FilterDefinition, FilterValues } from '@phila/phila-ui-filter-chip'
+import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 import { hasLocationData } from '../utilities/hasLocationData'
 
 // slots
@@ -54,21 +55,35 @@ defineSlots<{
 }>()
 
 // props
-const props = defineProps<{
-  locations: BasicLocation[]
-  searchOrUserLocation: LatLon
-  isLoading: string | false
-  errorMessage: string | null
-  locationPanelFilter?: LocationFilterOption[]
-  locationPanelSearch?: string
-  locationPanelSort?: SortLocationsOptions
-  locationSearchMode?: SearchMode
-  locationPanelLocationAvailable?: boolean
-  geojson?: unknown
-  isMobile: boolean
-  filters?: FilterDefinition[]
-  filterValues?: FilterValues
-}>()
+const props = withDefaults(
+  defineProps<{
+    locations: BasicLocation[]
+    isMobile: boolean
+    errorMessage: string | null
+    searchOrUserLocation: LatLon
+    isLoading: string | false
+    waitForUserLocation?: boolean
+    userLocationState?: UserLocationState
+    locationPanelFilter?: LocationFilterOption[]
+    locationPanelSearch?: string
+    locationPanelSort?: SortLocationsOptions
+    locationSearchMode?: SearchMode
+    geojson?: unknown
+    filters?: FilterDefinition[]
+    filterValues?: FilterValues
+  }>(),
+  {
+    waitForUserLocation: false,
+    userLocationState: 'unknown',
+    locationPanelFilter: undefined,
+    locationPanelSearch: undefined,
+    locationPanelSort: undefined,
+    locationSearchMode: undefined,
+    geojson: undefined,
+    filters: undefined,
+    filterValues: undefined,
+  }
+)
 
 // emits to parent app to handle
 const emit = defineEmits<{
@@ -90,6 +105,8 @@ function onFilterValues(value: FilterValues) {
 // component variables
 const snapPoints = [15, 50, 100]
 const config = inject(PINBOARD_CONFIG_KEY)
+// Mobile: chips render under the on-map search bar when 'map', else in the bottom sheet.
+const chipsOnMap = computed(() => config?.mobileFilterPlacement === 'map')
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const slots: Record<string, any> = useSlots()
 
@@ -259,23 +276,19 @@ const effectiveMapConfig = (() => {
         {{ errorMessage }}
       </div>
 
-      <div v-else-if="isLoading">
-        <MapCard
-          v-for="n in 5"
-          :key="n"
-          :is-loading="true"
-          :style="{ display: isMobile ? 'none' : 'block' }"
-        />
+      <div v-if="isLoading" class="loading-list">
+        <MapCard v-for="n in 5" :key="n" :is-loading="true" />
       </div>
 
-      <Teleport v-else to="#locations-panel-mobile" :disabled="!isMobile">
+      <Teleport v-else-if="!isLoading" to="#locations-panel-mobile" :disabled="!isMobile">
         <LocationsPanel
           ref="locationsPanelRef"
           :locations="locations"
           :location-filter="locationPanelFilter"
           :location-search="locationPanelSearch"
           :location-sort="locationPanelSort"
-          :location-available="locationPanelLocationAvailable"
+          :user-location-state="userLocationState"
+          :wait-for-user-location="waitForUserLocation"
           :hovered-id="hoveredLocationId"
           :selected-id="selectedLocationId"
           :is-mobile="isMobile"
@@ -288,12 +301,19 @@ const effectiveMapConfig = (() => {
           @sort-option="handleLocationSortChange"
         >
           <template v-if="filters" #below-search>
-            <FilterChipBar
-              :filters="filters"
-              :model-value="filterValues ?? {}"
-              @update:model-value="onFilterValues"
-              @open-filters="allFiltersOpen = true"
-            />
+            <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
+              <div class="filter-chip-bar">
+                <FilterChipGroup
+                  :filters="filters"
+                  :model-value="filterValues ?? {}"
+                  color="white"
+                  filter-button
+                  :elevated="isMobile && chipsOnMap"
+                  @update:model-value="onFilterValues"
+                  @open-filters="allFiltersOpen = true"
+                />
+              </div>
+            </Teleport>
           </template>
         </LocationsPanel>
       </Teleport>
@@ -331,13 +351,14 @@ const effectiveMapConfig = (() => {
       <div id="mobile-map-search-filter" class="mobile-map-search-filter"></div>
     </div>
 
-    <Teleport to="body" :disabled="!isMobile">
+    <Teleport to="#app" :disabled="!isMobile">
       <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
-        <AllFiltersPanel
-          v-model:open="allFiltersOpen"
+        <FilterPanel
+          v-if="allFiltersOpen"
           :filters="filters"
           :model-value="filterValues ?? {}"
           @update:model-value="onFilterValues"
+          @close="allFiltersOpen = false"
         />
       </div>
     </Teleport>
@@ -372,20 +393,6 @@ const effectiveMapConfig = (() => {
   </BottomSheet>
 </template>
 
-<style>
-.phila-navbar .phila-mobile-nav .nav-flyout {
-  flex: 0 0 25rem;
-  max-width: 25rem;
-  height: calc(100dvh - var(--nav-bottom));
-}
-
-.phila-navbar .phila-mobile-nav .nav-flyout .p-4 {
-  display: flex;
-  flex-direction: column;
-  row-gap: var(--spacing-m);
-}
-</style>
-
 <style scoped>
 .finder-panel {
   display: grid;
@@ -406,14 +413,14 @@ const effectiveMapConfig = (() => {
   color: var(--Schemes-Error, #b3261e);
 }
 
-.finder-panel-locations > :deep(.location-list),
-.finder-panel-locations > .location-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
+.loading-list {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
   gap: 0.75rem;
+  padding: 0.5rem 1rem 1rem 1rem;
+  scrollbar-width: none;
 }
 
 .finder-panel-map {
@@ -427,10 +434,6 @@ const effectiveMapConfig = (() => {
   padding: 0 1rem;
   font-family: var(--Body-Default-font-body-default-family);
   font-weight: 700;
-}
-
-.bottom-sheet-list-scroll :deep(.location-list) {
-  padding-top: 0.5rem;
 }
 
 .mobile-bottom-sheet {
@@ -496,6 +499,10 @@ const effectiveMapConfig = (() => {
 .bottom-sheet-detail :deep(img) {
   max-width: 100%;
   height: auto;
+}
+
+.filter-chip-bar {
+  padding: 0.5rem 0;
 }
 
 .all-filters-overlay {
@@ -568,28 +575,7 @@ const effectiveMapConfig = (() => {
     left: 0;
     right: 0;
     z-index: 2;
-    padding: 10px 24px;
-  }
-
-  .mobile-map-search-filter :deep(.mobile-search) {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .mobile-map-search-filter :deep(.mobile-search .state-layer),
-  .mobile-map-search-filter :deep(.mobile-search .content) {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
-  .mobile-map-search-filter :deep(.mobile-search .phila-text-field) {
-    padding: 0 var(--scale-small, 0.5rem) !important;
-  }
-
-  .mobile-map-search-filter :deep(.location-filters) {
-    padding: 0.25rem 0 0;
-    padding-left: 2px;
-    gap: 0.25rem;
+    padding: 10px 0;
   }
 
   /* Full-screen modal that covers the bottom sheet and map, rather than a

@@ -15,7 +15,7 @@ To render a feature:
 
 <script setup lang="ts">
 // vue imports
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 
 // 3rd party imports
 // philly ui imports
@@ -28,16 +28,17 @@ import SearchSuggestions from './SearchSuggestions.vue'
 
 // pinboard composables imports
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
+import { PINBOARD_CONFIG_KEY } from '../plugin'
 
 // type imports
-import type { LocationFilterOption, SortLocationsOptions } from '../types'
+import type { LocationFilterOption, SortLocationsOptions, UserLocationState } from '../types'
 
 // props
 const props = defineProps<{
-  searchPlaceholder?: string | undefined
-  filterOptions?: LocationFilterOption[] | undefined
-  sortOptions?: SortLocationsOptions | undefined
-  locationAvailable?: boolean | undefined
+  searchPlaceholder: string | undefined
+  filterOptions: LocationFilterOption[] | undefined
+  sortOptions: SortLocationsOptions | undefined
+  userLocationState: UserLocationState
   isMobile: boolean
 }>()
 
@@ -56,6 +57,10 @@ const searchWrapperRef = ref<HTMLElement | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
 const { searchSuggestions, dismissSuggestions, hideSuggestions, refetchSuggestions } =
   useSearchSuggestions(searchString)
+
+const config = inject(PINBOARD_CONFIG_KEY)
+// Elevate the floating search only when the cluster sits over the map (mobile + map placement).
+const elevatedSearch = computed(() => props.isMobile && config?.mobileFilterPlacement === 'map')
 
 // computed refs
 const sortChoices = computed<SortPanelOption[]>(() => {
@@ -127,6 +132,7 @@ function focusSearchInput() {
         v-if="searchPlaceholder"
         ref="searchWrapperRef"
         class="location-search"
+        :class="{ mobile: isMobile }"
         @keydown="handleSearchKeydown"
         @focusout="handleSearchFocusOut"
         @focusin="handleSearchFocusIn"
@@ -134,6 +140,7 @@ function focusSearchInput() {
         <Search
           v-model="searchString"
           :placeholder="searchPlaceholder"
+          :elevated="elevatedSearch"
           @update:model-value="handleSearchChange"
           @search="emit('search')"
         />
@@ -147,6 +154,7 @@ function focusSearchInput() {
       <LocationFilter
         v-if="filterOptions"
         class="location-filters"
+        :class="{ mobile: isMobile }"
         :filter-options="filterOptions"
         @selected-filter="handleFilterChange"
       />
@@ -157,7 +165,7 @@ function focusSearchInput() {
         <SortPanel
           :sort-options="sortChoices"
           :applied-sort="appliedSort"
-          :location-available="locationAvailable ?? false"
+          :user-location-state="props.userLocationState"
           :is-mobile="isMobile"
           @update:applied-sort="handleSortChange"
         />
@@ -177,8 +185,14 @@ function focusSearchInput() {
 
 .location-search {
   grid-area: search;
-  padding: 1rem 1rem 0rem 1rem;
+  padding: 1rem 0.9rem 0.75rem 0.9rem;
   width: 100%;
+}
+
+/* Teleported onto the map (mobile): the container supplies the top inset, so
+   keep only the 1rem side inset that aligns the search bar with the chip row. */
+.location-search.mobile {
+  padding: 0 1rem;
 }
 
 .location-search :deep(.search) {
@@ -187,11 +201,38 @@ function focusSearchInput() {
 
 .location-filters {
   grid-area: filters;
+  padding: 0rem 0rem 0rem 1rem;
+}
+
+/* 19px left inset aligns the filter chips with the search input on mobile. */
+.location-filters.mobile {
+  padding: 0.25rem 0 0;
+  padding-left: 19px;
+  gap: 0.25rem;
 }
 
 .location-sort {
   grid-area: sort;
   margin-left: auto;
-  padding: 0.75rem 1rem 0rem 0rem;
+  padding: 0rem 1rem 1.25rem 0rem;
+}
+
+@media (max-width: 768px) {
+  .location-search {
+    padding: 0.6rem 1.5rem 0.25rem 1.5rem;
+  }
+
+  .location-filters {
+    padding: 0rem 0rem 0rem 1.6rem;
+  }
+
+  .location-search :deep(.state-layer) {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .location-search :deep(.phila-text-field) {
+    padding: 0 var(--scale-small, 0.5rem);
+  }
 }
 </style>

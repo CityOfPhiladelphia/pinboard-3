@@ -9,23 +9,24 @@ import { MapCard } from '@phila/phila-ui-cards'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 
 // type imports
-import type { BasicLocation, LocationFilterOption, SortLocationsOptions } from '../types'
+import type {
+  BasicLocation,
+  LocationFilterOption,
+  SortLocationsOptions,
+  UserLocationState,
+} from '../types'
 
 // props
 const props = defineProps<{
   locations: BasicLocation[]
-  locationSearch?: string | undefined
-  locationFilter?: LocationFilterOption[] | undefined
-  locationSort?: SortLocationsOptions | undefined
-  locationAvailable?: boolean | undefined
-  hoveredId?: string | undefined
-  selectedId?: string | undefined
   isMobile: boolean
-  locationCardSlot?: (props: {
-    location: BasicLocation
-    isHovered: boolean
-    isSelected: boolean
-  }) => unknown
+  hoveredId: string | undefined
+  selectedId: string | undefined
+  waitForUserLocation: boolean
+  userLocationState: UserLocationState
+  locationSearch: string | undefined
+  locationFilter: LocationFilterOption[] | undefined
+  locationSort: SortLocationsOptions | undefined
 }>()
 
 // emits
@@ -95,15 +96,30 @@ defineExpose({ scrollToCard })
     :search-placeholder="locationSearch"
     :filter-options="locationFilter"
     :sort-options="locationSort"
-    :location-available="locationAvailable"
+    :user-location-state="props.userLocationState"
     :is-mobile="isMobile"
     @selected-filter="handleFilterChange"
     @sort-option="handleSortChange"
     @search-string="handleSearchChange"
     @search="emit('search')"
   />
+
   <slot name="below-search" />
-  <div ref="listRef" class="location-list content">
+
+  <div
+    v-if="waitForUserLocation && userLocationState === 'acquiring'"
+    ref="listRef"
+    class="location-list"
+  >
+    <MapCard
+      v-for="n in 5"
+      :key="n"
+      :is-loading="true"
+      :style="{ display: isMobile ? 'none' : 'block' }"
+    />
+  </div>
+
+  <div v-else ref="listRef" class="location-list">
     <MapCard
       v-for="location in locations"
       :key="location.id"
@@ -128,10 +144,12 @@ defineExpose({ scrollToCard })
 
 <style scoped>
 .location-list {
-  padding: 1rem;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
   gap: 0.75rem;
+  padding: 0.5rem 1rem 1rem 1rem;
   scrollbar-width: none;
 }
 
@@ -148,5 +166,11 @@ defineExpose({ scrollToCard })
 .location-card--selected {
   background-color: var(--Schemes-Surface-Container, #eee);
   outline: 2px solid var(--Schemes-Primary, #1976d2);
+}
+
+@media (max-width: 768px) {
+  .location-list {
+    padding-top: 1rem;
+  }
 }
 </style>

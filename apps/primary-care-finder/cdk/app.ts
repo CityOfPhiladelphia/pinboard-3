@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import { App, CfnOutput, Fn, Stack } from 'aws-cdk-lib'
-import * as acm from 'aws-cdk-lib/aws-certificatemanager'
 import * as route53 from 'aws-cdk-lib/aws-route53'
 import {
   StaticSite,
@@ -45,14 +44,9 @@ const stack = new Stack(app, 'primary-care-finder-' + environment, {
   stackName: 'primary-care-finder-' + environment,
 })
 
-const certificateARN = app.node.tryGetContext('certificateARN') as string | undefined
-const certificate = certificateARN
-  ? acm.Certificate.fromCertificateArn(stack, 'FrontendCert', certificateARN)
-  : undefined
-
 const frontendDomain = app.node.tryGetContext('frontendDomain') as string | undefined
 let frontendZone: route53.IHostedZone | undefined
-if (frontendDomain && certificate) {
+if (frontendDomain) {
   const zone = new route53.PublicHostedZone(stack, 'FrontendZone', {
     zoneName: frontendDomain,
   })
@@ -76,7 +70,6 @@ const accessLogBucket = new PhilaLogBucket(stack, 'AccessLogs', {
 new StaticSite(stack, 'primary-care-finderSite', {
   ...context,
   assetDir: '../frontend/dist',
-  ...(certificate ? { certificate } : {}),
   ...(frontendZone ? { hostedZone: frontendZone } : {}),
   logBucket: accessLogBucket.bucket,
 })
