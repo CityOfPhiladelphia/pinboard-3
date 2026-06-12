@@ -65,6 +65,18 @@ at **both** `LocationsPanel` render sites (desktop ~line 332, mobile ~line 443):
 
 (`useSlots()` is already imported in PinboardBody.)
 
+`LocationsPanel.vue` (~lines 27-32) already declares a dead, never-wired `locationCardSlot`
+function-prop (scope `{ location, isHovered, isSelected }`) from a past partial attempt.
+Decision: **remove the dead prop** (verify no consumer references it first) and use template
+slot forwarding with `{ location }` only — hovered/selected presentation stays wrapper-owned
+via the existing classes, so cards don't need those flags (YAGNI; extend the scope later if a
+consumer ever does).
+
+**Mobile side effect (accepted):** dropping `:location-panel-filter` also removes the built-in
+chips that float over the map on mobile (PinboardBody ~lines 399-404); the new `FilterChips`
+appears inside the mobile bottom sheet via `locations-header` instead. This relocation is
+deliberate, not breakage.
+
 **Test infrastructure:** `packages/ui` has NO tests today (no vitest, no test script). This
 slice adds a minimal setup mirroring the app convention — `vitest` + `@vue/test-utils` dev-deps,
 a `test`/`test:run` script, and `LocationsPanel.test.ts` covering: default MapCard rendering
@@ -117,10 +129,9 @@ but drops the now-unused `locationCardInfo`/`MapCardProps` shaping; `statusTagCo
 - `locations-header` slot: `ReportCallout` (CTA text → "Start a report"), then `FilterChips`.
 - Remove the `:location-panel-filter` prop (built-in TagGroup chips disappear).
 - Keep `:location-panel-search` + `@search` exactly as today.
-- New `#location-card="{ location }"` template rendering `ReportListingCard` with the resolved
-  report; if `reportById` misses (shouldn't happen), fall back to nothing — the wrapper still
-  renders, and the card shows the BasicLocation name/address minimally (implementer keeps this
-  trivial: render only when the report resolves, else plain name/address text).
+- New `#location-card="{ location }"` template: when `finder.reportById(location.id)` resolves,
+  render `ReportListingCard` with the report; otherwise (shouldn't happen) render plain
+  name/address text so the row is never empty.
 - Remove `TrendingArticles` import/usage.
 
 ### 5. Deletions (approved)
