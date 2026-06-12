@@ -186,11 +186,6 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
     }"
     info-title="About this tool"
   >
-    <template #mobile-nav>
-      <h4><a href="/">Finder</a></h4>
-      <h4><a href="/about">About</a></h4>
-    </template>
-
     <template #info-body>
       <span class="has-text-body-small">
         This tool helps Philadelphia residents find free and low-cost primary care providers near
@@ -287,5 +282,9 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+.phila-navbar-brand {
+  padding-left: var(--spacing-l);
 }
 </style>
