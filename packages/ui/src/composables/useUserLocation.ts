@@ -8,7 +8,7 @@ import type {
 } from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
-export function useUserLocation(promptOnPageLoad: boolean = false) {
+export function useUserLocation(promptOnPageLoad: boolean, watchLocation: boolean) {
   const userLocation = ref<LatLon>({
     latitude: NaN,
     longitude: NaN,
@@ -19,8 +19,42 @@ export function useUserLocation(promptOnPageLoad: boolean = false) {
   const watchId = ref<number | null>(null)
   const geolocationOptions = { timeout: Infinity, maximumAge: 0, enableHighAccuracy: false }
 
+  try {
+    navigator.permissions
+      .query({
+        name: 'geolocation',
+      })
+      .then((useLocationPermission) => {
+        // set userLocationPermissionState to change whenever navigator.permissions.state changes
+        // Safari has a known bug that keeps this from working (https://bugs.webkit.org/show_bug.cgi?id=259432)
+        useLocationPermission.onchange = () => {
+          switch (useLocationPermission.state) {
+            case 'granted': {
+              userLocationPermissionState.value = 'granted'
+              break
+            }
+            case 'denied': {
+              userLocationPermissionState.value = 'denied'
+              break
+            }
+            case 'prompt': {
+              if (gotInitialLocation.value) {
+                userLocationPermissionState.value = 'denied'
+              } else {
+                getUserLocation()
+              }
+              break
+            }
+          }
+        }
+      })
+  } catch (error) {
+    console.error(error)
+    userLocationPermissionState.value = 'denied'
+  }
+
   watch(gotInitialLocation, (newState) => {
-    if (newState) {
+    if (newState && watchLocation) {
       watchId.value = navigator.geolocation.watchPosition(
         locationSuccess,
         locationError,
@@ -53,53 +87,6 @@ export function useUserLocation(promptOnPageLoad: boolean = false) {
     },
     { immediate: promptOnPageLoad }
   )
-
-  getGeolocatePermissionState()
-
-  async function getGeolocatePermissionState() {
-    try {
-      const useLocationPermission = await navigator.permissions.query({
-        name: 'geolocation',
-      })
-      switch (useLocationPermission.state) {
-        case 'granted':
-        case 'denied': {
-          userLocationPermissionState.value = useLocationPermission.state
-          break
-        }
-        case 'prompt': {
-          // if useLocationPermission.state is 'prompt' remain in whatever state resulted from getUserLocation()
-          break
-        }
-      }
-
-      // set userLocationPermissionState to change whenever navigator.permissions.state changes
-      // Safari has a known bug that keeps this from working (https://bugs.webkit.org/show_bug.cgi?id=259432)
-      useLocationPermission.onchange = () => {
-        switch (useLocationPermission.state) {
-          case 'granted': {
-            userLocationPermissionState.value = 'granted'
-            break
-          }
-          case 'denied': {
-            userLocationPermissionState.value = 'denied'
-            break
-          }
-          case 'prompt': {
-            if (gotInitialLocation.value) {
-              userLocationPermissionState.value = 'denied'
-            } else {
-              getUserLocation()
-            }
-            break
-          }
-        }
-      }
-    } catch (error) {
-      console.error(error)
-      userLocationPermissionState.value = 'denied'
-    }
-  }
 
   function getUserLocation() {
     userLocationState.value = 'acquiring'
@@ -142,7 +129,7 @@ export function useUserLocation(promptOnPageLoad: boolean = false) {
     userLocationState.value = 'unknown'
   }
 
-  return { userLocation, userLocationPermissionState, userLocationState, getUserLocation }
+  return { userLocation, userLocationState, getUserLocation }
 }
 
 // verify location is in or near enough to Philadelphia
