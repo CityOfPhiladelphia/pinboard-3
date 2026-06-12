@@ -72,6 +72,10 @@ slot forwarding with `{ location }` only — hovered/selected presentation stays
 via the existing classes, so cards don't need those flags (YAGNI; extend the scope later if a
 consumer ever does).
 
+`BasicLocation.locationCardInfo` (packages/ui/src/types.ts:67) is currently **required**; the
+slot change makes it **optional** (`locationCardInfo?: MapCardProps`) so slot consumers don't
+fabricate MapCard props. Backwards-compatible — existing apps keep passing it.
+
 **Mobile side effect (accepted):** dropping `:location-panel-filter` also removes the built-in
 chips that float over the map on mobile (PinboardBody ~lines 399-404); the new `FilterChips`
 appears inside the mobile bottom sheet via `locations-header` instead. This relocation is
