@@ -104,6 +104,7 @@ defineExpose({ scrollToCard })
     @search-string="handleSearchChange"
     @search="emit('search')"
   />
+
   <slot name="below-search" />
 
   <div
