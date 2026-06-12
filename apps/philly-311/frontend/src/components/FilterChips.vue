@@ -1,7 +1,7 @@
 <!-- ABOUTME: Horizontal filter-chip row for the finder panel: leading "All Filters" chip,
      icon chips per service type, and a scroll chevron when the row overflows. -->
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faSliders, faChevronRight } from '@fortawesome/pro-solid-svg-icons'
 import { serviceTypeIconDefinition } from '@/utils/reportIcon'
@@ -32,11 +32,12 @@ onMounted(() => {
   window.addEventListener('resize', updateOverflow)
 })
 onBeforeUnmount(() => window.removeEventListener('resize', updateOverflow))
+watch(() => props.options, () => nextTick(updateOverflow), { deep: true })
 </script>
 
 <template>
   <div class="filter-chips">
-    <div ref="rowRef" class="filter-chips__row">
+    <div ref="rowRef" class="filter-chips__row" role="group" aria-label="Filter reports by type">
       <button
         type="button"
         class="filter-chips__chip"
@@ -58,7 +59,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateOverflow))
       >
         <FontAwesomeIcon
           :icon="serviceTypeIconDefinition(opt.label)"
-          :style="{ color: serviceTypeColor(opt.label) }"
+          :style="{ color: modelValue === opt.value ? '#fff' : serviceTypeColor(opt.label) }"
         />
         {{ opt.label }}
       </button>
@@ -109,9 +110,6 @@ onBeforeUnmount(() => window.removeEventListener('resize', updateOverflow))
   background: var(--ui-color-primary, #0f4d90);
   border-color: var(--ui-color-primary, #0f4d90);
   color: #fff;
-}
-.filter-chips__chip--selected :deep(svg) {
-  color: #fff !important;
 }
 .filter-chips__scroll {
   flex: none;

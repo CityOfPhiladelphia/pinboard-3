@@ -66,4 +66,33 @@ describe('FilterChips', () => {
     await w.find('.filter-chips__scroll').trigger('click')
     expect(row.scrollBy).toHaveBeenCalledWith({ left: 320, behavior: 'smooth' })
   })
+
+  it('recomputes overflow when options change', async () => {
+    const w = mountChips()
+    setOverflow(w, false)
+    window.dispatchEvent(new Event('resize'))
+    await w.vm.$nextTick()
+    expect(w.find('.filter-chips__scroll').exists()).toBe(false)
+
+    setOverflow(w, true)
+    await w.setProps({ options: [...OPTIONS, { value: 'X', label: 'X' }] })
+    await w.vm.$nextTick()
+    await w.vm.$nextTick()
+    expect(w.find('.filter-chips__scroll').exists()).toBe(true)
+  })
+
+  it('has accessible group role and label on the chip row', () => {
+    const row = mountChips().find('.filter-chips__row')
+    expect(row.attributes('role')).toBe('group')
+    expect(row.attributes('aria-label')).toBe('Filter reports by type')
+  })
+
+  it('applies white to selected chip icon and service color to unselected', () => {
+    const w = mountChips('Pothole Repair')
+    const chips = w.findAll('button.filter-chips__chip')
+    const selectedIcon = chips[1].find('font-awesome-icon-stub')
+    const unselectedIcon = chips[2].find('font-awesome-icon-stub')
+    expect(selectedIcon.attributes('style')).toMatch(/rgb\(255, 255, 255\)/)
+    expect(unselectedIcon.attributes('style')).not.toMatch(/rgb\(255, 255, 255\)/)
+  })
 })
