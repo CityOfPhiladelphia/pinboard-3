@@ -2,20 +2,14 @@
 // ABOUTME: Holds category, custom-field answers, location, photo, description,
 // ABOUTME: contact info, and privacy. Builds the API submit payload on demand.
 import { defineStore } from 'pinia'
-import { useApi } from '@/composables/useApi'
 import type {
   ContactInfo,
   PhotoAsset,
   PhotoSuggestion,
   SubmitPayload,
+  SubmittedReport,
   WizardLocation,
 } from '@/types/wizard'
-
-interface SubmitResponse {
-  id: string
-  caseNumber?: string
-  status?: string
-}
 
 interface State {
   category: string | null
@@ -26,8 +20,8 @@ interface State {
   contact: ContactInfo
   /** When true, the report is publicly visible. Default false (matches mobile). */
   publicVisibility: boolean
-  lastFieldErrors: Record<string, string> | null
   photoSuggestions: PhotoSuggestion[]
+  submitted: SubmittedReport | null
 }
 
 const initial = (): State => ({
@@ -38,8 +32,8 @@ const initial = (): State => ({
   photo: null,
   contact: {},
   publicVisibility: false,
-  lastFieldErrors: null,
   photoSuggestions: [],
+  submitted: null,
 })
 
 export const useReportSubmissionStore = defineStore('reportSubmission', {
@@ -103,21 +97,12 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
         Object.assign(state, initial())
       })
     },
-    async submit(): Promise<SubmitResponse> {
-      this.lastFieldErrors = null
-      const body = this.payload()
-      const api = useApi<SubmitResponse>({
-        url: '/private/key/submit',
-        method: 'POST',
-        body,
+    /** Record a successful submit and clear the wizard for a fresh report. */
+    recordSubmission(result: SubmittedReport) {
+      this.setPhoto(null)
+      this.$patch((state) => {
+        Object.assign(state, initial(), { submitted: result })
       })
-      const result = await api.fetchData()
-      if (api.error.value) {
-        if (api.error.value.fieldErrors) this.lastFieldErrors = api.error.value.fieldErrors
-        throw api.error.value
-      }
-      if (!result) throw new Error('Submit returned no data')
-      return result
     },
     /** Build the API submit payload. Throws if required fields are missing. */
     payload(): SubmitPayload {

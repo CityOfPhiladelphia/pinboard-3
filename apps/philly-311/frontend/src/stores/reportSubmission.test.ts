@@ -1,29 +1,12 @@
 // ABOUTME: Tests for the report submission Pinia store.
-// ABOUTME: Covers state mutations, isEmpty getter, payload builder, and submit action.
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { ref } from 'vue'
+// ABOUTME: Covers state mutations, isEmpty getter, payload builder, and recordSubmission.
+import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useReportSubmissionStore } from './reportSubmission'
-import { ApiError } from '@/composables/useApiError'
-
-const apiState = {
-  data: ref<unknown>(null),
-  error: ref<ApiError | null>(null),
-  isLoading: ref(false),
-  fetchData: vi.fn(),
-}
-
-vi.mock('@/composables/useApi', () => ({
-  useApi: () => apiState,
-}))
 
 describe('useReportSubmissionStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    apiState.data.value = null
-    apiState.error.value = null
-    apiState.isLoading.value = false
-    apiState.fetchData.mockReset()
   })
 
   describe('initial state', () => {
@@ -196,13 +179,6 @@ describe('useReportSubmissionStore', () => {
       expect(store.isEmpty).toBe(true)
     })
 
-    it('clears lastFieldErrors', () => {
-      const store = useReportSubmissionStore()
-      store.lastFieldErrors = { address: 'Not found' }
-      store.reset()
-      expect(store.lastFieldErrors).toBeNull()
-    })
-
     it('clears customFields and contact', () => {
       const store = useReportSubmissionStore()
       store.setQuestion('Color__c', 'Red')
@@ -210,6 +186,13 @@ describe('useReportSubmissionStore', () => {
       store.reset()
       expect(store.customFields).toEqual({})
       expect(store.contact).toEqual({})
+    })
+
+    it('clears submitted', () => {
+      const store = useReportSubmissionStore()
+      store.recordSubmission({ id: 'a1' })
+      store.reset()
+      expect(store.submitted).toBeNull()
     })
   })
 
@@ -393,67 +376,33 @@ describe('useReportSubmissionStore', () => {
     expect(store.photoSuggestions).toEqual([])
   })
 
-  describe('submit', () => {
-    function filledStore() {
+  describe('recordSubmission', () => {
+    it('stores the id and caseNumber', () => {
+      const store = useReportSubmissionStore()
+      store.recordSubmission({ id: 'a1', caseNumber: '311-0042' })
+      expect(store.submitted).toEqual({ id: 'a1', caseNumber: '311-0042' })
+    })
+
+    it('clears the wizard fields, including customFields and contact', () => {
       const store = useReportSubmissionStore()
       store.setCategory('Pothole Repair')
+      store.setQuestion('Severity__c', 'Deep')
       store.setLocation({ address: '1234 Main St', lat: 39.95, lng: -75.16 })
-      store.setDescription('Large pothole near the bus stop')
-      return store
-    }
-
-    it('returns response and keeps lastFieldErrors null on success', async () => {
-      const store = filledStore()
-      const response = { id: 'abc-123', caseNumber: '18000001' }
-      apiState.fetchData.mockResolvedValueOnce(response)
-
-      const result = await store.submit()
-
-      expect(result).toEqual(response)
-      expect(store.lastFieldErrors).toBeNull()
-    })
-
-    it('throws and populates lastFieldErrors when API returns fieldErrors', async () => {
-      const store = filledStore()
-      const fieldErrors = { address: 'Address not found' }
-      apiState.fetchData.mockResolvedValueOnce(null)
-      apiState.error.value = new ApiError(400, 'Validation failed', fieldErrors)
-
-      await expect(store.submit()).rejects.toBeInstanceOf(ApiError)
-      expect(store.lastFieldErrors).toEqual(fieldErrors)
-    })
-
-    it('throws and leaves lastFieldErrors null on generic 5xx error', async () => {
-      const store = filledStore()
-      apiState.fetchData.mockResolvedValueOnce(null)
-      apiState.error.value = new ApiError(500, 'Internal server error')
-
-      await expect(store.submit()).rejects.toBeInstanceOf(ApiError)
-      expect(store.lastFieldErrors).toBeNull()
-    })
-
-    it('throws when required state is missing (no category)', async () => {
-      const store = useReportSubmissionStore()
-      store.setLocation({ address: '1234 Main St', lat: 39.95, lng: -75.16 })
-      store.setDescription('A problem')
-
-      await expect(store.submit()).rejects.toThrow('category is required')
-    })
-
-    it('throws when required state is missing (no location)', async () => {
-      const store = useReportSubmissionStore()
-      store.setCategory('Pothole Repair')
-      store.setDescription('A problem')
-
-      await expect(store.submit()).rejects.toThrow('location is required')
-    })
-
-    it('throws when required state is missing (no description)', async () => {
-      const store = useReportSubmissionStore()
-      store.setCategory('Pothole Repair')
-      store.setLocation({ address: '1234 Main St', lat: 39.95, lng: -75.16 })
-
-      await expect(store.submit()).rejects.toThrow('description is required')
+      store.setDescription('Big hole in the road')
+      store.setContact({ name: 'Darren' })
+      store.setPrivacy(true)
+      store.setPhoto({ mediaUrl: 'https://cdn.example.com/p.jpg' })
+      store.recordSubmission({ id: 'a1' })
+      expect(store.category).toBeNull()
+      expect(store.customFields).toEqual({})
+      expect(store.location).toBeNull()
+      expect(store.description).toBe('')
+      expect(store.contact).toEqual({})
+      expect(store.publicVisibility).toBe(false)
+      expect(store.photo).toBeNull()
+      expect(store.photoSuggestions).toEqual([])
+      expect(store.isEmpty).toBe(true)
     })
   })
+
 })

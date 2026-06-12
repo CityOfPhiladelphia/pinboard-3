@@ -45,3 +45,16 @@ export interface SubmitPayload {
   mediaUrl?: string
   customFields?: Record<string, string>
 }
+
+/** Fields of the POST /private/key/submit success response the app uses. */
+export interface SubmitResponse {
+  id: string
+  caseNumber?: string
+  status?: string
+}
+
+/** The slice of a successful submit kept for the confirmation page. */
+export interface SubmittedReport {
+  id: string
+  caseNumber?: string
+}
