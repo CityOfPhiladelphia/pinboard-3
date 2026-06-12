@@ -74,6 +74,14 @@ describe('LocationsPanel - default branch (no slot)', () => {
     expect(w.find('[data-location-id="a1"]').classes()).toContain('location-card--hovered')
     expect(w.find('[data-location-id="b2"]').classes()).toContain('location-card--selected')
   })
+
+  it('selects via Enter keydown+keyup', async () => {
+    const w = mountDefault()
+    const first = w.find('[data-location-id="a1"]')
+    await first.trigger('keydown', { key: 'Enter' })
+    await first.trigger('keyup', { key: 'Enter' })
+    expect(w.emitted('select')).toHaveLength(1)
+  })
 })
 
 describe('LocationsPanel - location-card slot branch', () => {
