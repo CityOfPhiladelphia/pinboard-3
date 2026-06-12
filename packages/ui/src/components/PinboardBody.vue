@@ -83,6 +83,7 @@ const emit = defineEmits<{
 const allFiltersOpen = ref(false)
 
 function onFilterValues(value: FilterValues) {
+  console.log(value)
   emit('update:filterValues', value)
 }
 
