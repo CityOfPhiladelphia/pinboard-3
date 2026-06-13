@@ -44,18 +44,11 @@ Answers — confirmed with Darren). Skin follows the app's existing conventions
   `setTimeout` debounce is not ported).
 - Router already applies `?category=` deep links into the wizard (`router/index.ts`) —
   not needed for the unconditional CTA, but no router work is required either way.
-- `dompurify` + `@types/dompurify` already in `package.json`, unused so far.
+- `utils/sanitize.ts` + `sanitize.test.ts` — ALREADY PORTED (Increment-1 foundation pass):
+  DOMPurify wrapper with explicit allow-lists and the `rel="noopener"`/`target="_blank"`
+  link hook. No work needed; ArticleBody consumes it as-is.
 
 ## Components
-
-### `utils/sanitize.ts` (port from POC `frontend/src/utils/sanitize.ts`)
-
-DOMPurify wrapper. Explicit allow-lists only (no `USE_PROFILES` — combining them re-adds
-unwanted attrs like `style`; the POC comment documenting this is preserved):
-
-- `ALLOWED_TAGS`: `a p strong em ul ol li br h2 h3 h4 blockquote code pre`
-- `ALLOWED_ATTR`: `href rel target title`
-- `afterSanitizeAttributes` hook forces `rel="noopener"` and `target="_blank"` on links.
 
 ### `components/answers/ArticleBody.vue` (port)
 
@@ -114,8 +107,7 @@ state. No retries; navigation or re-typing re-triggers loads.
 
 ## Testing (TDD throughout)
 
-- `sanitize.test.ts`: strips `script`/`iframe`/`form`/`style` attrs; keeps allowed tags;
-  rewrites links with `noopener`/`_blank`.
+- `sanitize.test.ts` already exists and passes (Increment-1 port) — no new work.
 - `ArticleBody` test: renders sanitized HTML (malicious input does not survive to DOM).
 - `ArticleCard` test: title + link target.
 - `AnswersPage` test (mocked fetch per app conventions): initial load, Load more
