@@ -2,7 +2,8 @@
 
 **Date:** 2026-06-12
 **Branch:** `feat/f2-answers` off `311-staging`; merge back `--no-ff`; nothing pushed.
-**App:** `apps/philly-311` (Vue 3 + TS, vitest, PinboardShell chrome).
+**App:** `apps/philly-311` (Vue 3 + TS, vitest, PinboardShell chrome; code lives under
+`apps/philly-311/frontend/src/`).
 
 ## Goal
 
