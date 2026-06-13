@@ -9,7 +9,6 @@ export interface Article {
   title: string
   /** HTML body — must be sanitized before render. */
   body?: string
-  serviceType?: string
   lastPublishedAt?: string
   url?: string
 }
