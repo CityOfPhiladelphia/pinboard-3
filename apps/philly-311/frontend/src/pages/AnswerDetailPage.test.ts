@@ -89,4 +89,20 @@ describe('AnswerDetailPage', () => {
     expect(loadArticle).toHaveBeenLastCalledWith('kA2')
     expect(w.find('h1').text()).toBe('Second')
   })
+
+  it('ignores a stale load that resolves after a newer navigation', async () => {
+    let resolveFirst!: (v: unknown) => void
+    loadArticle.mockReturnValueOnce(new Promise((r) => { resolveFirst = r }))
+    const router = makeRouter()
+    await router.push('/answers/kA1')
+    await router.isReady()
+    const w = mount(AnswerDetailPage, { global: { plugins: [router] } })
+    loadArticle.mockResolvedValueOnce({ id: 'kA2', title: 'Second', body: '<p>2</p>' })
+    await router.push('/answers/kA2')
+    await flushPromises()
+    expect(w.find('h1').text()).toBe('Second')
+    resolveFirst({ id: 'kA1', title: 'First', body: '<p>1</p>' })
+    await flushPromises()
+    expect(w.find('h1').text()).toBe('Second')
+  })
 })

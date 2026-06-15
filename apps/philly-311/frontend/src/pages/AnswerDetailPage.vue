@@ -17,11 +17,13 @@ const error = ref<ApiError | null>(null)
 const notFound = ref(false)
 
 async function load() {
+  const loadedId = id.value
   isLoading.value = true
   error.value = null
   notFound.value = false
   try {
-    const result = await loadArticle(id.value)
+    const result = await loadArticle(loadedId)
+    if (id.value !== loadedId) return
     if (result === null) {
       notFound.value = true
       article.value = null
@@ -29,16 +31,17 @@ async function load() {
       article.value = result
     }
   } catch (e) {
+    if (id.value !== loadedId) return
     error.value = e instanceof ApiError ? e : new ApiError(0, (e as Error).message)
     article.value = null
   } finally {
-    isLoading.value = false
+    if (id.value === loadedId) isLoading.value = false
   }
 }
 
 onMounted(load)
-watch(id, (next, prev) => {
-  if (next !== prev) void load()
+watch(id, () => {
+  void load()
 })
 </script>
 
