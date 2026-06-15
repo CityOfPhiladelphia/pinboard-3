@@ -3,6 +3,7 @@
 <script setup lang="ts">
 import { PinboardShell } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
+import '@/assets/a11y.css'
 </script>
 
 <template>
