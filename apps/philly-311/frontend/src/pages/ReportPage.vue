@@ -5,6 +5,7 @@
 import { provide, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import StepIndicator from '@/components/wizard/StepIndicator.vue'
+import PillButton from '@/components/PillButton.vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { WIZARD_CAN_ADVANCE_KEY } from '@/composables/useWizardValidity'
 
@@ -75,37 +76,28 @@ function resetWizard() {
       >
         Reset
       </button>
-      <button
+      <PillButton
         v-else
-        type="button"
-        class="wizard__btn wizard__btn--secondary"
+        variant="outline"
         data-test="wizard-back"
         :disabled="!prevPath"
         @click="goPrev"
-      >
-        Back
-      </button>
+      >Back</PillButton>
 
       <div class="wizard__nav-right">
-        <button
+        <PillButton
           v-if="isImageStep"
-          type="button"
-          class="wizard__btn wizard__btn--secondary"
+          variant="outline"
           data-test="wizard-skip"
           @click="goNext"
-        >
-          Skip
-        </button>
-        <button
+        >Skip</PillButton>
+        <PillButton
           v-if="!isLast"
-          type="button"
-          class="wizard__btn wizard__btn--primary"
+          variant="primary"
           data-test="wizard-next"
           :disabled="!canAdvance || !nextPath"
           @click="goNext"
-        >
-          Next
-        </button>
+        >Next</PillButton>
       </div>
     </footer>
   </div>
@@ -137,26 +129,6 @@ function resetWizard() {
 .wizard__nav-right {
   display: flex;
   gap: var(--spacing-s, 0.75rem);
-}
-.wizard__btn {
-  padding: var(--spacing-s, 0.5rem) var(--spacing-l, 1.5rem);
-  border-radius: 9999px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.wizard__btn--primary {
-  background: var(--ui-color-primary, #0f4d90);
-  color: #fff;
-  border: none;
-}
-.wizard__btn--secondary {
-  background: #fff;
-  color: var(--ui-color-primary, #0f4d90);
-  border: 1px solid var(--ui-color-primary, #0f4d90);
-}
-.wizard__btn:disabled {
-  opacity: 0.5;
-  cursor: default;
 }
 .wizard__reset {
   background: none;
