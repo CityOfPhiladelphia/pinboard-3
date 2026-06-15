@@ -2,12 +2,10 @@
      description, and keywords; caseType-grouped two-column rows; click to select. -->
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import type { ServiceType } from '@/types/api'
 import { fuzzyScore } from '@/utils/fuzzy'
-import { serviceTypeIconDefinition } from '@/utils/reportIcon'
-import { serviceTypeColor } from '@/utils/serviceTypeMeta'
 import serviceTypeInfo from '@/data/service_types.json'
+import ServiceTypeIcon from '@/components/ServiceTypeIcon.vue'
 
 const props = defineProps<{ catalog: ServiceType[] }>()
 const emit = defineEmits<{ select: [serviceType: string] }>()
@@ -60,12 +58,7 @@ const groups = computed(() => {
       <ul class="type-directory__list">
         <li v-for="s in group.items" :key="s.serviceType">
           <button type="button" class="type-directory__row" @click="emit('select', s.serviceType)">
-            <span
-              class="type-directory__icon"
-              :style="{ backgroundColor: serviceTypeColor(s.serviceType) }"
-            >
-              <FontAwesomeIcon :icon="serviceTypeIconDefinition(s.serviceType)" />
-            </span>
+            <ServiceTypeIcon :service-type="s.serviceType" :size="32" />
             <span class="type-directory__body">
               <span class="type-directory__name">{{ s.serviceType }}</span>
               <span class="type-directory__desc">{{ s.description }}</span>
@@ -119,16 +112,6 @@ const groups = computed(() => {
 .type-directory__row:hover .type-directory__name,
 .type-directory__row:focus-visible .type-directory__name {
   text-decoration: underline;
-}
-.type-directory__icon {
-  flex: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
 }
 .type-directory__body {
   display: flex;
