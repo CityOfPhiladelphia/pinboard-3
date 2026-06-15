@@ -39,5 +39,6 @@ describe('App', () => {
     const link = w.find('[data-test="mobile-nav"]').findComponent(RouterLinkStub)
     expect(link.exists()).toBe(true)
     expect(link.props('to')).toBe('/answers')
+    expect(link.text()).toBe('Answers')
   })
 })
