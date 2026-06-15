@@ -2,6 +2,7 @@
      CTAs to start another report or browse nearby reports. -->
 <script setup lang="ts">
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
+import PillButton from '@/components/PillButton.vue'
 
 const store = useReportSubmissionStore()
 </script>
@@ -16,7 +17,7 @@ const store = useReportSubmissionStore()
       </p>
     </div>
     <div class="confirmation__actions">
-      <RouterLink class="confirmation__cta" to="/report">Report another issue</RouterLink>
+      <PillButton variant="primary" to="/report">Report another issue</PillButton>
       <RouterLink class="confirmation__link" to="/">See reports near you</RouterLink>
     </div>
   </div>
@@ -41,14 +42,6 @@ const store = useReportSubmissionStore()
   align-items: center;
   gap: var(--spacing-m, 1rem);
   margin-top: var(--spacing-l, 2rem);
-}
-.confirmation__cta {
-  padding: var(--spacing-s, 0.5rem) var(--spacing-l, 1.5rem);
-  border-radius: 9999px;
-  font-weight: 600;
-  background: var(--ui-color-primary, #0f4d90);
-  color: #fff;
-  text-decoration: none;
 }
 .confirmation__link {
   color: var(--ui-color-primary, #0f4d90);
