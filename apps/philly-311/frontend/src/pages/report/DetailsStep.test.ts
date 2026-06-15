@@ -84,3 +84,38 @@ describe('DetailsStep - composition', () => {
     expect(w.find('button').exists()).toBe(false)
   })
 })
+
+describe('DetailsStep - aria wiring', () => {
+  it('description textarea has aria-required="true"', () => {
+    const { w } = mountStep()
+    expect(w.find('textarea').attributes('aria-required')).toBe('true')
+  })
+
+  it('description textarea has aria-describedby pointing at the hint', () => {
+    const { w } = mountStep()
+    expect(w.find('textarea').attributes('aria-describedby')).toBe('details-description-hint')
+  })
+
+  it('hint paragraph has the id referenced by aria-describedby', () => {
+    const { w } = mountStep()
+    expect(w.find('.details-step__hint').attributes('id')).toBe('details-description-hint')
+  })
+
+  it('privacy checkbox has aria-describedby pointing at the privacy note', () => {
+    const { w } = mountStep()
+    expect(w.find('input[type="checkbox"]').attributes('aria-describedby')).toBe(
+      'details-privacy-note',
+    )
+  })
+
+  it('privacy note paragraph has the id referenced by the checkbox aria-describedby', () => {
+    const { w } = mountStep()
+    expect(w.find('.details-step__privacy-note').attributes('id')).toBe('details-privacy-note')
+  })
+
+  it('description textarea aria-describedby does not include the privacy note id', () => {
+    const { w } = mountStep()
+    const describedBy = w.find('textarea').attributes('aria-describedby') ?? ''
+    expect(describedBy).not.toContain('details-privacy-note')
+  })
+})

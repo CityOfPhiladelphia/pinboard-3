@@ -31,18 +31,25 @@ function setPrivacy(e: Event) {
       v-model="description"
       class="details-step__textarea"
       rows="4"
+      aria-required="true"
+      aria-describedby="details-description-hint"
     ></textarea>
-    <p class="details-step__hint">At least 10 characters.</p>
+    <p id="details-description-hint" class="details-step__hint">At least 10 characters.</p>
 
     <ContactInfo />
 
     <fieldset class="details-step__privacy">
       <legend class="details-step__privacy-legend">Visibility</legend>
       <label class="details-step__privacy-toggle">
-        <input type="checkbox" :checked="store.publicVisibility" @change="setPrivacy" />
+        <input
+          type="checkbox"
+          :checked="store.publicVisibility"
+          aria-describedby="details-privacy-note"
+          @change="setPrivacy"
+        />
         Make this report public
       </label>
-      <p class="details-step__privacy-note">
+      <p id="details-privacy-note" class="details-step__privacy-note">
         Public reports show up on the map. Off by default; only you and 311 staff see your private
         reports.
       </p>

@@ -47,6 +47,7 @@ function setCheckbox(values: Array<string | number | boolean>) {
 <template>
   <div class="question-field" :data-type="question.type">
     <!-- picklist (≤4): RadioGroup -->
+    <!-- phila-ui gap: RadioGroup has no required prop and doesn't forward $attrs to its <input type="radio"> elements -->
     <RadioGroup
       v-if="useRadioGroup"
       :group-label="labelText"
@@ -61,6 +62,7 @@ function setCheckbox(values: Array<string | number | boolean>) {
       <select
         :id="fieldId"
         :value="modelValue"
+        :aria-required="question.required || undefined"
         @change="set(($event.target as HTMLSelectElement).value)"
       >
         <option value="" disabled>Select…</option>
@@ -69,6 +71,7 @@ function setCheckbox(values: Array<string | number | boolean>) {
     </template>
 
     <!-- multipicklist: CheckboxGroup -->
+    <!-- phila-ui gap: CheckboxGroup has no required prop and doesn't forward $attrs to its <input type="checkbox"> elements -->
     <CheckboxGroup
       v-else-if="question.type === 'multipicklist'"
       :group-label="labelText"
@@ -84,20 +87,23 @@ function setCheckbox(values: Array<string | number | boolean>) {
         :id="fieldId"
         :value="modelValue"
         rows="3"
+        :aria-required="question.required || undefined"
         @input="set(($event.target as HTMLTextAreaElement).value)"
       ></textarea>
     </template>
 
-    <!-- date: DateField -->
+    <!-- date: DateField — forwards $attrs through its inner TextField to the native <input> -->
     <DateField
       v-else-if="question.type === 'date'"
       :id="fieldId"
       :label="labelText"
       :model-value="modelValue"
+      :aria-required="question.required || undefined"
       @update:model-value="set"
     />
 
     <!-- boolean: Switch -->
+    <!-- phila-ui gap: Switch hardcodes its inner checkbox attrs and doesn't forward $attrs to <input type="checkbox"> -->
     <Switch
       v-else-if="question.type === 'boolean'"
       :id="fieldId"
@@ -108,22 +114,24 @@ function setCheckbox(values: Array<string | number | boolean>) {
       @update:model-value="(v: string | number | boolean) => set(String(v))"
     />
 
-    <!-- number / currency / double: TextField with numeric mask -->
+    <!-- number / currency / double: TextField — forwards $attrs to the native <input> -->
     <TextField
       v-else-if="['number', 'currency', 'double'].includes(question.type)"
       :id="fieldId"
       :label="labelText"
       :model-value="modelValue"
       :imask-props="{ mask: Number }"
+      :aria-required="question.required || undefined"
       @update:model-value="set"
     />
 
-    <!-- string / fallback: TextField -->
+    <!-- string / fallback: TextField — forwards $attrs to the native <input> -->
     <TextField
       v-else
       :id="fieldId"
       :label="labelText"
       :model-value="modelValue"
+      :aria-required="question.required || undefined"
       @update:model-value="set"
     />
   </div>

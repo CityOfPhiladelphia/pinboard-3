@@ -143,6 +143,42 @@ describe('QuestionField choices shape', () => {
   })
 })
 
+describe('QuestionField aria-required on native controls', () => {
+  it('native textarea has aria-required="true" when required', () => {
+    const w = mount(QuestionField, {
+      props: { question: make({ type: 'textarea', required: true }), modelValue: '' },
+    })
+    expect(w.find('textarea').attributes('aria-required')).toBe('true')
+  })
+
+  it('native textarea has no aria-required when not required', () => {
+    const w = mount(QuestionField, {
+      props: { question: make({ type: 'textarea', required: false }), modelValue: '' },
+    })
+    expect(w.find('textarea').attributes('aria-required')).toBeUndefined()
+  })
+
+  it('native select (large picklist) has aria-required="true" when required', () => {
+    const w = mount(QuestionField, {
+      props: {
+        question: make({ type: 'picklist', options: ['A', 'B', 'C', 'D', 'E'], required: true }),
+        modelValue: '',
+      },
+    })
+    expect(w.find('select').attributes('aria-required')).toBe('true')
+  })
+
+  it('native select (large picklist) has no aria-required when not required', () => {
+    const w = mount(QuestionField, {
+      props: {
+        question: make({ type: 'picklist', options: ['A', 'B', 'C', 'D', 'E'], required: false }),
+        modelValue: '',
+      },
+    })
+    expect(w.find('select').attributes('aria-required')).toBeUndefined()
+  })
+})
+
 describe('QuestionField update:modelValue emissions', () => {
   it('emits new value from TextField for string type', async () => {
     const w = mount(QuestionField, {
