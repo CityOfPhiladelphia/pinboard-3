@@ -10,6 +10,7 @@ import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { visibleQuestions } from '@/utils/conditional'
 import { serviceTypeIconDefinition } from '@/utils/reportIcon'
 import { serviceTypeColor } from '@/utils/serviceTypeMeta'
+import PillButton from '@/components/PillButton.vue'
 import TypeSuggestions from '@/components/wizard/TypeSuggestions.vue'
 import TypeDirectory from '@/components/wizard/TypeDirectory.vue'
 import QuestionField from '@/components/wizard/QuestionField.vue'
@@ -61,9 +62,7 @@ function change() {
     <p v-if="isLoading && !catalog.length" class="issue-step__status">Loading issue types…</p>
     <p v-else-if="error" class="issue-step__error" role="alert">
       {{ error.message || 'Could not load issue types.' }}
-      <button type="button" data-test="retry-types" class="issue-step__retry" @click="retry">
-        Retry
-      </button>
+      <PillButton variant="outline" data-test="retry-types" @click="retry">Retry</PillButton>
     </p>
 
     <template v-else-if="!store.category">
@@ -194,15 +193,6 @@ function change() {
 }
 .issue-step__error {
   color: var(--ui-color-red, #c0392b);
-}
-.issue-step__retry {
-  background: none;
-  border: 1px solid var(--ui-color-primary, #0f4d90);
-  border-radius: 9999px;
-  color: var(--ui-color-primary, #0f4d90);
-  padding: 2px 12px;
-  margin-left: var(--spacing-s, 0.75rem);
-  cursor: pointer;
 }
 .issue-step__photo-band :deep(.type-suggestions) {
   align-self: start;
