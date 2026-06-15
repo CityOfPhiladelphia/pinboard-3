@@ -6,6 +6,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useKnowledgeArticles, type Article } from '@/composables/useKnowledgeArticles'
 import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
 import ArticleCard from '@/components/answers/ArticleCard.vue'
+import PillButton from '@/components/PillButton.vue'
 
 const k = useKnowledgeArticles()
 
@@ -101,16 +102,16 @@ onMounted(loadInitial)
       </li>
     </ul>
 
-    <button
+    <PillButton
       v-if="nextPageToken && !isSearching"
+      variant="outline"
       type="button"
-      class="answers__more"
-      data-test="answers-more"
       :disabled="isLoading"
+      data-test="answers-more"
       @click="loadMore"
     >
       Load more
-    </button>
+    </PillButton>
   </main>
 </template>
 
@@ -146,20 +147,6 @@ onMounted(loadInitial)
 }
 .answers__status {
   margin: var(--spacing-m, 1rem) 0;
-}
-.answers__more {
-  margin: var(--spacing-l, 1.5rem) 0;
-  padding: var(--spacing-s, 0.5rem) var(--spacing-l, 1.5rem);
-  border-radius: 9999px;
-  font-weight: 600;
-  cursor: pointer;
-  background: #fff;
-  color: var(--ui-color-primary, #0f4d90);
-  border: 1px solid var(--ui-color-primary, #0f4d90);
-}
-.answers__more:disabled {
-  opacity: 0.5;
-  cursor: default;
 }
 .sr-only {
   position: absolute;
