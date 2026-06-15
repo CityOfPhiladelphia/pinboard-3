@@ -2,11 +2,9 @@
      suggestions filtered to catalog membership, sorted by confidence, top 3, click to select. -->
 <script setup lang="ts">
 import { computed } from 'vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import type { ServiceType } from '@/types/api'
 import type { PhotoSuggestion } from '@/types/wizard'
-import { serviceTypeIconDefinition } from '@/utils/reportIcon'
-import { serviceTypeColor } from '@/utils/serviceTypeMeta'
+import ServiceTypeIcon from '@/components/ServiceTypeIcon.vue'
 
 const props = defineProps<{ suggestions: PhotoSuggestion[]; catalog: ServiceType[] }>()
 const emit = defineEmits<{ select: [serviceType: string] }>()
@@ -29,12 +27,7 @@ const top = computed(() => {
     <ul class="type-suggestions__list">
       <li v-for="s in top" :key="s.serviceType">
         <button type="button" class="type-suggestions__card" @click="emit('select', s.serviceType)">
-          <span
-            class="type-suggestions__icon"
-            :style="{ backgroundColor: serviceTypeColor(s.serviceType) }"
-          >
-            <FontAwesomeIcon :icon="serviceTypeIconDefinition(s.serviceType)" />
-          </span>
+          <ServiceTypeIcon :service-type="s.serviceType" :size="36" />
           <span class="type-suggestions__body">
             <span class="type-suggestions__name">{{ s.serviceType }}</span>
             <span class="type-suggestions__desc">{{ s.description }}</span>
@@ -86,16 +79,6 @@ const top = computed(() => {
 .type-suggestions__card:focus-visible {
   outline: 2px solid var(--ui-color-primary, #0f4d90);
   outline-offset: 1px;
-}
-.type-suggestions__icon {
-  flex: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
 }
 .type-suggestions__body {
   display: flex;
