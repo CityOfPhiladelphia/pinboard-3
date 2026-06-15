@@ -6,6 +6,7 @@ import { useRoute } from 'vue-router'
 import { useKnowledgeArticles, type Article } from '@/composables/useKnowledgeArticles'
 import { ApiError } from '@/composables/useApiError'
 import ArticleBody from '@/components/answers/ArticleBody.vue'
+import PillButton from '@/components/PillButton.vue'
 
 const route = useRoute()
 const id = computed(() => route.params.id as string)
@@ -71,9 +72,7 @@ watch(id, () => {
         This article doesn't have any content yet.
         <RouterLink to="/answers">Browse other answers</RouterLink>.
       </p>
-      <RouterLink class="answer-detail__cta" data-test="answer-cta" to="/report">
-        Start a report &rarr;
-      </RouterLink>
+      <PillButton variant="primary" to="/report" data-test="answer-cta">Start a report &rarr;</PillButton>
     </article>
   </main>
 </template>
@@ -92,15 +91,5 @@ watch(id, () => {
 }
 .answer-detail__status {
   margin: var(--spacing-m, 1rem) 0;
-}
-.answer-detail__cta {
-  display: inline-block;
-  margin: var(--spacing-l, 1.5rem) 0;
-  padding: var(--spacing-s, 0.5rem) var(--spacing-l, 1.5rem);
-  border-radius: 9999px;
-  font-weight: 600;
-  background: var(--ui-color-primary, #0f4d90);
-  color: #fff;
-  text-decoration: none;
 }
 </style>
