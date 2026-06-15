@@ -156,15 +156,10 @@ function handleSearchSubmit(s: string) {
 }
 
 function handleGeolocate(locationData: { latitude: number; longitude: number; accuracy: number }) {
-  console.log('Geolocation Accuracy: ', locationData.accuracy)
   userLocation.value = {
     latitude: locationData.latitude,
     longitude: locationData.longitude,
   }
-}
-
-function handleGeolocateError(error: Error | GeolocationPositionError) {
-  console.log(error)
 }
 
 const isMobile = PinboardComposables.useIsMobile()
@@ -230,11 +225,13 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
           position="top-right"
           :teleport-to="isMobile ? mobileControlsTarget : undefined"
         />
+        <!-- No @error handler by design: GeolocationButton shows its own callout
+             when location is blocked; other geolocation errors are non-blocking
+             since the finder works without location. -->
         <GeolocationButton
           position="bottom-right"
           :teleport-to="isMobile ? mobileControlsTarget : undefined"
           @located="handleGeolocate"
-          @error="handleGeolocateError"
         />
 
         <CircleLayer
