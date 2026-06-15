@@ -41,6 +41,8 @@ describe('PillButton', () => {
       slots: { default: 'X' },
     })
     expect(disabled.attributes('disabled')).toBeDefined()
+    await disabled.trigger('click')
+    expect(onClick).not.toHaveBeenCalled()
 
     // PillButton declares no emits; a consumer's @click falls through to the root <button>.
     const enabled = mount(PillButton, { attrs: { onClick }, slots: { default: 'X' } })

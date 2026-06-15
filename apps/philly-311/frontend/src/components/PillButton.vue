@@ -4,6 +4,7 @@
 import { computed } from 'vue'
 import { RouterLink, type RouteLocationRaw } from 'vue-router'
 
+// `disabled` applies in button mode only; no call site renders a disabled link.
 const props = withDefaults(
   defineProps<{
     variant?: 'primary' | 'outline'
