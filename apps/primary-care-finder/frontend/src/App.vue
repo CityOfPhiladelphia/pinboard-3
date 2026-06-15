@@ -231,7 +231,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
           :teleport-to="isMobile ? mobileControlsTarget : undefined"
         />
         <GeolocationButton
-          :position="isMobile ? 'top-right' : 'bottom-right'"
+          position="bottom-right"
           :teleport-to="isMobile ? mobileControlsTarget : undefined"
           @located="handleGeolocate"
           @error="handleGeolocateError"

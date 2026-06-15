@@ -38,7 +38,7 @@
     "@phila/phila-ui-core": "3.0.0-beta.5",
     "@phila/phila-ui-filter-chip": "0.2.0-beta.3",
     "@phila/phila-ui-filter-panel": "0.1.0-beta.0",
-    "@phila/phila-ui-map-core": "1.1.0-beta.17",
+    "@phila/phila-ui-map-core": "1.1.0-beta.20",
     "@phila/phila-ui-menu": "0.1.1-beta.7",
     "@phila/phila-ui-radio": "0.1.1-beta.6",
     "@phila/phila-ui-search": "1.2.0-beta.8",
