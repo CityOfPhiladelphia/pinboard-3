@@ -61,7 +61,7 @@ const {
 const isSearching = computed(() => query.value.trim().length > 0)
 const visible = computed(() => searchResults.value ?? items.value)
 const isLoading = computed(() => searchLoading.value || browseLoading.value)
-const errorMessage = computed(() => searchError.value ?? browseError.value)
+const errorMessage = computed(() => (isSearching.value ? searchError.value : browseError.value))
 
 onMounted(loadInitial)
 </script>

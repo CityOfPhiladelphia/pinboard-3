@@ -102,4 +102,17 @@ describe('AnswersPage', () => {
     await flushPromises()
     expect(w.find('[role="alert"]').text()).toContain('boom')
   })
+
+  it('a successful search renders results even after the initial browse failed', async () => {
+    loadArticles.mockRejectedValueOnce(new Error('boom'))
+    const w = mountPage()
+    await flushPromises()
+    expect(w.find('[role="alert"]').exists()).toBe(true)
+    loadArticles.mockResolvedValueOnce({ items: [a('9')], nextPageToken: undefined })
+    await w.find('input[type="search"]').setValue('pothole')
+    vi.advanceTimersByTime(250)
+    await flushPromises()
+    expect(w.find('[role="alert"]').exists()).toBe(false)
+    expect(w.text()).toContain('Article 9')
+  })
 })
