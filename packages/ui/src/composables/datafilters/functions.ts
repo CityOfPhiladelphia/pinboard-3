@@ -1,9 +1,9 @@
-import type {
-  ComputedFilterGroup,
-  DataFilterOptionsGroup,
-  FilterPanel,
-  FilterGroupSet,
-} from './classes'
+// import type {
+//   ComputedFilterGroup,
+//   DataFilterOptionsGroup,
+//   FilterPanel,
+//   FilterGroupSet,
+// } from './classes'
 import type { BitWiseOperation } from './types'
 
 /*
@@ -12,35 +12,6 @@ import type { BitWiseOperation } from './types'
 export const getBufferSize = (dataLength: number) => {
   return Math.ceil(dataLength / 32)
 }
-
-export const findClassesInObject = (
-  object: FilterPanel | FilterGroupSet,
-  searchKey: string,
-  classes: [DataFilterOptionsGroup, ComputedFilterGroup],
-  matched = []
-) => {
-  Object.keys(object[searchKey]).forEach((key, i) => {
-    if (!classes.some((classes) => Object.values(object[searchKey])[i] instanceof classes)) {
-      findClassesInObject(object[searchKey][key], searchKey, classes, matched)
-    } else {
-      matched.push([key, object[searchKey][key][searchKey]])
-    }
-  })
-  return matched
-}
-
-/*
-    // DATA STRUCTURING AND VALIDATION FUNCTIONS
-    */
-// export const validateArrayLengthsMatch = (args) => {
-//   const lengths = new Set(Array.from(args.slice(0, 2), (arr) => arr.length))
-//   args
-//     .slice(2)
-//     .forEach((arg) =>
-//       lengths.add(!Array.isArray(arg) || !Array.isArray(arg[0]) ? args[0].length : arg.length)
-//     )
-//   return lengths.size === 1
-// }
 
 export const getAllUniqueValuesFromStringField = (
   dataProperties: Record<string, string>[],
@@ -59,8 +30,8 @@ export const getAllUniqueValuesFromStringField = (
     */
 export const createOptionBitmask = (
   data: Record<string, unknown>[],
-  fieldName: string,
-  matchValues: unknown[] | string,
+  dataFields: string[],
+  matchValues: string[],
   selectionFunction: Function
 ) => {
   const bitarray = new Uint32Array(getBufferSize(data.length)) // bitArray for holdin set bits
@@ -70,7 +41,7 @@ export const createOptionBitmask = (
 
   // for each item, run bit setting function
   data.forEach((item, i) => {
-    accumulator |= selectionFunction(item, fieldName, matchValues) ? setBit : 0
+    accumulator |= selectionFunction(item, dataFields, matchValues) ? setBit : 0
     setBit <<= 1 // shift setBit to the left: 00000010 <<= 00000001
 
     // on 8th iteration, push bits to buffers and reset accumulators and setBit
@@ -147,17 +118,17 @@ export const getUniformBitarray = (bufferLength: number, oneOrZero: 1 | 0) => {
     // INPUT FUNCTIONS FOR GETTING BITFIELDS
     */
 export const matchFieldToOptions = (
-  dataProperties: Record<string, unknown>,
+  item: Record<string, unknown>,
   fieldName: string,
   valuesToMatch: unknown[]
 ) => {
-  return valuesToMatch.includes(dataProperties[fieldName])
+  return valuesToMatch.includes(item[fieldName])
 }
 
 export const matchOptionInString = (
-  dataProperties: Record<string, string>,
+  item: Record<string, string>,
   fieldName: string,
   option: string
 ) => {
-  return dataProperties[fieldName].toLowerCase().trim().includes(option[0])
+  return item[fieldName].toLowerCase().trim().includes(option[0])
 }

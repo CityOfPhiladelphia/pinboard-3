@@ -20,7 +20,8 @@ import LocationsPanel from './LocationsPanel.vue'
 import { FilterChipGroup } from '@phila/phila-ui-filter-chip'
 import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
-// pinboard composables imports
+// pinboard composables and utilities imports
+import { hasLocationData } from '../utilities/hasLocationData'
 
 // type imports
 import type {
@@ -32,7 +33,7 @@ import type {
   UserLocationState,
 } from '../types'
 import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
-import { hasLocationData } from '../utilities/hasLocationData'
+
 
 // slots
 defineSlots<{
@@ -94,13 +95,7 @@ const emit = defineEmits<{
   'update:filterValues': [value: FilterValues]
 }>()
 
-// filter state
-const allFiltersOpen = ref(false)
 
-function onFilterValues(value: FilterValues) {
-  console.log(value)
-  emit('update:filterValues', value)
-}
 
 // component variables
 const snapPoints = [15, 50, 100]
@@ -126,6 +121,10 @@ const locationsPanelRef = ref<{
 } | null>(null)
 const mapPanelRef = ref<{ panTo: (coordinates: LatLon) => void } | null>(null)
 const searchString = ref<string>('')
+  // filter state
+const allFiltersOpen = ref(false)
+
+
 
 // computed refs
 const bottomSheetPercent = computed(() => bottomSheetRef.value?.displayPercent ?? snapPoints[0])
@@ -245,6 +244,11 @@ function handleCloseLocationDetail() {
   }
 }
 
+function handleApplyFilter(value: FilterValues) {
+  console.log(value)
+  emit('update:filterValues', value)
+}
+
 // utility functions
 const effectiveMapConfig = (() => {
   // Merge mobile overrides into the map config ONCE at setup — not reactively.
@@ -305,11 +309,11 @@ const effectiveMapConfig = (() => {
               <div class="filter-chip-bar">
                 <FilterChipGroup
                   :filters="filters"
-                  :model-value="filterValues ?? {}"
+                  :model-value="filterValues"
                   color="white"
                   filter-button
                   :elevated="isMobile && chipsOnMap"
-                  @update:model-value="onFilterValues"
+                  @update:model-value="handleApplyFilter"
                   @open-filters="allFiltersOpen = true"
                 />
               </div>
@@ -356,8 +360,8 @@ const effectiveMapConfig = (() => {
         <FilterPanel
           v-if="allFiltersOpen"
           :filters="filters"
-          :model-value="filterValues ?? {}"
-          @update:model-value="onFilterValues"
+          :model-value="filterValues"
+          @update:model-value="handleApplyFilter"
           @close="allFiltersOpen = false"
         />
       </div>

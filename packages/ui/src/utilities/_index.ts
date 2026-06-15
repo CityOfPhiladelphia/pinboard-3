@@ -3,7 +3,6 @@ Central file to simplify importing functions into app projects.
 Contains references to exported functions and useful constants and regular expressions
 */
 
-import { getBrowserType } from './getBrowserType'
 import { getHaversineDistance } from './getHaversineDistance'
 import { hasLocationData } from './hasLocationData'
 
@@ -15,11 +14,4 @@ const StreetIntersection: Readonly<RegExp> =
 
 const Zipcode: Readonly<RegExp> = /^\d{5}(?:-\d{4})?$/
 
-export {
-  getBrowserType,
-  getHaversineDistance,
-  hasLocationData,
-  StreetAddress,
-  StreetIntersection,
-  Zipcode,
-}
+export { getHaversineDistance, hasLocationData, StreetAddress, StreetIntersection, Zipcode }

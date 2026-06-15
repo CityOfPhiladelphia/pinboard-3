@@ -1,6 +1,5 @@
 import './styles/global.css'
-import PinboardShell from './components/PinboardShell.vue'
-import PinboardBody from './components/PinboardBody.vue'
+export { PinboardBody, PinboardShell } from './components/_index'
 export * as PinboardComposables from './composables/_index'
 export * as PinboardUtilities from './utilities/_index'
 export { createPinboard } from './plugin'
@@ -19,10 +18,9 @@ export {
   GeolocationButton,
   BasemapToggle,
   MapCheckboxLegend,
+  type LegendItem,
 } from '@phila/phila-ui-map-core'
-export type { LegendItem } from '@phila/phila-ui-map-core'
 
 export { NavbarInfo } from '@phila/phila-ui-app-header'
-export { PinboardShell, PinboardBody }
 
 export type { FilterDefinition, FilterValues, FilterChoice } from '@phila/phila-ui-core'

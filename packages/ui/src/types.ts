@@ -78,15 +78,3 @@ export interface MenuOption {
 export type SortLocationsOptions = Record<string, string>
 
 export type ProxyAutocompleteResult = string[]
-
-export const Browsers = {
-  FIREFOX: 'FIREFOX',
-  SAMSUNG: 'SAMSUNG',
-  OPERA: 'OPERA',
-  EDGE: 'EDGE',
-  CHROME: 'CHROME',
-  SAFARI: 'SAFARI',
-  UNKNOWN: 'UNKNOWN',
-} as const
-
-export type BrowserType = (typeof Browsers)[keyof typeof Browsers]
