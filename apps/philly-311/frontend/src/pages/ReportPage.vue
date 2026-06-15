@@ -116,6 +116,8 @@ function resetWizard() {
   max-width: 980px;
   margin: 0 auto;
   padding: var(--spacing-m, 1rem);
+  height: 100%;
+  overflow-y: auto;
 }
 .wizard__crumb {
   font-size: 0.875rem;
