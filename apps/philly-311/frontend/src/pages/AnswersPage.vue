@@ -87,7 +87,9 @@ onMounted(loadInitial)
     />
 
     <p v-if="isLoading" class="answers__status">Loading articles&hellip;</p>
-    <p v-else-if="errorMessage" role="alert" class="answers__status">{{ errorMessage }}</p>
+    <p v-else-if="errorMessage" role="alert" class="answers__status">
+      Couldn't load articles. {{ errorMessage }}
+    </p>
     <p v-else-if="visible.length === 0 && isSearching" class="answers__status">
       No articles match &ldquo;{{ query.trim() }}&rdquo;.
     </p>
