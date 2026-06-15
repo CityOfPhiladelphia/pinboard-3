@@ -1,7 +1,7 @@
 // ABOUTME: Tests for ReportConfirmationPage — reference number from store.submitted
 // ABOUTME: and the report-another / finder links.
 import { describe, it, expect, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import { setActivePinia, createPinia } from 'pinia'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import ReportConfirmationPage from './ReportConfirmationPage.vue'
@@ -39,5 +39,17 @@ describe('ReportConfirmationPage', () => {
       .findAll('a.router-link-stub')
       .map((a) => a.attributes('href'))
     expect(hrefs).toEqual(['/report', '/'])
+  })
+
+  it('moves focus to the heading on mount', async () => {
+    const w = mount(ReportConfirmationPage, {
+      attachTo: document.body,
+      global: { stubs: { RouterLink: RouterLinkStub } },
+    })
+    await flushPromises()
+    const h1 = w.find('h1')
+    expect(h1.attributes('tabindex')).toBe('-1')
+    expect(document.activeElement).toBe(h1.element)
+    w.unmount()
   })
 })
