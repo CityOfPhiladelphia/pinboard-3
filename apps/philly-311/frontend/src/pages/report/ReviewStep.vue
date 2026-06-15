@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useApi } from '@/composables/useApi'
 import ReviewSummary from '@/components/wizard/ReviewSummary.vue'
+import PillButton from '@/components/PillButton.vue'
 import type { SubmitResponse } from '@/types/wizard'
 
 const GENERIC_ERROR = 'Something went wrong submitting your report. Please try again.'
@@ -51,7 +52,7 @@ async function submit() {
 
     <p v-if="errorMessage" class="review-step__error" role="alert">{{ errorMessage }}</p>
 
-    <button
+    <PillButton
       type="button"
       class="review-step__submit"
       data-test="review-submit"
@@ -59,7 +60,7 @@ async function submit() {
       @click="submit"
     >
       {{ submitting ? 'Submitting…' : 'Submit report' }}
-    </button>
+    </PillButton>
   </div>
 </template>
 
@@ -85,16 +86,5 @@ async function submit() {
 }
 .review-step__submit {
   margin-top: var(--spacing-m, 1rem);
-  padding: var(--spacing-s, 0.5rem) var(--spacing-l, 1.5rem);
-  border-radius: 9999px;
-  font-weight: 600;
-  cursor: pointer;
-  background: var(--ui-color-primary, #0f4d90);
-  color: #fff;
-  border: none;
-}
-.review-step__submit:disabled {
-  opacity: 0.5;
-  cursor: default;
 }
 </style>
