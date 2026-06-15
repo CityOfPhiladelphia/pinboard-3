@@ -3,14 +3,12 @@
      store.category; Next is gated on required visible questions via useWizardValidity. -->
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { useServiceTypes } from '@/composables/useServiceTypes'
 import { useWizardValidity } from '@/composables/useWizardValidity'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { visibleQuestions } from '@/utils/conditional'
-import { serviceTypeIconDefinition } from '@/utils/reportIcon'
-import { serviceTypeColor } from '@/utils/serviceTypeMeta'
 import PillButton from '@/components/PillButton.vue'
+import ServiceTypeIcon from '@/components/ServiceTypeIcon.vue'
 import TypeSuggestions from '@/components/wizard/TypeSuggestions.vue'
 import TypeDirectory from '@/components/wizard/TypeDirectory.vue'
 import QuestionField from '@/components/wizard/QuestionField.vue'
@@ -81,12 +79,7 @@ function change() {
 
     <template v-else>
       <div class="issue-step__selected">
-        <span
-          class="issue-step__selected-icon"
-          :style="{ backgroundColor: serviceTypeColor(store.category) }"
-        >
-          <FontAwesomeIcon :icon="serviceTypeIconDefinition(store.category)" />
-        </span>
+        <ServiceTypeIcon :service-type="store.category" :size="36" />
         <span class="issue-step__selected-body">
           <span class="issue-step__selected-name">{{ store.category }}</span>
           <span v-if="selected" class="issue-step__selected-desc">{{ selected.description }}</span>
@@ -151,16 +144,6 @@ function change() {
   border-radius: 8px;
   padding: var(--spacing-s, 0.75rem);
   margin-bottom: var(--spacing-m, 1rem);
-}
-.issue-step__selected-icon {
-  flex: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
 }
 .issue-step__selected-body {
   display: flex;
