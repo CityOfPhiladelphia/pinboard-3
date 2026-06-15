@@ -151,9 +151,12 @@ focus on mount.
   forwards `aria-required` to its underlying control; set it where it takes effect and do NOT add
   a non-functional attribute on a component that drops it. If a required type can't carry
   `aria-required` through phila-ui, note it as a phila-ui gap rather than working around it.
-- **DetailsStep** (`src/pages/report/DetailsStep.vue`): wire `aria-describedby` for the
-  description hint (`details-step__hint`) and the privacy note (`details-step__privacy-note`)
-  via stable ids, and `aria-required` on the description control.
+- **DetailsStep** (`src/pages/report/DetailsStep.vue`): the description textarea gets
+  `aria-describedby` pointing at the description hint (`details-step__hint`) **only**, plus
+  `aria-required`. The privacy note (`details-step__privacy-note`) describes the privacy toggle's
+  behavior, NOT the description field — so it is wired as the privacy checkbox's `aria-describedby`,
+  not the textarea's. Do not link the privacy note to the textarea (it would mis-announce the
+  privacy rules when the description field is focused). Use stable ids for both relationships.
 
 No visual change; assertions added for the wired attributes.
 
@@ -165,6 +168,12 @@ complete keyboard-nav option over a static-only contract):
 
 - **Static contract:** `role="combobox"` on the input with `aria-expanded` (reflecting the open
   state), `aria-controls` (the listbox id), `aria-autocomplete="list"`.
+- **Structural fix (required):** the current markup is `<li role="option"><button
+  type="button">…</button></li>`, which is ARIA-invalid — an interactive `<button>` cannot be a
+  descendant of `role="option"`. As part of adding keyboard nav, remove the inner `<button>` and
+  move the click handler onto the `<li role="option">` itself (the option is selected via click or
+  via Enter on the active descendant — the input keeps focus throughout, which is the correct
+  combobox pattern). Retarget the existing `…__results button:hover` CSS to the `<li>` accordingly.
 - **Keyboard navigation (new behavior):** track an `activeIndex` over the current results.
   ArrowDown / ArrowUp move the active option (wrapping or clamping — implementer picks the
   conventional behavior and documents it), `Enter` selects the active option (same path as a
