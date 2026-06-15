@@ -8,6 +8,7 @@ import { reverseGeocode, type AisFeature } from '@/composables/useAis'
 import { getCurrentPosition } from '@/composables/useGeolocation'
 import { useWizardValidity } from '@/composables/useWizardValidity'
 import { isInPhilly } from '@/utils/bounds'
+import PillButton from '@/components/PillButton.vue'
 import AddressSearch from '@/components/wizard/AddressSearch.vue'
 import LocationMap from '@/components/wizard/LocationMap.vue'
 
@@ -89,15 +90,15 @@ async function useMyLocation() {
     <div class="location-step__columns">
       <div class="location-step__form">
         <AddressSearch @select="onSelect" />
-        <button
-          type="button"
-          data-test="use-my-location"
+        <PillButton
+          variant="outline"
           class="location-step__geolocate"
+          data-test="use-my-location"
           :disabled="lookingUp"
           @click="useMyLocation"
         >
           {{ lookingUp ? 'Locating…' : 'Use my current location' }}
-        </button>
+        </PillButton>
         <p v-if="store.location" class="location-step__chosen" data-test="chosen-address">
           <strong>{{
             store.location.address || `${store.location.lat}, ${store.location.lng}`
@@ -130,17 +131,6 @@ async function useMyLocation() {
 }
 .location-step__geolocate {
   margin-top: var(--spacing-s, 0.75rem);
-  background: none;
-  border: 1px solid var(--ui-color-primary, #0f4d90);
-  border-radius: 9999px;
-  color: var(--ui-color-primary, #0f4d90);
-  font-weight: 600;
-  padding: 6px 16px;
-  cursor: pointer;
-}
-.location-step__geolocate:disabled {
-  opacity: 0.6;
-  cursor: default;
 }
 .location-step__chosen {
   margin: var(--spacing-s, 0.75rem) 0 0;
