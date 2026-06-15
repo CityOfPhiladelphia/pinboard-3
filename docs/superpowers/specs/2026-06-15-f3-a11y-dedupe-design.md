@@ -22,7 +22,8 @@ the targeted a11y fixes onto those components and a few specific call sites.
 3. **`.sr-only` global utility** — single definition, remove per-component copies.
 4. **Confirmation focus-on-heading** (a11y) — replace `role="status"` reliance.
 5. **QuestionField / DetailsStep aria** (a11y) — `aria-describedby` + `aria-required`.
-6. **AddressSearch combobox roles** (a11y) — complete the combobox ARIA contract.
+6. **AddressSearch combobox + keyboard nav** (a11y) — combobox ARIA contract plus arrow-key
+   navigation, Enter-to-select, Escape-to-close, and `aria-activedescendant`.
 7. **FilterChips ResizeObserver** — container-driven overflow detection.
 
 **Explicitly out of scope (deferred):**
@@ -74,8 +75,13 @@ Token fallbacks match today's values so there is no visual change.
 - `src/pages/ReportPage.vue` — wizard Next/Skip/Back/Reset controls that use the pill style
   (audit each; only the ones currently rendered as `9999px` pills convert — match current
   appearance exactly).
-- `src/pages/report/IssueTypeStep.vue` — pill CTA(s) present there.
-- `src/pages/report/LocationStep.vue` — pill CTA(s) present there.
+- `src/pages/report/IssueTypeStep.vue` — `issue-step__retry` (outline, error-path retry).
+- `src/pages/report/LocationStep.vue` — `location-step__geolocate` (outline, "Use my current
+  location"). Note these two are outline CTAs, not primary Start/Next/Submit buttons.
+
+Note on `ReportPage.vue`: its `wizard__reset` is a plain text link with **no** `border-radius`
+— it is NOT a pill and does NOT convert. Only the controls currently rendered as `9999px` pills
+convert.
 
 Each conversion is a pure refactor: the rendered DOM/classes may change, but the visual result
 and behavior must be identical. Existing step/page tests must stay green; where a test queries
@@ -135,21 +141,43 @@ focus on mount.
 
 ### 5. QuestionField / DetailsStep aria
 
-- **QuestionField** (`src/components/wizard/QuestionField.vue`): associate each field's hint text
-  with its control via `aria-describedby` (stable generated id), and set `aria-required` on the
-  native input/switch when the question is required.
+- **QuestionField** (`src/components/wizard/QuestionField.vue`): set `aria-required` on the
+  control when the question is required. **No `aria-describedby`** here — QuestionField renders no
+  hint text and the `QuestionField` type carries no hint/description field, so there is nothing to
+  describe (this is a correction from the brainstorm; `aria-describedby` applies only to
+  DetailsStep, which does have hints). QuestionField renders most types via phila-ui components
+  (TextField, RadioGroup, CheckboxGroup, DateField) plus a native large-picklist `<select>`,
+  `<textarea>`, and a `Switch`. The implementer must verify whether each phila-ui component
+  forwards `aria-required` to its underlying control; set it where it takes effect and do NOT add
+  a non-functional attribute on a component that drops it. If a required type can't carry
+  `aria-required` through phila-ui, note it as a phila-ui gap rather than working around it.
 - **DetailsStep** (`src/pages/report/DetailsStep.vue`): wire `aria-describedby` for the
-  description hint and the privacy note, and `aria-required` where applicable.
+  description hint (`details-step__hint`) and the privacy note (`details-step__privacy-note`)
+  via stable ids, and `aria-required` on the description control.
 
 No visual change; assertions added for the wired attributes.
 
-### 6. AddressSearch combobox roles (`src/components/wizard/AddressSearch.vue`)
+### 6. AddressSearch combobox + keyboard navigation (`src/components/wizard/AddressSearch.vue`)
 
-The results list already uses `listbox`/`option` roles but is missing the rest of the combobox
-contract. Complete it: `role="combobox"` on the input with `aria-expanded` (reflecting the open
-state), `aria-controls` (pointing at the listbox id), `aria-autocomplete="list"`, and
-`aria-activedescendant` for the highlighted option. Preserve the existing `open`-flag and
-debounce behavior. Add assertions for the combobox attributes and their reactive values.
+The results list already uses `listbox`/`option` roles but the input is not a combobox and the
+list has no keyboard navigation. F3 adds the **full combobox a11y contract** (Darren chose the
+complete keyboard-nav option over a static-only contract):
+
+- **Static contract:** `role="combobox"` on the input with `aria-expanded` (reflecting the open
+  state), `aria-controls` (the listbox id), `aria-autocomplete="list"`.
+- **Keyboard navigation (new behavior):** track an `activeIndex` over the current results.
+  ArrowDown / ArrowUp move the active option (wrapping or clamping — implementer picks the
+  conventional behavior and documents it), `Enter` selects the active option (same path as a
+  click), `Escape` closes the list and clears `activeIndex`. Each result `<li>`/option gets a
+  stable `id`; the input's `aria-activedescendant` reflects the active option's id (absent when
+  nothing is active). Typing resets `activeIndex` to none. Pointer hover MAY set the active
+  option but is not required.
+- Preserve the existing `open`-flag, `resolving` feedback, and debounce behavior, and the
+  existing stale-result handling — keyboard nav must not reintroduce the pick-echo refire.
+
+Tests: assert the static combobox attributes; assert ArrowDown/ArrowUp move `aria-activedescendant`
+reactively; assert `Enter` on an active option selects it; assert `Escape` closes the list. Real
+end-to-end keyboard behavior is also exercised in the live smoke.
 
 ### 7. FilterChips ResizeObserver (`src/components/FilterChips.vue`)
 
@@ -176,8 +204,8 @@ stubbed element metrics); real overflow behavior is covered by the live smoke.
      behaves as before; outline "Load more" on `/answers` still paginates.
   2. Issue-type step: suggestion + directory icon discs render with correct colors.
   3. Confirmation page: focus lands on the heading after submit.
-  4. AddressSearch: combobox exposes `aria-expanded`/`aria-activedescendant` as the list opens and
-     options are highlighted.
+  4. AddressSearch: arrow keys move the highlighted option (`aria-activedescendant` tracks it),
+     `Enter` selects it, `Escape` closes the list; `aria-expanded` reflects open state.
   5. FilterChips: chevron appears/disappears as the finder panel/viewport changes width (not just
      window resize).
   6. Console clean except the known-benign Pictometry `Unexpected token '<'`.
