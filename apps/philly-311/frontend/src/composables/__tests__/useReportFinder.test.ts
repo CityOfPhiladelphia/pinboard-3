@@ -56,6 +56,33 @@ describe('useReportFinder', () => {
     f.setFilter('all')
     expect(f.locations.value).toHaveLength(2)
   })
+  it('derives filterOptions from report data, ordered by prevalence desc', async () => {
+    getCurrentPosition.mockResolvedValue(null)
+    reportsRef.value = [
+      { ...sample, id: 'a', serviceType: 'Pothole Repair' },
+      { ...sample, id: 'b', serviceType: 'Pothole Repair' },
+      { ...sample, id: 'c', serviceType: 'Illegal Dumping' },
+    ]
+    const f = useReportFinder()
+    await f.init()
+    expect(f.filterOptions.value).toEqual([
+      { value: 'Pothole Repair', label: 'Pothole Repair' },
+      { value: 'Illegal Dumping', label: 'Illegal Dumping' },
+    ])
+  })
+  it('breaks count ties alphabetically and omits service types absent from the data', async () => {
+    getCurrentPosition.mockResolvedValue(null)
+    reportsRef.value = [
+      { ...sample, id: 'a', serviceType: 'Tree Maintenance' },
+      { ...sample, id: 'b', serviceType: 'Abandoned Vehicle' },
+    ]
+    const f = useReportFinder()
+    await f.init()
+    expect(f.filterOptions.value.map((o) => o.value)).toEqual([
+      'Abandoned Vehicle',
+      'Tree Maintenance',
+    ])
+  })
   it('looks up a report by id', async () => {
     getCurrentPosition.mockResolvedValue(null)
     const f = useReportFinder()

@@ -10,6 +10,7 @@ import { DEFAULT_CENTER, DEFAULT_RADIUS } from '@/utils/geoDefaults'
 
 export interface UseReportFinder {
   locations: ComputedRef<PinboardTypes.BasicLocation[]>
+  filterOptions: ComputedRef<{ value: string; label: string }[]>
   searchOrUserLocation: Ref<PinboardTypes.LatLon>
   isLoading: Ref<boolean>
   errorMessage: ComputedRef<string | null>
@@ -41,6 +42,16 @@ export function useReportFinder(): UseReportFinder {
     return list.map(reportToLocation)
   })
 
+  const filterOptions = computed<{ value: string; label: string }[]>(() => {
+    const counts = new Map<string, number>()
+    for (const r of reports.value) {
+      counts.set(r.serviceType, (counts.get(r.serviceType) ?? 0) + 1)
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .map(([serviceType]) => ({ value: serviceType, label: serviceType }))
+  })
+
   function reportById(id: string): Report | undefined {
     return reports.value.find((r) => r.id === id)
   }
@@ -62,6 +73,7 @@ export function useReportFinder(): UseReportFinder {
 
   return {
     locations,
+    filterOptions,
     searchOrUserLocation,
     isLoading,
     errorMessage,
