@@ -14,6 +14,11 @@ dist-ssr
 coverage
 *.local
 
+# Env files (hold API keys/secrets) — keep local, never commit
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
