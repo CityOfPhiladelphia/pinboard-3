@@ -2,7 +2,6 @@
 // Run with a TypeScript-aware runner, e.g.:  npx tsx apps/primary-care-finder/frontend/scripts/check-locale-parity.mjs
 // This is a seam for the future automated test suite (see bead pinboard-3-kz1); it is not yet wired into CI.
 
-import { createRequire } from 'module'
 import { fileURLToPath } from 'url'
 import path from 'path'
 

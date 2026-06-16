@@ -139,15 +139,17 @@ watch(panelOpen, (isOpen) => {
               @update:model-value="pendingSelection = $event"
             />
             <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
-              {{
-                locationAvailable ? t('pinboard.sortClosest') : t('pinboard.sortShareLocation')
-              }}
+              {{ locationAvailable ? t('pinboard.sortClosest') : t('pinboard.sortShareLocation') }}
             </p>
           </li>
         </ul>
         <div class="sort-panel-actions">
-          <PhilaButton variant="text" size="extra-small" @click="resetSort">{{ t('pinboard.reset') }}</PhilaButton>
-          <PhilaButton variant="primary" size="small" @click="applySort">{{ t('pinboard.apply') }}</PhilaButton>
+          <PhilaButton variant="text" size="extra-small" @click="resetSort">{{
+            t('pinboard.reset')
+          }}</PhilaButton>
+          <PhilaButton variant="primary" size="small" @click="applySort">{{
+            t('pinboard.apply')
+          }}</PhilaButton>
         </div>
       </div>
     </BottomSheet>
@@ -163,15 +165,17 @@ watch(panelOpen, (isOpen) => {
             @update:model-value="pendingSelection = $event"
           />
           <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
-            {{
-              locationAvailable ? t('pinboard.sortClosest') : t('pinboard.sortShareLocation')
-            }}
+            {{ locationAvailable ? t('pinboard.sortClosest') : t('pinboard.sortShareLocation') }}
           </p>
         </li>
       </ul>
       <div class="sort-panel-actions">
-        <PhilaButton variant="text" size="extra-small" @click="resetSort">{{ t('pinboard.reset') }}</PhilaButton>
-        <PhilaButton variant="primary" size="small" @click="applySort">{{ t('pinboard.apply') }}</PhilaButton>
+        <PhilaButton variant="text" size="extra-small" @click="resetSort">{{
+          t('pinboard.reset')
+        }}</PhilaButton>
+        <PhilaButton variant="primary" size="small" @click="applySort">{{
+          t('pinboard.apply')
+        }}</PhilaButton>
       </div>
     </div>
   </Teleport>
