@@ -24,11 +24,13 @@ export function useLocale() {
       window.location.search,
       window.localStorage.getItem(STORAGE_KEY)
     )
+    document.documentElement.lang = locale.value
   }
 
   function setLocale(code: string) {
     if (!languageCodes.has(code)) return
     locale.value = code
+    document.documentElement.lang = code
     window.localStorage.setItem(STORAGE_KEY, code)
     const url = new URL(window.location.href)
     url.searchParams.set('lang', code)

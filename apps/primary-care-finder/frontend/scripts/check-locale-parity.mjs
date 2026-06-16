@@ -2,7 +2,7 @@
 // Run with a TypeScript-aware runner, e.g.:  npx tsx apps/primary-care-finder/frontend/scripts/check-locale-parity.mjs
 // This is a seam for the future automated test suite (see bead pinboard-3-kz1); it is not yet wired into CI.
 
-import { fileURLToPath } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 import path from 'path'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -28,7 +28,7 @@ function flatten(obj, prefix = '') {
 
 async function loadMessages(locale) {
   const filePath = path.join(localesDir, `${locale}.ts`)
-  const mod = await import(filePath)
+  const mod = await import(pathToFileURL(filePath).href)
   return mod.default
 }
 
