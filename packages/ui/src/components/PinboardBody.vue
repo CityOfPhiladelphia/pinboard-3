@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // vue imports
 import { useSlots, inject, ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 // 3rd party imports
 import { faMap } from '@fortawesome/pro-solid-svg-icons'
@@ -101,6 +102,8 @@ function onFilterValues(value: FilterValues) {
   emit('update:filterValues', value)
 }
 
+const { t } = useI18n()
+
 // component variables
 const snapPoints = [15, 50, 100]
 const config = inject(PINBOARD_CONFIG_KEY)
@@ -147,8 +150,8 @@ const selectedLocationId = computed(() =>
 
 const locationCountLabel = computed(() => {
   const message = props.locations.length
-    ? `${props.locations.length} item${props.locations.length > 1 ? 's' : ''}`
-    : 'No locations match'
+    ? t('pinboard.itemCount', { count: props.locations.length }, props.locations.length)
+    : t('pinboard.noLocations')
   return props.isLoading || message
 })
 
@@ -366,7 +369,7 @@ const effectiveMapConfig = (() => {
     ref="bottomSheetRef"
     v-model="bottomSheetOpen"
     :snap-points="snapPoints"
-    :collapse-label="selectedLocation ? '' : 'Map view'"
+    :collapse-label="selectedLocation ? '' : t('pinboard.mapView')"
     :collapse-icon="selectedLocation ? undefined : faMap"
     class="mobile-bottom-sheet"
   >
