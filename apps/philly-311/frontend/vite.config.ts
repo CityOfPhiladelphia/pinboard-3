@@ -19,9 +19,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://yw32n3h725.execute-api.us-east-1.amazonaws.com',
+        target: 'https://wdw5s1yfxg.execute-api.us-east-1.amazonaws.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/test'),
+        rewrite: (path) => path.replace(/^\/api/, '/dev'),
       },
     },
   },
