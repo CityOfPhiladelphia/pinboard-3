@@ -9,16 +9,24 @@ import {
   BasemapToggle,
   PinboardComposables,
   PinboardUtilities,
+  LanguageSwitcher,
+  languages,
 } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
 import type { FilterDefinition, FilterValues, PinboardTypes } from '@pinboard/ui'
+import { useI18n } from 'vue-i18n'
 import { useLocations } from './composables/useLocations'
+import { useLocale } from './composables/useLocale'
 import LocationCard from './components/LocationCard.vue'
 import LocationDetail from './components/LocationDetail.vue'
 import type { PrimaryCareLocation } from './types'
 
-const searchPlaceholderText = 'Search by address or keyword...'
+const { t } = useI18n()
+const { locale, init, setLocale } = useLocale()
+init()
+
+const searchPlaceholderText = computed(() => t('searchPlaceholder'))
 
 const { locations, isLoading, errorMessage, geojson } = useLocations()
 // Location is requested only when the user clicks the geolocation button, which
@@ -32,78 +40,78 @@ const searchString = ref('')
 
 const filterValues = ref<FilterValues>({})
 
-const filterDefinitions: FilterDefinition[] = [
+const filterDefinitions = computed<FilterDefinition[]>(() => [
   {
     key: 'sort',
-    label: 'Sort',
+    label: t('filters.sort'),
     multiple: false,
     excludeFromCount: true,
     iconDefinition: faArrowUpArrowDown,
     // TODO(teammate): finalize sort options + ordering logic.
     choices: [
-      { text: 'Distance', value: 'distance' },
-      { text: 'Name (A–Z)', value: 'name' },
+      { text: t('filters.distance'), value: 'distance' },
+      { text: t('filters.name'), value: 'name' },
     ],
   },
   {
     key: 'ageGroup',
-    label: 'Age Group',
+    label: t('filters.ageGroup'),
     multiple: true,
     choices: [
-      { text: 'Adult', value: 'adult' },
-      { text: 'Children', value: 'children' },
+      { text: t('filters.adult'), value: 'adult' },
+      { text: t('filters.children'), value: 'children' },
     ],
   },
   {
     key: 'waitTime',
-    label: 'Wait time (Primary Care)',
+    label: t('filters.waitTime'),
     multiple: true,
     choices: [
-      { text: 'Same day or walk in', value: 'sameDay' },
-      { text: '<1 week (well visit)', value: 'weekWell' },
-      { text: '<1 week (sick visit)', value: 'weekSick' },
-      { text: '<2 months (all primary care)', value: 'twoMonths' },
+      { text: t('filters.sameDay'), value: 'sameDay' },
+      { text: t('filters.weekWell'), value: 'weekWell' },
+      { text: t('filters.weekSick'), value: 'weekSick' },
+      { text: t('filters.twoMonths'), value: 'twoMonths' },
     ],
   },
   {
     key: 'specialty',
-    label: 'Speciality services',
+    label: t('filters.specialty'),
     multiple: true,
     choices: [
-      { text: 'Mental health', value: 'mental' },
-      { text: 'Dental', value: 'dental' },
-      { text: 'Eye care', value: 'eye' },
-      { text: 'Podiatry', value: 'podiatry' },
-      { text: 'MAT', value: 'mat' },
-      { text: 'Nutrition', value: 'nutrition' },
-      { text: 'Tobacco cessation', value: 'tobacco' },
-      { text: 'Pharmacy', value: 'pharmacy' },
+      { text: t('filters.mental'), value: 'mental' },
+      { text: t('filters.dental'), value: 'dental' },
+      { text: t('filters.eye'), value: 'eye' },
+      { text: t('filters.podiatry'), value: 'podiatry' },
+      { text: t('filters.mat'), value: 'mat' },
+      { text: t('filters.nutrition'), value: 'nutrition' },
+      { text: t('filters.tobacco'), value: 'tobacco' },
+      { text: t('filters.pharmacy'), value: 'pharmacy' },
     ],
   },
   {
     key: 'tests',
-    label: 'Tests and imaging',
+    label: t('filters.tests'),
     multiple: true,
     choices: [
-      { text: 'Blood', value: 'blood' },
-      { text: 'STI', value: 'sti' },
-      { text: 'COVID', value: 'covid' },
-      { text: 'Mammography', value: 'mammo' },
-      { text: 'X-ray', value: 'xray' },
+      { text: t('filters.blood'), value: 'blood' },
+      { text: t('filters.sti'), value: 'sti' },
+      { text: t('filters.covid'), value: 'covid' },
+      { text: t('filters.mammo'), value: 'mammo' },
+      { text: t('filters.xray'), value: 'xray' },
     ],
   },
   {
     key: 'languages',
-    label: 'Languages spoken by staff',
+    label: t('filters.languages'),
     multiple: true,
     // TODO(teammate): replace with real `language` field values.
     choices: [
-      { text: 'Spanish', value: 'spanish' },
-      { text: 'Mandarin', value: 'mandarin' },
-      { text: 'Vietnamese', value: 'vietnamese' },
+      { text: t('filters.spanish'), value: 'spanish' },
+      { text: t('filters.mandarin'), value: 'mandarin' },
+      { text: t('filters.vietnamese'), value: 'vietnamese' },
     ],
   },
-]
+])
 
 // SEAM: data wiring belongs to the teammate. Returns locations unfiltered for now.
 // TODO(teammate): map filterValues → PrimaryCareProperties predicates.
@@ -176,22 +184,22 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
 
 <template>
   <PinboardShell
-    title="Primary Care Finder"
+    :title="t('app.name')"
     :logo="{
       variant: 'city',
       layout: 'single-line',
       colorScheme: 'on-primary',
-      customName: 'Primary Care Finder',
+      customName: t('app.name'),
       href: '/',
     }"
-    info-title="About this tool"
+    :info-title="t('app.aboutTitle')"
   >
+    <template #navbar-end>
+      <LanguageSwitcher :languages="languages" :locale="locale" @update:locale="setLocale" />
+    </template>
+
     <template #info-body>
-      <span class="has-text-body-small">
-        This tool helps Philadelphia residents find free and low-cost primary care providers near
-        them. Search by location, filter by services, and view details like hours, transit options,
-        and available tests.
-      </span>
+      <span class="has-text-body-small">{{ t('app.aboutBody') }}</span>
     </template>
 
     <PinboardBody
