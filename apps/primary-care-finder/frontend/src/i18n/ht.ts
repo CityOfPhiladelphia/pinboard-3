@@ -1,219 +1,268 @@
 export default {
-  "app": {
-    "title": "Chèche Swen Prensipal",
-    "subtitle": "Swen medikal gratis ak pri ki ba nan Philadelphia",
-    "noResults": "Pa gen sant sante yo jwenn. Tanpri tcheke òtograf ou oswa retire kèk nan filtè ou yo, epi eseye ankò."
+  app: {
+    title: 'Chèche Swen Prensipal',
+    subtitle: 'Swen medikal gratis ak pri ki ba nan Philadelphia',
+    noResults:
+      'Pa gen sant sante yo jwenn. Tanpri tcheke òtograf ou oswa retire kèk nan filtè ou yo, epi eseye ankò.',
   },
-  "introPage": {
-    "section1Title": "Jwenn swen prensipal gratis oswa a pri ki ba",
-    "p0": "Swen prensipal se kay swen sante w. Sèvis yo enkli prevansyon, byennèt, ak tretman pou maladi komen.",
-    "p05": "Sant sante sa yo sèvi tout moun. Estati imigrasyon ou oswa kapasite w pou peye pa pral anpeche w jwenn swen ou bezwen an.",
-    "p1": "Pou jwenn yon founisè swen prensipal nan Philadelphia:",
-    "ol1": {
-      "li1": "Filtre selon sèvis ou bezwen yo.",
-      "li2": "Chwazi kote a sou kat la pou plis detay.",
-      "li3": "Kontakte founisè a anvan ou vizite."
+  introPage: {
+    section1Title: 'Jwenn swen prensipal gratis oswa a pri ki ba',
+    p0: 'Swen prensipal se kay swen sante w. Sèvis yo enkli prevansyon, byennèt, ak tretman pou maladi komen.',
+    p05: 'Sant sante sa yo sèvi tout moun. Estati imigrasyon ou oswa kapasite w pou peye pa pral anpeche w jwenn swen ou bezwen an.',
+    p1: 'Pou jwenn yon founisè swen prensipal nan Philadelphia:',
+    ol1: {
+      li1: 'Filtre selon sèvis ou bezwen yo.',
+      li2: 'Chwazi kote a sou kat la pou plis detay.',
+      li3: 'Kontakte founisè a anvan ou vizite.',
     },
-    "section2Title": "Asirans ak pri",
-    "p2": "Sant sante sa yo pran plizyè fòm asirans. Sa gen ladann Medicare ak Medicaid. Ou ka jwenn swen menm si ou pa gen asirans. Si w pa gen asirans, w ap peye yon ti frè ki baze sou revni w ak kantite fanmi w.",
-    "section25Title": "Bezwen èd pou jwenn asirans sante?",
-    "p25": "Pwogram BenePhilly Philadelphia a ofri sipò gratis pou ede rezidan aplike pou asirans sante. Pou aprann plis, vizite <a href='https://www.phila.gov/programs/benephilly/' target='_blank'>https://www.phila.gov/programs/benephilly</a>.",
-    "section3Title": "Aksè nan lang",
-    "p3": "Tout sant sante ofri sèvis entèpretasyon telefòn. Gen kèk ki ofri tou entèpretasyon an pèsòn. Gade detay chak kote pou jwenn yon lis tout lang anplwaye yo pale. Ou ka chèche yon lang espesifik tou.",
-    "section4Title": "Etabli swen",
-    "p4": "Ou ka bezwen etabli swen ak yon founisè anvan ou kapab jwenn aksè nan kèk sèvis. Rele pou pran yon nouvo randevou pasyan pou vin yon pasyan nan yon sant sante.",
-    "section5Title": "Aktyalizasyon rechèch la",
-    "p5": "Nou aktyalize enfòmasyon pou chak sant sante chak twa mwa. Si gen yon bagay ki pa kòrèk, ou ka fè nou konn sa atravè",
-    "feedbackForm": "Fòmilè fidbak nou an"
+    section2Title: 'Asirans ak pri',
+    p2: 'Sant sante sa yo pran plizyè fòm asirans. Sa gen ladann Medicare ak Medicaid. Ou ka jwenn swen menm si ou pa gen asirans. Si w pa gen asirans, w ap peye yon ti frè ki baze sou revni w ak kantite fanmi w.',
+    section25Title: 'Bezwen èd pou jwenn asirans sante?',
+    p25: "Pwogram BenePhilly Philadelphia a ofri sipò gratis pou ede rezidan aplike pou asirans sante. Pou aprann plis, vizite <a href='https://www.phila.gov/programs/benephilly/' target='_blank'>https://www.phila.gov/programs/benephilly</a>.",
+    section3Title: 'Aksè nan lang',
+    p3: 'Tout sant sante ofri sèvis entèpretasyon telefòn. Gen kèk ki ofri tou entèpretasyon an pèsòn. Gade detay chak kote pou jwenn yon lis tout lang anplwaye yo pale. Ou ka chèche yon lang espesifik tou.',
+    section4Title: 'Etabli swen',
+    p4: 'Ou ka bezwen etabli swen ak yon founisè anvan ou kapab jwenn aksè nan kèk sèvis. Rele pou pran yon nouvo randevou pasyan pou vin yon pasyan nan yon sant sante.',
+    section5Title: 'Aktyalizasyon rechèch la',
+    p5: 'Nou aktyalize enfòmasyon pou chak sant sante chak twa mwa. Si gen yon bagay ki pa kòrèk, ou ka fè nou konn sa atravè',
+    feedbackForm: 'Fòmilè fidbak nou an',
   },
-  "cards": {
-    "table1Intro": "Sèvis sa yo ka espesyalize pou timoun oswa granmoun. Ou ka bezwen tou vin yon pasyan, oswa etabli swen, nan yon sant sante anvan ou ka jwenn aksè nan kèk sèvis.",
-    "table2Intro": "Rès sèvis yo pa divize pa laj. Gen kèk ki ouvri pou nenpòt moun, men ou ka bezwen etabli swen nan sant sante sa a anvan ou jwenn aksè nan lòt moun."
+  cards: {
+    table1Intro:
+      'Sèvis sa yo ka espesyalize pou timoun oswa granmoun. Ou ka bezwen tou vin yon pasyan, oswa etabli swen, nan yon sant sante anvan ou ka jwenn aksè nan kèk sèvis.',
+    table2Intro:
+      'Rès sèvis yo pa divize pa laj. Gen kèk ki ouvri pou nenpòt moun, men ou ka bezwen etabli swen nan sant sante sa a anvan ou jwenn aksè nan lòt moun.',
   },
-  "service": "Sèvis",
-  "slidingScale": "Pri echèl glisman",
-  "slidingScaleNull": "Echèl glisman pa bay. Rele pou plis enfòmasyon.",
-  "ageSpecificServices": "Sèvis pedyat ak granmoun",
-  "otherServices": "Plis sèvis",
-  "ageSpecificServicesEmpty": "Sit sa a pa ofri okenn sèvis ki limite pou timoun oswa granmoun",
-  "otherServicesEmpty": "Pa gen lòt sèvis yo ofri",
-  "ageRange": {
-    "category": "Gwoup laj",
-    "adult": "Granmoun",
-    "child": "Timoun",
-    "adults": "Granmoun",
-    "children": "Timoun yo"
+  service: 'Sèvis',
+  slidingScale: 'Pri echèl glisman',
+  slidingScaleNull: 'Echèl glisman pa bay. Rele pou plis enfòmasyon.',
+  ageSpecificServices: 'Sèvis pedyat ak granmoun',
+  otherServices: 'Plis sèvis',
+  ageSpecificServicesEmpty: 'Sit sa a pa ofri okenn sèvis ki limite pou timoun oswa granmoun',
+  otherServicesEmpty: 'Pa gen lòt sèvis yo ofri',
+  ageRange: {
+    category: 'Gwoup laj',
+    adult: 'Granmoun',
+    child: 'Timoun',
+    adults: 'Granmoun',
+    children: 'Timoun yo',
   },
-  "patientType": {
-    "category": "Elijiblite",
-    "patient_type_new": "Nouvo pasyan yo",
-    "patient_type_existing": "Pasyan etabli",
-    "patient_type_existing_only": "Dwe etabli swen nan sit la"
+  patientType: {
+    category: 'Elijiblite',
+    patient_type_new: 'Nouvo pasyan yo',
+    patient_type_existing: 'Pasyan etabli',
+    patient_type_existing_only: 'Dwe etabli swen nan sit la',
   },
-  "visitType": {
-    "category": "Swen Prensipal",
-    "well": "Byen vizite",
-    "sick": "Vizit malad",
-    "sports": "Espò fizik",
-    "prenatal": "Swen prenatal",
-    "women": "Sante fanm",
-    "telehealth": "Telesante",
-    "vaccine": "Vaksen"
+  visitType: {
+    category: 'Swen Prensipal',
+    well: 'Byen vizite',
+    sick: 'Vizit malad',
+    sports: 'Espò fizik',
+    prenatal: 'Swen prenatal',
+    women: 'Sante fanm',
+    telehealth: 'Telesante',
+    vaccine: 'Vaksen',
   },
-  "tests": {
-    "category": "Tès ak D",
-    "noTests": "Sit sa a pa ofri okenn nan tès yo oswa imaj ki nan lis nan filtè yo. Rele pou mande lòt tès oswa imaj.",
-    "blood": "Laboratwa ak san",
-    "sti": "Tès STI",
-    "covid": "Tès COVID",
-    "mammo": "Mamografi",
-    "xray": "radyografi"
+  tests: {
+    category: 'Tès ak D',
+    noTests:
+      'Sit sa a pa ofri okenn nan tès yo oswa imaj ki nan lis nan filtè yo. Rele pou mande lòt tès oswa imaj.',
+    blood: 'Laboratwa ak san',
+    sti: 'Tès STI',
+    covid: 'Tès COVID',
+    mammo: 'Mamografi',
+    xray: 'radyografi',
   },
-  "languages": {
-    "category": "Lang pale pa anplwaye"
+  languages: {
+    category: 'Lang pale pa anplwaye',
   },
-  "specialty": {
-    "category": "Sèvis espesyalite",
-    "mental": "Sante mantal",
-    "dental": "Dantè",
-    "eye": "Swen je",
-    "podiatry": "Poddyatri",
-    "mat": "Tretman ki ede medikaman",
-    "nutrition": "Konsèy sou nitrisyon",
-    "tobacco": "Ede kite tabak",
-    "pharmacy": "Famasi sou plas"
+  specialty: {
+    category: 'Sèvis espesyalite',
+    mental: 'Sante mantal',
+    dental: 'Dantè',
+    eye: 'Swen je',
+    podiatry: 'Poddyatri',
+    mat: 'Tretman ki ede medikaman',
+    nutrition: 'Konsèy sou nitrisyon',
+    tobacco: 'Ede kite tabak',
+    pharmacy: 'Famasi sou plas',
   },
-  "waitTime": {
-    "category": "Tan atant (Swen Prensipal)",
-    "walkIn": "Menm-jou oswa san randevou (vizit malad)",
-    "oneWeekWell": "<1 semèn (byen vizit)",
-    "oneWeekSick": "<1 semèn (vizit malad)",
-    "twoMonths": "<2 mwa (tout swen prensipal)"
+  waitTime: {
+    category: 'Tan atant (Swen Prensipal)',
+    walkIn: 'Menm-jou oswa san randevou (vizit malad)',
+    oneWeekWell: '<1 semèn (byen vizit)',
+    oneWeekSick: '<1 semèn (vizit malad)',
+    twoMonths: '<2 mwa (tout swen prensipal)',
   },
-  "transit": {
-    "bus": "Otobis",
-    "subway": {
-      "label": "Tren",
-      "BSL": "Liy Broad Street (liy zoranj)",
-      "MLF": "Liy Market-Frankford (liy ble)"
+  transit: {
+    bus: 'Otobis',
+    subway: {
+      label: 'Tren',
+      BSL: 'Liy Broad Street (liy zoranj)',
+      MLF: 'Liy Market-Frankford (liy ble)',
     },
-    "regRail": {
-      "label": "tren rejyonal",
-      "AL": "Liy Ayewopò",
-      "CHE": "Chestnut Hill East Line",
-      "CHW": "Chestnut Hill West Line",
-      "CL": "Liy Cynwyd",
-      "FC": "Sou entènèt jwèt Fox Chase liy",
-      "GC": "Glenside Konbine",
-      "LD": "Liy Lansdale/Doylestown",
-      "PM": "Center City rive nan Penn Medicine Station",
-      "MN": "Liy Manayunk/Norristown",
-      "ME": "Media/Elwyn Liy",
-      "PT": "Liy Paoli/Thorndale",
-      "TL": "Trenton liy",
-      "WL": "Liy Warminster",
-      "WTL": "Liy West Trenton",
-      "WN": "Liy Wilmington/Newark",
-      "FR": "Fern Rock rive nan Sant City"
+    regRail: {
+      label: 'tren rejyonal',
+      AL: 'Liy Ayewopò',
+      CHE: 'Chestnut Hill East Line',
+      CHW: 'Chestnut Hill West Line',
+      CL: 'Liy Cynwyd',
+      FC: 'Sou entènèt jwèt Fox Chase liy',
+      GC: 'Glenside Konbine',
+      LD: 'Liy Lansdale/Doylestown',
+      PM: 'Center City rive nan Penn Medicine Station',
+      MN: 'Liy Manayunk/Norristown',
+      ME: 'Media/Elwyn Liy',
+      PT: 'Liy Paoli/Thorndale',
+      TL: 'Trenton liy',
+      WL: 'Liy Warminster',
+      WTL: 'Liy West Trenton',
+      WN: 'Liy Wilmington/Newark',
+      FR: 'Fern Rock rive nan Sant City',
     },
-    "trolley": "Trolley",
-    "car": {
-      "label": "Machin",
-      "OST": "Pakin nan lari ki disponib",
-      "MOST": "Pakin ki mezire nan lari ki disponib",
-      "GP": "Garaj pakin disponib",
-      "FG": "Garaj pakin gratis disponib",
-      "OS": "Pakin sou plas disponib",
-      "FOS": "Gratis sou plas pakin disponib",
-      "RV": "Egzije validation",
-      "PL": "Pakin nan lari ki disponib"
-    }
+    trolley: 'Trolley',
+    car: {
+      label: 'Machin',
+      OST: 'Pakin nan lari ki disponib',
+      MOST: 'Pakin ki mezire nan lari ki disponib',
+      GP: 'Garaj pakin disponib',
+      FG: 'Garaj pakin gratis disponib',
+      OS: 'Pakin sou plas disponib',
+      FOS: 'Gratis sou plas pakin disponib',
+      RV: 'Egzije validation',
+      PL: 'Pakin nan lari ki disponib',
+    },
   },
-  "tooltips": {
-    "well": "Gen ladann fizik travay",
-    "mat": "Medikaman pou maladi itilizasyon opioid",
-    "women": "Gen ladann planifikasyon familyal ak swen jinekolojik"
+  tooltips: {
+    well: 'Gen ladann fizik travay',
+    mat: 'Medikaman pou maladi itilizasyon opioid',
+    women: 'Gen ladann planifikasyon familyal ak swen jinekolojik',
   },
-  "warnings": {
-    "This health center only offers HIV and STD/STI testing and treatment; walk-ins only ": "Sant sante sa a sèlman ofri VIH ak STD/STI tès ak tretman; mache-ins sèlman",
-    "No in-person visits available.": "Pa gen vizit pèsonèl ki disponib.",
-    "This health center only sees people who are living with HIV.": "Sant sante sa a sèlman wè moun k ap viv ak VIH.",
-    "COVID-19 vaccines and testing are available to everyone. For all other services, this health center only sees people who are immigrants, undocumented, or who speak Spanish.": "Vaksen ak tès COVID-19 yo disponib pou tout moun. Pou tout lòt sèvis, sant sante sa a sèlman wè moun ki imigran, ki pa gen papye, oswa ki pale panyòl.",
-    "Telehealth appointments for established patients only. New patient telehealth appointments available only for patients starting Hep C treatment.": "Randevou telehealth pou pasyan etabli sèlman. Nouvo randevou telehealth pasyan ki disponib sèlman pou pasyan ki kòmanse tretman Hep C.",
-    "New patients should call on the first Wednesday of the month to make an appointment.": "Nouvo pasyan yo ta dwe rele nan premye Mèkredi a nan mwa a pou fè yon randevou.",
-    "The pharmacy is currently closed for construction": "Se famasi a kounye a fèmen pou konstriksyon.",
-    "Services only offered for patients ages 14+": "Sèvis yo ofri sèlman pou pasyan ki gen laj 14 +"
+  warnings: {
+    'This health center only offers HIV and STD/STI testing and treatment; walk-ins only ':
+      'Sant sante sa a sèlman ofri VIH ak STD/STI tès ak tretman; mache-ins sèlman',
+    'No in-person visits available.': 'Pa gen vizit pèsonèl ki disponib.',
+    'This health center only sees people who are living with HIV.':
+      'Sant sante sa a sèlman wè moun k ap viv ak VIH.',
+    'COVID-19 vaccines and testing are available to everyone. For all other services, this health center only sees people who are immigrants, undocumented, or who speak Spanish.':
+      'Vaksen ak tès COVID-19 yo disponib pou tout moun. Pou tout lòt sèvis, sant sante sa a sèlman wè moun ki imigran, ki pa gen papye, oswa ki pale panyòl.',
+    'Telehealth appointments for established patients only. New patient telehealth appointments available only for patients starting Hep C treatment.':
+      'Randevou telehealth pou pasyan etabli sèlman. Nouvo randevou telehealth pasyan ki disponib sèlman pou pasyan ki kòmanse tretman Hep C.',
+    'New patients should call on the first Wednesday of the month to make an appointment.':
+      'Nouvo pasyan yo ta dwe rele nan premye Mèkredi a nan mwa a pou fè yon randevou.',
+    'The pharmacy is currently closed for construction':
+      'Se famasi a kounye a fèmen pou konstriksyon.',
+    'Services only offered for patients ages 14+':
+      'Sèvis yo ofri sèlman pou pasyan ki gen laj 14 +',
   },
-  "exceptions": {
-    "Open first and third Saturday of each month": "Louvri premye ak twazyèm samdi nan mwa a",
-    "Patients seen by appointment only from 4:30 p.m. - 8 p.m.": "Pasyan yo wè sou randevou sèlman apati 4:30 pm - 8 pm",
-    "Telehealth visits only": "Vizit telesante sèlman",
-    "On first Wednesday of the month, clinic opens at 1 p.m.": "Premye Mèkredi nan mwa a, klinik ouvè a 1 pm",
-    "Open until 8 p.m. by appointment only ": "Louvri jiska 8 pm sou randevou sèlman",
-    "Closed noon - 1 p.m.": "Fèmen midi - 1 pm",
-    "Closed at noon for lunch": "Fèmen a midi pou manje midi",
-    "Urgent care available from 10:30 a.m. - 2 p.m.": "Swen ijans disponib depi 10:30 a.m. - 2 pm",
-    "On second Friday of the month, clinic closes at 1 p.m.": "Sou dezyèm Vandredi nan mwa a, klinik fèmen nan 1 pm",
-    "On second Saturday of the month, clinic is open from 10 a.m. to 2 p.m. ": "Nan dezyèm Samdi nan mwa a, klinik louvri soti nan 10 am - 2 p.m.",
-    "Patients seen by appointment only until 7:30 p.m. on the first and third Thursdays of the month": "Pasyan yo wè pa randevou sèlman jouk 7:30 p.m. nan premye ak twazyèm jedi yo nan mwa a",
-    "Open first and third Thursday of each month from 5 p.m. - 7:30 p.m. (appointment only)": "Louvri premye ak twazyèm Jedi nan chak mwa soti nan 5 p.m. - 7:30 p.m. (randevou sèlman)",
-    "Open on second Saturday of the month": "Louvri nan dezyèm Samdi nan mwa a",
-    "Telehealth available 5 p.m. - 7 p.m.": "Telehealth disponib 5 p.m. - 7 p.m.",
-    "Closes at noon on the third Thursday of every month, Telehealth available 5 p.m. - 7 p.m.": "Fèmen nan midi nan Jedi a twazyèm nan chak mwa, Telehealth disponib 5 p.m. - 7 p.m.",
-    "Dental available 8:30 a.m. - 1 p.m. every third Saturday": "Dantè ki disponib 8:30 a.m. - 1 p.m. chak twazyèm Samdi",
-    "Open every fourth Saturday of the month for primary care and podiatry": "Louvri chak katriyèm Samdi nan mwa a pou swen prensipal ak podiatriy",
-    "Open 8:30 a.m. - 1 p.m. every second and fourth Saturday of the month": "Louvri 8:30 a.m. - 1 p.m. chak dezyèm ak katriyèm Samdi nan mwa a",
-    "Dental and pediatric services available 8:30 a.m. - 1 p.m. every second and fourth Saturday of the month": "Sèvis dantè ak pedyatrik ki disponib 8:30 a.m. - 1 p.m. chak dezyèm ak katriyèm Samdi nan mwa a",
-    "Open 8:30 a.m. - 12 p.m. every third Friday of the month": "Louvri 8:30 a.m. - 12 p.m. chak twazyèm vandredi nan mwa a",
-    "Open 8:30 a.m. - 12 p.m. every third Saturday of the month": "Louvri 8:30 a.m. - 12 p.m. chak twazyèm Samdi nan mwa a",
-    "On fourth Friday of the month, clinic opens from 10 a.m. - 5 p.m.": "Nan katriyèm Vandredi nan mwa a, klinik ouvè soti nan 10 a.m. - 5 p.m.",
-    "On fourth Friday of the month, clinic opens 10 a.m. - 5 p.m.": "Nan katriyèm Vandredi nan mwa a, klinik ouvè soti nan 10 a.m. - 5 p.m.",
-    "Closed 4 p.m. - 5 p.m.": "Fèmen 4 p.m. - 5 p.m.",
-    "Closes at 1 p.m. every second Friday of the month": "Fèmen nan 1pm chak dezyèm vandredi nan mwa a",
-    "Closes at noon on the third Thursday of every month": "Fèmen nan midi nan Jedi a twazyèm nan chak mwa",
-    "On 2nd and 4th Tuesday of the month, clinic is open from 7:30 a.m. - 8:00 p.m. ": "Sou 2nd ak 4th Madi nan mwa a, klinik la louvri soti nan 7:30 a.m. - 8:00 p.m.",
-    "On 2nd Thursday of the month, clinic is open from 9:00 a.m. - 5:00 p.m.": "Nan 2yèm Jedi a nan mwa a klinik la louvri soti nan 9:00 a.m. - 5:00 p.m.",
-    "On 2nd Friday of the month, clinic is open from 1:30 p.m. - 5:00 p.m.": "Sou Vandredi a 2nd nan mwa a klinik la louvri soti nan 1:30 p.m. - 5:00 p.m.",
-    "On second and fourth Saturday of the month, clinic is open from 8:30 a.m. - 1 p.m. for dental services": "Nan dezyèm ak katriyèm Samdi nan mwa a, klinik se louvri soti nan 8:30 a.m. - 1 p.m. pou sèvis dantè",
-    "Evening telehealth services 5 p.m. - 8 p.m.": "Sèvis telehealth aswè 5 p.m. - 8 p.m.",
-    "Evening telehealth services available 5 p.m. - 8 p.m.": "Sèvis telehealth aswè 5 p.m. - 8 p.m.",
-    "Evening Telehealth service 5 p.m. to 7 p.m.": "Sèvis Telehealth aswè 5 p.m. - 7 p.m.",
-    "Evening telehealth services 5 p.m. - 8 p.m. Open every fourth Saturday of the month for primary care and podiatry": "Sèvis telehealth aswè 5 p.m. - 8 p.m Louvri chak katriyèm Samdi nan mwa a pou swen prensipal ak podiatriy",
-    "On third Thursday of the month, clinic is closed": "Nan twazyèm Jedi nan mwa a, klinik yo fèmen",
-    "On second Friday of the month, clinic closes at noon": "Nan dezyèm vandredi nan mwa a, klinik fèmen nan midi",
-    "Open 5 p.m. - 8 p.m. by appointment only": "Louvri 5 pm a 8 pm pa randevou sèlman",
-    "Select Saturdays by appointment only": "Pa randevou sèlman nan kèk samdi",
-    "Open until 7 p.m. by appointment only ": "Louvri jouk 7pm pa randevou sèlman",
-    "On first and third Thursday of the month, clinic is open until 7:30 p.m.": "Nan premye ak twazyèm Jedi nan mwa a, klinik se louvri jouk 7:30 p.m.",
-    "Evening telehealth services available 5 p.m. - 6 p.m.": "Sèvis telehealth aswè ki disponib 5 p.m. - 6 p.m.",
-    "Dental services available 8:30 a.m. - 1 p.m.": "Sèvis dantè ki disponib 8:30am - 1 p.m.",
-    "Evening telehealth services available 5 p.m. - 7 p.m.": "Sèvis telehealth aswè ki disponib 5 p.m. - 7 p.m.",
-    "Evening telehealth services 5 p.m. to 7 p.m.": "Sèvis telehealth aswè ki disponib 5 p.m. - 7 p.m.",
-    "Open every first and third Saturday of the month": "Louvri chak premye ak twazyèm Samdi nan mwa a",
-    "Medical services are provided Thursday evenings only": "Sèvis medikal yo bay aswè jedi sèlman",
-    "On 2nd and 4th Saturday of the month, clinic is open from 7:00 a.m. - noon": "Sou 2nd ak 4th Samdi nan mwa a, klinik se louvri soti nan 7 a.m. - midi",
-    "Every other Saturday, clinic is open by appointment only": "Chak lòt Samdi, klinik se louvri pa randevou sèlman",
-    "On 2nd and 4th Saturday of the month, clinic is open from 8:30 a.m. - 1 p.m. for dental services": "Sou 2nd ak 4th Samdi nan mwa a, klinik se louvri soti nan 8:30 a.m. - 1 p.m. pou sèvis dantè",
-    "On 1st and 3rd Saturday of the month, clinic is open for dental services": "Sou 1st ak 3rd Samdi nan mwa a, klinik se louvri pou sèvis dantè",
-    "On 2nd Saturday of the month, clinic is open from 10 a.m. - 2 p.m.": "Nan 2nd Samdi nan mwa a, klinik se louvri soti nan 10 a.m. - 2 p.m.",
-    "Telehealth visits only from 9 a.m. - 3 p.m.": "Vizit telehealth sèlman soti nan 9 a.m. - 3 p.m."
+  exceptions: {
+    'Open first and third Saturday of each month': 'Louvri premye ak twazyèm samdi nan mwa a',
+    'Patients seen by appointment only from 4:30 p.m. - 8 p.m.':
+      'Pasyan yo wè sou randevou sèlman apati 4:30 pm - 8 pm',
+    'Telehealth visits only': 'Vizit telesante sèlman',
+    'On first Wednesday of the month, clinic opens at 1 p.m.':
+      'Premye Mèkredi nan mwa a, klinik ouvè a 1 pm',
+    'Open until 8 p.m. by appointment only ': 'Louvri jiska 8 pm sou randevou sèlman',
+    'Closed noon - 1 p.m.': 'Fèmen midi - 1 pm',
+    'Closed at noon for lunch': 'Fèmen a midi pou manje midi',
+    'Urgent care available from 10:30 a.m. - 2 p.m.': 'Swen ijans disponib depi 10:30 a.m. - 2 pm',
+    'On second Friday of the month, clinic closes at 1 p.m.':
+      'Sou dezyèm Vandredi nan mwa a, klinik fèmen nan 1 pm',
+    'On second Saturday of the month, clinic is open from 10 a.m. to 2 p.m. ':
+      'Nan dezyèm Samdi nan mwa a, klinik louvri soti nan 10 am - 2 p.m.',
+    'Patients seen by appointment only until 7:30 p.m. on the first and third Thursdays of the month':
+      'Pasyan yo wè pa randevou sèlman jouk 7:30 p.m. nan premye ak twazyèm jedi yo nan mwa a',
+    'Open first and third Thursday of each month from 5 p.m. - 7:30 p.m. (appointment only)':
+      'Louvri premye ak twazyèm Jedi nan chak mwa soti nan 5 p.m. - 7:30 p.m. (randevou sèlman)',
+    'Open on second Saturday of the month': 'Louvri nan dezyèm Samdi nan mwa a',
+    'Telehealth available 5 p.m. - 7 p.m.': 'Telehealth disponib 5 p.m. - 7 p.m.',
+    'Closes at noon on the third Thursday of every month, Telehealth available 5 p.m. - 7 p.m.':
+      'Fèmen nan midi nan Jedi a twazyèm nan chak mwa, Telehealth disponib 5 p.m. - 7 p.m.',
+    'Dental available 8:30 a.m. - 1 p.m. every third Saturday':
+      'Dantè ki disponib 8:30 a.m. - 1 p.m. chak twazyèm Samdi',
+    'Open every fourth Saturday of the month for primary care and podiatry':
+      'Louvri chak katriyèm Samdi nan mwa a pou swen prensipal ak podiatriy',
+    'Open 8:30 a.m. - 1 p.m. every second and fourth Saturday of the month':
+      'Louvri 8:30 a.m. - 1 p.m. chak dezyèm ak katriyèm Samdi nan mwa a',
+    'Dental and pediatric services available 8:30 a.m. - 1 p.m. every second and fourth Saturday of the month':
+      'Sèvis dantè ak pedyatrik ki disponib 8:30 a.m. - 1 p.m. chak dezyèm ak katriyèm Samdi nan mwa a',
+    'Open 8:30 a.m. - 12 p.m. every third Friday of the month':
+      'Louvri 8:30 a.m. - 12 p.m. chak twazyèm vandredi nan mwa a',
+    'Open 8:30 a.m. - 12 p.m. every third Saturday of the month':
+      'Louvri 8:30 a.m. - 12 p.m. chak twazyèm Samdi nan mwa a',
+    'On fourth Friday of the month, clinic opens from 10 a.m. - 5 p.m.':
+      'Nan katriyèm Vandredi nan mwa a, klinik ouvè soti nan 10 a.m. - 5 p.m.',
+    'On fourth Friday of the month, clinic opens 10 a.m. - 5 p.m.':
+      'Nan katriyèm Vandredi nan mwa a, klinik ouvè soti nan 10 a.m. - 5 p.m.',
+    'Closed 4 p.m. - 5 p.m.': 'Fèmen 4 p.m. - 5 p.m.',
+    'Closes at 1 p.m. every second Friday of the month':
+      'Fèmen nan 1pm chak dezyèm vandredi nan mwa a',
+    'Closes at noon on the third Thursday of every month':
+      'Fèmen nan midi nan Jedi a twazyèm nan chak mwa',
+    'On 2nd and 4th Tuesday of the month, clinic is open from 7:30 a.m. - 8:00 p.m. ':
+      'Sou 2nd ak 4th Madi nan mwa a, klinik la louvri soti nan 7:30 a.m. - 8:00 p.m.',
+    'On 2nd Thursday of the month, clinic is open from 9:00 a.m. - 5:00 p.m.':
+      'Nan 2yèm Jedi a nan mwa a klinik la louvri soti nan 9:00 a.m. - 5:00 p.m.',
+    'On 2nd Friday of the month, clinic is open from 1:30 p.m. - 5:00 p.m.':
+      'Sou Vandredi a 2nd nan mwa a klinik la louvri soti nan 1:30 p.m. - 5:00 p.m.',
+    'On second and fourth Saturday of the month, clinic is open from 8:30 a.m. - 1 p.m. for dental services':
+      'Nan dezyèm ak katriyèm Samdi nan mwa a, klinik se louvri soti nan 8:30 a.m. - 1 p.m. pou sèvis dantè',
+    'Evening telehealth services 5 p.m. - 8 p.m.': 'Sèvis telehealth aswè 5 p.m. - 8 p.m.',
+    'Evening telehealth services available 5 p.m. - 8 p.m.':
+      'Sèvis telehealth aswè 5 p.m. - 8 p.m.',
+    'Evening Telehealth service 5 p.m. to 7 p.m.': 'Sèvis Telehealth aswè 5 p.m. - 7 p.m.',
+    'Evening telehealth services 5 p.m. - 8 p.m. Open every fourth Saturday of the month for primary care and podiatry':
+      'Sèvis telehealth aswè 5 p.m. - 8 p.m Louvri chak katriyèm Samdi nan mwa a pou swen prensipal ak podiatriy',
+    'On third Thursday of the month, clinic is closed':
+      'Nan twazyèm Jedi nan mwa a, klinik yo fèmen',
+    'On second Friday of the month, clinic closes at noon':
+      'Nan dezyèm vandredi nan mwa a, klinik fèmen nan midi',
+    'Open 5 p.m. - 8 p.m. by appointment only': 'Louvri 5 pm a 8 pm pa randevou sèlman',
+    'Select Saturdays by appointment only': 'Pa randevou sèlman nan kèk samdi',
+    'Open until 7 p.m. by appointment only ': 'Louvri jouk 7pm pa randevou sèlman',
+    'On first and third Thursday of the month, clinic is open until 7:30 p.m.':
+      'Nan premye ak twazyèm Jedi nan mwa a, klinik se louvri jouk 7:30 p.m.',
+    'Evening telehealth services available 5 p.m. - 6 p.m.':
+      'Sèvis telehealth aswè ki disponib 5 p.m. - 6 p.m.',
+    'Dental services available 8:30 a.m. - 1 p.m.': 'Sèvis dantè ki disponib 8:30am - 1 p.m.',
+    'Evening telehealth services available 5 p.m. - 7 p.m.':
+      'Sèvis telehealth aswè ki disponib 5 p.m. - 7 p.m.',
+    'Evening telehealth services 5 p.m. to 7 p.m.':
+      'Sèvis telehealth aswè ki disponib 5 p.m. - 7 p.m.',
+    'Open every first and third Saturday of the month':
+      'Louvri chak premye ak twazyèm Samdi nan mwa a',
+    'Medical services are provided Thursday evenings only': 'Sèvis medikal yo bay aswè jedi sèlman',
+    'On 2nd and 4th Saturday of the month, clinic is open from 7:00 a.m. - noon':
+      'Sou 2nd ak 4th Samdi nan mwa a, klinik se louvri soti nan 7 a.m. - midi',
+    'Every other Saturday, clinic is open by appointment only':
+      'Chak lòt Samdi, klinik se louvri pa randevou sèlman',
+    'On 2nd and 4th Saturday of the month, clinic is open from 8:30 a.m. - 1 p.m. for dental services':
+      'Sou 2nd ak 4th Samdi nan mwa a, klinik se louvri soti nan 8:30 a.m. - 1 p.m. pou sèvis dantè',
+    'On 1st and 3rd Saturday of the month, clinic is open for dental services':
+      'Sou 1st ak 3rd Samdi nan mwa a, klinik se louvri pou sèvis dantè',
+    'On 2nd Saturday of the month, clinic is open from 10 a.m. - 2 p.m.':
+      'Nan 2nd Samdi nan mwa a, klinik se louvri soti nan 10 a.m. - 2 p.m.',
+    'Telehealth visits only from 9 a.m. - 3 p.m.':
+      'Vizit telehealth sèlman soti nan 9 a.m. - 3 p.m.',
   },
-  "closed": "Fèmen",
-  "closed*": "Fèmen*",
-  "slidingScaleExplanation": "Sa a se sa ou ka espere peye pou yon vizit medikal regilye. Pri w ap depann de revni w ak gwosè fanmi w.",
-  "share": "Pataje",
-  "results": "rezilta",
-  "outOf": "soti nan",
-  "backToHome": "Retounen nan paj dakèy",
-  "back": "Tounen",
-  "currentLocation": "Kouran kote",
-  "useCurrentLocation": "Sèvi ak aktyèl kote",
-  "searchBar": "Bar rechèch",
-  "searchButton": "Bouton rechèch la",
-  "otherLanguages": "Si w ap chèche pou yon lang diferan, ou ka tape li nan ba rechèch la sou kat jeyografik la",
-  "tableNoData": {
-    "noSpecializedServices": "Sant sante sa a pa ofri okenn sèvis ki limite a timoun oswa granmoun",
-    "noOtherServices": "Sant sante sa a pa ofri okenn lòt sèvis",
-    "noHours": "Pa gen èdtan li te ye pou sant sante sa a"
-  }
+  closed: 'Fèmen',
+  'closed*': 'Fèmen*',
+  slidingScaleExplanation:
+    'Sa a se sa ou ka espere peye pou yon vizit medikal regilye. Pri w ap depann de revni w ak gwosè fanmi w.',
+  share: 'Pataje',
+  results: 'rezilta',
+  outOf: 'soti nan',
+  backToHome: 'Retounen nan paj dakèy',
+  back: 'Tounen',
+  currentLocation: 'Kouran kote',
+  useCurrentLocation: 'Sèvi ak aktyèl kote',
+  searchBar: 'Bar rechèch',
+  searchButton: 'Bouton rechèch la',
+  otherLanguages:
+    'Si w ap chèche pou yon lang diferan, ou ka tape li nan ba rechèch la sou kat jeyografik la',
+  tableNoData: {
+    noSpecializedServices: 'Sant sante sa a pa ofri okenn sèvis ki limite a timoun oswa granmoun',
+    noOtherServices: 'Sant sante sa a pa ofri okenn lòt sèvis',
+    noHours: 'Pa gen èdtan li te ye pou sant sante sa a',
+  },
 }
