@@ -10,7 +10,6 @@ import {
   GeolocationButton,
   BasemapToggle,
 } from '@pinboard/ui'
-import commonCategories from '@/data/common_categories.json'
 import { useReportFinder } from '@/composables/useReportFinder'
 import { serviceTypeIconDefinition } from '@/utils/reportIcon'
 import ReportDetail from '@/components/ReportDetail.vue'
@@ -25,8 +24,6 @@ const searchPlaceholder = 'Search by address or ZIP'
 onMounted(() => {
   void finder.init()
 })
-
-const categoryOptions = commonCategories.map((c) => ({ value: c.title, label: c.title }))
 
 async function onSearch(query: string) {
   const feature = await searchAddress(query)
@@ -46,7 +43,7 @@ async function onSearch(query: string) {
     <template #locations-header>
       <ReportCallout />
       <FilterChips
-        :options="categoryOptions"
+        :options="finder.filterOptions.value"
         :model-value="finder.filter.value"
         @update:model-value="finder.setFilter"
       />

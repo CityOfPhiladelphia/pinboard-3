@@ -94,6 +94,16 @@ vi.mock('@/composables/useNearbyReports', () => ({
           address: 'A',
           distance: 100,
         },
+        {
+          id: '2',
+          caseNumber: '2',
+          lat: 39.96,
+          lng: -75.17,
+          serviceType: 'Graffiti Removal',
+          status: 'Open',
+          address: 'B',
+          distance: 200,
+        },
       ],
     },
     isLoading: { value: false },
@@ -117,7 +127,7 @@ describe('LandingPage', () => {
     const w = mount(LandingPage, { global: { stubs: { RouterLink: RouterLinkStub } } })
     await flushPromises()
     expect(w.find('.pinboard-stub').exists()).toBe(true)
-    expect(w.find('.count').text()).toBe('1')
+    expect(w.find('.count').text()).toBe('2')
     expect(load).toHaveBeenCalled()
   })
 
@@ -132,14 +142,17 @@ describe('LandingPage', () => {
     expect(header.find('.filter-chips').exists()).toBe(true)
   })
 
-  it('FilterChips receives all category options with the initial all-filter selected', async () => {
+  it('FilterChips receives only the service types present in the data, prevalence-sorted', async () => {
     const w = mount(LandingPage, { global: { stubs: globalStubs } })
     await flushPromises()
     const chips = w.find('.header').findAll('button.filter-chips__chip')
-    expect(chips.length).toBeGreaterThanOrEqual(11) // All Filters + one per common category
-    expect(chips[0].text()).toContain('All Filters')
+    // All Filters + one chip per service type in the data; tie on count breaks alphabetically.
+    expect(chips.map((c) => c.text())).toEqual([
+      'All Filters',
+      'Graffiti Removal',
+      'Pothole Repair',
+    ])
     expect(chips[0].attributes('aria-pressed')).toBe('true')
-    expect(chips.map((c) => c.text())).toEqual(expect.arrayContaining(['Pothole Repair']))
   })
 
   it('Pinboard does not receive locationPanelFilter', async () => {
@@ -173,7 +186,7 @@ describe('LandingPage', () => {
   it('selecting a category chip filters the location list; "All Filters" restores it', async () => {
     const w = mount(LandingPage, { global: { stubs: globalStubs } })
     await flushPromises()
-    expect(w.find('.count').text()).toBe('1')
+    expect(w.find('.count').text()).toBe('2')
 
     const chips = w.find('.header').findAll('button.filter-chips__chip')
     const graffitiChip = chips.find((c) => c.text().includes('Graffiti Removal'))
@@ -181,13 +194,13 @@ describe('LandingPage', () => {
     if (!graffitiChip) return
     await graffitiChip.trigger('click')
     await flushPromises()
-    expect(w.find('.count').text()).toBe('0')
+    expect(w.find('.count').text()).toBe('1')
 
     const allFiltersChip = chips.find((c) => c.text().includes('All Filters'))
     expect(allFiltersChip).toBeDefined()
     if (!allFiltersChip) return
     await allFiltersChip.trigger('click')
     await flushPromises()
-    expect(w.find('.count').text()).toBe('1')
+    expect(w.find('.count').text()).toBe('2')
   })
 })
