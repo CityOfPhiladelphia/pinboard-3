@@ -73,34 +73,33 @@ export function useNearbyReports() {
           limit: DEFAULT_LIMIT,
         },
       })
+
       if (!res.ok) {
         error.value = await parseError(res)
         reports.value = []
         return []
-      }
+      };
+
       const result = (await res.json()) as ApiResponse
       const issues = result?.issues ?? []
+
       reports.value = issues.map(
         (i): Report => ({
-          id: i.id,
-          caseNumber: i.caseNumber,
+          ...i,
           lat: i.latitude,
           lng: i.longitude,
-          serviceType: i.serviceType,
-          status: i.status,
-          address: i.address,
           department: i.department ?? undefined,
           mediaUrl: i.mediaUrl ?? undefined,
-          description: i.description,
-          distance: i.distance,
-          createdAt: i.createdAt,
-          updatedAt: i.updatedAt,
+
         }),
-      )
+      );
+
       return reports.value
+
     } catch (err) {
       error.value = err as Error
       reports.value = []
+      
       return []
     } finally {
       isLoading.value = false

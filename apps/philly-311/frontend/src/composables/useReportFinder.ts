@@ -24,7 +24,9 @@ export interface UseReportFinder {
 
 export function useReportFinder(): UseReportFinder {
   const { reports, isLoading, error, load } = useNearbyReports()
+
   const filter = ref('all')
+
   const searchOrUserLocation = ref<PinboardTypes.LatLon>({
     latitude: DEFAULT_CENTER.lat,
     longitude: DEFAULT_CENTER.lng,
@@ -37,6 +39,7 @@ export function useReportFinder(): UseReportFinder {
       filter.value === 'all'
         ? reports.value
         : reports.value.filter((r) => r.serviceType === filter.value)
+        
     return list.map(reportToLocation)
   })
 
