@@ -9,10 +9,16 @@ import {
   BasemapToggle,
   PinboardComposables,
   PinboardUtilities,
+  FilterChoiceGroup,
 } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
-import type { FilterDefinition, FilterValues, PinboardTypes } from '@pinboard/ui'
+import type {
+  FilterDefinition,
+  FilterValues,
+  IFilterSet,
+  PinboardTypes,
+} from '@pinboard/ui'
 import { useLocations } from './composables/useLocations'
 import { LocationCard, LocationDetail } from './components/_index.ts'
 import type { PrimaryCareLocation } from './types'
@@ -104,6 +110,107 @@ const filterDefinitions: FilterDefinition[] = [
   },
 ]
 
+const matchYes = ['Yes']
+const matchYesEstPat = ['Yes', 'Established Patients']
+
+function matchFieldToOptions(
+  item: Record<string, unknown>,
+  fieldName: string,
+  valuesToMatch: unknown[]
+) {
+  return valuesToMatch.includes(item[fieldName])
+}
+
+const a = computed(() => {
+  if (locations.value.length) {
+    console.log(locations.value)
+  const filterLogic: Record<string, IFilterSet> = {
+  filterSet: {
+    operation: '&',
+    childFilters: [
+      new FilterChoiceGroup({
+        data: locations.value,
+        operation: '|',
+        choices: {
+          [filterDefinitions[2].choices?.[0].text ?? 'sameDay']: {
+            dataFields: ['wait_sameday_sick_ad', 'wait_sameday_sick_ch'],
+            matches: matchYes,
+            matchingFunction: matchFieldToOptions,
+          },
+          [filterDefinitions[2].choices?.[1].text ?? 'weekWell']: {
+            dataFields: ['wait_week_well_ad', 'wait_week_well_ch'],
+            matches: matchYes,
+            matchingFunction: matchFieldToOptions,
+          },
+          [filterDefinitions[2].choices?.[2].text ?? 'weekSick']: {
+            dataFields: ['wait_week_sick_ad', 'wait_week_sick_ch'],
+            matches: matchYes,
+            matchingFunction: matchFieldToOptions,
+          },
+          [filterDefinitions[2].choices?.[3].text ?? 'twoMonths']: {
+            dataFields: ['wait_2mo_ad', 'wait_2mo_ch'],
+            matches: matchYes,
+            matchingFunction: matchFieldToOptions,
+          },
+        },
+      }),
+      new FilterChoiceGroup({
+        data: locations.value,
+        operation: '|',
+        choices: {
+          [filterDefinitions[2].choices?.[0].text ?? 'mental']: {
+            dataFields: ['special_mental_ad', 'special_mental_ch'],
+            matches: matchYesEstPat,
+            matchingFunction: matchFieldToOptions,
+          },
+          [filterDefinitions[2].choices?.[1].text ?? 'dental']: {
+            dataFields: ['special_dental_ad', 'special_dental_ch'],
+            matches: matchYesEstPat,
+            matchingFunction: matchFieldToOptions,
+          },
+          [filterDefinitions[2].choices?.[2].text ?? 'eye']: {
+            dataFields: ['special_eye_ad', 'special_eye_ch'],
+            matches: matchYesEstPat,
+            matchingFunction: matchFieldToOptions,
+          },
+          [filterDefinitions[2].choices?.[3].text ?? 'podiatry']: {
+            dataFields: ['special_podiatry'],
+            matches: matchYesEstPat,
+            matchingFunction: matchFieldToOptions,
+          },
+          [filterDefinitions[2].choices?.[3].text ?? 'mat']: {
+            dataFields: ['special_mat'],
+            matches: matchYesEstPat,
+            matchingFunction: matchFieldToOptions,
+          },
+          [filterDefinitions[2].choices?.[3].text ?? 'nutrition']: {
+            dataFields: ['special_nutrition'],
+            matches: matchYesEstPat,
+            matchingFunction: matchFieldToOptions,
+          },
+          [filterDefinitions[2].choices?.[3].text ?? 'tobacco']: {
+            dataFields: ['special_tobacco'],
+            matches: matchYesEstPat,
+            matchingFunction: matchFieldToOptions,
+          },
+          [filterDefinitions[2].choices?.[3].text ?? 'pharmacy']: {
+            dataFields: ['special_pharmacy'],
+            matches: matchYesEstPat,
+            matchingFunction: matchFieldToOptions,
+          },
+        },
+      }),
+    ],
+  },
+}
+return filterLogic
+  }
+
+return null
+})
+
+
+
 // SEAM: data wiring belongs to the teammate. Returns locations unfiltered for now.
 // TODO(teammate): map filterValues → PrimaryCareProperties predicates.
 //   ageGroup   → cross-cutting: match *_ad / *_ch fields per selection
@@ -137,6 +244,7 @@ const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
 })
 
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
+  console.log(a.value)
   let result = applyFilters(locationsWithDistance.value, filterValues.value)
 
   if (searchString.value) {

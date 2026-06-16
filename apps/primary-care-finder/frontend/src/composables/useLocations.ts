@@ -1,28 +1,8 @@
 import { ref, onMounted, type Ref } from 'vue'
-import type { PrimaryCareLocation, PrimaryCareProperties } from '@/types'
+import type { PrimaryCareLocation, PrimaryCareFeature, PrimaryCareResponse } from '@/types'
 
 const ARCGIS_URL =
   'https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/red_PrimaryCare/FeatureServer/0/query'
-
-interface RawFeature {
-  properties: Record<string, unknown>
-  geometry: { type: string; coordinates: [number, number, ...number[]] }
-}
-
-function isVisible(feature: RawFeature): boolean {
-  const props = feature.properties
-
-  // Exclude incomplete records
-  if (props.data_complete !== '2') return false
-
-  // Exclude test records
-  if (['3', '5', '6', '7', '8', '9'].includes(props.record as string)) return false
-
-  // Exclude test addresses
-  if (props.address === 'Test') return false
-
-  return true
-}
 
 export function useLocations(): {
   locations: Ref<PrimaryCareLocation[]>
@@ -38,7 +18,7 @@ export function useLocations(): {
   async function fetchLocations() {
     try {
       const params = new URLSearchParams({
-        where: '1=1',
+        where: "data_complete=2 AND record<>'test'",
         outFields: '*',
         f: 'geojson',
       })
@@ -50,32 +30,27 @@ export function useLocations(): {
         return
       }
 
-      const rawGeojson = await response.json()
-      const filteredFeatures = rawGeojson.features.filter(isVisible)
+      const rawGeojson = (await response.json()) as PrimaryCareResponse
 
-      locations.value = filteredFeatures.map(
-        (feature: RawFeature) =>
-          ({
-            id: String(feature.properties.objectid),
-            name: String(feature.properties.record ?? feature.properties.address ?? ''),
-            latitude: feature.geometry.coordinates[1],
-            longitude: feature.geometry.coordinates[0],
-            properties: feature.properties as PrimaryCareProperties,
-            geometry: feature.geometry,
-            locationCardInfo: {
-              heading: String(feature.properties.record ?? feature.properties.address ?? ''),
-              body: String(feature.properties.address ?? ''),
-            },
-          }) satisfies PrimaryCareLocation
-      )
+      locations.value = rawGeojson.features.map((feature) => ({
+        id: String(feature.properties.objectid),
+        name: String(feature.properties.record ?? feature.properties.address ?? ''),
+        latitude: feature.geometry.coordinates[1],
+        longitude: feature.geometry.coordinates[0],
+        properties: feature.properties,
+        locationCardInfo: {
+          heading: String(feature.properties.record ?? feature.properties.address ?? ''),
+          body: String(feature.properties.address ?? ''),
+        },
+      }))
 
       geojson.value = {
-        type: 'FeatureCollection' as const,
-        features: filteredFeatures.map((f: RawFeature) => ({
+        type: 'FeatureCollection',
+        features: rawGeojson.features.map((f) => ({
           ...f,
           properties: { ...f.properties, id: String(f.properties.objectid) },
         })),
-      }
+      } as const
     } catch {
       errorMessage.value = 'Error retrieving primary care sites'
     } finally {

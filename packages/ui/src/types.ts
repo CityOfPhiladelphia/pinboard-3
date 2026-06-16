@@ -2,7 +2,6 @@
 import type { MapCardProps } from '@phila/phila-ui-cards'
 
 export type Latitude = number
-
 export type Longitude = number
 
 export type LongitudeLatitude = [Longitude, Latitude]
@@ -57,11 +56,11 @@ export interface AlertBanner {
   message: string
 }
 
-export type BasicLocation = {
+export interface BasicLocation extends LatLon {
   id: string
   name: string
   locationCardInfo: MapCardProps
-} & LatLon
+}
 
 export interface LocationFilterOption {
   readonly value: string
@@ -78,3 +77,28 @@ export interface MenuOption {
 export type SortLocationsOptions = Record<string, string>
 
 export type ProxyAutocompleteResult = string[]
+
+export interface CartoResponse {
+  rows: [
+    {
+      cartodb_id: number
+      the_geom: string
+      the_geom_webmercator: string
+      objectid: number
+      [x: string]: unknown
+    },
+  ]
+}
+export interface ArcgisFeature {
+  type: string
+  id: number
+  geometry: {
+    type: string
+    coordinates: LongitudeLatitude
+  }
+  properties: unknown
+}
+export interface ArcgisResponse {
+  type: string
+  features: ArcgisFeature[]
+}

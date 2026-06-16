@@ -1,11 +1,15 @@
 import type { PinboardTypes } from '@pinboard/ui'
 
-export interface PrimaryCareLocationInfo {
+export type PrimaryCareLocation = PinboardTypes.BasicLocation &
+  Pick<PinboardTypes.ArcgisFeature, 'properties'>
+
+export interface PrimaryCareFeature extends PinboardTypes.ArcgisFeature {
   properties: PrimaryCareProperties
-  geometry: { type: string; coordinates: [number, number, ...number[]] }
 }
 
-export type PrimaryCareLocation = PinboardTypes.BasicLocation & PrimaryCareLocationInfo
+export interface PrimaryCareResponse extends PinboardTypes.ArcgisResponse {
+  features: PrimaryCareFeature[]
+}
 
 export interface PrimaryCareProperties {
   objectid: number
@@ -91,6 +95,4 @@ export interface PrimaryCareProperties {
   hours_sun_start: string | null
   hours_sun_end: string | null
   hours_sun_exceptions: string | null
-
-  [key: string]: unknown
 }

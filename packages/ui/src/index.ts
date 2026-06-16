@@ -4,6 +4,15 @@ export * as PinboardComposables from './composables/_index'
 export * as PinboardUtilities from './utilities/_index'
 export { createPinboard } from './plugin'
 export type * as PinboardTypes from './types'
+export {
+  type BitWiseOperation,
+  type MatchingFunction,
+  type IFilterChoiceGroup,
+  type IFilterSet,
+  FilterChoiceGroup,
+  FilterSet,
+} from './composables/datafilters/types'
+export type * as PinboardFilterTypes from './composables/datafilters/types'
 
 // Re-export map-core layer components so apps use the same MapLibre instance as PhilaMap
 export {
