@@ -3,13 +3,19 @@ import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader } from '@phila/phila-ui-app-header'
 import MobileNavPanel from './MobileNavPanel.vue'
 import type { VNode } from 'vue'
-import type { NavbarBrandProps } from '@phila/phila-ui-app-header'
+import type { NavbarBrandProps, Language } from '@phila/phila-ui-app-header'
 
 defineProps<{
   title: string
   logo?: NavbarBrandProps['logo']
   bannerTitle?: string
   bannerMessage?: string
+  languages?: Language[]
+  locale?: string
+}>()
+
+const emit = defineEmits<{
+  'update:locale': [code: string]
 }>()
 
 defineSlots<{
@@ -34,6 +40,9 @@ defineSlots<{
       }"
       :banner-title="bannerTitle"
       :banner-message="bannerMessage"
+      :languages="languages"
+      :locale="locale"
+      @update:locale="emit('update:locale', $event)"
     >
       <!-- Suppress AppHeader's default search button: it renders by default but opens an
            empty panel since we don't wire up search. Temporary until the upstream fix

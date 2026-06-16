@@ -1,7 +1,6 @@
 import './styles/global.css'
 import PinboardShell from './components/PinboardShell.vue'
 import PinboardBody from './components/PinboardBody.vue'
-import LanguageSwitcher from './components/LanguageSwitcher.vue'
 export * as PinboardComposables from './composables/_index'
 export * as PinboardUtilities from './utilities/_index'
 export { createPinboard } from './plugin'
@@ -24,7 +23,7 @@ export {
 export type { LegendItem } from '@phila/phila-ui-map-core'
 
 export { NavbarInfo } from '@phila/phila-ui-app-header'
-export { PinboardShell, PinboardBody, LanguageSwitcher }
+export { PinboardShell, PinboardBody }
 
 export type { FilterDefinition, FilterValues, FilterChoice } from '@phila/phila-ui-core'
 

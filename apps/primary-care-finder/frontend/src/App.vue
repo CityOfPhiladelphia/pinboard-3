@@ -9,7 +9,6 @@ import {
   BasemapToggle,
   PinboardComposables,
   PinboardUtilities,
-  LanguageSwitcher,
   languages,
 } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
@@ -193,11 +192,10 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
       href: '/',
     }"
     :info-title="t('app.aboutTitle')"
+    :languages="languages"
+    :locale="locale"
+    @update:locale="setLocale"
   >
-    <template #navbar-end>
-      <LanguageSwitcher :languages="languages" :locale="locale" @update:locale="setLocale" />
-    </template>
-
     <template #info-body>
       <span class="has-text-body-small">{{ t('app.aboutBody') }}</span>
     </template>
