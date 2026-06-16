@@ -72,7 +72,7 @@ watch(id, () => {
         This article doesn't have any content yet.
         <RouterLink to="/answers">Browse other answers</RouterLink>.
       </p>
-      <PillButton variant="primary" to="/report" data-test="answer-cta">Start a report &rarr;</PillButton>
+      <PillButton variant="primary" to="/report" class="answer-detail__cta" data-test="answer-cta">Start a report &rarr;</PillButton>
     </article>
   </main>
 </template>
@@ -91,5 +91,8 @@ watch(id, () => {
 }
 .answer-detail__status {
   margin: var(--spacing-m, 1rem) 0;
+}
+.answer-detail__cta {
+  margin: var(--spacing-l, 1.5rem) 0;
 }
 </style>

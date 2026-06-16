@@ -106,6 +106,7 @@ onMounted(loadInitial)
       v-if="nextPageToken && !isSearching"
       variant="outline"
       type="button"
+      class="answers__more"
       :disabled="isLoading"
       data-test="answers-more"
       @click="loadMore"
@@ -126,6 +127,9 @@ onMounted(loadInitial)
 .answers__crumb {
   font-size: 0.875rem;
   margin-bottom: var(--spacing-s, 0.75rem);
+}
+.answers__more {
+  margin: var(--spacing-l, 1.5rem) 0;
 }
 .answers__intro {
   margin-bottom: var(--spacing-m, 1rem);

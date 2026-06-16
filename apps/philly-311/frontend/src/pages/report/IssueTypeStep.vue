@@ -60,7 +60,7 @@ function change() {
     <p v-if="isLoading && !catalog.length" class="issue-step__status">Loading issue types…</p>
     <p v-else-if="error" class="issue-step__error" role="alert">
       {{ error.message || 'Could not load issue types.' }}
-      <PillButton variant="outline" data-test="retry-types" @click="retry">Retry</PillButton>
+      <PillButton variant="outline" class="issue-step__retry" data-test="retry-types" @click="retry">Retry</PillButton>
     </p>
 
     <template v-else-if="!store.category">
@@ -118,6 +118,9 @@ function change() {
   font-weight: 400;
   color: var(--ui-color-grey-700, #4a4a4a);
   font-size: 1rem;
+}
+.issue-step__retry {
+  margin-left: var(--spacing-s, 0.75rem);
 }
 .issue-step__photo-band {
   display: grid;
