@@ -5,6 +5,7 @@
 import { ref, type Ref } from 'vue'
 import { api311Fetch } from './api311'
 import { parseError } from './useApiError'
+import { DEFAULT_RADIUS } from '@/utils/geoDefaults'
 
 export interface Report {
   /** 8-digit Salesforce CaseNumber. Use this as the path param on /issues/:id. */
@@ -30,7 +31,6 @@ export interface Region {
   radius?: number
 }
 
-const DEFAULT_RADIUS = 1600
 const DEFAULT_LIMIT = 50
 
 interface ApiNearbyIssue {

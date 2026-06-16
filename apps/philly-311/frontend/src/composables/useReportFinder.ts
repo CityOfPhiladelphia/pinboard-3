@@ -6,9 +6,7 @@ import type { PinboardTypes } from '@pinboard/ui'
 import { useNearbyReports, type Report } from '@/composables/useNearbyReports'
 import { getCurrentPosition } from '@/composables/useGeolocation'
 import { reportToLocation } from '@/utils/reportCard'
-
-const DEFAULT_CENTER = { lat: 39.9526, lng: -75.1652 }
-const DEFAULT_RADIUS = 1600
+import { DEFAULT_CENTER, DEFAULT_RADIUS } from '@/utils/geoDefaults'
 
 export interface UseReportFinder {
   locations: ComputedRef<PinboardTypes.BasicLocation[]>
