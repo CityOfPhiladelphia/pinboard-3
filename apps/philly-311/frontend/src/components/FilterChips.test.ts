@@ -1,6 +1,6 @@
 // ABOUTME: Tests for FilterChips — leading All Filters chip, icon chips, selection
 // ABOUTME: emit + aria-pressed, and the overflow scroll chevron.
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import FilterChips from './FilterChips.vue'
 
@@ -8,6 +8,21 @@ const OPTIONS = [
   { value: 'Pothole Repair', label: 'Pothole Repair' },
   { value: 'Graffiti Removal', label: 'Graffiti Removal' },
 ]
+
+let triggerResize: () => void = () => {}
+
+beforeEach(() => {
+  triggerResize = () => {}
+  vi.stubGlobal('ResizeObserver', class {
+    constructor(cb: () => void) {
+      triggerResize = cb
+    }
+    observe = vi.fn()
+    disconnect = vi.fn()
+  })
+})
+
+afterEach(() => vi.unstubAllGlobals())
 
 function mountChips(modelValue = 'all') {
   return mount(FilterChips, {
@@ -51,7 +66,7 @@ describe('FilterChips', () => {
   it('hides the scroll chevron when the row does not overflow', async () => {
     const w = mountChips()
     setOverflow(w, false)
-    window.dispatchEvent(new Event('resize'))
+    triggerResize()
     await w.vm.$nextTick()
     expect(w.find('.filter-chips__scroll').exists()).toBe(false)
   })
@@ -59,7 +74,7 @@ describe('FilterChips', () => {
   it('shows the chevron when overflowing and scrolls the row on click', async () => {
     const w = mountChips()
     setOverflow(w, true)
-    window.dispatchEvent(new Event('resize'))
+    triggerResize()
     await w.vm.$nextTick()
     const row = w.find('.filter-chips__row').element as HTMLElement
     row.scrollBy = vi.fn()
@@ -70,7 +85,7 @@ describe('FilterChips', () => {
   it('recomputes overflow when options change', async () => {
     const w = mountChips()
     setOverflow(w, false)
-    window.dispatchEvent(new Event('resize'))
+    triggerResize()
     await w.vm.$nextTick()
     expect(w.find('.filter-chips__scroll').exists()).toBe(false)
 
@@ -94,5 +109,18 @@ describe('FilterChips', () => {
     const unselectedIcon = chips[2].find('font-awesome-icon-stub')
     expect(selectedIcon.attributes('style')).toMatch(/rgb\(255, 255, 255\)/)
     expect(unselectedIcon.attributes('style')).not.toMatch(/rgb\(255, 255, 255\)/)
+  })
+
+  it('observes the row with a ResizeObserver and disconnects on unmount', () => {
+    const observe = vi.fn()
+    const disconnect = vi.fn()
+    vi.stubGlobal('ResizeObserver', class {
+      observe = observe
+      disconnect = disconnect
+    })
+    const w = mount(FilterChips, { props: { options: [], modelValue: 'all' } })
+    expect(observe).toHaveBeenCalledTimes(1)
+    w.unmount()
+    expect(disconnect).toHaveBeenCalledTimes(1)
   })
 })

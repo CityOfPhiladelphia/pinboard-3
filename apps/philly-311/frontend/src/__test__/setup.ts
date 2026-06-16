@@ -4,6 +4,17 @@
 import { vi } from 'vitest'
 import { defineComponent, h, ref, computed } from 'vue'
 
+// ResizeObserver is not implemented in jsdom; stub it so components that observe
+// DOM elements don't throw in tests.
+vi.stubGlobal(
+  'ResizeObserver',
+  class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  },
+)
+
 vi.stubEnv('VITE_API_BASE_URL', 'https://api.example.test')
 vi.stubEnv('VITE_API_KEY', 'test-api-key')
 vi.stubEnv('VITE_SSO_CLIENT_ID', 'test-client')

@@ -27,11 +27,16 @@ function scrollRight() {
   row.scrollBy({ left: Math.round(row.clientWidth * 0.8), behavior: 'smooth' })
 }
 
+let observer: ResizeObserver | null = null
+
 onMounted(() => {
   updateOverflow()
-  window.addEventListener('resize', updateOverflow)
+  if (rowRef.value) {
+    observer = new ResizeObserver(() => updateOverflow())
+    observer.observe(rowRef.value)
+  }
 })
-onBeforeUnmount(() => window.removeEventListener('resize', updateOverflow))
+onBeforeUnmount(() => observer?.disconnect())
 watch(() => props.options, () => nextTick(updateOverflow), { deep: true })
 </script>
 
