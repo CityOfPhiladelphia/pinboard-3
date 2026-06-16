@@ -38,7 +38,7 @@ export function useReportFinder(): UseReportFinder {
       filter.value === 'all'
         ? reports.value
         : reports.value.filter((r) => r.serviceType === filter.value)
-        
+
     return list.map(reportToLocation)
   })
 
