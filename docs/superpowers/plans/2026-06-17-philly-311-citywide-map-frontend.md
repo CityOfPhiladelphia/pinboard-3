@@ -21,7 +21,8 @@
 
 | File | Responsibility | Change |
 |---|---|---|
-| `src/utils/geoDefaults.ts` | geo seed defaults + Philly bounds + city-wide radius | Modify |
+| `src/utils/geoDefaults.ts` | geo seed defaults + city-wide radius | Modify |
+| `src/composables/useMapBounds.ts` | existing `PHILLY_MAP_BOUNDS` reused for finder maxBounds | Reuse (no change) |
 | `src/composables/useNearbyReports.ts` | one paginated fetch of the issues endpoint | Modify |
 | `src/stores/openIssues.ts` | canonical dataset + progressive load + cache lifecycle | Create |
 | `src/composables/useReportFinder.ts` | adapt to read the store; seed; filter options | Modify |
@@ -35,22 +36,20 @@
 
 ---
 
-### Task 1: Philly bounds + city-wide radius constants
+### Task 1: City-wide radius constant (reuse existing Philly bounds)
+
+**Do NOT create a new Philly bounding box.** One already exists:
+`src/composables/useMapBounds.ts` exports `PHILLY_MAP_BOUNDS` (`[[-75.32, 39.83], [-74.92, 40.16]]`), deliberately padded to the CityBasemap tile cache (outside it the map 404s on tiles) and already used by the wizard pin map via `useMapBounds()`. Reuse that exact constant for the finder map's `maxBounds` (Task 5) so both maps share one pan limit and the tile-cache padding is preserved. This task only adds the city-wide radius.
 
 **Files:** Modify `src/utils/geoDefaults.ts`; Test `src/utils/__tests__/geoDefaults.test.ts` (create if absent).
 
-- [ ] **Step 1: Add constants** (keep existing `DEFAULT_CENTER`, `DEFAULT_RADIUS`):
+- [ ] **Step 1:** add to `geoDefaults.ts` (keep existing `DEFAULT_CENTER`, `DEFAULT_RADIUS`):
 ```ts
-// Philadelphia bounding box (mirrors the API's PHILLY_BOUNDS) as [[west,south],[east,north]].
-export const PHILLY_BOUNDS: [[number, number], [number, number]] = [
-  [-75.28, 39.86],
-  [-74.95, 40.14],
-]
 // Radius (meters) that covers the whole city from any in-bounds anchor — matches the API's raised MAX_RADIUS.
 export const CITYWIDE_RADIUS = 60000
 ```
-- [ ] **Step 2:** trivial test asserting bounds order (west<east, south<north) and `CITYWIDE_RADIUS === 60000`. Run `npx vitest run geoDefaults` → PASS.
-- [ ] **Step 3: Commit** `feat(philly-311): Philly bounds + city-wide radius constants`.
+- [ ] **Step 2:** trivial test asserting `CITYWIDE_RADIUS === 60000`. Run `npx vitest run geoDefaults` → PASS.
+- [ ] **Step 3: Commit** `feat(philly-311): city-wide seed radius constant`.
 
 ---
 
@@ -102,7 +101,7 @@ State: `reports: Report[]`, `byId: Map<string,Report>` (dedup), `seed: {lat,lng}
 
 - [ ] **Step 1 — expose the real map (packages/ui, additive):** in `MapPanel.vue` `slotProps`, replace `map: null as unknown` with the live instance: `map: (mapRef.value as any)?.map ?? null`. This is backward compatible (consumers got `null` before). Confirm `oem-flood-finder` still builds.
 - [ ] **Step 2 — minZoom (app config):** in `main.ts` `createPinboard({ map: {...} })`, add `minZoom: 10.5` (tunable) and keep existing `center`/`zoom`/`mobile`. (`MapConfig` already supports `minZoom`.)
-- [ ] **Step 3 — maxBounds (app, via exposed map):** in `LandingPage.vue`'s `#map-content` slot, when `map` is available (watch/`onMounted` within the slot scope), call `map.setMaxBounds(PHILLY_BOUNDS)` once. Verify `minZoom` actually reaches MapLibre; if `@phila/phila-ui-map-core` doesn't forward `minZoom` from config, also call `map.setMinZoom(10.5)` here (note which path worked).
+- [ ] **Step 3 — maxBounds (app, via exposed map):** add `map` to LandingPage's `#map-content` slot destructure (lines ~69-78 currently omit it). Reuse the **existing** `PHILLY_MAP_BOUNDS` from `@/composables/useMapBounds` (do NOT define a new box — see Task 1). When the exposed `map` becomes available (watch the slot's `map` prop; it's null until the MapLibre instance exists), call `map.setMaxBounds(PHILLY_MAP_BOUNDS)` once. Note: the existing `useMapBounds()` composable isn't a drop-in here — it expects a phila-ui-map-core `<Map>` *component* ref (reads `.map`/`.isLoaded` via `readExposed`), whereas the slot exposes the raw MapLibre instance — so call `setMaxBounds` directly, but share the constant. Verify `minZoom` actually reaches MapLibre; if `@phila/phila-ui-map-core` doesn't forward `minZoom` from config, also call `map.setMinZoom(10.5)` here (note which path worked).
 - [ ] **Step 4:** `npm run type-check` clean; commit `feat(philly-311): expose map instance; cap zoom + maxBounds to Philly`. Final minZoom value tuned in Task 6.
 
 ---
