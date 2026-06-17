@@ -1,4 +1,5 @@
 // ABOUTME: App entry point: install Pinia, sso-vue plugin, Router, then mount.
+import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

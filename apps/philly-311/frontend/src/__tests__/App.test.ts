@@ -1,5 +1,5 @@
-// ABOUTME: Tests for App — Answers entry points passed into PinboardShell's
-// ABOUTME: navbar-end and mobile-nav slots.
+// ABOUTME: Tests for App — Answers navbar-end entry and the phila .content
+// ABOUTME: wrapper around routed pages.
 import { describe, it, expect, vi } from 'vitest'
 import { defineComponent, h } from 'vue'
 import { mount, RouterLinkStub } from '@vue/test-utils'
@@ -34,11 +34,14 @@ describe('App', () => {
     expect(link.text()).toBe('Answers')
   })
 
-  it('puts an Answers link in the mobile-nav slot', () => {
+  it('does not populate the mobile-nav slot, so no burger menu renders', () => {
     const w = mountApp()
-    const link = w.find('[data-test="mobile-nav"]').findComponent(RouterLinkStub)
-    expect(link.exists()).toBe(true)
-    expect(link.props('to')).toBe('/answers')
-    expect(link.text()).toBe('Answers')
+    const mobileNav = w.find('[data-test="mobile-nav"]')
+    expect(mobileNav.findComponent(RouterLinkStub).exists()).toBe(false)
+  })
+
+  it('wraps routed pages in a phila .content region', () => {
+    const w = mountApp()
+    expect(w.find('.content.app-content').exists()).toBe(true)
   })
 })

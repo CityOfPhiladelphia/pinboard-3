@@ -1,5 +1,5 @@
-<!-- ABOUTME: Root component. Wraps every route in PinboardShell chrome and
-     surfaces the Answers entry in the navbar and mobile nav. -->
+<!-- ABOUTME: Root component. Wraps every route in PinboardShell chrome inside a
+     phila .content region and surfaces the Answers entry in the navbar. -->
 <script setup lang="ts">
 import { PinboardShell } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
@@ -20,14 +20,19 @@ import '@/assets/a11y.css'
     <template #navbar-end>
       <RouterLink class="navbar-answers" to="/answers">Answers</RouterLink>
     </template>
-    <template #mobile-nav>
-      <RouterLink to="/answers">Answers</RouterLink>
-    </template>
-    <RouterView />
+    <div class="content app-content">
+      <RouterView />
+    </div>
   </PinboardShell>
 </template>
 
 <style scoped>
+/* Pass-through wrapper: applies phila .content typography to routed pages
+   without introducing a layout box that would break the full-height map. */
+.app-content {
+  display: contents;
+}
+
 .navbar-answers {
   color: #fff;
   font-weight: 600;
