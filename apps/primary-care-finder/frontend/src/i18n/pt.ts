@@ -1,9 +1,32 @@
 export default {
   app: {
     title: 'Localizador de cuidados primários',
+    name: 'Localizador de cuidados primários',
     subtitle: 'Assistência médica gratuita e de baixo custo na Filadélfia',
     noResults:
       'Nenhum centro de saúde encontrado. Verifique a ortografia, ou remova alguns dos filtros, e tente novamente.',
+  },
+  searchPlaceholder: 'Pesquise por endereço ou palavra-chave...',
+  filters: {
+    sort: 'Ordenar por',
+    distance: 'Distância',
+    name: 'Alfabeticamente',
+    ageGroup: 'Faixa etária',
+    adult: 'Adulto',
+    children: 'Crianças',
+    waitTime: 'Tempo de espera (Cuidados primários)',
+    weekWell: '<1 semana (check-up)',
+    weekSick: '<1 semana (acompanhamento)',
+    twoMonths: '<2 meses (todos os cuidados primários)',
+    specialty: 'Serviços especializados',
+    mental: 'Saúde mental',
+    dental: 'Saúde oral',
+    eye: 'Cuidados oftalmológicos',
+    podiatry: 'Podologia',
+    tests: 'Testes e imagens',
+    mammo: 'Mamografia',
+    xray: 'Raio X',
+    languages: 'Idiomas falados pela equipe',
   },
   introPage: {
     section1Title: 'Encontre serviços primários gratuitos ou de baixo custo',

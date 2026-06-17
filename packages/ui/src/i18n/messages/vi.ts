@@ -10,5 +10,12 @@ export default {
     sortShareLocation: 'Share your location to sort by distance',
     reset: 'Reset',
     apply: 'Apply',
+    footer: {
+      termsOfUse: 'Điều khoản sử dụng',
+      rightToKnow: 'Quyền được biết',
+      privacyPolicy: 'Chính sách bảo mật',
+      accessibility: 'Khả năng tiếp cận',
+      feedback: 'Ý kiến phản hồi',
+    },
   },
 }

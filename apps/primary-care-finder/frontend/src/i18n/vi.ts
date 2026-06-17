@@ -1,9 +1,32 @@
 export default {
   app: {
     title: 'Công cụ tìm nhà cung cấp chăm sóc sức khoẻ ban đầu',
+    name: 'Công cụ tìm nhà cung cấp chăm sóc sức khoẻ ban đầu',
     subtitle: 'Phúc lợi y tế miễn phí và chi phí thấp tại Philadelphia',
     noResults:
       'Không có trung tâm y tế nào được tìm thấy. Vui lòng kiểm tra lỗi chính tả hoặc xoá một số bộ lọc tìm kiếm, và thử lại.',
+  },
+  searchPlaceholder: 'Tìm kiếm theo địa chỉ hoặc từ khóa...',
+  filters: {
+    sort: 'Sắp xếp theo',
+    distance: 'Khoảng cách',
+    name: 'Theo thứ tự bảng chữ cái',
+    ageGroup: 'Nhóm tuổi',
+    adult: 'Người lớn',
+    children: 'Nhiều trẻ em',
+    waitTime: 'Thời gian chờ (Chăm sóc sức khoẻ ban đầu)',
+    weekWell: '<1 tuần (khám sức khoẻ định kỳ)',
+    weekSick: '<1 week (khám bệnh)',
+    twoMonths: '<2 tháng (tất cả dịch vụ chăm sóc sức khoẻ ban đầu)',
+    specialty: 'Dịch vụ chuyên khoa',
+    mental: 'Sức khoẻ tâm lý',
+    dental: 'Răng miệng',
+    eye: 'Chăm sóc mắt',
+    podiatry: 'Chuyên khoa chân',
+    tests: 'Xét nghiệm và kết quả xét nghiệm',
+    mammo: 'Chụp X quang tuyến vú',
+    xray: 'Chụp X quang',
+    languages: 'Ngôn ngữ được sử dụng',
   },
   introPage: {
     section1Title: 'Tìm kiếm nhà cung cấp chăm sóc sức khoẻ ban đầu miễn phí hoặc chi phí thấp',

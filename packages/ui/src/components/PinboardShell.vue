@@ -2,6 +2,7 @@
 import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader } from '@phila/phila-ui-app-header'
 import MobileNavPanel from './MobileNavPanel.vue'
+import PinboardSubFooter from './PinboardSubFooter.vue'
 import type { VNode } from 'vue'
 import type { NavbarBrandProps, Language } from '@phila/phila-ui-app-header'
 
@@ -12,6 +13,7 @@ defineProps<{
   bannerMessage?: string
   languages?: Language[]
   locale?: string
+  feedbackHref?: string
 }>()
 
 const emit = defineEmits<{
@@ -74,8 +76,10 @@ defineSlots<{
     </main>
 
     <AppFooter :sub-footer-only="true">
-      <template v-if="$slots['sub-footer']" #subFooterSlot>
-        <slot name="sub-footer" />
+      <template #subFooterSlot>
+        <slot name="sub-footer">
+          <PinboardSubFooter :feedback-href="feedbackHref" />
+        </slot>
       </template>
     </AppFooter>
   </div>

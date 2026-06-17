@@ -27,6 +27,9 @@ init()
 
 const searchPlaceholderText = computed(() => t('searchPlaceholder'))
 
+const feedbackHref =
+  'https://www.phila.gov/departments/department-of-public-health/about-us/contact-us/#send-us-a-message'
+
 const { locations, isLoading, errorMessage, geojson } = useLocations()
 // Location is requested only when the user clicks the geolocation button, which
 // emits to handleGeolocate. The shared useUserLocation composable prompts on load,
@@ -194,6 +197,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
     :info-title="t('app.aboutTitle')"
     :languages="languages"
     :locale="locale"
+    :feedback-href="feedbackHref"
     @update:locale="setLocale"
   >
     <template #info-body>

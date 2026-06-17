@@ -1,9 +1,32 @@
 export default {
   app: {
     title: 'Buscador de atención primaria',
+    name: 'Buscador de atención primaria',
     subtitle: 'Atención médica gratuita y de bajo costo en Filadelfia',
     noResults:
       'No se encontraron centros de salud. Verifique la ortografía o elimine algunos de los filtros e inténtelo nuevamente.',
+  },
+  searchPlaceholder: 'Buscar por dirección o palabra clave...',
+  filters: {
+    ageGroup: 'Grupo etario',
+    adult: 'Adulto',
+    children: 'Niños',
+    waitTime: 'Tiempo de espera (atención primaria)',
+    weekWell: '<1 semana (consulta preventiva)',
+    weekSick: '<1 semana (consulta por enfermedad)',
+    twoMonths: '<2 meses (atención primaria completa)',
+    specialty: 'Especialidades',
+    mental: 'Salud mental',
+    dental: 'Odontología',
+    eye: 'Oftalmología',
+    podiatry: 'Podiatría',
+    tests: 'Exámenes y estudios por imágenes',
+    mammo: 'Mamografías',
+    xray: 'Radiografías',
+    languages: 'Idiomas que habla el personal',
+    sort: 'Ordenar por',
+    distance: 'Distancia',
+    name: 'Alfabéticamente',
   },
   introPage: {
     section1Title: 'Hallar atención médica gratuita o de bajo costo',

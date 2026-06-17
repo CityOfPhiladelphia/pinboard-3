@@ -10,5 +10,12 @@ export default {
     sortShareLocation: 'Share your location to sort by distance',
     reset: 'Reset',
     apply: 'Apply',
+    footer: {
+      termsOfUse: 'Términos de uso',
+      rightToKnow: 'Derecho a saber',
+      privacyPolicy: 'Política de privacidad',
+      accessibility: 'Accesibilidad',
+      feedback: 'Comentarios',
+    },
   },
 }

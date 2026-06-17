@@ -10,5 +10,12 @@ export default {
     sortShareLocation: 'Share your location to sort by distance',
     reset: 'Reset',
     apply: 'Apply',
+    footer: {
+      termsOfUse: '使用条款',
+      rightToKnow: '知情权',
+      privacyPolicy: '隐私政策',
+      accessibility: '无障碍',
+      feedback: '反馈',
+    },
   },
 }

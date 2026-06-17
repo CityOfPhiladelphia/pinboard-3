@@ -1,9 +1,32 @@
 export default {
   app: {
     title: 'Mtambuzi wa huduma ya msingi',
+    name: 'Mtambuzi wa huduma ya msingi',
     subtitle: 'Huduma ya matibabu ya bure na ya bei ya chini huko Philadelphia',
     noResults:
       'Hakuna vituo vya afya vilivyopatikana. Tafadhali angalia kosa la herufi au uondoe baadhi ya vichujio vyako, na ujaribu tena.',
+  },
+  searchPlaceholder: 'Tafuta kwa anwani au neno kuu...',
+  filters: {
+    sort: 'Panga Kwa',
+    distance: 'Umbali',
+    name: 'Kwa alfabeti',
+    ageGroup: 'Kikundi cha umri',
+    adult: 'Mtu mzima',
+    children: 'Watoto',
+    waitTime: 'Muda wa Kusubiri (Huduma ya Msingi)',
+    weekWell: 'Chini ya Wiki 1 (ziara ya uchunguzi)',
+    weekSick: 'Chini ya Wiki 1 (ziara ya wagonjwa)',
+    twoMonths: 'chini ya miezi 2 (huduma zote za msingi)',
+    specialty: 'Huduma maalum',
+    mental: 'Afya ya kiakili',
+    dental: 'Meno',
+    eye: 'Utunzaji wa macho',
+    podiatry: 'Matibabu ya miguu',
+    tests: 'Uchunguzi na picha',
+    mammo: 'Eksirei ya matiti',
+    xray: 'Eksirei',
+    languages: 'Lugha inayozungumzwa na wafany',
   },
   introPage: {
     section1Title: 'Tafuta huduma ya msingi isiyolipishwa au ya gharama nafuu',

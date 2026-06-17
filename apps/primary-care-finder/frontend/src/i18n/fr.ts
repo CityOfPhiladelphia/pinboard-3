@@ -1,9 +1,32 @@
 export default {
   app: {
     title: 'Outil de recherche de soins primaires',
+    name: 'Outil de recherche de soins primaires',
     subtitle: 'Soins médicaux gratuits et à faible coût à Philadelphie',
     noResults:
       'Aucun centre de santé trouvé. Veuillez vérifier l’orthographe ou supprimer certains de vos filtres, et réessayer.',
+  },
+  searchPlaceholder: 'Recherche par adresse ou par mot clé...',
+  filters: {
+    sort: 'Classer par',
+    distance: 'Distance',
+    name: 'Alphabétiquement',
+    ageGroup: "Groupe d'âge",
+    adult: 'Adulte',
+    children: 'Enfants',
+    waitTime: "Temps d'attente (soins primaires)",
+    weekWell: '<1 semaine (visite de routine)',
+    weekSick: '<1 semaine (visite médicale)',
+    twoMonths: '<2 mois (tous soins primaires)',
+    specialty: 'Services spécialisés',
+    mental: 'Santé mentale',
+    dental: 'Soins dentaires',
+    eye: 'Soins oculaires',
+    podiatry: 'Podologie',
+    tests: 'Tests et imagerie',
+    mammo: 'Mammographie',
+    xray: 'Radiographie',
+    languages: 'Langues parlées par le personnel',
   },
   introPage: {
     section1Title: 'Trouver des soins primaires gratuits ou à faible coût',

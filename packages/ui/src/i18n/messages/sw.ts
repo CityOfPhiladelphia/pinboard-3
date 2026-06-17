@@ -10,5 +10,12 @@ export default {
     sortShareLocation: 'Share your location to sort by distance',
     reset: 'Reset',
     apply: 'Apply',
+    footer: {
+      termsOfUse: 'Masharti ya matumizi',
+      rightToKnow: 'Haki ya kujua',
+      privacyPolicy: 'Sera ya faragha',
+      accessibility: 'Ufikiaji',
+      feedback: 'Maoni',
+    },
   },
 }
