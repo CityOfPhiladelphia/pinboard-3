@@ -34,12 +34,15 @@ export function useLocations(): {
       geojson.value = geojsonData
       locations.value = geojsonData.features.map((feature) => ({
         id: String(feature.properties.objectid),
-        name: String(feature.properties.record ?? feature.properties.address ?? ''),
+        name: (feature.properties.record ?? feature.properties.address ?? '').replace(
+          /Womens/,
+          "Women's"
+        ),
         latitude: feature.geometry.coordinates[1],
         longitude: feature.geometry.coordinates[0],
         locationCardInfo: {
-          heading: String(feature.properties.record ?? feature.properties.address ?? ''),
-          body: String(feature.properties.address ?? ''),
+          heading: feature.properties.record ?? feature.properties.address ?? '',
+          body: feature.properties.address ?? '',
         },
         ...feature.properties,
       }))

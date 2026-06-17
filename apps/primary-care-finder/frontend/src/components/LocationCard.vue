@@ -5,25 +5,16 @@ defineProps<{
   location: PrimaryCareLocation
 }>()
 
-function siteName(location: PrimaryCareLocation): string {
-  let value = location.properties.record
-  if (
-    value === 'Delaware Valley Community Health (DVCH) Maria de los Santos Womens Health Center'
-  ) {
-    value = "Delaware Valley Community Health (DVCH) Maria de los Santos Women's Health Center"
-  }
-  return value
-}
 </script>
 
 <template>
   <div class="location-card-content">
-    <strong>{{ siteName(location) }}</strong>
-    <div v-if="location.properties.address" class="card-address">
-      {{ location.properties.address }}
+    <strong>{{ location.name }}</strong>
+    <div v-if="location.address" class="card-address">
+      {{ location.address }}
     </div>
-    <div v-if="location.properties.med_phone_num" class="card-phone">
-      {{ location.properties.med_phone_num }}
+    <div v-if="location.med_phone_num" class="card-phone">
+      {{ location.med_phone_num }}
     </div>
   </div>
 </template>

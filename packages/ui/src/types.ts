@@ -102,3 +102,23 @@ export interface ArcgisResponse {
   type: string
   features: ArcgisFeature[]
 }
+
+type GeoJsonGeometryType =
+  | 'Point'
+  | 'MultiPoint'
+  | 'LineString'
+  | 'MultiLineString'
+  | 'Polygon'
+  | 'MultiPolygon'
+  | 'GeometryCollection'
+
+type GeoJsonType = GeoJsonGeometryType | 'Feature' | 'FeatureCollection'
+
+interface GeoJsonPoint {
+  type: Extract<GeoJsonGeometryType, 'Point'>
+  coordinates: [number, number] | [number, number, number] | [number, number, number, number]
+}
+
+export interface GeoJSON {
+  type: GeoJsonType
+}

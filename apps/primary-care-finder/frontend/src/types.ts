@@ -2,10 +2,10 @@ import type { PinboardTypes } from '@pinboard/ui'
 
 export interface PrimaryCareProperties {
   objectid: number
-  record: string
-  address: string
+  record: string | null
+  address: string | null
   address_2: string | null
-  zip_code: string
+  zip_code: string | null
   med_phone_num: string | null
   website: string | null
   language: string | null

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, toRaw } from 'vue'
+import { computed, ref, toValue } from 'vue'
 import {
   PinboardBody,
   PinboardShell,
@@ -123,7 +123,6 @@ function matchFieldToOptions(
 
 const a = computed(() => {
   if (locations.value.length) {
-    console.log(locations.value)
   const filterLogic: Record<string, IFilterSet> = {
   filterSet: {
     operation: '&',
@@ -347,7 +346,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
         <CircleLayer
           v-if="geojson"
           id="locations"
-          :source="{ type: 'geojson', data: toRaw(geojson) as any }"
+          :source="{ type: 'geojson', data: toValue(geojson) as any }"
           :paint="{
             'circle-radius': [
               'case',

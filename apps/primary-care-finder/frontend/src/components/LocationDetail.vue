@@ -13,24 +13,12 @@ const props = defineProps<{
 
 const { t, locale, messages } = useI18n()
 
-const p = computed(() => props.location.properties)
-
 const fullAddress = computed(() => {
-  let addr = p.value.address
-  if (p.value.address_2) addr += ', ' + p.value.address_2
-  addr += ', Philadelphia, PA ' + p.value.zip_code
+  let addr = props.location.address
+  if (props.location.address_2) addr += ', ' + props.location.address_2
+  addr += ', Philadelphia, PA ' + props.location.zip_code
   return addr
 })
-
-function siteName(): string {
-  let value = p.value.record
-  if (
-    value === 'Delaware Valley Community Health (DVCH) Maria de los Santos Womens Health Center'
-  ) {
-    value = "Delaware Valley Community Health (DVCH) Maria de los Santos Women's Health Center"
-  }
-  return value
-}
 
 // --- Age-specific services ---
 interface ServiceRow {
@@ -55,8 +43,8 @@ const ageSpecificServices = computed<ServiceRow[]>(() => {
   ]
   let id = 1
   for (const [service, adultField, childField] of checks) {
-    const adult = p.value[adultField] as string | null
-    const child = p.value[childField] as string | null
+    const adult = props.location[adultField] as string | null
+    const child = props.location[childField] as string | null
     if (YES_VALUES.includes(adult ?? '') || YES_VALUES.includes(child ?? '')) {
       rows.push({ id: id++, service, adult, child, existing: [adult, child] })
     }
@@ -86,7 +74,7 @@ const otherServices = computed<OtherServiceRow[]>(() => {
   ]
   let id = 1
   for (const [service, field] of checks) {
-    const val = p.value[field] as string | null
+    const val = props.location[field] as string | null
     if (YES_VALUES.includes(val ?? '')) {
       rows.push({ id: id++, service, value: val })
     }
@@ -109,7 +97,7 @@ const DAY_I18N_KEYS: Record<(typeof DAYS)[number], string> = {
 const exceptionsByDay = computed(() => {
   const result: Record<string, string> = {}
   for (const day of DAYS) {
-    const exc = p.value[`hours_${day}_exceptions`] as string | null
+    const exc = props.location[`hours_${day}_exceptions`] as string | null
     if (exc) result[day] = exc
   }
   return result
@@ -118,7 +106,7 @@ const exceptionsByDay = computed(() => {
 const exceptionsList = computed(() => {
   const arr: string[] = []
   for (const day of DAYS) {
-    const exc = p.value[`hours_${day}_exceptions`] as string | null
+    const exc = props.location[`hours_${day}_exceptions`] as string | null
     if (exc) arr.push(exc)
   }
   return [...new Set(arr)]
@@ -136,8 +124,8 @@ function exceptionCounter(day: string): number | null {
 }
 
 function parseTimeRange(day: string): string {
-  const start = p.value[`hours_${day}_start`] as string | null
-  const end = p.value[`hours_${day}_end`] as string | null
+  const start = props.location[`hours_${day}_start`] as string | null
+  const end = props.location[`hours_${day}_end`] as string | null
   const counter = exceptionCounter(day)
   let val: string
   if (start && end) {
@@ -159,13 +147,13 @@ function parseException(exception: string, index: number): string {
 // --- Tests ---
 const tests = computed(() => {
   const fields = ['blood', 'sti', 'covid', 'mammo', 'xray']
-  return fields.filter((f) => p.value[`tests_${f}`] === 'Yes')
+  return fields.filter((f) => props.location[`tests_${f}`] === 'Yes')
 })
 
 // --- Languages ---
 const languagesSpoken = computed<string[]>(() => {
-  if (!p.value.language) return []
-  return p.value.language.split(',').map((s) => s.trim())
+  if (!props.location.language) return []
+  return props.location.language.split(',').map((s) => s.trim())
 })
 
 function translateLanguage(lang: string): string {
@@ -199,7 +187,7 @@ function translateTransitList(raw: string | null, category: string): string {
 <template>
   <div class="location-detail content">
     <div class="detail-header">
-      <h2>{{ siteName() }}</h2>
+      <h2>{{ location.name }}</h2>
       <PhilaButton
         :icon-definition="faXmark"
         :icon-only="true"
@@ -213,52 +201,52 @@ function translateTransitList(raw: string | null, category: string): string {
 
     <div class="detail-body">
       <!-- Warning callout -->
-      <div v-if="p.optional_info_general" class="warning-callout">
-        {{ translateWarning(p.optional_info_general) }}
+      <div v-if="location.optional_info_general" class="warning-callout">
+        {{ translateWarning(location.optional_info_general) }}
       </div>
 
       <!-- Contact info -->
       <section class="contact-section">
-        <div v-if="p.address" class="contact-row">
+        <div v-if="location.address" class="contact-row">
           <span class="contact-label">{{ fullAddress }}</span>
         </div>
-        <div v-if="p.website" class="contact-row">
-          <a :href="p.website" target="_blank">{{ p.website }}</a>
+        <div v-if="location.website" class="contact-row">
+          <a :href="location.website" target="_blank">{{ location.website }}</a>
         </div>
-        <div v-if="p.med_phone_num" class="contact-row">
-          {{ p.med_phone_num }}
+        <div v-if="location.med_phone_num" class="contact-row">
+          {{ location.med_phone_num }}
         </div>
       </section>
 
       <!-- Transit -->
       <section
         v-if="
-          p.transport_bus ||
-          p.transport_subway ||
-          p.transport_train ||
-          p.transport_trolley ||
-          p.transport_parking
+          location.transport_bus ||
+          location.transport_subway ||
+          location.transport_train ||
+          location.transport_trolley ||
+          location.transport_parking
         "
         class="transit-section"
       >
-        <div v-if="p.transport_bus">
-          <strong>{{ $t('transit.bus') }}:</strong> {{ p.transport_bus }}
+        <div v-if="location.transport_bus">
+          <strong>{{ $t('transit.bus') }}:</strong> {{ location.transport_bus }}
         </div>
-        <div v-if="p.transport_subway">
+        <div v-if="location.transport_subway">
           <strong>{{ $t('transit.subway.label') }}:</strong>
-          {{ translateTransitList(p.transport_subway, 'subway') }}
+          {{ translateTransitList(location.transport_subway, 'subway') }}
         </div>
-        <div v-if="p.transport_train">
+        <div v-if="location.transport_train">
           <strong>{{ $t('transit.regRail.label') }}:</strong>
-          {{ translateTransitList(p.transport_train, 'regRail') }}
+          {{ translateTransitList(location.transport_train, 'regRail') }}
         </div>
-        <div v-if="p.transport_trolley">
+        <div v-if="location.transport_trolley">
           <strong>{{ $t('transit.trolley') }}:</strong>
-          {{ p.transport_trolley }}
+          {{ location.transport_trolley }}
         </div>
-        <div v-if="p.transport_parking">
+        <div v-if="location.transport_parking">
           <strong>{{ $t('transit.car.label') }}:</strong>
-          {{ translateTransitList(p.transport_parking, 'car') }}
+          {{ translateTransitList(location.transport_parking, 'car') }}
         </div>
       </section>
 
@@ -365,7 +353,7 @@ function translateTransitList(raw: string | null, category: string): string {
       <section>
         <h3>{{ $t('slidingScale') }}</h3>
         <p>{{ $t('slidingScaleExplanation') }}</p>
-        <p>{{ p.sliding_scale ?? $t('slidingScaleNull') }}</p>
+        <p>{{ location.sliding_scale ?? $t('slidingScaleNull') }}</p>
       </section>
     </div>
   </div>
