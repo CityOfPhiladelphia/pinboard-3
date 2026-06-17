@@ -1,5 +1,5 @@
 // Reports, per locale, keys present in en but missing elsewhere (they fall back to English).
-// Run with a TypeScript-aware runner, e.g.:  npx tsx apps/primary-care-finder/frontend/scripts/check-locale-parity.mjs
+// Run with a TypeScript-aware runner, e.g.:  npx tsx apps/primary-care-finder/frontend/scripts/check-locale-parity.ts
 // This is a seam for the future automated test suite (see bead pinboard-3-kz1); it is not yet wired into CI.
 
 import { fileURLToPath, pathToFileURL } from 'url'
