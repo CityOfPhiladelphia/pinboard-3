@@ -10,4 +10,12 @@ describe('ReportCallout', () => {
     expect(cta.props('to')).toBe('/report')
     expect(cta.text()).toContain('Start a report')
   })
+
+  it('renders the decorative document illustration hidden from assistive tech', () => {
+    const w = mount(ReportCallout, { global: { stubs: { RouterLink: RouterLinkStub } } })
+    const icon = w.find('img.report-callout__cta-icon')
+    expect(icon.exists()).toBe(true)
+    expect(icon.attributes('alt')).toBe('')
+    expect(icon.attributes('aria-hidden')).toBe('true')
+  })
 })

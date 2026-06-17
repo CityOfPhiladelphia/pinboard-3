@@ -1,0 +1,5 @@
+/* ABOUTME: Maps the app's semantic color tokens onto the phila design-system
+   scheme variables so primary surfaces follow phila theming. */
+:root {
+  --ui-color-primary: var(--Schemes-Primary, #1034f4);
+}
