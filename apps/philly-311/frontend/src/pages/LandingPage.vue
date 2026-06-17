@@ -17,6 +17,7 @@ import { searchAddress } from '@/composables/useAis'
 import ReportCallout from '@/components/ReportCallout.vue'
 import FilterChips from '@/components/FilterChips.vue'
 import ReportListingCard from '@/components/ReportListingCard.vue'
+import MapConstraints from '@/components/MapConstraints.vue'
 
 const finder = useReportFinder()
 const searchPlaceholder = 'Search by address or ZIP'
@@ -67,6 +68,7 @@ async function onSearch(query: string) {
 
     <template
       #map-content="{
+        map,
         zoom,
         isMobile,
         hoveredId,
@@ -77,6 +79,7 @@ async function onSearch(query: string) {
         onSelect,
       }"
     >
+      <MapConstraints v-if="map" :map="map" />
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />
       <BasemapToggle
         position="top-right"

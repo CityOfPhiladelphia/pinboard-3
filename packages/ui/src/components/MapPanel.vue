@@ -53,7 +53,7 @@ defineExpose({ panTo })
 const slotProps = computed(() => ({
   locations: props.locations,
   geojson: props.geojson,
-  map: null as unknown,
+  map: (mapRef.value as { map?: unknown } | null)?.map ?? null,
   zoom: zoom.value,
   isMobile: props.isMobile ?? false,
   hoveredId: props.hoveredId ?? null,
