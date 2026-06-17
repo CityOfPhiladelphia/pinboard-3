@@ -24,9 +24,10 @@ interface IFilterChoiceGroup {
 }
 
 class FilterChoiceGroup implements ClassWithBitfieldGetter {
-  private choiceBitfields: Record<string, Uint32Array>
+  private choiceBitfields: Record<string, Uint32Array> = {}
   private operation: BitWiseOperation
   constructor(params: IFilterChoiceGroup) {
+    console.log('PARAMS: ', params)
     this.operation = params.operation
     Object.entries(params.choices).forEach((choice) => {
       this.choiceBitfields[choice[0]] = createOptionBitmask(

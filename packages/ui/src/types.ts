@@ -56,7 +56,7 @@ export interface AlertBanner {
   message: string
 }
 
-export interface BasicLocation extends LatLon {
+export interface BasicLocation extends LatLon, Record<string, unknown> {
   id: string
   name: string
   locationCardInfo: MapCardProps

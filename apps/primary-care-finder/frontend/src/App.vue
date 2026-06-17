@@ -120,7 +120,7 @@ function matchFieldToOptions(
 ) {
   return valuesToMatch.includes(item[fieldName])
 }
-const d = () => locations.value.forEach((loc) => loc.properties)
+
 const a = computed(() => {
   if (locations.value.length) {
     console.log(locations.value)
@@ -129,25 +129,25 @@ const a = computed(() => {
     operation: '&',
     childFilters: [
       new FilterChoiceGroup({
-        data: d,
+        data: locations.value,
         operation: '|',
         choices: {
-          [filterDefinitions[2].choices?.[0].text ?? 'sameDay']: {
+          [filterDefinitions[2].choices?.[0].value ?? 'sameDay']: {
             dataFields: ['wait_sameday_sick_ad', 'wait_sameday_sick_ch'],
             matches: matchYes,
             matchingFunction: matchFieldToOptions,
           },
-          [filterDefinitions[2].choices?.[1].text ?? 'weekWell']: {
+          [filterDefinitions[2].choices?.[1].value ?? 'weekWell']: {
             dataFields: ['wait_week_well_ad', 'wait_week_well_ch'],
             matches: matchYes,
             matchingFunction: matchFieldToOptions,
           },
-          [filterDefinitions[2].choices?.[2].text ?? 'weekSick']: {
+          [filterDefinitions[2].choices?.[2].value ?? 'weekSick']: {
             dataFields: ['wait_week_sick_ad', 'wait_week_sick_ch'],
             matches: matchYes,
             matchingFunction: matchFieldToOptions,
           },
-          [filterDefinitions[2].choices?.[3].text ?? 'twoMonths']: {
+          [filterDefinitions[2].choices?.[3].value ?? 'twoMonths']: {
             dataFields: ['wait_2mo_ad', 'wait_2mo_ch'],
             matches: matchYes,
             matchingFunction: matchFieldToOptions,
@@ -158,42 +158,42 @@ const a = computed(() => {
         data: locations.value,
         operation: '|',
         choices: {
-          [filterDefinitions[2].choices?.[0].text ?? 'mental']: {
+          [filterDefinitions[2].choices?.[0].value ?? 'mental']: {
             dataFields: ['special_mental_ad', 'special_mental_ch'],
             matches: matchYesEstPat,
             matchingFunction: matchFieldToOptions,
           },
-          [filterDefinitions[2].choices?.[1].text ?? 'dental']: {
+          [filterDefinitions[2].choices?.[1].value ?? 'dental']: {
             dataFields: ['special_dental_ad', 'special_dental_ch'],
             matches: matchYesEstPat,
             matchingFunction: matchFieldToOptions,
           },
-          [filterDefinitions[2].choices?.[2].text ?? 'eye']: {
+          [filterDefinitions[2].choices?.[2].value ?? 'eye']: {
             dataFields: ['special_eye_ad', 'special_eye_ch'],
             matches: matchYesEstPat,
             matchingFunction: matchFieldToOptions,
           },
-          [filterDefinitions[2].choices?.[3].text ?? 'podiatry']: {
+          [filterDefinitions[2].choices?.[3].value ?? 'podiatry']: {
             dataFields: ['special_podiatry'],
             matches: matchYesEstPat,
             matchingFunction: matchFieldToOptions,
           },
-          [filterDefinitions[2].choices?.[3].text ?? 'mat']: {
+          [filterDefinitions[2].choices?.[3].value ?? 'mat']: {
             dataFields: ['special_mat'],
             matches: matchYesEstPat,
             matchingFunction: matchFieldToOptions,
           },
-          [filterDefinitions[2].choices?.[3].text ?? 'nutrition']: {
+          [filterDefinitions[2].choices?.[3].value ?? 'nutrition']: {
             dataFields: ['special_nutrition'],
             matches: matchYesEstPat,
             matchingFunction: matchFieldToOptions,
           },
-          [filterDefinitions[2].choices?.[3].text ?? 'tobacco']: {
+          [filterDefinitions[2].choices?.[3].value ?? 'tobacco']: {
             dataFields: ['special_tobacco'],
             matches: matchYesEstPat,
             matchingFunction: matchFieldToOptions,
           },
-          [filterDefinitions[2].choices?.[3].text ?? 'pharmacy']: {
+          [filterDefinitions[2].choices?.[3].value ?? 'pharmacy']: {
             dataFields: ['special_pharmacy'],
             matches: matchYesEstPat,
             matchingFunction: matchFieldToOptions,

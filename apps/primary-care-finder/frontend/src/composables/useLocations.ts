@@ -1,5 +1,5 @@
 import { ref, onMounted, type Ref } from 'vue'
-import type { PrimaryCareLocation, PrimaryCareFeature, PrimaryCareResponse } from '@/types'
+import type { PrimaryCareLocation, PrimaryCareResponse } from '@/types'
 
 const ARCGIS_URL =
   'https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/red_PrimaryCare/FeatureServer/0/query'
@@ -30,27 +30,19 @@ export function useLocations(): {
         return
       }
 
-      const rawGeojson = (await response.json()) as PrimaryCareResponse
-
-      locations.value = rawGeojson.features.map((feature) => ({
+      const geojsonData = (await response.json()) as PrimaryCareResponse
+      geojson.value = geojsonData
+      locations.value = geojsonData.features.map((feature) => ({
         id: String(feature.properties.objectid),
         name: String(feature.properties.record ?? feature.properties.address ?? ''),
         latitude: feature.geometry.coordinates[1],
         longitude: feature.geometry.coordinates[0],
-        properties: feature.properties,
         locationCardInfo: {
           heading: String(feature.properties.record ?? feature.properties.address ?? ''),
           body: String(feature.properties.address ?? ''),
         },
+        ...feature.properties,
       }))
-
-      geojson.value = {
-        type: 'FeatureCollection',
-        features: rawGeojson.features.map((f) => ({
-          ...f,
-          properties: { ...f.properties, id: String(f.properties.objectid) },
-        })),
-      } as const
     } catch {
       errorMessage.value = 'Error retrieving primary care sites'
     } finally {

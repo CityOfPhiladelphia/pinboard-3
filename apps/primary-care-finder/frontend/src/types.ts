@@ -86,8 +86,7 @@ export interface PrimaryCareProperties {
   hours_sun_exceptions: string | null
 }
 
-export type PrimaryCareLocation = PinboardTypes.BasicLocation &
-  Pick<PinboardTypes.ArcgisFeature, 'properties'>
+export type PrimaryCareLocation = PinboardTypes.BasicLocation & PrimaryCareProperties
 
 export interface PrimaryCareFeature extends PinboardTypes.ArcgisFeature {
   properties: PrimaryCareProperties
