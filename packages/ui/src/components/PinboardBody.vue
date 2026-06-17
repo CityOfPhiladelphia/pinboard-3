@@ -179,7 +179,8 @@ watch(selectedLocationId, (id) => {
 
 // The URL is the source of truth for selection. Resolve ?location= against the loaded locations:
 // on initial mount (immediate), when the data finishes loading, and on Back/Forward. An absent or
-// unknown id clears the selection (graceful). Direct set (not selectLocation) so it doesn't re-push.
+// unknown id clears the selection (graceful). Direct set (not selectLocation) so it doesn't re-push;
+// it also intentionally skips the deselect/visited-tracking emit — URL-driven nav doesn't mark visited.
 function resolveLocationFromRoute() {
   const param = route.query.location
   const id = typeof param === 'string' ? param : undefined
