@@ -106,4 +106,11 @@ li {
 ol {
   padding-left: 1.5rem;
 }
+
+/* @pinboard/ui ships `:is(.content ul,.content ol) li { margin: 0 0 var(--spacing-l) 0 }`
+   (specificity 0,1,2) which the bare `li` reset above can't beat. Scoping it under
+   .content-container wins, removing the 1.5rem gap between list items. */
+.content-container li {
+  margin: 0;
+}
 </style>
