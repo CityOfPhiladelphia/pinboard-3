@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // vue imports
 import { useSlots, inject, ref, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 // 3rd party imports
@@ -103,6 +104,8 @@ function onFilterValues(value: FilterValues) {
 }
 
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 
 // component variables
 const snapPoints = [15, 50, 100]
@@ -160,6 +163,33 @@ watch(selectedLocation, (loc) => {
   if (loc && props.isMobile) {
     bottomSheetRef.value?.snapTo(snapPoints.length - 1)
   }
+})
+
+// Reflect the selected location in the URL as ?location=<id>. push (not replace) so Back walks
+// the selection history. Guarded so it never re-pushes a value the URL already has — that guard
+// is also what stops it looping with the route → selection watcher below.
+watch(selectedLocationId, (id) => {
+  const desired = id ?? undefined
+  if (route.query.location === desired) return
+  const query = { ...route.query }
+  if (desired === undefined) delete query.location
+  else query.location = desired
+  router.push({ query })
+})
+
+// The URL is the source of truth for selection. Resolve ?location= against the loaded locations:
+// on initial mount (immediate), when the data finishes loading, and on Back/Forward. An absent or
+// unknown id clears the selection (graceful). Direct set (not selectLocation) so it doesn't re-push.
+function resolveLocationFromRoute() {
+  const param = route.query.location
+  const id = typeof param === 'string' ? param : undefined
+  if (id === selectedLocationId.value) return
+  const match = id ? props.locations.find((loc) => loc.id === id) : undefined
+  selectedLocation.value = match ?? undefined
+  if (match) mapPanelRef.value?.panTo(match)
+}
+watch([() => route.query.location, () => props.locations], resolveLocationFromRoute, {
+  immediate: true,
 })
 
 watch(
