@@ -72,7 +72,9 @@ Extend the existing route rather than add a new one.
 - `limit` — page size (keep `MAX_LIMIT = 200`; default page size for the map
   loader TBD in plan, e.g. 200).
 - `count` (boolean) — when set, return only `{ total }` (a `SELECT COUNT()` of
-  open-in-Philly cases) and skip row fetching. Used for cheap staleness checks.
+  open-in-Philly cases) and skip row fetching. `total` also rides along on the
+  normal page-1 response; the dedicated `count` mode exists purely so a
+  staleness check can read the count **without** fetching a page of rows.
 
 **Ordering & keyset:** order by `DISTANCE(geo, anchor) ASC, Id ASC`. The cursor
 carries the last `(distance, Id)`; the next page's `WHERE` is
@@ -128,6 +130,10 @@ longer gates on a radius. Filter chip options derive from the full set as it gro
 - empty cache → full progressive load.
 - populated cache → if `now - fetchedAt > TTL` (~5–10 min) → reload; else issue
   a `count`-mode request; `total` unchanged → reuse cache; changed → reload.
+- A **changed seed location** on re-entry (the user moved) does **not**
+  invalidate the cache — all points are already loaded; the seed only affects
+  streaming order and initial map center, not completeness. Re-center the view
+  on the new seed; keep the cached data.
 - Caveat (accepted): a raw count misses net-zero churn (one opens + one
   closes). The TTL backstop bounds the staleness window.
 
@@ -156,7 +162,9 @@ longer gates on a radius. Filter chip options derive from the full set as it gro
   from the store's points; on integer-zoom change (round `slotProps.zoom`),
   call `getClusters(worldBbox, zoom)` — all points are in Philly, so a wide
   bbox returns the Philly clusters. Re-index when the point set changes
-  (during streaming).
+  (during streaming) — **throttle/debounce** re-indexing so appending a page
+  every ~200 rows doesn't trigger a full supercluster rebuild per page (e.g.
+  re-index at most every N ms, and once more when streaming completes).
 - **Rendering** in the `#map-content` slot:
   - cluster feature → a `MapMarker` containing a count-badge component
     (`ClusterBadge` — circle sized/labelled by point count, styled to the
