@@ -1,8 +1,11 @@
 // ABOUTME: Tests for LandingPage — the Pinboard-powered finder for nearby 311 reports.
 // ABOUTME: Mocks @pinboard/ui locally so the map library isn't loaded in vitest.
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { setActivePinia, createPinia } from 'pinia'
 import { defineComponent, h } from 'vue'
 import { mount, flushPromises, RouterLinkStub } from '@vue/test-utils'
+import { useOpenIssuesStore } from '@/stores/openIssues'
+import type { Report } from '@/composables/useNearbyReports'
 
 vi.mock('@pinboard/ui', () => {
   const Pinboard = defineComponent({
@@ -79,41 +82,35 @@ vi.mock('@pinboard/ui', () => {
 vi.mock('@/composables/useGeolocation', () => ({
   getCurrentPosition: vi.fn().mockResolvedValue(null),
 }))
-const load = vi.fn().mockResolvedValue([])
-vi.mock('@/composables/useNearbyReports', () => ({
-  useNearbyReports: () => ({
-    reports: {
-      value: [
-        {
-          id: '1',
-          caseNumber: '1',
-          lat: 39.95,
-          lng: -75.16,
-          serviceType: 'Pothole Repair',
-          status: 'Open',
-          address: 'A',
-          distance: 100,
-        },
-        {
-          id: '2',
-          caseNumber: '2',
-          lat: 39.96,
-          lng: -75.17,
-          serviceType: 'Graffiti Removal',
-          status: 'Open',
-          address: 'B',
-          distance: 200,
-        },
-      ],
-    },
-    isLoading: { value: false },
-    error: { value: null },
-    load,
-  }),
-}))
 
 const searchAddress = vi.fn()
 vi.mock('@/composables/useAis', () => ({ searchAddress: (...a: unknown[]) => searchAddress(...a) }))
+
+const initialReports: Report[] = [
+  {
+    id: '1',
+    caseNumber: '1',
+    lat: 39.95,
+    lng: -75.16,
+    serviceType: 'Pothole Repair',
+    status: 'Open',
+    address: 'A',
+    distance: 100,
+  },
+  {
+    id: '2',
+    caseNumber: '2',
+    lat: 39.96,
+    lng: -75.17,
+    serviceType: 'Graffiti Removal',
+    status: 'Open',
+    address: 'B',
+    distance: 200,
+  },
+]
+
+let ensureLoaded: ReturnType<typeof vi.spyOn>
+
 import LandingPage from '../LandingPage.vue'
 
 const globalStubs = {
@@ -122,13 +119,20 @@ const globalStubs = {
   Tags: { props: ['text', 'color'], template: '<span class="tags-stub">{{ text }}</span>' },
 }
 
+beforeEach(() => {
+  setActivePinia(createPinia())
+  const store = useOpenIssuesStore()
+  ensureLoaded = vi.spyOn(store, 'ensureLoaded').mockResolvedValue(undefined)
+  store.$patch({ reports: initialReports })
+})
+
 describe('LandingPage', () => {
   it('mounts the Pinboard with mapped locations after init', async () => {
     const w = mount(LandingPage, { global: { stubs: { RouterLink: RouterLinkStub } } })
     await flushPromises()
     expect(w.find('.pinboard-stub').exists()).toBe(true)
     expect(w.find('.count').text()).toBe('2')
-    expect(load).toHaveBeenCalled()
+    expect(ensureLoaded).toHaveBeenCalled()
   })
 
   it('renders the report callout with "Start a report" CTA; trending articles are gone', async () => {
@@ -176,11 +180,11 @@ describe('LandingPage', () => {
     searchAddress.mockResolvedValue({ streetAddress: '1234 Market St', lat: 39.95, lng: -75.16 })
     const w = mount(LandingPage, { global: { stubs: { RouterLink: RouterLinkStub } } })
     await flushPromises()
-    load.mockClear()
+    ensureLoaded.mockClear()
     await w.find('.do-search').trigger('click')
     await flushPromises()
     expect(searchAddress).toHaveBeenCalledWith('1234 Market St')
-    expect(load).toHaveBeenCalledWith(expect.objectContaining({ lat: 39.95, lng: -75.16 }))
+    expect(ensureLoaded).not.toHaveBeenCalled()
   })
 
   it('selecting a category chip filters the location list; "All Filters" restores it', async () => {

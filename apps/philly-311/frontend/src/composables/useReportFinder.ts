@@ -1,12 +1,14 @@
-// ABOUTME: Finder state for the reports landing — seeds the nearby region (geolocation
+// ABOUTME: Finder state for the reports landing — seeds city-wide data (geolocation
 // ABOUTME: or default, loaded once), owns the service-type filter, and derives the
 // ABOUTME: BasicLocation list + reportById lookup the Pinboard view binds.
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import type { PinboardTypes } from '@pinboard/ui'
-import { useNearbyReports, type Report } from '@/composables/useNearbyReports'
+import type { Report } from '@/composables/useNearbyReports'
+import { useOpenIssuesStore } from '@/stores/openIssues'
 import { getCurrentPosition } from '@/composables/useGeolocation'
 import { reportToLocation } from '@/utils/reportCard'
-import { DEFAULT_CENTER, DEFAULT_RADIUS } from '@/utils/geoDefaults'
+import { DEFAULT_CENTER } from '@/utils/geoDefaults'
 
 export interface UseReportFinder {
   locations: ComputedRef<PinboardTypes.BasicLocation[]>
@@ -22,7 +24,8 @@ export interface UseReportFinder {
 }
 
 export function useReportFinder(): UseReportFinder {
-  const { reports, isLoading, error, load } = useNearbyReports()
+  const store = useOpenIssuesStore()
+  const { reports, isLoading, error } = storeToRefs(store)
 
   const filter = ref('all')
 
@@ -56,15 +59,15 @@ export function useReportFinder(): UseReportFinder {
     return reports.value.find((r) => r.id === id)
   }
 
-  async function setCenter(loc: PinboardTypes.LatLon) {
+  async function setCenter(loc: PinboardTypes.LatLon): Promise<void> {
     searchOrUserLocation.value = { latitude: loc.latitude, longitude: loc.longitude }
-    await load({ lat: loc.latitude, lng: loc.longitude, radius: DEFAULT_RADIUS })
   }
 
-  async function init() {
+  async function init(): Promise<void> {
     const pos = await getCurrentPosition()
     const center = pos ?? DEFAULT_CENTER
-    await setCenter({ latitude: center.lat, longitude: center.lng })
+    searchOrUserLocation.value = { latitude: center.lat, longitude: center.lng }
+    await store.ensureLoaded({ lat: center.lat, lng: center.lng })
   }
 
   function setFilter(value: string) {
