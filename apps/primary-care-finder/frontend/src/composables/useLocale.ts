@@ -71,5 +71,10 @@ export function useLocale() {
     syncLangQuery(code)
   }
 
+  // Re-stamp the active language onto every URL the user navigates to — including history entries
+  // created before the language was chosen — so Back/Forward never strip ?lang. Language is a
+  // sticky setting, not a back-able step; this keeps the URL consistent without adding history.
+  router.afterEach(() => syncLangQuery(locale.value))
+
   return { locale, init, setLocale }
 }
