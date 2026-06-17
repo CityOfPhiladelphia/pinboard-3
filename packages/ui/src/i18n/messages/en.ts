@@ -9,6 +9,13 @@ export default {
     sortShareLocation: 'Share your location to sort by distance',
     reset: 'Reset',
     apply: 'Apply',
+    infoPage: {
+      backToMap: 'Back to map',
+      onThisPage: 'On this page',
+    },
+    nav: {
+      learnMore: 'Learn more',
+    },
     footer: {
       termsOfUse: 'Terms of use',
       rightToKnow: 'Right to know',

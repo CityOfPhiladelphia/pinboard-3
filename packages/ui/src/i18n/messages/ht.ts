@@ -10,6 +10,13 @@ export default {
     sortShareLocation: 'Share your location to sort by distance',
     reset: 'Reset',
     apply: 'Apply',
+    infoPage: {
+      backToMap: 'Tounen nan kat la',
+      onThisPage: 'Sou paj sa a',
+    },
+    nav: {
+      learnMore: 'Aprann plis',
+    },
     footer: {
       termsOfUse: 'Kondisyon pou itilize',
       rightToKnow: 'Dwa pou konnen',

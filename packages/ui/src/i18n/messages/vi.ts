@@ -10,6 +10,13 @@ export default {
     sortShareLocation: 'Share your location to sort by distance',
     reset: 'Reset',
     apply: 'Apply',
+    infoPage: {
+      backToMap: 'Quay lại bản đồ',
+      onThisPage: 'Trên trang này',
+    },
+    nav: {
+      learnMore: 'Tìm hiểu thêm',
+    },
     footer: {
       termsOfUse: 'Điều khoản sử dụng',
       rightToKnow: 'Quyền được biết',

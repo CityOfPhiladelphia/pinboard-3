@@ -10,6 +10,13 @@ export default {
     sortShareLocation: 'Share your location to sort by distance',
     reset: 'Reset',
     apply: 'Apply',
+    infoPage: {
+      backToMap: '返回地图',
+      onThisPage: '本页内容',
+    },
+    nav: {
+      learnMore: '了解更多',
+    },
     footer: {
       termsOfUse: '使用条款',
       rightToKnow: '知情权',

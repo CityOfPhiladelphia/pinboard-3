@@ -10,6 +10,13 @@ export default {
     sortShareLocation: 'Share your location to sort by distance',
     reset: 'Reset',
     apply: 'Apply',
+    infoPage: {
+      backToMap: 'Rudi kwenye ramani',
+      onThisPage: 'Kwenye ukurasa huu',
+    },
+    nav: {
+      learnMore: 'Jifunze zaidi',
+    },
     footer: {
       termsOfUse: 'Masharti ya matumizi',
       rightToKnow: 'Haki ya kujua',

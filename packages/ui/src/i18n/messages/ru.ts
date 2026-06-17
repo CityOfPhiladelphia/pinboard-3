@@ -10,6 +10,13 @@ export default {
     sortShareLocation: 'Share your location to sort by distance',
     reset: 'Reset',
     apply: 'Apply',
+    infoPage: {
+      backToMap: 'Вернуться к карте',
+      onThisPage: 'На этой странице',
+    },
+    nav: {
+      learnMore: 'Подробнее',
+    },
     footer: {
       termsOfUse: 'Условия использования',
       rightToKnow: 'Право на информацию',
