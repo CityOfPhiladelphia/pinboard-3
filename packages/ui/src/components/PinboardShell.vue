@@ -221,13 +221,11 @@ function onSheetPointerUp() {
     margin-left: var(--spacing-s) !important;
   }
 }
-
-
 </style>
 
+<style>
 /* Teleported elements (scrim + bottom-sheet) live outside this component's
  * DOM scope, so scoped selectors won't reach them. Unscoped block required. */
-<style>
 .pinboard-shell-info-scrim {
   position: fixed;
   inset: 0;
@@ -238,7 +236,9 @@ function onSheetPointerUp() {
 /* Sheet sizes to its content; snap-points value is ignored visually.
  * --drag-y is set inline by the drag handler; transform-only transition
  * springs the sheet back when the user releases under threshold, while
- * keeping height static (animating to auto doesn't work cleanly). */
+ * keeping height static (animating to auto doesn't work cleanly).
+ * NOTE: `.bottom-sheet` is @phila/phila-ui-bottom-sheet's internal class — a
+ * deliberate coupling; revisit if that package renames it. */
 .pinboard-shell-info-sheet .bottom-sheet {
   height: auto !important;
   max-height: 90dvh;
