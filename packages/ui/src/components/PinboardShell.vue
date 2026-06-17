@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AppFooter } from '@phila/phila-ui-app-footer'
-import { AppHeader } from '@phila/phila-ui-app-header'
+import { AppHeader, NavbarInfo } from '@phila/phila-ui-app-header'
 import MobileNavPanel from './MobileNavPanel.vue'
 import PinboardSubFooter from './PinboardSubFooter.vue'
 import type { VNode } from 'vue'
@@ -14,6 +14,7 @@ defineProps<{
   languages?: Language[]
   locale?: string
   feedbackHref?: string
+  infoTitle?: string
 }>()
 
 const emit = defineEmits<{
@@ -24,6 +25,7 @@ defineSlots<{
   default(): VNode[]
   'mobile-nav'(): VNode[]
   'navbar-end'?(): VNode[]
+  'info-body'?(): VNode[]
   'sub-footer'?(): VNode[]
 }>()
 </script>
@@ -66,7 +68,10 @@ defineSlots<{
           <slot name="mobile-nav" />
         </MobileNavPanel>
       </template>
-      <template v-if="$slots['navbar-end']" #navbar-end>
+      <template v-if="infoTitle || $slots['navbar-end']" #navbar-end>
+        <NavbarInfo v-if="infoTitle" :info-title="infoTitle" :label="infoTitle">
+          <slot name="info-body" />
+        </NavbarInfo>
         <slot name="navbar-end" />
       </template>
     </AppHeader>
