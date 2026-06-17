@@ -1,4 +1,5 @@
 import { ref, onMounted, type Ref } from 'vue'
+import { PinboardUtilities } from '@pinboard/ui'
 import type { PrimaryCareLocation, PrimaryCareProperties } from '@/types'
 
 const ARCGIS_URL =
@@ -53,10 +54,22 @@ export function useLocations(): {
       const rawGeojson = await response.json()
       const filteredFeatures = rawGeojson.features.filter(isVisible)
 
+      // Stable, readable id per site: slug of the name (OBJECTID churns on the daily reload).
+      // Deduped so two sites that slug identically stay unique.
+      const seenSlugs = new Map<string, number>()
+      const ids = filteredFeatures.map((feature: RawFeature) => {
+        const rawName = String(feature.properties.record ?? feature.properties.address ?? '')
+        const base =
+          PinboardUtilities.slugify(rawName.replace(/^City of Philadelphia - /, '')) || 'location'
+        const n = seenSlugs.get(base) ?? 0
+        seenSlugs.set(base, n + 1)
+        return n === 0 ? base : `${base}-${n + 1}`
+      })
+
       locations.value = filteredFeatures.map(
-        (feature: RawFeature) =>
+        (feature: RawFeature, i: number) =>
           ({
-            id: String(feature.properties.objectid),
+            id: ids[i],
             name: String(feature.properties.record ?? feature.properties.address ?? ''),
             latitude: feature.geometry.coordinates[1],
             longitude: feature.geometry.coordinates[0],
@@ -71,9 +84,9 @@ export function useLocations(): {
 
       geojson.value = {
         type: 'FeatureCollection' as const,
-        features: filteredFeatures.map((f: RawFeature) => ({
+        features: filteredFeatures.map((f: RawFeature, i: number) => ({
           ...f,
-          properties: { ...f.properties, id: String(f.properties.objectid) },
+          properties: { ...f.properties, id: ids[i] },
         })),
       }
     } catch {
