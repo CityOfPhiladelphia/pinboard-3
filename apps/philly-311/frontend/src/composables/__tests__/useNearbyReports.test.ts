@@ -1,7 +1,7 @@
 // ABOUTME: Tests for useNearbyReports — API fetch, row mapping, error surfacing,
 // ABOUTME: and empty-result handling via the /private/key/nearby-issues endpoint.
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useNearbyReports } from '../useNearbyReports'
+import { useNearbyReports, fetchPage } from '../useNearbyReports'
 import type { Region } from '../useNearbyReports'
 
 const fetchMock = vi.fn()
@@ -127,5 +127,85 @@ describe('useNearbyReports', () => {
     expect(result).toEqual([])
     expect(reports.value).toEqual([])
     expect(error.value?.message).toBe('Network down')
+  })
+})
+
+describe('fetchPage', () => {
+  it('maps response body to reports with paging metadata', async () => {
+    fetchMock.mockResolvedValueOnce(okResponse({ issues: [ISSUE], nextCursor: 'abc', total: 42 }))
+
+    const result = await fetchPage({ lat: 39.9526, lng: -75.1652, radius: 800, limit: 50 })
+
+    expect(result.nextCursor).toBe('abc')
+    expect(result.total).toBe(42)
+    expect(result.reports).toHaveLength(1)
+    expect(result.reports[0]).toMatchObject({
+      id: '00812345',
+      lat: 39.95,
+      lng: -75.16,
+      department: 'Streets',
+      mediaUrl: 'https://img.example.test/photo.jpg',
+    })
+  })
+
+  it('passes cursor to the request query only when set', async () => {
+    fetchMock.mockResolvedValueOnce(okResponse({ issues: [], nextCursor: null }))
+
+    await fetchPage({ lat: 39.95, lng: -75.16, radius: 800, limit: 50, cursor: 'tok123' })
+
+    const [calledUrl] = fetchMock.mock.calls[0]
+    const url = new URL(calledUrl as string)
+    expect(url.searchParams.get('cursor')).toBe('tok123')
+  })
+
+  it('omits cursor from query when not set', async () => {
+    fetchMock.mockResolvedValueOnce(okResponse({ issues: [], nextCursor: null }))
+
+    await fetchPage({ lat: 39.95, lng: -75.16, radius: 800, limit: 50 })
+
+    const [calledUrl] = fetchMock.mock.calls[0]
+    const url = new URL(calledUrl as string)
+    expect(url.searchParams.has('cursor')).toBe(false)
+  })
+
+  it('passes withTotal=true to query only when withTotal is set', async () => {
+    fetchMock.mockResolvedValueOnce(okResponse({ issues: [], nextCursor: null, total: 10 }))
+
+    await fetchPage({ lat: 39.95, lng: -75.16, radius: 800, limit: 50, withTotal: true })
+
+    const [calledUrl] = fetchMock.mock.calls[0]
+    const url = new URL(calledUrl as string)
+    expect(url.searchParams.get('withTotal')).toBe('true')
+  })
+
+  it('omits withTotal from query when not set', async () => {
+    fetchMock.mockResolvedValueOnce(okResponse({ issues: [], nextCursor: null }))
+
+    await fetchPage({ lat: 39.95, lng: -75.16, radius: 800, limit: 50 })
+
+    const [calledUrl] = fetchMock.mock.calls[0]
+    const url = new URL(calledUrl as string)
+    expect(url.searchParams.has('withTotal')).toBe(false)
+  })
+
+  it('returns total from count-only response without mapping issues', async () => {
+    fetchMock.mockResolvedValueOnce(okResponse({ total: 42 }))
+
+    const result = await fetchPage({ lat: 39.95, lng: -75.16, radius: 800, limit: 50, count: true })
+
+    const [calledUrl] = fetchMock.mock.calls[0]
+    const url = new URL(calledUrl as string)
+    expect(url.searchParams.get('count')).toBe('true')
+    expect(result.total).toBe(42)
+    expect(result.reports).toEqual([])
+    expect(result.nextCursor).toBeNull()
+  })
+
+  it('throws on non-ok response with the parsed error message', async () => {
+    fetchMock.mockResolvedValueOnce(errorResponse(502, { error: 'Bad Gateway' }))
+
+    await expect(
+      fetchPage({ lat: 39.95, lng: -75.16, radius: 800, limit: 50 }),
+    ).rejects.toThrow('Bad Gateway')
   })
 })

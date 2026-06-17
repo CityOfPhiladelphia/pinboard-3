@@ -31,6 +31,22 @@ export interface Region {
   radius?: number
 }
 
+export interface PageParams {
+  lat: number
+  lng: number
+  radius: number
+  limit: number
+  cursor?: string
+  withTotal?: boolean
+  count?: boolean
+}
+
+export interface PageResult {
+  reports: Report[]
+  nextCursor: string | null
+  total?: number
+}
+
 const DEFAULT_LIMIT = 50
 
 interface ApiNearbyIssue {
@@ -50,8 +66,47 @@ interface ApiNearbyIssue {
   childCount: number
 }
 
-interface ApiResponse {
-  issues: ApiNearbyIssue[]
+interface ApiPageResponse {
+  issues?: ApiNearbyIssue[]
+  nextCursor?: string | null
+  total?: number
+}
+
+function toReport(i: ApiNearbyIssue): Report {
+  return {
+    ...i,
+    lat: i.latitude,
+    lng: i.longitude,
+    department: i.department ?? undefined,
+    mediaUrl: i.mediaUrl ?? undefined,
+  }
+}
+
+export async function fetchPage(params: PageParams): Promise<PageResult> {
+  const query: Record<string, string | number | boolean | undefined> = {
+    lat: params.lat,
+    lng: params.lng,
+    radius: params.radius,
+    limit: params.limit,
+  }
+  if (params.cursor !== undefined) query.cursor = params.cursor
+  if (params.withTotal) query.withTotal = 'true'
+  if (params.count) query.count = 'true'
+
+  const res = await api311Fetch({ path: '/private/key/nearby-issues', query })
+
+  if (!res.ok) {
+    throw await parseError(res)
+  }
+
+  const body = (await res.json()) as ApiPageResponse
+
+  if (params.count) {
+    return { reports: [], nextCursor: null, total: body.total }
+  }
+
+  const reports = (body.issues ?? []).map(toReport)
+  return { reports, nextCursor: body.nextCursor ?? null, total: body.total }
 }
 
 export function useNearbyReports() {
@@ -64,42 +119,17 @@ export function useNearbyReports() {
     error.value = null
 
     try {
-      const res = await api311Fetch({
-        path: '/private/key/nearby-issues',
-        query: {
-          lat: region.lat,
-          lng: region.lng,
-          radius: region.radius ?? DEFAULT_RADIUS,
-          limit: DEFAULT_LIMIT,
-        },
+      const result = await fetchPage({
+        lat: region.lat,
+        lng: region.lng,
+        radius: region.radius ?? DEFAULT_RADIUS,
+        limit: DEFAULT_LIMIT,
       })
-
-      if (!res.ok) {
-        error.value = await parseError(res)
-        reports.value = []
-        return []
-      };
-
-      const result = (await res.json()) as ApiResponse
-      const issues = result?.issues ?? []
-
-      reports.value = issues.map(
-        (i): Report => ({
-          ...i,
-          lat: i.latitude,
-          lng: i.longitude,
-          department: i.department ?? undefined,
-          mediaUrl: i.mediaUrl ?? undefined,
-
-        }),
-      );
-
+      reports.value = result.reports
       return reports.value
-
     } catch (err) {
       error.value = err as Error
       reports.value = []
-      
       return []
     } finally {
       isLoading.value = false
