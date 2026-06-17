@@ -120,7 +120,7 @@ function matchFieldToOptions(
 ) {
   return valuesToMatch.includes(item[fieldName])
 }
-
+const d = () => locations.value.forEach((loc) => loc.properties)
 const a = computed(() => {
   if (locations.value.length) {
     console.log(locations.value)
@@ -129,7 +129,7 @@ const a = computed(() => {
     operation: '&',
     childFilters: [
       new FilterChoiceGroup({
-        data: locations.value,
+        data: d,
         operation: '|',
         choices: {
           [filterDefinitions[2].choices?.[0].text ?? 'sameDay']: {

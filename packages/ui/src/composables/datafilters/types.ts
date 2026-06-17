@@ -7,7 +7,7 @@ interface ClassWithBitfieldGetter {
 }
 
 interface MatchingFunction {
-  (item: Record<string, unknown>, dataField: string, matchValues: string[]): boolean
+  <T>(item: Record<string, T>, dataField: string, matchValues: T[]): boolean
 }
 
 interface IFilterChoiceGroup {
