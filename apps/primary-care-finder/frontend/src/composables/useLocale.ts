@@ -1,4 +1,5 @@
 import { useI18n } from 'vue-i18n'
+import { useRouter, useRoute } from 'vue-router'
 import { languageCodes } from '@pinboard/ui'
 
 const STORAGE_KEY = 'pcf.locale'
@@ -33,6 +34,8 @@ function getBrowserLanguages(): readonly string[] {
 
 export function useLocale() {
   const { locale } = useI18n()
+  const router = useRouter()
+  const route = useRoute()
 
   function init() {
     locale.value = resolveInitialLocale(
@@ -48,9 +51,7 @@ export function useLocale() {
     locale.value = code
     document.documentElement.lang = code
     window.localStorage.setItem(STORAGE_KEY, code)
-    const url = new URL(window.location.href)
-    url.searchParams.set('lang', code)
-    window.history.replaceState({}, '', url)
+    router.replace({ query: { ...route.query, lang: code } })
   }
 
   return { locale, init, setLocale }
