@@ -37,13 +37,30 @@ export function useLocale() {
   const router = useRouter()
   const route = useRoute()
 
+  // Keep ?lang in the URL canonical: present for a non-default language, absent for
+  // the default (English). No-ops when the URL already matches, so it never loops or
+  // adds a redundant history entry.
+  function syncLangQuery(code: string) {
+    const desired = code === DEFAULT_LOCALE ? undefined : code
+    if (route.query.lang === desired) return
+    const query = { ...route.query }
+    if (desired === undefined) delete query.lang
+    else query.lang = desired
+    router.replace({ query })
+  }
+
   function init() {
-    locale.value = resolveInitialLocale(
+    const resolved = resolveInitialLocale(
       window.location.search,
       window.localStorage.getItem(STORAGE_KEY),
       getBrowserLanguages()
     )
-    document.documentElement.lang = locale.value
+    locale.value = resolved
+    document.documentElement.lang = resolved
+    // Reflect the resolved language in the URL once the router's initial navigation
+    // settles — so a localStorage/browser-resolved language is visible and shareable,
+    // not just an explicit switch.
+    router.isReady().then(() => syncLangQuery(resolved))
   }
 
   function setLocale(code: string) {
@@ -51,7 +68,7 @@ export function useLocale() {
     locale.value = code
     document.documentElement.lang = code
     window.localStorage.setItem(STORAGE_KEY, code)
-    router.replace({ query: { ...route.query, lang: code } })
+    syncLangQuery(code)
   }
 
   return { locale, init, setLocale }
