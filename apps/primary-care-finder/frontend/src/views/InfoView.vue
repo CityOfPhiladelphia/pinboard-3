@@ -79,7 +79,7 @@ const sections = computed(() => [
   width: 100%;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--spacing-3xl, 3rem);
+  gap: 1.5rem;
 }
 
 .subsection-container {

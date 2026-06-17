@@ -15,7 +15,7 @@ export default {
       onThisPage: 'Trên trang này',
     },
     nav: {
-      learnMore: 'Tìm hiểu thêm',
+      learnMore: 'Tìm hiểu thêm về công cụ này',
     },
     footer: {
       termsOfUse: 'Điều khoản sử dụng',

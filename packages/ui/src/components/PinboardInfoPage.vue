@@ -74,10 +74,10 @@ function scrollToSection(id: string) {
   display: flex;
   width: 100%;
   max-width: 45rem;
-  padding-bottom: var(--spacing-4xl, 4rem);
+  padding-bottom: 2rem;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--spacing-4xl, 4rem);
+  gap: 1.5rem;
 }
 
 .subsection-container {
@@ -111,8 +111,8 @@ function scrollToSection(id: string) {
   }
 
   .section {
-    gap: var(--spacing-2xl, 2rem);
-    padding-bottom: var(--spacing-2xl, 2rem);
+    gap: 1.25rem;
+    padding-bottom: 1.5rem;
   }
 
   .info-toc {

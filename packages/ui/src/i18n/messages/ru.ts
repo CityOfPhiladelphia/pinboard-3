@@ -15,7 +15,7 @@ export default {
       onThisPage: 'На этой странице',
     },
     nav: {
-      learnMore: 'Подробнее',
+      learnMore: 'Подробнее об инструменте',
     },
     footer: {
       termsOfUse: 'Условия использования',

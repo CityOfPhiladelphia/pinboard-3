@@ -17,6 +17,11 @@ app.use(
     },
   })
 )
-app.use(createPinboardRouter([{ path: '/', component: FinderView }, { path: '/info', component: InfoView }]))
+app.use(
+  createPinboardRouter([
+    { path: '/', component: FinderView },
+    { path: '/info', component: InfoView },
+  ])
+)
 
 app.mount('#app')

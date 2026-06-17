@@ -15,7 +15,7 @@ export default {
       onThisPage: 'En esta página',
     },
     nav: {
-      learnMore: 'Más información',
+      learnMore: 'Más información sobre la herramienta',
     },
     footer: {
       termsOfUse: 'Términos de uso',

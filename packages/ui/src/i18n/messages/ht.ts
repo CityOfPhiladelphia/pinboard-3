@@ -15,7 +15,7 @@ export default {
       onThisPage: 'Sou paj sa a',
     },
     nav: {
-      learnMore: 'Aprann plis',
+      learnMore: 'Aprann plis sou zouti a',
     },
     footer: {
       termsOfUse: 'Kondisyon pou itilize',

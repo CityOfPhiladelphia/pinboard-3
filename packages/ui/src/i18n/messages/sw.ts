@@ -15,7 +15,7 @@ export default {
       onThisPage: 'Kwenye ukurasa huu',
     },
     nav: {
-      learnMore: 'Jifunze zaidi',
+      learnMore: 'Jifunze zaidi kuhusu zana hii',
     },
     footer: {
       termsOfUse: 'Masharti ya matumizi',

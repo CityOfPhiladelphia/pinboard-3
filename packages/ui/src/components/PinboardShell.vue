@@ -5,7 +5,8 @@ import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { CloseButton } from '@phila/phila-ui-button'
 import MobileNavPanel from './MobileNavPanel.vue'
 import PinboardSubFooter from './PinboardSubFooter.vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import type { VNode } from 'vue'
 import type { NavbarBrandProps, Language } from '@phila/phila-ui-app-header'
 import { useIsMobile } from '../composables/useIsMobile'
@@ -19,6 +20,7 @@ defineProps<{
   locale?: string
   feedbackHref?: string
   infoTitle?: string
+  infoLabel?: string
 }>()
 
 const emit = defineEmits<{
@@ -35,6 +37,16 @@ defineSlots<{
 
 const isMobile = useIsMobile()
 const infoSheetOpen = ref(false)
+const navbarInfoRef = ref<{ hide: () => void } | null>(null)
+const route = useRoute()
+
+watch(
+  () => route.fullPath,
+  () => {
+    navbarInfoRef.value?.hide()
+    infoSheetOpen.value = false
+  }
+)
 
 /* Capture-phase click on the wrapper runs before the inner Tooltip's
  * bubble-phase listener, so stopPropagation suppresses the tooltip and
@@ -129,9 +141,14 @@ function onSheetPointerUp() {
       <template v-if="infoTitle || $slots['navbar-end']" #navbar-end>
         <template v-if="infoTitle">
           <div v-if="isMobile" class="navbar-info-mobile-wrap" @click.capture.stop="openInfoSheet">
-            <NavbarInfo :info-title="infoTitle" :label="infoTitle" />
+            <NavbarInfo :info-title="infoTitle" :label="infoLabel ?? infoTitle" />
           </div>
-          <NavbarInfo v-else :info-title="infoTitle" :label="infoTitle">
+          <NavbarInfo
+            ref="navbarInfoRef"
+            v-else
+            :info-title="infoTitle"
+            :label="infoLabel ?? infoTitle"
+          >
             <slot name="info-body" />
           </NavbarInfo>
         </template>
