@@ -79,7 +79,7 @@ const sections = computed(() => [
   width: 100%;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.5rem;
+  gap: 0.75rem;
 }
 
 .subsection-container {
@@ -88,5 +88,7 @@ const sections = computed(() => [
   align-items: flex-start;
   gap: var(--spacing-xs, 0.5rem);
   align-self: stretch;
+  /* a little extra above each section so they read apart while paragraphs stay tight */
+  margin-top: 0.5rem;
 }
 </style>

@@ -77,7 +77,7 @@ function scrollToSection(id: string) {
   padding-bottom: 2rem;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .subsection-container {
@@ -111,7 +111,7 @@ function scrollToSection(id: string) {
   }
 
   .section {
-    gap: 1.25rem;
+    gap: 0.75rem;
     padding-bottom: 1.5rem;
   }
 
