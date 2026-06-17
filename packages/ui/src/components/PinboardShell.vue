@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader, NavbarInfo } from '@phila/phila-ui-app-header'
+import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
+import { CloseButton } from '@phila/phila-ui-button'
 import MobileNavPanel from './MobileNavPanel.vue'
 import PinboardSubFooter from './PinboardSubFooter.vue'
+import { ref } from 'vue'
 import type { VNode } from 'vue'
 import type { NavbarBrandProps, Language } from '@phila/phila-ui-app-header'
+import { useIsMobile } from '../composables/useIsMobile'
 
 defineProps<{
   title: string
@@ -28,6 +32,60 @@ defineSlots<{
   'info-body'?(): VNode[]
   'sub-footer'?(): VNode[]
 }>()
+
+const isMobile = useIsMobile()
+const infoSheetOpen = ref(false)
+
+/* Capture-phase click on the wrapper runs before the inner Tooltip's
+ * bubble-phase listener, so stopPropagation suppresses the tooltip and
+ * we open the bottom sheet instead. */
+function openInfoSheet(event: Event) {
+  event.preventDefault()
+  event.stopPropagation()
+  infoSheetOpen.value = true
+}
+
+function closeInfoSheet() {
+  infoSheetOpen.value = false
+  dragY.value = 0
+}
+
+/* Drag-down-to-dismiss. BottomSheet's built-in drag is snap-point based
+ * and a single snap point ([60]) clamps it to no movement, so we layer
+ * our own pointer tracking on top: translate the sheet to follow the
+ * pointer, dismiss past DRAG_DISMISS_THRESHOLD on release, otherwise
+ * spring back. Clicks (zero delta) pass through. */
+const DRAG_DISMISS_THRESHOLD = 160
+const dragY = ref(0)
+const isDraggingSheet = ref(false)
+let dragStartY = 0
+
+function onSheetPointerDown(e: PointerEvent) {
+  dragStartY = e.clientY
+  dragY.value = 0
+  isDraggingSheet.value = true
+  document.addEventListener('pointermove', onSheetPointerMove)
+  document.addEventListener('pointerup', onSheetPointerUp)
+  document.addEventListener('pointercancel', onSheetPointerUp)
+}
+
+function onSheetPointerMove(e: PointerEvent) {
+  if (!isDraggingSheet.value) return
+  dragY.value = Math.max(0, e.clientY - dragStartY)
+}
+
+function onSheetPointerUp() {
+  if (!isDraggingSheet.value) return
+  isDraggingSheet.value = false
+  document.removeEventListener('pointermove', onSheetPointerMove)
+  document.removeEventListener('pointerup', onSheetPointerUp)
+  document.removeEventListener('pointercancel', onSheetPointerUp)
+  if (dragY.value > DRAG_DISMISS_THRESHOLD) {
+    closeInfoSheet()
+  } else {
+    dragY.value = 0
+  }
+}
 </script>
 
 <template>
@@ -69,9 +127,14 @@ defineSlots<{
         </MobileNavPanel>
       </template>
       <template v-if="infoTitle || $slots['navbar-end']" #navbar-end>
-        <NavbarInfo v-if="infoTitle" :info-title="infoTitle" :label="infoTitle">
-          <slot name="info-body" />
-        </NavbarInfo>
+        <template v-if="infoTitle">
+          <div v-if="isMobile" class="navbar-info-mobile-wrap" @click.capture.stop="openInfoSheet">
+            <NavbarInfo :info-title="infoTitle" :label="infoTitle" />
+          </div>
+          <NavbarInfo v-else :info-title="infoTitle" :label="infoTitle">
+            <slot name="info-body" />
+          </NavbarInfo>
+        </template>
         <slot name="navbar-end" />
       </template>
     </AppHeader>
@@ -88,6 +151,25 @@ defineSlots<{
       </template>
     </AppFooter>
   </div>
+
+  <Teleport to="body">
+    <Transition name="pinboard-shell-scrim-fade">
+      <div v-if="infoSheetOpen" class="pinboard-shell-info-scrim" @click="closeInfoSheet" />
+    </Transition>
+    <BottomSheet
+      v-if="infoSheetOpen"
+      v-model="infoSheetOpen"
+      class="pinboard-shell-info-sheet"
+      :class="{ 'pinboard-shell-info-sheet--dragging': isDraggingSheet }"
+      :style="{ zIndex: 101, '--drag-y': `${dragY}px` }"
+      :snap-points="[60]"
+      @pointerdown="onSheetPointerDown"
+    >
+      <CloseButton class="pinboard-shell-info-close" @click="closeInfoSheet" />
+      <h2 class="has-text-heading-5">{{ infoTitle }}</h2>
+      <slot name="info-body" />
+    </BottomSheet>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -138,5 +220,53 @@ defineSlots<{
   .pinboard :deep(.phila-navbar-brand-link) {
     margin-left: var(--spacing-s) !important;
   }
+}
+
+
+</style>
+
+/* Teleported elements (scrim + bottom-sheet) live outside this component's
+ * DOM scope, so scoped selectors won't reach them. Unscoped block required. */
+<style>
+.pinboard-shell-info-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Sheet sizes to its content; snap-points value is ignored visually.
+ * --drag-y is set inline by the drag handler; transform-only transition
+ * springs the sheet back when the user releases under threshold, while
+ * keeping height static (animating to auto doesn't work cleanly). */
+.pinboard-shell-info-sheet .bottom-sheet {
+  height: auto !important;
+  max-height: 90dvh;
+  padding: 0 var(--spacing-m) 50px;
+  transform: translateY(var(--drag-y, 0px));
+  transition: transform 0.25s ease-out !important;
+}
+
+.pinboard-shell-info-sheet.pinboard-shell-info-sheet--dragging .bottom-sheet {
+  transition: none !important;
+}
+
+.pinboard-shell-scrim-fade-leave-active {
+  transition: opacity 0.25s ease-out;
+  pointer-events: none;
+}
+
+.pinboard-shell-scrim-fade-leave-to {
+  opacity: 0;
+}
+
+.pinboard-shell-info-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+}
+
+.pinboard-shell-info-sheet h2 {
+  margin-bottom: var(--spacing-s);
 }
 </style>
