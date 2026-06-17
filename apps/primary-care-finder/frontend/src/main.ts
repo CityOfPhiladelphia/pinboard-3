@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createPinboard, createPinboardRouter } from '@pinboard/ui'
 import App from './App.vue'
 import FinderView from './views/FinderView.vue'
+import InfoView from './views/InfoView.vue'
 import i18n from './i18n'
 
 const app = createApp(App)
@@ -16,6 +17,6 @@ app.use(
     },
   })
 )
-app.use(createPinboardRouter([{ path: '/', component: FinderView }]))
+app.use(createPinboardRouter([{ path: '/', component: FinderView }, { path: '/info', component: InfoView }]))
 
 app.mount('#app')

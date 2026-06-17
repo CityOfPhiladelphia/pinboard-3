@@ -30,6 +30,7 @@ const feedbackHref =
   >
     <template #info-body>
       <span class="has-text-body-small">{{ t('app.aboutBody') }}</span>
+      <RouterLink to="/info">{{ t('pinboard.nav.learnMore') }}</RouterLink>
     </template>
 
     <RouterView />
