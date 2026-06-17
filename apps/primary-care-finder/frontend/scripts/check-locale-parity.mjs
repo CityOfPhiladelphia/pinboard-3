@@ -8,7 +8,7 @@ import path from 'path'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const localesDir = path.resolve(__dirname, '../src/i18n')
 
-const NON_ENGLISH_LOCALES = ['es', 'ch', 'vi', 'ru', 'fr', 'ar', 'pt', 'ht', 'sw']
+const NON_ENGLISH_LOCALES = ['es', 'zh', 'vi', 'ru', 'fr', 'ar', 'pt', 'ht', 'sw']
 
 /**
  * Flattens a nested object into dotted-key entries.

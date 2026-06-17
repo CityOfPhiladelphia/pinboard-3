@@ -4,7 +4,7 @@ These keys currently render in **English** (via `fallbackLocale: 'en'` in vue-i1
 are absent from the non-English locale files. They must be sent to the city's translation service
 and then added to the appropriate locale files listed below.
 
-Affected non-English locales: **es, ch, vi, ru, fr, ar, pt, ht, sw**
+Affected non-English locales: **es, zh, vi, ru, fr, ar, pt, ht, sw**
 
 > **Back-fill note (option 1):** The page title and the visible filter-chip category labels were
 > re-keyed from existing legacy translations already present in each locale file (e.g. `app.name`

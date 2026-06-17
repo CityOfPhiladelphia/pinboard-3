@@ -1,6 +1,6 @@
 import en from './en'
 import es from './es'
-import ch from './ch'
+import zh from './zh'
 import vi from './vi'
 import ru from './ru'
 import fr from './fr'
@@ -9,4 +9,4 @@ import pt from './pt'
 import ht from './ht'
 import sw from './sw'
 
-export const pinboardMessages = { en, es, ch, vi, ru, fr, ar, pt, ht, sw }
+export const pinboardMessages = { en, es, zh, vi, ru, fr, ar, pt, ht, sw }

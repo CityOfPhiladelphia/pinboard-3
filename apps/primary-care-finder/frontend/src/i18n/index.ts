@@ -2,7 +2,7 @@ import { createI18n } from 'vue-i18n'
 import { pinboardMessages, mergeDeep } from '@pinboard/ui'
 import en from './en'
 import es from './es'
-import ch from './ch'
+import zh from './zh'
 import vi from './vi'
 import ru from './ru'
 import fr from './fr'
@@ -11,7 +11,7 @@ import pt from './pt'
 import ht from './ht'
 import sw from './sw'
 
-const appMessages = { en, es, ch, vi, ru, fr, ar, pt, ht, sw }
+const appMessages = { en, es, zh, vi, ru, fr, ar, pt, ht, sw }
 const messages = mergeDeep(pinboardMessages, appMessages)
 
 const i18n = createI18n({

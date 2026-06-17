@@ -9,7 +9,7 @@ export interface Language {
 export const languages: Language[] = [
   { code: 'en', title: 'English', lang: 'en' },
   { code: 'es', title: 'Español', lang: 'es' },
-  { code: 'ch', title: '中文', lang: 'zh' },
+  { code: 'zh', title: '中文', lang: 'zh' },
   { code: 'vi', title: 'Tiếng Việt', lang: 'vi' },
   { code: 'ru', title: 'Русский', lang: 'ru' },
   { code: 'fr', title: 'Français', lang: 'fr' },
