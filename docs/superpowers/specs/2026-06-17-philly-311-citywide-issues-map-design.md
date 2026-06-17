@@ -63,10 +63,11 @@ full bounds of Philadelphia, and panning is constrained to the city.
 Extend the existing route rather than add a new one.
 
 **Query params (additive, backward compatible):**
-- `radius` — relax so a city-wide load is possible. Either raise `MAX_RADIUS`
-  to cover the city from any anchor (~35 km) or treat an explicit
-  `radius=all` / omitted-with-`all=true` as "no radius bound, whole city".
-  Existing small-radius callers keep working.
+- `radius` — **raise** `MAX_RADIUS` so a single query can cover the city from
+  any anchor (~35 km); the new client sends an explicit large radius. Do **not**
+  change `DEFAULT_RADIUS` or reinterpret an omitted radius — existing callers
+  (which always send a radius) keep working unchanged. City-wide coverage is an
+  explicit opt-in (large radius), never a change to default semantics.
 - `cursor` — opaque keyset cursor encoding the last row's `(distance, Id)`.
   Absent = first page.
 - `limit` — page size (keep `MAX_LIMIT = 200`; default page size for the map
@@ -93,6 +94,21 @@ ordering **and** dodges the `OFFSET` 2000 ceiling.
 ```
 Keep the existing parent/child dedup (`toNearbyIssues`). Payload stays the
 current `Report` shape — the list cards need address/time/status/thumbnail.
+
+**Backward compatibility (non-breaking guarantee):** existing consumers —
+iOS (`AppDataStore`/`API.swift`), Android (`ApiService`/`ReportsLoader`), and
+`web/webportal` — all send `radius` explicitly and decode the response
+leniently (Swift `Decodable` and Gson both ignore unknown fields). The route
+stays backward compatible by holding to: (1) `cursor`/`count` optional, the
+existing param set behaves exactly as today; (2) only *raise* `MAX_RADIUS`,
+never change `DEFAULT_RADIUS` or omitted-radius semantics; (3) city-wide + count
+gated behind explicit opt-in; (4) only *add* response fields (`nextCursor`,
+`total`), never remove/rename, and keep the `issues[]` object shape identical
+(`toNearbyIssues` untouched). The `(distance, Id)` tie-break only makes ordering
+deterministic — it does not change the rows a non-paginated call returns.
+*Note for mobile owners (not a contract change):* iOS decodes several `Issue`
+fields as non-optional (`department`, `address`, `description`); the open-only
+city-wide query carries the same decode exposure the current query already has.
 
 **Risk to size in the plan:** confirm Salesforce SOQL allows `DISTANCE()` in
 both `ORDER BY` and `WHERE` with a cursor comparison, and that the dedup step
