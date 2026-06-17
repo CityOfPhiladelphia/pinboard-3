@@ -105,6 +105,17 @@ function scrollToSection(id: string) {
   gap: var(--spacing-xs, 0.5rem);
 }
 
+/* Zero the phila-ui typography margins on the TOC heading/items so the ul gap above is the
+   only spacing (the element-level margins otherwise stack on it and spread the links apart). */
+.info-toc h2 {
+  margin: 0 0 0.5rem;
+}
+
+.info-toc li,
+.info-toc a {
+  margin: 0;
+}
+
 @media (max-width: 768px) {
   .content-area {
     padding: 1.5rem 1rem 0 1rem;

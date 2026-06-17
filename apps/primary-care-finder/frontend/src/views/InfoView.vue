@@ -91,4 +91,19 @@ const sections = computed(() => [
   /* a little extra above each section so they read apart while paragraphs stay tight */
   margin-top: 0.5rem;
 }
+
+/* phila-ui typography puts margins on p/ol/li/headings that outrank the global *{margin:0}
+   reset (element selectors beat *). Zero them here so the flex gaps above are the ONLY
+   vertical spacing — otherwise the typography margins stack on top and leave big white gaps. */
+h1,
+h2,
+p,
+ol,
+li {
+  margin: 0;
+}
+
+ol {
+  padding-left: 1.5rem;
+}
 </style>
