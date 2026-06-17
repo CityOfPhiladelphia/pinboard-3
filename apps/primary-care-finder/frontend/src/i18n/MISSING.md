@@ -35,25 +35,25 @@ The category labels (`ageGroup`, `waitTime`, `specialty`, `tests`, `languages`) 
 choices that share legacy wording were back-filled. The keys below remain because their English
 text is new or differs from any legacy label.
 
-| Key                  | English source text            |
-| -------------------- | ------------------------------ |
-| `filters.sameDay`    | `Same day or walk in`          |
-| `filters.mat`        | `MAT`                          |
-| `filters.nutrition`  | `Nutrition`                    |
-| `filters.tobacco`    | `Tobacco cessation`            |
-| `filters.pharmacy`   | `Pharmacy`                     |
-| `filters.blood`      | `Blood`                        |
-| `filters.sti`        | `STI`                          |
-| `filters.covid`      | `COVID`                        |
-| `filters.spanish`    | `Spanish`                      |
-| `filters.mandarin`   | `Mandarin`                     |
-| `filters.vietnamese` | `Vietnamese`                   |
+| Key                  | English source text   |
+| -------------------- | --------------------- |
+| `filters.sameDay`    | `Same day or walk in` |
+| `filters.mat`        | `MAT`                 |
+| `filters.nutrition`  | `Nutrition`           |
+| `filters.tobacco`    | `Tobacco cessation`   |
+| `filters.pharmacy`   | `Pharmacy`            |
+| `filters.blood`      | `Blood`               |
+| `filters.sti`        | `STI`                 |
+| `filters.covid`      | `COVID`               |
+| `filters.spanish`    | `Spanish`             |
+| `filters.mandarin`   | `Mandarin`            |
+| `filters.vietnamese` | `Vietnamese`          |
 
 ### Search / navigation strings
 
-| Key                 | English source text               |
-| ------------------- | --------------------------------- |
-| `closeDetails`      | `Close details`                   |
+| Key            | English source text |
+| -------------- | ------------------- |
+| `closeDetails` | `Close details`     |
 
 ### Hours and schedule strings (legacy gap — never present in ported catalogs)
 
