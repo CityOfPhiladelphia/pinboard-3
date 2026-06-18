@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { PhilaLink } from '@phila/phila-ui-link'
 import { faChevronLeft } from '@fortawesome/pro-solid-svg-icons'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     backTo?: string
     sections: { id: string; title: string }[]
