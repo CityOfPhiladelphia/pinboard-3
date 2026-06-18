@@ -2,12 +2,7 @@
      service-type filter chips, geolocation-seeded load, and inline report detail. -->
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import {
-  Pinboard,
-  MapNavigationControl,
-  GeolocationButton,
-  BasemapToggle,
-} from '@pinboard/ui'
+import { Pinboard, MapNavigationControl, GeolocationButton, BasemapToggle } from '@pinboard/ui'
 import { useReportFinder } from '@/composables/useReportFinder'
 import ReportDetail from '@/components/ReportDetail.vue'
 import { searchAddress } from '@/composables/useAis'

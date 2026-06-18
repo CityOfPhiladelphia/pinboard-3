@@ -10,7 +10,7 @@ afterEach(() => {
 })
 
 // Seven points packed tightly — supercluster will cluster them at low zoom.
-const TIGHT_GROUP: PinboardTypes.BasicLocation[] =Array.from({ length: 7 }, (_, i) => ({
+const TIGHT_GROUP: PinboardTypes.BasicLocation[] = Array.from({ length: 7 }, (_, i) => ({
   id: `loc-${i}`,
   name: 'Pothole Repair',
   latitude: 39.95 + i * 0.0001,
@@ -18,7 +18,7 @@ const TIGHT_GROUP: PinboardTypes.BasicLocation[] =Array.from({ length: 7 }, (_, 
 }))
 
 // Two points spread far apart — they stay as singles even at moderate zoom.
-const FAR_APART: PinboardTypes.BasicLocation[] =[
+const FAR_APART: PinboardTypes.BasicLocation[] = [
   { id: 'a', name: 'Pothole Repair', latitude: 39.95, longitude: -75.16 },
   { id: 'b', name: 'Graffiti Removal', latitude: 40.7, longitude: -74.0 },
 ]
@@ -93,10 +93,7 @@ describe('useClusters', () => {
     // At zoom 10, the tight group should be clustered.
     expect(clusters.value.some((c) => c.type === 'cluster')).toBe(true)
 
-    const total = clusters.value.reduce(
-      (sum, c) => sum + (c.type === 'cluster' ? c.count : 1),
-      0,
-    )
+    const total = clusters.value.reduce((sum, c) => sum + (c.type === 'cluster' ? c.count : 1), 0)
     expect(total).toBe(TIGHT_GROUP.length)
   })
 })

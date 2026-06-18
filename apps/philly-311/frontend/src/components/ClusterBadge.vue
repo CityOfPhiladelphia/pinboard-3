@@ -9,7 +9,9 @@ defineEmits<{ click: [] }>()
   <button
     type="button"
     class="cluster-badge"
-    :class="count < 10 ? 'cluster-badge--sm' : count < 100 ? 'cluster-badge--md' : 'cluster-badge--lg'"
+    :class="
+      count < 10 ? 'cluster-badge--sm' : count < 100 ? 'cluster-badge--md' : 'cluster-badge--lg'
+    "
     :aria-label="`${count} reports — zoom in`"
     @click="$emit('click')"
   >

@@ -28,7 +28,13 @@ beforeEach(() => {
   setActivePinia(createPinia())
   const store = useOpenIssuesStore()
   ensureLoaded = vi.spyOn(store, 'ensureLoaded').mockResolvedValue(undefined)
-  store.$patch({ reports: [sample, other], byId: new Map([['1', sample], ['2', other]]) })
+  store.$patch({
+    reports: [sample, other],
+    byId: new Map([
+      ['1', sample],
+      ['2', other],
+    ]),
+  })
   getCurrentPosition.mockReset()
 })
 

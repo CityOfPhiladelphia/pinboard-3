@@ -22,10 +22,7 @@ const emit = defineEmits<{
   select: [loc: PinboardTypes.BasicLocation]
 }>()
 
-const { clusters, expansionZoom } = useClusters(
-  toRef(props, 'locations'),
-  toRef(props, 'zoom'),
-)
+const { clusters, expansionZoom } = useClusters(toRef(props, 'locations'), toRef(props, 'zoom'))
 
 const locationById = computed<Map<string, PinboardTypes.BasicLocation>>(() => {
   const m = new Map<string, PinboardTypes.BasicLocation>()
@@ -44,16 +41,10 @@ function onClusterClick(item: { id: number; lng: number; lat: number }) {
 
 <template>
   <template v-for="item in clusters" :key="item.type === 'cluster' ? 'c' + item.id : item.id">
-    <MapMarker
-      v-if="item.type === 'cluster'"
-      :lng-lat="[item.lng, item.lat]"
-    >
+    <MapMarker v-if="item.type === 'cluster'" :lng-lat="[item.lng, item.lat]">
       <ClusterBadge :count="item.count" @click="onClusterClick(item)" />
     </MapMarker>
-    <MapMarker
-      v-else-if="locationById.get(item.id)"
-      :lng-lat="[item.lng, item.lat]"
-    >
+    <MapMarker v-else-if="locationById.get(item.id)" :lng-lat="[item.lng, item.lat]">
       <MapIconTextPin
         :zoom="zoom"
         :icon="serviceTypeIconDefinition(locationById.get(item.id)!.name)"
