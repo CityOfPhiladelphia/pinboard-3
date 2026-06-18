@@ -132,11 +132,10 @@ describe('useNearbyReports', () => {
 
 describe('fetchPage', () => {
   it('maps response body to reports with paging metadata', async () => {
-    fetchMock.mockResolvedValueOnce(okResponse({ issues: [ISSUE], nextCursor: 'abc', total: 42 }))
+    fetchMock.mockResolvedValueOnce(okResponse({ issues: [ISSUE], total: 42 }))
 
     const result = await fetchPage({ lat: 39.9526, lng: -75.1652, radius: 800, limit: 50 })
 
-    expect(result.nextCursor).toBe('abc')
     expect(result.total).toBe(42)
     expect(result.reports).toHaveLength(1)
     expect(result.reports[0]).toMatchObject({
@@ -148,28 +147,28 @@ describe('fetchPage', () => {
     })
   })
 
-  it('passes cursor to the request query only when set', async () => {
-    fetchMock.mockResolvedValueOnce(okResponse({ issues: [], nextCursor: null }))
+  it('passes offset to the request query when set', async () => {
+    fetchMock.mockResolvedValueOnce(okResponse({ issues: [] }))
 
-    await fetchPage({ lat: 39.95, lng: -75.16, radius: 800, limit: 50, cursor: 'tok123' })
+    await fetchPage({ lat: 39.95, lng: -75.16, radius: 800, limit: 50, offset: 400 })
 
     const [calledUrl] = fetchMock.mock.calls[0]
     const url = new URL(calledUrl as string)
-    expect(url.searchParams.get('cursor')).toBe('tok123')
+    expect(url.searchParams.get('offset')).toBe('400')
   })
 
-  it('omits cursor from query when not set', async () => {
-    fetchMock.mockResolvedValueOnce(okResponse({ issues: [], nextCursor: null }))
+  it('omits offset from query when not set', async () => {
+    fetchMock.mockResolvedValueOnce(okResponse({ issues: [] }))
 
     await fetchPage({ lat: 39.95, lng: -75.16, radius: 800, limit: 50 })
 
     const [calledUrl] = fetchMock.mock.calls[0]
     const url = new URL(calledUrl as string)
-    expect(url.searchParams.has('cursor')).toBe(false)
+    expect(url.searchParams.has('offset')).toBe(false)
   })
 
   it('passes withTotal=true to query only when withTotal is set', async () => {
-    fetchMock.mockResolvedValueOnce(okResponse({ issues: [], nextCursor: null, total: 10 }))
+    fetchMock.mockResolvedValueOnce(okResponse({ issues: [], total: 10 }))
 
     await fetchPage({ lat: 39.95, lng: -75.16, radius: 800, limit: 50, withTotal: true })
 
@@ -179,7 +178,7 @@ describe('fetchPage', () => {
   })
 
   it('omits withTotal from query when not set', async () => {
-    fetchMock.mockResolvedValueOnce(okResponse({ issues: [], nextCursor: null }))
+    fetchMock.mockResolvedValueOnce(okResponse({ issues: [] }))
 
     await fetchPage({ lat: 39.95, lng: -75.16, radius: 800, limit: 50 })
 
@@ -198,7 +197,6 @@ describe('fetchPage', () => {
     expect(url.searchParams.get('count')).toBe('true')
     expect(result.total).toBe(42)
     expect(result.reports).toEqual([])
-    expect(result.nextCursor).toBeNull()
   })
 
   it('throws on non-ok response with the parsed error message', async () => {

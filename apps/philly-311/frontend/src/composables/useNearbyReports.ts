@@ -36,14 +36,13 @@ export interface PageParams {
   lng: number
   radius: number
   limit: number
-  cursor?: string
+  offset?: number
   withTotal?: boolean
   count?: boolean
 }
 
 export interface PageResult {
   reports: Report[]
-  nextCursor: string | null
   total?: number
 }
 
@@ -68,7 +67,6 @@ interface ApiNearbyIssue {
 
 interface ApiPageResponse {
   issues?: ApiNearbyIssue[]
-  nextCursor?: string | null
   total?: number
 }
 
@@ -89,7 +87,7 @@ export async function fetchPage(params: PageParams): Promise<PageResult> {
     radius: params.radius,
     limit: params.limit,
   }
-  if (params.cursor !== undefined) query.cursor = params.cursor
+  if (params.offset !== undefined) query.offset = params.offset
   if (params.withTotal) query.withTotal = 'true'
   if (params.count) query.count = 'true'
 
@@ -102,11 +100,11 @@ export async function fetchPage(params: PageParams): Promise<PageResult> {
   const body = (await res.json()) as ApiPageResponse
 
   if (params.count) {
-    return { reports: [], nextCursor: null, total: body.total }
+    return { reports: [], total: body.total }
   }
 
   const reports = (body.issues ?? []).map(toReport)
-  return { reports, nextCursor: body.nextCursor ?? null, total: body.total }
+  return { reports, total: body.total }
 }
 
 export function useNearbyReports() {

@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useOpenIssuesStore } from '../openIssues'
-import type { Report, PageResult } from '@/composables/useNearbyReports'
+import type { Report, PageResult, PageParams } from '@/composables/useNearbyReports'
 
 // ------- helpers -------
 
@@ -20,12 +20,8 @@ function makeReport(id: string): Report {
   }
 }
 
-function pageResult(
-  reports: Report[],
-  nextCursor: string | null,
-  total?: number,
-): PageResult {
-  return { reports, nextCursor, total }
+function pageResult(reports: Report[], total?: number): PageResult {
+  return { reports, total }
 }
 
 const SEED = { lat: 39.9526, lng: -75.1652 }
@@ -34,7 +30,7 @@ const FIXED_NOW = 1_000_000
 
 // Pre-loads the store with a single report (id '001', total 1) at FIXED_NOW.
 async function loadInitial(store: ReturnType<typeof useOpenIssuesStore>) {
-  const mockFetch = vi.fn().mockResolvedValueOnce(pageResult([makeReport('001')], null, 1))
+  const mockFetch = vi.fn().mockResolvedValueOnce(pageResult([makeReport('001')], 1))
   await store.ensureLoaded(SEED, { fetchPage: mockFetch, now: () => FIXED_NOW })
 }
 
@@ -51,11 +47,12 @@ describe('useOpenIssuesStore', () => {
 
       let isLoadingDuringPage2: boolean | undefined
       const mockFetch = vi.fn()
-        .mockResolvedValueOnce(pageResult([makeReport('001')], 'cursor1', 2))
+        // Page 1: total=250 > PAGE_LIMIT=200, so background loop starts at offset=200
+        .mockResolvedValueOnce(pageResult([makeReport('001')], 250))
         .mockImplementationOnce(async () => {
-          // Captured while page 2 is being fetched — after page 1 completed
+          // Captured while offset=200 page is being fetched — after page 1 completed
           isLoadingDuringPage2 = store.isLoading
-          return pageResult([makeReport('002')], null)
+          return pageResult([makeReport('002')]) // 1 report < PAGE_LIMIT, loop stops
         })
 
       const promise = store.ensureLoaded(SEED, { fetchPage: mockFetch })
@@ -75,13 +72,15 @@ describe('useOpenIssuesStore', () => {
       const r2dup = makeReport('002') // duplicate id — should appear only once
 
       const mockFetch = vi.fn()
-        .mockResolvedValueOnce(pageResult([r1, r2], 'cursor1', 3))
-        .mockResolvedValueOnce(pageResult([r2dup, r3], null))
+        // Page 1: total=250 > PAGE_LIMIT=200, loop enters at offset=200
+        .mockResolvedValueOnce(pageResult([r1, r2], 250))
+        // offset=200: 2 reports < PAGE_LIMIT, stops the loop
+        .mockResolvedValueOnce(pageResult([r2dup, r3]))
 
       await store.ensureLoaded(SEED, { fetchPage: mockFetch })
 
       expect(store.reports).toHaveLength(3) // r1, r2, r3; r2dup deduped
-      expect(store.total).toBe(3)
+      expect(store.total).toBe(250)
       expect(store.byId.has('001')).toBe(true)
       expect(store.byId.has('002')).toBe(true)
       expect(store.byId.has('003')).toBe(true)
@@ -92,14 +91,14 @@ describe('useOpenIssuesStore', () => {
 
     it('sets seed from the call argument', async () => {
       const store = useOpenIssuesStore()
-      const mockFetch = vi.fn().mockResolvedValueOnce(pageResult([], null, 0))
+      const mockFetch = vi.fn().mockResolvedValueOnce(pageResult([], 0))
       await store.ensureLoaded(SEED, { fetchPage: mockFetch })
       expect(store.seed).toEqual(SEED)
     })
 
     it('single-page load: isStreaming never true', async () => {
       const store = useOpenIssuesStore()
-      const mockFetch = vi.fn().mockResolvedValueOnce(pageResult([makeReport('001')], null, 1))
+      const mockFetch = vi.fn().mockResolvedValueOnce(pageResult([makeReport('001')], 1))
       await store.ensureLoaded(SEED, { fetchPage: mockFetch })
       expect(store.isStreaming).toBe(false)
       expect(mockFetch).toHaveBeenCalledTimes(1)
@@ -127,7 +126,9 @@ describe('useOpenIssuesStore', () => {
       const r1 = makeReport('001')
       const boom = new Error('stream fail')
       const mockFetch = vi.fn()
-        .mockResolvedValueOnce(pageResult([r1], 'cursor1', 2))
+        // Page 1: total=250 so loop starts at offset=200
+        .mockResolvedValueOnce(pageResult([r1], 250))
+        // offset=200 throws
         .mockRejectedValueOnce(boom)
 
       await store.ensureLoaded(SEED, { fetchPage: mockFetch })
@@ -145,7 +146,7 @@ describe('useOpenIssuesStore', () => {
       const store = useOpenIssuesStore()
       await loadInitial(store) // total=1
 
-      const mockFetch = vi.fn().mockResolvedValueOnce(pageResult([], null, 1)) // count returns same total
+      const mockFetch = vi.fn().mockResolvedValueOnce(pageResult([], 1)) // count returns same total
       await store.ensureLoaded(SEED, {
         fetchPage: mockFetch,
         now: () => FIXED_NOW + 1_000, // well within TTL
@@ -162,8 +163,8 @@ describe('useOpenIssuesStore', () => {
 
       const r2 = makeReport('002')
       const mockFetch = vi.fn()
-        .mockResolvedValueOnce(pageResult([], null, 2))    // count check: total now 2
-        .mockResolvedValueOnce(pageResult([r2], null, 2)) // page 1 of reload
+        .mockResolvedValueOnce(pageResult([], 2))    // count check: total now 2
+        .mockResolvedValueOnce(pageResult([r2], 2)) // page 1 of reload, total=2 < PAGE_LIMIT, no loop
       await store.ensureLoaded(SEED, {
         fetchPage: mockFetch,
         now: () => FIXED_NOW + 1_000,
@@ -182,7 +183,7 @@ describe('useOpenIssuesStore', () => {
       await loadInitial(store) // fetchedAt=FIXED_NOW, total=1
 
       const r2 = makeReport('002')
-      const reloadFetch = vi.fn().mockResolvedValueOnce(pageResult([r2], null, 1))
+      const reloadFetch = vi.fn().mockResolvedValueOnce(pageResult([r2], 1))
       await store.ensureLoaded(SEED, {
         fetchPage: reloadFetch,
         now: () => FIXED_NOW + 5 * 60_000 + 1, // 1ms past TTL
@@ -200,7 +201,7 @@ describe('useOpenIssuesStore', () => {
       const store = useOpenIssuesStore()
       await loadInitial(store)
 
-      const mockFetch = vi.fn().mockResolvedValueOnce(pageResult([], null, 1))
+      const mockFetch = vi.fn().mockResolvedValueOnce(pageResult([], 1))
       await store.ensureLoaded(ALT_SEED, {
         fetchPage: mockFetch,
         now: () => FIXED_NOW + 1_000,
@@ -217,7 +218,7 @@ describe('useOpenIssuesStore', () => {
   describe('concurrency guard', () => {
     it('concurrent calls share a single in-flight load', async () => {
       const store = useOpenIssuesStore()
-      const mockFetch = vi.fn().mockResolvedValueOnce(pageResult([makeReport('001')], null, 1))
+      const mockFetch = vi.fn().mockResolvedValueOnce(pageResult([makeReport('001')], 1))
 
       const p1 = store.ensureLoaded(SEED, { fetchPage: mockFetch })
       const p2 = store.ensureLoaded(SEED, { fetchPage: mockFetch })
@@ -228,6 +229,30 @@ describe('useOpenIssuesStore', () => {
 
       expect(mockFetch).toHaveBeenCalledTimes(1) // only one actual load
       expect(store.reports).toHaveLength(1)
+    })
+  })
+
+  describe('OFFSET_CAP', () => {
+    it('stops paging at OFFSET_CAP even when total exceeds it', async () => {
+      const store = useOpenIssuesStore()
+      const calledOffsets: number[] = []
+
+      const mockFetch = vi.fn().mockImplementation(async (params: PageParams) => {
+        calledOffsets.push(params.offset ?? 0)
+        // Return exactly 200 (PAGE_LIMIT) reports to prevent the early-stop branch
+        const reports = Array.from(
+          { length: 200 },
+          (_, i) => makeReport(`${params.offset ?? 0}_${i}`),
+        )
+        return { reports, total: params.withTotal ? 5000 : undefined }
+      })
+
+      await store.ensureLoaded(SEED, { fetchPage: mockFetch })
+
+      // offset=0 (page 1) + offset=200,400,...,1800 = 10 calls; offset=2000 must not appear
+      expect(mockFetch).toHaveBeenCalledTimes(10)
+      expect(calledOffsets).not.toContain(2000)
+      expect(Math.max(...calledOffsets)).toBe(1800)
     })
   })
 })

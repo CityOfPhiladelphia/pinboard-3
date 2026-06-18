@@ -12,6 +12,9 @@ import { CITYWIDE_RADIUS } from '@/utils/geoDefaults'
 
 const TTL_MS = 5 * 60_000
 const PAGE_LIMIT = 200
+// SOQL OFFSET cap mirrored from the backend — only the first 2000 nearest issues load;
+// full-city paging awaits the backend's future cursor pagination.
+const OFFSET_CAP = 2000
 
 export interface EnsureLoadedOpts {
   /** Override the clock; defaults to Date.now. Useful in tests. */
@@ -51,6 +54,7 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
         lng: anchor.lng,
         radius: CITYWIDE_RADIUS,
         limit: PAGE_LIMIT,
+        offset: 0,
         withTotal: true,
       })
       for (const r of page1.reports) {
@@ -68,18 +72,18 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
       isLoading.value = false
     }
 
-    let cursor = page1.nextCursor
-    if (!cursor) return
+    const bound = Math.min(total.value ?? 0, OFFSET_CAP)
+    if (PAGE_LIMIT >= bound) return
 
     isStreaming.value = true
-    while (cursor) {
+    for (let offset = PAGE_LIMIT; offset < bound; offset += PAGE_LIMIT) {
       try {
         const page = await fetch({
           lat: anchor.lat,
           lng: anchor.lng,
           radius: CITYWIDE_RADIUS,
           limit: PAGE_LIMIT,
-          cursor,
+          offset,
         })
         for (const r of page.reports) {
           if (!byId.value.has(r.id)) {
@@ -87,7 +91,7 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
             byId.value.set(r.id, r)
           }
         }
-        cursor = page.nextCursor
+        if (page.reports.length < PAGE_LIMIT) break
       } catch (e) {
         error.value = e as Error
         isStreaming.value = false
