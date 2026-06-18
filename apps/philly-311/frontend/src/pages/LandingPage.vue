@@ -4,20 +4,18 @@
 import { onMounted } from 'vue'
 import {
   Pinboard,
-  MapMarker,
-  MapIconTextPin,
   MapNavigationControl,
   GeolocationButton,
   BasemapToggle,
 } from '@pinboard/ui'
 import { useReportFinder } from '@/composables/useReportFinder'
-import { serviceTypeIconDefinition } from '@/utils/reportIcon'
 import ReportDetail from '@/components/ReportDetail.vue'
 import { searchAddress } from '@/composables/useAis'
 import ReportCallout from '@/components/ReportCallout.vue'
 import FilterChips from '@/components/FilterChips.vue'
 import ReportListingCard from '@/components/ReportListingCard.vue'
 import MapConstraints from '@/components/MapConstraints.vue'
+import ClusteredMarkers from '@/components/ClusteredMarkers.vue'
 
 const finder = useReportFinder()
 const searchPlaceholder = 'Search by address or ZIP'
@@ -89,22 +87,16 @@ async function onSearch(query: string) {
         :position="isMobile ? 'top-right' : 'bottom-right'"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
       />
-      <MapMarker
-        v-for="loc in finder.locations.value"
-        :key="loc.id"
-        :lng-lat="[loc.longitude, loc.latitude]"
-      >
-        <MapIconTextPin
-          :zoom="zoom"
-          :icon="serviceTypeIconDefinition(loc.name)"
-          color-theme="light-primary"
-          :hovered="hoveredId === loc.id"
-          :selected="selectedId === loc.id"
-          @mouseenter="onHover(loc.id)"
-          @mouseleave="onHoverEnd()"
-          @click="onSelect(loc)"
-        />
-      </MapMarker>
+      <ClusteredMarkers
+        :locations="finder.locations.value"
+        :zoom="zoom"
+        :map="map"
+        :hovered-id="hoveredId"
+        :selected-id="selectedId"
+        @hover="onHover"
+        @hover-end="onHoverEnd"
+        @select="onSelect"
+      />
     </template>
   </Pinboard>
 </template>
