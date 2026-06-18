@@ -25,7 +25,7 @@ export interface UseReportFinder {
 
 export function useReportFinder(): UseReportFinder {
   const store = useOpenIssuesStore()
-  const { reports, isLoading, error } = storeToRefs(store)
+  const { reports, isLoading, error, byId } = storeToRefs(store)
 
   const filter = ref('all')
 
@@ -56,7 +56,7 @@ export function useReportFinder(): UseReportFinder {
   })
 
   function reportById(id: string): Report | undefined {
-    return reports.value.find((r) => r.id === id)
+    return byId.value.get(id)
   }
 
   async function setCenter(loc: PinboardTypes.LatLon): Promise<void> {

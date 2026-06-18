@@ -2,10 +2,8 @@
 // ABOUTME: to the same Salesforce instance as /issues/:id so case-number IDs
 // ABOUTME: round-trip cleanly when a user clicks a marker for the detail page.
 // ABOUTME: Anonymous-ok route, so no auth handle is passed to api311Fetch.
-import { ref, type Ref } from 'vue'
 import { api311Fetch } from './api311'
 import { parseError } from './useApiError'
-import { DEFAULT_RADIUS } from '@/utils/geoDefaults'
 
 export interface Report {
   /** 8-digit Salesforce CaseNumber. Use this as the path param on /issues/:id. */
@@ -24,13 +22,6 @@ export interface Report {
   updatedAt?: string
 }
 
-export interface Region {
-  lat: number
-  lng: number
-  /** Maps to API's `radius` in meters. */
-  radius?: number
-}
-
 export interface PageParams {
   lat: number
   lng: number
@@ -45,8 +36,6 @@ export interface PageResult {
   reports: Report[]
   total?: number
 }
-
-const DEFAULT_LIMIT = 50
 
 interface ApiNearbyIssue {
   id: string
@@ -105,34 +94,4 @@ export async function fetchPage(params: PageParams): Promise<PageResult> {
 
   const reports = (body.issues ?? []).map(toReport)
   return { reports, total: body.total }
-}
-
-export function useNearbyReports() {
-  const reports: Ref<Report[]> = ref([])
-  const isLoading = ref(false)
-  const error = ref<Error | null>(null)
-
-  async function load(region: Region): Promise<Report[]> {
-    isLoading.value = true
-    error.value = null
-
-    try {
-      const result = await fetchPage({
-        lat: region.lat,
-        lng: region.lng,
-        radius: region.radius ?? DEFAULT_RADIUS,
-        limit: DEFAULT_LIMIT,
-      })
-      reports.value = result.reports
-      return reports.value
-    } catch (err) {
-      error.value = err as Error
-      reports.value = []
-      return []
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  return { reports, isLoading, error, load }
 }

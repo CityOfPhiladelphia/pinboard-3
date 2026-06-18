@@ -1,6 +1,6 @@
 // ABOUTME: Supercluster-backed composable that bins BasicLocation points into
 // ABOUTME: cluster/single items at the current zoom level, with throttled re-indexing.
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onScopeDispose } from 'vue'
 import type { Ref, ComputedRef } from 'vue'
 import Supercluster from 'supercluster'
 import type { PinboardTypes } from '@pinboard/ui'
@@ -57,6 +57,10 @@ export function useClusters(
       pendingLoad = true
     }
   }
+
+  onScopeDispose(() => {
+    if (throttleTimer) clearTimeout(throttleTimer)
+  })
 
   // Seed index with initial points synchronously so the computed isn't empty.
   index.load(points.value.map(toFeature))

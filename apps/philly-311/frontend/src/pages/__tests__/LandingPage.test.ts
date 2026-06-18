@@ -123,7 +123,7 @@ beforeEach(() => {
   setActivePinia(createPinia())
   const store = useOpenIssuesStore()
   ensureLoaded = vi.spyOn(store, 'ensureLoaded').mockResolvedValue(undefined)
-  store.$patch({ reports: initialReports })
+  store.$patch({ reports: initialReports, byId: new Map(initialReports.map((r) => [r.id, r])) })
 })
 
 describe('LandingPage', () => {

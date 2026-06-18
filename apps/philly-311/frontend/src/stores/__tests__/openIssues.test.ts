@@ -118,6 +118,25 @@ describe('useOpenIssuesStore', () => {
       expect(store.reports).toHaveLength(0)
       expect(store.error).toBe(boom)
     })
+
+    it('preserves prior dataset when page-1 fails during a reload', async () => {
+      const store = useOpenIssuesStore()
+      await loadInitial(store) // reports=['001'], total=1, fetchedAt=FIXED_NOW
+
+      const boom = new Error('reload page-1 fail')
+      // TTL expired → reload path; page 1 fails
+      const mockFetch = vi.fn().mockRejectedValueOnce(boom)
+      await store.ensureLoaded(SEED, {
+        fetchPage: mockFetch,
+        now: () => FIXED_NOW + 5 * 60_000 + 1, // 1ms past TTL
+      })
+
+      expect(store.isLoading).toBe(false)
+      // Prior data intact
+      expect(store.reports).toHaveLength(1)
+      expect(store.reports[0].id).toBe('001')
+      expect(store.error).toBe(boom)
+    })
   })
 
   describe('mid-stream error', () => {
@@ -137,6 +156,29 @@ describe('useOpenIssuesStore', () => {
       expect(store.reports[0].id).toBe('001')
       expect(store.isStreaming).toBe(false)
       expect(store.isLoading).toBe(false)
+      expect(store.error).toBe(boom)
+    })
+  })
+
+  describe('count-check error (populated + within TTL)', () => {
+    it('retains cached data and surfaces error when count fetch rejects', async () => {
+      const store = useOpenIssuesStore()
+      await loadInitial(store) // reports=['001'], total=1
+
+      const boom = new Error('count check failed')
+      const mockFetch = vi.fn().mockRejectedValueOnce(boom)
+      await store.ensureLoaded(SEED, {
+        fetchPage: mockFetch,
+        now: () => FIXED_NOW + 1_000, // well within TTL
+      })
+
+      // Only the failing count call — no page reload
+      expect(mockFetch).toHaveBeenCalledTimes(1)
+      expect(mockFetch.mock.calls[0][0]).toMatchObject({ count: true })
+      // Cached data preserved
+      expect(store.reports).toHaveLength(1)
+      expect(store.reports[0].id).toBe('001')
+      // Error surfaced
       expect(store.error).toBe(boom)
     })
   })

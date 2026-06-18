@@ -41,9 +41,15 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
     fetch: (params: PageParams) => Promise<PageResult>,
     now: () => number,
   ): Promise<void> {
-    reports.value = []
-    byId.value = new Map()
-    total.value = null
+    // For an initial (empty-cache) load there is nothing to preserve, so clear immediately.
+    // For a reload, keep prior data in place until page 1 succeeds to avoid a blank state
+    // if page 1 fails mid-reload.
+    const isReload = fetchedAt.value !== null
+    if (!isReload) {
+      reports.value = []
+      byId.value = new Map()
+      total.value = null
+    }
     error.value = null
     isLoading.value = true
 
@@ -57,12 +63,17 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
         offset: 0,
         withTotal: true,
       })
+      // Page 1 landed — atomically replace the dataset (clears stale data on reload path).
+      const newById = new Map<string, Report>()
+      const newReports: Report[] = []
       for (const r of page1.reports) {
-        if (!byId.value.has(r.id)) {
-          reports.value.push(r)
-          byId.value.set(r.id, r)
+        if (!newById.has(r.id)) {
+          newReports.push(r)
+          newById.set(r.id, r)
         }
       }
+      reports.value = newReports
+      byId.value = newById
       total.value = page1.total ?? null
       fetchedAt.value = now()
     } catch (e) {
@@ -120,16 +131,23 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
       return
     }
 
-    // Within TTL: check live count before deciding to reload
-    const { total: liveTotal } = await fetch({
-      lat: anchor.lat,
-      lng: anchor.lng,
-      radius: CITYWIDE_RADIUS,
-      limit: PAGE_LIMIT,
-      count: true,
-    })
+    // Within TTL: check live count before deciding to reload.
+    // On a transient failure here, keep the cached dataset — a flaky revalidation
+    // should not evict good data.
+    try {
+      const { total: liveTotal } = await fetch({
+        lat: anchor.lat,
+        lng: anchor.lng,
+        radius: CITYWIDE_RADIUS,
+        limit: PAGE_LIMIT,
+        count: true,
+      })
 
-    if (liveTotal === total.value) return // cache is still fresh
+      if (liveTotal === total.value) return // cache is still fresh
+    } catch (e) {
+      error.value = e as Error
+      return
+    }
 
     await _fullLoad(anchor, fetch, now)
   }
@@ -138,6 +156,8 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
     newSeed: { lat: number; lng: number },
     opts?: EnsureLoadedOpts,
   ): Promise<void> {
+    // CITYWIDE_RADIUS covers the full city from any in-bounds seed, so a seed change
+    // mid-flight doesn't affect the completeness of the dataset being loaded.
     seed.value = newSeed
 
     if (_inFlight) return _inFlight
