@@ -7,9 +7,9 @@ export type * as PinboardTypes from './types'
 export {
   type BitWiseOperation,
   type MatchingFunction,
-  type IFilterChoiceGroup,
+  type IFilterChoiceBitfieldGroup,
   type IFilterSet,
-  FilterChoiceGroup,
+  FilterChoiceBitfieldGroup,
   FilterSet,
 } from './composables/datafilters/types'
 export type * as PinboardFilterTypes from './composables/datafilters/types'

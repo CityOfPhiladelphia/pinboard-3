@@ -245,7 +245,6 @@ function handleCloseLocationDetail() {
 }
 
 function handleApplyFilter(value: FilterValues) {
-  console.log(value)
   emit('update:filterValues', value)
 }
 

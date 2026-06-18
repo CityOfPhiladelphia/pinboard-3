@@ -1,4 +1,4 @@
-import type { PinboardTypes } from '@pinboard/ui'
+import type { PinboardTypes, FilterValues } from '@pinboard/ui'
 
 export interface PrimaryCareProperties {
   objectid: number
@@ -94,4 +94,37 @@ export interface PrimaryCareFeature extends PinboardTypes.ArcgisFeature {
 
 export interface PrimaryCareResponse extends PinboardTypes.ArcgisResponse {
   features: PrimaryCareFeature[]
+}
+
+export type SortMode = 'distance' | 'name'
+export type AgeGroupFilter = 'adult' | 'children'
+export type WaitTimeFilter = 'sameDay' | 'weekWell' | 'weekSick' | 'twoMonths'
+export type VisitTypeFilter =
+  | 'primaryWell'
+  | 'primarySick'
+  | 'primarySports'
+  | 'primaryPrenatal'
+  | 'primaryWomen'
+  | 'primaryTelehealth'
+  | 'primaryVaccines'
+export type SpecialtyFilter =
+  | 'mental'
+  | 'dental'
+  | 'eye'
+  | 'podiatry'
+  | 'mat'
+  | 'nutrition'
+  | 'tobacco'
+  | 'pharmacy'
+export type TestsFilter = 'blood' | 'sti' | 'covid' | 'mammo' | 'xray'
+export type LanguagesFilter = 'spanish' | 'mandarin' | 'vietnamese'
+
+export interface PrimaryCareFilterValues extends FilterValues {
+  sort: SortMode
+  ageGroup: AgeGroupFilter[]
+  waitTime: WaitTimeFilter[]
+  visitType: VisitTypeFilter[]
+  specialty: SpecialtyFilter[]
+  tests: TestsFilter[]
+  languages: LanguagesFilter[]
 }

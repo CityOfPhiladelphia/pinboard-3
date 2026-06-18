@@ -22,12 +22,12 @@ export const getAllUniqueValuesFromStringField = (
 /*
     // BIT MANIPULATING FUNCTIONS
     */
-export const createOptionBitmask = (
+export function createOptionBitmask(
   data: Record<string, unknown>[],
   dataFields: string[],
   matchValues: string[],
-  selectionFunction: Function
-) => {
+  matchingFunction: Function
+) {
   const bitarray = new Uint32Array(getBufferSize(data.length)) // bitArray for holdin set bits
   let accumulator = 0 // accumulate set bits before being pushed into buffer
   let offset = 0 // tracks the offset for setting a bit in the accumulator
@@ -35,7 +35,7 @@ export const createOptionBitmask = (
 
   // for each item, run bit setting function
   data.forEach((item, i) => {
-    accumulator |= selectionFunction(item, dataFields, matchValues) ? setBit : 0
+    accumulator |= matchingFunction(item, dataFields, matchValues) ? setBit : 0
     setBit <<= 1 // shift setBit to the left: 00000010 <<= 00000001
 
     // on 8th iteration, push bits to buffers and reset accumulators and setBit

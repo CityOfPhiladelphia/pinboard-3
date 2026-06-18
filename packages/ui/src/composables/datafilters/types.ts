@@ -1,4 +1,5 @@
-import { bitarrayBitwiseOperator, createOptionBitmask } from './functions'
+import { bitarrayBitwiseOperator, createOptionBitmask, getUniformBitarray } from './functions'
+import type { FilterValues } from '../..'
 
 type BitWiseOperation = '&' | '|' | '^'
 
@@ -7,10 +8,43 @@ interface ClassWithBitfieldGetter {
 }
 
 interface MatchingFunction {
-  <T>(item: Record<string, T>, dataField: string, matchValues: T[]): boolean
+  <T>(item: Record<string, T>, dataFields: string[], matchValues: T[]): boolean
 }
 
-interface IFilterChoiceGroup {
+export interface IFilterChoiceBitfield {
+  data: Record<string, unknown>[]
+  dataFields: string[]
+  matches: string[]
+  matchingFunction: MatchingFunction
+}
+
+export class FilterChoiceBitfield {
+  private bitfield: Uint32Array
+  private checked: boolean = false
+
+  constructor(params: IFilterChoiceBitfield) {
+    this.bitfield = createOptionBitmask(
+      params.data,
+      params.dataFields,
+      params.matches,
+      params.matchingFunction
+    )
+  }
+
+  getBitfield() {
+    return this.checked ? this.bitfield : getUniformBitarray(this.bitfield.length, 0)
+  }
+
+  getChecked() {
+    return this.checked
+  }
+
+  setChecked(checked: boolean) {
+    this.checked = checked
+  }
+}
+
+interface IFilterChoiceBitfieldGroup {
   operation: BitWiseOperation
   data: Record<string, unknown>[]
   choices: Record<
@@ -23,19 +57,18 @@ interface IFilterChoiceGroup {
   >
 }
 
-class FilterChoiceGroup implements ClassWithBitfieldGetter {
-  private choiceBitfields: Record<string, Uint32Array> = {}
+class FilterChoiceBitfieldGroup implements ClassWithBitfieldGetter {
+  private choiceBitfields: Record<string, FilterChoiceBitfield> = {}
   private operation: BitWiseOperation
-  constructor(params: IFilterChoiceGroup) {
-    console.log('PARAMS: ', params)
+  constructor(params: IFilterChoiceBitfieldGroup) {
     this.operation = params.operation
     Object.entries(params.choices).forEach((choice) => {
-      this.choiceBitfields[choice[0]] = createOptionBitmask(
-        params.data,
-        choice[1].dataFields,
-        choice[1].matches,
-        choice[1].matchingFunction
-      )
+      this.choiceBitfields[choice[0]] = new FilterChoiceBitfield({
+        data: params.data,
+        dataFields: choice[1].dataFields,
+        matches: choice[1].matches,
+        matchingFunction: choice[1].matchingFunction,
+      })
     })
   }
 
@@ -50,12 +83,12 @@ class FilterChoiceGroup implements ClassWithBitfieldGetter {
 
 interface IFilterSet {
   operation: BitWiseOperation
-  childFilters: (FilterChoiceGroup | FilterSet)[]
+  childFilters: Record<string, FilterChoiceBitfieldGroup | FilterSet>
 }
 
 class FilterSet implements ClassWithBitfieldGetter {
   private operation: BitWiseOperation
-  private childFilters: (FilterChoiceGroup | FilterSet)[]
+  private childFilters: Record<string, FilterChoiceBitfieldGroup | FilterSet>
   constructor(params: IFilterSet) {
     this.operation = params.operation
     this.childFilters = params.childFilters
@@ -64,11 +97,13 @@ class FilterSet implements ClassWithBitfieldGetter {
   bitfield(activeFilters: string[]): Uint32Array<ArrayBufferLike> {
     return bitarrayBitwiseOperator(
       null,
-      Array.from(this.childFilters, (childFilter) => childFilter.bitfield(activeFilters)),
+      Array.from(Object.values(this.childFilters), (childFilter) =>
+        childFilter.bitfield(activeFilters)
+      ),
       this.operation
     )
   }
 }
 
-export type { BitWiseOperation, MatchingFunction, IFilterChoiceGroup, IFilterSet }
-export { FilterChoiceGroup, FilterSet }
+export type { BitWiseOperation, MatchingFunction, IFilterChoiceBitfieldGroup, IFilterSet }
+export { FilterChoiceBitfieldGroup, FilterSet }
