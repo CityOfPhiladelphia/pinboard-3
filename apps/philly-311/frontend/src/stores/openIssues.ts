@@ -1,5 +1,5 @@
 // ABOUTME: Pinia store owning the canonical citywide open-issue dataset.
-// ABOUTME: Loads progressively (page 1 first, then background paging) with count+TTL cache invalidation.
+// ABOUTME: Loads progressively (page 1 first, then background paging) with probe+TTL cache invalidation.
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import {
@@ -36,6 +36,21 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
   // Not part of exposed state — tracks the in-flight Promise to prevent concurrent loads.
   let _inFlight: Promise<void> | null = null
 
+  /** Fetches a single row and derives total from the Link `last` offset. */
+  async function _probeTotal(
+    fetch: (params: PageParams) => Promise<PageResult>,
+    anchor: { lat: number; lng: number },
+  ): Promise<number> {
+    const { reports: rows, lastOffset } = await fetch({
+      lat: anchor.lat,
+      lng: anchor.lng,
+      radius: CITYWIDE_RADIUS,
+      limit: 1,
+      offset: 0,
+    })
+    return rows.length === 0 ? 0 : lastOffset !== null ? lastOffset + 1 : rows.length
+  }
+
   async function _fullLoad(
     anchor: { lat: number; lng: number },
     fetch: (params: PageParams) => Promise<PageResult>,
@@ -61,7 +76,6 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
         radius: CITYWIDE_RADIUS,
         limit: PAGE_LIMIT,
         offset: 0,
-        withTotal: true,
       })
       // Page 1 landed — atomically replace the dataset (clears stale data on reload path).
       const newById = new Map<string, Report>()
@@ -74,7 +88,6 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
       }
       reports.value = newReports
       byId.value = newById
-      total.value = page1.total ?? null
       fetchedAt.value = now()
     } catch (e) {
       error.value = e as Error
@@ -83,18 +96,27 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
       isLoading.value = false
     }
 
-    const bound = Math.min(total.value ?? 0, OFFSET_CAP)
-    if (PAGE_LIMIT >= bound) return
+    // Probe for total after page 1 is painted
+    try {
+      total.value = await _probeTotal(fetch, anchor)
+    } catch (e) {
+      error.value = e as Error
+      return
+    }
+
+    // Background paging driven by nextOffset from each page
+    let next = page1.nextOffset
+    if (next === null || next >= OFFSET_CAP) return
 
     isStreaming.value = true
-    for (let offset = PAGE_LIMIT; offset < bound; offset += PAGE_LIMIT) {
+    while (next !== null && next < OFFSET_CAP) {
       try {
         const page = await fetch({
           lat: anchor.lat,
           lng: anchor.lng,
           radius: CITYWIDE_RADIUS,
           limit: PAGE_LIMIT,
-          offset,
+          offset: next,
         })
         for (const r of page.reports) {
           if (!byId.value.has(r.id)) {
@@ -102,7 +124,8 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
             byId.value.set(r.id, r)
           }
         }
-        if (page.reports.length < PAGE_LIMIT) break
+        if (page.reports.length === 0) break
+        next = page.nextOffset
       } catch (e) {
         error.value = e as Error
         isStreaming.value = false
@@ -131,23 +154,18 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
       return
     }
 
-    // Within TTL: check live count before deciding to reload.
+    // Within TTL: probe live total before deciding to reload.
     // On a transient failure here, keep the cached dataset — a flaky revalidation
     // should not evict good data.
+    let liveTotal: number
     try {
-      const { total: liveTotal } = await fetch({
-        lat: anchor.lat,
-        lng: anchor.lng,
-        radius: CITYWIDE_RADIUS,
-        limit: PAGE_LIMIT,
-        count: true,
-      })
-
-      if (liveTotal === total.value) return // cache is still fresh
+      liveTotal = await _probeTotal(fetch, anchor)
     } catch (e) {
       error.value = e as Error
       return
     }
+
+    if (liveTotal === total.value) return // cache is still fresh
 
     await _fullLoad(anchor, fetch, now)
   }

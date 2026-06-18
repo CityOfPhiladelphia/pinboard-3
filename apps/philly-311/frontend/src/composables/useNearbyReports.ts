@@ -28,13 +28,12 @@ export interface PageParams {
   radius: number
   limit: number
   offset?: number
-  withTotal?: boolean
-  count?: boolean
 }
 
 export interface PageResult {
   reports: Report[]
-  total?: number
+  nextOffset: number | null
+  lastOffset: number | null
 }
 
 interface ApiNearbyIssue {
@@ -54,11 +53,6 @@ interface ApiNearbyIssue {
   childCount: number
 }
 
-interface ApiPageResponse {
-  issues?: ApiNearbyIssue[]
-  total?: number
-}
-
 function toReport(i: ApiNearbyIssue): Report {
   return {
     ...i,
@@ -69,16 +63,45 @@ function toReport(i: ApiNearbyIssue): Report {
   }
 }
 
+/**
+ * Parse the RFC 5988 `Link` response header, extracting `next` and `last` offsets.
+ * Each part is `<url>; rel="x"`. The offset is read from the `offset` query param.
+ */
+export function parseLinkHeader(header: string | null): {
+  next: number | null
+  last: number | null
+} {
+  if (!header) return { next: null, last: null }
+  let next: number | null = null
+  let last: number | null = null
+  for (const part of header.split(',')) {
+    const match = part.match(/<([^>]+)>;\s*rel="([^"]+)"/)
+    if (!match) continue
+    const [, urlStr, rel] = match
+    if (rel !== 'next' && rel !== 'last') continue
+    try {
+      const url = new URL(urlStr, 'http://localhost')
+      const raw = url.searchParams.get('offset')
+      if (raw === null) continue
+      const num = parseInt(raw, 10)
+      if (isNaN(num)) continue
+      if (rel === 'next') next = num
+      else last = num
+    } catch {
+      continue
+    }
+  }
+  return { next, last }
+}
+
 export async function fetchPage(params: PageParams): Promise<PageResult> {
-  const query: Record<string, string | number | boolean | undefined> = {
+  const query: Record<string, string | number | undefined> = {
     lat: params.lat,
     lng: params.lng,
     radius: params.radius,
     limit: params.limit,
   }
   if (params.offset !== undefined) query.offset = params.offset
-  if (params.withTotal) query.withTotal = 'true'
-  if (params.count) query.count = 'true'
 
   const res = await api311Fetch({ path: '/private/key/nearby-issues', query })
 
@@ -86,12 +109,9 @@ export async function fetchPage(params: PageParams): Promise<PageResult> {
     throw await parseError(res)
   }
 
-  const body = (await res.json()) as ApiPageResponse
-
-  if (params.count) {
-    return { reports: [], total: body.total }
-  }
-
+  const link = res.headers.get('Link')
+  const { next, last } = parseLinkHeader(link)
+  const body = (await res.json()) as { issues?: ApiNearbyIssue[] }
   const reports = (body.issues ?? []).map(toReport)
-  return { reports, total: body.total }
+  return { reports, nextOffset: next, lastOffset: last }
 }
