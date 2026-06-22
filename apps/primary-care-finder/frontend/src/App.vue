@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, toValue } from 'vue'
+import { computed, ref, toValue, watchEffect } from 'vue'
 import {
   PinboardBody,
   PinboardShell,
@@ -12,14 +12,30 @@ import {
   FilterChoiceBitfieldGroup,
   FilterSet,
 } from '@pinboard/ui'
-import '@pinboard/ui/style.css'
-import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
-import type { FilterDefinition, FilterValues, IFilterSet, PinboardTypes } from '@pinboard/ui'
+import type { FilterValues, PinboardTypes } from '@pinboard/ui'
 import { useLocations } from './composables/useLocations'
 import { LocationCard, LocationDetail } from './components/_index.ts'
+import { filterDefinitions } from './configs/filterChipDefinitions.ts'
+import {
+  waitTimeFilterParams,
+  visitTypeFilterParams,
+  specialtyFilterParams,
+  testsFilterParams,
+  languageFilterParams,
+  optionNames,
+} from './configs/filterLogicParams.ts'
 import type { PrimaryCareFilterValues, PrimaryCareLocation } from './types'
 
 const searchPlaceholderText = 'Search by address or keyword...'
+const emptyFilters: PrimaryCareFilterValues = {
+        sort: '',
+        ageGroup: [],
+        waitTime: [],
+        visitType: [],
+        specialty: [],
+        tests: [],
+        languages: [],
+      }
 
 const isMobile = PinboardComposables.useIsMobile()
 const { locations, isLoading, errorMessage, geojson } = useLocations()
@@ -30,315 +46,149 @@ const userLocation = ref<PinboardTypes.LatLon>({
   latitude: NaN,
   longitude: NaN,
 })
+
 const searchString = ref('')
 
-const filterValues = ref<PrimaryCareFilterValues>({
-  sort: 'name',
-  ageGroup: [],
-  waitTime: [],
-  visitType: [],
-  specialty: [],
-  tests: [],
-  languages: [],
-})
-
-const filterDefinitions: FilterDefinition[] = [
-  {
-    key: 'sort',
-    label: 'Sort',
-    multiple: false,
-    excludeFromCount: true,
-    iconDefinition: faArrowUpArrowDown,
-    // TODO(teammate): finalize sort options + ordering logic.
-    choices: [
-      { text: 'Distance', value: 'distance' },
-      { text: 'Name (A–Z)', value: 'name' },
-    ],
-  },
-  {
-    key: 'ageGroup',
-    label: 'Age Group',
-    multiple: true,
-    choices: [
-      { text: 'Adult', value: 'adult' },
-      { text: 'Children', value: 'children' },
-    ],
-  },
-  {
-    key: 'waitTime',
-    label: 'Wait time (Primary Care)',
-    multiple: true,
-    choices: [
-      { text: 'Same day or walk in', value: 'sameDay' },
-      { text: '<1 week (well visit)', value: 'weekWell' },
-      { text: '<1 week (sick visit)', value: 'weekSick' },
-      { text: '<2 months (all primary care)', value: 'twoMonths' },
-    ],
-  },
-  {
-    key: 'visitType',
-    label: 'Primary care',
-    multiple: true,
-    choices: [
-      { text: 'Well visit', value: 'primaryWell' },
-      { text: 'Sick visit', value: 'primarySick' },
-      { text: 'Sports physicals', value: 'primarySports' },
-      { text: 'Prenatal care', value: 'primaryPrenatal' },
-      { text: "Women's health", value: 'primaryWomen' },
-      { text: 'Telehealth', value: 'primaryTelehealth' },
-      { text: 'Vaccines', value: 'primaryVaccines' },
-    ],
-  },
-  {
-    key: 'specialty',
-    label: 'Speciality services',
-    multiple: true,
-    choices: [
-      { text: 'Mental health', value: 'mental' },
-      { text: 'Dental', value: 'dental' },
-      { text: 'Eye care', value: 'eye' },
-      { text: 'Podiatry', value: 'podiatry' },
-      { text: 'MAT', value: 'mat' },
-      { text: 'Nutrition', value: 'nutrition' },
-      { text: 'Tobacco cessation', value: 'tobacco' },
-      { text: 'Pharmacy', value: 'pharmacy' },
-    ],
-  },
-  {
-    key: 'tests',
-    label: 'Tests and imaging',
-    multiple: true,
-    choices: [
-      { text: 'Blood', value: 'blood' },
-      { text: 'STI', value: 'sti' },
-      { text: 'COVID', value: 'covid' },
-      { text: 'Mammography', value: 'mammo' },
-      { text: 'X-ray', value: 'xray' },
-    ],
-  },
-  {
-    key: 'languages',
-    label: 'Languages spoken by staff',
-    multiple: true,
-    // TODO(teammate): replace with real `language` field values.
-    choices: [
-      { text: 'Spanish', value: 'spanish' },
-      { text: 'Mandarin', value: 'mandarin' },
-      { text: 'Vietnamese', value: 'vietnamese' },
-    ],
-  },
-]
-
-const matchYes = ['Yes']
-const matchYesEstPat = ['Yes', 'Established Patients']
-
-function matchFieldsToOptions(
-  item: Record<string, unknown>,
-  fieldNames: string[],
-  valuesToMatch: unknown[]
-) {
-  return fieldNames.some((fieldName) => valuesToMatch.includes(item[fieldName]))
-}
-
-function matchOptionInString(
-  item: Record<string, unknown>,
-  fieldNames: string[],
-  valuesToMatch: unknown[]
-) {
-  return fieldNames.some((fieldName) =>
-    valuesToMatch.some((value) =>
-      String(item[fieldName]).toLowerCase().trim().includes(String(value).toLowerCase().trim())
-    )
-  )
-}
+const filterValues = ref<PrimaryCareFilterValues>(emptyFilters)
 
 const filterBitfields = computed(() => {
-  if (locations.value.length) {
-    const waitTimeFilter = new FilterChoiceBitfieldGroup({
-      data: locations.value,
-      operation: '|',
-      choices: {
-        [filterDefinitions[2].choices?.[0].value ?? 'sameDay']: {
-          dataFields: ['wait_sameday_sick_ad', 'wait_sameday_sick_ch'],
-          matches: matchYes,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[2].choices?.[1].value ?? 'weekWell']: {
-          dataFields: ['wait_week_well_ad', 'wait_week_well_ch'],
-          matches: matchYes,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[2].choices?.[2].value ?? 'weekSick']: {
-          dataFields: ['wait_week_sick_ad', 'wait_week_sick_ch'],
-          matches: matchYes,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[2].choices?.[3].value ?? 'twoMonths']: {
-          dataFields: ['wait_2mo_ad', 'wait_2mo_ch'],
-          matches: matchYes,
-          matchingFunction: matchFieldsToOptions,
-        },
-      },
-    })
-
-    const visitTypeFilter = new FilterChoiceBitfieldGroup({
-      data: locations.value,
-      operation: '|',
-      choices: {
-        [filterDefinitions[3].choices?.[0].value ?? 'primaryWell']: {
-          dataFields: ['primary_well_ad', 'primary_well_ch'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[3].choices?.[1].value ?? 'primarySick']: {
-          dataFields: ['primary_sick_ad', 'primary_sick_ch'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[3].choices?.[2].value ?? 'primarySports']: {
-          dataFields: ['primary_sports'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[3].choices?.[3].value ?? 'primaryPrenatal']: {
-          dataFields: ['primary_prenatal'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[3].choices?.[4].value ?? 'primaryWomen']: {
-          dataFields: ['primary_women'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[3].choices?.[5].value ?? 'primaryTelehealth']: {
-          dataFields: ['primary_telehealth'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[3].choices?.[6].value ?? 'primaryVaccines']: {
-          dataFields: ['primary_vacc_ad', 'primary_vacc_child'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-      },
-    })
-
-    const specialtyFilter = new FilterChoiceBitfieldGroup({
-      data: locations.value,
-      operation: '|',
-      choices: {
-        [filterDefinitions[4].choices?.[0].value ?? 'mental']: {
-          dataFields: ['special_mental_ad', 'special_mental_ch'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[4].choices?.[1].value ?? 'dental']: {
-          dataFields: ['special_dental_ad', 'special_dental_ch'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[4].choices?.[2].value ?? 'eye']: {
-          dataFields: ['special_eye_ad', 'special_eye_ch'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[4].choices?.[3].value ?? 'podiatry']: {
-          dataFields: ['special_podiatry'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[4].choices?.[3].value ?? 'mat']: {
-          dataFields: ['special_mat'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[4].choices?.[3].value ?? 'nutrition']: {
-          dataFields: ['special_nutrition'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[4].choices?.[3].value ?? 'tobacco']: {
-          dataFields: ['special_tobacco'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[4].choices?.[3].value ?? 'pharmacy']: {
-          dataFields: ['special_pharmacy'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-      },
-    })
-
-    const testsFilter = new FilterChoiceBitfieldGroup({
-      data: locations.value,
-      operation: '|',
-      choices: {
-        [filterDefinitions[5].choices?.[0].value ?? 'blood']: {
-          dataFields: ['tests_blood'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[5].choices?.[1].value ?? 'sti']: {
-          dataFields: ['tests_sti'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[5].choices?.[2].value ?? 'covid']: {
-          dataFields: ['tests_covid'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[5].choices?.[3].value ?? 'mammo']: {
-          dataFields: ['tests_mammo'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-        [filterDefinitions[5].choices?.[3].value ?? 'xray']: {
-          dataFields: ['tests_xray'],
-          matches: matchYesEstPat,
-          matchingFunction: matchFieldsToOptions,
-        },
-      },
-    })
-
-    const languageFilter = new FilterChoiceBitfieldGroup({
-      data: locations.value,
-      operation: '|',
-      choices: {
-        [filterDefinitions[6].choices?.[0].value ?? 'spanish']: {
-          dataFields: ['language'],
-          matches: ['Spanish'],
-          matchingFunction: matchOptionInString,
-        },
-        [filterDefinitions[6].choices?.[1].value ?? 'mandarin']: {
-          dataFields: ['language'],
-          matches: ['Mandarin'],
-          matchingFunction: matchOptionInString,
-        },
-        [filterDefinitions[6].choices?.[2].value ?? 'vietnamese']: {
-          dataFields: ['language'],
-          matches: ['Vietnamese'],
-          matchingFunction: matchOptionInString,
-        },
-      },
-    })
-
-    const filterSet: IFilterSet = {
-      operation: '&',
-      childFilters: {
-        [filterDefinitions[2].key]: waitTimeFilter,
-        [filterDefinitions[3].key]: visitTypeFilter,
-        [filterDefinitions[4].key]: specialtyFilter,
-        [filterDefinitions[5].key]: testsFilter,
-        [filterDefinitions[6].key]: languageFilter,
-      },
-    }
-    const filterLogic = new FilterSet(filterSet)
-    return filterLogic
+  const commonParams = {
+    data: locations.value,
+    bufferLength: Math.ceil(locations.value.length / 32),
   }
+  const waitTimeFilter = new FilterChoiceBitfieldGroup({
+    ...commonParams,
+    ...waitTimeFilterParams,
+  })
 
-  return null
+  const visitTypeFilter = new FilterChoiceBitfieldGroup({
+    ...commonParams,
+    ...visitTypeFilterParams,
+  })
+
+  const specialtyFilter = new FilterChoiceBitfieldGroup({
+    ...commonParams,
+    ...specialtyFilterParams,
+  })
+
+  const testsFilter = new FilterChoiceBitfieldGroup({
+    ...commonParams,
+    ...testsFilterParams,
+  })
+
+  const languageFilter = new FilterChoiceBitfieldGroup({
+    ...commonParams,
+    ...languageFilterParams,
+  })
+
+  return new FilterSet({
+    operation: '&',
+    bufferLength: commonParams.bufferLength,
+    childFilters: {
+      [filterDefinitions[2].key]: waitTimeFilter,
+      [filterDefinitions[3].key]: visitTypeFilter,
+      [filterDefinitions[4].key]: specialtyFilter,
+      [filterDefinitions[5].key]: testsFilter,
+      [filterDefinitions[6].key]: languageFilter,
+    },
+  })
+})
+
+watchEffect(() => {
+  console.log(filterBitfields.value.childFilters[filterDefinitions[2].key])
+  // wait time
+  filterBitfields.value.childFilters[filterDefinitions[2].key].childFilters[
+    optionNames.sameDay
+  ].setChecked(filterValues.value.waitTime.includes(optionNames.sameDay))
+  filterBitfields.value.childFilters[filterDefinitions[2].key].childFilters[
+    optionNames.weekWell
+  ].setChecked(filterValues.value.waitTime.includes(optionNames.weekWell))
+  filterBitfields.value.childFilters[filterDefinitions[2].key].childFilters[
+    optionNames.weekSick
+  ].setChecked(filterValues.value.waitTime.includes(optionNames.weekSick))
+  filterBitfields.value.childFilters[filterDefinitions[2].key].childFilters[
+    optionNames.twoMonths
+  ].setChecked(filterValues.value.waitTime.includes(optionNames.twoMonths))
+
+  // visit type
+  filterBitfields.value.childFilters[filterDefinitions[3].key].childFilters[
+    optionNames.primaryWell
+  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryWell))
+  filterBitfields.value.childFilters[filterDefinitions[3].key].childFilters[
+    optionNames.primarySick
+  ].setChecked(filterValues.value.visitType.includes(optionNames.primarySick))
+  filterBitfields.value.childFilters[filterDefinitions[3].key].childFilters[
+    optionNames.primarySports
+  ].setChecked(filterValues.value.visitType.includes(optionNames.primarySports))
+  filterBitfields.value.childFilters[filterDefinitions[3].key].childFilters[
+    optionNames.primaryPrenatal
+  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryPrenatal))
+  filterBitfields.value.childFilters[filterDefinitions[3].key].childFilters[
+    optionNames.primaryWomen
+  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryWomen))
+  filterBitfields.value.childFilters[filterDefinitions[3].key].childFilters[
+    optionNames.primaryTelehealth
+  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryTelehealth))
+  filterBitfields.value.childFilters[filterDefinitions[3].key].childFilters[
+    optionNames.primaryVaccines
+  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryVaccines))
+
+  // specialty
+  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
+    optionNames.mental
+  ].setChecked(filterValues.value.specialty.includes(optionNames.mental))
+  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
+    optionNames.dental
+  ].setChecked(filterValues.value.specialty.includes(optionNames.dental))
+  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
+    optionNames.eye
+  ].setChecked(filterValues.value.specialty.includes(optionNames.eye))
+  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
+    optionNames.podiatry
+  ].setChecked(filterValues.value.specialty.includes(optionNames.podiatry))
+  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
+    optionNames.mat
+  ].setChecked(filterValues.value.specialty.includes(optionNames.mat))
+  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
+    optionNames.nutrition
+  ].setChecked(filterValues.value.specialty.includes(optionNames.nutrition))
+  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
+    optionNames.tobacco
+  ].setChecked(filterValues.value.specialty.includes(optionNames.tobacco))
+  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
+    optionNames.pharmacy
+  ].setChecked(filterValues.value.specialty.includes(optionNames.pharmacy))
+
+  // tests
+  filterBitfields.value.childFilters[filterDefinitions[5].key].childFilters[
+    optionNames.blood
+  ].setChecked(filterValues.value.tests.includes(optionNames.blood))
+  filterBitfields.value.childFilters[filterDefinitions[5].key].childFilters[
+    optionNames.sti
+  ].setChecked(filterValues.value.tests.includes(optionNames.sti))
+  filterBitfields.value.childFilters[filterDefinitions[5].key].childFilters[
+    optionNames.covid
+  ].setChecked(filterValues.value.tests.includes(optionNames.covid))
+  filterBitfields.value.childFilters[filterDefinitions[5].key].childFilters[
+    optionNames.mammo
+  ].setChecked(filterValues.value.tests.includes(optionNames.mammo))
+  filterBitfields.value.childFilters[filterDefinitions[5].key].childFilters[
+    optionNames.xray
+  ].setChecked(filterValues.value.tests.includes(optionNames.xray))
+
+  // languages
+  filterBitfields.value.childFilters[filterDefinitions[6].key].childFilters[
+    optionNames.spanish
+  ].setChecked(filterValues.value.languages.includes(optionNames.spanish))
+  filterBitfields.value.childFilters[filterDefinitions[6].key].childFilters[
+    optionNames.mandarin
+  ].setChecked(filterValues.value.languages.includes(optionNames.mandarin))
+  filterBitfields.value.childFilters[filterDefinitions[6].key].childFilters[
+    optionNames.vietnamese
+  ].setChecked(filterValues.value.languages.includes(optionNames.vietnamese))
+
+  filterBitfields.value.setChecked()
+  console.log("WATCH: ", filterBitfields.value.getBitfield())
 })
 
 // SEAM: data wiring belongs to the teammate. Returns locations unfiltered for now.
@@ -405,7 +255,9 @@ function handleGeolocateError(error: Error | GeolocationPositionError) {
 }
 
 function handleApplyFilter(value: FilterValues) {
-  filterValues.value = value as PrimaryCareFilterValues
+  filterValues.value = Object.keys(filterValues.value).length
+    ? (value as PrimaryCareFilterValues)
+    : emptyFilters
   console.log(filterValues.value)
 }
 

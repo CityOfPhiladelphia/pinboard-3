@@ -23,7 +23,7 @@ export function useLocations(): {
         f: 'geojson',
       })
 
-      const response = await fetch(`${ARCGIS_URL}?${params}`)
+      const response = await fetch(`${ARCGIS_URL}?${params.toString()}`)
 
       if (!response.ok) {
         errorMessage.value = 'Error retrieving primary care sites'

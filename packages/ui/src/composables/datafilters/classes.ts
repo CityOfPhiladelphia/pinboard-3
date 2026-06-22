@@ -1,79 +1,117 @@
-// import { bitarrayBitwiseOperator, createOptionBitmask } from './functions'
+import { bitarrayBitwiseOperator, createOptionBitmask, getUniformBitarray } from './functions'
+import type {
+  BitWiseOperation,
+  IFilterChoiceBitfield,
+  IFilterChoiceBitfieldGroup,
+  IFilterSet,
+} from './types'
 
-// import type {
-//   BitWiseOperation,
-//   ClassWithBitfieldGetter,
-//   IFilterChoiceBitfield,
-//   IFilterChoiceGroupBitfield,
-// } from './types'
+export class FilterChoiceBitfield {
+  private bitfield: Uint32Array
+  private checked: boolean = false
 
-// class FilterChoiceBitfield {
-//   bitfield: Uint32Array
-//   constructor(params: IFilterChoiceBitfield) {
-//     this.bitfield = createOptionBitmask(
-//       params.data,
-//       params.dataFields,
-//       params.matches,
-//       params.matchingFunction
-//     )
-//   }
-// }
+  constructor(params: IFilterChoiceBitfield) {
+    this.bitfield = createOptionBitmask(
+      params.data,
+      params.dataFields,
+      params.matches,
+      params.matchingFunction
+    )
+  }
 
-// class FilterChoiceGroup implements ClassWithBitfieldGetter {
-//   private choiceBitfields: Record<string, Uint32Array>
-//   private operation: BitWiseOperation
-//   constructor(params: IFilterChoiceGroupBitfield) {
-//     if (
-//       ![params.dataFields.length, params.matches.length].every(
-//         (length) => length === params.choices.length
-//       )
-//     ) {
-//       throw new Error(
-//         `Length of fields [choices, dataFields, matches${Array.isArray(params.matchingFunction) ? ', matchingFunction' : ''}] must all match: choices.length = ${params.choices.length}, dataFields.length = ${params.dataFields.length}, matches.length = ${params.matches.length}${Array.isArray(params.matchingFunction) ? `, matchingFunction.length = ${params.matchingFunction.length}` : ''}`
-//       )
-//     }
-//     this.operation = params.operation
-//     const choiceKeys = Array.from(params.choices, (choice, i) => {
-//       return [
-//         choice.value,
-//         new FilterChoiceBitfield({
-//           data: params.data,
-//           dataFields: params.dataFields[i],
-//           matches: params.matches[i],
-//           matchingFunction: Array.isArray(params.matchingFunction)
-//             ? params.matchingFunction[i]
-//             : params.matchingFunction,
-//         }),
-//       ]
-//     })
-//     this.choiceBitfields = Object.fromEntries(choiceKeys)
-//   }
+  getChecked() {
+    return this.checked
+  }
 
-//   bitfield(activeFilters: string[]) {
-//     return bitarrayBitwiseOperator(
-//       null,
-//       Array.from(activeFilters, (key) => this.choiceBitfields[key]),
-//       this.operation
-//     )
-//   }
-// }
+  setChecked(checked: boolean) {
+    this.checked = checked
+  }
 
-// export class FilterSet implements ClassWithBitfieldGetter {
-//   private operation: BitWiseOperation
-//   private childFilters: (FilterChoiceGroup | FilterSet)[]
-//   constructor(
-//     operation: BitWiseOperation,
-//     childFilters: (FilterChoiceGroup | FilterSet)[]
-//   ) {
-//     this.operation = operation
-//     this.childFilters = childFilters
-//   }
+  getBitfield() {
+    return this.bitfield
+  }
+}
 
-//   bitfield(activeFilters: string[]): Uint32Array<ArrayBufferLike> {
-//     return bitarrayBitwiseOperator(
-//       null,
-//       Array.from(this.childFilters, (childFilter) => childFilter.bitfield(activeFilters)),
-//       this.operation
-//     )
-//   }
-// }
+class FilterChoiceBitfieldGroup {
+  childFilters: Record<string, FilterChoiceBitfield> = {}
+  private operation: BitWiseOperation
+  private bufferLength: number
+  private checked: boolean = false
+  constructor(params: IFilterChoiceBitfieldGroup) {
+    this.operation = params.operation
+    this.bufferLength = params.bufferLength
+    Object.entries(params.choices).forEach((choice) => {
+      this.childFilters[choice[0]] = new FilterChoiceBitfield({
+        data: params.data,
+        dataFields: choice[1].dataFields,
+        matches: choice[1].matches,
+        matchingFunction: choice[1].matchingFunction,
+      })
+    })
+  }
+
+  getChecked() {
+    return this.checked
+  }
+
+  setChecked() {
+    this.checked = false
+    for (const choice of Object.values(this.childFilters)) {
+      this.checked = this.checked || choice.getChecked()
+    }
+  }
+
+  getBitfield(): Uint32Array {
+    return this.getChecked()
+      ? bitarrayBitwiseOperator(
+          null,
+          Array.from(Object.values(this.childFilters), (choice) =>
+            choice.getChecked()
+              ? choice.getBitfield()
+              : getUniformBitarray(this.bufferLength, this.operation === '&' ? 1 : 0)
+          ),
+          this.operation
+        )
+      : getUniformBitarray(this.bufferLength, 0)
+  }
+}
+
+class FilterSet {
+  childFilters: Record<string, FilterChoiceBitfieldGroup | FilterSet>
+  private operation: BitWiseOperation
+  private bufferLength: number
+  private checked: boolean = false
+  constructor(params: IFilterSet) {
+    this.operation = params.operation
+    this.childFilters = params.childFilters
+    this.bufferLength = params.bufferLength
+  }
+
+  getBitfield(): Uint32Array {
+    return this.getChecked()
+      ? bitarrayBitwiseOperator(
+          null,
+          Array.from(Object.values(this.childFilters), (choice) =>
+            choice.getChecked()
+              ? choice.getBitfield()
+              : getUniformBitarray(this.bufferLength, this.operation === '&' ? 1 : 0)
+          ),
+          this.operation
+        )
+      : getUniformBitarray(this.bufferLength, 0)
+  }
+
+  getChecked() {
+    return this.checked
+  }
+
+  setChecked() {
+    this.checked = false
+    for (const choice of Object.values(this.childFilters)) {
+      choice.setChecked()
+      this.checked = this.checked || choice.getChecked()
+    }
+  }
+}
+
+export { FilterChoiceBitfieldGroup, FilterSet }

@@ -96,7 +96,7 @@ export interface PrimaryCareResponse extends PinboardTypes.ArcgisResponse {
   features: PrimaryCareFeature[]
 }
 
-export type SortMode = 'distance' | 'name'
+export type SortMode = '' | 'distance' | 'name'
 export type AgeGroupFilter = 'adult' | 'children'
 export type WaitTimeFilter = 'sameDay' | 'weekWell' | 'weekSick' | 'twoMonths'
 export type VisitTypeFilter =
