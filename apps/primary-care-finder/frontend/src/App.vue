@@ -112,10 +112,7 @@ const filterLogic = computed(() => {
 //   tests      → tests_* fields
 //   languages  → language field
 //   sort       → ordering (apply after filtering; not a predicate)
-function applyFilters(
-  locations: PrimaryCareLocation[],
-  _values: FilterValues
-): PrimaryCareLocation[] {
+function applyFilters(locations: PrimaryCareLocation[]): PrimaryCareLocation[] {
   if (!filterLogicalValues.value.length) {
     return locations
   }
@@ -153,8 +150,7 @@ const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
 })
 
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
-  console.log('SET BITS: ', filterLogicalValues.value)
-  let result = applyFilters(locationsWithDistance.value, filterValues.value)
+  let result = applyFilters(locationsWithDistance.value)
 
   if (searchString.value) {
     const terms = searchString.value.replace(/\W+/g, ' ').toLowerCase().split(' ').filter(Boolean)
