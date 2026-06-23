@@ -1,4 +1,5 @@
 import type {
+  AgeGroupFilter,
   LanguagesFilter,
   SpecialtyFilter,
   TestsFilter,
@@ -29,6 +30,25 @@ function matchOptionInString(
       String(item[fieldName]).toLowerCase().trim().includes(String(value).toLowerCase().trim())
     )
   )
+}
+
+const ageGroupOption0 = filterDefinitions[1].choices?.[0].value ?? 'adult'
+const ageGroupOption1 = filterDefinitions[1].choices?.[1].value ?? 'children'
+
+const ageGroupFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
+  operation: '|',
+  choices: {
+    [ageGroupOption0]: {
+      dataFields: ['adults'],
+      matches: matchYes,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [ageGroupOption1]: {
+      dataFields: ['children'],
+      matches: matchYes,
+      matchingFunction: matchFieldsToOptions,
+    },
+  },
 }
 
 const waitOption0 = filterDefinitions[2].choices?.[0].value ?? 'sameDay'
@@ -229,6 +249,8 @@ const languageFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLen
 }
 
 const optionNames = {
+  adult: ageGroupOption0 as AgeGroupFilter,
+  children: ageGroupOption1 as AgeGroupFilter,
   sameDay: waitOption0 as WaitTimeFilter,
   weekWell: waitOption1 as WaitTimeFilter,
   weekSick: waitOption2 as WaitTimeFilter,
@@ -259,6 +281,7 @@ const optionNames = {
 }
 
 export {
+  ageGroupFilterParams,
   waitTimeFilterParams,
   visitTypeFilterParams,
   specialtyFilterParams,

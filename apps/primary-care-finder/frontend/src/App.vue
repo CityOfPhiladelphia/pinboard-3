@@ -17,6 +17,7 @@ import { useLocations } from './composables/useLocations'
 import { LocationCard, LocationDetail } from './components/_index.ts'
 import { filterDefinitions } from './configs/filterChipDefinitions.ts'
 import {
+  ageGroupFilterParams,
   waitTimeFilterParams,
   visitTypeFilterParams,
   specialtyFilterParams,
@@ -58,6 +59,10 @@ const filterLogic = computed(() => {
     data: locations.value,
     bufferLength: Math.ceil(locations.value.length / 32),
   }
+  const ageGroupFilter = new FilterChoiceBitfieldGroup({
+    ...commonParams,
+    ...ageGroupFilterParams,
+  })
   const waitTimeFilter = new FilterChoiceBitfieldGroup({
     ...commonParams,
     ...waitTimeFilterParams,
@@ -87,6 +92,7 @@ const filterLogic = computed(() => {
     operation: '&',
     bufferLength: commonParams.bufferLength,
     childFilters: {
+      [filterDefinitions[1].key]: ageGroupFilter,
       [filterDefinitions[2].key]: waitTimeFilter,
       [filterDefinitions[3].key]: visitTypeFilter,
       [filterDefinitions[4].key]: specialtyFilter,
@@ -116,7 +122,7 @@ const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
 
 const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
   if (geojson.value?.features) {
-    let result = applyFilters(geojson.value.features)
+    let result = filterLogicalValues.value.length ? applyFilters(geojson.value.features) : geojson.value.features
 
     if (searchString.value) {
       const terms = searchString.value.replace(/\W+/g, ' ').toLowerCase().split(' ').filter(Boolean)
@@ -135,7 +141,7 @@ const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
 })
 
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
-  let result = applyFilters(locationsWithDistance.value)
+  let result = filterLogicalValues.value.length ? applyFilters(locationsWithDistance.value) : locationsWithDistance.value
 
   if (searchString.value) {
     const terms = searchString.value.replace(/\W+/g, ' ').toLowerCase().split(' ').filter(Boolean)
@@ -149,6 +155,14 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
 })
 
 watchEffect(() => {
+  // age group
+  filterLogic.value.childFilters[filterDefinitions[1].key].childFilters[
+    optionNames.adult
+  ].setChecked(filterValues.value.ageGroup.includes(optionNames.adult))
+  filterLogic.value.childFilters[filterDefinitions[1].key].childFilters[
+    optionNames.children
+  ].setChecked(filterValues.value.ageGroup.includes(optionNames.children))
+
   // wait time
   filterLogic.value.childFilters[filterDefinitions[2].key].childFilters[
     optionNames.sameDay
@@ -243,16 +257,13 @@ watchEffect(() => {
   filterLogicalValues.value = filterLogic.value.getBitfield()
 })
 
-function applyFilters<T>(locations: T[]): T[] {
-  if (!filterLogicalValues.value.length) {
-    return locations
-  }
+function applyFilters<T>(arr: T[]): T[] {
   const filtered: T[] = []
   let check = 1
   let offset = 0
-  locations.forEach((location) => {
+  arr.forEach((item) => {
     if (check & filterLogicalValues.value[offset]) {
-      filtered.push(location)
+      filtered.push(item)
     }
     check <<= 1
     if (!(check & 0xffffffff)) {

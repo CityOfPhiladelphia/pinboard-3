@@ -3,7 +3,8 @@ import type { PrimaryCareLocation, PrimaryCareResponse } from '@/types'
 
 const ARCGIS_URL =
   'https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/red_PrimaryCare/FeatureServer/0/query'
-// const CARTO_URL = `https://phl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT *, objectid::text AS id, ST_AsGeoJSON(the_geom) as location FROM pdph_primary_care_finder WHERE "record" <> 'test'`
+// const CARTO_URL = `https://phl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM pdph_primary_care_finder WHERE "record" <> 'test'`
+const CARTO_URL = `https://phl.carto.com/api/v2/sql?q=SELECT *, objectid::text AS id, ST_AsGeoJSON(the_geom)::jsonb as location FROM pdph_primary_care_finder WHERE "record" <> 'test'`
 
 export function useLocations(): {
   locations: Ref<PrimaryCareLocation[]>
@@ -25,7 +26,16 @@ export function useLocations(): {
       })
 
       const response = await fetch(`${ARCGIS_URL}?${params.toString()}`)
-      // const response = await fetch(CARTO_URL)
+      const response2 = await fetch(CARTO_URL)
+      const data2 = (await response2.json()).rows
+      console.log('CARTO: ', data2)
+
+      // const cartFeats = (await response2.json()).features
+      // const cartoRecs = new Set()
+      // cartFeats.forEach((element) => {
+      //   cartoRecs.add(element.properties.record)
+      // })
+      // console.log('CARTO: ', [...cartoRecs])
 
       if (!response.ok) {
         errorMessage.value = 'Error retrieving primary care sites'
@@ -33,6 +43,16 @@ export function useLocations(): {
       }
 
       const geojsonData = (await response.json()) as PrimaryCareResponse
+      // console.log('AGO: ', geojsonData)
+
+      // const agoRecs = new Set()
+      // geojsonData.features.forEach((element) => {
+      //   agoRecs.add(element.properties.record)
+      // })
+
+      // console.log('AGO: ', [...agoRecs])
+      // console.log(agoRecs.difference(cartoRecs))
+
       geojson.value = geojsonData
       locations.value = geojsonData.features.map((feature) => ({
         id: String(feature.id),
@@ -48,6 +68,7 @@ export function useLocations(): {
         },
         ...feature.properties,
       }))
+      console.log('AGO: ', locations.value)
     } catch {
       errorMessage.value = 'Error retrieving primary care sites'
     } finally {
