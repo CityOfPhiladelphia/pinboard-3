@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 // 3rd party imports
-import { faMap } from '@fortawesome/pro-solid-svg-icons'
+import { IconMap } from '@phila/phila-ui-core/icons'
 
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
@@ -401,7 +401,7 @@ const effectiveMapConfig = (() => {
     v-model="bottomSheetOpen"
     :snap-points="snapPoints"
     :collapse-label="selectedLocation ? '' : t('pinboard.mapView')"
-    :collapse-icon="selectedLocation ? undefined : faMap"
+    :collapse-icon="selectedLocation ? undefined : IconMap"
     class="mobile-bottom-sheet"
   >
     <div class="bottom-sheet-stack">

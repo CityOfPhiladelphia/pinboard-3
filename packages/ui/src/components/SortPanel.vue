@@ -4,8 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Radio } from '@phila/phila-ui-radio'
 import { PhilaButton, CloseButton } from '@phila/phila-ui-button'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
+import { IconSort } from '@phila/phila-ui-core/icons'
 import type { UserLocationState } from '../types'
 
 export interface SortPanelOption {
@@ -107,7 +106,7 @@ watch(panelOpen, (isOpen) => {
 <template>
   <div class="sort-panel-root">
     <button ref="triggerEl" type="button" class="sort-panel-trigger" @click="openPanel">
-      <FontAwesomeIcon :icon="faArrowUpArrowDown" class="sort-panel-trigger-icon" />
+      <IconSort class="sort-panel-trigger-icon" />
       <span>{{ triggerLabel }}</span>
     </button>
   </div>

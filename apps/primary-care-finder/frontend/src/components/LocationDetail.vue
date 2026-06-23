@@ -4,7 +4,7 @@ import { format, parseISO } from 'date-fns'
 import { useI18n } from 'vue-i18n'
 import type { PrimaryCareLocation } from '@/types'
 import { PhilaButton } from '@phila/phila-ui-button'
-import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { IconClose } from '@phila/phila-ui-core/icons'
 
 const props = defineProps<{
   location: PrimaryCareLocation
@@ -201,7 +201,7 @@ function translateTransitList(raw: string | null, category: string): string {
     <div class="detail-header">
       <h2>{{ siteName() }}</h2>
       <PhilaButton
-        :icon-definition="faXmark"
+        :icon="IconClose"
         :icon-only="true"
         variant="standard"
         size="small"

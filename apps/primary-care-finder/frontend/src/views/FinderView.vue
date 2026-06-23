@@ -9,7 +9,7 @@ import {
   PinboardComposables,
   PinboardUtilities,
 } from '@pinboard/ui'
-import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
+import { IconSort } from '@phila/phila-ui-core/icons'
 import type { FilterDefinition, FilterValues, PinboardTypes } from '@pinboard/ui'
 import { useI18n } from 'vue-i18n'
 import { useLocations } from '../composables/useLocations'
@@ -39,7 +39,7 @@ const filterDefinitions = computed<FilterDefinition[]>(() => [
     label: t('filters.sort'),
     multiple: false,
     excludeFromCount: true,
-    iconDefinition: faArrowUpArrowDown,
+    icon: IconSort,
     // TODO(teammate): finalize sort options + ordering logic.
     choices: [
       { text: t('filters.distance'), value: 'distance' },

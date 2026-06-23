@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { PhilaLink } from '@phila/phila-ui-link'
-import { faChevronLeft } from '@fortawesome/pro-solid-svg-icons'
+import { IconChevronLeft } from '@phila/phila-ui-core/icons'
 
 withDefaults(
   defineProps<{
@@ -28,7 +28,7 @@ function scrollToSection(id: string) {
           <PhilaLink
             :href="backTo"
             :text="t('pinboard.infoPage.backToMap')"
-            :icon-definition="faChevronLeft"
+            :icon="IconChevronLeft"
             size="small"
             @click.prevent="router.push(backTo)"
           />
