@@ -24,7 +24,7 @@ import {
   languageFilterParams,
   optionNames,
 } from './configs/filterLogicParams.ts'
-import type { PrimaryCareFilterValues, PrimaryCareLocation } from './types'
+import type { PrimaryCareFilterValues, PrimaryCareLocation, PrimaryCareResponse } from './types'
 
 const searchPlaceholderText = 'Search by address or keyword...'
 const emptyFilters: PrimaryCareFilterValues = {
@@ -97,41 +97,6 @@ const filterLogic = computed(() => {
   return filterLogicGroup
 })
 
-// const filterLogicalValues = computed(() => {
-//   console.log("BITARRAYS: ", filterLogic.value)
-//   return filterSelected.value
-//     ? filterLogic.value.getBitfield()
-//     : getUniformBitarray(filterLogic.value.getBufferLength(), 1)
-// })
-
-// SEAM: data wiring belongs to the teammate. Returns locations unfiltered for now.
-// TODO(teammate): map filterValues → PrimaryCareProperties predicates.
-//   ageGroup   → cross-cutting: match *_ad / *_ch fields per selection
-//   waitTime   → wait_* fields
-//   specialty  → special_* fields
-//   tests      → tests_* fields
-//   languages  → language field
-//   sort       → ordering (apply after filtering; not a predicate)
-function applyFilters(locations: PrimaryCareLocation[]): PrimaryCareLocation[] {
-  if (!filterLogicalValues.value.length) {
-    return locations
-  }
-  const filtered: PrimaryCareLocation[] = []
-  let check = 1
-  let offset = 0
-  locations.forEach((location) => {
-    if (check & filterLogicalValues.value[offset]) {
-      filtered.push(location)
-    }
-    check <<= 1
-    if (!(check & 0xFFFFFFFF)) {
-      check = 1
-      offset++
-    }
-  })
-  return filtered
-}
-
 const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   const { latitude, longitude } = userLocation.value
   return locations.value.map((loc) => ({
@@ -147,6 +112,26 @@ const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
         : undefined,
     },
   }))
+})
+
+const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
+  if (geojson.value?.features) {
+    let result = applyFilters(geojson.value.features)
+
+    if (searchString.value) {
+      const terms = searchString.value.replace(/\W+/g, ' ').toLowerCase().split(' ').filter(Boolean)
+      result = result.filter((loc) => {
+        const haystack = JSON.stringify(Object.values(loc)).toLowerCase()
+        return terms.some((term) => haystack.includes(term))
+      })
+    }
+
+    return {
+      type: 'FeatureCollection',
+      features: result,
+    }
+  }
+  return undefined
 })
 
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
@@ -258,6 +243,26 @@ watchEffect(() => {
   filterLogicalValues.value = filterLogic.value.getBitfield()
 })
 
+function applyFilters<T>(locations: T[]): T[] {
+  if (!filterLogicalValues.value.length) {
+    return locations
+  }
+  const filtered: T[] = []
+  let check = 1
+  let offset = 0
+  locations.forEach((location) => {
+    if (check & filterLogicalValues.value[offset]) {
+      filtered.push(location)
+    }
+    check <<= 1
+    if (!(check & 0xffffffff)) {
+      check = 1
+      offset++
+    }
+  })
+  return filtered
+}
+
 function handleSearchSubmit(s: string) {
   searchString.value = s
 }
@@ -312,7 +317,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
       :is-loading="isLoading"
       :error-message="errorMessage"
       :location-panel-search="searchPlaceholderText"
-      :geojson="geojson"
+      :geojson="filteredGeojson"
       :is-mobile="isMobile"
       :filters="filterDefinitions"
       @search="handleSearchSubmit"
@@ -328,7 +333,6 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
 
       <template
         #map-content="{
-          geojson,
           hoveredId,
           selectedId,
           mobileControlsTarget,
@@ -350,9 +354,9 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
         />
 
         <CircleLayer
-          v-if="geojson"
+          v-if="filteredGeojson"
           id="locations"
-          :source="{ type: 'geojson', data: toValue(geojson) as any }"
+          :source="{ type: 'geojson', data: toValue(filteredGeojson) as any }"
           :paint="{
             'circle-radius': [
               'case',
@@ -373,13 +377,17 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
             'circle-stroke-color': '#ffffff',
             'circle-stroke-width': 2,
           }"
-          @mouseenter="(e: any) => onHover(e.features?.[0]?.properties?.id)"
+          @mouseenter="
+            (e: any) => {
+              onHover(String(e.features?.[0]?.id))
+            }
+          "
           @mouseleave="onHoverEnd"
           @click="
             (e: any) => {
               const feature = e.features?.[0]
               if (!feature) return
-              const loc = locationsWithDistance.find((l) => l.id === feature.properties?.id)
+              const loc = locationsWithDistance.find((l) => l.id === String(feature.id))
               if (loc) onSelect(loc)
             }
           "

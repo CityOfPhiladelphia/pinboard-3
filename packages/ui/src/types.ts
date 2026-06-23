@@ -91,7 +91,7 @@ export interface CartoResponse {
 }
 export interface ArcgisFeature {
   type: string
-  id: number
+  id: number | string
   geometry: {
     type: string
     coordinates: LongitudeLatitude

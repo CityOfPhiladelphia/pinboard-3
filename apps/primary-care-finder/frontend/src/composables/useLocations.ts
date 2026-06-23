@@ -3,17 +3,18 @@ import type { PrimaryCareLocation, PrimaryCareResponse } from '@/types'
 
 const ARCGIS_URL =
   'https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/red_PrimaryCare/FeatureServer/0/query'
+// const CARTO_URL = `https://phl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT *, objectid::text AS id, ST_AsGeoJSON(the_geom) as location FROM pdph_primary_care_finder WHERE "record" <> 'test'`
 
 export function useLocations(): {
   locations: Ref<PrimaryCareLocation[]>
   isLoading: Ref<string | false>
   errorMessage: Ref<string | null>
-  geojson: Ref<unknown>
+  geojson: Ref<PrimaryCareResponse | undefined>
 } {
   const locations = ref<PrimaryCareLocation[]>([])
   const isLoading = ref<string | false>('Loading data...')
   const errorMessage = ref<string | null>(null)
-  const geojson = ref<unknown>(null)
+  const geojson = ref<PrimaryCareResponse | undefined>(undefined)
 
   async function fetchLocations() {
     try {
@@ -24,6 +25,7 @@ export function useLocations(): {
       })
 
       const response = await fetch(`${ARCGIS_URL}?${params.toString()}`)
+      // const response = await fetch(CARTO_URL)
 
       if (!response.ok) {
         errorMessage.value = 'Error retrieving primary care sites'
@@ -33,7 +35,7 @@ export function useLocations(): {
       const geojsonData = (await response.json()) as PrimaryCareResponse
       geojson.value = geojsonData
       locations.value = geojsonData.features.map((feature) => ({
-        id: String(feature.properties.objectid),
+        id: String(feature.id),
         name: (feature.properties.record ?? feature.properties.address ?? '').replace(
           /Womens/,
           "Women's"
