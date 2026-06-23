@@ -10,7 +10,7 @@ import {
   PinboardComposables,
   PinboardUtilities,
   FilterChoiceBitfieldGroup,
-  FilterSet,
+  FilterGroup,
 } from '@pinboard/ui'
 import type { FilterValues, PinboardTypes } from '@pinboard/ui'
 import { useLocations } from './composables/useLocations'
@@ -25,17 +25,18 @@ import {
   optionNames,
 } from './configs/filterLogicParams.ts'
 import type { PrimaryCareFilterValues, PrimaryCareLocation } from './types'
+import { getUniformBitarray } from '../../../../packages/ui/src/composables/datafilters/functions.ts'
 
 const searchPlaceholderText = 'Search by address or keyword...'
 const emptyFilters: PrimaryCareFilterValues = {
-        sort: '',
-        ageGroup: [],
-        waitTime: [],
-        visitType: [],
-        specialty: [],
-        tests: [],
-        languages: [],
-      }
+  sort: '',
+  ageGroup: [],
+  waitTime: [],
+  visitType: [],
+  specialty: [],
+  tests: [],
+  languages: [],
+}
 
 const isMobile = PinboardComposables.useIsMobile()
 const { locations, isLoading, errorMessage, geojson } = useLocations()
@@ -49,9 +50,11 @@ const userLocation = ref<PinboardTypes.LatLon>({
 
 const searchString = ref('')
 
+const filterSelected = ref<boolean>(false)
+
 const filterValues = ref<PrimaryCareFilterValues>(emptyFilters)
 
-const filterBitfields = computed(() => {
+const filterLogic = computed(() => {
   const commonParams = {
     data: locations.value,
     bufferLength: Math.ceil(locations.value.length / 32),
@@ -81,7 +84,7 @@ const filterBitfields = computed(() => {
     ...languageFilterParams,
   })
 
-  return new FilterSet({
+  const filterLogicGroup = new FilterGroup({
     operation: '&',
     bufferLength: commonParams.bufferLength,
     childFilters: {
@@ -92,103 +95,13 @@ const filterBitfields = computed(() => {
       [filterDefinitions[6].key]: languageFilter,
     },
   })
+  return filterLogicGroup
 })
 
-watchEffect(() => {
-  console.log(filterBitfields.value.childFilters[filterDefinitions[2].key])
-  // wait time
-  filterBitfields.value.childFilters[filterDefinitions[2].key].childFilters[
-    optionNames.sameDay
-  ].setChecked(filterValues.value.waitTime.includes(optionNames.sameDay))
-  filterBitfields.value.childFilters[filterDefinitions[2].key].childFilters[
-    optionNames.weekWell
-  ].setChecked(filterValues.value.waitTime.includes(optionNames.weekWell))
-  filterBitfields.value.childFilters[filterDefinitions[2].key].childFilters[
-    optionNames.weekSick
-  ].setChecked(filterValues.value.waitTime.includes(optionNames.weekSick))
-  filterBitfields.value.childFilters[filterDefinitions[2].key].childFilters[
-    optionNames.twoMonths
-  ].setChecked(filterValues.value.waitTime.includes(optionNames.twoMonths))
-
-  // visit type
-  filterBitfields.value.childFilters[filterDefinitions[3].key].childFilters[
-    optionNames.primaryWell
-  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryWell))
-  filterBitfields.value.childFilters[filterDefinitions[3].key].childFilters[
-    optionNames.primarySick
-  ].setChecked(filterValues.value.visitType.includes(optionNames.primarySick))
-  filterBitfields.value.childFilters[filterDefinitions[3].key].childFilters[
-    optionNames.primarySports
-  ].setChecked(filterValues.value.visitType.includes(optionNames.primarySports))
-  filterBitfields.value.childFilters[filterDefinitions[3].key].childFilters[
-    optionNames.primaryPrenatal
-  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryPrenatal))
-  filterBitfields.value.childFilters[filterDefinitions[3].key].childFilters[
-    optionNames.primaryWomen
-  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryWomen))
-  filterBitfields.value.childFilters[filterDefinitions[3].key].childFilters[
-    optionNames.primaryTelehealth
-  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryTelehealth))
-  filterBitfields.value.childFilters[filterDefinitions[3].key].childFilters[
-    optionNames.primaryVaccines
-  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryVaccines))
-
-  // specialty
-  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
-    optionNames.mental
-  ].setChecked(filterValues.value.specialty.includes(optionNames.mental))
-  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
-    optionNames.dental
-  ].setChecked(filterValues.value.specialty.includes(optionNames.dental))
-  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
-    optionNames.eye
-  ].setChecked(filterValues.value.specialty.includes(optionNames.eye))
-  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
-    optionNames.podiatry
-  ].setChecked(filterValues.value.specialty.includes(optionNames.podiatry))
-  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
-    optionNames.mat
-  ].setChecked(filterValues.value.specialty.includes(optionNames.mat))
-  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
-    optionNames.nutrition
-  ].setChecked(filterValues.value.specialty.includes(optionNames.nutrition))
-  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
-    optionNames.tobacco
-  ].setChecked(filterValues.value.specialty.includes(optionNames.tobacco))
-  filterBitfields.value.childFilters[filterDefinitions[4].key].childFilters[
-    optionNames.pharmacy
-  ].setChecked(filterValues.value.specialty.includes(optionNames.pharmacy))
-
-  // tests
-  filterBitfields.value.childFilters[filterDefinitions[5].key].childFilters[
-    optionNames.blood
-  ].setChecked(filterValues.value.tests.includes(optionNames.blood))
-  filterBitfields.value.childFilters[filterDefinitions[5].key].childFilters[
-    optionNames.sti
-  ].setChecked(filterValues.value.tests.includes(optionNames.sti))
-  filterBitfields.value.childFilters[filterDefinitions[5].key].childFilters[
-    optionNames.covid
-  ].setChecked(filterValues.value.tests.includes(optionNames.covid))
-  filterBitfields.value.childFilters[filterDefinitions[5].key].childFilters[
-    optionNames.mammo
-  ].setChecked(filterValues.value.tests.includes(optionNames.mammo))
-  filterBitfields.value.childFilters[filterDefinitions[5].key].childFilters[
-    optionNames.xray
-  ].setChecked(filterValues.value.tests.includes(optionNames.xray))
-
-  // languages
-  filterBitfields.value.childFilters[filterDefinitions[6].key].childFilters[
-    optionNames.spanish
-  ].setChecked(filterValues.value.languages.includes(optionNames.spanish))
-  filterBitfields.value.childFilters[filterDefinitions[6].key].childFilters[
-    optionNames.mandarin
-  ].setChecked(filterValues.value.languages.includes(optionNames.mandarin))
-  filterBitfields.value.childFilters[filterDefinitions[6].key].childFilters[
-    optionNames.vietnamese
-  ].setChecked(filterValues.value.languages.includes(optionNames.vietnamese))
-
-  filterBitfields.value.setChecked()
-  console.log("WATCH: ", filterBitfields.value.getBitfield())
+const filterLogicalValues = computed(() => {
+  return filterSelected.value
+    ? filterLogic.value.getBitfield()
+    : getUniformBitarray(filterLogic.value.getBufferLength(), 1)
 })
 
 // SEAM: data wiring belongs to the teammate. Returns locations unfiltered for now.
@@ -224,7 +137,7 @@ const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
 })
 
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
-  console.log(filterBitfields.value)
+  console.log("SET BITS: ", filterLogicalValues.value)
   let result = applyFilters(locationsWithDistance.value, filterValues.value)
 
   if (searchString.value) {
@@ -236,6 +149,101 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
   }
 
   return result
+})
+
+watchEffect(() => {
+  // wait time
+  filterLogic.value.childFilters[filterDefinitions[2].key].childFilters[
+    optionNames.sameDay
+  ].setChecked(filterValues.value.waitTime.includes(optionNames.sameDay))
+  filterLogic.value.childFilters[filterDefinitions[2].key].childFilters[
+    optionNames.weekWell
+  ].setChecked(filterValues.value.waitTime.includes(optionNames.weekWell))
+  filterLogic.value.childFilters[filterDefinitions[2].key].childFilters[
+    optionNames.weekSick
+  ].setChecked(filterValues.value.waitTime.includes(optionNames.weekSick))
+  filterLogic.value.childFilters[filterDefinitions[2].key].childFilters[
+    optionNames.twoMonths
+  ].setChecked(filterValues.value.waitTime.includes(optionNames.twoMonths))
+
+  // visit type
+  filterLogic.value.childFilters[filterDefinitions[3].key].childFilters[
+    optionNames.primaryWell
+  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryWell))
+  filterLogic.value.childFilters[filterDefinitions[3].key].childFilters[
+    optionNames.primarySick
+  ].setChecked(filterValues.value.visitType.includes(optionNames.primarySick))
+  filterLogic.value.childFilters[filterDefinitions[3].key].childFilters[
+    optionNames.primarySports
+  ].setChecked(filterValues.value.visitType.includes(optionNames.primarySports))
+  filterLogic.value.childFilters[filterDefinitions[3].key].childFilters[
+    optionNames.primaryPrenatal
+  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryPrenatal))
+  filterLogic.value.childFilters[filterDefinitions[3].key].childFilters[
+    optionNames.primaryWomen
+  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryWomen))
+  filterLogic.value.childFilters[filterDefinitions[3].key].childFilters[
+    optionNames.primaryTelehealth
+  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryTelehealth))
+  filterLogic.value.childFilters[filterDefinitions[3].key].childFilters[
+    optionNames.primaryVaccines
+  ].setChecked(filterValues.value.visitType.includes(optionNames.primaryVaccines))
+
+  // specialty
+  filterLogic.value.childFilters[filterDefinitions[4].key].childFilters[
+    optionNames.mental
+  ].setChecked(filterValues.value.specialty.includes(optionNames.mental))
+  filterLogic.value.childFilters[filterDefinitions[4].key].childFilters[
+    optionNames.dental
+  ].setChecked(filterValues.value.specialty.includes(optionNames.dental))
+  filterLogic.value.childFilters[filterDefinitions[4].key].childFilters[optionNames.eye].setChecked(
+    filterValues.value.specialty.includes(optionNames.eye)
+  )
+  filterLogic.value.childFilters[filterDefinitions[4].key].childFilters[
+    optionNames.podiatry
+  ].setChecked(filterValues.value.specialty.includes(optionNames.podiatry))
+  filterLogic.value.childFilters[filterDefinitions[4].key].childFilters[optionNames.mat].setChecked(
+    filterValues.value.specialty.includes(optionNames.mat)
+  )
+  filterLogic.value.childFilters[filterDefinitions[4].key].childFilters[
+    optionNames.nutrition
+  ].setChecked(filterValues.value.specialty.includes(optionNames.nutrition))
+  filterLogic.value.childFilters[filterDefinitions[4].key].childFilters[
+    optionNames.tobacco
+  ].setChecked(filterValues.value.specialty.includes(optionNames.tobacco))
+  filterLogic.value.childFilters[filterDefinitions[4].key].childFilters[
+    optionNames.pharmacy
+  ].setChecked(filterValues.value.specialty.includes(optionNames.pharmacy))
+
+  // tests
+  filterLogic.value.childFilters[filterDefinitions[5].key].childFilters[
+    optionNames.blood
+  ].setChecked(filterValues.value.tests.includes(optionNames.blood))
+  filterLogic.value.childFilters[filterDefinitions[5].key].childFilters[optionNames.sti].setChecked(
+    filterValues.value.tests.includes(optionNames.sti)
+  )
+  filterLogic.value.childFilters[filterDefinitions[5].key].childFilters[
+    optionNames.covid
+  ].setChecked(filterValues.value.tests.includes(optionNames.covid))
+  filterLogic.value.childFilters[filterDefinitions[5].key].childFilters[
+    optionNames.mammo
+  ].setChecked(filterValues.value.tests.includes(optionNames.mammo))
+  filterLogic.value.childFilters[filterDefinitions[5].key].childFilters[
+    optionNames.xray
+  ].setChecked(filterValues.value.tests.includes(optionNames.xray))
+
+  // languages
+  filterLogic.value.childFilters[filterDefinitions[6].key].childFilters[
+    optionNames.spanish
+  ].setChecked(filterValues.value.languages.includes(optionNames.spanish))
+  filterLogic.value.childFilters[filterDefinitions[6].key].childFilters[
+    optionNames.mandarin
+  ].setChecked(filterValues.value.languages.includes(optionNames.mandarin))
+  filterLogic.value.childFilters[filterDefinitions[6].key].childFilters[
+    optionNames.vietnamese
+  ].setChecked(filterValues.value.languages.includes(optionNames.vietnamese))
+
+  filterSelected.value = filterLogic.value.getChecked()
 })
 
 function handleSearchSubmit(s: string) {
@@ -251,14 +259,13 @@ function handleGeolocate(locationData: { latitude: number; longitude: number; ac
 }
 
 function handleGeolocateError(error: Error | GeolocationPositionError) {
-  console.log(error)
+  console.error(error)
 }
 
 function handleApplyFilter(value: FilterValues) {
   filterValues.value = Object.keys(filterValues.value).length
     ? (value as PrimaryCareFilterValues)
     : emptyFilters
-  console.log(filterValues.value)
 }
 
 function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {

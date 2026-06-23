@@ -1,4 +1,4 @@
-import { FilterChoiceBitfieldGroup, FilterSet } from './classes'
+import { FilterChoiceBitfieldGroup, FilterGroup } from './classes'
 
 export type BitWiseOperation = '&' | '|' | '^'
 
@@ -24,8 +24,8 @@ export interface IFilterChoiceBitfieldGroup {
   choices: Record<string, Omit<IFilterChoiceBitfield, 'data'>>
 }
 
-export interface IFilterSet {
+export interface IFilterGroup {
   operation: BitWiseOperation
-  childFilters: Record<string, FilterChoiceBitfieldGroup | FilterSet>
+  childFilters: Record<string, FilterChoiceBitfieldGroup | FilterGroup>
   bufferLength: number
 }

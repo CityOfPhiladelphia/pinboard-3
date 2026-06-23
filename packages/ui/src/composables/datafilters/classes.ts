@@ -3,7 +3,7 @@ import type {
   BitWiseOperation,
   IFilterChoiceBitfield,
   IFilterChoiceBitfieldGroup,
-  IFilterSet,
+  IFilterGroup,
 } from './types'
 
 export class FilterChoiceBitfield {
@@ -51,6 +51,7 @@ class FilterChoiceBitfieldGroup {
   }
 
   getChecked() {
+    this.setChecked()
     return this.checked
   }
 
@@ -76,15 +77,19 @@ class FilterChoiceBitfieldGroup {
   }
 }
 
-class FilterSet {
-  childFilters: Record<string, FilterChoiceBitfieldGroup | FilterSet>
+class FilterGroup {
+  childFilters: Record<string, FilterChoiceBitfieldGroup | FilterGroup>
   private operation: BitWiseOperation
   private bufferLength: number
   private checked: boolean = false
-  constructor(params: IFilterSet) {
+  constructor(params: IFilterGroup) {
     this.operation = params.operation
     this.childFilters = params.childFilters
     this.bufferLength = params.bufferLength
+  }
+
+  getBufferLength() {
+    return this.bufferLength
   }
 
   getBitfield(): Uint32Array {
@@ -102,6 +107,7 @@ class FilterSet {
   }
 
   getChecked() {
+    this.setChecked()
     return this.checked
   }
 
@@ -114,4 +120,4 @@ class FilterSet {
   }
 }
 
-export { FilterChoiceBitfieldGroup, FilterSet }
+export { FilterChoiceBitfieldGroup, FilterGroup }

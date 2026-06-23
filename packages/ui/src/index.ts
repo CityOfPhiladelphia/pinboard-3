@@ -8,9 +8,9 @@ export type {
   BitWiseOperation,
   MatchingFunction,
   IFilterChoiceBitfieldGroup,
-  IFilterSet,
+  IFilterGroup,
 } from './composables/datafilters/types'
-export { FilterChoiceBitfieldGroup, FilterSet } from './composables/datafilters/classes'
+export { FilterChoiceBitfieldGroup, FilterGroup } from './composables/datafilters/classes'
 export type * as PinboardFilterTypes from './composables/datafilters/types'
 
 // Re-export map-core layer components so apps use the same MapLibre instance as PhilaMap
