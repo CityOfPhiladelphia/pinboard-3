@@ -46,6 +46,8 @@ export type LocationPanelDTO = {
 } & PinboardTypes.BasicLocation
 
 export interface OemFields {
+  /** Flood-API device id, used to fetch readings. Decoupled from the slug `id`. */
+  deviceId: string
   deviceType: DeviceType
   lastUpdated: Date | null
   actionStage: number

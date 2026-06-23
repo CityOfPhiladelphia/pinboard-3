@@ -206,7 +206,7 @@ function translateTransitList(raw: string | null, category: string): string {
         variant="standard"
         size="small"
         class="detail-close-btn"
-        aria-label="Close details"
+        :aria-label="t('closeDetails')"
         @click="onClose"
       />
     </div>
