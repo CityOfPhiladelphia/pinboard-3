@@ -63,17 +63,17 @@ class FilterChoiceBitfieldGroup {
   }
 
   getBitfield(): Uint32Array {
-    return this.getChecked()
-      ? bitarrayBitwiseOperator(
-          null,
-          Array.from(Object.values(this.childFilters), (choice) =>
-            choice.getChecked()
-              ? choice.getBitfield()
-              : getUniformBitarray(this.bufferLength, this.operation === '&' ? 1 : 0)
-          ),
-          this.operation
-        )
-      : getUniformBitarray(this.bufferLength, 0)
+    if (this.getChecked()) {
+      const checkedBitfields: Uint32Array[] = []
+      Object.values(this.childFilters).forEach((choice) => {
+        if (choice.getChecked()) {
+          checkedBitfields.push(choice.getBitfield())
+        }
+      })
+      return bitarrayBitwiseOperator(null, checkedBitfields, this.operation)
+    }
+
+    return getUniformBitarray(this.bufferLength, 0)
   }
 }
 
@@ -93,17 +93,17 @@ class FilterGroup {
   }
 
   getBitfield(): Uint32Array {
-    return this.getChecked()
-      ? bitarrayBitwiseOperator(
-          null,
-          Array.from(Object.values(this.childFilters), (choice) =>
-            choice.getChecked()
-              ? choice.getBitfield()
-              : getUniformBitarray(this.bufferLength, this.operation === '&' ? 1 : 0)
-          ),
-          this.operation
-        )
-      : getUniformBitarray(this.bufferLength, 0)
+    if (this.getChecked()) {
+      const checkedBitfields: Uint32Array[] = []
+      Object.values(this.childFilters).forEach((choice) => {
+        if (choice.getChecked()) {
+          checkedBitfields.push(choice.getBitfield())
+        }
+      })
+      return bitarrayBitwiseOperator(null, checkedBitfields, this.operation)
+    }
+
+    return getUniformBitarray(this.bufferLength, this.operation === '&' ? 1 : 0)
   }
 
   getChecked() {

@@ -77,7 +77,6 @@ defineSlots<{
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  /* width: min(100vw, 1450px); */
   margin: auto;
 }
 

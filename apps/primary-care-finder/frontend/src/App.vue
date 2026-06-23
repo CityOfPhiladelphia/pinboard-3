@@ -25,7 +25,6 @@ import {
   optionNames,
 } from './configs/filterLogicParams.ts'
 import type { PrimaryCareFilterValues, PrimaryCareLocation } from './types'
-import { getUniformBitarray } from '../../../../packages/ui/src/composables/datafilters/functions.ts'
 
 const searchPlaceholderText = 'Search by address or keyword...'
 const emptyFilters: PrimaryCareFilterValues = {
@@ -50,7 +49,7 @@ const userLocation = ref<PinboardTypes.LatLon>({
 
 const searchString = ref('')
 
-const filterSelected = ref<boolean>(false)
+const filterLogicalValues = ref<Uint32Array>(new Uint32Array())
 
 const filterValues = ref<PrimaryCareFilterValues>(emptyFilters)
 
@@ -98,11 +97,12 @@ const filterLogic = computed(() => {
   return filterLogicGroup
 })
 
-const filterLogicalValues = computed(() => {
-  return filterSelected.value
-    ? filterLogic.value.getBitfield()
-    : getUniformBitarray(filterLogic.value.getBufferLength(), 1)
-})
+// const filterLogicalValues = computed(() => {
+//   console.log("BITARRAYS: ", filterLogic.value)
+//   return filterSelected.value
+//     ? filterLogic.value.getBitfield()
+//     : getUniformBitarray(filterLogic.value.getBufferLength(), 1)
+// })
 
 // SEAM: data wiring belongs to the teammate. Returns locations unfiltered for now.
 // TODO(teammate): map filterValues → PrimaryCareProperties predicates.
@@ -116,7 +116,23 @@ function applyFilters(
   locations: PrimaryCareLocation[],
   _values: FilterValues
 ): PrimaryCareLocation[] {
-  return locations
+  if (!filterLogicalValues.value.length) {
+    return locations
+  }
+  const filtered: PrimaryCareLocation[] = []
+  let check = 1
+  let offset = 0
+  locations.forEach((location) => {
+    if (check & filterLogicalValues.value[offset]) {
+      filtered.push(location)
+    }
+    check <<= 1
+    if (!(check & 0xFFFFFFFF)) {
+      check = 1
+      offset++
+    }
+  })
+  return filtered
 }
 
 const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
@@ -137,7 +153,7 @@ const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
 })
 
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
-  console.log("SET BITS: ", filterLogicalValues.value)
+  console.log('SET BITS: ', filterLogicalValues.value)
   let result = applyFilters(locationsWithDistance.value, filterValues.value)
 
   if (searchString.value) {
@@ -243,7 +259,7 @@ watchEffect(() => {
     optionNames.vietnamese
   ].setChecked(filterValues.value.languages.includes(optionNames.vietnamese))
 
-  filterSelected.value = filterLogic.value.getChecked()
+  filterLogicalValues.value = filterLogic.value.getBitfield()
 })
 
 function handleSearchSubmit(s: string) {
