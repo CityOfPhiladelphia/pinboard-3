@@ -190,7 +190,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
     @search="handleSearchSubmit"
   >
     <template #locations-header>
-      <div class="locations-callout">
+      <div v-if="!isMobile" class="locations-callout">
         <Callout
           type="info"
           title="Free and low-cost medical care in Philadelphia"
@@ -276,5 +276,6 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
 
 .locations-callout :deep(.callout-title) {
   font-size: var(--scale-200);
+  text-align: left;
 }
 </style>

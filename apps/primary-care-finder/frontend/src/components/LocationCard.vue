@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PhilaLink } from '@pinboard/ui'
-import { IconPhone, IconLocationArrow, IconGlobe } from '@phila/phila-ui-core/icons'
+import { IconPhone, IconLocationDot, IconGlobe } from '@phila/phila-ui-core/icons'
 import type { PrimaryCareLocation } from '@/types'
 
 defineProps<{
@@ -44,7 +44,7 @@ function mapsUrl(location: PrimaryCareLocation): string {
       <PhilaLink
         v-if="location.properties.address"
         :href="mapsUrl(location)"
-        :icon="IconLocationArrow"
+        :icon="IconLocationDot"
         size="small"
         target="_blank"
         rel="noopener noreferrer"
