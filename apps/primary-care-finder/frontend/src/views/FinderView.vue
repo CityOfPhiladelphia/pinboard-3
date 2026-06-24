@@ -9,7 +9,8 @@ import {
   PinboardComposables,
   PinboardUtilities,
 } from '@pinboard/ui'
-import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
+import { IconSort } from '@phila/phila-ui-core/icons'
+import { Callout } from '@pinboard/ui'
 import type { FilterDefinition, FilterValues, PinboardTypes } from '@pinboard/ui'
 import { useI18n } from 'vue-i18n'
 import { useLocations } from '../composables/useLocations'
@@ -39,7 +40,7 @@ const filterDefinitions = computed<FilterDefinition[]>(() => [
     label: t('filters.sort'),
     multiple: false,
     excludeFromCount: true,
-    iconDefinition: faArrowUpArrowDown,
+    icon: IconSort,
     // TODO(teammate): finalize sort options + ordering logic.
     choices: [
       { text: t('filters.distance'), value: 'distance' },
@@ -188,8 +189,18 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
     :filters="filterDefinitions"
     @search="handleSearchSubmit"
   >
+    <template #locations-header>
+      <div v-if="!isMobile" class="locations-callout">
+        <Callout
+          type="info"
+          title="Free and low-cost medical care in Philadelphia"
+          message="Our primary care finder can help you find a provider in Philadelphia. These health care centers serve everyone. Your immigration status or ability to pay won't stop you from getting the care you need."
+        />
+      </div>
+    </template>
+
     <template #location-card="{ location }">
-      <LocationCard :location="location" />
+      <LocationCard :location="asPrimaryCareLocation(location)" />
     </template>
 
     <template #location-detail="{ location, onClose }">
@@ -257,3 +268,14 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
     </template>
   </PinboardBody>
 </template>
+
+<style scoped>
+.locations-callout {
+  padding: 1.5rem 1rem 0 1rem;
+}
+
+.locations-callout :deep(.callout-title) {
+  font-size: var(--scale-200);
+  text-align: left;
+}
+</style>

@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 // 3rd party imports
-import { faMap } from '@fortawesome/pro-solid-svg-icons'
+import { IconMap } from '@phila/phila-ui-core/icons'
 
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
@@ -40,6 +40,7 @@ import { hasLocationData } from '../utilities/hasLocationData'
 defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
+  'location-card'?(props: { location: BasicLocation }): unknown
   'location-detail'?(props: { location: BasicLocation; onClose: () => void }): unknown
   'map-content'?(props: {
     locations: BasicLocation[]
@@ -348,6 +349,9 @@ const effectiveMapConfig = (() => {
               </div>
             </Teleport>
           </template>
+          <template v-if="$slots['location-card']" #location-card="{ location }">
+            <slot name="location-card" :location="location" />
+          </template>
         </LocationsPanel>
       </Teleport>
     </div>
@@ -401,7 +405,7 @@ const effectiveMapConfig = (() => {
     v-model="bottomSheetOpen"
     :snap-points="snapPoints"
     :collapse-label="selectedLocation ? '' : t('pinboard.mapView')"
-    :collapse-icon="selectedLocation ? undefined : faMap"
+    :collapse-icon="selectedLocation ? undefined : IconMap"
     class="mobile-bottom-sheet"
   >
     <div class="bottom-sheet-stack">

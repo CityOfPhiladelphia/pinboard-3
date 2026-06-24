@@ -24,9 +24,12 @@ export {
 } from '@phila/phila-ui-map-core'
 export type { LegendItem } from '@phila/phila-ui-map-core'
 
+export { Callout } from '@phila/phila-ui-callout'
+export { PhilaLink } from '@phila/phila-ui-link'
 export { NavbarInfo } from '@phila/phila-ui-app-header'
 export { PinboardShell, PinboardBody, PinboardInfoPage }
 
+export { Icon } from '@phila/phila-ui-core'
 export type { FilterDefinition, FilterValues, FilterChoice } from '@phila/phila-ui-core'
 
 export { mergeDeep, languages, languageCodes, pinboardMessages, type Language } from './i18n'
