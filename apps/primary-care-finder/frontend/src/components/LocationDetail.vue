@@ -3,17 +3,9 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { PrimaryCareLocation } from '@/types'
 import { PhilaButton } from '@phila/phila-ui-button'
-import { PhilaLink, Icon } from '@pinboard/ui'
+import { PhilaLink } from '@pinboard/ui'
 import LocationTags from './LocationTags.vue'
-import {
-  IconClose,
-  IconPhone,
-  IconGlobe,
-  IconLocationDot,
-  IconLanguage,
-  IconBus,
-  IconClock,
-} from '@phila/phila-ui-core/icons'
+import { IconClose } from '@phila/phila-ui-core/icons'
 
 const props = defineProps<{
   location: PrimaryCareLocation
@@ -117,7 +109,7 @@ function parseTime(raw: string | null): string {
   if (!raw) return ''
   const [hStr, mStr] = raw.split(':')
   let h = parseInt(hStr)
-  const ampm = h >= 12 ? 'PM' : 'AM'
+  const ampm = h >= 12 ? 'pm' : 'am'
   h = h % 12 || 12
   return mStr === '00' ? `${h}\u00A0${ampm}` : `${h}:${mStr}\u00A0${ampm}`
 }
@@ -211,7 +203,6 @@ function translateTransitList(raw: string | null, category: string): string {
       <div class="detail-columns">
         <div class="detail-col-left">
           <div class="detail-cell">
-            <Icon :icon="IconPhone" inline class="cell-icon" />
             <span class="has-text-label-small cell-label">Contact</span>
             <div class="cell-content">
               <PhilaLink v-if="p.med_phone_num" :href="`tel:${p.med_phone_num}`" size="small">
@@ -220,7 +211,6 @@ function translateTransitList(raw: string | null, category: string): string {
             </div>
           </div>
           <div class="detail-cell">
-            <Icon :icon="IconGlobe" inline class="cell-icon" />
             <span class="has-text-label-small cell-label">Website</span>
             <div class="cell-content">
               <PhilaLink
@@ -235,7 +225,6 @@ function translateTransitList(raw: string | null, category: string): string {
             </div>
           </div>
           <div class="detail-cell">
-            <Icon :icon="IconLanguage" inline class="cell-icon" />
             <span class="has-text-label-small cell-label">Languages spoken</span>
             <div class="cell-content">
               <span class="has-text-body-small">
@@ -244,7 +233,6 @@ function translateTransitList(raw: string | null, category: string): string {
             </div>
           </div>
           <div class="detail-cell">
-            <Icon :icon="IconBus" inline class="cell-icon" />
             <span class="has-text-label-small cell-label">Transit options</span>
             <div class="cell-content cell-list">
               <span v-if="p.transport_bus" class="has-text-body-small">
@@ -270,7 +258,6 @@ function translateTransitList(raw: string | null, category: string): string {
         </div>
         <div class="detail-col-right">
           <div class="detail-cell">
-            <Icon :icon="IconLocationDot" inline class="cell-icon" />
             <span class="has-text-label-small cell-label">Location</span>
             <div class="cell-content">
               <PhilaLink :href="mapsUrl()" size="small" target="_blank" rel="noopener noreferrer">
@@ -279,7 +266,6 @@ function translateTransitList(raw: string | null, category: string): string {
             </div>
           </div>
           <div class="detail-cell">
-            <Icon :icon="IconClock" inline class="cell-icon" />
             <span class="has-text-label-small cell-label">Hours</span>
             <div class="cell-content hours-list">
               <div v-for="day in DAYS" :key="day" class="hours-entry">
@@ -425,25 +411,16 @@ function translateTransitList(raw: string | null, category: string): string {
 }
 
 .detail-cell {
-  display: grid;
-  grid-template-columns: 1rem 1fr;
-  column-gap: 0.5rem;
-  row-gap: 0.25rem;
-  align-items: start;
-}
-
-.cell-icon {
-  margin-top: 1px;
-  color: var(--Schemes-On-Surface-Low);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .cell-label {
   color: var(--Schemes-On-Surface-Low);
-  padding-top: 2px;
 }
 
 .cell-content {
-  grid-column: 2;
 }
 
 .cell-list {

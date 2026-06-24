@@ -36,7 +36,7 @@ interface TagConfig {
 function formatTime(t: string): string {
   const [hStr, mStr] = t.split(':')
   let h = parseInt(hStr)
-  const ampm = h >= 12 ? 'PM' : 'AM'
+  const ampm = h >= 12 ? 'pm' : 'am'
   h = h % 12 || 12
   return mStr === '00' ? `${h}\u00A0${ampm}` : `${h}:${mStr}\u00A0${ampm}`
 }
@@ -108,7 +108,7 @@ const cardTags = computed<TagConfig[]>(() => {
       : null,
     !!todayEnd && todayEnd >= '18:00:00'
       ? {
-          text: 'Open after 6PM',
+          text: 'Open after 6pm',
           color: 'blue',
           icon: IconClock,
           tooltip: todaysHoursTooltip.value,
