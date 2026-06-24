@@ -155,13 +155,6 @@ function parseTimeRange(day: string): string {
   return val
 }
 
-function parseException(exception: string, index: number): string {
-  const stars = '*'.repeat(index)
-  const msgs = messages.value[locale.value] as Record<string, Record<string, string>>
-  const translated = msgs?.exceptions?.[exception]
-  return stars + ' ' + (translated ?? exception)
-}
-
 // --- Tests ---
 const tests = computed(() => {
   const fields = ['blood', 'sti', 'covid', 'mammo', 'xray']
