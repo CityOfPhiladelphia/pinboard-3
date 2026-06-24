@@ -75,6 +75,8 @@ export default {
     patient_type_new: 'مرضى جدد',
     patient_type_existing: 'مرضى حاليون',
     patient_type_existing_only: 'يجب تقديم الرعاية في الموقع',
+    patient_type_existing_only_subtext:
+      '*You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: 'الرعاية الأساسية',

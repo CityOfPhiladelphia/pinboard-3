@@ -76,6 +76,8 @@ export default {
     patient_type_new: 'Wagonjwa wapya',
     patient_type_existing: 'Wagonjwa walioanzishwa',
     patient_type_existing_only: 'Lazima uanzishe huduma kwenye eneo',
+    patient_type_existing_only_subtext:
+      '*You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: 'Huduma ya msingi',

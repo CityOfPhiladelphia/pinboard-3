@@ -1,10 +1,10 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { computed } from 'vue'
-import { format, parseISO } from 'date-fns'
 import { useI18n } from 'vue-i18n'
 import type { PrimaryCareLocation } from '@/types'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { PhilaLink, Icon } from '@pinboard/ui'
+import LocationTags from './LocationTags.vue'
 import {
   IconClose,
   IconPhone,
@@ -49,66 +49,39 @@ function siteName(): string {
 }
 
 // --- Age-specific services ---
-interface ServiceRow {
-  id: number
-  service: string
-  adult: string | null
-  child: string | null
-  existing: (string | null)[]
-}
+const ALL_SERVICES: [string, string[]][] = [
+  ['visitType.well', ['primary_well_ad', 'primary_well_ch']],
+  ['visitType.sick', ['primary_sick_ad', 'primary_sick_ch']],
+  ['visitType.vaccine', ['primary_vacc_ad', 'primary_vacc_child']],
+  ['specialty.mental', ['special_mental_ad', 'special_mental_ch']],
+  ['specialty.dental', ['special_dental_ad', 'special_dental_ch']],
+  ['specialty.eye', ['special_eye_ad', 'special_eye_ch']],
+  ['visitType.sports', ['primary_sports']],
+  ['visitType.prenatal', ['primary_prenatal']],
+  ['visitType.women', ['primary_women']],
+  ['specialty.mat', ['special_mat']],
+  ['specialty.podiatry', ['special_podiatry']],
+  ['specialty.nutrition', ['special_nutrition']],
+  ['specialty.tobacco', ['special_tobacco']],
+  ['visitType.telehealth', ['primary_telehealth']],
+  ['specialty.pharmacy', ['special_pharmacy']],
+]
 
-const YES_VALUES = ['Yes', 'Established Patients']
+// Services available to new patients or walk-ins (any field is "Yes")
+const newPatientServices = computed<string[]>(() =>
+  ALL_SERVICES.filter(([, fields]) =>
+    fields.some((f) => (p.value[f] as string | null) === 'Yes')
+  ).map(([label]) => label)
+)
 
-const ageSpecificServices = computed<ServiceRow[]>(() => {
-  const rows: ServiceRow[] = []
-  const checks: [string, string, string][] = [
-    ['visitType.well', 'primary_well_ad', 'primary_well_ch'],
-    ['visitType.sick', 'primary_sick_ad', 'primary_sick_ch'],
-    ['visitType.vaccine', 'primary_vacc_ad', 'primary_vacc_child'],
-    ['specialty.mental', 'special_mental_ad', 'special_mental_ch'],
-    ['specialty.dental', 'special_dental_ad', 'special_dental_ch'],
-    ['specialty.eye', 'special_eye_ad', 'special_eye_ch'],
-  ]
-  let id = 1
-  for (const [service, adultField, childField] of checks) {
-    const adult = p.value[adultField] as string | null
-    const child = p.value[childField] as string | null
-    if (YES_VALUES.includes(adult ?? '') || YES_VALUES.includes(child ?? '')) {
-      rows.push({ id: id++, service, adult, child, existing: [adult, child] })
-    }
-  }
-  return rows
-})
-
-// --- Other services ---
-interface OtherServiceRow {
-  id: number
-  service: string
-  value: string | null
-}
-
-const otherServices = computed<OtherServiceRow[]>(() => {
-  const rows: OtherServiceRow[] = []
-  const checks: [string, string][] = [
-    ['visitType.sports', 'primary_sports'],
-    ['visitType.prenatal', 'primary_prenatal'],
-    ['visitType.women', 'primary_women'],
-    ['specialty.mat', 'special_mat'],
-    ['specialty.podiatry', 'special_podiatry'],
-    ['specialty.nutrition', 'special_nutrition'],
-    ['specialty.tobacco', 'special_tobacco'],
-    ['visitType.telehealth', 'primary_telehealth'],
-    ['specialty.pharmacy', 'special_pharmacy'],
-  ]
-  let id = 1
-  for (const [service, field] of checks) {
-    const val = p.value[field] as string | null
-    if (YES_VALUES.includes(val ?? '')) {
-      rows.push({ id: id++, service, value: val })
-    }
-  }
-  return rows
-})
+// Services exclusive to existing patients (no field is "Yes", but at least one is "Established Patients")
+const existingOnlyServices = computed<string[]>(() =>
+  ALL_SERVICES.filter(
+    ([, fields]) =>
+      !fields.some((f) => (p.value[f] as string | null) === 'Yes') &&
+      fields.some((f) => (p.value[f] as string | null) === 'Established Patients')
+  ).map(([label]) => label)
+)
 
 // --- Hours ---
 const DAYS = ['mon', 'tues', 'wed', 'thurs', 'fri', 'sat', 'sun'] as const
@@ -142,7 +115,11 @@ const exceptionsList = computed(() => {
 
 function parseTime(raw: string | null): string {
   if (!raw) return ''
-  return format(parseISO('2022-05-24T' + raw), 'h:mm aaaa')
+  const [hStr, mStr] = raw.split(':')
+  let h = parseInt(hStr)
+  const ampm = h >= 12 ? 'PM' : 'AM'
+  h = h % 12 || 12
+  return mStr === '00' ? `${h}\u00A0${ampm}` : `${h}:${mStr}\u00A0${ampm}`
 }
 
 function exceptionCounter(day: string): number | null {
@@ -151,13 +128,20 @@ function exceptionCounter(day: string): number | null {
   return 1 + exceptionsList.value.indexOf(exc)
 }
 
+function getExceptionText(day: string): string | null {
+  const exc = exceptionsByDay.value[day]
+  if (!exc) return null
+  const msgs = messages.value[locale.value] as Record<string, Record<string, string>>
+  return msgs?.exceptions?.[exc] ?? exc
+}
+
 function parseTimeRange(day: string): string {
   const start = p.value[`hours_${day}_start`] as string | null
   const end = p.value[`hours_${day}_end`] as string | null
   const counter = exceptionCounter(day)
   let val: string
   if (start && end) {
-    val = parseTime(start) + ' - ' + parseTime(end)
+    val = parseTime(start) + '\u00A0–\u00A0' + parseTime(end)
   } else {
     val = t('closed')
   }
@@ -221,6 +205,7 @@ function translateTransitList(raw: string | null, category: string): string {
     </div>
 
     <div class="detail-body">
+      <LocationTags :location="location" detail />
       <span class="has-text-label-default">Location details</span>
 
       <div class="detail-columns">
@@ -245,7 +230,7 @@ function translateTransitList(raw: string | null, category: string): string {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {{ p.website }}
+                Provider website
               </PhilaLink>
             </div>
           </div>
@@ -297,9 +282,17 @@ function translateTransitList(raw: string | null, category: string): string {
             <Icon :icon="IconClock" inline class="cell-icon" />
             <span class="has-text-label-small cell-label">Hours</span>
             <div class="cell-content hours-list">
-              <div v-for="day in DAYS" :key="day" class="hours-row">
-                <span class="has-text-body-small hours-day">{{ $t(DAY_I18N_KEYS[day]) }}</span>
-                <span class="has-text-body-small">{{ parseTimeRange(day) }}</span>
+              <div v-for="day in DAYS" :key="day" class="hours-entry">
+                <div class="hours-row">
+                  <span class="has-text-body-small hours-day">{{ $t(DAY_I18N_KEYS[day]) }}</span>
+                  <span class="has-text-body-small">{{ parseTimeRange(day) }}</span>
+                </div>
+                <span
+                  v-if="getExceptionText(day)"
+                  class="has-text-body-extra-small hours-exception"
+                >
+                  {{ '*'.repeat(exceptionCounter(day) ?? 1) }} {{ getExceptionText(day) }}
+                </span>
               </div>
             </div>
           </div>
@@ -313,72 +306,41 @@ function translateTransitList(raw: string | null, category: string): string {
 
       <span class="has-text-label-default">Services available</span>
 
-      <!-- Age-specific services table -->
+      <!-- New patient services -->
       <section class="services-section">
-        <span class="has-text-label-small cell-label">{{ $t('ageSpecificServices') }}</span>
-        <span class="has-text-body-small">{{ $t('cards.table1Intro') }}</span>
-        <table v-if="ageSpecificServices.length" class="data-table">
-          <thead>
-            <tr>
-              <th>{{ $t('service') }}</th>
-              <th class="center">{{ $t('ageRange.adult') }}</th>
-              <th class="center">{{ $t('ageRange.child') }}</th>
-              <th class="center">
-                {{ $t('patientType.patient_type_existing_only') }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="row in ageSpecificServices" :key="row.id">
-              <td>{{ $t(row.service) }}</td>
-              <td class="center">
-                {{ YES_VALUES.includes(row.adult ?? '') ? '✓' : '' }}
-              </td>
-              <td class="center">
-                {{ YES_VALUES.includes(row.child ?? '') ? '✓' : '' }}
-              </td>
-              <td class="center">
-                {{ row.existing.includes('Established Patients') ? '✓' : '' }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <span class="has-text-label-small cell-label">{{
+          $t('patientType.patient_type_new')
+        }}</span>
+        <div v-if="newPatientServices.length" class="service-list">
+          <span v-for="label in newPatientServices" :key="label" class="has-text-body-small">
+            {{ $t(label) }}
+          </span>
+        </div>
         <span v-else class="has-text-body-small">{{
           $t('tableNoData.noSpecializedServices')
         }}</span>
       </section>
 
-      <!-- Other services table -->
+      <!-- Existing patient only services -->
       <section class="services-section">
-        <span class="has-text-label-small cell-label">{{ $t('otherServices') }}</span>
-        <span class="has-text-body-small">{{ $t('cards.table2Intro') }}</span>
-        <table v-if="otherServices.length" class="data-table">
-          <thead>
-            <tr>
-              <th>{{ $t('service') }}</th>
-              <th class="center">{{ $t('patientType.patient_type_new') }}</th>
-              <th class="center">
-                {{ $t('patientType.patient_type_existing') }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="row in otherServices" :key="row.id">
-              <td>{{ $t(row.service) }}</td>
-              <td class="center">{{ row.value === 'Yes' ? '✓' : '' }}</td>
-              <td class="center">
-                {{ YES_VALUES.includes(row.value ?? '') ? '✓' : '' }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <span class="has-text-label-small cell-label">{{
+          $t('patientType.patient_type_existing_only')
+        }}</span>
+        <span class="has-text-body-extra-small">{{
+          $t('patientType.patient_type_existing_only_subtext')
+        }}</span>
+        <div v-if="existingOnlyServices.length" class="service-list">
+          <span v-for="label in existingOnlyServices" :key="label" class="has-text-body-small">
+            {{ $t(label) }}
+          </span>
+        </div>
         <span v-else class="has-text-body-small">{{ $t('tableNoData.noOtherServices') }}</span>
       </section>
 
       <!-- Tests -->
       <section class="services-section">
         <span class="has-text-label-small cell-label">{{ $t('tests.category') }}</span>
-        <div v-if="tests.length" class="cell-list">
+        <div v-if="tests.length" class="service-list">
           <span v-for="test in tests" :key="test" class="has-text-body-small">{{
             $t(`tests.${test}`)
           }}</span>
@@ -401,6 +363,7 @@ function translateTransitList(raw: string | null, category: string): string {
   display: flex;
   flex-direction: column;
   height: 100%;
+  container-type: inline-size;
 }
 
 .detail-header {
@@ -433,15 +396,22 @@ function translateTransitList(raw: string | null, category: string): string {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  color: var(--Schemes-On-Surface-High);
 }
 
 .detail-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 1rem;
 }
 
 @media (max-width: 768px), (max-width: 1064px) and (max-height: 600px) {
+  .detail-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@container (max-width: 500px) {
   .detail-columns {
     grid-template-columns: 1fr;
   }
@@ -485,7 +455,7 @@ function translateTransitList(raw: string | null, category: string): string {
 .hours-list {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--spacing-s);
 }
 
 .hours-row {
@@ -496,6 +466,10 @@ function translateTransitList(raw: string | null, category: string): string {
 
 .hours-day {
   color: var(--Schemes-On-Surface-Low);
+}
+
+.hours-exception {
+  display: block;
 }
 
 .services-section {
@@ -511,25 +485,9 @@ function translateTransitList(raw: string | null, category: string): string {
   padding: 0.75rem 1rem;
 }
 
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 0.5rem;
-}
-
-.data-table th,
-.data-table td {
-  border: 1px solid #ddd;
-  padding: 0.5rem;
-  text-align: left;
-}
-
-.data-table th {
-  background: #f5f5f5;
-  font-weight: 600;
-}
-
-.center {
-  text-align: center;
+.service-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xs);
 }
 </style>

@@ -75,6 +75,8 @@ export default {
     patient_type_new: 'Nouvo pasyan yo',
     patient_type_existing: 'Pasyan etabli',
     patient_type_existing_only: 'Dwe etabli swen nan sit la',
+    patient_type_existing_only_subtext:
+      '*You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: 'Swen Prensipal',

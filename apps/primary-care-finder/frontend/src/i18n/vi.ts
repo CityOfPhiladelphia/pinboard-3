@@ -77,6 +77,8 @@ export default {
     patient_type_new: 'Bệnh nhân mới',
     patient_type_existing: 'Bệnh nhân đã được thiết lập hồ sơ',
     patient_type_existing_only: 'Bắt buộc thiết lập dịch vụ chăm sóc sức khoẻ tại chỗ',
+    patient_type_existing_only_subtext:
+      '*You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: 'Chăm sóc sức khoẻ ban đầu',

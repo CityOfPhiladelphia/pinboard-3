@@ -89,9 +89,11 @@ export default {
   },
   patientType: {
     category: 'Eligibility',
-    patient_type_new: 'New patients',
+    patient_type_new: 'For new patients or walk-ins',
     patient_type_existing: 'Established patients',
-    patient_type_existing_only: 'Must establish care at site',
+    patient_type_existing_only: 'Existing patients only',
+    patient_type_existing_only_subtext:
+      '*You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: 'Primary care',

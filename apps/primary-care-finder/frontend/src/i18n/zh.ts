@@ -74,6 +74,8 @@ export default {
     patient_type_new: '新患者',
     patient_type_existing: '已建立医患关系的患者',
     patient_type_existing_only: '必须在现场建立医患关系',
+    patient_type_existing_only_subtext:
+      '*You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: '基本医疗',

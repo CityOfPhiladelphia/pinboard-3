@@ -76,6 +76,8 @@ export default {
     patient_type_new: 'Nouveaux patients',
     patient_type_existing: 'Patients établis',
     patient_type_existing_only: 'Des soins doivent être mis en place sur le site',
+    patient_type_existing_only_subtext:
+      '*You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: 'Soins primaires',

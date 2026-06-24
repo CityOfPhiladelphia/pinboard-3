@@ -76,6 +76,8 @@ export default {
     patient_type_new: 'Pacientes nuevos',
     patient_type_existing: 'Pacientes establecidos',
     patient_type_existing_only: 'Debe programar la atención en el sitio',
+    patient_type_existing_only_subtext:
+      '*You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: 'Atención primaria',

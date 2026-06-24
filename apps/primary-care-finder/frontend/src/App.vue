@@ -50,4 +50,10 @@ const feedbackHref =
 .phila-navbar-brand {
   padding-left: var(--spacing-l);
 }
+
+/* Allow tooltip bubbles to escape the card boundary (overflow:hidden clips them otherwise) */
+.location-card--custom {
+  overflow: visible !important;
+  overflow-x: clip !important;
+}
 </style>

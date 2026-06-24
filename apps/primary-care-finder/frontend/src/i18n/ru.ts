@@ -76,6 +76,8 @@ export default {
     patient_type_new: 'Новые пациенты',
     patient_type_existing: 'Пациенты под наблюдением',
     patient_type_existing_only: 'Должны получать помощь в центре',
+    patient_type_existing_only_subtext:
+      '*You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: 'Первичная медицинская помощь',
