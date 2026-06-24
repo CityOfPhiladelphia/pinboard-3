@@ -200,7 +200,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
     </template>
 
     <template #location-card="{ location }">
-      <LocationCard :location="location" />
+      <LocationCard :location="asPrimaryCareLocation(location)" />
     </template>
 
     <template #location-detail="{ location, onClose }">

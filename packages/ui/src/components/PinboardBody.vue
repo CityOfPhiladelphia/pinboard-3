@@ -40,6 +40,7 @@ import { hasLocationData } from '../utilities/hasLocationData'
 defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
+  'location-card'?(props: { location: BasicLocation }): unknown
   'location-detail'?(props: { location: BasicLocation; onClose: () => void }): unknown
   'map-content'?(props: {
     locations: BasicLocation[]
@@ -347,6 +348,9 @@ const effectiveMapConfig = (() => {
                 />
               </div>
             </Teleport>
+          </template>
+          <template v-if="$slots['location-card']" #location-card="{ location }">
+            <slot name="location-card" :location="location" />
           </template>
         </LocationsPanel>
       </Teleport>
