@@ -5,7 +5,13 @@ import { ClientTable, type ColumnDef } from '@phila/phila-ui-table'
 import { PhlTabNav, PhlTab } from '@phila/phila-ui-tabs'
 import { computed, ref, type Ref } from 'vue'
 import { Icon } from '@phila/phila-ui-core'
-import { IconGauge, IconCloudRain, IconDroplet, IconCloudShowersHeavy, IconTemperatureFull } from '@phila/phila-ui-core/icons'
+import {
+  IconGauge,
+  IconCloudRain,
+  IconDroplet,
+  IconCloudShowersHeavy,
+  IconTemperatureFull,
+} from '@phila/phila-ui-core/icons'
 import { PinboardComposables } from '@pinboard/ui'
 
 const props = defineProps<{

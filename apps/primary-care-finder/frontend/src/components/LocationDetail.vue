@@ -5,7 +5,15 @@ import { useI18n } from 'vue-i18n'
 import type { PrimaryCareLocation } from '@/types'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { PhilaLink, Icon } from '@pinboard/ui'
-import { IconClose, IconPhone, IconGlobe, IconLocationDot, IconLanguage, IconBus, IconClock } from '@phila/phila-ui-core/icons'
+import {
+  IconClose,
+  IconPhone,
+  IconGlobe,
+  IconLocationDot,
+  IconLanguage,
+  IconBus,
+  IconClock,
+} from '@phila/phila-ui-core/icons'
 
 const props = defineProps<{
   location: PrimaryCareLocation
@@ -24,7 +32,9 @@ const fullAddress = computed(() => {
 })
 
 function mapsUrl(): string {
-  const parts = [p.value.address, p.value.address_2, p.value.zip_code, 'Philadelphia, PA'].filter(Boolean)
+  const parts = [p.value.address, p.value.address_2, p.value.zip_code, 'Philadelphia, PA'].filter(
+    Boolean
+  )
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parts.join(', '))}`
 }
 
@@ -256,16 +266,19 @@ function translateTransitList(raw: string | null, category: string): string {
                 {{ $t('transit.bus') }}: {{ p.transport_bus }}
               </span>
               <span v-if="p.transport_subway" class="has-text-body-small">
-                {{ $t('transit.subway.label') }}: {{ translateTransitList(p.transport_subway, 'subway') }}
+                {{ $t('transit.subway.label') }}:
+                {{ translateTransitList(p.transport_subway, 'subway') }}
               </span>
               <span v-if="p.transport_train" class="has-text-body-small">
-                {{ $t('transit.regRail.label') }}: {{ translateTransitList(p.transport_train, 'regRail') }}
+                {{ $t('transit.regRail.label') }}:
+                {{ translateTransitList(p.transport_train, 'regRail') }}
               </span>
               <span v-if="p.transport_trolley" class="has-text-body-small">
                 {{ $t('transit.trolley') }}: {{ p.transport_trolley }}
               </span>
               <span v-if="p.transport_parking" class="has-text-body-small">
-                {{ $t('transit.car.label') }}: {{ translateTransitList(p.transport_parking, 'car') }}
+                {{ $t('transit.car.label') }}:
+                {{ translateTransitList(p.transport_parking, 'car') }}
               </span>
             </div>
           </div>
@@ -275,12 +288,7 @@ function translateTransitList(raw: string | null, category: string): string {
             <Icon :icon="IconLocationDot" inline class="cell-icon" />
             <span class="has-text-label-small cell-label">Location</span>
             <div class="cell-content">
-              <PhilaLink
-                :href="mapsUrl()"
-                size="small"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <PhilaLink :href="mapsUrl()" size="small" target="_blank" rel="noopener noreferrer">
                 {{ fullAddress }}
               </PhilaLink>
             </div>
@@ -335,7 +343,9 @@ function translateTransitList(raw: string | null, category: string): string {
             </tr>
           </tbody>
         </table>
-        <span v-else class="has-text-body-small">{{ $t('tableNoData.noSpecializedServices') }}</span>
+        <span v-else class="has-text-body-small">{{
+          $t('tableNoData.noSpecializedServices')
+        }}</span>
       </section>
 
       <!-- Other services table -->
@@ -369,7 +379,9 @@ function translateTransitList(raw: string | null, category: string): string {
       <section class="services-section">
         <span class="has-text-label-small cell-label">{{ $t('tests.category') }}</span>
         <div v-if="tests.length" class="cell-list">
-          <span v-for="test in tests" :key="test" class="has-text-body-small">{{ $t(`tests.${test}`) }}</span>
+          <span v-for="test in tests" :key="test" class="has-text-body-small">{{
+            $t(`tests.${test}`)
+          }}</span>
         </div>
         <span v-else class="has-text-body-small">{{ $t('tests.noTests') }}</span>
       </section>
@@ -499,7 +511,6 @@ function translateTransitList(raw: string | null, category: string): string {
   padding: 0.75rem 1rem;
 }
 
-
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -521,5 +532,4 @@ function translateTransitList(raw: string | null, category: string): string {
 .center {
   text-align: center;
 }
-
 </style>
