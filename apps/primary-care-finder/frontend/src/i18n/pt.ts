@@ -1,4 +1,22 @@
 export default {
+  // First-pass translations — verify with the city translation process.
+  tags: {
+    openNow: 'Aberto agora',
+    closed: 'Fechado',
+    checkHours: 'Verificar horário',
+    weekendHours: 'Horário de fim de semana',
+    openAfter6: 'Aberto após as 18h',
+    walkIns: 'Atendimento sem hora marcada',
+    telehealth: 'Telessaúde',
+    parking: 'Estacionamento no local',
+    pharmacy: 'Farmácia no local',
+    adultCare: 'Atendimento para adultos',
+    pediatrics: 'Pediatria',
+    multipleLanguages: 'Vários idiomas',
+    todayClosed: 'Hoje: Fechado',
+    todayHours: 'Hoje: {range}',
+  },
+  providerWebsite: 'Site do prestador',
   app: {
     title: 'Localizador de cuidados primários',
     name: 'Localizador de cuidados primários',
@@ -75,6 +93,8 @@ export default {
     patient_type_new: 'Novos pacientes',
     patient_type_existing: 'Pacientes estabelecidos',
     patient_type_existing_only: 'Deve estabelecer os cuidados no local',
+    patient_type_existing_only_subtext:
+      '*You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: 'Cuidados primários',

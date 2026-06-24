@@ -26,6 +26,8 @@ export type { LegendItem } from '@phila/phila-ui-map-core'
 
 export { Callout } from '@phila/phila-ui-callout'
 export { PhilaLink } from '@phila/phila-ui-link'
+export { Tags } from '@phila/phila-ui-tags'
+export { Tooltip } from '@phila/phila-ui-tooltip'
 export { NavbarInfo } from '@phila/phila-ui-app-header'
 export { PinboardShell, PinboardBody, PinboardInfoPage }
 
