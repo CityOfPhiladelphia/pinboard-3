@@ -1,4 +1,22 @@
 export default {
+  // First-pass translations — verify with the city translation process.
+  tags: {
+    openNow: 'Открыто сейчас',
+    closed: 'Закрыто',
+    checkHours: 'Уточните часы работы',
+    weekendHours: 'Часы работы в выходные',
+    openAfter6: 'Открыто после 18:00',
+    walkIns: 'Без записи',
+    telehealth: 'Телемедицина',
+    parking: 'Парковка на месте',
+    pharmacy: 'Аптека на месте',
+    adultCare: 'Помощь взрослым',
+    pediatrics: 'Педиатрия',
+    multipleLanguages: 'Несколько языков',
+    todayClosed: 'Сегодня: закрыто',
+    todayHours: 'Сегодня: {range}',
+  },
+  providerWebsite: 'Веб-сайт поставщика услуг',
   app: {
     title: 'Средство для поиска первичной медицинской помощи',
     name: 'Средство для поиска первичной медицинской помощи',

@@ -1,4 +1,22 @@
 export default {
+  // First-pass translations — verify with the city translation process.
+  tags: {
+    openNow: 'Aberto agora',
+    closed: 'Fechado',
+    checkHours: 'Verificar horário',
+    weekendHours: 'Horário de fim de semana',
+    openAfter6: 'Aberto após as 18h',
+    walkIns: 'Atendimento sem hora marcada',
+    telehealth: 'Telessaúde',
+    parking: 'Estacionamento no local',
+    pharmacy: 'Farmácia no local',
+    adultCare: 'Atendimento para adultos',
+    pediatrics: 'Pediatria',
+    multipleLanguages: 'Vários idiomas',
+    todayClosed: 'Hoje: Fechado',
+    todayHours: 'Hoje: {range}',
+  },
+  providerWebsite: 'Site do prestador',
   app: {
     title: 'Localizador de cuidados primários',
     name: 'Localizador de cuidados primários',

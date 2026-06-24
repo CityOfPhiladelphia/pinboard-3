@@ -1,4 +1,22 @@
 export default {
+  // First-pass translations — verify with the city translation process (Swahili especially).
+  tags: {
+    openNow: 'Imefunguliwa sasa',
+    closed: 'Imefungwa',
+    checkHours: 'Angalia saa za kazi',
+    weekendHours: 'Saa za kazi za wikendi',
+    openAfter6: 'Imefunguliwa baada ya saa 6 jioni',
+    walkIns: 'Bila miadi',
+    telehealth: 'Huduma ya afya kwa njia ya mtandao',
+    parking: 'Maegesho ya gari hapa',
+    pharmacy: 'Duka la dawa hapa',
+    adultCare: 'Huduma kwa watu wazima',
+    pediatrics: 'Huduma za watoto',
+    multipleLanguages: 'Lugha mbalimbali',
+    todayClosed: 'Leo: Imefungwa',
+    todayHours: 'Leo: {range}',
+  },
+  providerWebsite: 'Tovuti ya mtoa huduma',
   app: {
     title: 'Mtambuzi wa huduma ya msingi',
     name: 'Mtambuzi wa huduma ya msingi',

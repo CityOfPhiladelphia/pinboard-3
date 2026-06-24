@@ -220,7 +220,7 @@ function translateTransitList(raw: string | null, category: string): string {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Provider website
+                {{ $t('providerWebsite') }}
               </PhilaLink>
             </div>
           </div>

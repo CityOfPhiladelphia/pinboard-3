@@ -1,4 +1,22 @@
 export default {
+  // First-pass translations — verify with the city translation process.
+  tags: {
+    openNow: '现在营业',
+    closed: '已关闭',
+    checkHours: '查看营业时间',
+    weekendHours: '周末营业时间',
+    openAfter6: '晚上6点后营业',
+    walkIns: '无需预约',
+    telehealth: '远程医疗',
+    parking: '现场停车',
+    pharmacy: '现场药房',
+    adultCare: '成人护理',
+    pediatrics: '儿科',
+    multipleLanguages: '多种语言',
+    todayClosed: '今天：已关闭',
+    todayHours: '今天：{range}',
+  },
+  providerWebsite: '提供者网站',
   app: {
     title: '基本医疗机构查找器',
     name: '基本医疗机构查找器',

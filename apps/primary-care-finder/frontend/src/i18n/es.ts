@@ -1,4 +1,22 @@
 export default {
+  // First-pass translations — verify with the city translation process.
+  tags: {
+    openNow: 'Abierto ahora',
+    closed: 'Cerrado',
+    checkHours: 'Consultar horario',
+    weekendHours: 'Horario de fin de semana',
+    openAfter6: 'Abierto después de las 6 p. m.',
+    walkIns: 'Atención sin cita',
+    telehealth: 'Telesalud',
+    parking: 'Estacionamiento en el lugar',
+    pharmacy: 'Farmacia en el lugar',
+    adultCare: 'Atención para adultos',
+    pediatrics: 'Pediatría',
+    multipleLanguages: 'Varios idiomas',
+    todayClosed: 'Hoy: Cerrado',
+    todayHours: 'Hoy: {range}',
+  },
+  providerWebsite: 'Sitio web del proveedor',
   app: {
     title: 'Buscador de atención primaria',
     name: 'Buscador de atención primaria',

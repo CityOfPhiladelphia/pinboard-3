@@ -1,4 +1,21 @@
 export default {
+  tags: {
+    openNow: 'Open now',
+    closed: 'Closed',
+    checkHours: 'Check hours',
+    weekendHours: 'Weekend hours',
+    openAfter6: 'Open after 6pm',
+    walkIns: 'Walk-ins available',
+    telehealth: 'Telehealth',
+    parking: 'Parking on site',
+    pharmacy: 'Pharmacy on site',
+    adultCare: 'Adult care',
+    pediatrics: 'Pediatrics',
+    multipleLanguages: 'Multiple languages',
+    todayClosed: 'Today: Closed',
+    todayHours: 'Today: {range}',
+  },
+  providerWebsite: 'Provider website',
   app: {
     title: 'Primary care finder',
     subtitle: 'Free and low-cost medical care in Philadelphia',

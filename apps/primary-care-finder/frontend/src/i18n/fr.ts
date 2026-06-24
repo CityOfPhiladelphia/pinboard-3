@@ -1,4 +1,22 @@
 export default {
+  // First-pass translations — verify with the city translation process.
+  tags: {
+    openNow: 'Ouvert maintenant',
+    closed: 'Fermé',
+    checkHours: 'Vérifier les horaires',
+    weekendHours: 'Horaires du week-end',
+    openAfter6: 'Ouvert après 18 h',
+    walkIns: 'Sans rendez-vous',
+    telehealth: 'Télésanté',
+    parking: 'Stationnement sur place',
+    pharmacy: 'Pharmacie sur place',
+    adultCare: 'Soins pour adultes',
+    pediatrics: 'Pédiatrie',
+    multipleLanguages: 'Plusieurs langues',
+    todayClosed: "Aujourd'hui : Fermé",
+    todayHours: "Aujourd'hui : {range}",
+  },
+  providerWebsite: 'Site web du prestataire',
   app: {
     title: 'Outil de recherche de soins primaires',
     name: 'Outil de recherche de soins primaires',

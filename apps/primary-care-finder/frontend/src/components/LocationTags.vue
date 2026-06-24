@@ -1,5 +1,6 @@
 ﻿<script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Tags, Tooltip } from '@pinboard/ui'
 import type { TagColor } from '@phila/phila-ui-tags'
 import type { IconComponent } from '@phila/phila-ui-core'
@@ -19,6 +20,8 @@ const props = defineProps<{
   max?: number
   detail?: boolean
 }>()
+
+const { t } = useI18n()
 
 const p = computed(() => props.location.properties)
 
@@ -45,8 +48,8 @@ const todaysHoursTooltip = computed<string>(() => {
   const dayKey = DAYS[new Date().getDay()]
   const start = p.value[`hours_${dayKey}_start`] as string | null
   const end = p.value[`hours_${dayKey}_end`] as string | null
-  if (!start || !end) return 'Today: Closed'
-  return `Today:\u00A0${formatTime(start)}\u00A0–\u00A0${formatTime(end)}`
+  if (!start || !end) return t('tags.todayClosed')
+  return t('tags.todayHours', { range: `${formatTime(start)} – ${formatTime(end)}` })
 })
 
 const hoursStatus = computed<'openNow' | 'closed' | 'checkHours'>(() => {
@@ -68,14 +71,14 @@ const hoursStatus = computed<'openNow' | 'closed' | 'checkHours'>(() => {
 const detailTags = computed<TagConfig[]>(() => {
   const candidates: (TagConfig | null)[] = [
     !!p.value.wait_sameday_sick_ad || !!p.value.wait_sameday_sick_ch
-      ? { text: 'Walk-ins available', color: 'purple', icon: IconPersonWalking }
+      ? { text: t('tags.walkIns'), color: 'purple', icon: IconPersonWalking }
       : null,
     p.value.primary_telehealth === 'Yes'
-      ? { text: 'Telehealth', color: 'purple', icon: IconVideo }
+      ? { text: t('tags.telehealth'), color: 'purple', icon: IconVideo }
       : null,
-    p.value.transport_parking ? { text: 'Parking on site', color: 'blue', icon: IconCar } : null,
+    p.value.transport_parking ? { text: t('tags.parking'), color: 'blue', icon: IconCar } : null,
     p.value.special_pharmacy === 'Yes'
-      ? { text: 'Pharmacy on site', color: 'blue', icon: IconSuitcaseMedical }
+      ? { text: t('tags.pharmacy'), color: 'blue', icon: IconSuitcaseMedical }
       : null,
   ]
   return candidates.filter((t): t is TagConfig => t !== null)
@@ -90,10 +93,10 @@ const cardTags = computed<TagConfig[]>(() => {
     {
       text:
         hoursStatus.value === 'openNow'
-          ? 'Open now'
+          ? t('tags.openNow')
           : hoursStatus.value === 'closed'
-            ? 'Closed'
-            : 'Check hours',
+            ? t('tags.closed')
+            : t('tags.checkHours'),
       color:
         hoursStatus.value === 'openNow'
           ? 'green'
@@ -104,25 +107,25 @@ const cardTags = computed<TagConfig[]>(() => {
       tooltip: todaysHoursTooltip.value,
     },
     !!p.value.hours_sat_start || !!p.value.hours_sun_start
-      ? { text: 'Weekend hours', color: 'blue', icon: IconClock, tooltip: todaysHoursTooltip.value }
+      ? { text: t('tags.weekendHours'), color: 'blue', icon: IconClock, tooltip: todaysHoursTooltip.value }
       : null,
     !!todayEnd && todayEnd >= '18:00:00'
       ? {
-          text: 'Open after 6pm',
+          text: t('tags.openAfter6'),
           color: 'blue',
           icon: IconClock,
           tooltip: todaysHoursTooltip.value,
         }
       : null,
     !!p.value.wait_sameday_sick_ad || !!p.value.wait_sameday_sick_ch
-      ? { text: 'Walk-ins available', color: 'purple', icon: IconPersonWalking }
+      ? { text: t('tags.walkIns'), color: 'purple', icon: IconPersonWalking }
       : null,
     p.value.primary_telehealth === 'Yes'
-      ? { text: 'Telehealth', color: 'purple', icon: IconVideo }
+      ? { text: t('tags.telehealth'), color: 'purple', icon: IconVideo }
       : null,
-    p.value.transport_parking ? { text: 'Parking on site', color: 'blue', icon: IconCar } : null,
+    p.value.transport_parking ? { text: t('tags.parking'), color: 'blue', icon: IconCar } : null,
     p.value.special_pharmacy === 'Yes'
-      ? { text: 'Pharmacy on site', color: 'blue', icon: IconSuitcaseMedical }
+      ? { text: t('tags.pharmacy'), color: 'blue', icon: IconSuitcaseMedical }
       : null,
     [
       'primary_well_ad',
@@ -132,7 +135,7 @@ const cardTags = computed<TagConfig[]>(() => {
       'special_dental_ad',
       'special_eye_ad',
     ].some((f) => YES_VALUES.includes((p.value[f] as string) ?? ''))
-      ? { text: 'Adult care', color: 'purple', icon: IconPerson }
+      ? { text: t('tags.adultCare'), color: 'purple', icon: IconPerson }
       : null,
     [
       'primary_well_ch',
@@ -142,19 +145,13 @@ const cardTags = computed<TagConfig[]>(() => {
       'special_dental_ch',
       'special_eye_ch',
     ].some((f) => YES_VALUES.includes((p.value[f] as string) ?? ''))
-      ? { text: 'Pediatrics', color: 'purple', icon: IconPerson }
+      ? { text: t('tags.pediatrics'), color: 'purple', icon: IconPerson }
       : null,
     !!p.value.language && p.value.language.split(',').filter(Boolean).length > 1
       ? {
-          text: 'Multiple languages',
+          text: t('tags.multipleLanguages'),
           color: 'purple',
           icon: IconLanguage,
-          // tooltip: (() => {
-          //   const langs = p.value.language!.split(',').map((l) => l.trim()).filter(Boolean)
-          //   const shown = langs.slice(0, 4)
-          //   const rest = langs.length - shown.length
-          //   return rest > 0 ? `${shown.join(', ')} +${rest} more` : shown.join(', ')
-          // })(),
         }
       : null,
   ]

@@ -1,4 +1,22 @@
 export default {
+  // First-pass translations — verify with the city translation process.
+  tags: {
+    openNow: 'Đang mở cửa',
+    closed: 'Đã đóng cửa',
+    checkHours: 'Xem giờ làm việc',
+    weekendHours: 'Giờ làm việc cuối tuần',
+    openAfter6: 'Mở cửa sau 6 giờ tối',
+    walkIns: 'Khám không cần hẹn',
+    telehealth: 'Khám bệnh từ xa',
+    parking: 'Có chỗ đậu xe tại chỗ',
+    pharmacy: 'Nhà thuốc tại chỗ',
+    adultCare: 'Chăm sóc người lớn',
+    pediatrics: 'Nhi khoa',
+    multipleLanguages: 'Nhiều ngôn ngữ',
+    todayClosed: 'Hôm nay: Đã đóng cửa',
+    todayHours: 'Hôm nay: {range}',
+  },
+  providerWebsite: 'Trang web của nhà cung cấp',
   app: {
     title: 'Công cụ tìm nhà cung cấp chăm sóc sức khoẻ ban đầu',
     name: 'Công cụ tìm nhà cung cấp chăm sóc sức khoẻ ban đầu',

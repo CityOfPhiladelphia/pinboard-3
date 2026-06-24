@@ -1,4 +1,22 @@
 export default {
+  // First-pass translations — verify with the city translation process.
+  tags: {
+    openNow: 'Ouvè kounye a',
+    closed: 'Fèmen',
+    checkHours: 'Tcheke orè',
+    weekendHours: 'Orè wikenn',
+    openAfter6: 'Ouvè apre 6è diswa',
+    walkIns: 'San randevou',
+    telehealth: 'Telesante',
+    parking: 'Pakin sou plas',
+    pharmacy: 'Famasi sou plas',
+    adultCare: 'Swen pou granmoun',
+    pediatrics: 'Pedyatri',
+    multipleLanguages: 'Plizyè lang',
+    todayClosed: 'Jodi a: Fèmen',
+    todayHours: 'Jodi a: {range}',
+  },
+  providerWebsite: 'Sitwèb founisè a',
   app: {
     title: 'Chèche Swen Prensipal',
     subtitle: 'Swen medikal gratis ak pri ki ba nan Philadelphia',
