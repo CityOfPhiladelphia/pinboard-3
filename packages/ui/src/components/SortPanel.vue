@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Radio } from '@phila/phila-ui-radio'
 import { PhilaButton, CloseButton } from '@phila/phila-ui-button'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
+import { IconSort } from '@phila/phila-ui-core/icons'
 import type { UserLocationState } from '../types'
 
 export interface SortPanelOption {
@@ -23,13 +23,15 @@ const emit = defineEmits<{
   'update:appliedSort': [value: string | null]
 }>()
 
+const { t } = useI18n()
+
 const panelOpen = ref(false)
 const pendingSelection = ref<string | undefined>(undefined)
 
 const triggerLabel = computed(() => {
-  if (!props.appliedSort) return 'Sort'
+  if (!props.appliedSort) return t('pinboard.sort')
   const match = props.sortOptions.find((o) => o.value === props.appliedSort)
-  return match ? `Sort: ${match.label}` : 'Sort'
+  return match ? t('pinboard.sortBy', { label: match.label }) : t('pinboard.sort')
 })
 
 const locationAvailable = computed(() => {
@@ -104,7 +106,7 @@ watch(panelOpen, (isOpen) => {
 <template>
   <div class="sort-panel-root">
     <button ref="triggerEl" type="button" class="sort-panel-trigger" @click="openPanel">
-      <FontAwesomeIcon :icon="faArrowUpArrowDown" class="sort-panel-trigger-icon" />
+      <IconSort class="sort-panel-trigger-icon" />
       <span>{{ triggerLabel }}</span>
     </button>
   </div>
@@ -136,17 +138,17 @@ watch(panelOpen, (isOpen) => {
               @update:model-value="pendingSelection = $event"
             />
             <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
-              {{
-                locationAvailable
-                  ? 'Closest to furthest'
-                  : 'Share your location to sort by distance'
-              }}
+              {{ locationAvailable ? t('pinboard.sortClosest') : t('pinboard.sortShareLocation') }}
             </p>
           </li>
         </ul>
         <div class="sort-panel-actions">
-          <PhilaButton variant="text" size="extra-small" @click="resetSort">Reset</PhilaButton>
-          <PhilaButton variant="primary" size="small" @click="applySort">Apply</PhilaButton>
+          <PhilaButton variant="text" size="extra-small" @click="resetSort">{{
+            t('pinboard.reset')
+          }}</PhilaButton>
+          <PhilaButton variant="primary" size="small" @click="applySort">{{
+            t('pinboard.apply')
+          }}</PhilaButton>
         </div>
       </div>
     </BottomSheet>
@@ -162,15 +164,17 @@ watch(panelOpen, (isOpen) => {
             @update:model-value="pendingSelection = $event"
           />
           <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
-            {{
-              locationAvailable ? 'Closest to furthest' : 'Share your location to sort by distance'
-            }}
+            {{ locationAvailable ? t('pinboard.sortClosest') : t('pinboard.sortShareLocation') }}
           </p>
         </li>
       </ul>
       <div class="sort-panel-actions">
-        <PhilaButton variant="text" size="extra-small" @click="resetSort">Reset</PhilaButton>
-        <PhilaButton variant="primary" size="small" @click="applySort">Apply</PhilaButton>
+        <PhilaButton variant="text" size="extra-small" @click="resetSort">{{
+          t('pinboard.reset')
+        }}</PhilaButton>
+        <PhilaButton variant="primary" size="small" @click="applySort">{{
+          t('pinboard.apply')
+        }}</PhilaButton>
       </div>
     </div>
   </Teleport>

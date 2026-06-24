@@ -11,7 +11,7 @@ export const viteJsConfig = [
   js.configs.recommended,
   ...tseslint.configs.strict,
   {
-    files: ['**/*.{js,ts,vue}'],
+    files: ['**/*.{js,mjs,ts,vue}'],
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: 'module',

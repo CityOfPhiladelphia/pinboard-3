@@ -12,7 +12,9 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "dev:oem": "pnpm --filter @pinboard/oem-flood-finder dev",
+    "dev:oem:fresh": "pnpm --filter @pinboard/oem-flood-finder dev:fresh",
     "dev:pc": "pnpm --filter @pinboard/primary-care-finder dev",
+    "dev:pc:fresh": "pnpm --filter @pinboard/primary-care-finder dev:fresh",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
     "format": "prettier --write .",
@@ -32,7 +34,6 @@
   },
   "pnpm": {
     "overrides": {
-      "@fortawesome/fontawesome-common-types": "7.1.0",
       "minimatch@<3.1.3": ">=3.1.3",
       "minimatch@>=9.0.0 <9.0.6": ">=9.0.6",
       "minimatch@>=10.0.0 <10.2.1": ">=10.2.1",

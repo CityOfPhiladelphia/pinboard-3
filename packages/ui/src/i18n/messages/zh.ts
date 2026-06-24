@@ -1,0 +1,28 @@
+// Shell chrome catalog. Strings sourced from vue3-pinboard/src/i18n/ch.js where available; English fallbacks flagged in MISSING report.
+export default {
+  pinboard: {
+    itemCount: 'no locations | {count} item | {count} items',
+    noLocations: 'No locations match',
+    mapView: 'Map view',
+    sort: 'Sort',
+    sortBy: 'Sort: {label}',
+    sortClosest: 'Closest to furthest',
+    sortShareLocation: 'Share your location to sort by distance',
+    reset: 'Reset',
+    apply: 'Apply',
+    infoPage: {
+      backToMap: '返回地图',
+      onThisPage: '本页内容',
+    },
+    nav: {
+      learnMore: '详细了解该工具',
+    },
+    footer: {
+      termsOfUse: '使用条款',
+      rightToKnow: '知情权',
+      privacyPolicy: '隐私政策',
+      accessibility: '无障碍',
+      feedback: '反馈',
+    },
+  },
+}

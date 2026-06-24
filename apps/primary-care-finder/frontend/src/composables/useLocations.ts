@@ -1,10 +1,9 @@
 import { ref, onMounted, type Ref } from 'vue'
-import type { PrimaryCareLocation, PrimaryCareResponse } from '@/types'
+import { PinboardUtilities } from '@pinboard/ui'
+import type { PrimaryCareLocation, PrimaryCareResponse, PrimaryCareProperties } from '@/types'
 
 const ARCGIS_URL =
   'https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/red_PrimaryCare/FeatureServer/0/query'
-// const CARTO_URL = `https://phl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM pdph_primary_care_finder WHERE "record" <> 'test'`
-const CARTO_URL = `https://phl.carto.com/api/v2/sql?q=SELECT *, objectid::text AS id, ST_AsGeoJSON(the_geom)::jsonb as location FROM pdph_primary_care_finder WHERE "record" <> 'test'`
 
 export function useLocations(): {
   locations: Ref<PrimaryCareLocation[]>
@@ -26,16 +25,6 @@ export function useLocations(): {
       })
 
       const response = await fetch(`${ARCGIS_URL}?${params.toString()}`)
-      const response2 = await fetch(CARTO_URL)
-      const data2 = (await response2.json()).rows
-      console.log('CARTO: ', data2)
-
-      // const cartFeats = (await response2.json()).features
-      // const cartoRecs = new Set()
-      // cartFeats.forEach((element) => {
-      //   cartoRecs.add(element.properties.record)
-      // })
-      // console.log('CARTO: ', [...cartoRecs])
 
       if (!response.ok) {
         errorMessage.value = 'Error retrieving primary care sites'
@@ -43,32 +32,42 @@ export function useLocations(): {
       }
 
       const geojsonData = (await response.json()) as PrimaryCareResponse
-      // console.log('AGO: ', geojsonData)
 
-      // const agoRecs = new Set()
-      // geojsonData.features.forEach((element) => {
-      //   agoRecs.add(element.properties.record)
-      // })
+      // Stable, readable id per site: slug of the name (OBJECTID churns on the daily reload).
+      // Deduped so two sites that slug identically stay unique.
+      const seenSlugs = new Map<string, number>()
+      const ids = geojsonData.features.map((feature: RawFeature) => {
+        const rawName = String(feature.properties.record ?? feature.properties.address ?? '')
+        const base =
+          PinboardUtilities.slugify(rawName.replace(/^City of Philadelphia - /, '')) || 'location'
+        const n = seenSlugs.get(base) ?? 0
+        seenSlugs.set(base, n + 1)
+        return n === 0 ? base : `${base}-${n + 1}`
+      })
 
-      // console.log('AGO: ', [...agoRecs])
-      // console.log(agoRecs.difference(cartoRecs))
+      locations.value = geojsonData.features.map(
+        (feature: RawFeature, i: number) =>
+          ({
+            id: ids[i],
+            name: String(feature.properties.record ?? feature.properties.address ?? ''),
+            latitude: feature.geometry.coordinates[1],
+            longitude: feature.geometry.coordinates[0],
+            properties: feature.properties as PrimaryCareProperties,
+            geometry: feature.geometry,
+            locationCardInfo: {
+              heading: String(feature.properties.record ?? feature.properties.address ?? ''),
+              body: String(feature.properties.address ?? ''),
+            },
+          }) satisfies PrimaryCareLocation
+      )
 
-      geojson.value = geojsonData
-      locations.value = geojsonData.features.map((feature) => ({
-        id: String(feature.id),
-        name: (feature.properties.record ?? feature.properties.address ?? '').replace(
-          /Womens/,
-          "Women's"
-        ),
-        latitude: feature.geometry.coordinates[1],
-        longitude: feature.geometry.coordinates[0],
-        locationCardInfo: {
-          heading: feature.properties.record ?? feature.properties.address ?? '',
-          body: feature.properties.address ?? '',
-        },
-        ...feature.properties,
-      }))
-      console.log('AGO: ', locations.value)
+      geojson.value = {
+        type: 'FeatureCollection' as const,
+        features: geojsonData.features.map((f: RawFeature, i: number) => ({
+          ...f,
+          properties: { ...f.properties, id: ids[i] },
+        })),
+      }
     } catch {
       errorMessage.value = 'Error retrieving primary care sites'
     } finally {

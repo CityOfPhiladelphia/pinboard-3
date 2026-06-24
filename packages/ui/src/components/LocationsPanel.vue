@@ -120,25 +120,46 @@ defineExpose({ scrollToCard })
   </div>
 
   <div v-else ref="listRef" class="location-list">
-    <MapCard
-      v-for="location in locations"
-      :key="location.id"
-      :data-location-id="location.id"
-      v-bind="location.locationCardInfo"
-      :class="[
-        'location-card',
-        {
-          'location-card--hovered': hoveredId === location.id,
-          'location-card--selected': selectedId === location.id,
-        },
-      ]"
-      tabindex="0"
-      @click="emit('select', location)"
-      @mouseenter="emit('hover', location.id)"
-      @mouseleave="emit('hover-end')"
-      @keydown.enter="pendingKeydown = true"
-      @keyup.enter="handleCardKeyup(location)"
-    />
+    <template v-for="location in locations" :key="location.id">
+      <div
+        v-if="$slots['location-card']"
+        :data-location-id="location.id"
+        :class="[
+          'location-card',
+          'location-card--custom',
+          {
+            'location-card--hovered': hoveredId === location.id,
+            'location-card--selected': selectedId === location.id,
+          },
+        ]"
+        tabindex="0"
+        @click="emit('select', location)"
+        @mouseenter="emit('hover', location.id)"
+        @mouseleave="emit('hover-end')"
+        @keydown.enter="pendingKeydown = true"
+        @keyup.enter="handleCardKeyup(location)"
+      >
+        <slot name="location-card" :location="location" />
+      </div>
+      <MapCard
+        v-else
+        :data-location-id="location.id"
+        v-bind="location.locationCardInfo"
+        :class="[
+          'location-card',
+          {
+            'location-card--hovered': hoveredId === location.id,
+            'location-card--selected': selectedId === location.id,
+          },
+        ]"
+        tabindex="0"
+        @click="emit('select', location)"
+        @mouseenter="emit('hover', location.id)"
+        @mouseleave="emit('hover-end')"
+        @keydown.enter="pendingKeydown = true"
+        @keyup.enter="handleCardKeyup(location)"
+      />
+    </template>
   </div>
 </template>
 
@@ -156,6 +177,13 @@ defineExpose({ scrollToCard })
 .location-card {
   cursor: pointer;
   flex-shrink: 0;
+}
+
+.location-card--custom {
+  border: 1px solid var(--Schemes-Border, #a9a9a9);
+  border-radius: var(--scale-200);
+  background-color: var(--Schemes-On-Primary, #fff);
+  overflow: hidden;
 }
 
 .location-card--hovered {

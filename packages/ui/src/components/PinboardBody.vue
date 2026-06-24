@@ -1,9 +1,11 @@
 <script setup lang="ts">
 // vue imports
 import { useSlots, inject, ref, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 // 3rd party imports
-import { faMap } from '@fortawesome/pro-solid-svg-icons'
+import { IconMap } from '@phila/phila-ui-core/icons'
 
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
@@ -39,6 +41,7 @@ import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
+  'location-card'?(props: { location: BasicLocation }): unknown
   'location-detail'?(props: { location: BasicLocation; onClose: () => void }): unknown
   'map-content'?(props: {
     locations: BasicLocation[]
@@ -97,6 +100,10 @@ const emit = defineEmits<{
 
 
 
+const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+
 // component variables
 const snapPoints = [15, 50, 100]
 const config = inject(PINBOARD_CONFIG_KEY)
@@ -147,8 +154,8 @@ const selectedLocationId = computed(() =>
 
 const locationCountLabel = computed(() => {
   const message = props.locations.length
-    ? `${props.locations.length} item${props.locations.length > 1 ? 's' : ''}`
-    : 'No locations match'
+    ? t('pinboard.itemCount', { count: props.locations.length }, props.locations.length)
+    : t('pinboard.noLocations')
   return props.isLoading || message
 })
 
@@ -157,6 +164,34 @@ watch(selectedLocation, (loc) => {
   if (loc && props.isMobile) {
     bottomSheetRef.value?.snapTo(snapPoints.length - 1)
   }
+})
+
+// Reflect the selected location in the URL as ?location=<id>. push (not replace) so Back walks
+// the selection history. Guarded so it never re-pushes a value the URL already has — that guard
+// is also what stops it looping with the route → selection watcher below.
+watch(selectedLocationId, (id) => {
+  const desired = id ?? undefined
+  if (route.query.location === desired) return
+  const query = { ...route.query }
+  if (desired === undefined) delete query.location
+  else query.location = desired
+  router.push({ query })
+})
+
+// The URL is the source of truth for selection. Resolve ?location= against the loaded locations:
+// on initial mount (immediate), when the data finishes loading, and on Back/Forward. An absent or
+// unknown id clears the selection (graceful). Direct set (not selectLocation) so it doesn't re-push;
+// it also intentionally skips the deselect/visited-tracking emit — URL-driven nav doesn't mark visited.
+function resolveLocationFromRoute() {
+  const param = route.query.location
+  const id = typeof param === 'string' ? param : undefined
+  if (id === selectedLocationId.value) return
+  const match = id ? props.locations.find((loc) => loc.id === id) : undefined
+  selectedLocation.value = match ?? undefined
+  if (match) mapPanelRef.value?.panTo(match)
+}
+watch([() => route.query.location, () => props.locations], resolveLocationFromRoute, {
+  immediate: true,
 })
 
 watch(
@@ -318,6 +353,9 @@ const effectiveMapConfig = (() => {
               </div>
             </Teleport>
           </template>
+          <template v-if="$slots['location-card']" #location-card="{ location }">
+            <slot name="location-card" :location="location" />
+          </template>
         </LocationsPanel>
       </Teleport>
     </div>
@@ -370,8 +408,8 @@ const effectiveMapConfig = (() => {
     ref="bottomSheetRef"
     v-model="bottomSheetOpen"
     :snap-points="snapPoints"
-    :collapse-label="selectedLocation ? '' : 'Map view'"
-    :collapse-icon="selectedLocation ? undefined : faMap"
+    :collapse-label="selectedLocation ? '' : t('pinboard.mapView')"
+    :collapse-icon="selectedLocation ? undefined : IconMap"
     class="mobile-bottom-sheet"
   >
     <div class="bottom-sheet-stack">

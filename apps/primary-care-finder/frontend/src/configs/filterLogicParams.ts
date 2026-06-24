@@ -32,8 +32,8 @@ function matchOptionInString(
   )
 }
 
-const ageGroupOption0 = filterDefinitions[1].choices?.[0].value ?? 'adult'
-const ageGroupOption1 = filterDefinitions[1].choices?.[1].value ?? 'children'
+const ageGroupOption0 = filterDefinitions.value[1].choices?.[0].value ?? 'adult'
+const ageGroupOption1 = filterDefinitions.value[1].choices?.[1].value ?? 'children'
 
 const ageGroupFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
   operation: '|',
@@ -51,10 +51,10 @@ const ageGroupFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLen
   },
 }
 
-const waitOption0 = filterDefinitions[2].choices?.[0].value ?? 'sameDay'
-const waitOption1 = filterDefinitions[2].choices?.[1].value ?? 'weekWell'
-const waitOption2 = filterDefinitions[2].choices?.[2].value ?? 'weekSick'
-const waitOption3 = filterDefinitions[2].choices?.[3].value ?? 'twoMonths'
+const waitOption0 = filterDefinitions.value[2].choices?.[0].value ?? 'sameDay'
+const waitOption1 = filterDefinitions.value[2].choices?.[1].value ?? 'weekWell'
+const waitOption2 = filterDefinitions.value[2].choices?.[2].value ?? 'weekSick'
+const waitOption3 = filterDefinitions.value[2].choices?.[3].value ?? 'twoMonths'
 
 const waitTimeFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
   operation: '|',
@@ -82,13 +82,13 @@ const waitTimeFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLen
   },
 }
 
-const visitTypeOption0 = filterDefinitions[3].choices?.[0].value ?? 'primaryWell'
-const visitTypeOption1 = filterDefinitions[3].choices?.[1].value ?? 'primarySick'
-const visitTypeOption2 = filterDefinitions[3].choices?.[2].value ?? 'primarySports'
-const visitTypeOption3 = filterDefinitions[3].choices?.[3].value ?? 'primaryPrenatal'
-const visitTypeOption4 = filterDefinitions[3].choices?.[4].value ?? 'primaryWomen'
-const visitTypeOption5 = filterDefinitions[3].choices?.[5].value ?? 'primaryTelehealth'
-const visitTypeOption6 = filterDefinitions[3].choices?.[6].value ?? 'primaryVaccines'
+const visitTypeOption0 = filterDefinitions.value[3].choices?.[0].value ?? 'primaryWell'
+const visitTypeOption1 = filterDefinitions.value[3].choices?.[1].value ?? 'primarySick'
+const visitTypeOption2 = filterDefinitions.value[3].choices?.[2].value ?? 'primarySports'
+const visitTypeOption3 = filterDefinitions.value[3].choices?.[3].value ?? 'primaryPrenatal'
+const visitTypeOption4 = filterDefinitions.value[3].choices?.[4].value ?? 'primaryWomen'
+const visitTypeOption5 = filterDefinitions.value[3].choices?.[5].value ?? 'primaryTelehealth'
+const visitTypeOption6 = filterDefinitions.value[3].choices?.[6].value ?? 'primaryVaccines'
 
 const visitTypeFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
   operation: '|',
@@ -131,14 +131,14 @@ const visitTypeFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLe
   },
 }
 
-const specialtyOption0 = filterDefinitions[4].choices?.[0].value ?? 'mental'
-const specialtyOption1 = filterDefinitions[4].choices?.[1].value ?? 'dental'
-const specialtyOption2 = filterDefinitions[4].choices?.[2].value ?? 'eye'
-const specialtyOption3 = filterDefinitions[4].choices?.[3].value ?? 'podiatry'
-const specialtyOption4 = filterDefinitions[4].choices?.[4].value ?? 'mat'
-const specialtyOption5 = filterDefinitions[4].choices?.[5].value ?? 'nutrition'
-const specialtyOption6 = filterDefinitions[4].choices?.[6].value ?? 'tobacco'
-const specialtyOption7 = filterDefinitions[4].choices?.[7].value ?? 'pharmacy'
+const specialtyOption0 = filterDefinitions.value[4].choices?.[0].value ?? 'mental'
+const specialtyOption1 = filterDefinitions.value[4].choices?.[1].value ?? 'dental'
+const specialtyOption2 = filterDefinitions.value[4].choices?.[2].value ?? 'eye'
+const specialtyOption3 = filterDefinitions.value[4].choices?.[3].value ?? 'podiatry'
+const specialtyOption4 = filterDefinitions.value[4].choices?.[4].value ?? 'mat'
+const specialtyOption5 = filterDefinitions.value[4].choices?.[5].value ?? 'nutrition'
+const specialtyOption6 = filterDefinitions.value[4].choices?.[6].value ?? 'tobacco'
+const specialtyOption7 = filterDefinitions.value[4].choices?.[7].value ?? 'pharmacy'
 
 const specialtyFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
   operation: '|',
@@ -186,11 +186,11 @@ const specialtyFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLe
   },
 }
 
-const testsOption0 = filterDefinitions[5].choices?.[0].value ?? 'blood'
-const testsOption1 = filterDefinitions[5].choices?.[1].value ?? 'sti'
-const testsOption2 = filterDefinitions[5].choices?.[2].value ?? 'covid'
-const testsOption3 = filterDefinitions[5].choices?.[3].value ?? 'mammo'
-const testsOption4 = filterDefinitions[5].choices?.[4].value ?? 'xray'
+const testsOption0 = filterDefinitions.value[5].choices?.[0].value ?? 'blood'
+const testsOption1 = filterDefinitions.value[5].choices?.[1].value ?? 'sti'
+const testsOption2 = filterDefinitions.value[5].choices?.[2].value ?? 'covid'
+const testsOption3 = filterDefinitions.value[5].choices?.[3].value ?? 'mammo'
+const testsOption4 = filterDefinitions.value[5].choices?.[4].value ?? 'xray'
 
 const testsFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
   operation: '|',
@@ -223,9 +223,9 @@ const testsFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength
   },
 }
 
-const languageOption0 = filterDefinitions[6].choices?.[0].value ?? 'spanish'
-const languageOption1 = filterDefinitions[6].choices?.[1].value ?? 'mandarin'
-const languageOption2 = filterDefinitions[6].choices?.[2].value ?? 'vietnamese'
+const languageOption0 = filterDefinitions.value[6].choices?.[0].value ?? 'spanish'
+const languageOption1 = filterDefinitions.value[6].choices?.[1].value ?? 'mandarin'
+const languageOption2 = filterDefinitions.value[6].choices?.[2].value ?? 'vietnamese'
 
 const languageFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
   operation: '|',

@@ -1,8 +1,9 @@
 import './styles/global.css'
 export { createPinboard } from './plugin'
-export { PinboardBody, PinboardShell } from './components/_index'
+export { PinboardBody, PinboardShell, PinboardInfoPage } from './components/_index'
 export * as PinboardComposables from './composables/_index'
 export * as PinboardUtilities from './utilities/_index'
+export { createPinboardRouter } from './router/createPinboardRouter'
 export type * as PinboardTypes from './types'
 export type {
   BitWiseOperation,
@@ -29,6 +30,11 @@ export {
   type LegendItem,
 } from '@phila/phila-ui-map-core'
 
+export { Callout } from '@phila/phila-ui-callout'
+export { PhilaLink } from '@phila/phila-ui-link'
 export { NavbarInfo } from '@phila/phila-ui-app-header'
 
+export { Icon } from '@phila/phila-ui-core'
 export type { FilterDefinition, FilterValues, FilterChoice } from '@phila/phila-ui-core'
+
+export { mergeDeep, languages, languageCodes, pinboardMessages, type Language } from './i18n'

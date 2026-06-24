@@ -5,6 +5,7 @@ Contains references to exported functions and useful constants and regular expre
 
 import { getHaversineDistance } from './getHaversineDistance'
 import { hasLocationData } from './hasLocationData'
+import { slugify } from './slugify'
 
 const StreetAddress: Readonly<RegExp> =
   /^(?:\d{1,5}(?:-\d{1,5})?[A-Za-z]{0,3} )(?:(?:(?:[NnSs](?:[Oo][RrUu][Tt][Hh])?)|(?:[EeWw](?:[AaEe][Ss][Tt])?)){0,2} )?\w+ \w{2,}$/
@@ -14,4 +15,11 @@ const StreetIntersection: Readonly<RegExp> =
 
 const Zipcode: Readonly<RegExp> = /^\d{5}(?:-\d{4})?$/
 
-export { getHaversineDistance, hasLocationData, StreetAddress, StreetIntersection, Zipcode }
+export {
+  getHaversineDistance,
+  hasLocationData,
+  slugify,
+  StreetAddress,
+  StreetIntersection,
+  Zipcode,
+}
