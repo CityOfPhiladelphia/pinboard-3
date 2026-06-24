@@ -49,7 +49,7 @@ const todaysHoursTooltip = computed<string>(() => {
   const start = p.value[`hours_${dayKey}_start`] as string | null
   const end = p.value[`hours_${dayKey}_end`] as string | null
   if (!start || !end) return t('tags.todayClosed')
-  return t('tags.todayHours', { range: `${formatTime(start)} – ${formatTime(end)}` })
+  return t('tags.todayHours', { range: `${formatTime(start)}\u00A0–\u00A0${formatTime(end)}` })
 })
 
 const hoursStatus = computed<'openNow' | 'closed' | 'checkHours'>(() => {
@@ -107,7 +107,12 @@ const cardTags = computed<TagConfig[]>(() => {
       tooltip: todaysHoursTooltip.value,
     },
     !!p.value.hours_sat_start || !!p.value.hours_sun_start
-      ? { text: t('tags.weekendHours'), color: 'blue', icon: IconClock, tooltip: todaysHoursTooltip.value }
+      ? {
+          text: t('tags.weekendHours'),
+          color: 'blue',
+          icon: IconClock,
+          tooltip: todaysHoursTooltip.value,
+        }
       : null,
     !!todayEnd && todayEnd >= '18:00:00'
       ? {
