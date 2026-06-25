@@ -164,11 +164,10 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
   >
     <template #locations-header>
       <div v-if="!isMobile" class="locations-callout">
-        <Callout
-          type="info"
-          title="Free and low-cost medical care in Philadelphia"
-          message="Our primary care finder can help you find a provider in Philadelphia. These health care centers serve everyone. Your immigration status or ability to pay won't stop you from getting the care you need."
-        />
+        <Callout type="info" :title="t('callout.title')">
+          {{ t('callout.message') }}
+          <RouterLink to="/info">{{ t('callout.linkText') }}</RouterLink>
+        </Callout>
       </div>
     </template>
 

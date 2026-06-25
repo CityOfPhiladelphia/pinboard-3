@@ -185,7 +185,7 @@ function focusSearchInput() {
 
 .location-search {
   grid-area: search;
-  padding: 1rem 0.9rem 0.75rem 0.9rem;
+  padding: 1rem 0.9rem 0.25rem 0.9rem;
   width: 100%;
 }
 

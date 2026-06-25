@@ -22,12 +22,11 @@ All 9 non-English locale files are missing the keys below. Provide translations 
 
 ### `app.*` — application metadata
 
-| Key              | English source text                                                                                                                                                                                          |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `app.viewList`   | `View list`                                                                                                                                                                                                  |
-| `app.viewMap`    | `View map`                                                                                                                                                                                                   |
-| `app.aboutTitle` | `About this tool`                                                                                                                                                                                            |
-| `app.aboutBody`  | `This tool helps Philadelphia residents find free and low-cost primary care providers near them. Search by location, filter by services, and view details like hours, transit options, and available tests.` |
+| Key             | English source text                                                                                                                                                                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `app.viewList`  | `View list`                                                                                                                                                                                                  |
+| `app.viewMap`   | `View map`                                                                                                                                                                                                   |
+| `app.aboutBody` | `This tool helps Philadelphia residents find free and low-cost primary care providers near them. Search by location, filter by services, and view details like hours, transit options, and available tests.` |
 
 ### `filters.*` — sidebar filter labels (remaining new keys only)
 
@@ -57,23 +56,16 @@ text is new or differs from any legacy label.
 
 ### Hours and schedule strings (legacy gap — never present in ported catalogs)
 
-| Key               | English source text        |
-| ----------------- | -------------------------- |
-| `hours`           | `Hours`                    |
-| `daysOfTheWeek`   | `Day`                      |
-| `schedule`        | `Schedule`                 |
-| `languagesSpoken` | `Languages spoken`         |
-| `english`         | `English`                  |
-| `noInfo`          | `No information available` |
-| `Monday`          | `Monday`                   |
-| `Tuesday`         | `Tuesday`                  |
-| `Wednesday`       | `Wednesday`                |
-| `Thursday`        | `Thursday`                 |
-| `Friday`          | `Friday`                   |
-| `Saturday`        | `Saturday`                 |
-| `Sunday`          | `Sunday`                   |
+| Key        | English source text        |
+| ---------- | -------------------------- |
+| `schedule` | `Schedule`                 |
+| `english`  | `English`                  |
+| `noInfo`   | `No information available` |
 
-**Total missing app keys per locale: 29** (was 50; 17 back-filled from legacy keys, 4 sourced from @phila/pinboard)
+> `hours`, `daysOfTheWeek`, `languagesSpoken`, and `Monday`–`Sunday` were back-filled from the
+> @phila/pinboard (vue3-pinboard) professional catalog — no longer missing. See Notes.
+
+**Total missing app keys per locale: 18** (was 50; 17 back-filled from legacy keys, 4 sourced from @phila/pinboard; `app.aboutTitle` + detail-panel labels first-pass translated, days/hours/language-names sourced from vue3-pinboard — see Notes)
 
 ---
 
@@ -104,6 +96,28 @@ verbatim in all translations. `itemCount` uses vue-i18n plural syntax
 
 ## Notes
 
+- **Left-panel callout (`callout.*`) — first-pass translations, verify with the city.** All 9
+  non-English locales now carry `callout.title` / `callout.message` / `callout.linkText`. The
+  `title` reuses each locale's existing professional `app.subtitle`, and the last two sentences of
+  `message` reuse the existing professional `introPage.p05` verbatim. Only the lead sentence of
+  `message` ("Our primary care finder can help you find a provider in Philadelphia.") and
+  `linkText` ("Learn more about getting care") were translated first-pass (AI) — these two
+  fragments per locale should be confirmed by the city translation service.
+- **Header "About this tool" link (`app.aboutTitle`) — first-pass translations, verify with the
+  city.** The header info control was changed from a tooltip to a link to `/info`
+  (`PinboardShell` `info-href` prop), and `app.aboutTitle` is now translated in all 9 non-English
+  locales (standard "About this tool" UI phrase). Confirm with the city translation service.
+- **Detail-panel labels + day/hours/language-name strings — ported from vue3-pinboard
+  (@phila/pinboard).** The location-detail panel labels were i18n-keyed and translated in all 9
+  non-English locales. Sources:
+  - **Authoritative (copied verbatim from `vue3-pinboard/src/i18n/<locale>.js`):** `website`,
+    `hours`, `languagesSpoken`, `daysOfTheWeek`, `Monday`–`Sunday`, and the full `languages.*`
+    language-name map (~60+ names per locale, used by `LocationDetail` to translate the data's
+    language values). vue3-pinboard's `ch` locale maps to this app's `zh`.
+  - **First-pass (AI) — verify with the city:** the labels not present in vue3-pinboard —
+    `locationDetails`, `contact`, `location`, `transitOptions`, `servicesAvailable`.
+  - **Pre-existing truncations carried in by the port:** vue3-pinboard's `sw` (Swahili)
+    `languagesSpoken` is truncated (`'Lugha zinazozungum'`); fix at the source when reviewed.
 - **Arabic (`ar`)**: translations exist for the shared-chrome stubs and the app-string stubs, but
   the layout remains left-to-right. RTL mirroring (`dir="rtl"`) is a separate future effort.
 - **Taxonomy reconcile (deferred):** the app catalog currently carries the same content under two
