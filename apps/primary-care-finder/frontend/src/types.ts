@@ -66,7 +66,42 @@ export interface PrimaryCareProperties {
   children: 'Yes' | 'No' | null
   caveat_ad_ch: string | null
 
+  primary_prenatal: 'Yes' | 'Established Patients' | 'No' | null
+  primary_sick: 'Yes' | 'Established Patients' | 'No' | null
+  primary_telehealth: 'Yes' | 'Established Patients' | 'No' | null
+  primary_vacc: 'Yes' | 'Established Patients' | 'No' | null
+  primary_well: 'Yes' | 'Established Patients' | 'No' | null
+  primary_women: 'Yes' | 'Established Patients' | 'No' | null
+  primary_sports: 'Yes' | 'Established Patients' | 'No' | null
+
+  special_dental: 'Yes' | 'Established Patients' | 'No' | null
+  special_eye: 'Yes' | 'Established Patients' | 'No' | null
+  special_mat: 'Yes' | 'Established Patients' | 'No' | null
+  special_mental: 'Yes' | 'Established Patients' | 'No' | null
+  special_nutrition: 'Yes' | 'Established Patients' | 'No' | null
+  special_pharmacy: 'Yes' | 'Established Patients' | 'No' | null
+  special_podiatry: 'Yes' | 'Established Patients' | 'No' | null
+  special_tobacco: 'Yes' | 'Established Patients' | 'No' | null
+
+  tests_blood: 'Yes' | 'No' | null
+  tests_covid: 'Yes' | 'No' | null
+  tests_mammo: 'Yes' | 'No' | null
+  tests_sti: 'Yes' | 'No' | null
+  tests_xray: 'Yes' | 'No' | null
+
   walk_ins_sick: 'Yes' | 'No' | null
+  sick_adult_wait:
+    | 'Same day'
+    | 'Less than one week'
+    | 'Less than two months'
+    | 'More than two months'
+    | null
+  sick_child_wait:
+    | 'Same day'
+    | 'Less than one week'
+    | 'Less than two months'
+    | 'More than two months'
+    | null
   well_adult_wait:
     | 'Same day'
     | 'Less than one week'
@@ -91,40 +126,6 @@ export interface PrimaryCareProperties {
     | 'Less than two months'
     | 'More than two months'
     | null
-  sick_adult_wait:
-    | 'Same day'
-    | 'Less than one week'
-    | 'Less than two months'
-    | 'More than two months'
-    | null
-  sick_child_wait:
-    | 'Same day'
-    | 'Less than one week'
-    | 'Less than two months'
-    | 'More than two months'
-    | null
-
-  primary_prenatal: 'Yes' | 'Established Patients' | 'No' | null
-  primary_sick: 'Yes' | 'Established Patients' | 'No' | null
-  primary_telehealth: 'Yes' | 'Established Patients' | 'No' | null
-  primary_vacc: 'Yes' | 'Established Patients' | 'No' | null
-  primary_well: 'Yes' | 'Established Patients' | 'No' | null
-  primary_women: 'Yes' | 'Established Patients' | 'No' | null
-
-  special_dental: 'Yes' | 'Established Patients' | 'No' | null
-  special_eye: 'Yes' | 'Established Patients' | 'No' | null
-  special_mat: 'Yes' | 'Established Patients' | 'No' | null
-  special_mental: 'Yes' | 'Established Patients' | 'No' | null
-  special_nutrition: 'Yes' | 'Established Patients' | 'No' | null
-  special_pharmacy: 'Yes' | 'Established Patients' | 'No' | null
-  special_podiatry: 'Yes' | 'Established Patients' | 'No' | null
-  special_tobacco: 'Yes' | 'Established Patients' | 'No' | null
-
-  tests_blood: 'Yes' | 'No' | null
-  tests_covid: 'Yes' | 'No' | null
-  tests_mammo: 'Yes' | 'No' | null
-  tests_sti: 'Yes' | 'No' | null
-  tests_xray: 'Yes' | 'No' | null
 
   languages: string | null
 }

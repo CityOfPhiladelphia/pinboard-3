@@ -1,7 +1,7 @@
 ﻿<script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { PrimaryCareLocation } from '@/types'
+import type { PrimaryCareField, PrimaryCareLocation } from '@/types'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { PhilaLink } from '@pinboard/ui'
 import LocationTags from './LocationTags.vue'
@@ -30,13 +30,13 @@ function mapsUrl(): string {
 
 
 // --- Age-specific services ---
-const ALL_SERVICES: [string, string[]][] = [
-  ['visitType.well', ['primary_well_ad', 'primary_well_ch']],
-  ['visitType.sick', ['primary_sick_ad', 'primary_sick_ch']],
-  ['visitType.vaccine', ['primary_vacc_ad', 'primary_vacc_child']],
-  ['specialty.mental', ['special_mental_ad', 'special_mental_ch']],
-  ['specialty.dental', ['special_dental_ad', 'special_dental_ch']],
-  ['specialty.eye', ['special_eye_ad', 'special_eye_ch']],
+const ALL_SERVICES: [string, PrimaryCareField[]][] = [
+  ['visitType.well', ['primary_well']],
+  ['visitType.sick', ['primary_sick']],
+  ['visitType.vaccine', ['primary_vacc']],
+  ['specialty.mental', ['special_mental']],
+  ['specialty.dental', ['special_dental']],
+  ['specialty.eye', ['special_eye']],
   ['visitType.sports', ['primary_sports']],
   ['visitType.prenatal', ['primary_prenatal']],
   ['visitType.women', ['primary_women']],
@@ -47,6 +47,8 @@ const ALL_SERVICES: [string, string[]][] = [
   ['visitType.telehealth', ['primary_telehealth']],
   ['specialty.pharmacy', ['special_pharmacy']],
 ]
+
+
 
 // Services available to new patients or walk-ins (any field is "Yes")
 const newPatientServices = computed<string[]>(() =>
@@ -116,9 +118,9 @@ function getExceptionText(day: string): string | null {
   return msgs?.exceptions?.[exc] ?? exc
 }
 
-function parseTimeRange(day: string): string {
-  const start = props.location.properties[`hours_${day}_start`] as string | null
-  const end = props.location.properties[`hours_${day}_end`] as string | null
+function parseTimeRange(day: typeof DAYS[number]): string {
+  const start = String(props.location.properties[`hours_${day}_start`])
+  const end = String(props.location.properties[`hours_${day}_end`])
   const counter = exceptionCounter(day)
   let val: string
   if (start && end) {
@@ -132,8 +134,8 @@ function parseTimeRange(day: string): string {
 
 // --- Tests ---
 const tests = computed(() => {
-  const fields = ['blood', 'sti', 'covid', 'mammo', 'xray']
-  return fields.filter((f) => props.location.properties[`tests_${f}`] === 'Yes')
+  const fields: PrimaryCareField[] = ['tests_blood', 'tests_sti', 'tests_covid', 'tests_mammo', 'tests_xray']
+  return fields.filter((f) => props.location.properties[f] === 'Yes')
 })
 
 // --- Languages ---

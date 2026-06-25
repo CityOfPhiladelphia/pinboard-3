@@ -7,7 +7,7 @@ export { createPinboardRouter } from './router/createPinboardRouter'
 export type * as PinboardTypes from './types'
 export type {
   BitWiseOperation,
-  MatchingFunction,
+  // MatchingFunction,
   IFilterChoiceBitfieldGroup,
   IFilterGroup,
 } from './composables/datafilters/types'
