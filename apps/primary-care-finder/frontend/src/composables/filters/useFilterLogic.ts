@@ -435,7 +435,7 @@ export function useFilterLogic(
 
   const filterLogic = computed(() => {
     const commonParams = {
-      data: locations.value as Record<string, any>[],
+      data: locations.value as Record<string, unknown>[],
       bufferLength: getBufferSize(locations.value.length),
     }
     const ageGroupFilter = new FilterChoiceBitfieldGroup({
