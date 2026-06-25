@@ -1,11 +1,10 @@
-import type { BasicLocation } from '../../types'
 import { FilterChoiceBitfieldGroup, FilterGroup } from './classes'
 
 export type BitWiseOperation = '&' | '|' | '^'
 
 export interface MatchingFunction {
   <T>(
-    item: BasicLocation & Record<string, unknown>,
+    item: Record<string, unknown>,
     dataFields: string[],
     matchValues: T[]
   ): boolean
@@ -23,7 +22,7 @@ export interface IFilterChoiceBitfieldGroup {
   operation: BitWiseOperation
   bufferLength: number
   data: Record<string, unknown>[]
-  choices: Record<string, Omit<IFilterChoiceBitfield, 'data'>>
+  choices: Record<string, Omit<IFilterChoiceBitfield, 'data' | 'bufferLength'>>
 }
 
 export interface IFilterGroup {

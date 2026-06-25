@@ -14,6 +14,8 @@ const props = defineProps<{
 
 const { t, locale, messages } = useI18n()
 
+const p = computed(() => props.location.properties)
+
 const fullAddress = computed(() => {
   let addr = props.location.properties.address
   if (props.location.properties.address_2) addr += ', ' + props.location.properties.address_2
@@ -103,8 +105,9 @@ function getExceptionText(day: string): string | null {
 }
 
 function parseTimeRange(day: string): string {
-  const start = p.value[`hours_${day}_start`] as string | null
-  const end = p.value[`hours_${day}_end`] as string | null
+  const props = p.value as unknown as Record<string, string | null>
+  const start = props[`hours_${day}_start`]
+  const end = props[`hours_${day}_end`]
   let val: string
   if (start && end) {
     val = parseTime(start) + '\u00A0–\u00A0' + parseTime(end)
