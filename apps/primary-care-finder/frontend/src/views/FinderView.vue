@@ -35,6 +35,9 @@ const emptyFilters: PrimaryCareFilterValues = {
 
 const searchPlaceholderText = computed(() => t('searchPlaceholder'))
 
+// The left-panel callout starts expanded on load; the user can still collapse it.
+const calloutOpen = ref(true)
+
 const { locations, isLoading, errorMessage, geojson } = useLocations()
 // Location is requested only when the user clicks the geolocation button, which
 // emits to handleGeolocate. The shared useUserLocation composable prompts on load,
@@ -164,7 +167,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
   >
     <template #locations-header>
       <div v-if="!isMobile" class="locations-callout">
-        <Callout type="info" :title="t('callout.title')">
+        <Callout v-model:open="calloutOpen" type="info" :title="t('callout.title')">
           {{ t('callout.message') }}
           <RouterLink to="/info">{{ t('callout.linkText') }}</RouterLink>
         </Callout>
