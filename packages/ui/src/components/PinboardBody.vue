@@ -36,7 +36,6 @@ import type {
 } from '../types'
 import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 
-
 // slots
 defineSlots<{
   nav?(): unknown
@@ -98,8 +97,6 @@ const emit = defineEmits<{
   'update:filterValues': [value: FilterValues]
 }>()
 
-
-
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
@@ -128,10 +125,8 @@ const locationsPanelRef = ref<{
 } | null>(null)
 const mapPanelRef = ref<{ panTo: (coordinates: LatLon) => void } | null>(null)
 const searchString = ref<string>('')
-  // filter state
+// filter state
 const allFiltersOpen = ref(false)
-
-
 
 // computed refs
 const bottomSheetPercent = computed(() => bottomSheetRef.value?.displayPercent ?? snapPoints[0])

@@ -22,9 +22,12 @@ const fullAddress = computed(() => {
 })
 
 function mapsUrl(): string {
-  const parts = [props.location.properties.address, props.location.properties.address_2, props.location.properties.zip_code, 'Philadelphia, PA'].filter(
-    Boolean
-  )
+  const parts = [
+    props.location.properties.address,
+    props.location.properties.address_2,
+    props.location.properties.zip_code,
+    'Philadelphia, PA',
+  ].filter(Boolean)
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parts.join(', '))}`
 }
 
@@ -45,8 +48,6 @@ const ALL_SERVICES: [string, PrimaryCareField[]][] = [
   ['visitType.telehealth', ['primary_telehealth']],
   ['specialty.pharmacy', ['special_pharmacy']],
 ]
-
-
 
 // Services available to new patients or walk-ins (any field is "Yes")
 const newPatientServices = computed<string[]>(() =>
@@ -116,7 +117,7 @@ function getExceptionText(day: string): string | null {
   return msgs?.exceptions?.[exc] ?? exc
 }
 
-function parseTimeRange(day: typeof DAYS[number]): string {
+function parseTimeRange(day: (typeof DAYS)[number]): string {
   const start = props.location.properties[`hours_${day}_start`]
   const end = props.location.properties[`hours_${day}_end`]
   const counter = exceptionCounter(day)
@@ -132,7 +133,13 @@ function parseTimeRange(day: typeof DAYS[number]): string {
 
 // --- Tests ---
 const tests = computed(() => {
-  const fields: PrimaryCareField[] = ['tests_blood', 'tests_sti', 'tests_covid', 'tests_mammo', 'tests_xray']
+  const fields: PrimaryCareField[] = [
+    'tests_blood',
+    'tests_sti',
+    'tests_covid',
+    'tests_mammo',
+    'tests_xray',
+  ]
   return fields.filter((f) => props.location.properties[f] === 'Yes')
 })
 
@@ -194,7 +201,11 @@ function translateTransitList(raw: string | null, category: string): string {
           <div class="detail-cell">
             <span class="has-text-label-small cell-label">Contact</span>
             <div class="cell-content">
-              <PhilaLink v-if="location.properties.med_phone_num" :href="`tel:${location.properties.med_phone_num}`" size="small">
+              <PhilaLink
+                v-if="location.properties.med_phone_num"
+                :href="`tel:${location.properties.med_phone_num}`"
+                size="small"
+              >
                 {{ location.properties.med_phone_num }}
               </PhilaLink>
             </div>
@@ -327,7 +338,9 @@ function translateTransitList(raw: string | null, category: string): string {
       <section class="services-section">
         <span class="has-text-label-small cell-label">{{ $t('slidingScale') }}</span>
         <span class="has-text-body-small">{{ $t('slidingScaleExplanation') }}</span>
-        <span class="has-text-body-small">{{ location.properties.sliding_scale ?? $t('slidingScaleNull') }}</span>
+        <span class="has-text-body-small">{{
+          location.properties.sliding_scale ?? $t('slidingScaleNull')
+        }}</span>
       </section>
     </div>
   </div>

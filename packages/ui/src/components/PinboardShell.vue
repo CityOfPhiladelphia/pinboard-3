@@ -144,8 +144,8 @@ function onSheetPointerUp() {
             <NavbarInfo :info-title="infoTitle" :label="infoLabel ?? infoTitle" />
           </div>
           <NavbarInfo
-            ref="navbarInfoRef"
             v-else
+            ref="navbarInfoRef"
             :info-title="infoTitle"
             :label="infoLabel ?? infoTitle"
           >
