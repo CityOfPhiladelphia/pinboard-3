@@ -1,4 +1,4 @@
-import type { BitWiseOperation } from './types'
+import type { BitWiseOperation, MatchingFunction } from './types'
 
 /*
     // HELPER FUNCTIONS
@@ -19,16 +19,28 @@ export const getAllUniqueValuesFromStringField = (
   return [...unique]
 }
 
+function isBigEndian() {
+  const a = 0x02
+  let b = a
+  b <<= 1
+  return b > a
+}
+
 /*
     // BIT MANIPULATING FUNCTIONS
     */
 export function createOptionBitmask(
   data: Record<string, unknown>[],
+  bufferSize: number,
   dataFields: string[],
   matchValues: string[],
-  matchingFunction: Function
+  matchingFunction: MatchingFunction
 ) {
-  const bitarray = new Uint32Array(getBufferSize(data.length)) // bitArray for holdin set bits
+  if (bufferSize < getBufferSize(data.length)) {
+    throw new Error('Data too large to fit into buffer')
+  }
+  const bitarray = new Uint32Array(bufferSize) // bitArray for holding set bits
+  const shiftLeft = isBigEndian()
   let accumulator = 0 // accumulate set bits before being pushed into buffer
   let offset = 0 // tracks the offset for setting a bit in the accumulator
   let setBit = 1 // gets shifted to the left once every cycle to set bits in the accumulator
@@ -36,10 +48,10 @@ export function createOptionBitmask(
   // for each item, run bit setting function
   data.forEach((item) => {
     accumulator |= matchingFunction(item, dataFields, matchValues) ? setBit : 0
-    setBit <<= 1 // shift setBit to the left: 00000010 <<= 00000001
+    setBit = shiftLeft ? setBit << 1 : setBit >> 1 // shift setBit to the left: 00000010 <<= 00000001
 
-    // on 8th iteration, push bits to buffers and reset accumulators and setBit
-    if (!(setBit & 0xffffffff)) {
+    // after 32nd iteration, push bits to buffers and reset accumulators and setBit
+    if (setBit & 0x100000000) {
       bitarray[offset] = accumulator
       accumulator = 0 // reset accumulator
       setBit = 1 // reset setBit
@@ -73,7 +85,7 @@ export const bitarrayBitwiseOperator = (
   }
   const bufferLength = otherBitarrays[0].length
   if (
-    Array.from(otherBitarrays, (bitarray) => bitarray.length).every(
+    Array.from(otherBitarrays, (bitarray) => bitarray.length).some(
       (length) => length !== bufferLength
     )
   ) {

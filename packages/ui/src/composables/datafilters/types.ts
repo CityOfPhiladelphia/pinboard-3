@@ -1,21 +1,22 @@
+import type { BasicLocation } from '../../types'
 import { FilterChoiceBitfieldGroup, FilterGroup } from './classes'
 
 export type BitWiseOperation = '&' | '|' | '^'
 
-// export interface ClassWithBitfieldGetter {
-//   bitfield(activeFilters: string[]): Uint32Array<ArrayBufferLike>
-// }
-
-// export interface MatchingFunction {
-//   <T>(item: Record<string, T>, dataFields: string[], matchValues: T[]): boolean
-// }
+export interface MatchingFunction {
+  <T>(
+    item: BasicLocation & Record<string, unknown>,
+    dataFields: string[],
+    matchValues: T[]
+  ): boolean
+}
 
 export interface IFilterChoiceBitfield {
   data: Record<string, unknown>[]
+  bufferLength: number
   dataFields: string[]
   matches: string[]
-  // matchingFunction: MatchingFunction
-  matchingFunction: Function
+  matchingFunction: MatchingFunction
 }
 
 export interface IFilterChoiceBitfieldGroup {

@@ -11,7 +11,9 @@ import {
 import {
   FilterChoiceBitfieldGroup,
   FilterGroup,
+  getBufferSize,
   type IFilterChoiceBitfieldGroup,
+  type MatchingFunction,
 } from '@pinboard/ui'
 import type { PrimaryCareFilterValues, PrimaryCareLocation, PrimaryCareProperties } from '@/types'
 
@@ -23,11 +25,11 @@ export function useFilterLogic(
   const matchYes = ['Yes']
   const matchYesEstPat = ['Yes', 'Established Patients']
 
-  function matchFieldsToOptions(
+  const matchFieldsToOptions: MatchingFunction = (
     item: PrimaryCareLocation,
     fieldNames: (keyof PrimaryCareProperties)[],
     valuesToMatch: unknown[]
-  ) {
+  ) => {
     return fieldNames.some((fieldName) => valuesToMatch.includes(item.properties[fieldName]))
   }
 
@@ -434,7 +436,7 @@ export function useFilterLogic(
   const filterLogic = computed(() => {
     const commonParams = {
       data: locations.value as Record<string, any>[],
-      bufferLength: Math.ceil(locations.value.length / 32),
+      bufferLength: getBufferSize(locations.value.length),
     }
     const ageGroupFilter = new FilterChoiceBitfieldGroup({
       ...commonParams,

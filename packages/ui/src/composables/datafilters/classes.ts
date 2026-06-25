@@ -13,6 +13,7 @@ export class FilterChoiceBitfield {
   constructor(params: IFilterChoiceBitfield) {
     this.bitfield = createOptionBitmask(
       params.data,
+      params.bufferLength,
       params.dataFields,
       params.matches,
       params.matchingFunction
@@ -43,6 +44,7 @@ class FilterChoiceBitfieldGroup {
     Object.entries(params.choices).forEach((choice) => {
       this.childFilters[choice[0]] = new FilterChoiceBitfield({
         data: params.data,
+        bufferLength: params.bufferLength,
         dataFields: choice[1].dataFields,
         matches: choice[1].matches,
         matchingFunction: choice[1].matchingFunction,
