@@ -38,15 +38,22 @@ export function useLocale() {
   const route = useRoute()
 
   // Keep ?lang in the URL canonical: present for a non-default language, absent for
-  // the default (English). No-ops when the URL already matches, so it never loops or
-  // adds a redundant history entry.
+  // the default (English). No-ops when the URL already matches, and the syncing guard
+  // stops the router.afterEach hook below from re-triggering this replace while its own
+  // navigation is still settling — otherwise afterEach → replace → afterEach recurses
+  // faster than the route can commit and the main thread locks up.
+  let syncing = false
   function syncLangQuery(code: string) {
+    if (syncing) return
     const desired = code === DEFAULT_LOCALE ? undefined : code
     if (route.query.lang === desired) return
     const query = { ...route.query }
     if (desired === undefined) delete query.lang
     else query.lang = desired
-    router.replace({ query })
+    syncing = true
+    router.replace({ query }).finally(() => {
+      syncing = false
+    })
   }
 
   function init() {
