@@ -1,5 +1,13 @@
 import { computed, ref, watchEffect, type Ref } from 'vue'
-import { filterKeys, filterValues } from './filterKeysValues'
+import {
+  filterKeys,
+  ageGroupOptions,
+  waitOptions,
+  visitTypeOptions,
+  specialtyOptions,
+  testsOptions,
+  languageOptions,
+} from './filterKeysValues'
 import {
   FilterChoiceBitfieldGroup,
   FilterGroup,
@@ -43,60 +51,15 @@ export function useFilterLogic(
     )
   }
 
-  const languages = [
-    'ASL',
-    'Amharic',
-    'Arabic',
-    'Bengali',
-    'Burmese',
-    'Cambodian',
-    'Cantonese',
-    'Chinese',
-    'English',
-    'Fanta',
-    'Filipino',
-    'French',
-    'French Creole',
-    'Fula',
-    'Gujarati',
-    'Haitian Creole',
-    'Hebrew',
-    'Hindi',
-    'Indonesian',
-    'Karen',
-    'Khmer',
-    'Kinyarwanda',
-    'Kirundi',
-    'Koloqua',
-    'Korean',
-    'Lebanese',
-    'Malayalam',
-    'Malaysian',
-    'Mandarin',
-    'Nepali',
-    'Portuguese',
-    'Punjabi',
-    'Shanghainese',
-    'Sinhalese',
-    'Spanish',
-    'Swahili',
-    'Tagalog',
-    'Taiwanese',
-    'Telugu',
-    'Urdu',
-    'Vietnamese',
-    'Yoruba',
-  ]
-
   const ageGroupFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
     operation: '&',
     choices: {
-      [filterValues.ageGroupOption0]: {
+      [ageGroupOptions.ageGroupOption0]: {
         dataFields: ['adults'],
         matches: matchYes,
         matchingFunction: matchFieldsToOptions,
       },
-      [filterValues.ageGroupOption1]: {
+      [ageGroupOptions.ageGroupOption1]: {
         dataFields: ['children'],
         matches: matchYes,
         matchingFunction: matchFieldsToOptions,
@@ -104,143 +67,143 @@ export function useFilterLogic(
     },
   }
 
+  const visitTypeChoices = {
+    [visitTypeOptions.visitTypeOption0]: {
+      dataFields: ['primary_well'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [visitTypeOptions.visitTypeOption1]: {
+      dataFields: ['primary_sick'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [visitTypeOptions.visitTypeOption2]: {
+      dataFields: ['primary_sports'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [visitTypeOptions.visitTypeOption3]: {
+      dataFields: ['primary_prenatal'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [visitTypeOptions.visitTypeOption4]: {
+      dataFields: ['primary_women'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [visitTypeOptions.visitTypeOption5]: {
+      dataFields: ['primary_telehealth'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [visitTypeOptions.visitTypeOption6]: {
+      dataFields: ['primary_vacc'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+  }
+
+  const specialtyChoices = {
+    [specialtyOptions.specialtyOption0]: {
+      dataFields: ['special_mental'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [specialtyOptions.specialtyOption1]: {
+      dataFields: ['special_dental'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [specialtyOptions.specialtyOption2]: {
+      dataFields: ['special_eye'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [specialtyOptions.specialtyOption3]: {
+      dataFields: ['special_podiatry'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [specialtyOptions.specialtyOption4]: {
+      dataFields: ['special_mat'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [specialtyOptions.specialtyOption5]: {
+      dataFields: ['special_nutrition'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [specialtyOptions.specialtyOption6]: {
+      dataFields: ['special_tobacco'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [specialtyOptions.specialtyOption7]: {
+      dataFields: ['special_pharmacy'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+  }
+
+  const testsChoices = {
+    [testsOptions.testsOption0]: {
+      dataFields: ['tests_blood'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [testsOptions.testsOption1]: {
+      dataFields: ['tests_sti'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [testsOptions.testsOption2]: {
+      dataFields: ['tests_covid'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [testsOptions.testsOption3]: {
+      dataFields: ['tests_mammo'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+    [testsOptions.testsOption4]: {
+      dataFields: ['tests_xray'],
+      matches: matchYesEstPat,
+      matchingFunction: matchFieldsToOptions,
+    },
+  }
+
   const visitTypeFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
     operation: '&',
     choices: {
-      [filterValues.visitTypeOption0]: {
-        dataFields: ['primary_well'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.visitTypeOption1]: {
-        dataFields: ['primary_sick'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.visitTypeOption2]: {
-        dataFields: ['primary_sports'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.visitTypeOption3]: {
-        dataFields: ['primary_prenatal'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.visitTypeOption4]: {
-        dataFields: ['primary_women'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.visitTypeOption5]: {
-        dataFields: ['primary_telehealth'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.visitTypeOption6]: {
-        dataFields: ['primary_vacc'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-    },
-  }
-
-  const specialtyFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
-    operation: '&',
-    choices: {
-      [filterValues.specialtyOption0]: {
-        dataFields: ['special_mental'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.specialtyOption1]: {
-        dataFields: ['special_dental'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.specialtyOption2]: {
-        dataFields: ['special_eye'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.specialtyOption3]: {
-        dataFields: ['special_podiatry'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.specialtyOption4]: {
-        dataFields: ['special_mat'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.specialtyOption5]: {
-        dataFields: ['special_nutrition'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.specialtyOption6]: {
-        dataFields: ['special_tobacco'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.specialtyOption7]: {
-        dataFields: ['special_pharmacy'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-    },
-  }
-
-  const testsFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
-    operation: '&',
-    choices: {
-      [filterValues.testsOption0]: {
-        dataFields: ['tests_blood'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.testsOption1]: {
-        dataFields: ['tests_sti'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.testsOption2]: {
-        dataFields: ['tests_covid'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.testsOption3]: {
-        dataFields: ['tests_mammo'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [filterValues.testsOption4]: {
-        dataFields: ['tests_xray'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
+      ...visitTypeChoices,
+      ...specialtyChoices,
+      ...testsChoices,
     },
   }
 
   const waitTimeFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
     operation: '&',
     choices: {
-      [filterValues.waitOption0]: {
+      [waitOptions.waitOption0]: {
         dataFields: ['walk_ins_sick', 'sick_adult_wait', 'sick_child_wait'],
         matches: ['Yes', 'Same day'],
         matchingFunction: matchFieldsToOptions,
       },
-      [filterValues.waitOption1]: {
+      [waitOptions.waitOption1]: {
         dataFields: ['well_adult_wait', 'well_child_wait'],
         matches: ['Same day', 'Less than one week'],
         matchingFunction: matchFieldsToOptions,
       },
-      [filterValues.waitOption2]: {
+      [waitOptions.waitOption2]: {
         dataFields: ['walk_ins_sick', 'sick_adult_wait', 'sick_child_wait'],
         matches: ['Yes', 'Same day', 'Less than one week'],
         matchingFunction: matchFieldsToOptions,
       },
-      [filterValues.waitOption3]: {
+      [waitOptions.waitOption3]: {
         dataFields: [
           'walk_ins_sick',
           'sick_adult_wait',
@@ -259,19 +222,19 @@ export function useFilterLogic(
   const languageFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
     operation: '&',
     choices: {
-      [filterValues.languageOption0]: {
+      [languageOptions.languageOption0]: {
         dataFields: ['languages'],
-        matches: ['Spanish'],
+        matches: ['ASL'],
         matchingFunction: matchOptionInString,
       },
-      [filterValues.languageOption1]: {
+      [languageOptions.languageOption1]: {
         dataFields: ['languages'],
-        matches: ['Mandarin'],
+        matches: ['Amharic'],
         matchingFunction: matchOptionInString,
       },
-      [filterValues.languageOption2]: {
+      [languageOptions.languageOption2]: {
         dataFields: ['languages'],
-        matches: ['Vietnamese'],
+        matches: ['Arabic'],
         matchingFunction: matchOptionInString,
       },
     },
@@ -296,16 +259,6 @@ export function useFilterLogic(
       ...visitTypeFilterParams,
     })
 
-    const specialtyFilter = new FilterChoiceBitfieldGroup({
-      ...commonParams,
-      ...specialtyFilterParams,
-    })
-
-    const testsFilter = new FilterChoiceBitfieldGroup({
-      ...commonParams,
-      ...testsFilterParams,
-    })
-
     const languageFilter = new FilterChoiceBitfieldGroup({
       ...commonParams,
       ...languageFilterParams,
@@ -318,8 +271,6 @@ export function useFilterLogic(
         [filterKeys.ageGroup]: ageGroupFilter,
         [filterKeys.waitTime]: waitTimeFilter,
         [filterKeys.visitType]: visitTypeFilter,
-        [filterKeys.specialty]: specialtyFilter,
-        [filterKeys.tests]: testsFilter,
         [filterKeys.languages]: languageFilter,
       },
     })
@@ -329,102 +280,102 @@ export function useFilterLogic(
   watchEffect(() => {
     // age group
     filterLogic.value.childFilters[filterKeys.ageGroup].childFilters[
-      filterValues.ageGroupOption0
-    ].setChecked(filterState.value.ageGroup.includes(filterValues.ageGroupOption0))
+      ageGroupOptions.ageGroupOption0
+    ].setChecked(filterState.value.ageGroup.includes(ageGroupOptions.ageGroupOption0))
     filterLogic.value.childFilters[filterKeys.ageGroup].childFilters[
-      filterValues.ageGroupOption1
-    ].setChecked(filterState.value.ageGroup.includes(filterValues.ageGroupOption1))
+      ageGroupOptions.ageGroupOption1
+    ].setChecked(filterState.value.ageGroup.includes(ageGroupOptions.ageGroupOption1))
 
     // wait time
     filterLogic.value.childFilters[filterKeys.waitTime].childFilters[
-      filterValues.waitOption0
-    ].setChecked(filterState.value.waitTime.includes(filterValues.waitOption0))
+      waitOptions.waitOption0
+    ].setChecked(filterState.value.waitTime.includes(waitOptions.waitOption0))
     filterLogic.value.childFilters[filterKeys.waitTime].childFilters[
-      filterValues.waitOption1
-    ].setChecked(filterState.value.waitTime.includes(filterValues.waitOption1))
+      waitOptions.waitOption1
+    ].setChecked(filterState.value.waitTime.includes(waitOptions.waitOption1))
     filterLogic.value.childFilters[filterKeys.waitTime].childFilters[
-      filterValues.waitOption2
-    ].setChecked(filterState.value.waitTime.includes(filterValues.waitOption2))
+      waitOptions.waitOption2
+    ].setChecked(filterState.value.waitTime.includes(waitOptions.waitOption2))
     filterLogic.value.childFilters[filterKeys.waitTime].childFilters[
-      filterValues.waitOption3
-    ].setChecked(filterState.value.waitTime.includes(filterValues.waitOption3))
+      waitOptions.waitOption3
+    ].setChecked(filterState.value.waitTime.includes(waitOptions.waitOption3))
 
     // visit type
     filterLogic.value.childFilters[filterKeys.visitType].childFilters[
-      filterValues.visitTypeOption0
-    ].setChecked(filterState.value.visitType.includes(filterValues.visitTypeOption0))
+      visitTypeOptions.visitTypeOption0
+    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption0))
     filterLogic.value.childFilters[filterKeys.visitType].childFilters[
-      filterValues.visitTypeOption1
-    ].setChecked(filterState.value.visitType.includes(filterValues.visitTypeOption1))
+      visitTypeOptions.visitTypeOption1
+    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption1))
     filterLogic.value.childFilters[filterKeys.visitType].childFilters[
-      filterValues.visitTypeOption2
-    ].setChecked(filterState.value.visitType.includes(filterValues.visitTypeOption2))
+      visitTypeOptions.visitTypeOption2
+    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption2))
     filterLogic.value.childFilters[filterKeys.visitType].childFilters[
-      filterValues.visitTypeOption3
-    ].setChecked(filterState.value.visitType.includes(filterValues.visitTypeOption3))
+      visitTypeOptions.visitTypeOption3
+    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption3))
     filterLogic.value.childFilters[filterKeys.visitType].childFilters[
-      filterValues.visitTypeOption4
-    ].setChecked(filterState.value.visitType.includes(filterValues.visitTypeOption4))
+      visitTypeOptions.visitTypeOption4
+    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption4))
     filterLogic.value.childFilters[filterKeys.visitType].childFilters[
-      filterValues.visitTypeOption5
-    ].setChecked(filterState.value.visitType.includes(filterValues.visitTypeOption5))
+      visitTypeOptions.visitTypeOption5
+    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption5))
     filterLogic.value.childFilters[filterKeys.visitType].childFilters[
-      filterValues.visitTypeOption6
-    ].setChecked(filterState.value.visitType.includes(filterValues.visitTypeOption6))
+      visitTypeOptions.visitTypeOption6
+    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption6))
 
     // specialty
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      filterValues.specialtyOption0
-    ].setChecked(filterState.value.specialty.includes(filterValues.specialtyOption0))
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      filterValues.specialtyOption1
-    ].setChecked(filterState.value.specialty.includes(filterValues.specialtyOption1))
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      filterValues.specialtyOption2
-    ].setChecked(filterState.value.specialty.includes(filterValues.specialtyOption2))
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      filterValues.specialtyOption3
-    ].setChecked(filterState.value.specialty.includes(filterValues.specialtyOption3))
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      filterValues.specialtyOption4
-    ].setChecked(filterState.value.specialty.includes(filterValues.specialtyOption4))
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      filterValues.specialtyOption5
-    ].setChecked(filterState.value.specialty.includes(filterValues.specialtyOption5))
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      filterValues.specialtyOption6
-    ].setChecked(filterState.value.specialty.includes(filterValues.specialtyOption6))
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      filterValues.specialtyOption7
-    ].setChecked(filterState.value.specialty.includes(filterValues.specialtyOption7))
+    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+      specialtyOptions.specialtyOption0
+    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption0))
+    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+      specialtyOptions.specialtyOption1
+    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption1))
+    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+      specialtyOptions.specialtyOption2
+    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption2))
+    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+      specialtyOptions.specialtyOption3
+    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption3))
+    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+      specialtyOptions.specialtyOption4
+    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption4))
+    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+      specialtyOptions.specialtyOption5
+    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption5))
+    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+      specialtyOptions.specialtyOption6
+    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption6))
+    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+      specialtyOptions.specialtyOption7
+    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption7))
 
     // tests
-    filterLogic.value.childFilters[filterKeys.tests].childFilters[
-      filterValues.testsOption0
-    ].setChecked(filterState.value.tests.includes(filterValues.testsOption0))
-    filterLogic.value.childFilters[filterKeys.tests].childFilters[
-      filterValues.testsOption1
-    ].setChecked(filterState.value.tests.includes(filterValues.testsOption1))
-    filterLogic.value.childFilters[filterKeys.tests].childFilters[
-      filterValues.testsOption2
-    ].setChecked(filterState.value.tests.includes(filterValues.testsOption2))
-    filterLogic.value.childFilters[filterKeys.tests].childFilters[
-      filterValues.testsOption3
-    ].setChecked(filterState.value.tests.includes(filterValues.testsOption3))
-    filterLogic.value.childFilters[filterKeys.tests].childFilters[
-      filterValues.testsOption4
-    ].setChecked(filterState.value.tests.includes(filterValues.testsOption4))
+    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+      testsOptions.testsOption0
+    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption0))
+    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+      testsOptions.testsOption1
+    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption1))
+    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+      testsOptions.testsOption2
+    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption2))
+    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+      testsOptions.testsOption3
+    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption3))
+    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+      testsOptions.testsOption4
+    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption4))
 
     // languages
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      filterValues.languageOption0
-    ].setChecked(filterState.value.languages.includes(filterValues.languageOption0))
+      languageOptions.languageOption0
+    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption0))
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      filterValues.languageOption1
-    ].setChecked(filterState.value.languages.includes(filterValues.languageOption1))
+      languageOptions.languageOption1
+    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption1))
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      filterValues.languageOption2
-    ].setChecked(filterState.value.languages.includes(filterValues.languageOption2))
+      languageOptions.languageOption2
+    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption2))
 
     filterLogicalValue.value = filterLogic.value.getBitfield()
   })
