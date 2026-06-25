@@ -11,6 +11,8 @@ export const filterKeys = {
   ageGroup: 'ageGroup',
   waitTime: 'waitTime',
   visitType: 'visitType',
+  specialty: 'specialty',
+  tests: 'tests',
   languages: 'languages',
 }
 

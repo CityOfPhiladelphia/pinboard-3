@@ -45,8 +45,9 @@ export function useFilterLogic(
       valuesToMatch.some((value) =>
         String(item.properties[fieldName])
           .toLowerCase()
-          .trim()
-          .includes(String(value).toLowerCase().trim())
+          .replace(/\W+/g, '')
+          .split(',')
+          .includes(String(value).toLowerCase().replace(/\W+/g, ''))
       )
     )
   }
@@ -67,121 +68,121 @@ export function useFilterLogic(
     },
   }
 
-  const visitTypeChoices = {
-    [visitTypeOptions.visitTypeOption0]: {
-      dataFields: ['primary_well'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [visitTypeOptions.visitTypeOption1]: {
-      dataFields: ['primary_sick'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [visitTypeOptions.visitTypeOption2]: {
-      dataFields: ['primary_sports'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [visitTypeOptions.visitTypeOption3]: {
-      dataFields: ['primary_prenatal'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [visitTypeOptions.visitTypeOption4]: {
-      dataFields: ['primary_women'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [visitTypeOptions.visitTypeOption5]: {
-      dataFields: ['primary_telehealth'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [visitTypeOptions.visitTypeOption6]: {
-      dataFields: ['primary_vacc'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-  }
-
-  const specialtyChoices = {
-    [specialtyOptions.specialtyOption0]: {
-      dataFields: ['special_mental'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [specialtyOptions.specialtyOption1]: {
-      dataFields: ['special_dental'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [specialtyOptions.specialtyOption2]: {
-      dataFields: ['special_eye'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [specialtyOptions.specialtyOption3]: {
-      dataFields: ['special_podiatry'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [specialtyOptions.specialtyOption4]: {
-      dataFields: ['special_mat'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [specialtyOptions.specialtyOption5]: {
-      dataFields: ['special_nutrition'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [specialtyOptions.specialtyOption6]: {
-      dataFields: ['special_tobacco'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [specialtyOptions.specialtyOption7]: {
-      dataFields: ['special_pharmacy'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-  }
-
-  const testsChoices = {
-    [testsOptions.testsOption0]: {
-      dataFields: ['tests_blood'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [testsOptions.testsOption1]: {
-      dataFields: ['tests_sti'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [testsOptions.testsOption2]: {
-      dataFields: ['tests_covid'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [testsOptions.testsOption3]: {
-      dataFields: ['tests_mammo'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-    [testsOptions.testsOption4]: {
-      dataFields: ['tests_xray'],
-      matches: matchYesEstPat,
-      matchingFunction: matchFieldsToOptions,
-    },
-  }
-
   const visitTypeFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
     operation: '&',
     choices: {
-      ...visitTypeChoices,
-      ...specialtyChoices,
-      ...testsChoices,
+      [visitTypeOptions.visitTypeOption0]: {
+        dataFields: ['primary_well'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [visitTypeOptions.visitTypeOption1]: {
+        dataFields: ['primary_sick'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [visitTypeOptions.visitTypeOption2]: {
+        dataFields: ['primary_sports'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [visitTypeOptions.visitTypeOption3]: {
+        dataFields: ['primary_prenatal'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [visitTypeOptions.visitTypeOption4]: {
+        dataFields: ['primary_women'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [visitTypeOptions.visitTypeOption5]: {
+        dataFields: ['primary_telehealth'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [visitTypeOptions.visitTypeOption6]: {
+        dataFields: ['primary_vacc'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+    },
+  }
+
+  const specialtyFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
+    operation: '&',
+    choices: {
+      [specialtyOptions.specialtyOption0]: {
+        dataFields: ['special_mental'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [specialtyOptions.specialtyOption1]: {
+        dataFields: ['special_dental'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [specialtyOptions.specialtyOption2]: {
+        dataFields: ['special_eye'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [specialtyOptions.specialtyOption3]: {
+        dataFields: ['special_podiatry'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [specialtyOptions.specialtyOption4]: {
+        dataFields: ['special_mat'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [specialtyOptions.specialtyOption5]: {
+        dataFields: ['special_nutrition'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [specialtyOptions.specialtyOption6]: {
+        dataFields: ['special_tobacco'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [specialtyOptions.specialtyOption7]: {
+        dataFields: ['special_pharmacy'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+    },
+  }
+
+  const testsFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
+    operation: '&',
+    choices: {
+      [testsOptions.testsOption0]: {
+        dataFields: ['tests_blood'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [testsOptions.testsOption1]: {
+        dataFields: ['tests_sti'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [testsOptions.testsOption2]: {
+        dataFields: ['tests_covid'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [testsOptions.testsOption3]: {
+        dataFields: ['tests_mammo'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
+      [testsOptions.testsOption4]: {
+        dataFields: ['tests_xray'],
+        matches: matchYesEstPat,
+        matchingFunction: matchFieldsToOptions,
+      },
     },
   }
 
@@ -224,17 +225,212 @@ export function useFilterLogic(
     choices: {
       [languageOptions.languageOption0]: {
         dataFields: ['languages'],
-        matches: ['ASL'],
+        matches: [languageOptions.languageOption0],
         matchingFunction: matchOptionInString,
       },
       [languageOptions.languageOption1]: {
         dataFields: ['languages'],
-        matches: ['Amharic'],
+        matches: [languageOptions.languageOption1],
         matchingFunction: matchOptionInString,
       },
       [languageOptions.languageOption2]: {
         dataFields: ['languages'],
-        matches: ['Arabic'],
+        matches: [languageOptions.languageOption2],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption3]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption3],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption4]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption4],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption5]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption5],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption6]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption6],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption7]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption7],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption8]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption8],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption9]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption9],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption10]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption10],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption11]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption11],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption12]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption12],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption13]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption13],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption14]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption14],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption15]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption15],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption16]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption16],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption17]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption17],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption18]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption18],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption19]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption19],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption20]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption20],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption21]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption21],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption22]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption22],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption23]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption23],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption24]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption24],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption25]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption25],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption26]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption26],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption27]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption27],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption28]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption28],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption29]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption29],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption30]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption30],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption31]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption31],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption32]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption32],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption33]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption33],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption34]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption34],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption35]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption35],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption36]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption36],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption37]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption37],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption38]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption38],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption39]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption39],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption40]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption40],
+        matchingFunction: matchOptionInString,
+      },
+      [languageOptions.languageOption41]: {
+        dataFields: ['languages'],
+        matches: [languageOptions.languageOption41],
         matchingFunction: matchOptionInString,
       },
     },
@@ -259,6 +455,16 @@ export function useFilterLogic(
       ...visitTypeFilterParams,
     })
 
+    const specialtyFilter = new FilterChoiceBitfieldGroup({
+      ...commonParams,
+      ...specialtyFilterParams,
+    })
+
+    const testsFilter = new FilterChoiceBitfieldGroup({
+      ...commonParams,
+      ...testsFilterParams,
+    })
+
     const languageFilter = new FilterChoiceBitfieldGroup({
       ...commonParams,
       ...languageFilterParams,
@@ -271,6 +477,8 @@ export function useFilterLogic(
         [filterKeys.ageGroup]: ageGroupFilter,
         [filterKeys.waitTime]: waitTimeFilter,
         [filterKeys.visitType]: visitTypeFilter,
+        [filterKeys.specialty]: specialtyFilter,
+        [filterKeys.tests]: testsFilter,
         [filterKeys.languages]: languageFilter,
       },
     })
@@ -324,45 +532,45 @@ export function useFilterLogic(
     ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption6))
 
     // specialty
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption0
     ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption0))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption1
     ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption1))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption2
     ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption2))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption3
     ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption3))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption4
     ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption4))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption5
     ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption5))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption6
     ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption6))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption7
     ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption7))
 
     // tests
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+    filterLogic.value.childFilters[filterKeys.tests].childFilters[
       testsOptions.testsOption0
     ].setChecked(filterState.value.tests.includes(testsOptions.testsOption0))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+    filterLogic.value.childFilters[filterKeys.tests].childFilters[
       testsOptions.testsOption1
     ].setChecked(filterState.value.tests.includes(testsOptions.testsOption1))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+    filterLogic.value.childFilters[filterKeys.tests].childFilters[
       testsOptions.testsOption2
     ].setChecked(filterState.value.tests.includes(testsOptions.testsOption2))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+    filterLogic.value.childFilters[filterKeys.tests].childFilters[
       testsOptions.testsOption3
     ].setChecked(filterState.value.tests.includes(testsOptions.testsOption3))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
+    filterLogic.value.childFilters[filterKeys.tests].childFilters[
       testsOptions.testsOption4
     ].setChecked(filterState.value.tests.includes(testsOptions.testsOption4))
 
