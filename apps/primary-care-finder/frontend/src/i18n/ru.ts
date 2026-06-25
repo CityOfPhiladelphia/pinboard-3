@@ -1,4 +1,22 @@
 export default {
+  // First-pass translations — verify with the city translation process.
+  tags: {
+    openNow: 'Открыто сейчас',
+    closed: 'Закрыто',
+    checkHours: 'Уточните часы работы',
+    weekendHours: 'Часы работы в выходные',
+    openAfter6: 'Открыто после 18:00',
+    walkIns: 'Без записи',
+    telehealth: 'Телемедицина',
+    parking: 'Парковка на месте',
+    pharmacy: 'Аптека на месте',
+    adultCare: 'Помощь взрослым',
+    pediatrics: 'Педиатрия',
+    multipleLanguages: 'Несколько языков',
+    todayClosed: 'Сегодня: закрыто',
+    todayHours: 'Сегодня: {range}',
+  },
+  providerWebsite: 'Веб-сайт поставщика услуг',
   app: {
     title: 'Средство для поиска первичной медицинской помощи',
     name: 'Средство для поиска первичной медицинской помощи',
@@ -76,6 +94,8 @@ export default {
     patient_type_new: 'Новые пациенты',
     patient_type_existing: 'Пациенты под наблюдением',
     patient_type_existing_only: 'Должны получать помощь в центре',
+    patient_type_existing_only_subtext:
+      '*You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: 'Первичная медицинская помощь',

@@ -1,4 +1,22 @@
 export default {
+  // First-pass translations — verify with the city translation process.
+  tags: {
+    openNow: 'Đang mở cửa',
+    closed: 'Đã đóng cửa',
+    checkHours: 'Xem giờ làm việc',
+    weekendHours: 'Giờ làm việc cuối tuần',
+    openAfter6: 'Mở cửa sau 6 giờ tối',
+    walkIns: 'Khám không cần hẹn',
+    telehealth: 'Khám bệnh từ xa',
+    parking: 'Có chỗ đậu xe tại chỗ',
+    pharmacy: 'Nhà thuốc tại chỗ',
+    adultCare: 'Chăm sóc người lớn',
+    pediatrics: 'Nhi khoa',
+    multipleLanguages: 'Nhiều ngôn ngữ',
+    todayClosed: 'Hôm nay: Đã đóng cửa',
+    todayHours: 'Hôm nay: {range}',
+  },
+  providerWebsite: 'Trang web của nhà cung cấp',
   app: {
     title: 'Công cụ tìm nhà cung cấp chăm sóc sức khoẻ ban đầu',
     name: 'Công cụ tìm nhà cung cấp chăm sóc sức khoẻ ban đầu',
@@ -77,6 +95,8 @@ export default {
     patient_type_new: 'Bệnh nhân mới',
     patient_type_existing: 'Bệnh nhân đã được thiết lập hồ sơ',
     patient_type_existing_only: 'Bắt buộc thiết lập dịch vụ chăm sóc sức khoẻ tại chỗ',
+    patient_type_existing_only_subtext:
+      '*You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: 'Chăm sóc sức khoẻ ban đầu',
