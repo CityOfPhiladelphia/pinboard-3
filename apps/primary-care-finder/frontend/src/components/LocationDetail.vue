@@ -28,8 +28,6 @@ function mapsUrl(): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parts.join(', '))}`
 }
 
-
-// --- Age-specific services ---
 const ALL_SERVICES: [string, PrimaryCareField[]][] = [
   ['visitType.well', ['primary_well']],
   ['visitType.sick', ['primary_sick']],
@@ -119,8 +117,8 @@ function getExceptionText(day: string): string | null {
 }
 
 function parseTimeRange(day: typeof DAYS[number]): string {
-  const start = String(props.location.properties[`hours_${day}_start`])
-  const end = String(props.location.properties[`hours_${day}_end`])
+  const start = props.location.properties[`hours_${day}_start`]
+  const end = props.location.properties[`hours_${day}_end`]
   const counter = exceptionCounter(day)
   let val: string
   if (start && end) {
@@ -319,7 +317,7 @@ function translateTransitList(raw: string | null, category: string): string {
         <span class="has-text-label-small cell-label">{{ $t('tests.category') }}</span>
         <div v-if="tests.length" class="service-list">
           <span v-for="test in tests" :key="test" class="has-text-body-small">{{
-            $t(`tests.${test}`)
+            $t(test.replace('_', '.'))
           }}</span>
         </div>
         <span v-else class="has-text-body-small">{{ $t('tests.noTests') }}</span>

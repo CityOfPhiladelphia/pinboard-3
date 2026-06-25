@@ -43,12 +43,53 @@ export function useFilterLogic(
     )
   }
 
-  interface FilterParams {
-    dataFields: PrimaryCareField[]
-  }
+  const languages = [
+    'ASL',
+    'Amharic',
+    'Arabic',
+    'Bengali',
+    'Burmese',
+    'Cambodian',
+    'Cantonese',
+    'Chinese',
+    'English',
+    'Fanta',
+    'Filipino',
+    'French',
+    'French Creole',
+    'Fula',
+    'Gujarati',
+    'Haitian Creole',
+    'Hebrew',
+    'Hindi',
+    'Indonesian',
+    'Karen',
+    'Khmer',
+    'Kinyarwanda',
+    'Kirundi',
+    'Koloqua',
+    'Korean',
+    'Lebanese',
+    'Malayalam',
+    'Malaysian',
+    'Mandarin',
+    'Nepali',
+    'Portuguese',
+    'Punjabi',
+    'Shanghainese',
+    'Sinhalese',
+    'Spanish',
+    'Swahili',
+    'Tagalog',
+    'Taiwanese',
+    'Telugu',
+    'Urdu',
+    'Vietnamese',
+    'Yoruba',
+  ]
 
   const ageGroupFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
-    operation: '|',
+    operation: '&',
     choices: {
       [filterValues.ageGroupOption0]: {
         dataFields: ['adults'],
@@ -64,7 +105,7 @@ export function useFilterLogic(
   }
 
   const visitTypeFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
-    operation: '|',
+    operation: '&',
     choices: {
       [filterValues.visitTypeOption0]: {
         dataFields: ['primary_well'],
@@ -105,7 +146,7 @@ export function useFilterLogic(
   }
 
   const specialtyFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
-    operation: '|',
+    operation: '&',
     choices: {
       [filterValues.specialtyOption0]: {
         dataFields: ['special_mental'],
@@ -151,7 +192,7 @@ export function useFilterLogic(
   }
 
   const testsFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
-    operation: '|',
+    operation: '&',
     choices: {
       [filterValues.testsOption0]: {
         dataFields: ['tests_blood'],
@@ -182,7 +223,7 @@ export function useFilterLogic(
   }
 
   const waitTimeFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
-    operation: '|',
+    operation: '&',
     choices: {
       [filterValues.waitOption0]: {
         dataFields: ['walk_ins_sick', 'sick_adult_wait', 'sick_child_wait'],
@@ -216,7 +257,7 @@ export function useFilterLogic(
   }
 
   const languageFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
-    operation: '|',
+    operation: '&',
     choices: {
       [filterValues.languageOption0]: {
         dataFields: ['languages'],
