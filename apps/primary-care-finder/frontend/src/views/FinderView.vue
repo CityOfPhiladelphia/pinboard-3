@@ -15,9 +15,25 @@ import type { FilterValues, PinboardTypes } from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
 import { useFilterChipDefinitions } from '@/composables/filters/useFilterChipDefinitions.ts'
 import { useFilterLogic } from '@/composables/filters/useFilterLogic'
+import {
+  filterKeys,
+  visitTypeOptions,
+  specialtyOptions,
+  testsOptions,
+} from '@/composables/filters/filterKeysValues'
 import LocationCard from '@/components/LocationCard.vue'
 import LocationDetail from '@/components/LocationDetail.vue'
-import type { PrimaryCareFilterValues, PrimaryCareLocation, PrimaryCareResponse } from '@/types'
+import type {
+  AgeGroupFilter,
+  LanguagesFilter,
+  PrimaryCareFilterValues,
+  PrimaryCareLocation,
+  PrimaryCareResponse,
+  SpecialtyFilter,
+  TestsFilter,
+  VisitTypeFilter,
+  WaitTimeFilter,
+} from '@/types'
 
 const isMobile = PinboardComposables.useIsMobile()
 const { t } = useI18n()
@@ -49,6 +65,30 @@ const userLocation = ref<PinboardTypes.LatLon>({
 const searchString = ref('')
 
 const filterState = ref<PrimaryCareFilterValues>(emptyFilters)
+
+const VISIT_TYPE_SET = new Set<string>(Object.values(visitTypeOptions))
+const SPECIALTY_SET = new Set<string>(Object.values(specialtyOptions))
+const TESTS_SET = new Set<string>(Object.values(testsOptions))
+
+function activeKeys(map: boolean | Record<string, boolean> | undefined): string[] {
+  if (!map || typeof map !== 'object') return []
+  return Object.entries(map).filter(([, v]) => v).map(([k]) => k)
+}
+
+function toMap(arr: string[]): Record<string, boolean> {
+  return Object.fromEntries(arr.map((v) => [v, true]))
+}
+
+const filterValuesForProp = computed<FilterValues>(() => ({
+  [filterKeys.ageGroup]: toMap(filterState.value.ageGroup),
+  [filterKeys.waitTime]: toMap(filterState.value.waitTime),
+  [filterKeys.visitType]: toMap([
+    ...filterState.value.visitType,
+    ...filterState.value.specialty,
+    ...filterState.value.tests,
+  ]),
+  [filterKeys.languages]: toMap(filterState.value.languages),
+}))
 
 const { filterLogicalValue } = useFilterLogic(locations, filterState)
 
@@ -140,10 +180,17 @@ function handleGeolocateError(error: Error | GeolocationPositionError) {
   console.error(error)
 }
 
-function handleApplyFilter(value: FilterValues) {
-  filterState.value = Object.keys(filterState.value).length
-    ? (value as PrimaryCareFilterValues)
-    : emptyFilters
+function handleApplyFilter(values: FilterValues) {
+  const allVisitType = activeKeys(values[filterKeys.visitType])
+  filterState.value = {
+    sort: filterState.value.sort,
+    ageGroup: activeKeys(values[filterKeys.ageGroup]) as AgeGroupFilter[],
+    waitTime: activeKeys(values[filterKeys.waitTime]) as WaitTimeFilter[],
+    visitType: allVisitType.filter((v) => VISIT_TYPE_SET.has(v)) as VisitTypeFilter[],
+    specialty: allVisitType.filter((v) => SPECIALTY_SET.has(v)) as SpecialtyFilter[],
+    tests: allVisitType.filter((v) => TESTS_SET.has(v)) as TestsFilter[],
+    languages: activeKeys(values[filterKeys.languages]) as LanguagesFilter[],
+  }
 }
 
 function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
@@ -153,7 +200,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
 
 <template>
   <PinboardBody
-    v-model:filter-values="filterState"
+    :filter-values="filterValuesForProp"
     :locations="filteredLocations"
     :search-or-user-location="userLocation"
     :is-loading="isLoading"
