@@ -8,16 +8,6 @@ defineProps<{
   location: PrimaryCareLocation
 }>()
 
-function siteName(location: PrimaryCareLocation): string {
-  let value = location.properties.record
-  if (
-    value === 'Delaware Valley Community Health (DVCH) Maria de los Santos Womens Health Center'
-  ) {
-    value = "Delaware Valley Community Health (DVCH) Maria de los Santos Women's Health Center"
-  }
-  return value
-}
-
 function mapsUrl(location: PrimaryCareLocation): string {
   const { address, address_2, zip_code } = location.properties
   const parts = [address, address_2, zip_code, 'Philadelphia, PA'].filter(Boolean)
@@ -27,7 +17,7 @@ function mapsUrl(location: PrimaryCareLocation): string {
 
 <template>
   <div class="card-content">
-    <strong class="card-heading">{{ siteName(location) }}</strong>
+    <strong class="card-heading">{{ location.name }}</strong>
     <span v-if="location.locationCardInfo.subheader" class="card-distance">
       {{ location.locationCardInfo.subheader }}
     </span>

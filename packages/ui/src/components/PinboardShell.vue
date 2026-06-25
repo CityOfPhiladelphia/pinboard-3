@@ -161,8 +161,8 @@ function onSheetPointerUp() {
             <NavbarInfo :info-title="infoTitle" :label="infoLabel ?? infoTitle" />
           </div>
           <NavbarInfo
-            ref="navbarInfoRef"
             v-else
+            ref="navbarInfoRef"
             :info-title="infoTitle"
             :label="infoLabel ?? infoTitle"
           >
@@ -211,7 +211,6 @@ function onSheetPointerUp() {
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  /* width: min(100vw, 1450px); */
   margin: auto;
 }
 

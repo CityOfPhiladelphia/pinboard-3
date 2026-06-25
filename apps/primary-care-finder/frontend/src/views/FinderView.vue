@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, toRaw } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   PinboardBody,
   CircleLayer,
@@ -8,17 +9,29 @@ import {
   BasemapToggle,
   PinboardComposables,
   PinboardUtilities,
+  Callout,
 } from '@pinboard/ui'
-import { IconSort } from '@phila/phila-ui-core/icons'
-import { Callout } from '@pinboard/ui'
-import type { FilterDefinition, FilterValues, PinboardTypes } from '@pinboard/ui'
-import { useI18n } from 'vue-i18n'
-import { useLocations } from '../composables/useLocations'
-import LocationCard from '../components/LocationCard.vue'
-import LocationDetail from '../components/LocationDetail.vue'
-import type { PrimaryCareLocation } from '../types'
+import type { FilterValues, PinboardTypes } from '@pinboard/ui'
+import { useLocations } from '@/composables/useLocations'
+import { useFilterChipDefinitions } from '@/composables/filters/useFilterChipDefinitions.ts'
+import { useFilterLogic } from '@/composables/filters/useFilterLogic'
+import LocationCard from '@/components/LocationCard.vue'
+import LocationDetail from '@/components/LocationDetail.vue'
+import type { PrimaryCareFilterValues, PrimaryCareLocation, PrimaryCareResponse } from '@/types'
 
+const isMobile = PinboardComposables.useIsMobile()
 const { t } = useI18n()
+const { filterChipDefinitions } = useFilterChipDefinitions()
+
+const emptyFilters: PrimaryCareFilterValues = {
+  sort: '',
+  ageGroup: [],
+  waitTime: [],
+  visitType: [],
+  specialty: [],
+  tests: [],
+  languages: [],
+}
 
 const searchPlaceholderText = computed(() => t('searchPlaceholder'))
 
@@ -32,95 +45,9 @@ const userLocation = ref<PinboardTypes.LatLon>({
 })
 const searchString = ref('')
 
-const filterValues = ref<FilterValues>({})
+const filterState = ref<PrimaryCareFilterValues>(emptyFilters)
 
-const filterDefinitions = computed<FilterDefinition[]>(() => [
-  {
-    key: 'sort',
-    label: t('filters.sort'),
-    multiple: false,
-    excludeFromCount: true,
-    icon: IconSort,
-    // TODO(teammate): finalize sort options + ordering logic.
-    choices: [
-      { text: t('filters.distance'), value: 'distance' },
-      { text: t('filters.name'), value: 'name' },
-    ],
-  },
-  {
-    key: 'ageGroup',
-    label: t('filters.ageGroup'),
-    multiple: true,
-    choices: [
-      { text: t('filters.adult'), value: 'adult' },
-      { text: t('filters.children'), value: 'children' },
-    ],
-  },
-  {
-    key: 'waitTime',
-    label: t('filters.waitTime'),
-    multiple: true,
-    choices: [
-      { text: t('filters.sameDay'), value: 'sameDay' },
-      { text: t('filters.weekWell'), value: 'weekWell' },
-      { text: t('filters.weekSick'), value: 'weekSick' },
-      { text: t('filters.twoMonths'), value: 'twoMonths' },
-    ],
-  },
-  {
-    key: 'specialty',
-    label: t('filters.specialty'),
-    multiple: true,
-    choices: [
-      { text: t('filters.mental'), value: 'mental' },
-      { text: t('filters.dental'), value: 'dental' },
-      { text: t('filters.eye'), value: 'eye' },
-      { text: t('filters.podiatry'), value: 'podiatry' },
-      { text: t('filters.mat'), value: 'mat' },
-      { text: t('filters.nutrition'), value: 'nutrition' },
-      { text: t('filters.tobacco'), value: 'tobacco' },
-      { text: t('filters.pharmacy'), value: 'pharmacy' },
-    ],
-  },
-  {
-    key: 'tests',
-    label: t('filters.tests'),
-    multiple: true,
-    choices: [
-      { text: t('filters.blood'), value: 'blood' },
-      { text: t('filters.sti'), value: 'sti' },
-      { text: t('filters.covid'), value: 'covid' },
-      { text: t('filters.mammo'), value: 'mammo' },
-      { text: t('filters.xray'), value: 'xray' },
-    ],
-  },
-  {
-    key: 'languages',
-    label: t('filters.languages'),
-    multiple: true,
-    // TODO(teammate): replace with real `language` field values.
-    choices: [
-      { text: t('filters.spanish'), value: 'spanish' },
-      { text: t('filters.mandarin'), value: 'mandarin' },
-      { text: t('filters.vietnamese'), value: 'vietnamese' },
-    ],
-  },
-])
-
-// SEAM: data wiring belongs to the teammate. Returns locations unfiltered for now.
-// TODO(teammate): map filterValues → PrimaryCareProperties predicates.
-//   ageGroup   → cross-cutting: match *_ad / *_ch fields per selection
-//   waitTime   → wait_* fields
-//   specialty  → special_* fields
-//   tests      → tests_* fields
-//   languages  → language field
-//   sort       → ordering (apply after filtering; not a predicate)
-function applyFilters(
-  locations: PrimaryCareLocation[],
-  _values: FilterValues
-): PrimaryCareLocation[] {
-  return locations
-}
+const { filterLogicalValue } = useFilterLogic(locations, filterState)
 
 const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   const { latitude, longitude } = userLocation.value
@@ -139,8 +66,32 @@ const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   }))
 })
 
+const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
+  if (geojson.value?.features) {
+    let result = filterLogicalValue.value.length
+      ? applyFilters(geojson.value.features)
+      : geojson.value.features
+
+    if (searchString.value) {
+      const terms = searchString.value.replace(/\W+/g, ' ').toLowerCase().split(' ').filter(Boolean)
+      result = result.filter((loc) => {
+        const haystack = JSON.stringify(Object.values(loc)).toLowerCase()
+        return terms.some((term) => haystack.includes(term))
+      })
+    }
+
+    return {
+      type: 'FeatureCollection',
+      features: result,
+    }
+  }
+  return undefined
+})
+
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
-  let result = applyFilters(locationsWithDistance.value, filterValues.value)
+  let result = filterLogicalValue.value.length
+    ? applyFilters(locationsWithDistance.value)
+    : locationsWithDistance.value
 
   if (searchString.value) {
     const terms = searchString.value.replace(/\W+/g, ' ').toLowerCase().split(' ').filter(Boolean)
@@ -152,6 +103,23 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
 
   return result
 })
+
+function applyFilters<T>(arr: T[]): T[] {
+  const filtered: T[] = []
+  let check = 1
+  let offset = 0
+  arr.forEach((item) => {
+    if (check & filterLogicalValue.value[offset]) {
+      filtered.push(item)
+    }
+    check <<= 1
+    if (!(check & 0xffffffff)) {
+      check = 1
+      offset++
+    }
+  })
+  return filtered
+}
 
 function handleSearchSubmit(s: string) {
   searchString.value = s
@@ -166,10 +134,14 @@ function handleGeolocate(locationData: { latitude: number; longitude: number; ac
 }
 
 function handleGeolocateError(error: Error | GeolocationPositionError) {
-  console.log(error)
+  console.error(error)
 }
 
-const isMobile = PinboardComposables.useIsMobile()
+function handleApplyFilter(value: FilterValues) {
+  filterState.value = Object.keys(filterState.value).length
+    ? (value as PrimaryCareFilterValues)
+    : emptyFilters
+}
 
 function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
   return location as PrimaryCareLocation
@@ -178,16 +150,17 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
 
 <template>
   <PinboardBody
-    v-model:filter-values="filterValues"
+    v-model:filter-values="filterState"
     :locations="filteredLocations"
     :search-or-user-location="userLocation"
     :is-loading="isLoading"
     :error-message="errorMessage"
     :location-panel-search="searchPlaceholderText"
-    :geojson="geojson"
+    :geojson="filteredGeojson"
     :is-mobile="isMobile"
-    :filters="filterDefinitions"
+    :filters="filterChipDefinitions"
     @search="handleSearchSubmit"
+    @update:filter-values="handleApplyFilter"
   >
     <template #locations-header>
       <div v-if="!isMobile" class="locations-callout">
@@ -207,15 +180,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
     </template>
 
     <template
-      #map-content="{
-        geojson,
-        hoveredId,
-        selectedId,
-        mobileControlsTarget,
-        onHover,
-        onHoverEnd,
-        onSelect,
-      }"
+      #map-content="{ hoveredId, selectedId, mobileControlsTarget, onHover, onHoverEnd, onSelect }"
     >
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />
       <BasemapToggle
@@ -230,9 +195,9 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
       />
 
       <CircleLayer
-        v-if="geojson"
+        v-if="filteredGeojson"
         id="locations"
-        :source="{ type: 'geojson', data: toRaw(geojson) as any }"
+        :source="{ type: 'geojson', data: toRaw(filteredGeojson) as any }"
         :paint="{
           'circle-radius': [
             'case',

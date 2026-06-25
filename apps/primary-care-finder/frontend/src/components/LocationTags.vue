@@ -23,10 +23,6 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
-const p = computed(() => props.location.properties)
-
-const YES_VALUES = ['Yes', 'Established Patients']
-
 const DAYS = ['sun', 'mon', 'tues', 'wed', 'thurs', 'fri', 'sat'] as const
 
 interface TagConfig {
@@ -46,8 +42,8 @@ function formatTime(t: string): string {
 
 const todaysHoursTooltip = computed<string>(() => {
   const dayKey = DAYS[new Date().getDay()]
-  const start = p.value[`hours_${dayKey}_start`] as string | null
-  const end = p.value[`hours_${dayKey}_end`] as string | null
+  const start = props.location.properties[`hours_${dayKey}_start`] as string | null
+  const end = props.location.properties[`hours_${dayKey}_end`] as string | null
   if (!start || !end) return t('tags.todayClosed')
   return t('tags.todayHours', { range: `${formatTime(start)}\u00A0–\u00A0${formatTime(end)}` })
 })
@@ -55,9 +51,9 @@ const todaysHoursTooltip = computed<string>(() => {
 const hoursStatus = computed<'openNow' | 'closed' | 'checkHours'>(() => {
   const now = new Date()
   const dayKey = DAYS[now.getDay()]
-  const start = p.value[`hours_${dayKey}_start`] as string | null
-  const end = p.value[`hours_${dayKey}_end`] as string | null
-  const exceptions = p.value[`hours_${dayKey}_exceptions`] as string | null
+  const start = props.location.properties[`hours_${dayKey}_start`] as string | null
+  const end = props.location.properties[`hours_${dayKey}_end`] as string | null
+  const exceptions = props.location.properties[`hours_${dayKey}_exceptions`] as string | null
 
   if (exceptions) return 'checkHours'
   if (!start || !end) return 'closed'
@@ -70,14 +66,17 @@ const hoursStatus = computed<'openNow' | 'closed' | 'checkHours'>(() => {
 
 const detailTags = computed<TagConfig[]>(() => {
   const candidates: (TagConfig | null)[] = [
-    !!p.value.wait_sameday_sick_ad || !!p.value.wait_sameday_sick_ch
+    // !!props.location.properties.wait_sameday_sick_ad || !!props.location.properties.wait_sameday_sick_ch
+    props.location.properties.walk_ins_sick === 'Yes'
       ? { text: t('tags.walkIns'), color: 'purple', icon: IconPersonWalking }
       : null,
-    p.value.primary_telehealth === 'Yes'
+    props.location.properties.primary_telehealth === 'Yes'
       ? { text: t('tags.telehealth'), color: 'purple', icon: IconVideo }
       : null,
-    p.value.transport_parking ? { text: t('tags.parking'), color: 'blue', icon: IconCar } : null,
-    p.value.special_pharmacy === 'Yes'
+    props.location.properties.transport_parking
+      ? { text: t('tags.parking'), color: 'blue', icon: IconCar }
+      : null,
+    props.location.properties.special_pharmacy === 'Yes'
       ? { text: t('tags.pharmacy'), color: 'blue', icon: IconSuitcaseMedical }
       : null,
   ]
@@ -87,7 +86,7 @@ const detailTags = computed<TagConfig[]>(() => {
 const cardTags = computed<TagConfig[]>(() => {
   const now = new Date()
   const dayKey = DAYS[now.getDay()]
-  const todayEnd = p.value[`hours_${dayKey}_end`] as string | null
+  const todayEnd = props.location.properties[`hours_${dayKey}_end`] as string | null
 
   const candidates: (TagConfig | null)[] = [
     {
@@ -106,7 +105,7 @@ const cardTags = computed<TagConfig[]>(() => {
       icon: IconClock,
       tooltip: todaysHoursTooltip.value,
     },
-    !!p.value.hours_sat_start || !!p.value.hours_sun_start
+    !!props.location.properties.hours_sat_start || !!props.location.properties.hours_sun_start
       ? {
           text: t('tags.weekendHours'),
           color: 'blue',
@@ -122,37 +121,27 @@ const cardTags = computed<TagConfig[]>(() => {
           tooltip: todaysHoursTooltip.value,
         }
       : null,
-    !!p.value.wait_sameday_sick_ad || !!p.value.wait_sameday_sick_ch
+    // !!props.location.properties.wait_sameday_sick_ad || !!props.location.properties.wait_sameday_sick_ch
+    props.location.properties.walk_ins_sick === 'Yes'
       ? { text: t('tags.walkIns'), color: 'purple', icon: IconPersonWalking }
       : null,
-    p.value.primary_telehealth === 'Yes'
+    props.location.properties.primary_telehealth === 'Yes'
       ? { text: t('tags.telehealth'), color: 'purple', icon: IconVideo }
       : null,
-    p.value.transport_parking ? { text: t('tags.parking'), color: 'blue', icon: IconCar } : null,
-    p.value.special_pharmacy === 'Yes'
+    props.location.properties.transport_parking
+      ? { text: t('tags.parking'), color: 'blue', icon: IconCar }
+      : null,
+    props.location.properties.special_pharmacy === 'Yes'
       ? { text: t('tags.pharmacy'), color: 'blue', icon: IconSuitcaseMedical }
       : null,
-    [
-      'primary_well_ad',
-      'primary_sick_ad',
-      'primary_vacc_ad',
-      'special_mental_ad',
-      'special_dental_ad',
-      'special_eye_ad',
-    ].some((f) => YES_VALUES.includes((p.value[f] as string) ?? ''))
+    props.location.properties.adults === 'Yes'
       ? { text: t('tags.adultCare'), color: 'purple', icon: IconPerson }
       : null,
-    [
-      'primary_well_ch',
-      'primary_sick_ch',
-      'primary_vacc_child',
-      'special_mental_ch',
-      'special_dental_ch',
-      'special_eye_ch',
-    ].some((f) => YES_VALUES.includes((p.value[f] as string) ?? ''))
+    props.location.properties.children === 'Yes'
       ? { text: t('tags.pediatrics'), color: 'purple', icon: IconPerson }
       : null,
-    !!p.value.language && p.value.language.split(',').filter(Boolean).length > 1
+    !!props.location.properties.languages &&
+    props.location.properties.languages.split(',').filter(Boolean).length > 1
       ? {
           text: t('tags.multipleLanguages'),
           color: 'purple',

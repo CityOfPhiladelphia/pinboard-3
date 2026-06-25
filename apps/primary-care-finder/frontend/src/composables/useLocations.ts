@@ -1,92 +1,50 @@
 import { ref, onMounted, type Ref } from 'vue'
-import { PinboardUtilities } from '@pinboard/ui'
-import type { PrimaryCareLocation, PrimaryCareProperties } from '@/types'
+import type { PrimaryCareLocation, PrimaryCareResponse, PrimaryCareFeature } from '@/types'
 
-const ARCGIS_URL =
-  'https://services.arcgis.com/fLeGjb7u4uXqeF9q/ArcGIS/rest/services/red_PrimaryCare/FeatureServer/0/query'
-
-interface RawFeature {
-  properties: Record<string, unknown>
-  geometry: { type: string; coordinates: [number, number, ...number[]] }
-}
-
-function isVisible(feature: RawFeature): boolean {
-  const props = feature.properties
-
-  // Exclude incomplete records
-  if (props.data_complete !== '2') return false
-
-  // Exclude test records
-  if (['3', '5', '6', '7', '8', '9'].includes(props.record as string)) return false
-
-  // Exclude test addresses
-  if (props.address === 'Test') return false
-
-  return true
-}
+const CARTO_URL = `https://phl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM pdph_primary_care_finder WHERE "record" <> 'test'`
 
 export function useLocations(): {
   locations: Ref<PrimaryCareLocation[]>
   isLoading: Ref<string | false>
   errorMessage: Ref<string | null>
-  geojson: Ref<unknown>
+  geojson: Ref<PrimaryCareResponse | undefined>
 } {
   const locations = ref<PrimaryCareLocation[]>([])
   const isLoading = ref<string | false>('Loading data...')
   const errorMessage = ref<string | null>(null)
-  const geojson = ref<unknown>(null)
+  const geojson = ref<PrimaryCareResponse | undefined>(undefined)
 
   async function fetchLocations() {
     try {
-      const params = new URLSearchParams({
-        where: '1=1',
-        outFields: '*',
-        f: 'geojson',
-      })
-
-      const response = await fetch(`${ARCGIS_URL}?${params}`)
+      const response = await fetch(encodeURI(CARTO_URL))
 
       if (!response.ok) {
         errorMessage.value = 'Error retrieving primary care sites'
         return
       }
 
-      const rawGeojson = await response.json()
-      const filteredFeatures = rawGeojson.features.filter(isVisible)
-
-      // Stable, readable id per site: slug of the name (OBJECTID churns on the daily reload).
-      // Deduped so two sites that slug identically stay unique.
-      const seenSlugs = new Map<string, number>()
-      const ids = filteredFeatures.map((feature: RawFeature) => {
-        const rawName = String(feature.properties.record ?? feature.properties.address ?? '')
-        const base =
-          PinboardUtilities.slugify(rawName.replace(/^City of Philadelphia - /, '')) || 'location'
-        const n = seenSlugs.get(base) ?? 0
-        seenSlugs.set(base, n + 1)
-        return n === 0 ? base : `${base}-${n + 1}`
-      })
-
-      locations.value = filteredFeatures.map(
-        (feature: RawFeature, i: number) =>
-          ({
-            id: ids[i],
-            name: String(feature.properties.record ?? feature.properties.address ?? ''),
-            latitude: feature.geometry.coordinates[1],
-            longitude: feature.geometry.coordinates[0],
-            properties: feature.properties as PrimaryCareProperties,
-            geometry: feature.geometry,
-            locationCardInfo: {
-              heading: String(feature.properties.record ?? feature.properties.address ?? ''),
-              body: String(feature.properties.address ?? ''),
-            },
-          }) satisfies PrimaryCareLocation
-      )
+      const geojsonData = (await response.json()) as PrimaryCareResponse
+      locations.value = geojsonData.features.map((feature: PrimaryCareFeature) => ({
+        id: String(feature.properties.cartodb_id),
+        name: (feature.properties.record ?? feature.properties.address ?? '').replace(
+          /Womens/,
+          "Women's"
+        ),
+        latitude: feature.geometry.coordinates[1],
+        longitude: feature.geometry.coordinates[0],
+        properties: feature.properties,
+        geometry: feature.geometry,
+        locationCardInfo: {
+          heading: String(feature.properties.record ?? feature.properties.address ?? ''),
+          body: String(feature.properties.address ?? ''),
+        },
+      }))
 
       geojson.value = {
         type: 'FeatureCollection' as const,
-        features: filteredFeatures.map((f: RawFeature, i: number) => ({
-          ...f,
-          properties: { ...f.properties, id: ids[i] },
+        features: geojsonData.features.map((feature: PrimaryCareFeature) => ({
+          ...feature,
+          properties: { ...feature.properties, id: String(feature.properties.cartodb_id) },
         })),
       }
     } catch {

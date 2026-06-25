@@ -59,7 +59,7 @@ const locationFilterMode = ref<Filters>('all')
 const visitedIds = ref(new Set<string>())
 const visibleFloodLayers = ref<FloodLayerId[]>([])
 const { oemLocations, isLoading, errorMessage } = useLocations()
-const { userLocation, userLocationState } = PinboardComposables.useUserLocation(true)
+const { userLocation, userLocationState } = PinboardComposables.useUserLocation(true, true)
 const locationSortMode = ref<SortMode>(
   ['located', 'watching'].includes(userLocationState.value) ? 'DistAsc' : '',
 )
