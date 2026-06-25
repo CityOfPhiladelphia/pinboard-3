@@ -65,7 +65,7 @@ function mapsUrl(location: PrimaryCareLocation): string {
         class="card-link card-link--full"
         @click.stop
       >
-        Provider Website
+        {{ $t('providerWebsite') }}
       </PhilaLink>
     </div>
   </div>

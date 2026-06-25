@@ -96,15 +96,6 @@ const exceptionsByDay = computed(() => {
   return result
 })
 
-const exceptionsList = computed(() => {
-  const arr: string[] = []
-  for (const day of DAYS) {
-    const exc = p.value[`hours_${day}_exceptions`] as string | null
-    if (exc) arr.push(exc)
-  }
-  return [...new Set(arr)]
-})
-
 function parseTime(raw: string | null): string {
   if (!raw) return ''
   const [hStr, mStr] = raw.split(':')
@@ -112,12 +103,6 @@ function parseTime(raw: string | null): string {
   const ampm = h >= 12 ? 'pm' : 'am'
   h = h % 12 || 12
   return mStr === '00' ? `${h}\u00A0${ampm}` : `${h}:${mStr}\u00A0${ampm}`
-}
-
-function exceptionCounter(day: string): number | null {
-  const exc = exceptionsByDay.value[day]
-  if (!exc) return null
-  return 1 + exceptionsList.value.indexOf(exc)
 }
 
 function getExceptionText(day: string): string | null {
@@ -130,14 +115,13 @@ function getExceptionText(day: string): string | null {
 function parseTimeRange(day: string): string {
   const start = p.value[`hours_${day}_start`] as string | null
   const end = p.value[`hours_${day}_end`] as string | null
-  const counter = exceptionCounter(day)
   let val: string
   if (start && end) {
     val = parseTime(start) + '\u00A0–\u00A0' + parseTime(end)
   } else {
     val = t('closed')
   }
-  if (counter) val += '*'.repeat(counter)
+  if (exceptionsByDay.value[day]) val += '*'
   return val
 }
 
@@ -164,6 +148,16 @@ function translateWarning(warning: string): string {
 }
 
 // --- Transit helpers ---
+const hasTransit = computed(() =>
+  Boolean(
+    p.value.transport_bus ||
+    p.value.transport_subway ||
+    p.value.transport_train ||
+    p.value.transport_trolley ||
+    p.value.transport_parking
+  )
+)
+
 function translateTransitList(raw: string | null, category: string): string {
   if (!raw) return ''
   const msgs = messages.value[locale.value] as Record<
@@ -198,42 +192,36 @@ function translateTransitList(raw: string | null, category: string): string {
 
     <div class="detail-body">
       <LocationTags :location="location" detail />
-      <span class="has-text-label-default">Location details</span>
+      <span class="has-text-label-default">{{ $t('locationDetails') }}</span>
 
       <div class="detail-columns">
         <div class="detail-col-left">
-          <div class="detail-cell">
-            <span class="has-text-label-small cell-label">Contact</span>
+          <div v-if="p.med_phone_num" class="detail-cell">
+            <span class="has-text-label-small cell-label">{{ $t('contact') }}</span>
             <div class="cell-content">
-              <PhilaLink v-if="p.med_phone_num" :href="`tel:${p.med_phone_num}`" size="small">
+              <PhilaLink :href="`tel:${p.med_phone_num}`" size="small">
                 {{ p.med_phone_num }}
               </PhilaLink>
             </div>
           </div>
-          <div class="detail-cell">
-            <span class="has-text-label-small cell-label">Website</span>
+          <div v-if="p.website" class="detail-cell">
+            <span class="has-text-label-small cell-label">{{ $t('website') }}</span>
             <div class="cell-content">
-              <PhilaLink
-                v-if="p.website"
-                :href="p.website"
-                size="small"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <PhilaLink :href="p.website" size="small" target="_blank" rel="noopener noreferrer">
                 {{ $t('providerWebsite') }}
               </PhilaLink>
             </div>
           </div>
-          <div class="detail-cell">
-            <span class="has-text-label-small cell-label">Languages spoken</span>
+          <div v-if="languagesSpoken.length" class="detail-cell">
+            <span class="has-text-label-small cell-label">{{ $t('languagesSpoken') }}</span>
             <div class="cell-content">
               <span class="has-text-body-small">
                 {{ languagesSpoken.map(translateLanguage).join(', ') }}
               </span>
             </div>
           </div>
-          <div class="detail-cell">
-            <span class="has-text-label-small cell-label">Transit options</span>
+          <div v-if="hasTransit" class="detail-cell">
+            <span class="has-text-label-small cell-label">{{ $t('transitOptions') }}</span>
             <div class="cell-content cell-list">
               <span v-if="p.transport_bus" class="has-text-body-small">
                 {{ $t('transit.bus') }}: {{ p.transport_bus }}
@@ -258,7 +246,7 @@ function translateTransitList(raw: string | null, category: string): string {
         </div>
         <div class="detail-col-right">
           <div class="detail-cell">
-            <span class="has-text-label-small cell-label">Location</span>
+            <span class="has-text-label-small cell-label">{{ $t('location') }}</span>
             <div class="cell-content">
               <PhilaLink :href="mapsUrl()" size="small" target="_blank" rel="noopener noreferrer">
                 {{ fullAddress }}
@@ -266,7 +254,7 @@ function translateTransitList(raw: string | null, category: string): string {
             </div>
           </div>
           <div class="detail-cell">
-            <span class="has-text-label-small cell-label">Hours</span>
+            <span class="has-text-label-small cell-label">{{ $t('hours') }}</span>
             <div class="cell-content hours-list">
               <div v-for="day in DAYS" :key="day" class="hours-entry">
                 <div class="hours-row">
@@ -277,7 +265,7 @@ function translateTransitList(raw: string | null, category: string): string {
                   v-if="getExceptionText(day)"
                   class="has-text-body-extra-small hours-exception"
                 >
-                  {{ '*'.repeat(exceptionCounter(day) ?? 1) }} {{ getExceptionText(day) }}
+                  * {{ getExceptionText(day) }}
                 </span>
               </div>
             </div>
@@ -290,48 +278,43 @@ function translateTransitList(raw: string | null, category: string): string {
         {{ translateWarning(p.optional_info_general) }}
       </div>
 
-      <span class="has-text-label-default">Services available</span>
+      <span class="has-text-label-default">{{ $t('servicesAvailable') }}</span>
 
       <!-- New patient services -->
-      <section class="services-section">
+      <section v-if="newPatientServices.length" class="services-section">
         <span class="has-text-label-small cell-label">{{
           $t('patientType.patient_type_new')
         }}</span>
-        <div v-if="newPatientServices.length" class="service-list">
+        <div class="service-list">
           <span v-for="label in newPatientServices" :key="label" class="has-text-body-small">
             {{ $t(label) }}
           </span>
         </div>
-        <span v-else class="has-text-body-small">{{
-          $t('tableNoData.noSpecializedServices')
-        }}</span>
       </section>
 
       <!-- Existing patient only services -->
-      <section class="services-section">
+      <section v-if="existingOnlyServices.length" class="services-section">
         <span class="has-text-label-small cell-label">{{
           $t('patientType.patient_type_existing_only')
         }}</span>
         <span class="has-text-body-extra-small">{{
           $t('patientType.patient_type_existing_only_subtext')
         }}</span>
-        <div v-if="existingOnlyServices.length" class="service-list">
+        <div class="service-list">
           <span v-for="label in existingOnlyServices" :key="label" class="has-text-body-small">
             {{ $t(label) }}
           </span>
         </div>
-        <span v-else class="has-text-body-small">{{ $t('tableNoData.noOtherServices') }}</span>
       </section>
 
       <!-- Tests -->
-      <section class="services-section">
+      <section v-if="tests.length" class="services-section">
         <span class="has-text-label-small cell-label">{{ $t('tests.category') }}</span>
-        <div v-if="tests.length" class="service-list">
+        <div class="service-list">
           <span v-for="test in tests" :key="test" class="has-text-body-small">{{
             $t(`tests.${test}`)
           }}</span>
         </div>
-        <span v-else class="has-text-body-small">{{ $t('tests.noTests') }}</span>
       </section>
 
       <!-- Sliding scale -->
@@ -363,6 +346,7 @@ function translateTransitList(raw: string | null, category: string): string {
 
 .detail-header h2 {
   font-size: 1.25rem;
+  line-height: 1.4;
   margin: 0;
   flex: 1;
 }

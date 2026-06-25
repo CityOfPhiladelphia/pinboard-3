@@ -23,19 +23,12 @@ const feedbackHref =
       href: '/',
     }"
     :info-label="t('app.aboutTitle')"
-    :info-title="t('introPage.section1Title')"
+    info-href="/info"
     :languages="languages"
     :locale="locale"
     :feedback-href="feedbackHref"
     @update:locale="setLocale"
   >
-    <template #info-body>
-      <p class="has-text-body-small">
-        {{ t('introPage.p0') }}
-        <RouterLink to="/info">{{ t('pinboard.nav.learnMore') }}</RouterLink>
-      </p>
-    </template>
-
     <RouterView />
   </PinboardShell>
 </template>
