@@ -5,6 +5,9 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 export default defineConfig({
   plugins: [vue(), vueDevTools()],
+  build: {
+    minify: 'esbuild',
+  },
   resolve: {
     // @pinboard/ui externalizes these peers, so its source and the app must
     // resolve to a single copy of each — otherwise vue-router/vue-i18n inject()

@@ -1,4 +1,22 @@
 export default {
+  // First-pass translations — verify with the city translation process.
+  tags: {
+    openNow: 'Abierto ahora',
+    closed: 'Cerrado',
+    checkHours: 'Consultar horario',
+    weekendHours: 'Horario de fin de semana',
+    openAfter6: 'Abierto después de las 6 p. m.',
+    walkIns: 'Atención sin cita',
+    telehealth: 'Telesalud',
+    parking: 'Estacionamiento en el lugar',
+    pharmacy: 'Farmacia en el lugar',
+    adultCare: 'Atención para adultos',
+    pediatrics: 'Pediatría',
+    multipleLanguages: 'Varios idiomas',
+    todayClosed: 'Hoy: Cerrado',
+    todayHours: 'Hoy: {range}',
+  },
+  providerWebsite: 'Sitio web del proveedor',
   app: {
     title: 'Buscador de atención primaria',
     name: 'Buscador de atención primaria',
@@ -76,6 +94,8 @@ export default {
     patient_type_new: 'Pacientes nuevos',
     patient_type_existing: 'Pacientes establecidos',
     patient_type_existing_only: 'Debe programar la atención en el sitio',
+    patient_type_existing_only_subtext:
+      '*You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: 'Atención primaria',

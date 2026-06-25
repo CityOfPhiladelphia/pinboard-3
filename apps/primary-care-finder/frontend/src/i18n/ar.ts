@@ -1,4 +1,22 @@
 export default {
+  // First-pass translations — verify with the city translation process.
+  tags: {
+    openNow: 'مفتوح الآن',
+    closed: 'مغلق',
+    checkHours: 'تحقق من ساعات العمل',
+    weekendHours: 'ساعات عمل نهاية الأسبوع',
+    openAfter6: 'مفتوح بعد الساعة 6 مساءً',
+    walkIns: 'بدون موعد',
+    telehealth: 'الرعاية الصحية عن بُعد',
+    parking: 'موقف سيارات في الموقع',
+    pharmacy: 'صيدلية في الموقع',
+    adultCare: 'رعاية البالغين',
+    pediatrics: 'طب الأطفال',
+    multipleLanguages: 'لغات متعددة',
+    todayClosed: 'اليوم: مغلق',
+    todayHours: 'اليوم: {range}',
+  },
+  providerWebsite: 'موقع مقدّم الخدمة',
   app: {
     title: 'بحث الرعاية الأساسية',
     name: 'بحث الرعاية الأساسية',
@@ -75,6 +93,8 @@ export default {
     patient_type_new: 'مرضى جدد',
     patient_type_existing: 'مرضى حاليون',
     patient_type_existing_only: 'يجب تقديم الرعاية في الموقع',
+    patient_type_existing_only_subtext:
+      '*You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: 'الرعاية الأساسية',
