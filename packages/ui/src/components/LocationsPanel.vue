@@ -170,8 +170,12 @@ defineExpose({ scrollToCard })
   flex: 1;
   overflow-y: auto;
   gap: 0.75rem;
-  padding: 0.5rem 1rem 1rem 1rem;
-  scrollbar-width: none;
+  /* Left inset stays 1rem. The right inset is 0.5rem padding + the reserved
+     scrollbar gutter (~0.5rem for a thin bar), so the scrollbar sits *inside* a
+     right gap that visually matches the 1rem on the left. */
+  padding: 0.5rem 0.5rem 1rem 1rem;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
 }
 
 .location-card {
@@ -198,7 +202,8 @@ defineExpose({ scrollToCard })
 
 @media (max-width: 768px) {
   .location-list {
-    padding-top: 1rem;
+    padding: 1rem;
+    scrollbar-width: none;
   }
 }
 </style>
