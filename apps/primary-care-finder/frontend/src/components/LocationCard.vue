@@ -7,28 +7,6 @@ defineProps<{
   location: PrimaryCareLocation
 }>()
 
-<<<<<<< HEAD
-</script>
-
-<template>
-  <div class="location-card-content">
-    <strong>{{ location.name }}</strong>
-    <div v-if="location.address" class="card-address">
-      {{ location.address }}
-    </div>
-    <div v-if="location.med_phone_num" class="card-phone">
-      {{ location.med_phone_num }}
-=======
-function siteName(location: PrimaryCareLocation): string {
-  let value = location.properties.record
-  if (
-    value === 'Delaware Valley Community Health (DVCH) Maria de los Santos Womens Health Center'
-  ) {
-    value = "Delaware Valley Community Health (DVCH) Maria de los Santos Women's Health Center"
-  }
-  return value
-}
-
 function mapsUrl(location: PrimaryCareLocation): string {
   const { address, address_2, zip_code } = location.properties
   const parts = [address, address_2, zip_code, 'Philadelphia, PA'].filter(Boolean)
@@ -38,7 +16,7 @@ function mapsUrl(location: PrimaryCareLocation): string {
 
 <template>
   <div class="card-content">
-    <strong class="card-heading">{{ siteName(location) }}</strong>
+    <strong class="card-heading">{{ location.name }}</strong>
     <span v-if="location.locationCardInfo.subheader" class="card-distance">
       {{ location.locationCardInfo.subheader }}
     </span>
@@ -77,7 +55,6 @@ function mapsUrl(location: PrimaryCareLocation): string {
       >
         Provider Website
       </PhilaLink>
->>>>>>> b9b487173b7baa2cfe1194942e215adc54bd4d74
     </div>
   </div>
 </template>

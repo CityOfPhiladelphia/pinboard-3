@@ -6,15 +6,16 @@ export type BitWiseOperation = '&' | '|' | '^'
 //   bitfield(activeFilters: string[]): Uint32Array<ArrayBufferLike>
 // }
 
-export interface MatchingFunction {
-  <T>(item: Record<string, T>, dataFields: string[], matchValues: T[]): boolean
-}
+// export interface MatchingFunction {
+//   <T>(item: Record<string, T>, dataFields: string[], matchValues: T[]): boolean
+// }
 
 export interface IFilterChoiceBitfield {
   data: Record<string, unknown>[]
   dataFields: string[]
   matches: string[]
-  matchingFunction: MatchingFunction
+  // matchingFunction: MatchingFunction
+  matchingFunction: Function
 }
 
 export interface IFilterChoiceBitfieldGroup {

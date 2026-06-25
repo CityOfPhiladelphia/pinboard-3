@@ -56,7 +56,7 @@ export interface AlertBanner {
   message: string
 }
 
-export interface BasicLocation extends LatLon, Record<string, unknown> {
+export interface BasicLocation extends LatLon {
   id: string
   name: string
   locationCardInfo: MapCardProps
@@ -78,29 +78,38 @@ export type SortLocationsOptions = Record<string, string>
 
 export type ProxyAutocompleteResult = string[]
 
-export interface CartoResponse {
-  rows: [
-    {
-      cartodb_id: number
-      the_geom: string
-      the_geom_webmercator: string
-      objectid: number
-      [x: string]: unknown
-    },
-  ]
+export interface CartoResponseFields {
+  cartodb_id: number
+  the_geom: string
+  the_geom_webmercator: string
 }
+
+export interface CartoResponse {
+  rows: CartoResponseFields[]
+}
+
 export interface ArcgisFeature {
-  type: string
-  id: number | string
+  type: 'Feature'
+  id: number
   geometry: {
     type: string
     coordinates: LongitudeLatitude
   }
   properties: unknown
 }
-export interface ArcgisResponse {
-  type: string
-  features: ArcgisFeature[]
+
+export interface CartoFeature {
+  type: 'Feature'
+  geometry: {
+    type: string
+    coordinates: LongitudeLatitude
+  }
+  properties: unknown
+}
+
+export interface GeoJSONFeatureCollectionResponse {
+  type: 'FeatureCollection'
+  features: ArcgisFeature[] | CartoFeature[]
 }
 
 // type GeoJsonGeometryType =
