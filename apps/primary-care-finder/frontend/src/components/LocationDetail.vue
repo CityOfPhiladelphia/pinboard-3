@@ -284,7 +284,7 @@ function translateTransitList(raw: string | null, category: string): string {
               <span v-if="location.properties.transport_trolley" class="has-text-body-small">
                 {{ $t('transit.trolley') }}: {{ location.properties.transport_trolley }}
               </span>
-              <span v-if="location.properties.transport_parking " class="has-text-body-small">
+              <span v-if="location.properties.transport_parking" class="has-text-body-small">
                 {{ $t('transit.car.label') }}:
                 {{ translateTransitList(location.properties.transport_parking, 'car') }}
               </span>
