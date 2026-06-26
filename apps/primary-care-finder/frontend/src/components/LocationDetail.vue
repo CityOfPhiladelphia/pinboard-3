@@ -485,9 +485,6 @@ function translateTransitList(raw: string | null, category: string): string {
   font-size: var(--Label-Default-font-label-default-size) !important;
 }
 
-.cell-content {
-}
-
 .cell-list {
   display: flex;
   flex-direction: column;
