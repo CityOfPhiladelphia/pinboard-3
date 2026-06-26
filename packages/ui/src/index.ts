@@ -11,7 +11,7 @@ export type {
   IFilterChoiceBitfieldGroup,
   IFilterGroup,
 } from './composables/datafilters/types'
-export { getBufferSize } from './composables/datafilters/functions'
+export { getBufferSize, shiftLeft } from './composables/datafilters/functions'
 export { FilterChoiceBitfieldGroup, FilterGroup } from './composables/datafilters/classes'
 export type * as PinboardFilterTypes from './composables/datafilters/types'
 

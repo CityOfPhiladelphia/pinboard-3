@@ -12,6 +12,7 @@ import {
   PinboardComposables,
   PinboardUtilities,
   Callout,
+  shiftLeft,
 } from '@pinboard/ui'
 import type { FilterValues, PinboardTypes } from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
@@ -151,6 +152,8 @@ const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
 })
 
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
+  console.log(filterLogicalValue.value)
+  console.log(filterState.value)
   let result = filterLogicalValue.value.length
     ? applyFilters(locationsWithDistance.value)
     : locationsWithDistance.value
@@ -173,6 +176,7 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
 })
 
 function applyFilters<T>(arr: T[]): T[] {
+  const shiftDirection = shiftLeft()
   const filtered: T[] = []
   let check = 1
   let offset = 0
@@ -180,8 +184,8 @@ function applyFilters<T>(arr: T[]): T[] {
     if (check & filterLogicalValue.value[offset]) {
       filtered.push(item)
     }
-    check <<= 1
-    if (check & 0x100000000) {
+    check = shiftDirection ? check << 1 : check >> 1
+    if (check < 0) {
       check = 1
       offset++
     }
