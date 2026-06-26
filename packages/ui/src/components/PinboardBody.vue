@@ -156,8 +156,26 @@ const locationCountLabel = computed(() => {
 
 // watchers
 watch(selectedLocation, (loc) => {
-  if (loc && props.isMobile) {
-    bottomSheetRef.value?.snapTo(snapPoints.length - 1)
+  if (loc) {
+    // Mutual exclusion: the detail panel and the filter panel share the left
+    // slot, so selecting a location closes the filter panel. Covers every
+    // selection path (map click, list click, URL/back-forward nav).
+    allFiltersOpen.value = false
+    if (props.isMobile) {
+      bottomSheetRef.value?.snapTo(snapPoints.length - 1)
+    }
+  }
+})
+
+// Defensive: enforce the "one left panel at a time" invariant in state. Not
+// reachable in the current UI (an open detail overlay covers the Filters
+// button), but keeps the invariant if the structural cleanup (bead
+// pinboard-3-nag) later makes filters reachable with a detail open. Desktop
+// only: on mobile the filter panel is full-screen and leaving the detail in
+// state returns the user to it when the filters close.
+watch(allFiltersOpen, (open) => {
+  if (open && !props.isMobile) {
+    handleCloseLocationDetail()
   }
 })
 
