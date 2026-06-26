@@ -508,6 +508,8 @@ function translateTransitList(raw: string | null, category: string): string {
 
 .hours-exception {
   display: block;
+  /* Wrap before the time column instead of running the full width. */
+  max-width: 65%;
 }
 
 .services-section {
