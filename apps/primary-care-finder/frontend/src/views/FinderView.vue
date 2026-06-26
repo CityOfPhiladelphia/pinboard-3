@@ -22,9 +22,7 @@ import LocationDetail from '@/components/LocationDetail.vue'
 import type { PrimaryCareFilterValues, PrimaryCareLocation, PrimaryCareResponse } from '@/types'
 import { IconLocationDot } from '@phila/phila-ui-core/icons'
 
-import {
-  sortLocations
-} from '@/utilities/sortLocations'
+import { sortLocations } from '@/utilities/sortLocations'
 
 const emptyFilters: PrimaryCareFilterValues = {
   sort: '',
@@ -89,7 +87,11 @@ const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
       : geojson.value.features
 
     if (keywordsForSearch.value) {
-      const terms = keywordsForSearch.value.replace(/\W+/g, ' ').toLowerCase().split(' ').filter(Boolean)
+      const terms = keywordsForSearch.value
+        .replace(/\W+/g, ' ')
+        .toLowerCase()
+        .split(' ')
+        .filter(Boolean)
       result = result.filter((loc) => {
         const haystack = JSON.stringify(Object.values(loc)).toLowerCase()
         return terms.some((term) => haystack.includes(term))
@@ -110,14 +112,20 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
     : locationsWithDistance.value
 
   if (keywordsForSearch.value) {
-    const terms = keywordsForSearch.value.replace(/\W+/g, ' ').toLowerCase().split(' ').filter(Boolean)
+    const terms = keywordsForSearch.value
+      .replace(/\W+/g, ' ')
+      .toLowerCase()
+      .split(' ')
+      .filter(Boolean)
     result = result.filter((loc) => {
       const haystack = JSON.stringify(Object.values(loc)).toLowerCase()
       return terms.some((term) => haystack.includes(term))
     })
   }
 
-  return filterState.value.sort ? sortLocations(result, searchOrUserLocation, filterState.value.sort) : result
+  return filterState.value.sort
+    ? sortLocations(result, searchOrUserLocation, filterState.value.sort)
+    : result
 })
 
 function applyFilters<T>(arr: T[]): T[] {
@@ -226,7 +234,15 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
     </template>
 
     <template
-      #map-content="{ hoveredId, selectedId, zoom, mobileControlsTarget, onHover, onHoverEnd, onSelect }"
+      #map-content="{
+        hoveredId,
+        selectedId,
+        zoom,
+        mobileControlsTarget,
+        onHover,
+        onHoverEnd,
+        onSelect,
+      }"
     >
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />
       <BasemapToggle
@@ -276,12 +292,12 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
         "
       />
       <MapMarker
-          v-if="PinboardUtilities.hasLocationData(searchOrUserLocation)"
-          key="searchOrUserLocation"
-          :lng-lat="[searchOrUserLocation.longitude, searchOrUserLocation.latitude]"
-        >
-          <MapIconTextPin :zoom="zoom" :icon="IconLocationDot" color-theme="light-tertiary" />
-        </MapMarker>
+        v-if="PinboardUtilities.hasLocationData(searchOrUserLocation)"
+        key="searchOrUserLocation"
+        :lng-lat="[searchOrUserLocation.longitude, searchOrUserLocation.latitude]"
+      >
+        <MapIconTextPin :zoom="zoom" :icon="IconLocationDot" color-theme="light-tertiary" />
+      </MapMarker>
     </template>
   </PinboardBody>
 </template>
