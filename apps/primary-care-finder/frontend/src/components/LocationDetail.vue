@@ -318,15 +318,6 @@ function translateTransitList(raw: string | null, category: string): string {
           }}</span>
         </div>
       </section>
-
-      <!-- Sliding scale -->
-      <section class="services-section">
-        <span class="has-text-label-small cell-label">{{ $t('slidingScale') }}</span>
-        <span class="has-text-body-small">{{ $t('slidingScaleExplanation') }}</span>
-        <span class="has-text-body-small">{{
-          location.properties.sliding_scale ?? $t('slidingScaleNull')
-        }}</span>
-      </section>
     </div>
   </div>
 </template>
