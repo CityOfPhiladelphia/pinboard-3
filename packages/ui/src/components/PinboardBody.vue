@@ -366,6 +366,11 @@ const effectiveMapConfig = (() => {
               </div>
             </Teleport>
           </template>
+          <template #list-header>
+            <div v-if="!isMobile" class="location-list-header">
+              <span>{{ locationCountLabel }}</span>
+            </div>
+          </template>
           <template v-if="$slots['location-card']" #location-card="{ location }">
             <slot name="location-card" :location="location" />
           </template>
@@ -485,6 +490,13 @@ const effectiveMapConfig = (() => {
   align-items: center;
   justify-content: space-between;
   padding: 0 1rem;
+  font-family: var(--Body-Default-font-body-default-family);
+  font-weight: 700;
+}
+
+/* Desktop: item count above the locations list (mirrors the mobile sheet count). */
+.location-list-header {
+  padding: 0.75rem 1rem 0.5rem;
   font-family: var(--Body-Default-font-body-default-family);
   font-weight: 700;
 }
