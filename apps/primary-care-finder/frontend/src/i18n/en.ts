@@ -22,6 +22,7 @@ export default {
   location: 'Location',
   transitOptions: 'Transit options',
   servicesAvailable: 'Services available',
+  patientsServed: 'Patients served',
   callout: {
     title: 'Free and low-cost medical care in Philadelphia',
     message:
@@ -95,6 +96,9 @@ export default {
     child: 'Child',
     adults: 'Adults',
     children: 'Children',
+    servesAdults: 'Serves adults.',
+    servesChildren: 'Serves children.',
+    servesBoth: 'Serves adults and children.',
   },
   patientType: {
     category: 'Eligibility',
@@ -266,6 +270,18 @@ export default {
     well: 'Includes work physicals',
     mat: 'Medications for opioid use disorder',
     women: 'Includes family planning and gynecological care',
+  },
+  caveats: {
+    'Exclusively serves adolescents and young adults (ages 13-26).':
+      'Exclusively serves adolescents and young adults (ages 13-26).',
+    'Exclusively serves people living with HIV.': 'Exclusively serves people living with HIV.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
+      "Exclusively serves uninsured members of Philadelphia's Latine immigrant community. No work physicals. Services for children are limited to dental, eye care, and mental health.",
+    'Services for children are limited to dental, mental health, and vaccines.':
+      'Services for children are limited to dental, mental health, and vaccines.',
+    'Special focus on LGBTQ+ ': 'Special focus on LGBTQ+',
+    'Special focus on people who are currently or recently homeless, or at risk of homelessness.':
+      'Special focus on people who are currently or recently homeless, or at risk of homelessness.',
   },
   warnings: {
     'This health center only offers HIV and STD/STI testing and treatment; walk-ins only ':

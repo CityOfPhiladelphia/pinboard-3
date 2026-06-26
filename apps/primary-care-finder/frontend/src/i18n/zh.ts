@@ -33,6 +33,7 @@ export default {
   location: '地点',
   transitOptions: '交通选择',
   servicesAvailable: '提供的服务',
+  patientsServed: '服务对象',
   callout: {
     title: '费城的免费、低价医疗护理服务',
     message:
@@ -109,6 +110,9 @@ export default {
     child: '儿童',
     adults: '成人',
     children: '儿童',
+    servesAdults: '为成人提供服务。',
+    servesChildren: '为儿童提供服务。',
+    servesBoth: '为成人和儿童提供服务。',
   },
   patientType: {
     category: '资格',
@@ -268,6 +272,18 @@ export default {
     well: '包括工作体检',
     mat: '针对阿片类药物成瘾的治疗药物',
     women: '包括计划生育和妇科护理',
+  },
+  caveats: {
+    'Exclusively serves adolescents and young adults (ages 13-26).':
+      '仅为青少年和青年（13-26岁）提供服务。',
+    'Exclusively serves people living with HIV.': '仅为艾滋病病毒感染者提供服务。',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
+      '仅为费城拉丁裔移民社区中没有医疗保险的成员提供服务。不提供就业体检。为儿童提供的服务仅限于牙科、眼科和心理健康。',
+    'Services for children are limited to dental, mental health, and vaccines.':
+      '为儿童提供的服务仅限于牙科、心理健康和疫苗接种。',
+    'Special focus on LGBTQ+ ': '特别关注 LGBTQ+',
+    'Special focus on people who are currently or recently homeless, or at risk of homelessness.':
+      '特别关注目前或近期无家可归，或面临无家可归风险的人群。',
   },
   warnings: {
     'This health center only offers HIV and STD/STI testing and treatment; walk-ins only ':
