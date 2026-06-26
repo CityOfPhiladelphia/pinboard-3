@@ -244,6 +244,8 @@ function handleApplyFilter(values: FilterValues) {
     tests: allVisitType.filter((v) => TESTS_SET.has(v)) as TestsFilter[],
     languages: activeKeys(values[filterKeys.languages]) as LanguagesFilter[],
   }
+
+  console.log(filterState.value)
 }
 
 function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
