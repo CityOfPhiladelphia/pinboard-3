@@ -72,7 +72,9 @@ const TESTS_SET = new Set<string>(Object.values(testsOptions))
 
 function activeKeys(map: boolean | Record<string, boolean> | undefined): string[] {
   if (!map || typeof map !== 'object') return []
-  return Object.entries(map).filter(([, v]) => v).map(([k]) => k)
+  return Object.entries(map)
+    .filter(([, v]) => v)
+    .map(([k]) => k)
 }
 
 function toMap(arr: string[]): Record<string, boolean> {
