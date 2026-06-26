@@ -124,6 +124,20 @@ verbatim in all translations. `itemCount` uses vue-i18n plural syntax
   services may be available for walk-ins. Contact the provider for more information." The non-English
   versions are first-pass (AI), each reusing the locale's existing professional `tags.walkIns`
   wording for the "walk-ins" term; confirm with the city translation service.
+- **"Patients served" section (`patientsServed`, `ageRange.serves*`, `caveats.*`) — first-pass
+  translations, verify with the city.** A new detail-panel "Patients served" section shows which
+  age groups a location serves and a focus/limitation caveat from the data. All three pieces are
+  first-pass (AI) in the 9 non-English locales:
+  - `patientsServed` — the section header ("Patients served").
+  - `ageRange.servesAdults` / `servesChildren` / `servesBoth` — "Serves adults." / "Serves
+    children." / "Serves adults and children." (data-derived from the `adults`/`children` fields,
+    mirroring the age-group filter).
+  - `caveats.*` — the 6 distinct `caveat_ad_ch` strings from the database (e.g. HIV-only,
+    LGBTQ+ focus, homeless focus, age-limited, uninsured-immigrant). Keyed by the **exact**
+    English database string (preserving its original whitespace) per the same lookup pattern as
+    `warnings`/`exceptions`; the English value is cleaned, the other locales hold the translation.
+    Untranslated locales fall back to the raw English DB string. New caveat strings added to the
+    data later need a matching key in each locale.
 - **Arabic (`ar`)**: translations exist for the shared-chrome stubs and the app-string stubs, but
   the layout remains left-to-right. RTL mirroring (`dir="rtl"`) is a separate future effort.
 - **Taxonomy reconcile (deferred):** the app catalog currently carries the same content under two

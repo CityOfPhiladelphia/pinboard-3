@@ -67,6 +67,24 @@ const existingOnlyServices = computed<string[]>(() =>
   ).map(([label]) => label)
 )
 
+// Age groups served — mirrors the age-group filter (adults/children === 'Yes').
+const ageGroupServed = computed<string | null>(() => {
+  const servesAdults = p.value.adults === 'Yes'
+  const servesChildren = p.value.children === 'Yes'
+  if (servesAdults && servesChildren) return t('ageRange.servesBoth')
+  if (servesAdults) return t('ageRange.servesAdults')
+  if (servesChildren) return t('ageRange.servesChildren')
+  return null
+})
+
+// One flowing line: the age groups served, then the caveat, as a single sentence.
+const patientsServedText = computed<string>(() => {
+  const parts: string[] = []
+  if (ageGroupServed.value) parts.push(ageGroupServed.value)
+  if (p.value.caveat_ad_ch) parts.push(translateCaveat(p.value.caveat_ad_ch))
+  return parts.join(' ')
+})
+
 // --- Hours ---
 const DAYS = ['mon', 'tues', 'wed', 'thurs', 'fri', 'sat', 'sun'] as const
 const DAY_I18N_KEYS: Record<(typeof DAYS)[number], string> = {
@@ -144,6 +162,11 @@ function translateLanguage(lang: string): string {
 function translateWarning(warning: string): string {
   const msgs = messages.value[locale.value] as Record<string, Record<string, string>>
   return msgs?.warnings?.[warning] ?? warning
+}
+
+function translateCaveat(caveat: string): string {
+  const msgs = messages.value[locale.value] as Record<string, Record<string, string>>
+  return msgs?.caveats?.[caveat] ?? caveat
 }
 
 // --- Transit helpers ---
@@ -279,19 +302,23 @@ function translateTransitList(raw: string | null, category: string): string {
 
       <span class="has-text-label-default">{{ $t('servicesAvailable') }}</span>
 
+      <!-- Patients served -->
+      <section v-if="patientsServedText" class="services-section">
+        <span class="has-text-label-small cell-label">{{ $t('patientsServed') }}</span>
+        <span class="has-text-body-small">{{ patientsServedText }}</span>
+      </section>
+
       <!-- New patient services -->
       <section v-if="newPatientServices.length" class="services-section">
         <span class="has-text-label-small cell-label">{{
           $t('patientType.patient_type_new')
         }}</span>
-        <span class="has-text-body-extra-small">{{
-          $t('patientType.patient_type_new_subtext')
-        }}</span>
-        <div class="service-list">
-          <span v-for="label in newPatientServices" :key="label" class="has-text-body-small">
+        <span class="has-text-body-small">{{ $t('patientType.patient_type_new_subtext') }}</span>
+        <ul class="service-list">
+          <li v-for="label in newPatientServices" :key="label" class="has-text-body-small">
             {{ $t(label) }}
-          </span>
-        </div>
+          </li>
+        </ul>
       </section>
 
       <!-- Existing patient only services -->
@@ -299,33 +326,24 @@ function translateTransitList(raw: string | null, category: string): string {
         <span class="has-text-label-small cell-label">{{
           $t('patientType.patient_type_existing_only')
         }}</span>
-        <span class="has-text-body-extra-small">{{
+        <span class="has-text-body-small">{{
           $t('patientType.patient_type_existing_only_subtext')
         }}</span>
-        <div class="service-list">
-          <span v-for="label in existingOnlyServices" :key="label" class="has-text-body-small">
+        <ul class="service-list">
+          <li v-for="label in existingOnlyServices" :key="label" class="has-text-body-small">
             {{ $t(label) }}
-          </span>
-        </div>
+          </li>
+        </ul>
       </section>
 
       <!-- Tests -->
       <section v-if="tests.length" class="services-section">
         <span class="has-text-label-small cell-label">{{ $t('tests.category') }}</span>
-        <div class="service-list">
-          <span v-for="test in tests" :key="test" class="has-text-body-small">{{
-            $t(test.replace('_', '.'))
-          }}</span>
-        </div>
-      </section>
-
-      <!-- Sliding scale -->
-      <section class="services-section">
-        <span class="has-text-label-small cell-label">{{ $t('slidingScale') }}</span>
-        <span class="has-text-body-small">{{ $t('slidingScaleExplanation') }}</span>
-        <span class="has-text-body-small">{{
-          location.properties.sliding_scale ?? $t('slidingScaleNull')
-        }}</span>
+        <ul class="service-list">
+          <li v-for="test in tests" :key="test" class="has-text-body-small">
+            {{ $t(test.replace('_', '.')) }}
+          </li>
+        </ul>
       </section>
     </div>
   </div>
@@ -404,8 +422,11 @@ function translateTransitList(raw: string | null, category: string): string {
   gap: 0.25rem;
 }
 
+/* Make the bold headers a step larger than the body text below them, so the
+   hierarchy comes from larger headers rather than shrinking the content. */
 .cell-label {
   color: var(--Schemes-On-Surface-Low);
+  font-size: var(--Label-Default-font-label-default-size) !important;
 }
 
 .cell-content {
@@ -429,10 +450,6 @@ function translateTransitList(raw: string | null, category: string): string {
   gap: 0.5rem;
 }
 
-.hours-day {
-  color: var(--Schemes-On-Surface-Low);
-}
-
 .hours-exception {
   display: block;
 }
@@ -441,6 +458,15 @@ function translateTransitList(raw: string | null, category: string): string {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  border-top: 1px solid var(--Schemes-Outline-Variant, rgba(0, 0, 0, 0.12));
+  padding-top: 1.5rem;
+}
+
+/* No divider above the first section — it sits right under the "Services
+   available" heading. */
+.services-section:first-of-type {
+  border-top: none;
+  padding-top: 0;
 }
 
 .warning-callout {
@@ -451,8 +477,18 @@ function translateTransitList(raw: string | null, category: string): string {
 }
 
 .service-list {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-xs);
+  margin: 0;
+  padding-left: 1.5rem;
+  list-style-type: disc;
+}
+
+/* Reset the global ul/li spacing (li gets a large margin-bottom by default). */
+.service-list li {
+  margin: 0;
+  padding: 0;
+}
+
+.service-list li + li {
+  margin-top: var(--spacing-xs);
 }
 </style>

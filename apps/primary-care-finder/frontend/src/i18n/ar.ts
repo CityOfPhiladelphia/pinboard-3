@@ -33,6 +33,7 @@ export default {
   location: 'الموقع',
   transitOptions: 'خيارات النقل',
   servicesAvailable: 'الخدمات المتاحة',
+  patientsServed: 'المرضى المخدومون',
   callout: {
     title: 'رعاية طبية مجانية ومنخفضة التكلفة في فيلادلفيا',
     message:
@@ -110,6 +111,9 @@ export default {
     child: 'طفل',
     adults: 'بالغون',
     children: 'أطفال',
+    servesAdults: 'يخدم البالغين.',
+    servesChildren: 'يخدم الأطفال.',
+    servesBoth: 'يخدم البالغين والأطفال.',
   },
   patientType: {
     category: 'الأهلية',
@@ -272,6 +276,19 @@ export default {
     well: 'يتضمن أعمال بدنية',
     mat: 'أدوية لاضطراب تعاطي الأفيون',
     women: 'يتضمن خدمات الرعاية لتخطيط الأسرة وطب النساء',
+  },
+  caveats: {
+    'Exclusively serves adolescents and young adults (ages 13-26).':
+      'يخدم المراهقين والشباب حصرياً (من سن 13 إلى 26).',
+    'Exclusively serves people living with HIV.':
+      'يخدم حصرياً الأشخاص المتعايشين مع فيروس نقص المناعة البشرية (HIV).',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
+      'يخدم حصرياً أفراد مجتمع المهاجرين اللاتينيين غير المؤمَّن عليهم في فيلادلفيا. لا توجد فحوصات طبية للعمل. الخدمات المقدمة للأطفال تقتصر على طب الأسنان والعناية بالعيون والصحة النفسية.',
+    'Services for children are limited to dental, mental health, and vaccines.':
+      'الخدمات المقدمة للأطفال تقتصر على طب الأسنان والصحة النفسية واللقاحات.',
+    'Special focus on LGBTQ+ ': 'تركيز خاص على مجتمع LGBTQ+',
+    'Special focus on people who are currently or recently homeless, or at risk of homelessness.':
+      'تركيز خاص على الأشخاص الذين يعانون حالياً أو عانوا مؤخراً من التشرد، أو المعرضين لخطر التشرد.',
   },
   warnings: {
     'This health center only offers HIV and STD/STI testing and treatment; walk-ins only ':
