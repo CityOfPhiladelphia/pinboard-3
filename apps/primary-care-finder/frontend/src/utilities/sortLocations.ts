@@ -9,6 +9,7 @@ export function sortLocations(
 ) {
   locations = toValue(locations)
   sortMode = toValue(sortMode)
+  console.log(sortMode)
   switch (
     PinboardUtilities.hasLocationData(currentLocation.value) && !sortMode ? 'distance' : sortMode
   ) {

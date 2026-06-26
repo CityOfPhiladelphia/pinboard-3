@@ -29,6 +29,7 @@ import { IconLocationDot } from '@phila/phila-ui-core/icons'
 import type {
   AgeGroupFilter,
   LanguagesFilter,
+  PrimaryCareFilters,
   PrimaryCareFilterValues,
   PrimaryCareLocation,
   PrimaryCareResponse,
@@ -234,15 +235,16 @@ function handleGeolocateError(error: Error | GeolocationPositionError) {
 }
 
 function handleApplyFilter(values: FilterValues) {
-  const allVisitType = activeKeys(values[filterKeys.visitType])
+  const filters = values as PrimaryCareFilters
+  const allVisitType = activeKeys(filters[filterKeys.visitType])
   filterState.value = {
-    sort: filterState.value.sort,
-    ageGroup: activeKeys(values[filterKeys.ageGroup]) as AgeGroupFilter[],
-    waitTime: activeKeys(values[filterKeys.waitTime]) as WaitTimeFilter[],
+    sort: filters.sort.distance ? 'distance' : filters.sort.name ? 'name' : '',
+    ageGroup: activeKeys(filters[filterKeys.ageGroup]) as AgeGroupFilter[],
+    waitTime: activeKeys(filters[filterKeys.waitTime]) as WaitTimeFilter[],
     visitType: allVisitType.filter((v) => VISIT_TYPE_SET.has(v)) as VisitTypeFilter[],
     specialty: allVisitType.filter((v) => SPECIALTY_SET.has(v)) as SpecialtyFilter[],
     tests: allVisitType.filter((v) => TESTS_SET.has(v)) as TestsFilter[],
-    languages: activeKeys(values[filterKeys.languages]) as LanguagesFilter[],
+    languages: activeKeys(filters[filterKeys.languages]) as LanguagesFilter[],
   }
 
   console.log(filterState.value)
