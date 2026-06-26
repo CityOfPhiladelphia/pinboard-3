@@ -216,3 +216,86 @@ export interface PrimaryCareFilterValues {
   tests: TestsFilter[]
   languages: LanguagesFilter[]
 }
+
+export interface PrimaryCareFilters extends Record<string, Record<string, boolean>> {
+  sort: {
+    distance: boolean
+    name: boolean
+  }
+  ageGroup: {
+    adult: boolean
+    children: boolean
+  }
+  visitType: {
+    blood: boolean
+    covid: boolean
+    dental: boolean
+    eye: boolean
+    mammo: boolean
+    mat: boolean
+    mental: boolean
+    nutrition: boolean
+    pharmacy: boolean
+    podiatry: boolean
+    primaryPrenatal: boolean
+    primarySick: boolean
+    primarySports: boolean
+    primaryTelehealth: boolean
+    primaryVaccines: boolean
+    primaryWell: boolean
+    primaryWomen: boolean
+    sti: boolean
+    tobacco: boolean
+    xray: boolean
+  }
+  waitTime: {
+    sameDay: boolean
+    twoMonths: boolean
+    weekSick: boolean
+    weekWell: boolean
+  }
+  languages: {
+    amharic: boolean
+    arabic: boolean
+    asl: boolean
+    bengali: boolean
+    burmese: boolean
+    cambodian: boolean
+    cantonese: boolean
+    chinese: boolean
+    english: boolean
+    fanta: boolean
+    filipino: boolean
+    french: boolean
+    frenchcreole: boolean
+    fula: boolean
+    gujarati: boolean
+    haitiancreole: boolean
+    hebrew: boolean
+    hindi: boolean
+    indonesian: boolean
+    karen: boolean
+    khmer: boolean
+    kinyarwanda: boolean
+    kirundi: boolean
+    koloqua: boolean
+    korean: boolean
+    lebanese: boolean
+    malayalam: boolean
+    malaysian: boolean
+    mandarin: boolean
+    nepali: boolean
+    portuguese: boolean
+    punjabi: boolean
+    shanghainese: boolean
+    sinhalese: boolean
+    spanish: boolean
+    swahili: boolean
+    tagalog: boolean
+    taiwanese: boolean
+    telugu: boolean
+    urdu: boolean
+    vietnamese: boolean
+    yoruba: boolean
+  }
+}
