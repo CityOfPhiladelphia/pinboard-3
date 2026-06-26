@@ -21,13 +21,12 @@ export default defineConfig({
     rollupOptions: {
       external: (id) => {
         // Allow map-core CSS to be bundled into our output
-        if (id.includes('@phila/phila-ui-map-core') && id.endsWith('.css'))
-          return false
-        if (id.includes('@phila/phila-ui-bottom-sheet') && id.endsWith('.css'))
-          return false
+        if (id.includes('@phila/phila-ui-map-core') && id.endsWith('.css')) return false
+        if (id.includes('@phila/phila-ui-bottom-sheet') && id.endsWith('.css')) return false
         return [
           'vue',
           'vue-router',
+          'vue-i18n',
           '@pinboard/core',
           '@phila/phila-ui-map-core',
           '@phila/phila-ui-bottom-sheet',

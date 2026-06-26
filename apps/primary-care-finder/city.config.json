@@ -7,27 +7,29 @@
   "compliance": [],
   "confidentiality": "low",
   "cdkPath": "./cdk",
+  "packageManager": "pnpm",
   "environments": {
     "dev": {
-      "profile": "OITDevelopers",
+      "profile": "oit-primary-care-cc",
       "vpc": "Development-AWS",
       "certificateARN": "",
       "apiDomain": "",
-      "frontendDomain": ""
+      "frontendDomain": "dev-primary-care.phila.gov"
     },
     "test": {
-      "profile": "OITDevelopers",
+      "profile": "oit-primary-care-cc",
       "vpc": "Development-AWS",
       "certificateARN": "",
       "apiDomain": "",
-      "frontendDomain": ""
+      "frontendDomain": "test-primary-care.phila.gov"
     },
     "prod": {
-      "profile": "OITDevelopers",
-      "vpc": "Default - Dont delete",
+      "profile": "oit-primary-care-cc",
+      "vpc": "ProdCityNetVpc",
       "certificateARN": "",
       "apiDomain": "",
-      "frontendDomain": ""
+      "frontendDomain": "primary-care.phila.gov"
     }
-  }
+  },
+  "frontendBuildCommand": "build-only"
 }

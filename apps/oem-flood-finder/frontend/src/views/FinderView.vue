@@ -3,17 +3,15 @@
 import { computed, ref, watch } from 'vue'
 
 // 3rd party imports
-import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
-import { faLocationDot } from '@fortawesome/pro-solid-svg-icons'
+import { IconGauge, IconCamera, IconLocationDot } from '@phila/phila-ui-core/icons'
 
 // philly ui imports
 // pinboard imports
 import {
-  Pinboard,
+  PinboardBody,
   MapMarker,
   MapIconTextPin,
   MapNavigationControl,
-  GeolocationButton,
   BasemapToggle,
   FillLayer,
   MapCheckboxLegend,
@@ -60,11 +58,12 @@ const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
 const locationFilterMode = ref<Filters>('all')
 const visitedIds = ref(new Set<string>())
 const visibleFloodLayers = ref<FloodLayerId[]>([])
-const { oemLocations, userLocation, isLoading, errorMessage } = useLocations()
+const { oemLocations, isLoading, errorMessage } = useLocations()
+const { userLocation, userLocationState } = PinboardComposables.useUserLocation(true, true)
 const locationSortMode = ref<SortMode>(
-  PinboardUtilities.hasLocationData(userLocation) ? 'DistAsc' : '',
+  ['located', 'watching'].includes(userLocationState.value) ? 'DistAsc' : '',
 )
-const { searchOrUserLocation } = PinboardComposables.userUserAndSearchLocations(
+const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
   userLocation,
   addressCoordinates,
   finishedAddressFetch,
@@ -72,11 +71,9 @@ const { searchOrUserLocation } = PinboardComposables.userUserAndSearchLocations(
   finishedZipFetch,
 )
 
-// conputed refs
-const hasCurrentLocation = computed(() =>
-  PinboardUtilities.hasLocationData(searchOrUserLocation.value),
-)
+const isMobile = PinboardComposables.useIsMobile()
 
+// computed refs
 const currentLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
@@ -155,17 +152,6 @@ function handleSearchSubmit(locationSearchString: string) {
   }
 }
 
-function handleGeolocate(locationData: PinboardTypes.LatLon & { accuracy: number }) {
-  userLocation.value = {
-    latitude: locationData.latitude,
-    longitude: locationData.longitude,
-  }
-}
-
-function handleGeolocateError(error: Error | GeolocationPositionError) {
-  console.log(error)
-}
-
 function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
   onSelect(loc)
 }
@@ -173,10 +159,14 @@ function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
 function handleDeselect(id: string) {
   visitedIds.value.add(id)
 }
+
+function asOemLocation(location: PinboardTypes.BasicLocation) {
+  return location as OemLocation
+}
 </script>
 
 <template>
-  <Pinboard
+  <PinboardBody
     :locations="currentLocations"
     :search-or-user-location="searchOrUserLocation"
     :is-loading="isLoading"
@@ -185,14 +175,16 @@ function handleDeselect(id: string) {
     :location-panel-filter="filterOptions"
     :location-panel-sort="sortLocationsOptions"
     :location-search-mode="locationSearchMode"
-    :location-panel-location-available="hasCurrentLocation"
+    :wait-for-user-location="false"
+    :user-location-state="userLocationState"
+    :is-mobile="isMobile"
     @search="handleSearchSubmit"
     @selected-locations-filter="handleLocationFilterChange"
     @sort-locations-option="handleLocationSortChange"
     @deselect="handleDeselect"
   >
     <template #location-detail="{ location, onClose }">
-      <LocationDetail :location="location as OemLocation" :on-close="onClose" />
+      <LocationDetail :on-close="onClose" :location="asOemLocation(location)" />
     </template>
 
     <template
@@ -200,7 +192,6 @@ function handleDeselect(id: string) {
         hoveredId,
         selectedId,
         zoom,
-        isMobile,
         mobileControlsTarget,
         mobileControlsTargetLeft,
         onHover,
@@ -209,16 +200,7 @@ function handleDeselect(id: string) {
       }"
     >
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />
-      <BasemapToggle
-        position="top-right"
-        :teleport-to="isMobile ? mobileControlsTarget : undefined"
-      />
-      <GeolocationButton
-        :position="isMobile ? 'top-right' : 'bottom-right'"
-        :teleport-to="isMobile ? mobileControlsTarget : undefined"
-        @located="handleGeolocate"
-        @error="handleGeolocateError"
-      />
+      <BasemapToggle position="top-right" :teleport-to="isMobile ? mobileControlsTarget : null" />
 
       <FillLayer
         v-for="id in FLOOD_LAYER_IDS"
@@ -234,7 +216,7 @@ function handleDeselect(id: string) {
         :items="FLOOD_LEGEND_ITEMS"
         position="bottom-left"
         :leave-room-for-controls="false"
-        :teleport-to="isMobile ? mobileControlsTargetLeft : undefined"
+        :teleport-to="isMobile ? mobileControlsTargetLeft : null"
       />
 
       <div v-if="!isLoading">
@@ -245,11 +227,11 @@ function handleDeselect(id: string) {
         >
           <MapIconTextPin
             :zoom="zoom"
-            :icon="isGauge(loc) ? faGauge : faCamera"
+            :icon="isGauge(loc) ? IconGauge : IconCamera"
             :text="
               loc.locationCardInfo.tags?.[1]?.text !== 'No data'
-                ? loc.locationCardInfo.tags?.[1]?.text
-                : undefined
+                ? (loc.locationCardInfo.tags?.[1]?.text ?? '')
+                : ''
             "
             :color-theme="isGauge(loc) ? 'light-primary' : 'light-purple'"
             :hovered="hoveredId === loc.id"
@@ -265,11 +247,11 @@ function handleDeselect(id: string) {
           key="searchOrUserLocation"
           :lng-lat="[searchOrUserLocation.longitude, searchOrUserLocation.latitude]"
         >
-          <MapIconTextPin :zoom="zoom" :icon="faLocationDot" color-theme="light-tertiary" />
+          <MapIconTextPin :zoom="zoom" :icon="IconLocationDot" color-theme="light-tertiary" />
         </MapMarker>
       </div>
     </template>
-  </Pinboard>
+  </PinboardBody>
 </template>
 
 <style scoped>

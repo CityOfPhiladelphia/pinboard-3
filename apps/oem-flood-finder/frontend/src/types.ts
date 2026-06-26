@@ -46,6 +46,8 @@ export type LocationPanelDTO = {
 } & PinboardTypes.BasicLocation
 
 export interface OemFields {
+  /** Flood-API device id, used to fetch readings. Decoupled from the slug `id`. */
+  deviceId: string
   deviceType: DeviceType
   lastUpdated: Date | null
   actionStage: number
@@ -58,24 +60,6 @@ export interface OemFields {
 
 export type OemLocation = PinboardTypes.BasicLocation & OemFields
 
-export interface AwareReadingDTO {
-  validTimeUTC: string
-  gaugeId: string
-  flashFloodIndicator: boolean
-  flashFloodThreshold: number
-  flashFloodDetectionImagingEnabled: boolean
-  gaugeHeight: number
-  gaugeHeightUnit: string
-  isFlooding: boolean
-  rainfall: number
-  rainIntensity: number
-  barometricPressure: number
-  airTemperature: number
-  waterTemperature: number
-  floodImpacts: FloodImpact[]
-  floodEvents: Flood[]
-}
-
 export interface UsgsReadingDTO {
   validTimeUTC: string
   gaugeId: string
@@ -85,6 +69,24 @@ export interface UsgsReadingDTO {
   floodImpacts: FloodImpact[]
   floodEvents: Flood[]
 }
+
+export interface AwareReadingDTO extends UsgsReadingDTO {
+  flashFloodIndicator: boolean
+  flashFloodThreshold: number
+  flashFloodDetectionImagingEnabled: boolean
+  rainfall: number
+  rainIntensity: number
+  barometricPressure: number
+  airTemperature: number
+  waterTemperature: number
+}
+
+export type ReadingState =
+  | { kind: 'Loading' }
+  | { kind: 'Loaded'; gaugeType: 'Aware'; data: AwareReadingDTO[] }
+  | { kind: 'Loaded'; gaugeType: 'Usgs'; data: UsgsReadingDTO[] }
+  | { kind: 'Error'; message: string }
+  | { kind: 'No Call Needed' }
 
 export type Filters = 'all' | 'gauges' | 'cameras'
 

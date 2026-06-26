@@ -1,24 +1,17 @@
 <script setup lang="ts">
 // vue imports
-import {
-  useSlots,
-  inject,
-  ref,
-  computed,
-  onMounted,
-  onUnmounted,
-  watch,
-} from 'vue'
+import { useSlots, inject, ref, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 // 3rd party imports
-import { faMap } from '@fortawesome/pro-solid-svg-icons'
+import { IconMap } from '@phila/phila-ui-core/icons'
 
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
-import { MapCard } from '@phila/phila-ui-cards'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
-import { Search } from '@phila/phila-ui-search'
+import { MapCard } from '@phila/phila-ui-cards'
 
 // import pinboard config
 import { PINBOARD_CONFIG_KEY } from '../plugin'
@@ -26,11 +19,11 @@ import { PINBOARD_CONFIG_KEY } from '../plugin'
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
-import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
-import SearchSuggestions from './SearchSuggestions.vue'
+import { FilterChipGroup } from '@phila/phila-ui-filter-chip'
+import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
-// pinboard composables imports
-import { useSearchSuggestions } from '../composables/useSearchSuggestions'
+// pinboard composables and utilities imports
+import { hasLocationData } from '../utilities/hasLocationData'
 
 // type imports
 import type {
@@ -39,23 +32,21 @@ import type {
   LocationFilterOption,
   SearchMode,
   SortLocationsOptions,
+  UserLocationState,
 } from '../types'
-import { hasLocationData } from '../utilities/hasLocationData'
+import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 
 // slots
 defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
-  'location-detail'?(props: {
-    location: BasicLocation
-    onClose: () => void
-  }): unknown
+  'location-card'?(props: { location: BasicLocation }): unknown
+  'location-detail'?(props: { location: BasicLocation; onClose: () => void }): unknown
   'map-content'?(props: {
     locations: BasicLocation[]
     geojson: unknown
     map: unknown
     zoom: number
-    isMobile: boolean
     hoveredId: string | null
     selectedId: string | null
     mobileControlsTarget: HTMLDivElement | null
@@ -67,18 +58,35 @@ defineSlots<{
 }>()
 
 // props
-const props = defineProps<{
-  locations: BasicLocation[]
-  searchOrUserLocation: LatLon
-  isLoading: boolean
-  errorMessage: string | null
-  locationPanelFilter?: LocationFilterOption[]
-  locationPanelSearch?: string
-  locationPanelSort?: SortLocationsOptions
-  locationSearchMode?: SearchMode
-  locationPanelLocationAvailable?: boolean
-  geojson?: unknown
-}>()
+const props = withDefaults(
+  defineProps<{
+    locations: BasicLocation[]
+    isMobile: boolean
+    errorMessage: string | null
+    searchOrUserLocation: LatLon
+    isLoading: string | false
+    waitForUserLocation?: boolean
+    userLocationState?: UserLocationState
+    locationPanelFilter?: LocationFilterOption[]
+    locationPanelSearch?: string
+    locationPanelSort?: SortLocationsOptions
+    locationSearchMode?: SearchMode
+    geojson?: unknown
+    filters?: FilterDefinition[]
+    filterValues?: FilterValues
+  }>(),
+  {
+    waitForUserLocation: false,
+    userLocationState: 'unknown',
+    locationPanelFilter: undefined,
+    locationPanelSearch: undefined,
+    locationPanelSort: undefined,
+    locationSearchMode: undefined,
+    geojson: undefined,
+    filters: undefined,
+    filterValues: undefined,
+  }
+)
 
 // emits to parent app to handle
 const emit = defineEmits<{
@@ -86,22 +94,24 @@ const emit = defineEmits<{
   selectedLocationsFilter: [filter: string]
   sortLocationsOption: [sort: string]
   deselect: [locationId: string]
+  'update:filterValues': [value: FilterValues]
 }>()
+
+const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 
 // component variables
 const snapPoints = [15, 50, 100]
-let mql: MediaQueryList | null = null
 const config = inject(PINBOARD_CONFIG_KEY)
+// Mobile: chips render under the on-map search bar when 'map', else in the bottom sheet.
+const chipsOnMap = computed(() => config?.mobileFilterPlacement === 'map')
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const slots: Record<string, any> = useSlots()
 
 // refs
-const isMobile = ref(
-  typeof window !== 'undefined' &&
-    window.matchMedia('(max-width: 768px)').matches
-)
-const hoveredLocationId = ref<string | null>(null)
-const selectedLocation = ref<BasicLocation | null>(null)
+const hoveredLocationId = ref<string | undefined>(undefined)
+const selectedLocation = ref<BasicLocation | undefined>(undefined)
 const bottomSheetOpen = ref(true)
 const bottomSheetRef = ref<{
   snapTo: (index: number) => void
@@ -113,25 +123,15 @@ const mobileControlsTargetLeft = ref<HTMLDivElement | null>(null)
 const locationsPanelRef = ref<{
   scrollToCard: (id: string, behavior?: ScrollBehavior) => void
 } | null>(null)
-const mapPanelRef = ref<{ panTo: (lngLat: [number, number]) => void } | null>(
-  null
-)
+const mapPanelRef = ref<{ panTo: (coordinates: LatLon) => void } | null>(null)
 const searchString = ref<string>('')
-const { searchSuggestions, dismissSuggestions } =
-  useSearchSuggestions(searchString)
-const mobileSearchWrapperRef = ref<HTMLElement | null>(null)
-const mobileSuggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(
-  null
-)
+// filter state
+const allFiltersOpen = ref(false)
 
 // computed refs
-const bottomSheetPercent = computed(
-  () => bottomSheetRef.value?.displayPercent ?? snapPoints[0]
-)
+const bottomSheetPercent = computed(() => bottomSheetRef.value?.displayPercent ?? snapPoints[0])
 
-const bottomSheetDragging = computed(
-  () => bottomSheetRef.value?.isDragging ?? false
-)
+const bottomSheetDragging = computed(() => bottomSheetRef.value?.isDragging ?? false)
 
 const mobileControlsStyle = computed(() => {
   const percent = bottomSheetPercent.value
@@ -139,27 +139,72 @@ const mobileControlsStyle = computed(() => {
   return {
     bottom: `calc(${percent}% + 10px)`,
     opacity,
-    transition: bottomSheetDragging.value
-      ? 'none'
-      : 'bottom 0.3s ease-out, opacity 0.3s ease-out',
+    transition: bottomSheetDragging.value ? 'none' : 'bottom 0.3s ease-out, opacity 0.3s ease-out',
   }
 })
 
 const selectedLocationId = computed(() =>
-  selectedLocation.value === null ? null : selectedLocation.value.id
+  selectedLocation.value === undefined ? undefined : selectedLocation.value.id
 )
 
 const locationCountLabel = computed(() => {
-  const n = props.locations.length
-  if (n === 0) return 'No locations match'
-  return `${n} item${n > 1 ? 's' : ''}`
+  const message = props.locations.length
+    ? t('pinboard.itemCount', { count: props.locations.length }, props.locations.length)
+    : t('pinboard.noLocations')
+  return props.isLoading || message
 })
 
 // watchers
 watch(selectedLocation, (loc) => {
-  if (loc && isMobile.value) {
-    bottomSheetRef.value?.snapTo(snapPoints.length - 1)
+  if (loc) {
+    // Mutual exclusion: the detail panel and the filter panel share the left
+    // slot, so selecting a location closes the filter panel. Covers every
+    // selection path (map click, list click, URL/back-forward nav).
+    allFiltersOpen.value = false
+    if (props.isMobile) {
+      bottomSheetRef.value?.snapTo(snapPoints.length - 1)
+    }
   }
+})
+
+// Defensive: enforce the "one left panel at a time" invariant in state. Not
+// reachable in the current UI (an open detail overlay covers the Filters
+// button), but keeps the invariant if the structural cleanup (bead
+// pinboard-3-nag) later makes filters reachable with a detail open. Desktop
+// only: on mobile the filter panel is full-screen and leaving the detail in
+// state returns the user to it when the filters close.
+watch(allFiltersOpen, (open) => {
+  if (open && !props.isMobile) {
+    handleCloseLocationDetail()
+  }
+})
+
+// Reflect the selected location in the URL as ?location=<id>. push (not replace) so Back walks
+// the selection history. Guarded so it never re-pushes a value the URL already has — that guard
+// is also what stops it looping with the route → selection watcher below.
+watch(selectedLocationId, (id) => {
+  const desired = id ?? undefined
+  if (route.query.location === desired) return
+  const query = { ...route.query }
+  if (desired === undefined) delete query.location
+  else query.location = desired
+  router.push({ query })
+})
+
+// The URL is the source of truth for selection. Resolve ?location= against the loaded locations:
+// on initial mount (immediate), when the data finishes loading, and on Back/Forward. An absent or
+// unknown id clears the selection (graceful). Direct set (not selectLocation) so it doesn't re-push;
+// it also intentionally skips the deselect/visited-tracking emit — URL-driven nav doesn't mark visited.
+function resolveLocationFromRoute() {
+  const param = route.query.location
+  const id = typeof param === 'string' ? param : undefined
+  if (id === selectedLocationId.value) return
+  const match = id ? props.locations.find((loc) => loc.id === id) : undefined
+  selectedLocation.value = match ?? undefined
+  if (match) mapPanelRef.value?.panTo(match)
+}
+watch([() => route.query.location, () => props.locations], resolveLocationFromRoute, {
+  immediate: true,
 })
 
 watch(
@@ -170,10 +215,10 @@ watch(
       props.locationSearchMode &&
       ['address', 'zipcode'].includes(props.locationSearchMode)
     ) {
-      mapPanelRef.value?.panTo([newLocation.longitude, newLocation.latitude])
+      mapPanelRef.value?.panTo(newLocation)
     }
   },
-  { deep: true }
+  { deep: 1 }
 )
 
 // event handlers
@@ -182,7 +227,7 @@ function handleHover(id: string) {
 }
 
 function handleHoverEnd() {
-  hoveredLocationId.value = null
+  hoveredLocationId.value = undefined
 }
 
 function selectLocation(location: BasicLocation) {
@@ -196,7 +241,7 @@ function selectLocation(location: BasicLocation) {
 
 function handleSelect(location: BasicLocation) {
   selectLocation(location)
-  mapPanelRef.value?.panTo([location.longitude, location.latitude])
+  mapPanelRef.value?.panTo(location)
 }
 
 function handleMapSelect(location: BasicLocation) {
@@ -222,35 +267,6 @@ function handleSearchChange(search: string) {
   }
 }
 
-function handleSuggestionSelect(suggestion: string) {
-  dismissSuggestions()
-  searchString.value = suggestion
-  emit('search', suggestion)
-  focusMobileSearchInput()
-}
-
-function handleMobileSearchKeydown(event: KeyboardEvent) {
-  const target = event.target as HTMLElement
-  if (
-    event.key === 'ArrowDown' &&
-    searchSuggestions.value.length &&
-    target.tagName === 'INPUT'
-  ) {
-    event.preventDefault()
-    mobileSuggestionsRef.value?.focusFirst()
-  }
-}
-
-function handleSuggestionDismiss() {
-  focusMobileSearchInput()
-}
-
-function focusMobileSearchInput() {
-  const input =
-    mobileSearchWrapperRef.value?.querySelector<HTMLElement>('input')
-  input?.focus()
-}
-
 function handleSearchSubmit() {
   emit('search', searchString.value)
 }
@@ -261,7 +277,7 @@ function handleCloseLocationDetail() {
     emit('deselect', closedId)
   }
 
-  if (isMobile.value && closedId) {
+  if (props.isMobile && closedId) {
     bottomSheetRef.value?.snapTo(1)
     // Re-center the card in the shrunken list viewport AFTER the sheet
     // snap animation finishes. Keep the list hidden (selectedLocation
@@ -269,27 +285,16 @@ function handleCloseLocationDetail() {
     // drift, then reveal at the correct position via an instant scroll.
     setTimeout(() => {
       locationsPanelRef.value?.scrollToCard(closedId, 'instant')
-      selectedLocation.value = null
+      selectedLocation.value = undefined
     }, 350)
   } else {
-    selectedLocation.value = null
+    selectedLocation.value = undefined
   }
 }
 
-function handleMediaChange(e: MediaQueryListEvent) {
-  isMobile.value = e.matches
+function handleApplyFilter(value: FilterValues) {
+  emit('update:filterValues', value)
 }
-
-// lifecycle functions
-onMounted(() => {
-  mql = window.matchMedia('(max-width: 768px)')
-  isMobile.value = mql.matches
-  mql.addEventListener('change', handleMediaChange)
-})
-
-onUnmounted(() => {
-  mql?.removeEventListener('change', handleMediaChange)
-})
 
 // utility functions
 const effectiveMapConfig = (() => {
@@ -299,7 +304,7 @@ const effectiveMapConfig = (() => {
   const map = config?.map
   if (!map) return map
   const { mobile, ...base } = map
-  if (isMobile.value && mobile) {
+  if (props.isMobile && mobile) {
     return { ...base, ...mobile }
   }
   return base
@@ -307,7 +312,7 @@ const effectiveMapConfig = (() => {
 </script>
 
 <template>
-  <div v-if="selectedLocation !== null" class="detail-overlay">
+  <div v-if="selectedLocation !== undefined && !isMobile" class="detail-overlay">
     <slot
       name="location-detail"
       :location="selectedLocation"
@@ -318,34 +323,54 @@ const effectiveMapConfig = (() => {
     <div class="finder-panel-locations">
       <slot name="locations-header" />
 
-      <div v-if="isLoading" class="location-list">
-        <MapCard v-for="n in 5" :key="n" :is-loading="true" />
-      </div>
-
-      <div
-        v-else-if="errorMessage"
-        class="status-message status-message--error"
-      >
+      <div v-if="errorMessage" class="status-message status-message--error">
         {{ errorMessage }}
       </div>
 
-      <LocationsPanel
-        v-else-if="!isLoading"
-        :locations="locations"
-        :location-filter="locationPanelFilter"
-        :location-search="locationPanelSearch"
-        :location-sort="locationPanelSort"
-        :location-available="locationPanelLocationAvailable"
-        :hovered-id="hoveredLocationId"
-        :selected-id="selectedLocationId"
-        @select="handleSelect"
-        @hover="handleHover"
-        @hover-end="handleHoverEnd"
-        @search-string="handleSearchChange"
-        @search="handleSearchSubmit"
-        @selected-filter="handleLocationFilterChange"
-        @sort-option="handleLocationSortChange"
-      />
+      <div v-if="isLoading" class="loading-list">
+        <MapCard v-for="n in 5" :key="n" :is-loading="true" />
+      </div>
+
+      <Teleport v-else-if="!isLoading" to="#locations-panel-mobile" :disabled="!isMobile">
+        <LocationsPanel
+          ref="locationsPanelRef"
+          :locations="locations"
+          :location-filter="locationPanelFilter"
+          :location-search="locationPanelSearch"
+          :location-sort="locationPanelSort"
+          :user-location-state="userLocationState"
+          :wait-for-user-location="waitForUserLocation"
+          :hovered-id="hoveredLocationId"
+          :selected-id="selectedLocationId"
+          :is-mobile="isMobile"
+          @select="handleSelect"
+          @hover="handleHover"
+          @hover-end="handleHoverEnd"
+          @search-string="handleSearchChange"
+          @search="handleSearchSubmit"
+          @selected-filter="handleLocationFilterChange"
+          @sort-option="handleLocationSortChange"
+        >
+          <template v-if="filters" #below-search>
+            <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
+              <div class="filter-chip-bar">
+                <FilterChipGroup
+                  :filters="filters"
+                  :model-value="filterValues"
+                  color="white"
+                  filter-button
+                  :elevated="isMobile && chipsOnMap"
+                  @update:model-value="handleApplyFilter"
+                  @open-filters="allFiltersOpen = true"
+                />
+              </div>
+            </Teleport>
+          </template>
+          <template v-if="$slots['location-card']" #location-card="{ location }">
+            <slot name="location-card" :location="location" />
+          </template>
+        </LocationsPanel>
+      </Teleport>
     </div>
 
     <div class="finder-panel-map">
@@ -377,82 +402,37 @@ const effectiveMapConfig = (() => {
         class="mobile-controls-float-left"
         :style="mobileControlsStyle"
       />
-      <div
-        ref="mobileSearchWrapperRef"
-        class="mobile-map-search-filter"
-        @keydown="handleMobileSearchKeydown"
-      >
-        <Search
-          v-if="locationPanelSearch"
-          v-model="searchString"
-          class-name="mobile-search"
-          :placeholder="locationPanelSearch"
-          @update:model-value="handleSearchChange"
-          @search="handleSearchSubmit"
-        />
-        <SearchSuggestions
-          ref="mobileSuggestionsRef"
-          :suggestions="searchSuggestions"
-          @select="handleSuggestionSelect"
-          @dismiss="handleSuggestionDismiss"
-        />
-        <LocationSearchFilterPanel
-          v-if="locationPanelFilter"
-          :filter-options="locationPanelFilter"
-          :location-available="locationPanelLocationAvailable"
-          @selected-filter="handleLocationFilterChange"
-        />
-      </div>
+      <div id="mobile-map-search-filter" class="mobile-map-search-filter"></div>
+    </div>
+
+    <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
+      <FilterPanel
+        v-if="allFiltersOpen"
+        :filters="filters"
+        :model-value="filterValues"
+        :full-screen="isMobile"
+        @update:model-value="handleApplyFilter"
+        @close="allFiltersOpen = false"
+      />
     </div>
   </div>
   <BottomSheet
     ref="bottomSheetRef"
     v-model="bottomSheetOpen"
     :snap-points="snapPoints"
-    :collapse-label="selectedLocation ? undefined : 'Map view'"
-    :collapse-icon="selectedLocation ? undefined : faMap"
+    :collapse-label="selectedLocation ? '' : t('pinboard.mapView')"
+    :collapse-icon="selectedLocation ? undefined : IconMap"
     class="mobile-bottom-sheet"
   >
     <div class="bottom-sheet-stack">
-      <div
-        class="bottom-sheet-list-scroll"
-        :class="{ 'is-hidden': selectedLocation }"
-      >
+      <div class="bottom-sheet-list-scroll" :class="{ 'is-hidden': selectedLocation }">
         <slot name="locations-header" />
-        <div v-if="!isLoading && !errorMessage" class="location-sheet-header">
+        <div class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
-          <LocationSearchFilterPanel
-            v-if="locationPanelSort"
-            :sort-options="locationPanelSort"
-            :location-available="locationPanelLocationAvailable"
-            @sort-option="handleLocationSortChange"
-          />
+          <div id="bottom-sheet-sort"></div>
         </div>
 
-        <div v-if="isLoading" class="location-list">
-          <MapCard v-for="n in 5" :key="n" :is-loading="true" />
-        </div>
-
-        <div
-          v-else-if="errorMessage"
-          class="status-message status-message--error"
-        >
-          {{ errorMessage }}
-        </div>
-
-        <LocationsPanel
-          v-else
-          ref="locationsPanelRef"
-          :locations="locations"
-          :location-filter="locationPanelFilter"
-          :location-search="locationPanelSearch"
-          :hovered-id="hoveredLocationId"
-          :selected-id="selectedLocationId"
-          @select="handleSelect"
-          @hover="handleHover"
-          @hover-end="handleHoverEnd"
-          @selected-filter="handleLocationFilterChange"
-        />
+        <div id="locations-panel-mobile"></div>
       </div>
 
       <div v-if="selectedLocation" class="bottom-sheet-detail">
@@ -466,26 +446,13 @@ const effectiveMapConfig = (() => {
   </BottomSheet>
 </template>
 
-<style>
-.phila-navbar .phila-mobile-nav .nav-flyout {
-  flex: 0 0 25rem;
-  max-width: 25rem;
-  height: calc(100dvh - var(--nav-bottom));
-}
-
-.phila-navbar .phila-mobile-nav .nav-flyout .p-4 {
-  display: flex;
-  flex-direction: column;
-  row-gap: var(--spacing-m);
-}
-</style>
-
 <style scoped>
 .finder-panel {
   display: grid;
   grid-template-columns: 1fr 2fr;
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
 .finder-panel-locations {
@@ -499,14 +466,14 @@ const effectiveMapConfig = (() => {
   color: var(--Schemes-Error, #b3261e);
 }
 
-.finder-panel-locations > :deep(.location-list),
-.finder-panel-locations > .location-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
+.loading-list {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
   gap: 0.75rem;
+  padding: 0.5rem 1rem 1rem 1rem;
+  scrollbar-width: none;
 }
 
 .finder-panel-map {
@@ -522,15 +489,7 @@ const effectiveMapConfig = (() => {
   font-weight: 700;
 }
 
-.bottom-sheet-list-scroll :deep(.location-list) {
-  padding-top: 0.5rem;
-}
-
 .mobile-bottom-sheet {
-  display: none;
-}
-
-.mobile-map-search-filter {
   display: none;
 }
 
@@ -595,14 +554,32 @@ const effectiveMapConfig = (() => {
   height: auto;
 }
 
-@media (max-width: 768px) {
+.filter-chip-bar {
+  padding: 0.5rem 0;
+}
+
+.all-filters-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  /* Match the locations panel: the 1fr of the finder's `1fr 2fr` grid = 1/3. */
+  width: calc(100% / 3);
+  z-index: 12;
+  background: var(--Schemes-Surface-Bright, #fff);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  display: none;
+}
+
+.all-filters-overlay.open {
+  display: block;
+}
+
+/* Keep in sync with the matchMedia query in useIsMobile.ts */
+@media (max-width: 768px), (max-width: 1064px) and (max-height: 600px) {
   .finder-panel {
     position: relative;
     display: block;
-  }
-
-  .finder-panel-locations {
-    display: none;
   }
 
   .finder-panel-map {
@@ -651,40 +628,13 @@ const effectiveMapConfig = (() => {
     left: 0;
     right: 0;
     z-index: 2;
-    padding: 10px 24px;
+    padding: 10px 0;
   }
 
-  .mobile-map-search-filter :deep(.mobile-search) {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .mobile-map-search-filter :deep(.mobile-search .state-layer),
-  .mobile-map-search-filter :deep(.mobile-search .content) {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
-  .mobile-map-search-filter :deep(.mobile-search .phila-text-field) {
-    padding: 0 var(--scale-small, 0.5rem) !important;
-  }
-
-  .mobile-map-search-filter :deep(.location-filters) {
-    padding: 0.25rem 0 0;
-    padding-left: 2px;
-    gap: 0.25rem;
-  }
-
-  .mobile-map-search-filter :deep(.location-sort) {
-    display: none;
-  }
-
-  .mobile-bottom-sheet :deep(.location-filters),
-  .mobile-bottom-sheet :deep(.location-search) {
-    display: none;
-  }
-
-  .detail-overlay {
+  /* Mobile: FilterPanel renders its own full-screen takeover (teleported to
+     <body>, above the header). The desktop slide-over wrapper is inert here —
+     the v-if'd FilterPanel still mounts and teleports itself out. */
+  .all-filters-overlay.open {
     display: none;
   }
 }

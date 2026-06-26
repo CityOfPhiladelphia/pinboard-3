@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:fresh": "vite --force",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
@@ -15,13 +16,15 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@fortawesome/free-solid-svg-icons": "^7.1.0",
-    "@phila/phila-ui-button": "2.2.3-beta.2",
+    "@phila/phila-ui-button": "2.3.0-beta.9",
+    "@phila/phila-ui-core": "3.0.0-beta.8",
+    "@phila/phila-ui-tags": "0.1.0-beta.9",
+    "@phila/phila-ui-tooltip": "0.1.0-beta.8",
     "@pinboard/ui": "workspace:*",
     "date-fns": "^4.1.0",
-    "vue": "^3.5.33",
-    "vue-i18n": "^11.0.1",
-    "vue-router": "^5.0.6"
+    "vue": "catalog:",
+    "vue-i18n": "catalog:",
+    "vue-router": "catalog:"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
@@ -29,6 +32,7 @@
     "@vitejs/plugin-vue": "^6.0.3",
     "npm-run-all2": "^8.0.4",
     "typescript": "^6.0.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vite-plugin-vue-devtools": "^8.0.5"
   }
 }

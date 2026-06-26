@@ -11,7 +11,7 @@ export const viteJsConfig = [
   js.configs.recommended,
   ...tseslint.configs.strict,
   {
-    files: ['**/*.{js,ts,vue}'],
+    files: ['**/*.{js,mjs,ts,vue}'],
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: 'module',
@@ -26,10 +26,7 @@ export const viteJsConfig = [
       },
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        { argsIgnorePattern: '^_' },
-      ],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'no-undef': 'off',
     },
   },

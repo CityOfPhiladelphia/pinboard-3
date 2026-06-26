@@ -1,5 +1,5 @@
 import { type Ref, ref, toValue, watch } from 'vue'
-import type { AisAutocompleteResult } from '../types'
+import type { ProxyAutocompleteResult } from '../types'
 
 export function useSearchSuggestions(search: string | Ref<string>) {
   const searchSuggestions = ref<string[]>([])
@@ -7,23 +7,19 @@ export function useSearchSuggestions(search: string | Ref<string>) {
   let skipNextFetch = false
 
   async function getSearchSuggestions(stringValue: string) {
-    if (!stringValue || stringValue.length < 3) {
+    if (!stringValue || !/^(?:\d{1,5}(?:-\d{1,5})?[A-Za-z]{0,3} \w+)/.test(stringValue)) {
       searchSuggestions.value = []
       return
     }
-
     try {
       const response = await fetch(
-        `https://ais-autocomplete.citygeo.phila.city/autocomplete?q=${stringValue.replace(/ /, '+')}`
+        `https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/autocomplete?q=${encodeURIComponent(stringValue)}&simple=true${import.meta.env.DEV ? `&client_id=${import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD}` : ''}`
       )
-      const suggestions: AisAutocompleteResult = await response.json()
-      const suggestedAddresses = suggestions.count
-        ? Array.from(
-            suggestions.results.addresses,
-            (suggestion) => suggestion.address
-          )
-        : []
-      searchSuggestions.value = suggestedAddresses
+      if (!response.ok) {
+        searchSuggestionsError.value = { status: response.status, message: response.body }
+        return
+      }
+      searchSuggestions.value = (await response.json()) as ProxyAutocompleteResult
     } catch (err) {
       searchSuggestionsError.value = err
     }
@@ -32,6 +28,14 @@ export function useSearchSuggestions(search: string | Ref<string>) {
   function dismissSuggestions() {
     skipNextFetch = true
     searchSuggestions.value = []
+  }
+
+  function hideSuggestions() {
+    searchSuggestions.value = []
+  }
+
+  function refetchSuggestions() {
+    getSearchSuggestions(toValue(search))
   }
 
   watch(
@@ -45,5 +49,11 @@ export function useSearchSuggestions(search: string | Ref<string>) {
     }
   )
 
-  return { searchSuggestions, searchSuggestionsError, dismissSuggestions }
+  return {
+    searchSuggestions,
+    searchSuggestionsError,
+    dismissSuggestions,
+    hideSuggestions,
+    refetchSuggestions,
+  }
 }

@@ -1,15 +1,12 @@
 import { ref, computed, onBeforeMount, type Ref, type ComputedRef } from 'vue'
-import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
+import { IconWater, IconCamera } from '@phila/phila-ui-core/icons'
+import { PinboardUtilities } from '@pinboard/ui'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 import type { LocationPanelDTO, OemLocation } from '@/types'
-import { PinboardComposables, PinboardUtilities, type PinboardTypes } from '@pinboard/ui'
-
-const { userLocation, userLocationPermission } = PinboardComposables.useUserLocation()
 
 export function useLocations(): {
   oemLocations: Ref<OemLocation[]>
-  userLocation: Ref<PinboardTypes.LatLon>
-  isLoading: ComputedRef<boolean>
+  isLoading: ComputedRef<string | false>
   errorMessage: Ref<string | null>
 } {
   const oemLocations = ref<OemLocation[]>([])
@@ -17,20 +14,25 @@ export function useLocations(): {
   const hasData = ref<boolean>(false)
 
   const isLoading = computed(() => {
-    // if has has location services active, isLoading will remain true while resolving user location
-    // return !(
-    //   hasData.value &&
-    //   (userLocationPermission.value === 'denied' || PinboardUtilities.hasLocationData(userLocation))
-    // )
+    if (!hasData.value) {
+      return 'Loading data...'
+    }
     return false
   })
 
   onBeforeMount(async () => {
-    const locations: LocationPanelDTO[] =
-      import.meta.env.DEV || true
-        ? await getLocationsDev(errorMessage)
-        : await getLocationsProxy(errorMessage)
+    const locations: LocationPanelDTO[] = import.meta.env.DEV
+      ? await getLocationsDev(errorMessage)
+      : await getLocationsProxy(errorMessage)
+    const seenSlugs = new Map<string, number>()
     oemLocations.value = Array.from(locations, (loc) => {
+      // Stable, readable id from the name for selection + ?location= deep-links. The flood-API
+      // device id (loc.id, used to fetch readings) is kept separately as deviceId.
+      const base = PinboardUtilities.slugify(loc.name) || 'location'
+      const n = seenSlugs.get(base) ?? 0
+      seenSlugs.set(base, n + 1)
+      const id = n === 0 ? base : `${base}-${n + 1}`
+
       const cardInfo: MapCardProps = {
         heading: loc.name,
         subheader: undefined,
@@ -39,7 +41,8 @@ export function useLocations(): {
       }
 
       const oemLocation: OemLocation = {
-        id: loc.id,
+        id,
+        deviceId: loc.id,
         name: loc.name,
         latitude: loc.latitude,
         longitude: loc.longitude,
@@ -58,29 +61,29 @@ export function useLocations(): {
     hasData.value = true
   })
 
-  return { oemLocations, userLocation, isLoading, errorMessage }
+  return { oemLocations, isLoading, errorMessage }
 }
 
 function getLocationTags(loc: LocationPanelDTO): NonNullable<MapCardProps['tags']> {
   if (loc.deviceType === 'Camera') {
-    return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
+    return [{ text: 'Camera', color: 'purple' as const, icon: IconCamera }]
   }
   const gaugeValue =
     Number.isNaN(loc.gaugeHeight) || loc.gaugeHeight === -9999.9
       ? 'No data'
       : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
-  return [{ text: 'Gauge', color: 'blue' as const, iconDefinition: faWater }, { text: gaugeValue }]
+  return [{ text: 'Gauge', color: 'blue' as const, icon: IconWater }, { text: gaugeValue }]
 }
 
 async function getLocationsProxy(errorMessageRef: Ref) {
   const response = await fetch(
-    'https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/getOemLocations',
+    'https://haydr3k097.execute-api.us-east-1.amazonaws.com/getOemLocations',
   )
   if (!response.ok) {
     errorMessageRef.value = 'Error retrieving gauges'
     return
   }
-  return response.json()
+  return await response.json()
 }
 
 async function getLocationsDev(errorMessageRef: Ref) {
@@ -97,5 +100,5 @@ async function getLocationsDev(errorMessageRef: Ref) {
     errorMessageRef.value = 'Error retrieving gauges'
     return
   }
-  return response.json()
+  return await response.json()
 }

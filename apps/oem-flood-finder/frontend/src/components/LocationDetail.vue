@@ -7,7 +7,7 @@ import { useLocationDetail } from '@/composables/useLocationDetail'
 import { CloseButton } from '@phila/phila-ui-button'
 import { Tags } from '@phila/phila-ui-tags'
 import { Icon } from '@phila/phila-ui-core'
-import { faClock, faCompass } from '@fortawesome/pro-solid-svg-icons'
+import { IconCompass, IconClock } from '@phila/phila-ui-core/icons'
 
 const props = defineProps<{
   location: OemLocation
@@ -15,7 +15,7 @@ const props = defineProps<{
 }>()
 
 const readingState = useLocationDetail(
-  () => props.location.id,
+  () => props.location.deviceId,
   () => props.location.deviceType,
 )
 
@@ -55,7 +55,7 @@ const lastUpdatedDate = computed(() => {
         <h4 v-if="location.deviceType === 'Aware' || location.deviceType === 'Usgs'">
           {{ location.name }}
         </h4>
-        <h2 v-else-if="location.deviceType === 'Camera'">{{ location.name }}</h2>
+        <h4 v-else-if="location.deviceType === 'Camera'">{{ location.name }}</h4>
         <Tags v-if="gaugeHeight" size="large" color="blue" variant="readonly" :text="gaugeHeight" />
       </div>
 
@@ -73,7 +73,7 @@ const lastUpdatedDate = computed(() => {
 
         <div class="gauge-information" style="padding: var(--spacing-s) 0 0 0">
           <div>
-            <Icon :iconDefinition="faClock" size="extra-small" />
+            <Icon :icon="IconClock" size="extra-small" />
             <div style="margin-left: var(--spacing-s)">
               <div class="has-text-label-small" style="color: #666">Last Updated</div>
               <div class="has-text-body-small">{{ lastUpdatedDate }}</div>
@@ -81,7 +81,7 @@ const lastUpdatedDate = computed(() => {
           </div>
 
           <div>
-            <Icon :iconDefinition="faCompass" size="extra-small" />
+            <Icon :icon="IconCompass" size="extra-small" />
             <div style="margin-left: var(--spacing-s)">
               <div class="has-text-label-small" style="color: #666">Coordinates</div>
               <div class="has-text-body-small">

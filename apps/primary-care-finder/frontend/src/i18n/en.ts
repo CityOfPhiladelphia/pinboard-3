@@ -1,4 +1,34 @@
 export default {
+  tags: {
+    openNow: 'Open now',
+    closed: 'Closed',
+    checkHours: 'Check hours',
+    weekendHours: 'Weekend hours',
+    openAfter6: 'Open after 6pm',
+    walkIns: 'Walk-ins available',
+    telehealth: 'Telehealth',
+    parking: 'Parking on site',
+    pharmacy: 'Pharmacy on site',
+    adultCare: 'Adult care',
+    pediatrics: 'Pediatrics',
+    multipleLanguages: 'Multiple languages',
+    todayClosed: 'Today: Closed',
+    todayHours: 'Today: {range}',
+  },
+  providerWebsite: 'Provider website',
+  locationDetails: 'Location details',
+  contact: 'Contact',
+  website: 'Website',
+  location: 'Location',
+  transitOptions: 'Transit options',
+  servicesAvailable: 'Services available',
+  patientsServed: 'Patients served',
+  callout: {
+    title: 'Free and low-cost medical care in Philadelphia',
+    message:
+      "Our primary care finder can help you find a provider in Philadelphia. These health care centers serve everyone. Your immigration status or ability to pay won't stop you from getting the care you need.",
+    linkText: 'Learn more about getting care',
+  },
   app: {
     title: 'Primary care finder',
     subtitle: 'Free and low-cost medical care in Philadelphia',
@@ -6,7 +36,17 @@ export default {
       'No health centers found. Please check your spelling or remove some of your filters, and try again.',
     viewList: 'View list',
     viewMap: 'View map',
+    name: 'Primary Care Finder',
+    aboutTitle: 'About this tool',
+    aboutBody:
+      'This tool helps Philadelphia residents find free and low-cost primary care providers near them. Search by location, filter by services, and view details like hours, transit options, and available tests.',
   },
+  filters: {
+    sort: 'Sort',
+    distance: 'Distance',
+    name: 'Name (A–Z)',
+  },
+  searchPlaceholder: 'Search by address or keyword...',
   introPage: {
     section1Title: 'Find free or low-cost primary care',
     p0: 'Primary care is your health care home. Services include prevention, wellness, and treatment for common illnesses.',
@@ -49,12 +89,19 @@ export default {
     child: 'Child',
     adults: 'Adults',
     children: 'Children',
+    servesAdults: 'Serves adults.',
+    servesChildren: 'Serves children.',
+    servesBoth: 'Serves adults and children.',
   },
   patientType: {
     category: 'Eligibility',
-    patient_type_new: 'New patients',
+    patient_type_new: 'For new patients',
+    patient_type_new_subtext:
+      'Some of these services may be available for walk-ins. Contact the provider for more information.',
     patient_type_existing: 'Established patients',
-    patient_type_existing_only: 'Must establish care at site',
+    patient_type_existing_only: 'Existing patients only',
+    patient_type_existing_only_subtext:
+      'You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
     category: 'Primary care',
@@ -78,6 +125,82 @@ export default {
   },
   languages: {
     category: 'Languages spoken by staff',
+    english: 'English',
+    spanish: 'Spanish',
+    chinese: 'Chinese',
+    french: 'French',
+    arabic: 'Arabic',
+    hindi: 'Hindi',
+    algerian: 'Algerian',
+    russian: 'Russian',
+    amharic: 'Amharic',
+    cambodian: 'Cambodian',
+    'cambodian (khmer)': 'Cambodian (Khmer)',
+    indonesian: 'Indonesian',
+    mandarin: 'Mandarin',
+    asl: 'ASL',
+    bengali: 'Bengali',
+    bengalis: 'Bengali',
+    vietnamese: 'Vietnamese',
+    malayalam: 'Malayalam',
+    malayim: 'Malayalam',
+    malaysian: 'Malaysian',
+    fanta: 'Fanta',
+    urdu: 'Urdu',
+    hebrew: 'Hebrew',
+    tagalog: 'Tagalog',
+    gujarati: 'Gujarati',
+    portuguese: 'Portuguese',
+    portugese: 'Portuguese',
+    punjabi: 'Punjabi',
+    'brazilian portuguese': 'Brazilian Portuguese',
+    'french creole': 'Haitian Creole',
+    'french-creole': 'Haitian Creole',
+    frenchcreole: 'Haitian Creole',
+    fula: 'Fula',
+    karen: 'Karen',
+    koloqua: 'Koloqua',
+    yoruba: 'Yoruba',
+    telugu: 'Telugu',
+    kinyarwanda: 'Kinyarwanda',
+    khmer: 'Khmer',
+    swahili: 'Swahili',
+    kirundi: 'Kirundi',
+    cantonese: 'Cantonese',
+    burmese: 'Burmese',
+    creole: 'Haitian Creole',
+    korean: 'Korean',
+    'haitian creole': 'Haitian Creole',
+    'haitian-creole': 'Haitian Creole',
+    haitiancreole: 'Haitian Creole',
+    lebanese: 'Lebanese',
+    taiwanese: 'Taiwanese',
+    shanghainese: 'Shanghainese',
+    sinhalese: 'Sinhalese',
+    'bahasa indonesian': 'Bahasa Indonesian',
+    italian: 'Italian',
+    chin: 'Chin',
+    filipino: 'Filipino',
+    farsi: 'Farsi',
+    ukrainian: 'Ukrainian',
+    german: 'German',
+    hmong: 'Hmong',
+    japanese: 'Japanese',
+    lao: 'Lao',
+    nepali: 'Nepali',
+    shan: 'Shan',
+    thai: 'Thai',
+    dari: 'Dari',
+    dutch: 'Dutch',
+    pashtu: 'Pashtu',
+    tigrinya: 'Tigrinya',
+    mandingo: 'Mandingo',
+    bambara: 'Bambara',
+    ewe: 'Ewe',
+    krio: 'Krio',
+    patois: 'Patois',
+    pular: 'Pular',
+    'farsi and malayalam': 'Farsi and Malayalam',
   },
   specialty: {
     category: 'Specialty services',
@@ -91,7 +214,7 @@ export default {
     pharmacy: 'On-site pharmacy',
   },
   waitTime: {
-    category: 'Wait time (Primary Care)',
+    category: 'Wait time',
     walkIn: 'Same-day or walk-in (sick visit)',
     oneWeekWell: '<1 week (well visit)',
     oneWeekSick: '<1 week (sick visit)',
@@ -141,6 +264,18 @@ export default {
     mat: 'Medications for opioid use disorder',
     women: 'Includes family planning and gynecological care',
   },
+  caveats: {
+    'Exclusively serves adolescents and young adults (ages 13-26).':
+      'Exclusively serves adolescents and young adults (ages 13-26).',
+    'Exclusively serves people living with HIV.': 'Exclusively serves people living with HIV.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
+      "Exclusively serves uninsured members of Philadelphia's Latine immigrant community. No work physicals. Services for children are limited to dental, eye care, and mental health.",
+    'Services for children are limited to dental, mental health, and vaccines.':
+      'Services for children are limited to dental, mental health, and vaccines.',
+    'Special focus on LGBTQ+ ': 'Special focus on LGBTQ+',
+    'Special focus on people who are currently or recently homeless, or at risk of homelessness.':
+      'Special focus on people who are currently or recently homeless, or at risk of homelessness.',
+  },
   warnings: {
     'This health center only offers HIV and STD/STI testing and treatment; walk-ins only ':
       'This health center only offers HIV and STD/STI testing and treatment; walk-ins only ',
@@ -155,19 +290,16 @@ export default {
       'New patients should call on the first Wednesday of the month to make an appointment.',
     'The pharmacy is currently closed for construction':
       'The pharmacy is currently closed for construction.',
-    'Services only offered for patients ages 14+':
-      'Services only offered for patients ages 14+',
+    'Services only offered for patients ages 14+': 'Services only offered for patients ages 14+',
   },
   exceptions: {
-    'Open first and third Saturday of each month':
-      'Open on first and third Saturdays of the month',
+    'Open first and third Saturday of each month': 'Open on first and third Saturdays of the month',
     'Patients seen by appointment only from 4:30 p.m. - 8 p.m.':
       'Patients seen by appointment only from 4:30 p.m. - 8 p.m.',
     'Telehealth visits only': 'Telehealth visits only',
     'On first Wednesday of the month, clinic opens at 1 p.m.':
       'On first Wednesday of the month, clinic opens at 1 p.m.',
-    'Open until 8 p.m. by appointment only ':
-      'Open until 8 p.m. by appointment only',
+    'Open until 8 p.m. by appointment only ': 'Open until 8 p.m. by appointment only',
     'Closed noon - 1 p.m.': 'Closed noon - 1 p.m.',
     'Closed at noon for lunch': 'Closed at noon for lunch',
     'Urgent care available from 10:30 a.m. - 2 p.m.':
@@ -180,10 +312,8 @@ export default {
       'Patients seen by appointment only until 7:30 p.m. on the first and third Thursdays of the month',
     'Open first and third Thursday of each month from 5 p.m. - 7:30 p.m. (appointment only)':
       'Open first and third Thursday of each month from 5 p.m. - 7:30 p.m. (appointment only)',
-    'Open on second Saturday of the month':
-      'Open on second Saturday of the month',
-    'Telehealth available 5 p.m. - 7 p.m.':
-      'Telehealth available 5 p.m. - 7 p.m.',
+    'Open on second Saturday of the month': 'Open on second Saturday of the month',
+    'Telehealth available 5 p.m. - 7 p.m.': 'Telehealth available 5 p.m. - 7 p.m.',
     'Closes at noon on the third Thursday of every month, Telehealth available 5 p.m. - 7 p.m.':
       'Closes at noon on the third Thursday of every month, Telehealth available 5 p.m. - 7 p.m.',
     'Dental available 8:30 a.m. - 1 p.m. every third Saturday':
@@ -215,12 +345,10 @@ export default {
       'On 2nd Friday of the month, clinic is open from 1:30 p.m. - 5 p.m.',
     'On second and fourth Saturday of the month, clinic is open from 8:30 a.m. - 1 p.m. for dental services':
       'On second and fourth Saturday of the month, clinic is open from 8:30 a.m. - 1 p.m. for dental services',
-    'Evening telehealth services 5 p.m. - 8 p.m.':
-      'Evening telehealth services 5 p.m. - 8 p.m.',
+    'Evening telehealth services 5 p.m. - 8 p.m.': 'Evening telehealth services 5 p.m. - 8 p.m.',
     'Evening telehealth services available 5 p.m. - 8 p.m.':
       'Evening telehealth services 5 p.m. - 8 p.m.',
-    'Evening Telehealth service 5 p.m. to 7 p.m.':
-      'Evening Telehealth service 5 p.m. to 7 p.m.',
+    'Evening Telehealth service 5 p.m. to 7 p.m.': 'Evening Telehealth service 5 p.m. to 7 p.m.',
     'Evening telehealth services 5 p.m. - 8 p.m. Open every fourth Saturday of the month for primary care and podiatry':
       'Evening telehealth services 5 p.m. - 8 p.m. Open every fourth Saturday of the month for primary care and podiatry',
     'On third Thursday of the month, clinic is closed':
@@ -229,22 +357,17 @@ export default {
       'Closed noon - 1 p.m.  On second Friday of the month, clinic closes at noon',
     'On second Friday of the month, clinic closes at noon':
       'On second Friday of the month, clinic closes at noon',
-    'Open 5 p.m. - 8 p.m. by appointment only':
-      'Open 5 p.m. to 8 p.m. by appointment only',
-    'Select Saturdays by appointment only':
-      'By appointment only on some Saturdays',
-    'Open until 7 p.m. by appointment only ':
-      'Open until 7 p.m. by appointment only',
+    'Open 5 p.m. - 8 p.m. by appointment only': 'Open 5 p.m. to 8 p.m. by appointment only',
+    'Select Saturdays by appointment only': 'By appointment only on some Saturdays',
+    'Open until 7 p.m. by appointment only ': 'Open until 7 p.m. by appointment only',
     'On first and third Thursday of the month, clinic is open until 7:30 p.m.':
       'On first and third Thursday of the month, clinic is open until 7:30 p.m.',
     'Evening telehealth services available 5 p.m. - 6 p.m.':
       'Evening telehealth services available 5 p.m. - 6 p.m.',
-    'Dental services available 8:30 a.m. - 1 p.m.':
-      'Dental services available 8:30 a.m. - 1 p.m.',
+    'Dental services available 8:30 a.m. - 1 p.m.': 'Dental services available 8:30 a.m. - 1 p.m.',
     'Evening telehealth services available 5 p.m. - 7 p.m.':
       'Evening telehealth services available 5 p.m. - 7 p.m.',
-    'Evening telehealth services 5 p.m. to 7 p.m.':
-      'Evening telehealth services 5 p.m. to 7 p.m.',
+    'Evening telehealth services 5 p.m. to 7 p.m.': 'Evening telehealth services 5 p.m. to 7 p.m.',
     'Open every first and third Saturday of the month':
       'Open every first and third Saturday of the month',
     'Medical services are provided Thursday evenings only':
@@ -259,8 +382,7 @@ export default {
       'On 1st and 3rd Saturday of the month, clinic is open for dental services',
     'On 2nd Saturday of the month, clinic is open from 10 a.m. - 2 p.m.':
       'On 2nd Saturday of the month, clinic is open from 10 a.m. - 2 p.m.',
-    'Telehealth visits only from 9 a.m. - 3 p.m.':
-      'Telehealth visits only from 9 a.m. - 3 p.m.',
+    'Telehealth visits only from 9 a.m. - 3 p.m.': 'Telehealth visits only from 9 a.m. - 3 p.m.',
   },
   hours: 'Hours',
   daysOfTheWeek: 'Day',
@@ -284,6 +406,7 @@ export default {
   outOf: 'out of',
   backToHome: 'Back to home',
   back: 'Back',
+  closeDetails: 'Close details',
   currentLocation: 'Current location',
   useCurrentLocation: 'Use current location',
   searchBar: 'Search bar',

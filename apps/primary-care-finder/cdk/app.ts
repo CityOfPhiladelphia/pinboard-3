@@ -1,13 +1,12 @@
 #!/usr/bin/env node
-import 'source-map-support/register'
 import { App, CfnOutput, Fn, Stack } from 'aws-cdk-lib'
-import * as acm from 'aws-cdk-lib/aws-certificatemanager'
 import * as route53 from 'aws-cdk-lib/aws-route53'
 import {
   StaticSite,
   Confidentiality,
   applyStandardTags,
   applyNagChecks,
+  PhilaLogBucket,
   type Environment,
 } from '@phila/constructs'
 
@@ -17,9 +16,7 @@ const app = new App()
 const environment = app.node.tryGetContext('environment') as Environment
 
 if (!environment) {
-  throw new Error(
-    'Environment must be specified via context. Use: cdk deploy -c environment=dev'
-  )
+  throw new Error('Environment must be specified via context. Use: cdk deploy -c environment=dev')
 }
 
 // Read compliance frameworks from context
@@ -47,18 +44,9 @@ const stack = new Stack(app, 'primary-care-finder-' + environment, {
   stackName: 'primary-care-finder-' + environment,
 })
 
-const certificateARN = app.node.tryGetContext('certificateARN') as
-  | string
-  | undefined
-const certificate = certificateARN
-  ? acm.Certificate.fromCertificateArn(stack, 'FrontendCert', certificateARN)
-  : undefined
-
-const frontendDomain = app.node.tryGetContext('frontendDomain') as
-  | string
-  | undefined
+const frontendDomain = app.node.tryGetContext('frontendDomain') as string | undefined
 let frontendZone: route53.IHostedZone | undefined
-if (frontendDomain && certificate) {
+if (frontendDomain) {
   const zone = new route53.PublicHostedZone(stack, 'FrontendZone', {
     zoneName: frontendDomain,
   })
@@ -71,12 +59,19 @@ if (frontendDomain && certificate) {
   }
 }
 
+const accessLogBucket = new PhilaLogBucket(stack, 'AccessLogs', {
+  ...context,
+  logBucketId: 'access-logs',
+  logRetentionDays: 1096,
+  s3ManagedEncryption: true,
+})
+
 // Scope as any so linked @phila/constructs resolves to a single Construct type at runtime.
 new StaticSite(stack, 'primary-care-finderSite', {
   ...context,
   assetDir: '../frontend/dist',
-  ...(certificate ? { certificate } : {}),
   ...(frontendZone ? { hostedZone: frontendZone } : {}),
+  logBucket: accessLogBucket.bucket,
 })
 
 applyStandardTags(app, context)

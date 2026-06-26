@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Radio } from '@phila/phila-ui-radio'
 import { PhilaButton, CloseButton } from '@phila/phila-ui-button'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faArrowUpArrowDown } from '@fortawesome/pro-solid-svg-icons'
+import { IconSort } from '@phila/phila-ui-core/icons'
+import type { UserLocationState } from '../types'
 
 export interface SortPanelOption {
   value: string
@@ -14,24 +15,31 @@ export interface SortPanelOption {
 const props = defineProps<{
   sortOptions: SortPanelOption[]
   appliedSort: string | null
-  locationAvailable: boolean
+  userLocationState: UserLocationState
+  isMobile: boolean
 }>()
 
 const emit = defineEmits<{
   'update:appliedSort': [value: string | null]
 }>()
 
+const { t } = useI18n()
+
 const panelOpen = ref(false)
-const pendingSelection = ref<string | null>(null)
+const pendingSelection = ref<string | undefined>(undefined)
 
 const triggerLabel = computed(() => {
-  if (!props.appliedSort) return 'Sort'
+  if (!props.appliedSort) return t('pinboard.sort')
   const match = props.sortOptions.find((o) => o.value === props.appliedSort)
-  return match ? `Sort: ${match.label}` : 'Sort'
+  return match ? t('pinboard.sortBy', { label: match.label }) : t('pinboard.sort')
+})
+
+const locationAvailable = computed(() => {
+  return ['located', 'watching'].includes(props.userLocationState)
 })
 
 function openPanel() {
-  pendingSelection.value = props.appliedSort
+  pendingSelection.value = props.appliedSort ?? undefined
   panelOpen.value = true
 }
 
@@ -40,7 +48,7 @@ function closePanel() {
 }
 
 function applySort() {
-  emit('update:appliedSort', pendingSelection.value)
+  emit('update:appliedSort', pendingSelection.value ?? null)
   closePanel()
 }
 
@@ -52,19 +60,6 @@ function resetSort() {
 const formEl = ref<HTMLElement | null>(null)
 const triggerEl = ref<HTMLElement | null>(null)
 const anchorStyle = ref<Record<string, string>>({})
-
-const isMobile = ref(false)
-let mql: MediaQueryList | null = null
-
-function handleMediaChange(e: MediaQueryListEvent) {
-  isMobile.value = e.matches
-}
-
-onMounted(() => {
-  mql = window.matchMedia('(max-width: 768px)')
-  isMobile.value = mql.matches
-  mql.addEventListener('change', handleMediaChange)
-})
 
 function recomputeAnchor() {
   const rect = triggerEl.value?.getBoundingClientRect()
@@ -78,7 +73,7 @@ function recomputeAnchor() {
 }
 
 function handleDocumentClick(e: MouseEvent) {
-  if (!panelOpen.value || isMobile.value) return
+  if (!panelOpen.value || props.isMobile) return
   const target = e.target as Node
   if (formEl.value?.contains(target) || triggerEl.value?.contains(target)) {
     return
@@ -106,28 +101,12 @@ watch(panelOpen, (isOpen) => {
     window.removeEventListener('scroll', recomputeAnchor, true)
   }
 })
-
-onBeforeUnmount(() => {
-  document.removeEventListener('mousedown', handleDocumentClick)
-  document.removeEventListener('keydown', handleKeydown)
-  window.removeEventListener('resize', recomputeAnchor)
-  window.removeEventListener('scroll', recomputeAnchor, true)
-  mql?.removeEventListener('change', handleMediaChange)
-})
 </script>
 
 <template>
   <div class="sort-panel-root">
-    <button
-      ref="triggerEl"
-      type="button"
-      class="sort-panel-trigger"
-      @click="openPanel"
-    >
-      <FontAwesomeIcon
-        :icon="faArrowUpArrowDown"
-        class="sort-panel-trigger-icon"
-      />
+    <button ref="triggerEl" type="button" class="sort-panel-trigger" @click="openPanel">
+      <IconSort class="sort-panel-trigger-icon" />
       <span>{{ triggerLabel }}</span>
     </button>
   </div>
@@ -149,74 +128,53 @@ onBeforeUnmount(() => {
       <div ref="formEl" class="sort-panel-form sort-panel-form--mobile">
         <CloseButton class="sort-panel-close" @click="closePanel" />
         <ul class="sort-panel-options">
-          <li
-            v-for="option in sortOptions"
-            :key="option.value"
-            class="sort-panel-option"
-          >
+          <li v-for="option in sortOptions" :key="option.value" class="sort-panel-option">
             <Radio
               name="sort-panel-radio"
               :value="option.value"
               :text="option.label"
-              :model-value="pendingSelection ?? undefined"
+              :model-value="pendingSelection ?? ''"
               :disabled="option.value === 'DistAsc' && !locationAvailable"
               @update:model-value="pendingSelection = $event"
             />
             <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
-              {{
-                locationAvailable
-                  ? 'Closest to furthest'
-                  : 'Share your location to sort by distance'
-              }}
+              {{ locationAvailable ? t('pinboard.sortClosest') : t('pinboard.sortShareLocation') }}
             </p>
           </li>
         </ul>
         <div class="sort-panel-actions">
-          <PhilaButton variant="text" size="extra-small" @click="resetSort"
-            >Reset</PhilaButton
-          >
-          <PhilaButton variant="primary" size="small" @click="applySort"
-            >Apply</PhilaButton
-          >
+          <PhilaButton variant="text" size="extra-small" @click="resetSort">{{
+            t('pinboard.reset')
+          }}</PhilaButton>
+          <PhilaButton variant="primary" size="small" @click="applySort">{{
+            t('pinboard.apply')
+          }}</PhilaButton>
         </div>
       </div>
     </BottomSheet>
-    <div
-      v-else-if="panelOpen"
-      ref="formEl"
-      class="sort-panel-form"
-      :style="anchorStyle"
-    >
+    <div v-else-if="panelOpen" ref="formEl" class="sort-panel-form" :style="anchorStyle">
       <ul class="sort-panel-options">
-        <li
-          v-for="option in sortOptions"
-          :key="option.value"
-          class="sort-panel-option"
-        >
+        <li v-for="option in sortOptions" :key="option.value" class="sort-panel-option">
           <Radio
             name="sort-panel-radio"
             :value="option.value"
             :text="option.label"
-            :model-value="pendingSelection ?? undefined"
+            :model-value="pendingSelection ?? ''"
             :disabled="option.value === 'DistAsc' && !locationAvailable"
             @update:model-value="pendingSelection = $event"
           />
           <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
-            {{
-              locationAvailable
-                ? 'Closest to furthest'
-                : 'Share your location to sort by distance'
-            }}
+            {{ locationAvailable ? t('pinboard.sortClosest') : t('pinboard.sortShareLocation') }}
           </p>
         </li>
       </ul>
       <div class="sort-panel-actions">
-        <PhilaButton variant="text" size="extra-small" @click="resetSort"
-          >Reset</PhilaButton
-        >
-        <PhilaButton variant="primary" size="small" @click="applySort"
-          >Apply</PhilaButton
-        >
+        <PhilaButton variant="text" size="extra-small" @click="resetSort">{{
+          t('pinboard.reset')
+        }}</PhilaButton>
+        <PhilaButton variant="primary" size="small" @click="applySort">{{
+          t('pinboard.apply')
+        }}</PhilaButton>
       </div>
     </div>
   </Teleport>
@@ -236,7 +194,6 @@ onBeforeUnmount(() => {
   background: #ffffff;
   border: 1px solid #c2c2c2;
   border-radius: var(--border-radius-xs);
-  font-family: var(--Body-Default-font-body-default-family);
   font-size: 0.875rem;
   color: #454545;
   cursor: pointer;
@@ -265,7 +222,6 @@ onBeforeUnmount(() => {
     0 0 0 1px rgba(0, 0, 0, 0.06);
   border-radius: 8px;
   width: 280px;
-  font-family: var(--Body-Default-font-body-default-family);
   font-size: var(--Body-Default-font-body-default-size, 1rem);
   color: var(--Schemes-On-Surface, #333);
 }

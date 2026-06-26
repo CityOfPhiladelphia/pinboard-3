@@ -1,0 +1,422 @@
+export default {
+  // First-pass translations — verify with the city translation process.
+  tags: {
+    openNow: 'Aberto agora',
+    closed: 'Fechado',
+    checkHours: 'Verificar horário',
+    weekendHours: 'Horário de fim de semana',
+    openAfter6: 'Aberto após as 18h',
+    walkIns: 'Atendimento sem hora marcada',
+    telehealth: 'Telessaúde',
+    parking: 'Estacionamento no local',
+    pharmacy: 'Farmácia no local',
+    adultCare: 'Atendimento para adultos',
+    pediatrics: 'Pediatria',
+    multipleLanguages: 'Vários idiomas',
+    todayClosed: 'Hoje: Fechado',
+    todayHours: 'Hoje: {range}',
+  },
+  providerWebsite: 'Site do prestador',
+  website: 'Site',
+  hours: 'Horas',
+  languagesSpoken: 'Idiomas falados',
+  daysOfTheWeek: 'Dia da semana',
+  Monday: 'Segunda-feira',
+  Tuesday: 'terça',
+  Wednesday: 'Quarta-feira',
+  Thursday: 'Quinta-feira',
+  Friday: 'Sexta-feira',
+  Saturday: 'sábado',
+  Sunday: 'domingo',
+  locationDetails: 'Detalhes do local',
+  contact: 'Contato',
+  location: 'Local',
+  transitOptions: 'Opções de transporte',
+  servicesAvailable: 'Serviços disponíveis',
+  patientsServed: 'Pacientes atendidos',
+  callout: {
+    title: 'Assistência médica gratuita e de baixo custo na Filadélfia',
+    message:
+      'Nosso localizador de cuidados primários pode ajudá-lo a encontrar um prestador na Filadélfia. Esses centros de saúde atendem a todos. Seu status de imigração ou situação financeira não o(a) impedirá de obter os serviços que você precisa.',
+    linkText: 'Saiba mais sobre como obter atendimento',
+  },
+  app: {
+    aboutTitle: 'Sobre esta ferramenta',
+    title: 'Localizador de cuidados primários',
+    name: 'Localizador de cuidados primários',
+    subtitle: 'Assistência médica gratuita e de baixo custo na Filadélfia',
+    noResults:
+      'Nenhum centro de saúde encontrado. Verifique a ortografia, ou remova alguns dos filtros, e tente novamente.',
+  },
+  searchPlaceholder: 'Pesquise por endereço ou palavra-chave...',
+  filters: {
+    sort: 'Ordenar por',
+    distance: 'Distância',
+    name: 'Alfabeticamente',
+    ageGroup: 'Faixa etária',
+    adult: 'Adulto',
+    children: 'Crianças',
+    waitTime: 'Tempo de espera (Cuidados primários)',
+    weekWell: '<1 semana (check-up)',
+    weekSick: '<1 semana (acompanhamento)',
+    twoMonths: '<2 meses (todos os cuidados primários)',
+    specialty: 'Serviços especializados',
+    mental: 'Saúde mental',
+    dental: 'Saúde oral',
+    eye: 'Cuidados oftalmológicos',
+    podiatry: 'Podologia',
+    tests: 'Testes e imagens',
+    mammo: 'Mamografia',
+    xray: 'Raio X',
+    languages: 'Idiomas falados pela equipe',
+  },
+  introPage: {
+    section1Title: 'Encontre serviços primários gratuitos ou de baixo custo',
+    p0: 'Os cuidados primários são a sua casa de serviços de saúde. Os serviços incluem prevenção, bem-estar e tratamento para doenças comuns.',
+    p05: 'Esses centros de saúde atendem a todos. Seu status de imigração ou situação financeira não o(a) impedirá de obter os serviços que você precisa.',
+    p1: 'Para encontrar um prestador de cuidados primários na Filadélfia:',
+    ol1: {
+      li1: 'Filtre pelos serviços que você precisa.',
+      li2: 'Selecione o local no mapa para obter detalhes.',
+      li3: 'Entre em contato com o prestador antes da sua visita.',
+    },
+    section2Title: 'Seguro e custo',
+    p2: 'Esses centros de saúde oferecem muitas opções de seguro. Dentre elas, Medicare e Medicaid. Você pode obter serviços mesmo se não tiver seguro. Caso não tenha seguro, você pagará uma pequena taxa com base em sua renda e número de membros da sua família.',
+    section25Title: 'Precisa de ajuda para obter um seguro de saúde?',
+    p25: "O programa BenePhilly da Filadélfia oferece suporte gratuito para ajudar os residentes a se inscreverem no seguro saúde. Para saber mais, visite <a href='https://www.phila.gov/programs/benephilly/' target='_blank'>https://www.phila.gov/programs/benephilly</a>.",
+    section3Title: 'Acesso ao idioma',
+    p3: 'Todos os centros de saúde oferecem serviços de interpretação por telefone. Alguns também oferecem interpretação presencial. Veja os detalhes de cada local para obter uma lista de todos os idiomas falados pela equipe. Você também pode pesquisar um idioma específico.',
+    section4Title: 'Como estabelecer cuidados',
+    p4: 'Você pode precisar estabelecer os cuidados com um prestador antes de acessar alguns serviços. Ligue para agendar uma nova consulta para se tornar um paciente em um centro de saúde.',
+    section5Title: 'Atualizações para o localizador',
+    p5: 'Atualizamos as informações em cada centro de saúde a cada três meses. Se algo estiver errado, nos informe através do seu',
+    feedbackForm: 'formulário de feedback',
+  },
+  cards: {
+    table1Intro:
+      'Esses serviços podem ser especializados para crianças ou adultos. Você também pode precisar se tornar um paciente ou estabelecer os cuidados em um centro de saúde antes de acessar alguns serviços.',
+    table2Intro:
+      'Os demais serviços não são divididos por idade. Alguns estão disponíveis para qualquer pessoa, mas talvez seja necessário ser paciente deste centro de saúde antes de acessar outros.',
+  },
+  service: 'Serviço',
+  slidingScale: 'Custo de escala móvel',
+  slidingScaleNull: 'Escala móvel não fornecida Ligue para obter mais informações.',
+  ageSpecificServices: 'Atendimento pediátrico e adulto',
+  otherServices: 'Mais serviços',
+  ageSpecificServicesEmpty: 'Este site não oferece serviços limitados a crianças ou adultos',
+  otherServicesEmpty: 'Nenhum outro serviço oferecido',
+  ageRange: {
+    category: 'Faixa etária',
+    adult: 'Adulto',
+    child: 'Criança',
+    adults: 'Adultos',
+    children: 'Crianças',
+    servesAdults: 'Atende adultos.',
+    servesChildren: 'Atende crianças.',
+    servesBoth: 'Atende adultos e crianças.',
+  },
+  patientType: {
+    category: 'Elegibilidade',
+    patient_type_new: 'Novos pacientes',
+    patient_type_new_subtext:
+      'Alguns desses serviços podem estar disponíveis sem hora marcada. Entre em contato com o provedor para obter mais informações.',
+    patient_type_existing: 'Pacientes estabelecidos',
+    patient_type_existing_only: 'Deve estabelecer os cuidados no local',
+    patient_type_existing_only_subtext:
+      'Talvez você precise se tornar paciente de um centro de saúde antes de poder acessar alguns serviços. Isso também é chamado de estabelecer cuidados.',
+  },
+  visitType: {
+    category: 'Cuidados primários',
+    well: 'Check-up',
+    sick: 'Acompanhamento',
+    sports: 'Esportes físicos',
+    prenatal: 'Cuidados pré-natais',
+    women: 'Saúde da mulher',
+    telehealth: 'Telessaúde',
+    vaccine: 'Vacinas',
+  },
+  tests: {
+    category: 'Testes e imagens',
+    noTests:
+      'Este site não oferece nenhum dos testes ou imagens listados nos filtros. Ligue para perguntar sobre outros exames ou imagens.',
+    blood: 'Laboratórios e exames de sangue',
+    sti: 'Teste de DST',
+    covid: 'Teste de COVID',
+    mammo: 'Mamografia',
+    xray: 'Raio X',
+  },
+  languages: {
+    category: 'Idiomas falados pela equipe',
+    english: 'Inglês',
+    spanish: 'espanhol',
+    chinese: 'chinês',
+    french: 'francês',
+    arabic: 'árabe',
+    hindi: 'hindi',
+    algerian: 'argelino',
+    russian: 'russa',
+    cambodian: 'Cambojano',
+    'cambodian (khmer)': 'Cambojano (Khmer)',
+    indonesian: 'indonésio',
+    mandarin: 'Mandarim',
+    asl: 'PERGUNTAR',
+    bengali: 'bengali',
+    bengalis: 'bengali',
+    vietnamese: 'vietnamita',
+    malayalam: 'Malaiala',
+    malayim: 'Malaiala',
+    fanta: 'Fanta',
+    urdu: 'urdu',
+    hebrew: 'hebreu',
+    tagalog: 'tagalo',
+    gujarati: 'Gujarati',
+    portuguese: 'portuguesa',
+    portugese: 'portuguesa',
+    'brazilian portuguese': 'Português do Brasil',
+    'french creole': 'Crioulo haitiano',
+    'french-creole': 'Crioulo haitiano',
+    karen: 'Karen',
+    yoruba: 'Ioruba',
+    telugu: 'Télugo',
+    kinyarwanda: 'Quinyarwanda',
+    khmer: 'Khmer',
+    swahili: 'suaíli',
+    kirundi: 'Kirundi',
+    cantonese: 'cantonesa',
+    burmese: 'birmanês',
+    creole: 'Crioulo haitiano',
+    korean: 'coreana',
+    'haitian creole': 'Crioulo haitiano',
+    'haitian-creole': 'Crioulo haitiano',
+    haitianCreole: 'Crioulo haitiano',
+    taiwanese: 'taiwanês',
+    'bahasa indonesian': 'Bahasa indonésio',
+    italian: 'italiano',
+    chin: 'Queixo',
+    filipino: 'Filipino',
+    farsi: 'Farsi',
+    ukrainian: 'ucraniano',
+    german: 'alemã',
+    hmong: 'Hmong',
+    japanese: 'japonesa',
+    lao: 'laosiano',
+    nepali: 'Nepalês',
+    shan: 'Shan',
+    thai: 'tailandês',
+    dari: 'Dari',
+    dutch: 'holandês',
+    pashtu: 'Pashtu',
+    tigrinya: 'Tigrínia',
+    mandingo: 'Mandingo',
+    bambara: 'Bambara',
+    ewe: 'Ovelha',
+    krio: 'Krio',
+    patois: 'Patois',
+    pular: 'Pular',
+    'farsi and malayalam': 'Farsi e Malaiala',
+  },
+  specialty: {
+    category: 'Serviços especializados',
+    mental: 'Saúde mental',
+    dental: 'Saúde oral',
+    eye: 'Cuidados oftalmológicos',
+    podiatry: 'Podologia',
+    mat: 'Tratamento assistido por medicamentos',
+    nutrition: 'Aconselhamento nutricional',
+    tobacco: 'Ajuda contra tabagismo',
+    pharmacy: 'Farmácia no local',
+  },
+  waitTime: {
+    category: 'Tempo de espera (Cuidados primários)',
+    walkIn: 'Mesmo dia ou sem agendamento (consulta)',
+    oneWeekWell: '<1 semana (check-up)',
+    oneWeekSick: '<1 semana (acompanhamento)',
+    twoMonths: '<2 meses (todos os cuidados primários)',
+  },
+  transit: {
+    bus: 'Ônibus',
+    subway: {
+      label: 'Metrô',
+      BSL: 'Linha Broad Street (linha laranja)',
+      MLF: 'Linha Market-Frankford (linha azul)',
+    },
+    regRail: {
+      label: 'Linha regional',
+      AL: 'Linha do aeroporto',
+      CHE: 'Linha Chestnut Hill East ',
+      CHW: 'Linha Chestnut Hill West',
+      CL: 'Linha Cynwyd ',
+      FC: 'Linha Fox Chase',
+      GC: 'Glenside Combinada',
+      LD: 'Linha Lansdale/Doylestown',
+      PM: 'Centro da Cidade até a estação Penn Medicine',
+      MN: 'Linha Manayunk/Norristown',
+      ME: 'Linha Media/Elwyn',
+      PT: 'Linha Paoli/Thorndale',
+      TL: 'Linha Trenton',
+      WL: 'Linha Warminster',
+      WTL: 'Linha West Trenton',
+      WN: 'Linha Wilmington/Newark',
+      FR: 'Fern Rock ao centro da cidade',
+    },
+    trolley: 'Bonde',
+    car: {
+      label: 'Carro:',
+      OST: 'Estacionamento na rua disponível',
+      MOST: 'Estacionamento na rua com parquímetro disponível',
+      GP: 'Garagem disponível',
+      FG: 'Garagem gratuita disponível',
+      OS: 'Estacionamento no local disponível',
+      FOS: 'Estacionamento gratuito disponível no local ',
+      RV: 'Requer validação',
+      PL: 'Área de estacionamento na rua disponível',
+    },
+  },
+  tooltips: {
+    well: 'Inclui exames físicos de trabalho',
+    mat: 'Medicamentos para transtorno por uso de opióides',
+    women: 'Inclui planejamento familiar e cuidados ginecológicos',
+  },
+  caveats: {
+    'Exclusively serves adolescents and young adults (ages 13-26).':
+      'Atende exclusivamente adolescentes e jovens adultos (de 13 a 26 anos).',
+    'Exclusively serves people living with HIV.':
+      'Atende exclusivamente pessoas que vivem com HIV.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
+      'Atende exclusivamente membros não segurados da comunidade imigrante latina de Filadélfia. Não realiza exames médicos para o trabalho. Os serviços para crianças limitam-se a atendimento odontológico, oftalmológico e de saúde mental.',
+    'Services for children are limited to dental, mental health, and vaccines.':
+      'Os serviços para crianças limitam-se a atendimento odontológico, de saúde mental e vacinas.',
+    'Special focus on LGBTQ+ ': 'Foco especial em LGBTQ+',
+    'Special focus on people who are currently or recently homeless, or at risk of homelessness.':
+      'Foco especial em pessoas que estão atualmente ou recentemente em situação de rua, ou em risco de ficar sem moradia.',
+  },
+  warnings: {
+    'This health center only offers HIV and STD/STI testing and treatment; walk-ins only ':
+      'Este centro de saúde oferece apenas testes e tratamento para HIV e DST/IST; somente visitantes',
+    'No in-person visits available.': 'Não há visitas presenciais disponíveis.',
+    'This health center only sees people who are living with HIV.':
+      'Este centro de saúde atende apenas pessoas que convivem com HIV.',
+    'COVID-19 vaccines and testing are available to everyone. For all other services, this health center only sees people who are immigrants, undocumented, or who speak Spanish.':
+      'As vacinas e testes COVID-19 estão disponíveis para todos. Para todos os outros serviços, este centro de saúde atende apenas imigrantes, pessoas indocumentadas ou que falam espanhol.',
+    'Telehealth appointments for established patients only. New patient telehealth appointments available only for patients starting Hep C treatment.':
+      'Consultas de telessaúde apenas para pacientes estabelecidos. Novas consultas de telessaúde para pacientes disponíveis apenas para pacientes que iniciam tratamento para hepatite C.',
+    'New patients should call on the first Wednesday of the month to make an appointment.':
+      'Novos pacientes devem ligar na primeira quarta-feira do mês para marcar uma consulta.',
+    'The pharmacy is currently closed for construction':
+      'A farmácia está atualmente fechada para construção.',
+    'Services only offered for patients ages 14+':
+      'Serviços oferecidos apenas para pacientes com mais de 14 anos',
+  },
+  exceptions: {
+    'Open first and third Saturday of each month': 'Aberta nos primeiro e terceiro sábados do mês',
+    'Patients seen by appointment only from 4:30 p.m. - 8 p.m.':
+      'Pacientes atendidos somente com hora marcada das 16h30 às 20h',
+    'Telehealth visits only': 'Somente visitas de telessaúde',
+    'On first Wednesday of the month, clinic opens at 1 p.m.':
+      'Na primeira quarta-feira do mês, a clínica abre às 13h.',
+    'Open until 8 p.m. by appointment only ': 'Aberta até às 20h somente com agendamento',
+    'Closed noon - 1 p.m.': 'Fechada das 12h às 13h',
+    'Closed at noon for lunch': 'Fechado ao meio-dia para almoço',
+    'Urgent care available from 10:30 a.m. - 2 p.m.': 'Atendimentos de urgência das 10:30 às 14h',
+    'On second Friday of the month, clinic closes at 1 p.m.':
+      'Na segunda sexta-feira do mês, a clínica fecha às 13h.',
+    'On second Saturday of the month, clinic is open from 10 a.m. to 2 p.m. ':
+      'No segundo sábado do mês, a clínica abre das 10h às 14h.',
+    'Patients seen by appointment only until 7:30 p.m. on the first and third Thursdays of the month':
+      'Pacientes atendidos com hora marcada somente até as 19h30 na primeira e terceira quintas-feiras do mês',
+    'Open first and third Thursday of each month from 5 p.m. - 7:30 p.m. (appointment only)':
+      'Aberto na primeira e terceira quinta-feira de cada mês, das 17h às 19h30 (somente com hora marcada)',
+    'Open on second Saturday of the month': 'Aberto no segundo sábado do mês',
+    'Telehealth available 5 p.m. - 7 p.m.': 'Telessaúde disponível das 17h às 19h',
+    'Closes at noon on the third Thursday of every month, Telehealth available 5 p.m. - 7 p.m.':
+      'Fecha ao meio-dia na terceira quinta-feira de cada mês, o Telessaúde está disponível das 17h às 19h',
+    'Dental available 8:30 a.m. - 1 p.m. every third Saturday':
+      'Odontologia disponível das 8h30 às 13h a cada terceiro sábado',
+    'Open every fourth Saturday of the month for primary care and podiatry':
+      'Aberto todo quarto sábado do mês para cuidados primários e podologia',
+    'Open 8:30 a.m. - 1 p.m. every second and fourth Saturday of the month':
+      'Aberto das 8h30 às 13h a cada segundo e quarto sábado do mês',
+    'Dental and pediatric services available 8:30 a.m. - 1 p.m. every second and fourth Saturday of the month':
+      'Serviços odontológicos e pediátricos disponíveis das 8h30 às 13h a cada segundo e quarto sábado do mês',
+    'Open 8:30 a.m. - 12 p.m. every third Friday of the month':
+      'Aberto das 8h30 às 12h toda terceira sexta-feira do mês',
+    'Open 8:30 a.m. - 12 p.m. every third Saturday of the month':
+      'Aberto das 8h30 às 12h todo terceiro sábado do mês',
+    'On fourth Friday of the month, clinic opens from 10 a.m. - 5 p.m.':
+      'Na quarta sexta-feira do mês, a clínica abre das 10h às 17h',
+    'On fourth Friday of the month, clinic opens 10 a.m. - 5 p.m.':
+      'Na quarta sexta-feira do mês, a clínica abre das 10h às 17h',
+    'Closed 4 p.m. - 5 p.m.': 'Fechado das 16h às 17h',
+    'Closes at 1 p.m. every second Friday of the month':
+      'Fecha às 13h toda segunda sexta-feira do mês',
+    'Closes at noon on the third Thursday of every month':
+      'Fecha ao meio-dia na terceira quinta-feira de cada mês',
+    'On 2nd and 4th Tuesday of the month, clinic is open from 7:30 a.m. - 8:00 p.m. ':
+      'Na 2ª e 4ª terça-feira do mês, a clínica está aberta das 7h30 às 20h.',
+    'On 2nd Thursday of the month, clinic is open from 9:00 a.m. - 5:00 p.m.':
+      'Na 2ª quinta-feira do mês, a clínica está aberta das 9h às 17h.',
+    'On 2nd Friday of the month, clinic is open from 1:30 p.m. - 5:00 p.m.':
+      'Na 2ª sexta-feira do mês, a clínica está aberta das 13h30 às 17h.',
+    'On second and fourth Saturday of the month, clinic is open from 8:30 a.m. - 1 p.m. for dental services':
+      'No segundo e quarto sábado do mês, a clínica está aberta das 8h30 às 13h para serviços odontológicos',
+    'Evening telehealth services 5 p.m. - 8 p.m.': 'Serviços noturnos de telessaúde das 17h às 20h',
+    'Evening telehealth services available 5 p.m. - 8 p.m.':
+      'Serviços noturnos de telessaúde das 17h às 20h',
+    'Evening Telehealth service 5 p.m. to 7 p.m.': 'Serviço noturno de telessaúde, das 17h às 19h',
+    'Evening telehealth services 5 p.m. - 8 p.m. Open every fourth Saturday of the month for primary care and podiatry':
+      'Serviços noturnos de telessaúde, das 17h às 20h, abertos todo quarto sábado do mês para cuidados primários e podologia',
+    'On third Thursday of the month, clinic is closed':
+      'Na terceira quinta-feira do mês, a clínica está fechada',
+    'On second Friday of the month, clinic closes at noon':
+      'Na segunda sexta-feira do mês, a clínica fecha ao meio-dia',
+    'Open 5 p.m. - 8 p.m. by appointment only': 'Aberto das 17h às 20h somente com hora marcada',
+    'Select Saturdays by appointment only': 'Com hora marcada somente em alguns sábados',
+    'Open until 7 p.m. by appointment only ': 'Aberto até as 19h somente com hora marcada',
+    'On first and third Thursday of the month, clinic is open until 7:30 p.m.':
+      'Na primeira e terceira quinta-feira do mês, a clínica está aberta até as 19h30.',
+    'Evening telehealth services available 5 p.m. - 6 p.m.':
+      'Serviços noturnos de telessaúde disponíveis das 17h às 18h',
+    'Dental services available 8:30 a.m. - 1 p.m.':
+      'Serviços odontológicos disponíveis das 8h30 às 13h',
+    'Evening telehealth services available 5 p.m. - 7 p.m.':
+      'Serviços noturnos de telessaúde disponíveis das 17h às 19h',
+    'Evening telehealth services 5 p.m. to 7 p.m.':
+      'Serviços noturnos de telessaúde disponíveis das 17h às 19h',
+    'Open every first and third Saturday of the month':
+      'Aberto todo primeiro e terceiro sábado do mês',
+    'Medical services are provided Thursday evenings only':
+      'Os serviços médicos são fornecidos apenas nas noites de quinta-feira',
+    'On 2nd and 4th Saturday of the month, clinic is open from 7:00 a.m. - noon':
+      'No 2º e 4º sábado do mês, a clínica está aberta das 7h ao meio-dia',
+    'Every other Saturday, clinic is open by appointment only':
+      'A cada dois sábados, a clínica está aberta somente com hora marcada',
+    'On 2nd and 4th Saturday of the month, clinic is open from 8:30 a.m. - 1 p.m. for dental services':
+      'No 2º e 4º sábado do mês, a clínica está aberta das 8h30 às 13h para serviços odontológicos',
+    'On 1st and 3rd Saturday of the month, clinic is open for dental services':
+      'No 1º e 3º sábado do mês, a clínica está aberta para serviços odontológicos',
+    'On 2nd Saturday of the month, clinic is open from 10 a.m. - 2 p.m.':
+      'No 2º sábado do mês, a clínica está aberta das 10h às 14h.',
+    'Telehealth visits only from 9 a.m. - 3 p.m.': 'Visitas de telessaúde somente das 9h às 15h',
+  },
+  closed: 'Fechada',
+  'closed*': 'Fechada*',
+  slidingScaleExplanation:
+    'Isto é o que você poderá pagar por uma visita médica regular. Seu custo irá depender da sua renda e número de membros da sua família.',
+  share: 'Compartilhar',
+  results: 'resultados',
+  outOf: 'fora de',
+  backToHome: 'Voltar à página inicial',
+  back: 'Voltar',
+  currentLocation: 'Localização atual',
+  useCurrentLocation: 'Use a localização atual',
+  searchBar: 'Barra de pesquisa',
+  searchButton: 'Botão de pesquisa',
+  otherLanguages:
+    'Se você estiver procurando por um idioma diferente, você pode digitá-lo na barra de pesquisa no mapa',
+  tableNoData: {
+    noSpecializedServices:
+      'Este centro de saúde não oferece serviços limitados a crianças ou adultos',
+    noOtherServices: 'Este centro de saúde não oferece nenhum outro serviço',
+    noHours: 'Não há horas conhecidas para este centro de saúde',
+  },
+}

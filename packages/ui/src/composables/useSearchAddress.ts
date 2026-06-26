@@ -1,5 +1,5 @@
 import { type Ref, ref, toValue, watchEffect } from 'vue'
-import type { LatLon, AisAddressSearchResponse } from '../types'
+import type { LatLon } from '../types'
 
 export function useSearchAddress(address: string | Ref<string>) {
   const addressCoordinates = ref<LatLon>({
@@ -22,32 +22,22 @@ export function useSearchAddress(address: string | Ref<string>) {
       return
     }
 
-    const url = `${import.meta.env.DEV || true ? import.meta.env.VITE_AIS_URL : 'https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/queryAisAddress?address='}${encodeURIComponent(addressDeref)}`
-
-    if (import.meta.env.DEV || true) {
-      try {
-        const result: AisAddressSearchResponse = await (await fetch(url)).json()
-        addressCoordinates.value.longitude =
-          result.features[0].geometry.coordinates[0] ?? NaN
-        addressCoordinates.value.latitude =
-          result.features[0].geometry.coordinates[1] ?? NaN
-        finishedAddressFetch.value = true
-      } catch (err) {
-        console.error('Failed to get response from AIS: ', err)
+    try {
+      const url = `https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/addresslocation/${encodeURIComponent(addressDeref)}${import.meta.env.DEV ? `?client_id=${import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD}` : ''}`
+      const response = await fetch(url)
+      if (!response.ok) {
         clearAddress()
-        finishedAddressFetch.value = true
+        console.error({ status: response.status, message: response.body })
+        return
       }
-    } else {
-      try {
-        const result: LatLon = await (await fetch(url)).json()
-        addressCoordinates.value.longitude = result.longitude ?? NaN
-        addressCoordinates.value.latitude = result.latitude ?? NaN
-        finishedAddressFetch.value = true
-      } catch (err) {
-        console.error('Failed to get response from AIS: ', err)
-        clearAddress()
-        finishedAddressFetch.value = true
-      }
+      const result: LatLon = await response.json()
+      addressCoordinates.value.longitude = result?.longitude ?? NaN
+      addressCoordinates.value.latitude = result?.latitude ?? NaN
+      finishedAddressFetch.value = true
+    } catch (err) {
+      console.error('Failed to get response from AIS: ', err)
+      clearAddress()
+      finishedAddressFetch.value = true
     }
   }
 

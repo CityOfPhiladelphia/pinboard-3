@@ -1,17 +1,13 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Logo } from '@phila/phila-ui-logo'
 import { PhilaLink } from '@phila/phila-ui-link'
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import { IconChevronLeft } from '@phila/phila-ui-core/icons'
+import { PinboardComposables } from '@pinboard/ui'
 
 const router = useRouter()
 
-const mq = window.matchMedia('(max-width: 768px)')
-const isMobile = ref(mq.matches)
-const onMqChange = (e: MediaQueryListEvent) => (isMobile.value = e.matches)
-mq.addEventListener('change', onMqChange)
-onUnmounted(() => mq.removeEventListener('change', onMqChange))
+const isMobile = PinboardComposables.useIsMobile()
 </script>
 
 <template>
@@ -23,7 +19,7 @@ onUnmounted(() => mq.removeEventListener('change', onMqChange))
             <PhilaLink
               href="/"
               text="Back to map"
-              :icon-definition="faChevronLeft"
+              :icon="IconChevronLeft"
               @click.prevent="router.push('/')"
             />
             <h1>Flood information and resources</h1>
@@ -110,7 +106,11 @@ onUnmounted(() => mq.removeEventListener('change', onMqChange))
                   </a>
                 </li>
                 <li style="margin: 0">
-                  <a target="_blank" href="https://phila.formstack.com/forms/oem_flood_monitoring_map_feedback">Send feedback about this program</a>
+                  <a
+                    target="_blank"
+                    href="https://phila.formstack.com/forms/oem_flood_monitoring_map_feedback"
+                    >Send feedback about this program</a
+                  >
                 </li>
               </ul>
             </div>

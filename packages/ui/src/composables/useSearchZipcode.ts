@@ -36,10 +36,17 @@ export function useSearchZipcode(zipcode: string | Ref<string>) {
     })
 
     try {
-      const response = await (await fetch(`${url}?${params}`)).json()
-      zipcodePolygon.value.centroid.longitude = response.features[0].centroid.x
-      zipcodePolygon.value.centroid.latitude = response.features[0].centroid.y
-      zipcodePolygon.value.nodes = response.features[0].geometry.rings
+      const response = await fetch(`${url}?${params}`)
+      if (!response.ok) {
+        console.error({ status: response.status, message: response.body })
+        clearZipcode()
+        finishedZipFetch.value = true
+        return
+      }
+      const data = await response.json()
+      zipcodePolygon.value.centroid.longitude = data.features[0].centroid.x
+      zipcodePolygon.value.centroid.latitude = data.features[0].centroid.y
+      zipcodePolygon.value.nodes = data.features[0].geometry.rings
       finishedZipFetch.value = true
     } catch (err) {
       console.error('Failed to get response from ArcGIS: ', err)
