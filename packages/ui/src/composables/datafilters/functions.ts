@@ -19,7 +19,7 @@ export const getAllUniqueValuesFromStringField = (
   return [...unique]
 }
 
-function isBigEndian() {
+export function shiftLeft() {
   const a = 0x02
   let b = a
   b <<= 1
@@ -40,7 +40,7 @@ export function createOptionBitmask(
     throw new Error('Data too large to fit into buffer')
   }
   const bitarray = new Uint32Array(bufferSize) // bitArray for holding set bits
-  const shiftLeft = isBigEndian()
+  const shiftDirection = shiftLeft()
   let accumulator = 0 // accumulate set bits before being pushed into buffer
   let offset = 0 // tracks the offset for setting a bit in the accumulator
   let setBit = 1 // gets shifted to the left once every cycle to set bits in the accumulator
@@ -48,10 +48,10 @@ export function createOptionBitmask(
   // for each item, run bit setting function
   data.forEach((item) => {
     accumulator |= matchingFunction(item, dataFields, matchValues) ? setBit : 0
-    setBit = shiftLeft ? setBit << 1 : setBit >> 1 // shift setBit to the left: 00000010 <<= 00000001
+    setBit = shiftDirection ? setBit << 1 : setBit >> 1 // shift setBit to the left: 00000010 <<= 00000001
 
     // after 32nd iteration, push bits to buffers and reset accumulators and setBit
-    if (setBit & 0x100000000) {
+    if (setBit < 0) {
       bitarray[offset] = accumulator
       accumulator = 0 // reset accumulator
       setBit = 1 // reset setBit
