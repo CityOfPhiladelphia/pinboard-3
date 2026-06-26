@@ -3,9 +3,17 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { PrimaryCareField, PrimaryCareLocation } from '@/types'
 import { PhilaButton } from '@phila/phila-ui-button'
-import { PhilaLink } from '@pinboard/ui'
+import { PhilaLink, Icon } from '@pinboard/ui'
 import LocationTags from './LocationTags.vue'
-import { IconClose } from '@phila/phila-ui-core/icons'
+import {
+  IconClose,
+  IconPhone,
+  IconGlobe,
+  IconLocationDot,
+  IconLanguage,
+  IconBus,
+  IconClock,
+} from '@phila/phila-ui-core/icons'
 
 const props = defineProps<{
   location: PrimaryCareLocation
@@ -110,7 +118,7 @@ function parseTime(raw: string | null): string {
   if (!raw) return ''
   const [hStr, mStr] = raw.split(':')
   let h = parseInt(hStr)
-  const ampm = h >= 12 ? 'pm' : 'am'
+  const ampm = h >= 12 ? 'p.m.' : 'a.m.'
   h = h % 12 || 12
   return mStr === '00' ? `${h}\u00A0${ampm}` : `${h}:${mStr}\u00A0${ampm}`
 }
@@ -214,36 +222,53 @@ function translateTransitList(raw: string | null, category: string): string {
 
     <div class="detail-body">
       <LocationTags :location="location" detail />
-      <span class="has-text-label-default">{{ $t('locationDetails') }}</span>
+      <span class="has-text-label-large">{{ $t('locationDetails') }}</span>
 
-      <div class="detail-columns">
+      <!-- Contact: phone, website, address — icon + value, no headers -->
+      <div class="detail-columns detail-zone">
         <div class="detail-col-left">
-          <div v-if="p.med_phone_num" class="detail-cell">
-            <span class="has-text-label-small cell-label">{{ $t('contact') }}</span>
-            <div class="cell-content">
-              <PhilaLink :href="`tel:${p.med_phone_num}`" size="small">
-                {{ p.med_phone_num }}
-              </PhilaLink>
-            </div>
+          <div v-if="p.med_phone_num" class="icon-row">
+            <Icon :icon="IconPhone" inline decorative class="row-icon" />
+            <PhilaLink :href="`tel:${p.med_phone_num}`" size="small">
+              {{ p.med_phone_num }}
+            </PhilaLink>
           </div>
-          <div v-if="p.website" class="detail-cell">
-            <span class="has-text-label-small cell-label">{{ $t('website') }}</span>
-            <div class="cell-content">
-              <PhilaLink :href="p.website" size="small" target="_blank" rel="noopener noreferrer">
-                {{ $t('providerWebsite') }}
-              </PhilaLink>
-            </div>
+          <div v-if="p.url_appt" class="icon-row">
+            <Icon :icon="IconGlobe" inline decorative class="row-icon" />
+            <PhilaLink :href="p.url_appt" size="small" target="_blank" rel="noopener noreferrer">
+              {{ $t('providerWebsite') }}
+            </PhilaLink>
           </div>
+        </div>
+        <div class="detail-col-right">
+          <div class="icon-row">
+            <Icon :icon="IconLocationDot" inline decorative class="row-icon" />
+            <PhilaLink :href="mapsUrl()" size="small" target="_blank" rel="noopener noreferrer">
+              {{ fullAddress }}
+            </PhilaLink>
+          </div>
+        </div>
+      </div>
+
+      <!-- Languages spoken + transit options — icon + header + content -->
+      <div class="detail-columns detail-zone detail-zone--divided">
+        <div class="detail-col-left">
           <div v-if="languagesSpoken.length" class="detail-cell">
-            <span class="has-text-label-small cell-label">{{ $t('languagesSpoken') }}</span>
-            <div class="cell-content">
-              <span class="has-text-body-small">
-                {{ languagesSpoken.map(translateLanguage).join(', ') }}
-              </span>
+            <div class="cell-header">
+              <Icon :icon="IconLanguage" inline decorative class="row-icon" />
+              <span class="has-text-label-small cell-label">{{ $t('languagesSpoken') }}</span>
             </div>
+            <span class="has-text-body-small">
+              {{ languagesSpoken.map(translateLanguage).join(', ') }}
+            </span>
           </div>
+        </div>
+        <div class="detail-col-right">
           <div v-if="hasTransit" class="detail-cell">
-            <span class="has-text-label-small cell-label">{{ $t('transitOptions') }}</span>
+            <div class="cell-header">
+              <Icon :icon="IconBus" inline decorative class="row-icon" />
+              <span class="has-text-label-small cell-label">{{ $t('transitOptions') }}</span>
+            </div>
             <div class="cell-content cell-list">
               <span v-if="location.properties.transport_bus" class="has-text-body-small">
                 {{ $t('transit.bus') }}: {{ location.properties.transport_bus }}
@@ -266,31 +291,23 @@ function translateTransitList(raw: string | null, category: string): string {
             </div>
           </div>
         </div>
-        <div class="detail-col-right">
-          <div class="detail-cell">
-            <span class="has-text-label-small cell-label">{{ $t('location') }}</span>
-            <div class="cell-content">
-              <PhilaLink :href="mapsUrl()" size="small" target="_blank" rel="noopener noreferrer">
-                {{ fullAddress }}
-              </PhilaLink>
+      </div>
+
+      <!-- Hours — full width -->
+      <div class="detail-cell detail-zone detail-zone--divided">
+        <div class="cell-header">
+          <Icon :icon="IconClock" inline decorative class="row-icon" />
+          <span class="has-text-label-small cell-label">{{ $t('hours') }}</span>
+        </div>
+        <div class="cell-content hours-list">
+          <div v-for="day in DAYS" :key="day" class="hours-entry">
+            <div class="hours-row">
+              <span class="has-text-body-small hours-day">{{ $t(DAY_I18N_KEYS[day]) }}</span>
+              <span class="has-text-body-small">{{ parseTimeRange(day) }}</span>
             </div>
-          </div>
-          <div class="detail-cell">
-            <span class="has-text-label-small cell-label">{{ $t('hours') }}</span>
-            <div class="cell-content hours-list">
-              <div v-for="day in DAYS" :key="day" class="hours-entry">
-                <div class="hours-row">
-                  <span class="has-text-body-small hours-day">{{ $t(DAY_I18N_KEYS[day]) }}</span>
-                  <span class="has-text-body-small">{{ parseTimeRange(day) }}</span>
-                </div>
-                <span
-                  v-if="getExceptionText(day)"
-                  class="has-text-body-extra-small hours-exception"
-                >
-                  * {{ getExceptionText(day) }}
-                </span>
-              </div>
-            </div>
+            <span v-if="getExceptionText(day)" class="has-text-body-extra-small hours-exception">
+              * {{ getExceptionText(day) }}
+            </span>
           </div>
         </div>
       </div>
@@ -300,7 +317,7 @@ function translateTransitList(raw: string | null, category: string): string {
         {{ translateWarning(location.properties.optional_info_general) }}
       </div>
 
-      <span class="has-text-label-default">{{ $t('servicesAvailable') }}</span>
+      <span class="has-text-label-large detail-zone--divided">{{ $t('servicesAvailable') }}</span>
 
       <!-- Patients served -->
       <section v-if="patientsServedText" class="services-section">
@@ -419,13 +436,52 @@ function translateTransitList(raw: string | null, category: string): string {
 .detail-cell {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
+}
+
+/* Indent the data under the section header so it lines up past the header icon. */
+.detail-cell > :not(.cell-header) {
+  padding-left: calc(var(--Label-Default-font-label-default-size) + 0.5rem);
+}
+
+/* Contact section: an icon next to the value (phone, website, address), no header. */
+.icon-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+/* Languages / transit / hours: an icon next to the section header. */
+.cell-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.row-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.icon-row .row-icon {
+  /* nudge down to sit on the first line of the value */
+  margin-top: 0.15rem;
+}
+
+.cell-header .row-icon {
+  font-size: var(--Label-Default-font-label-default-size);
+}
+
+/* Gray divider above the zones that follow the contact section. */
+.detail-zone--divided {
+  border-top: 1px solid var(--Schemes-Outline-Variant, rgba(0, 0, 0, 0.12));
+  padding-top: 1.5rem;
 }
 
 /* Make the bold headers a step larger than the body text below them, so the
    hierarchy comes from larger headers rather than shrinking the content. */
 .cell-label {
-  color: var(--Schemes-On-Surface-Low);
+  color: var(--Schemes-On-Surface-High);
   font-size: var(--Label-Default-font-label-default-size) !important;
 }
 
@@ -452,6 +508,8 @@ function translateTransitList(raw: string | null, category: string): string {
 
 .hours-exception {
   display: block;
+  /* Wrap before the time column instead of running the full width. */
+  max-width: 65%;
 }
 
 .services-section {

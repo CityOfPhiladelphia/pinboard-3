@@ -106,6 +106,8 @@ defineExpose({ scrollToCard })
 
   <slot name="below-search" />
 
+  <slot name="list-header" />
+
   <div
     v-if="waitForUserLocation && userLocationState === 'acquiring'"
     ref="listRef"
