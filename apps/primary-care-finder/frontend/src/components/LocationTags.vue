@@ -9,9 +9,7 @@ import {
   IconSuitcaseMedical,
   IconVideo,
   IconPersonWalking,
-  IconPerson,
   IconClock,
-  IconLanguage,
 } from '@phila/phila-ui-core/icons'
 import type { PrimaryCareLocation } from '@/types'
 
@@ -21,9 +19,17 @@ const props = defineProps<{
   detail?: boolean
 }>()
 
-const { t } = useI18n()
+const { t, locale, messages } = useI18n()
 
 const DAYS = ['sun', 'mon', 'tues', 'wed', 'thurs', 'fri', 'sat'] as const
+
+const LATER_HOURS_MAP: Partial<Record<(typeof DAYS)[number], 'M' | 'T' | 'W' | 'R' | 'F'>> = {
+  mon: 'M',
+  tues: 'T',
+  wed: 'W',
+  thurs: 'R',
+  fri: 'F',
+}
 
 interface TagConfig {
   text: string
@@ -55,13 +61,22 @@ const hoursStatus = computed<'openNow' | 'closed' | 'checkHours'>(() => {
   const end = props.location.properties[`hours_${dayKey}_end`] as string | null
   const exceptions = props.location.properties[`hours_${dayKey}_exceptions`] as string | null
 
-  if (exceptions) return 'checkHours'
-  if (!start || !end) return 'closed'
-
   const h = String(now.getHours()).padStart(2, '0')
   const m = String(now.getMinutes()).padStart(2, '0')
   const currentTime = `${h}:${m}:00`
-  return currentTime >= start && currentTime <= end ? 'openNow' : 'closed'
+
+  if (!start || currentTime < start) return 'closed'
+
+  if (!exceptions) {
+    return end && currentTime < end ? 'openNow' : 'closed'
+  }
+
+  const laterDayCode = LATER_HOURS_MAP[dayKey]
+  if (laterDayCode && props.location.properties.later_hours_day === laterDayCode) {
+    return 'checkHours'
+  }
+
+  return end && currentTime < end ? 'checkHours' : 'closed'
 })
 
 const detailTags = computed<TagConfig[]>(() => {
@@ -81,6 +96,14 @@ const detailTags = computed<TagConfig[]>(() => {
       : null,
   ]
   return candidates.filter((t): t is TagConfig => t !== null)
+})
+
+const todaysException = computed<string | undefined>(() => {
+  const dayKey = DAYS[new Date().getDay()]
+  const exc = props.location.properties[`hours_${dayKey}_exceptions`] as string | null
+  if (!exc) return undefined
+  const msgs = messages.value[locale.value] as Record<string, Record<string, string>>
+  return msgs?.exceptions?.[exc] ?? exc
 })
 
 const cardTags = computed<TagConfig[]>(() => {
@@ -103,50 +126,16 @@ const cardTags = computed<TagConfig[]>(() => {
             ? 'red'
             : 'yellow',
       icon: IconClock,
-      tooltip: todaysHoursTooltip.value,
+      tooltip:
+        hoursStatus.value === 'checkHours' && todaysException.value
+          ? `${todaysHoursTooltip.value} – ${todaysException.value}`
+          : todaysHoursTooltip.value,
     },
     !!props.location.properties.hours_sat_start || !!props.location.properties.hours_sun_start
-      ? {
-          text: t('tags.weekendHours'),
-          color: 'blue',
-          icon: IconClock,
-          tooltip: todaysHoursTooltip.value,
-        }
+      ? { text: t('tags.weekendHours'), color: 'blue', icon: IconClock }
       : null,
     !!todayEnd && todayEnd >= '18:00:00'
-      ? {
-          text: t('tags.openAfter6'),
-          color: 'blue',
-          icon: IconClock,
-          tooltip: todaysHoursTooltip.value,
-        }
-      : null,
-    // !!props.location.properties.wait_sameday_sick_ad || !!props.location.properties.wait_sameday_sick_ch
-    props.location.properties.walk_ins_sick === 'Yes'
-      ? { text: t('tags.walkIns'), color: 'purple', icon: IconPersonWalking }
-      : null,
-    props.location.properties.primary_telehealth === 'Yes'
-      ? { text: t('tags.telehealth'), color: 'purple', icon: IconVideo }
-      : null,
-    props.location.properties.transport_parking
-      ? { text: t('tags.parking'), color: 'blue', icon: IconCar }
-      : null,
-    props.location.properties.special_pharmacy === 'Yes'
-      ? { text: t('tags.pharmacy'), color: 'blue', icon: IconSuitcaseMedical }
-      : null,
-    props.location.properties.adults === 'Yes'
-      ? { text: t('tags.adultCare'), color: 'purple', icon: IconPerson }
-      : null,
-    props.location.properties.children === 'Yes'
-      ? { text: t('tags.pediatrics'), color: 'purple', icon: IconPerson }
-      : null,
-    !!props.location.properties.languages &&
-    props.location.properties.languages.split(',').filter(Boolean).length > 1
-      ? {
-          text: t('tags.multipleLanguages'),
-          color: 'purple',
-          icon: IconLanguage,
-        }
+      ? { text: t('tags.openAfter6'), color: 'blue', icon: IconClock }
       : null,
   ]
 

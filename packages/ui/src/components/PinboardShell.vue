@@ -3,6 +3,8 @@ import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader, NavbarInfo } from '@phila/phila-ui-app-header'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { CloseButton } from '@phila/phila-ui-button'
+import { Icon } from '@phila/phila-ui-core'
+import { IconCircleInfo } from '@phila/phila-ui-core/icons'
 import MobileNavPanel from './MobileNavPanel.vue'
 import PinboardSubFooter from './PinboardSubFooter.vue'
 import { ref, watch } from 'vue'
@@ -21,6 +23,7 @@ defineProps<{
   feedbackHref?: string
   infoTitle?: string
   infoLabel?: string
+  infoHref?: string
 }>()
 
 const emit = defineEmits<{
@@ -138,8 +141,22 @@ function onSheetPointerUp() {
           <slot name="mobile-nav" />
         </MobileNavPanel>
       </template>
-      <template v-if="infoTitle || $slots['navbar-end']" #navbar-end>
-        <template v-if="infoTitle">
+      <template v-if="infoHref || infoTitle || $slots['navbar-end']" #navbar-end>
+        <RouterLink v-if="infoHref" :to="infoHref" class="navbar-info-link">
+          <Icon
+            :icon="IconCircleInfo"
+            decorative
+            inline
+            size="small"
+            class="navbar-info-link__icon"
+          />
+          <span
+            v-if="infoLabel ?? infoTitle"
+            class="navbar-info-link__label has-text-body-default hidden-tablet"
+            >{{ infoLabel ?? infoTitle }}</span
+          >
+        </RouterLink>
+        <template v-else-if="infoTitle">
           <div v-if="isMobile" class="navbar-info-mobile-wrap" @click.capture.stop="openInfoSheet">
             <NavbarInfo :info-title="infoTitle" :label="infoLabel ?? infoTitle" />
           </div>
@@ -205,6 +222,28 @@ function onSheetPointerUp() {
 
 .pinboard :deep(.phila-navbar) {
   column-gap: var(--spacing-s);
+}
+
+.navbar-info-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  text-decoration: none;
+}
+
+.navbar-info-link__icon {
+  color: white;
+}
+
+.navbar-info-link__label {
+  color: var(--Extended-Colors-link-default);
+  text-decoration: underline;
+  font-weight: normal;
+}
+
+.navbar-info-link:hover .navbar-info-link__label {
+  color: var(--Extended-Colors-link-hover);
+  text-decoration-color: var(--Extended-Colors-link-hover);
 }
 
 .phila-navbar .phila-mobile-nav .nav-flyout {

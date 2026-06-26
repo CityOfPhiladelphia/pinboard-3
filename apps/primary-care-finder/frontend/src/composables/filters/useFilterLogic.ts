@@ -26,21 +26,25 @@ export function useFilterLogic(
   const matchYesEstPat = ['Yes', 'Established Patients']
 
   const matchFieldsToOptions: MatchingFunction = (
-    item: PrimaryCareLocation,
-    fieldNames: (keyof PrimaryCareProperties)[],
+    item: Record<string, unknown>,
+    fieldNames: string[],
     valuesToMatch: unknown[]
   ) => {
-    return fieldNames.some((fieldName) => valuesToMatch.includes(item.properties[fieldName]))
+    const loc = item as unknown as PrimaryCareLocation
+    return (fieldNames as (keyof PrimaryCareProperties)[]).some((fieldName) =>
+      valuesToMatch.includes(loc.properties[fieldName])
+    )
   }
 
-  function matchOptionInString(
-    item: PrimaryCareLocation,
-    fieldNames: (keyof PrimaryCareProperties)[],
-    valuesToMatch: string[]
-  ) {
-    return fieldNames.some((fieldName) =>
-      valuesToMatch.some((value) =>
-        String(item.properties[fieldName])
+  const matchOptionInString: MatchingFunction = (
+    item: Record<string, unknown>,
+    fieldNames: string[],
+    valuesToMatch: unknown[]
+  ) => {
+    const loc = item as unknown as PrimaryCareLocation
+    return (fieldNames as (keyof PrimaryCareProperties)[]).some((fieldName) =>
+      (valuesToMatch as string[]).some((value) =>
+        String(loc.properties[fieldName])
           .toLowerCase()
           .replace(/\s+/g, '')
           .split(',')
@@ -435,7 +439,7 @@ export function useFilterLogic(
 
   const filterLogic = computed(() => {
     const commonParams = {
-      data: locations.value as Record<string, any>[],
+      data: locations.value as unknown as Record<string, unknown>[],
       bufferLength: getBufferSize(locations.value.length),
     }
     const ageGroupFilter = new FilterChoiceBitfieldGroup({

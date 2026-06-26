@@ -78,6 +78,17 @@ function scrollToSection(id: string) {
   flex-direction: column;
   align-items: flex-start;
   gap: 1rem;
+  /* Break long unbreakable tokens (e.g. URLs) so they wrap instead of forcing
+     the column wider than the viewport on narrow screens. */
+  overflow-wrap: anywhere;
+}
+
+/* Links are injected via v-html (no scope attribute) and may inherit a global
+   `a` rule that resets wrapping — force long URLs to break with a winning
+   selector so they can't push the column past the viewport. */
+.section :deep(a) {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .subsection-container {
@@ -117,19 +128,29 @@ function scrollToSection(id: string) {
 }
 
 @media (max-width: 768px) {
+  /* Fill the viewport and allow the flex chain to shrink, so the content wraps
+     to the phone width instead of resolving to the 45rem max and overflowing. */
+  .inner-container {
+    width: 100%;
+    min-width: 0;
+  }
+
   .content-area {
+    flex: 1;
+    min-width: 0;
     padding: 1.5rem 1rem 0 1rem;
   }
 
   .section {
     gap: 0.75rem;
     padding-bottom: 1.5rem;
+    max-width: 100%;
   }
 
+  /* Hide the on-this-page table of contents on mobile so the /info content
+     fits on a phone (the sticky desktop TOC doesn't translate to small screens). */
   .info-toc {
-    position: static;
-    flex-basis: auto;
-    order: -1;
+    display: none;
   }
 }
 </style>
