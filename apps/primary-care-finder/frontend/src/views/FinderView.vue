@@ -5,6 +5,8 @@ import {
   PinboardBody,
   CircleLayer,
   MapNavigationControl,
+  MapIconTextPin,
+  MapMarker,
   GeolocationButton,
   BasemapToggle,
   PinboardComposables,
@@ -18,10 +20,11 @@ import { useFilterLogic } from '@/composables/filters/useFilterLogic'
 import LocationCard from '@/components/LocationCard.vue'
 import LocationDetail from '@/components/LocationDetail.vue'
 import type { PrimaryCareFilterValues, PrimaryCareLocation, PrimaryCareResponse } from '@/types'
+import { IconLocationDot } from '@phila/phila-ui-core/icons'
 
-const isMobile = PinboardComposables.useIsMobile()
-const { t } = useI18n()
-const { filterChipDefinitions } = useFilterChipDefinitions()
+import {
+  sortLocations
+} from '@/utilities/sortLocations'
 
 const emptyFilters: PrimaryCareFilterValues = {
   sort: '',
@@ -33,9 +36,11 @@ const emptyFilters: PrimaryCareFilterValues = {
   languages: [],
 }
 
-const searchPlaceholderText = computed(() => t('searchPlaceholder'))
-
+const { t } = useI18n()
+const isMobile = PinboardComposables.useIsMobile()
+const { filterChipDefinitions } = useFilterChipDefinitions()
 const { locations, isLoading, errorMessage, geojson } = useLocations()
+
 // Location is requested only when the user clicks the geolocation button, which
 // emits to handleGeolocate. The shared useUserLocation composable prompts on load,
 // which the primary care finder intentionally avoids.
@@ -43,10 +48,21 @@ const userLocation = ref<PinboardTypes.LatLon>({
   latitude: NaN,
   longitude: NaN,
 })
-const searchString = ref('')
-
+const addressForSearch = ref<string>('')
+const { addressCoordinates, finishedAddressFetch } =
+  PinboardComposables.useSearchAddress(addressForSearch)
+const zipcodeForSearch = ref<string>('')
+const { zipcodePolygon, finishedZipFetch } = PinboardComposables.useSearchZipcode(zipcodeForSearch)
+const keywordsForSearch = ref<string>('')
+const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
+const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
+  userLocation,
+  addressCoordinates,
+  finishedAddressFetch,
+  zipcodePolygon,
+  finishedZipFetch
+)
 const filterState = ref<PrimaryCareFilterValues>(emptyFilters)
-
 const { filterLogicalValue } = useFilterLogic(locations, filterState)
 
 const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
@@ -72,8 +88,8 @@ const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
       ? applyFilters(geojson.value.features)
       : geojson.value.features
 
-    if (searchString.value) {
-      const terms = searchString.value.replace(/\W+/g, ' ').toLowerCase().split(' ').filter(Boolean)
+    if (keywordsForSearch.value) {
+      const terms = keywordsForSearch.value.replace(/\W+/g, ' ').toLowerCase().split(' ').filter(Boolean)
       result = result.filter((loc) => {
         const haystack = JSON.stringify(Object.values(loc)).toLowerCase()
         return terms.some((term) => haystack.includes(term))
@@ -93,15 +109,15 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
     ? applyFilters(locationsWithDistance.value)
     : locationsWithDistance.value
 
-  if (searchString.value) {
-    const terms = searchString.value.replace(/\W+/g, ' ').toLowerCase().split(' ').filter(Boolean)
+  if (keywordsForSearch.value) {
+    const terms = keywordsForSearch.value.replace(/\W+/g, ' ').toLowerCase().split(' ').filter(Boolean)
     result = result.filter((loc) => {
       const haystack = JSON.stringify(Object.values(loc)).toLowerCase()
       return terms.some((term) => haystack.includes(term))
     })
   }
 
-  return result
+  return filterState.value.sort ? sortLocations(result, searchOrUserLocation, filterState.value.sort) : result
 })
 
 function applyFilters<T>(arr: T[]): T[] {
@@ -113,7 +129,7 @@ function applyFilters<T>(arr: T[]): T[] {
       filtered.push(item)
     }
     check <<= 1
-    if (!(check & 0xffffffff)) {
+    if (check & 0x100000000) {
       check = 1
       offset++
     }
@@ -121,8 +137,37 @@ function applyFilters<T>(arr: T[]): T[] {
   return filtered
 }
 
-function handleSearchSubmit(s: string) {
-  searchString.value = s
+function handleSearchSubmit(locationSearchString: string) {
+  switch (true) {
+    case PinboardUtilities.StreetAddress.test(locationSearchString):
+    case PinboardUtilities.StreetIntersection.test(locationSearchString): {
+      locationSearchMode.value = 'address'
+      addressForSearch.value = locationSearchString
+      zipcodeForSearch.value = ''
+      keywordsForSearch.value = ''
+      break
+    }
+    case PinboardUtilities.Zipcode.test(locationSearchString): {
+      locationSearchMode.value = 'zipcode'
+      zipcodeForSearch.value = locationSearchString
+      addressForSearch.value = ''
+      keywordsForSearch.value = ''
+      break
+    }
+    case locationSearchString !== '': {
+      locationSearchMode.value = 'keyword'
+      keywordsForSearch.value = locationSearchString
+      addressForSearch.value = ''
+      zipcodeForSearch.value = ''
+      break
+    }
+    default: {
+      locationSearchMode.value = undefined
+      addressForSearch.value = locationSearchString
+      zipcodeForSearch.value = locationSearchString
+      keywordsForSearch.value = locationSearchString
+    }
+  }
 }
 
 function handleGeolocate(locationData: { latitude: number; longitude: number; accuracy: number }) {
@@ -152,10 +197,11 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
   <PinboardBody
     v-model:filter-values="filterState"
     :locations="filteredLocations"
-    :search-or-user-location="userLocation"
+    :search-or-user-location="searchOrUserLocation"
+    :location-search-mode="locationSearchMode"
     :is-loading="isLoading"
     :error-message="errorMessage"
-    :location-panel-search="searchPlaceholderText"
+    :location-panel-search="t('searchPlaceholder')"
     :geojson="filteredGeojson"
     :is-mobile="isMobile"
     :filters="filterChipDefinitions"
@@ -180,7 +226,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
     </template>
 
     <template
-      #map-content="{ hoveredId, selectedId, mobileControlsTarget, onHover, onHoverEnd, onSelect }"
+      #map-content="{ hoveredId, selectedId, zoom, mobileControlsTarget, onHover, onHoverEnd, onSelect }"
     >
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />
       <BasemapToggle
@@ -229,6 +275,13 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
           }
         "
       />
+      <MapMarker
+          v-if="PinboardUtilities.hasLocationData(searchOrUserLocation)"
+          key="searchOrUserLocation"
+          :lng-lat="[searchOrUserLocation.longitude, searchOrUserLocation.latitude]"
+        >
+          <MapIconTextPin :zoom="zoom" :icon="IconLocationDot" color-theme="light-tertiary" />
+        </MapMarker>
     </template>
   </PinboardBody>
 </template>

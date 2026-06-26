@@ -44,13 +44,6 @@ export default {
     sort: 'Sort',
     distance: 'Distance',
     name: 'Name (A–Z)',
-    mat: 'MAT',
-    nutrition: 'Nutrition',
-    tobacco: 'Tobacco cessation',
-    pharmacy: 'Pharmacy',
-    blood: 'Blood',
-    sti: 'STI',
-    covid: 'COVID',
   },
   searchPlaceholder: 'Search by address or keyword...',
   introPage: {
@@ -215,7 +208,7 @@ export default {
     pharmacy: 'On-site pharmacy',
   },
   waitTime: {
-    category: 'Wait time (Primary Care)',
+    category: 'Wait time',
     walkIn: 'Same-day or walk-in (sick visit)',
     oneWeekWell: '<1 week (well visit)',
     oneWeekSick: '<1 week (sick visit)',
