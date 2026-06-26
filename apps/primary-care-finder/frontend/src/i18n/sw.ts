@@ -115,6 +115,8 @@ export default {
   patientType: {
     category: 'Kustahiki',
     patient_type_new: 'Wagonjwa wapya',
+    patient_type_new_subtext:
+      'Baadhi ya huduma hizi zinaweza kupatikana bila miadi. Wasiliana na mtoa huduma kwa maelezo zaidi.',
     patient_type_existing: 'Wagonjwa walioanzishwa',
     patient_type_existing_only: 'Lazima uanzishe huduma kwenye eneo',
     patient_type_existing_only_subtext:

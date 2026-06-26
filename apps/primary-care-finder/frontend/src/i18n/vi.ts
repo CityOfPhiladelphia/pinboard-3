@@ -116,6 +116,8 @@ export default {
   patientType: {
     category: 'Đủ điều kiện',
     patient_type_new: 'Bệnh nhân mới',
+    patient_type_new_subtext:
+      'Một số dịch vụ này có thể được cung cấp cho bệnh nhân không cần hẹn trước. Liên hệ với nhà cung cấp để biết thêm thông tin.',
     patient_type_existing: 'Bệnh nhân đã được thiết lập hồ sơ',
     patient_type_existing_only: 'Bắt buộc thiết lập dịch vụ chăm sóc sức khoẻ tại chỗ',
     patient_type_existing_only_subtext:

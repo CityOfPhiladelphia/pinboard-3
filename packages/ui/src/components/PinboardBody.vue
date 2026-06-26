@@ -387,17 +387,16 @@ const effectiveMapConfig = (() => {
       <div id="mobile-map-search-filter" class="mobile-map-search-filter"></div>
     </div>
 
-    <Teleport to="#app" :disabled="!isMobile">
-      <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
-        <FilterPanel
-          v-if="allFiltersOpen"
-          :filters="filters"
-          :model-value="filterValues"
-          @update:model-value="handleApplyFilter"
-          @close="allFiltersOpen = false"
-        />
-      </div>
-    </Teleport>
+    <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
+      <FilterPanel
+        v-if="allFiltersOpen"
+        :filters="filters"
+        :model-value="filterValues"
+        :full-screen="isMobile"
+        @update:model-value="handleApplyFilter"
+        @close="allFiltersOpen = false"
+      />
+    </div>
   </div>
   <BottomSheet
     ref="bottomSheetRef"
@@ -614,14 +613,11 @@ const effectiveMapConfig = (() => {
     padding: 10px 0;
   }
 
-  /* Full-screen modal that covers the bottom sheet and map, rather than a
-     slide-over panel trapped inside the finder panel. */
-  .all-filters-overlay {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    z-index: 1100;
-    box-shadow: none;
+  /* Mobile: FilterPanel renders its own full-screen takeover (teleported to
+     <body>, above the header). The desktop slide-over wrapper is inert here —
+     the v-if'd FilterPanel still mounts and teleports itself out. */
+  .all-filters-overlay.open {
+    display: none;
   }
 }
 </style>
