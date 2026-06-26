@@ -33,6 +33,7 @@ export default {
   location: 'Eneo',
   transitOptions: 'Njia za usafiri',
   servicesAvailable: 'Huduma zinazopatikana',
+  patientsServed: 'Wagonjwa wanaohudumiwa',
   callout: {
     title: 'Huduma ya matibabu ya bure na ya bei ya chini huko Philadelphia',
     message:
@@ -111,6 +112,9 @@ export default {
     child: 'Mtoto',
     adults: 'Watu wazima',
     children: 'Watoto',
+    servesAdults: 'Hutumikia watu wazima.',
+    servesChildren: 'Hutumikia watoto.',
+    servesBoth: 'Hutumikia watu wazima na watoto.',
   },
   patientType: {
     category: 'Kustahiki',
@@ -273,6 +277,18 @@ export default {
     well: 'Inajumuisha vipimo vya kimwili',
     mat: 'Dawa za ugonjwa wa matumizi ya opioid',
     women: 'Inajumuisha upangaji uzazi na utunzaji wa uzazi',
+  },
+  caveats: {
+    'Exclusively serves adolescents and young adults (ages 13-26).':
+      'Hutumikia pekee vijana balehe na vijana wazima (wenye umri wa miaka 13-26).',
+    'Exclusively serves people living with HIV.': 'Hutumikia pekee watu wanaoishi na VVU.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
+      'Hutumikia pekee wanajamii wahamiaji wa Latine wasio na bima ya afya katika Philadelphia. Hakuna uchunguzi wa afya kwa ajili ya kazi. Huduma kwa watoto zimepunguzwa kwa meno, macho, na afya ya akili.',
+    'Services for children are limited to dental, mental health, and vaccines.':
+      'Huduma kwa watoto zimepunguzwa kwa meno, afya ya akili, na chanjo.',
+    'Special focus on LGBTQ+ ': 'Inaangazia hasa LGBTQ+',
+    'Special focus on people who are currently or recently homeless, or at risk of homelessness.':
+      'Inaangazia hasa watu ambao kwa sasa au hivi karibuni hawana makazi, au walio katika hatari ya kukosa makazi.',
   },
   warnings: {
     'This health center only offers HIV and STD/STI testing and treatment; walk-ins only ':

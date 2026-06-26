@@ -33,6 +33,7 @@ export default {
   location: 'Местоположение',
   transitOptions: 'Варианты общественного транспорта',
   servicesAvailable: 'Доступные услуги',
+  patientsServed: 'Обслуживаемые пациенты',
   callout: {
     title: 'Бесплатная или недорогая медицинская помощь в Филадельфии',
     message:
@@ -111,6 +112,9 @@ export default {
     child: 'Ребенок',
     adults: 'Взрослые',
     children: 'Дети',
+    servesAdults: 'Обслуживает взрослых.',
+    servesChildren: 'Обслуживает детей.',
+    servesBoth: 'Обслуживает взрослых и детей.',
   },
   patientType: {
     category: 'Соответствие',
@@ -271,6 +275,18 @@ export default {
     well: 'Включает рабочие медосмотры',
     mat: 'Препараты для лечения опиоидной зависимости',
     women: 'Включает планирование семьи и гинекологию',
+  },
+  caveats: {
+    'Exclusively serves adolescents and young adults (ages 13-26).':
+      'Обслуживает исключительно подростков и молодых людей (в возрасте 13–26 лет).',
+    'Exclusively serves people living with HIV.': 'Обслуживает исключительно людей, живущих с ВИЧ.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
+      'Обслуживает исключительно незастрахованных членов латиноамериканского иммигрантского сообщества Филадельфии. Без медосмотров для трудоустройства. Услуги для детей ограничены стоматологией, офтальмологией и психиатрической помощью.',
+    'Services for children are limited to dental, mental health, and vaccines.':
+      'Услуги для детей ограничены стоматологией, психиатрической помощью и вакцинацией.',
+    'Special focus on LGBTQ+ ': 'Особое внимание уделяется сообществу LGBTQ+',
+    'Special focus on people who are currently or recently homeless, or at risk of homelessness.':
+      'Особое внимание уделяется людям, которые в настоящее время или недавно остались без жилья, либо находятся под угрозой потери жилья.',
   },
   warnings: {
     'This health center only offers HIV and STD/STI testing and treatment; walk-ins only ':

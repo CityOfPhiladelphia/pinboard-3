@@ -33,6 +33,7 @@ export default {
   location: 'Local',
   transitOptions: 'Opções de transporte',
   servicesAvailable: 'Serviços disponíveis',
+  patientsServed: 'Pacientes atendidos',
   callout: {
     title: 'Assistência médica gratuita e de baixo custo na Filadélfia',
     message:
@@ -110,6 +111,9 @@ export default {
     child: 'Criança',
     adults: 'Adultos',
     children: 'Crianças',
+    servesAdults: 'Atende adultos.',
+    servesChildren: 'Atende crianças.',
+    servesBoth: 'Atende adultos e crianças.',
   },
   patientType: {
     category: 'Elegibilidade',
@@ -272,6 +276,19 @@ export default {
     well: 'Inclui exames físicos de trabalho',
     mat: 'Medicamentos para transtorno por uso de opióides',
     women: 'Inclui planejamento familiar e cuidados ginecológicos',
+  },
+  caveats: {
+    'Exclusively serves adolescents and young adults (ages 13-26).':
+      'Atende exclusivamente adolescentes e jovens adultos (de 13 a 26 anos).',
+    'Exclusively serves people living with HIV.':
+      'Atende exclusivamente pessoas que vivem com HIV.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
+      'Atende exclusivamente membros não segurados da comunidade imigrante latina de Filadélfia. Não realiza exames médicos para o trabalho. Os serviços para crianças limitam-se a atendimento odontológico, oftalmológico e de saúde mental.',
+    'Services for children are limited to dental, mental health, and vaccines.':
+      'Os serviços para crianças limitam-se a atendimento odontológico, de saúde mental e vacinas.',
+    'Special focus on LGBTQ+ ': 'Foco especial em LGBTQ+',
+    'Special focus on people who are currently or recently homeless, or at risk of homelessness.':
+      'Foco especial em pessoas que estão atualmente ou recentemente em situação de rua, ou em risco de ficar sem moradia.',
   },
   warnings: {
     'This health center only offers HIV and STD/STI testing and treatment; walk-ins only ':

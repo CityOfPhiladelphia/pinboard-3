@@ -33,6 +33,7 @@ export default {
   location: 'Địa điểm',
   transitOptions: 'Lựa chọn phương tiện di chuyển',
   servicesAvailable: 'Dịch vụ hiện có',
+  patientsServed: 'Bệnh nhân được phục vụ',
   callout: {
     title: 'Phúc lợi y tế miễn phí và chi phí thấp tại Philadelphia',
     message:
@@ -112,6 +113,9 @@ export default {
     child: 'Trẻ em',
     adults: 'Nhiều người lớn',
     children: 'Nhiều trẻ em',
+    servesAdults: 'Phục vụ người lớn.',
+    servesChildren: 'Phục vụ trẻ em.',
+    servesBoth: 'Phục vụ người lớn và trẻ em.',
   },
   patientType: {
     category: 'Đủ điều kiện',
@@ -272,6 +276,18 @@ export default {
     well: 'Bao gồm khám sức khoẻ xin việc',
     mat: 'Kê thuốc cho hội chứng rối loạn sử dụng opioid',
     women: 'Bao gồm tư vấn kế hoạch hoá gia đình và chăm sóc phụ khoa',
+  },
+  caveats: {
+    'Exclusively serves adolescents and young adults (ages 13-26).':
+      'Chỉ phục vụ thanh thiếu niên và người trẻ tuổi (từ 13 đến 26 tuổi).',
+    'Exclusively serves people living with HIV.': 'Chỉ phục vụ người sống chung với HIV.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
+      'Chỉ phục vụ những thành viên không có bảo hiểm thuộc cộng đồng người nhập cư gốc Latinh ở Philadelphia. Không khám sức khỏe để đi làm. Dịch vụ cho trẻ em chỉ giới hạn ở nha khoa, chăm sóc mắt và sức khỏe tâm thần.',
+    'Services for children are limited to dental, mental health, and vaccines.':
+      'Dịch vụ cho trẻ em chỉ giới hạn ở nha khoa, sức khỏe tâm thần và tiêm chủng.',
+    'Special focus on LGBTQ+ ': 'Đặc biệt chú trọng đến cộng đồng LGBTQ+',
+    'Special focus on people who are currently or recently homeless, or at risk of homelessness.':
+      'Đặc biệt chú trọng đến những người hiện đang hoặc gần đây vô gia cư, hoặc có nguy cơ trở thành vô gia cư.',
   },
   warnings: {
     'This health center only offers HIV and STD/STI testing and treatment; walk-ins only ':

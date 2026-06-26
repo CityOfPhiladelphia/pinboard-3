@@ -33,6 +33,7 @@ export default {
   location: 'Kote',
   transitOptions: 'Opsyon transpò',
   servicesAvailable: 'Sèvis ki disponib',
+  patientsServed: 'Pasyan yo sèvi',
   callout: {
     title: 'Swen medikal gratis ak pri ki ba nan Philadelphia',
     message:
@@ -110,6 +111,9 @@ export default {
     child: 'Timoun',
     adults: 'Granmoun',
     children: 'Timoun yo',
+    servesAdults: 'Sèvi granmoun.',
+    servesChildren: 'Sèvi timoun.',
+    servesBoth: 'Sèvi granmoun ak timoun.',
   },
   patientType: {
     category: 'Elijiblite',
@@ -272,6 +276,18 @@ export default {
     well: 'Gen ladann fizik travay',
     mat: 'Medikaman pou maladi itilizasyon opioid',
     women: 'Gen ladann planifikasyon familyal ak swen jinekolojik',
+  },
+  caveats: {
+    'Exclusively serves adolescents and young adults (ages 13-26).':
+      'Sèvi sèlman adolesan ak jèn granmoun (ki gen 13 a 26 an).',
+    'Exclusively serves people living with HIV.': 'Sèvi sèlman moun k ap viv ak VIH.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
+      'Sèvi sèlman manm kominote imigran Latine nan Filadèlfi ki pa gen asirans. Pa gen egzamen fizik pou travay. Sèvis pou timoun yo limite ak dan, swen je, ak sante mantal.',
+    'Services for children are limited to dental, mental health, and vaccines.':
+      'Sèvis pou timoun yo limite ak dan, sante mantal, ak vaksen.',
+    'Special focus on LGBTQ+ ': 'Konsantrasyon espesyal sou LGBTQ+',
+    'Special focus on people who are currently or recently homeless, or at risk of homelessness.':
+      'Konsantrasyon espesyal sou moun ki san kay kounye a oswa ki te san kay dènyèman, oswa ki an risk pou yo san kay.',
   },
   warnings: {
     'This health center only offers HIV and STD/STI testing and treatment; walk-ins only ':

@@ -33,6 +33,7 @@ export default {
   location: 'Emplacement',
   transitOptions: 'Options de transport',
   servicesAvailable: 'Services disponibles',
+  patientsServed: 'Patients accueillis',
   callout: {
     title: 'Soins médicaux gratuits et à faible coût à Philadelphie',
     message:
@@ -111,6 +112,9 @@ export default {
     child: 'Enfant',
     adults: 'Adultes',
     children: 'Enfants',
+    servesAdults: 'Accueille les adultes.',
+    servesChildren: 'Accueille les enfants.',
+    servesBoth: 'Accueille les adultes et les enfants.',
   },
   patientType: {
     category: 'Admissibilité',
@@ -272,6 +276,19 @@ export default {
     well: 'Inclut les examens physiques d’aptitude au travail',
     mat: 'Médicaments pour les troubles liés à la consommation d’opioïdes',
     women: 'Inclut le planning familial et les soins gynécologiques',
+  },
+  caveats: {
+    'Exclusively serves adolescents and young adults (ages 13-26).':
+      'Accueille exclusivement les adolescents et jeunes adultes (âgés de 13 à 26 ans).',
+    'Exclusively serves people living with HIV.':
+      'Accueille exclusivement les personnes vivant avec le VIH.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
+      'Accueille exclusivement les membres sans assurance maladie de la communauté immigrée latino-américaine de Philadelphie. Pas de visites médicales du travail. Les services pour les enfants se limitent aux soins dentaires, aux soins oculaires et à la santé mentale.',
+    'Services for children are limited to dental, mental health, and vaccines.':
+      'Les services pour les enfants se limitent aux soins dentaires, à la santé mentale et aux vaccins.',
+    'Special focus on LGBTQ+ ': 'Attention particulière portée aux personnes LGBTQ+',
+    'Special focus on people who are currently or recently homeless, or at risk of homelessness.':
+      'Attention particulière portée aux personnes actuellement ou récemment sans-abri, ou à risque de le devenir.',
   },
   warnings: {
     'This health center only offers HIV and STD/STI testing and treatment; walk-ins only ':
