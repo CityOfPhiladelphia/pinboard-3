@@ -284,6 +284,9 @@ function translateTransitList(raw: string | null, category: string): string {
         <span class="has-text-label-small cell-label">{{
           $t('patientType.patient_type_new')
         }}</span>
+        <span class="has-text-body-extra-small">{{
+          $t('patientType.patient_type_new_subtext')
+        }}</span>
         <div class="service-list">
           <span v-for="label in newPatientServices" :key="label" class="has-text-body-small">
             {{ $t(label) }}

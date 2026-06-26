@@ -114,6 +114,8 @@ export default {
   patientType: {
     category: 'Elijiblite',
     patient_type_new: 'Nouvo pasyan yo',
+    patient_type_new_subtext:
+      'Kèk nan sèvis sa yo ka disponib san randevou. Kontakte founisè a pou plis enfòmasyon.',
     patient_type_existing: 'Pasyan etabli',
     patient_type_existing_only: 'Dwe etabli swen nan sit la',
     patient_type_existing_only_subtext:

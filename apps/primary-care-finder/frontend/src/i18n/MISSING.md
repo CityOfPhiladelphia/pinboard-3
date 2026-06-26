@@ -118,6 +118,12 @@ verbatim in all translations. `itemCount` uses vue-i18n plural syntax
     `locationDetails`, `contact`, `location`, `transitOptions`, `servicesAvailable`.
   - **Pre-existing truncations carried in by the port:** vue3-pinboard's `sw` (Swahili)
     `languagesSpoken` is truncated (`'Lugha zinazozungum'`); fix at the source when reviewed.
+- **New-patient services subtext (`patientType.patient_type_new_subtext`) — first-pass
+  translations, verify with the city.** The "For new patients" detail-panel heading was trimmed
+  (English dropped "or walk-ins") and a subtitle was added in all 10 locales: "Some of these
+  services may be available for walk-ins. Contact the provider for more information." The non-English
+  versions are first-pass (AI), each reusing the locale's existing professional `tags.walkIns`
+  wording for the "walk-ins" term; confirm with the city translation service.
 - **Arabic (`ar`)**: translations exist for the shared-chrome stubs and the app-string stubs, but
   the layout remains left-to-right. RTL mirroring (`dir="rtl"`) is a separate future effort.
 - **Taxonomy reconcile (deferred):** the app catalog currently carries the same content under two

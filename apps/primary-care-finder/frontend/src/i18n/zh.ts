@@ -113,6 +113,7 @@ export default {
   patientType: {
     category: '资格',
     patient_type_new: '新患者',
+    patient_type_new_subtext: '其中一些服务可能无需预约即可获得。请联系提供方了解更多信息。',
     patient_type_existing: '已建立医患关系的患者',
     patient_type_existing_only: '必须在现场建立医患关系',
     patient_type_existing_only_subtext:
