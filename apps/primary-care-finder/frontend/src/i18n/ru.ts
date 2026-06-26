@@ -115,6 +115,8 @@ export default {
   patientType: {
     category: 'Соответствие',
     patient_type_new: 'Новые пациенты',
+    patient_type_new_subtext:
+      'Некоторые из этих услуг могут быть доступны без записи. Свяжитесь с поставщиком услуг для получения дополнительной информации.',
     patient_type_existing: 'Пациенты под наблюдением',
     patient_type_existing_only: 'Должны получать помощь в центре',
     patient_type_existing_only_subtext:

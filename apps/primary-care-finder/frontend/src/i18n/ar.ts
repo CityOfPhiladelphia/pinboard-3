@@ -114,6 +114,8 @@ export default {
   patientType: {
     category: 'الأهلية',
     patient_type_new: 'مرضى جدد',
+    patient_type_new_subtext:
+      'قد تتوفر بعض هذه الخدمات بدون موعد. اتصل بمقدم الخدمة لمزيد من المعلومات.',
     patient_type_existing: 'مرضى حاليون',
     patient_type_existing_only: 'يجب تقديم الرعاية في الموقع',
     patient_type_existing_only_subtext:

@@ -1,4 +1,4 @@
-import type { PinboardTypes, FilterValues } from '@pinboard/ui'
+import type { PinboardTypes } from '@pinboard/ui'
 
 export interface PrimaryCareProperties {
   cartodb_id: number | null
@@ -207,7 +207,7 @@ export type LanguagesFilter =
   | 'vietnamese'
   | 'yoruba'
 
-export interface PrimaryCareFilterValues extends FilterValues {
+export interface PrimaryCareFilterValues {
   sort: SortMode
   ageGroup: AgeGroupFilter[]
   waitTime: WaitTimeFilter[]
