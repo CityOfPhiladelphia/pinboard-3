@@ -104,7 +104,7 @@ export default {
       'You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
-    category: 'Primary care',
+    category: 'Visit type',
     well: 'Well visit',
     sick: 'Sick visit',
     sports: 'Sports physicals',
