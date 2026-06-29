@@ -58,9 +58,6 @@ export function createOptionBitmask(
     } else {
       setBit = shiftDirection ? setBit << 1 : setBit >> 1 // shift setBit to the left: 00000010 <<= 00000001
     }
-    // after 32nd iteration, push bits to buffers and reset accumulators and setBit
-    if (setBit < 0) {
-    }
   })
 
   // push remaining bits to buffer if forEach ended ended before pushing accumulator
