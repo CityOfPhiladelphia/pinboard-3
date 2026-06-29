@@ -221,7 +221,7 @@ export default {
     dental: 'Dantè',
     eye: 'Swen je',
     podiatry: 'Poddyatri',
-    mat: 'Tretman ki ede medikaman',
+    mat: 'Tretman ki ede medikaman (MAT)',
     nutrition: 'Konsèy sou nitrisyon',
     tobacco: 'Ede kite tabak',
     pharmacy: 'Famasi sou plas',

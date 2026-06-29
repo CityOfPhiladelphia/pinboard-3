@@ -208,7 +208,7 @@ export default {
     dental: 'Dental',
     eye: 'Eye care',
     podiatry: 'Podiatry',
-    mat: 'Medication-assisted treatment',
+    mat: 'Medication-assisted treatment (MAT)',
     nutrition: 'Nutrition counseling',
     tobacco: 'Help quitting tobacco',
     pharmacy: 'On-site pharmacy',

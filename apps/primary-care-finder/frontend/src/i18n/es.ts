@@ -222,7 +222,7 @@ export default {
     dental: 'Odontología',
     eye: 'Oftalmología',
     podiatry: 'Podiatría',
-    mat: 'Tratamiento asistido por medicamentos',
+    mat: 'Tratamiento asistido por medicamentos (MAT)',
     nutrition: 'Asesoramiento nutricional',
     tobacco: 'Ayuda para dejar de fumar',
     pharmacy: 'Farmacia en el sitio',

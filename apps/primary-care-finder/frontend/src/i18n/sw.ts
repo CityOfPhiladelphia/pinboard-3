@@ -222,7 +222,7 @@ export default {
     dental: 'Meno',
     eye: 'Utunzaji wa macho',
     podiatry: 'Matibabu ya miguu',
-    mat: 'Matibabu ya matumizi ya dawa',
+    mat: 'Matibabu ya matumizi ya dawa (MAT)',
     nutrition: 'Ushauri wa lishe',
     tobacco: 'Msaada wa kuacha tumbaku',
     pharmacy: 'Duka la dawa kwenye eneo',

@@ -221,7 +221,7 @@ export default {
     dental: 'Răng miệng',
     eye: 'Chăm sóc mắt',
     podiatry: 'Chuyên khoa chân',
-    mat: 'Điều trị hỗ trợ dùng thuốc',
+    mat: 'Điều trị hỗ trợ dùng thuốc (MAT)',
     nutrition: 'Tư vấn dinh dưỡng',
     tobacco: 'Hỗ trợ cai thuốc lá',
     pharmacy: 'Nhà thuốc tại chỗ',

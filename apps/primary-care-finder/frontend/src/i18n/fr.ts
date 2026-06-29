@@ -221,7 +221,7 @@ export default {
     dental: 'Soins dentaires',
     eye: 'Soins oculaires',
     podiatry: 'Podologie',
-    mat: 'Traitement médicamenteux',
+    mat: 'Traitement médicamenteux (MAT)',
     nutrition: 'Conseils en nutrition',
     tobacco: 'Aide au sevrage tabagique',
     pharmacy: 'Pharmacie sur place',

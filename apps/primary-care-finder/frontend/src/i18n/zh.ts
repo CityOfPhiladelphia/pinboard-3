@@ -217,7 +217,7 @@ export default {
     dental: '牙科',
     eye: '眼科',
     podiatry: '足科',
-    mat: '药物辅助治疗',
+    mat: '药物辅助治疗 (MAT)',
     nutrition: '营养咨询',
     tobacco: '戒烟帮助',
     pharmacy: '机构隶属药房',
