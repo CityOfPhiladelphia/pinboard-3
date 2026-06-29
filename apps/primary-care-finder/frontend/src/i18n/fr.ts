@@ -118,7 +118,7 @@ export default {
   },
   patientType: {
     category: 'Admissibilité',
-    patient_type_new: 'Tous les patients',
+    patient_type_new: 'Patients nouveaux ou existants',
     patient_type_new_subtext:
       "Certains de ces services peuvent être disponibles sans rendez-vous. Contactez le prestataire pour plus d'informations.",
     patient_type_existing: 'Patients établis',
