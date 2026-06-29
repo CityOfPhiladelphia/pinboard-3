@@ -36,7 +36,7 @@ export default {
       'No health centers found. Please check your spelling or remove some of your filters, and try again.',
     viewList: 'View list',
     viewMap: 'View map',
-    name: 'Primary Care Finder',
+    name: 'Primary care finder',
     aboutTitle: 'About this tool',
     aboutBody:
       'This tool helps Philadelphia residents find free and low-cost primary care providers near them. Search by location, filter by services, and view details like hours, transit options, and available tests.',

@@ -154,6 +154,21 @@ const locationCountLabel = computed(() => {
   return props.isLoading || message
 })
 
+// Filter chips in use bubble up to sit right after the (pinned) Sort chip, so the
+// active filters lead the row. excludeFromCount filters (e.g. Sort) keep their
+// position; the partition is stable, so only a newly-(de)activated chip moves.
+const orderedChipFilters = computed(() => {
+  const all = props.filters ?? []
+  const values = props.filterValues ?? {}
+  const isActive = (key: string) => {
+    const v = values[key]
+    return v && typeof v === 'object' ? Object.values(v).some(Boolean) : v === true
+  }
+  const pinned = all.filter((f) => f.excludeFromCount)
+  const rest = all.filter((f) => !f.excludeFromCount)
+  return [...pinned, ...rest.filter((f) => isActive(f.key)), ...rest.filter((f) => !isActive(f.key))]
+})
+
 // watchers
 watch(selectedLocation, (loc) => {
   if (loc) {
@@ -355,7 +370,7 @@ const effectiveMapConfig = (() => {
             <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
               <div class="filter-chip-bar">
                 <FilterChipGroup
-                  :filters="filters"
+                  :filters="orderedChipFilters"
                   :model-value="filterValues"
                   color="white"
                   filter-button
