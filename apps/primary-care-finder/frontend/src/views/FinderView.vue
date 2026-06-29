@@ -98,7 +98,7 @@ function toMap(arr: string[]): Record<string, boolean> {
 const filterValuesForProp = computed<FilterValues>(() => ({
   sort: {
     distance: filterState.value.sort.includes('distance'),
-    name: filterState.value.sort.includes('name')
+    name: filterState.value.sort.includes('name'),
   },
   [filterKeys.ageGroup]: toMap(filterState.value.ageGroup),
   [filterKeys.waitTime]: toMap(filterState.value.waitTime),
