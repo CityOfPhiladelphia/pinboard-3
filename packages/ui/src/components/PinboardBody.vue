@@ -166,7 +166,11 @@ const orderedChipFilters = computed(() => {
   }
   const pinned = all.filter((f) => f.excludeFromCount)
   const rest = all.filter((f) => !f.excludeFromCount)
-  return [...pinned, ...rest.filter((f) => isActive(f.key)), ...rest.filter((f) => !isActive(f.key))]
+  return [
+    ...pinned,
+    ...rest.filter((f) => isActive(f.key)),
+    ...rest.filter((f) => !isActive(f.key)),
+  ]
 })
 
 // watchers
