@@ -87,18 +87,35 @@ function mapsUrl(location: PrimaryCareLocation): string {
   margin-top: 0.25rem;
 }
 
+/* The link is a flex row (.phila-link). min-width:0 lets the grid column shrink and
+   flex-start keeps the icon at the top once the text wraps to a second line. */
 .card-link {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  align-items: flex-start;
+}
+
+/* Let the link's text (the unclassed span ActionContent renders) wrap within its
+   column instead of forcing the column wider. */
+.card-link :deep(span:not(.phila-icon-core)) {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .card-link :deep(.phila-icon-core) {
   color: var(--Schemes-On-Surface-Low);
+  flex-shrink: 0;
 }
 
 .card-link--full {
   grid-column: 1 / -1;
+}
+
+/* Mobile: stack the links so each gets its own full-width line — the address then
+   has the whole card width instead of half. */
+@media (max-width: 768px) {
+  .card-links {
+    grid-template-columns: 1fr;
+  }
 }
 
 .card-tags {
