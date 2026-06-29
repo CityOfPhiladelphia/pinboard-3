@@ -16,10 +16,10 @@ export default {
     todayClosed: 'Сегодня: закрыто',
     todayHours: 'Сегодня: {range}',
   },
-  providerWebsite: 'Веб-сайт поставщика услуг',
+  providerWebsite: 'Веб-сайт медицинского центра',
   website: 'Сайт',
   hours: 'Часы работы',
-  languagesSpoken: 'Разговорные языки',
+  languagesSpoken: 'Языки, на которых говорит персонал',
   daysOfTheWeek: 'День недели',
   Monday: 'Понедельник',
   Tuesday: 'Вторник',
@@ -118,7 +118,7 @@ export default {
   },
   patientType: {
     category: 'Соответствие',
-    patient_type_new: 'Новые пациенты',
+    patient_type_new: 'Все пациенты',
     patient_type_new_subtext:
       'Некоторые из этих услуг могут быть доступны без записи. Свяжитесь с поставщиком услуг для получения дополнительной информации.',
     patient_type_existing: 'Пациенты под наблюдением',

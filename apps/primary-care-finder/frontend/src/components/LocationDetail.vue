@@ -318,6 +318,7 @@ function translateTransitList(raw: string | null, category: string): string {
       </div>
 
       <span class="has-text-label-large detail-zone--divided">{{ $t('servicesAvailable') }}</span>
+      <span class="has-text-body-small">{{ $t('patientType.patient_type_new_subtext') }}</span>
 
       <!-- Patients served -->
       <section v-if="patientsServedText" class="services-section">
@@ -330,7 +331,6 @@ function translateTransitList(raw: string | null, category: string): string {
         <span class="has-text-label-small cell-label">{{
           $t('patientType.patient_type_new')
         }}</span>
-        <span class="has-text-body-small">{{ $t('patientType.patient_type_new_subtext') }}</span>
         <ul class="service-list">
           <li v-for="label in newPatientServices" :key="label" class="has-text-body-small">
             {{ $t(label) }}

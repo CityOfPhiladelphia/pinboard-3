@@ -16,10 +16,10 @@ export default {
     todayClosed: 'Hoy: Cerrado',
     todayHours: 'Hoy: {range}',
   },
-  providerWebsite: 'Sitio web del proveedor',
+  providerWebsite: 'Sitio web del centro de salud',
   website: 'Sitio web',
   hours: 'Horario',
-  languagesSpoken: 'Idiomas hablados',
+  languagesSpoken: 'Idiomas que habla el personal',
   daysOfTheWeek: 'Día de la semana',
   Monday: 'Lunes',
   Tuesday: 'Martes',
@@ -118,7 +118,7 @@ export default {
   },
   patientType: {
     category: 'Elegibilidad',
-    patient_type_new: 'Pacientes nuevos',
+    patient_type_new: 'Todos los pacientes',
     patient_type_new_subtext:
       'Es posible que algunos de estos servicios estén disponibles sin cita previa. Comuníquese con el proveedor para obtener más información.',
     patient_type_existing: 'Pacientes establecidos',

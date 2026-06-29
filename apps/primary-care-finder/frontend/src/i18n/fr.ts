@@ -16,10 +16,10 @@ export default {
     todayClosed: "Aujourd'hui : Fermé",
     todayHours: "Aujourd'hui : {range}",
   },
-  providerWebsite: 'Site web du prestataire',
+  providerWebsite: 'Site web du centre de santé',
   website: 'Site web',
   hours: 'Heures',
-  languagesSpoken: 'Langues parlées',
+  languagesSpoken: 'Langues parlées par le personnel',
   daysOfTheWeek: 'Jour de la semaine',
   Monday: 'Lundi',
   Tuesday: 'Mardi',
@@ -118,7 +118,7 @@ export default {
   },
   patientType: {
     category: 'Admissibilité',
-    patient_type_new: 'Nouveaux patients',
+    patient_type_new: 'Tous les patients',
     patient_type_new_subtext:
       "Certains de ces services peuvent être disponibles sans rendez-vous. Contactez le prestataire pour plus d'informations.",
     patient_type_existing: 'Patients établis',

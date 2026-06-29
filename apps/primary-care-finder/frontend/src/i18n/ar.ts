@@ -16,10 +16,10 @@ export default {
     todayClosed: 'اليوم: مغلق',
     todayHours: 'اليوم: {range}',
   },
-  providerWebsite: 'موقع مقدّم الخدمة',
+  providerWebsite: 'موقع المركز الصحي',
   website: 'الموقع الإلكتروني',
   hours: 'ساعات',
-  languagesSpoken: 'اللغات التي يتم التحدث بها',
+  languagesSpoken: 'اللغات التي يتحدث بها الموظفون',
   daysOfTheWeek: 'يوم الأسبوع',
   Monday: 'الإثنين',
   Tuesday: 'الثلاثاء',
@@ -117,7 +117,7 @@ export default {
   },
   patientType: {
     category: 'الأهلية',
-    patient_type_new: 'مرضى جدد',
+    patient_type_new: 'جميع المرضى',
     patient_type_new_subtext:
       'قد تتوفر بعض هذه الخدمات بدون موعد. اتصل بمقدم الخدمة لمزيد من المعلومات.',
     patient_type_existing: 'مرضى حاليون',

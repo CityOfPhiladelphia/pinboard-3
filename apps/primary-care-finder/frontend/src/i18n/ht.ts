@@ -16,10 +16,10 @@ export default {
     todayClosed: 'Jodi a: Fèmen',
     todayHours: 'Jodi a: {range}',
   },
-  providerWebsite: 'Sitwèb founisè a',
+  providerWebsite: 'Sitwèb sant sante a',
   website: 'Sit wèb',
   hours: 'Èdtan',
-  languagesSpoken: 'Lang pale',
+  languagesSpoken: 'Lang pale pa anplwaye',
   daysOfTheWeek: 'Jou nan semèn nan',
   Monday: 'Lendi',
   Tuesday: 'Madi',
@@ -117,7 +117,7 @@ export default {
   },
   patientType: {
     category: 'Elijiblite',
-    patient_type_new: 'Nouvo pasyan yo',
+    patient_type_new: 'Tout pasyan yo',
     patient_type_new_subtext:
       'Kèk nan sèvis sa yo ka disponib san randevou. Kontakte founisè a pou plis enfòmasyon.',
     patient_type_existing: 'Pasyan etabli',

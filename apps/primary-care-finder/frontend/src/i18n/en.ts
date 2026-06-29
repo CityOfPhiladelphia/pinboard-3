@@ -15,7 +15,7 @@ export default {
     todayClosed: 'Today: Closed',
     todayHours: 'Today: {range}',
   },
-  providerWebsite: 'Provider website',
+  providerWebsite: 'Health center website',
   locationDetails: 'Location details',
   contact: 'Contact',
   website: 'Website',
@@ -95,7 +95,7 @@ export default {
   },
   patientType: {
     category: 'Eligibility',
-    patient_type_new: 'For new patients',
+    patient_type_new: 'For all patients',
     patient_type_new_subtext:
       'Some of these services may be available for walk-ins. Contact the provider for more information.',
     patient_type_existing: 'Established patients',
@@ -387,7 +387,7 @@ export default {
   hours: 'Hours',
   daysOfTheWeek: 'Day',
   schedule: 'Schedule',
-  languagesSpoken: 'Languages spoken',
+  languagesSpoken: 'Languages spoken by staff',
   english: 'English',
   noInfo: 'No information available',
   Monday: 'Monday',
