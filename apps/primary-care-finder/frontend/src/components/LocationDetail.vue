@@ -318,7 +318,9 @@ function translateTransitList(raw: string | null, category: string): string {
       </div>
 
       <span class="has-text-label-large detail-zone--divided">{{ $t('servicesAvailable') }}</span>
-      <span class="has-text-body-small">{{ $t('patientType.patient_type_new_subtext') }}</span>
+      <span v-if="location.properties.walk_ins_sick === 'Yes'" class="has-text-body-small">
+        {{ $t('patientType.patient_type_new_subtext') }}
+      </span>
 
       <!-- Patients served -->
       <section v-if="patientsServedText" class="services-section">
