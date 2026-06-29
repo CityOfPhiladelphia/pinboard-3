@@ -154,10 +154,13 @@ const locationCountLabel = computed(() => {
   return props.isLoading || message
 })
 
-// Filter chips in use bubble up to sit right after the (pinned) Sort chip, so the
-// active filters lead the row. excludeFromCount filters (e.g. Sort) keep their
-// position; the partition is stable, so only a newly-(de)activated chip moves.
-const orderedChipFilters = computed(() => {
+// Filter chips in use bubble up to sit right after the (pinned) Sort chip. The
+// order is a snapshot recomputed only at safe moments — initial load, a chip's
+// dropdown closing, and the All-Filters panel closing — never live while a
+// dropdown is open, so a chip never moves out from under its own popover.
+const chipOrderKeys = ref<string[]>([])
+
+function recomputeChipOrder() {
   const all = props.filters ?? []
   const values = props.filterValues ?? {}
   const isActive = (key: string) => {
@@ -166,12 +169,34 @@ const orderedChipFilters = computed(() => {
   }
   const pinned = all.filter((f) => f.excludeFromCount)
   const rest = all.filter((f) => !f.excludeFromCount)
-  return [
+  chipOrderKeys.value = [
     ...pinned,
     ...rest.filter((f) => isActive(f.key)),
     ...rest.filter((f) => !isActive(f.key)),
-  ]
+  ].map((f) => f.key)
+}
+
+// Map the snapshot order onto the current filter definitions, so locale/label
+// changes still flow through while the order stays put. Any filter not yet in the
+// snapshot falls back to source order at the end.
+const orderedChipFilters = computed(() => {
+  const all = props.filters ?? []
+  if (!chipOrderKeys.value.length) return all
+  const byKey = new Map(all.map((f) => [f.key, f]))
+  const ordered = chipOrderKeys.value
+    .map((k) => byKey.get(k))
+    .filter((f): f is FilterDefinition => !!f)
+  const known = new Set(chipOrderKeys.value)
+  return [...ordered, ...all.filter((f) => !known.has(f.key))]
 })
+
+// Seed on load and refresh on locale (filters) changes. Otherwise the order only
+// updates on dropdown-close / panel-close (wired in the template + watcher below).
+watch(
+  () => props.filters,
+  () => recomputeChipOrder(),
+  { immediate: true }
+)
 
 // watchers
 watch(selectedLocation, (loc) => {
@@ -196,6 +221,8 @@ watch(allFiltersOpen, (open) => {
   if (open && !props.isMobile) {
     handleCloseLocationDetail()
   }
+  // Reorder chips to reflect what was toggled in the panel, once it's closed.
+  if (!open) recomputeChipOrder()
 })
 
 // Reflect the selected location in the URL as ?location=<id>. push (not replace) so Back walks
@@ -379,9 +406,11 @@ const effectiveMapConfig = (() => {
                   color="white"
                   filter-button
                   :filter-button-text="t('pinboard.filters')"
+                  :reset-text="t('pinboard.reset')"
                   :elevated="isMobile && chipsOnMap"
                   @update:model-value="handleApplyFilter"
                   @open-filters="allFiltersOpen = true"
+                  @dropdown-close="recomputeChipOrder"
                 />
               </div>
             </Teleport>
@@ -436,6 +465,8 @@ const effectiveMapConfig = (() => {
         :filters="filters"
         :model-value="filterValues"
         :full-screen="isMobile"
+        :title="t('pinboard.allFilters')"
+        :reset-text="t('pinboard.reset')"
         @update:model-value="handleApplyFilter"
         @close="allFiltersOpen = false"
       />

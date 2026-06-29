@@ -28,6 +28,7 @@ pass. Review before release.
 | `sortClosest`       | "Closest to furthest" sort option.                                                                                                                                                                    |
 | `sortShareLocation` | "Share your location to sort by distance" prompt.                                                                                                                                                     |
 | `reset`, `apply`    | Common UI buttons; high confidence but unreviewed.                                                                                                                                                    |
+| `allFilters`        | "All filters" — the FilterPanel header title.                                                                                                                                                         |
 
 ## How to verify in the app
 

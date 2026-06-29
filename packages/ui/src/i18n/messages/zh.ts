@@ -5,6 +5,7 @@ export default {
     noLocations: '没有匹配的结果',
     mapView: '查看地图',
     filters: '筛选',
+    allFilters: '所有筛选',
     sort: '排序',
     sortBy: '排序：{label}',
     sortClosest: '从近到远',
