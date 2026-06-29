@@ -256,7 +256,7 @@ function translateTransitList(raw: string | null, category: string): string {
           <div v-if="languagesSpoken.length" class="detail-cell">
             <div class="cell-header">
               <Icon :icon="IconLanguage" inline decorative class="row-icon" />
-              <span class="has-text-label-small cell-label">{{ $t('languagesSpoken') }}</span>
+              <span class="has-text-label-small cell-label">{{ $t('languages.category') }}</span>
             </div>
             <span class="has-text-body-small">
               {{ languagesSpoken.map(translateLanguage).join(', ') }}
