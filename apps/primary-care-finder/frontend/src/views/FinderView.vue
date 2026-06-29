@@ -152,8 +152,6 @@ const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
 })
 
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
-  console.log(filterLogicalValue.value)
-  console.log(filterState.value)
   let result = filterLogicalValue.value.length
     ? applyFilters(locationsWithDistance.value)
     : locationsWithDistance.value
@@ -178,16 +176,18 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
 function applyFilters<T>(arr: T[]): T[] {
   const shiftDirection = shiftLeft()
   const filtered: T[] = []
-  let check = 1
+  let checkBit = 1
   let offset = 0
   arr.forEach((item) => {
-    if (check & filterLogicalValue.value[offset]) {
+    if (checkBit & filterLogicalValue.value[offset]) {
       filtered.push(item)
     }
-    check = shiftDirection ? check << 1 : check >> 1
-    if (check < 0) {
-      check = 1
+
+    if (checkBit & 0x8000_0000) {
+      checkBit = 1
       offset++
+    } else {
+      checkBit = shiftDirection ? checkBit << 1 : checkBit >> 1
     }
   })
   return filtered

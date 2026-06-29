@@ -81,18 +81,24 @@ const hoursStatus = computed<'openNow' | 'closed' | 'checkHours'>(() => {
 
 const detailTags = computed<TagConfig[]>(() => {
   const candidates: (TagConfig | null)[] = [
-    // !!props.location.properties.wait_sameday_sick_ad || !!props.location.properties.wait_sameday_sick_ch
     props.location.properties.walk_ins_sick === 'Yes'
       ? { text: t('tags.walkIns'), color: 'purple', icon: IconPersonWalking }
       : null,
     props.location.properties.primary_telehealth === 'Yes'
       ? { text: t('tags.telehealth'), color: 'purple', icon: IconVideo }
       : null,
-    props.location.properties.transport_parking
+    props.location.properties.transport_parking &&
+    /GP|PL|OS(?!T)/.test(props.location.properties.transport_parking)
       ? { text: t('tags.parking'), color: 'blue', icon: IconCar }
       : null,
     props.location.properties.special_pharmacy === 'Yes'
       ? { text: t('tags.pharmacy'), color: 'blue', icon: IconSuitcaseMedical }
+      : null,
+    props.location.properties.weekend_hrs === 'Yes'
+      ? { text: t('tags.weekendHours'), color: 'blue', icon: IconClock }
+      : null,
+    props.location.properties.evening_hrs === 'Yes'
+      ? { text: t('tags.openAfter6'), color: 'blue', icon: IconClock }
       : null,
   ]
   return candidates.filter((t): t is TagConfig => t !== null)

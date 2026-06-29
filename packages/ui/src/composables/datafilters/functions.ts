@@ -48,18 +48,19 @@ export function createOptionBitmask(
   // for each item, run bit setting function
   data.forEach((item) => {
     accumulator |= matchingFunction(item, dataFields, matchValues) ? setBit : 0
-    setBit = shiftDirection ? setBit << 1 : setBit >> 1 // shift setBit to the left: 00000010 <<= 00000001
 
-    // after 32nd iteration, push bits to buffers and reset accumulators and setBit
-    if (setBit < 0) {
+    // if 32nd bit of setBit is set, push accumulator to bitarray and reset loop for next iteration, else shift setBit
+    if (setBit & 0x8000_0000) {
       bitarray[offset] = accumulator
       accumulator = 0 // reset accumulator
       setBit = 1 // reset setBit
       offset++ // increment offset for next push to buffer
+    } else {
+      setBit = shiftDirection ? setBit << 1 : setBit >> 1 // shift setBit to the left: 00000010 <<= 00000001
     }
   })
 
-  // push remaining bits to buffer if forEach ended when i % 32 != 31
+  // push remaining bits to buffer if forEach ended ended before pushing accumulator
   if (accumulator) {
     bitarray[offset] = accumulator
   }
