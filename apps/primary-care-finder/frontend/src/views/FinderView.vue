@@ -167,7 +167,7 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
       .split(' ')
       .filter(Boolean)
     result = result.filter((loc) => {
-      const haystack = JSON.stringify(Object.values(loc)).toLowerCase()
+      const haystack = JSON.stringify(Object.values(loc.properties)).toLowerCase()
       return terms.some((term) => haystack.includes(term))
     })
   }
