@@ -13,7 +13,9 @@ export function sortLocations(
     PinboardUtilities.hasLocationData(currentLocation.value) && !sortMode ? 'distance' : sortMode
   ) {
     case 'name': {
-      locations.sort((a, b) => a.name.localeCompare(b.name))
+      locations.sort((a, b) => {
+        return a.name.localeCompare(b.name)
+      })
       break
     }
     case 'distance': {
