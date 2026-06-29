@@ -3,6 +3,7 @@ export default {
     itemCount: 'no locations | {count} item | {count} items',
     noLocations: 'No locations match',
     mapView: 'Map view',
+    filters: 'Filters',
     sort: 'Sort',
     sortBy: 'Sort: {label}',
     sortClosest: 'Closest to furthest',

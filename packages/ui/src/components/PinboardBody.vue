@@ -359,6 +359,7 @@ const effectiveMapConfig = (() => {
                   :model-value="filterValues"
                   color="white"
                   filter-button
+                  :filter-button-text="t('pinboard.filters')"
                   :elevated="isMobile && chipsOnMap"
                   @update:model-value="handleApplyFilter"
                   @open-filters="allFiltersOpen = true"
