@@ -15,11 +15,11 @@ import {
   type IFilterChoiceBitfieldGroup,
   type MatchingFunction,
 } from '@pinboard/ui'
-import type { PrimaryCareFilterValues, PrimaryCareLocation, PrimaryCareProperties } from '@/types'
+import type { PrimaryCareFilters, PrimaryCareLocation, PrimaryCareProperties } from '@/types'
 
 export function useFilterLogic(
   locations: Ref<PrimaryCareLocation[]>,
-  filterState: Ref<PrimaryCareFilterValues>
+  filterState: Ref<PrimaryCareFilters>
 ) {
   const filterLogicalValue = ref<Uint32Array>(new Uint32Array())
   const matchYes = ['Yes']
@@ -490,218 +490,218 @@ export function useFilterLogic(
     // age group
     filterLogic.value.childFilters[filterKeys.ageGroup].childFilters[
       ageGroupOptions.ageGroupOption0
-    ].setChecked(filterState.value.ageGroup.includes(ageGroupOptions.ageGroupOption0))
+    ].setChecked(filterState.value.ageGroup.adult)
     filterLogic.value.childFilters[filterKeys.ageGroup].childFilters[
       ageGroupOptions.ageGroupOption1
-    ].setChecked(filterState.value.ageGroup.includes(ageGroupOptions.ageGroupOption1))
+    ].setChecked(filterState.value.ageGroup.children)
 
     // wait time
     filterLogic.value.childFilters[filterKeys.waitTime].childFilters[
       waitOptions.waitOption0
-    ].setChecked(filterState.value.waitTime.includes(waitOptions.waitOption0))
+    ].setChecked(filterState.value.waitTime.sameDay)
     filterLogic.value.childFilters[filterKeys.waitTime].childFilters[
       waitOptions.waitOption1
-    ].setChecked(filterState.value.waitTime.includes(waitOptions.waitOption1))
+    ].setChecked(filterState.value.waitTime.weekSick)
     filterLogic.value.childFilters[filterKeys.waitTime].childFilters[
       waitOptions.waitOption2
-    ].setChecked(filterState.value.waitTime.includes(waitOptions.waitOption2))
+    ].setChecked(filterState.value.waitTime.weekWell)
     filterLogic.value.childFilters[filterKeys.waitTime].childFilters[
       waitOptions.waitOption3
-    ].setChecked(filterState.value.waitTime.includes(waitOptions.waitOption3))
+    ].setChecked(filterState.value.waitTime.twoMonths)
 
     // visit type
     filterLogic.value.childFilters[filterKeys.visitType].childFilters[
       visitTypeOptions.visitTypeOption0
-    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption0))
+    ].setChecked(filterState.value.visitType.primaryWell)
     filterLogic.value.childFilters[filterKeys.visitType].childFilters[
       visitTypeOptions.visitTypeOption1
-    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption1))
+    ].setChecked(filterState.value.visitType.primarySick)
     filterLogic.value.childFilters[filterKeys.visitType].childFilters[
       visitTypeOptions.visitTypeOption2
-    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption2))
+    ].setChecked(filterState.value.visitType.primarySports)
     filterLogic.value.childFilters[filterKeys.visitType].childFilters[
       visitTypeOptions.visitTypeOption3
-    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption3))
+    ].setChecked(filterState.value.visitType.primaryPrenatal)
     filterLogic.value.childFilters[filterKeys.visitType].childFilters[
       visitTypeOptions.visitTypeOption4
-    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption4))
+    ].setChecked(filterState.value.visitType.primaryWomen)
     filterLogic.value.childFilters[filterKeys.visitType].childFilters[
       visitTypeOptions.visitTypeOption5
-    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption5))
+    ].setChecked(filterState.value.visitType.primaryTelehealth)
     filterLogic.value.childFilters[filterKeys.visitType].childFilters[
       visitTypeOptions.visitTypeOption6
-    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption6))
+    ].setChecked(filterState.value.visitType.primaryVaccines)
 
     // specialty
     filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption0
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption0))
+    ].setChecked(filterState.value.visitType.mental)
     filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption1
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption1))
+    ].setChecked(filterState.value.visitType.dental)
     filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption2
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption2))
+    ].setChecked(filterState.value.visitType.eye)
     filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption3
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption3))
+    ].setChecked(filterState.value.visitType.podiatry)
     filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption4
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption4))
+    ].setChecked(filterState.value.visitType.mat)
     filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption5
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption5))
+    ].setChecked(filterState.value.visitType.nutrition)
     filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption6
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption6))
+    ].setChecked(filterState.value.visitType.tobacco)
     filterLogic.value.childFilters[filterKeys.specialty].childFilters[
       specialtyOptions.specialtyOption7
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption7))
+    ].setChecked(filterState.value.visitType.pharmacy)
 
     // tests
     filterLogic.value.childFilters[filterKeys.tests].childFilters[
       testsOptions.testsOption0
-    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption0))
+    ].setChecked(filterState.value.visitType.blood)
     filterLogic.value.childFilters[filterKeys.tests].childFilters[
       testsOptions.testsOption1
-    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption1))
+    ].setChecked(filterState.value.visitType.sti)
     filterLogic.value.childFilters[filterKeys.tests].childFilters[
       testsOptions.testsOption2
-    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption2))
+    ].setChecked(filterState.value.visitType.covid)
     filterLogic.value.childFilters[filterKeys.tests].childFilters[
       testsOptions.testsOption3
-    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption3))
+    ].setChecked(filterState.value.visitType.mammo)
     filterLogic.value.childFilters[filterKeys.tests].childFilters[
       testsOptions.testsOption4
-    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption4))
+    ].setChecked(filterState.value.visitType.xray)
 
     // languages
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption0
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption0))
+    ].setChecked(filterState.value.languages.asl)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption1
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption1))
+    ].setChecked(filterState.value.languages.amharic)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption2
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption2))
+    ].setChecked(filterState.value.languages.arabic)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption3
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption3))
+    ].setChecked(filterState.value.languages.bengali)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption4
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption4))
+    ].setChecked(filterState.value.languages.burmese)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption5
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption5))
+    ].setChecked(filterState.value.languages.cambodian)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption6
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption6))
+    ].setChecked(filterState.value.languages.cantonese)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption7
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption7))
+    ].setChecked(filterState.value.languages.chinese)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption8
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption8))
+    ].setChecked(filterState.value.languages.english)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption9
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption9))
+    ].setChecked(filterState.value.languages.fanta)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption10
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption10))
+    ].setChecked(filterState.value.languages.filipino)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption11
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption11))
+    ].setChecked(filterState.value.languages.french)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption12
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption12))
+    ].setChecked(filterState.value.languages.frenchcreole)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption13
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption13))
+    ].setChecked(filterState.value.languages.fula)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption14
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption14))
+    ].setChecked(filterState.value.languages.gujarati)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption15
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption15))
+    ].setChecked(filterState.value.languages.haitiancreole)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption16
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption16))
+    ].setChecked(filterState.value.languages.hebrew)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption17
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption17))
+    ].setChecked(filterState.value.languages.hindi)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption18
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption18))
+    ].setChecked(filterState.value.languages.indonesian)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption19
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption19))
+    ].setChecked(filterState.value.languages.karen)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption20
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption20))
+    ].setChecked(filterState.value.languages.khmer)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption21
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption21))
+    ].setChecked(filterState.value.languages.kinyarwanda)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption22
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption22))
+    ].setChecked(filterState.value.languages.kirundi)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption23
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption23))
+    ].setChecked(filterState.value.languages.koloqua)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption24
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption24))
+    ].setChecked(filterState.value.languages.korean)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption25
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption25))
+    ].setChecked(filterState.value.languages.lebanese)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption26
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption26))
+    ].setChecked(filterState.value.languages.malayalam)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption27
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption27))
+    ].setChecked(filterState.value.languages.malaysian)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption28
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption28))
+    ].setChecked(filterState.value.languages.mandarin)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption29
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption29))
+    ].setChecked(filterState.value.languages.nepali)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption30
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption30))
+    ].setChecked(filterState.value.languages.portuguese)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption31
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption31))
+    ].setChecked(filterState.value.languages.punjabi)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption32
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption32))
+    ].setChecked(filterState.value.languages.shanghainese)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption33
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption33))
+    ].setChecked(filterState.value.languages.sinhalese)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption34
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption34))
+    ].setChecked(filterState.value.languages.spanish)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption35
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption35))
+    ].setChecked(filterState.value.languages.swahili)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption36
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption36))
+    ].setChecked(filterState.value.languages.tagalog)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption37
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption37))
+    ].setChecked(filterState.value.languages.taiwanese)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption38
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption38))
+    ].setChecked(filterState.value.languages.telugu)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption39
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption39))
+    ].setChecked(filterState.value.languages.urdu)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption40
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption40))
+    ].setChecked(filterState.value.languages.vietnamese)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption41
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption41))
+    ].setChecked(filterState.value.languages.yoruba)
 
     filterLogicalValue.value = filterLogic.value.getBitfield()
   })
