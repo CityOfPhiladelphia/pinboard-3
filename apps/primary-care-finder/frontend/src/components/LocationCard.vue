@@ -70,8 +70,8 @@ function mapsUrl(location: PrimaryCareLocation): string {
 }
 
 .card-heading {
-  font-size: var(--Heading-H5-font-heading-5-size);
-  line-height: var(--Heading-H5-font-heading-5-lineheight);
+  font-size: var(--Heading-H6-font-heading-6-size);
+  line-height: var(--Heading-H6-font-heading-6-lineheight);
 }
 
 .card-distance {
