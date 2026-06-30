@@ -230,6 +230,9 @@ importers:
 
   apps/primary-care-finder/frontend:
     dependencies:
+      '@phila/phila-ui-bottom-sheet':
+        specifier: 0.1.0-beta.14
+        version: 0.1.0-beta.14(@fortawesome/fontawesome-svg-core@7.1.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.33(typescript@6.0.3)))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-button':
         specifier: 2.3.0-beta.9
         version: 2.3.0-beta.9(@fortawesome/fontawesome-svg-core@7.1.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.33(typescript@6.0.3)))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
