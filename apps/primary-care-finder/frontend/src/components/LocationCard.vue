@@ -17,7 +17,7 @@ function mapsUrl(location: PrimaryCareLocation): string {
 
 <template>
   <div class="card-content">
-    <strong class="card-heading">{{ location.name }}</strong>
+    <span class="card-heading has-text-label-default">{{ location.name }}</span>
     <span v-if="location.locationCardInfo.subheader" class="card-distance">
       {{ location.locationCardInfo.subheader }}
     </span>
@@ -67,11 +67,6 @@ function mapsUrl(location: PrimaryCareLocation): string {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-}
-
-.card-heading {
-  font-size: var(--Heading-H6-font-heading-6-size);
-  line-height: var(--Heading-H6-font-heading-6-lineheight);
 }
 
 .card-distance {
