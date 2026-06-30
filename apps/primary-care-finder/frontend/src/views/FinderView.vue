@@ -110,7 +110,7 @@ const emptyFilters: PrimaryCareFilters = {
     urdu: false,
     vietnamese: false,
     yoruba: false,
-  }
+  },
 }
 
 const { t } = useI18n()
@@ -207,9 +207,7 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
     })
   }
 
-  return filterState.value.sort
-    ? sortLocations(result, searchOrUserLocation, sortMode)
-    : result
+  return filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
 })
 
 function applyFilters<T>(arr: T[]): T[] {
