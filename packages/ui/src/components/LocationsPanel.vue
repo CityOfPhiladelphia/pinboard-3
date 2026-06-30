@@ -106,6 +106,8 @@ defineExpose({ scrollToCard })
 
   <slot name="below-search" />
 
+  <slot name="list-header" />
+
   <div
     v-if="waitForUserLocation && userLocationState === 'acquiring'"
     ref="listRef"
@@ -120,25 +122,46 @@ defineExpose({ scrollToCard })
   </div>
 
   <div v-else ref="listRef" class="location-list">
-    <MapCard
-      v-for="location in locations"
-      :key="location.id"
-      :data-location-id="location.id"
-      v-bind="location.locationCardInfo"
-      :class="[
-        'location-card',
-        {
-          'location-card--hovered': hoveredId === location.id,
-          'location-card--selected': selectedId === location.id,
-        },
-      ]"
-      tabindex="0"
-      @click="emit('select', location)"
-      @mouseenter="emit('hover', location.id)"
-      @mouseleave="emit('hover-end')"
-      @keydown.enter="pendingKeydown = true"
-      @keyup.enter="handleCardKeyup(location)"
-    />
+    <template v-for="location in locations" :key="location.id">
+      <div
+        v-if="$slots['location-card']"
+        :data-location-id="location.id"
+        :class="[
+          'location-card',
+          'location-card--custom',
+          {
+            'location-card--hovered': hoveredId === location.id,
+            'location-card--selected': selectedId === location.id,
+          },
+        ]"
+        tabindex="0"
+        @click="emit('select', location)"
+        @mouseenter="emit('hover', location.id)"
+        @mouseleave="emit('hover-end')"
+        @keydown.enter="pendingKeydown = true"
+        @keyup.enter="handleCardKeyup(location)"
+      >
+        <slot name="location-card" :location="location" />
+      </div>
+      <MapCard
+        v-else
+        :data-location-id="location.id"
+        v-bind="location.locationCardInfo"
+        :class="[
+          'location-card',
+          {
+            'location-card--hovered': hoveredId === location.id,
+            'location-card--selected': selectedId === location.id,
+          },
+        ]"
+        tabindex="0"
+        @click="emit('select', location)"
+        @mouseenter="emit('hover', location.id)"
+        @mouseleave="emit('hover-end')"
+        @keydown.enter="pendingKeydown = true"
+        @keyup.enter="handleCardKeyup(location)"
+      />
+    </template>
   </div>
 </template>
 
@@ -149,13 +172,24 @@ defineExpose({ scrollToCard })
   flex: 1;
   overflow-y: auto;
   gap: 0.75rem;
-  padding: 0.5rem 1rem 1rem 1rem;
-  scrollbar-width: none;
+  /* Left inset stays 1rem. The right inset is 0.5rem padding + the reserved
+     scrollbar gutter (~0.5rem for a thin bar), so the scrollbar sits *inside* a
+     right gap that visually matches the 1rem on the left. */
+  padding: 0.5rem 0.5rem 1rem 1rem;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
 }
 
 .location-card {
   cursor: pointer;
   flex-shrink: 0;
+}
+
+.location-card--custom {
+  border: 1px solid var(--Schemes-Border, #a9a9a9);
+  border-radius: var(--scale-200);
+  background-color: var(--Schemes-On-Primary, #fff);
+  overflow: hidden;
 }
 
 .location-card--hovered {
@@ -170,7 +204,8 @@ defineExpose({ scrollToCard })
 
 @media (max-width: 768px) {
   .location-list {
-    padding-top: 1rem;
+    padding: 1rem;
+    scrollbar-width: none;
   }
 }
 </style>

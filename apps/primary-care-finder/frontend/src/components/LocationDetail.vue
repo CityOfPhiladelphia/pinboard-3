@@ -1,10 +1,19 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { computed } from 'vue'
-import { format, parseISO } from 'date-fns'
 import { useI18n } from 'vue-i18n'
-import type { PrimaryCareLocation } from '@/types'
+import type { PrimaryCareField, PrimaryCareLocation } from '@/types'
 import { PhilaButton } from '@phila/phila-ui-button'
-import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { PhilaLink, Icon } from '@pinboard/ui'
+import LocationTags from './LocationTags.vue'
+import {
+  IconClose,
+  IconPhone,
+  IconGlobe,
+  IconLocationDot,
+  IconLanguage,
+  IconBus,
+  IconClock,
+} from '@phila/phila-ui-core/icons'
 
 const props = defineProps<{
   location: PrimaryCareLocation
@@ -16,82 +25,72 @@ const { t, locale, messages } = useI18n()
 const p = computed(() => props.location.properties)
 
 const fullAddress = computed(() => {
-  let addr = p.value.address
-  if (p.value.address_2) addr += ', ' + p.value.address_2
-  addr += ', Philadelphia, PA ' + p.value.zip_code
+  let addr = props.location.properties.address
+  if (props.location.properties.address_2) addr += ', ' + props.location.properties.address_2
+  addr += ', Philadelphia, PA ' + props.location.properties.zip_code
   return addr
 })
 
-function siteName(): string {
-  let value = p.value.record
-  if (
-    value === 'Delaware Valley Community Health (DVCH) Maria de los Santos Womens Health Center'
-  ) {
-    value = "Delaware Valley Community Health (DVCH) Maria de los Santos Women's Health Center"
-  }
-  return value
+function mapsUrl(): string {
+  const parts = [
+    props.location.properties.address,
+    props.location.properties.address_2,
+    props.location.properties.zip_code,
+    'Philadelphia, PA',
+  ].filter(Boolean)
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parts.join(', '))}`
 }
 
-// --- Age-specific services ---
-interface ServiceRow {
-  id: number
-  service: string
-  adult: string | null
-  child: string | null
-  existing: (string | null)[]
-}
+const ALL_SERVICES: [string, PrimaryCareField[]][] = [
+  ['visitType.well', ['primary_well']],
+  ['visitType.sick', ['primary_sick']],
+  ['visitType.vaccine', ['primary_vacc']],
+  ['specialty.mental', ['special_mental']],
+  ['specialty.dental', ['special_dental']],
+  ['specialty.eye', ['special_eye']],
+  ['visitType.sports', ['primary_sports']],
+  ['visitType.prenatal', ['primary_prenatal']],
+  ['visitType.women', ['primary_women']],
+  ['specialty.mat', ['special_mat']],
+  ['specialty.podiatry', ['special_podiatry']],
+  ['specialty.nutrition', ['special_nutrition']],
+  ['specialty.tobacco', ['special_tobacco']],
+  ['visitType.telehealth', ['primary_telehealth']],
+  ['specialty.pharmacy', ['special_pharmacy']],
+]
 
-const YES_VALUES = ['Yes', 'Established Patients']
+// Services available to new patients or walk-ins (any field is "Yes")
+const newPatientServices = computed<string[]>(() =>
+  ALL_SERVICES.filter(([, fields]) =>
+    fields.some((f) => (props.location.properties[f] as string | null) === 'Yes')
+  ).map(([label]) => label)
+)
 
-const ageSpecificServices = computed<ServiceRow[]>(() => {
-  const rows: ServiceRow[] = []
-  const checks: [string, string, string][] = [
-    ['visitType.well', 'primary_well_ad', 'primary_well_ch'],
-    ['visitType.sick', 'primary_sick_ad', 'primary_sick_ch'],
-    ['visitType.vaccine', 'primary_vacc_ad', 'primary_vacc_child'],
-    ['specialty.mental', 'special_mental_ad', 'special_mental_ch'],
-    ['specialty.dental', 'special_dental_ad', 'special_dental_ch'],
-    ['specialty.eye', 'special_eye_ad', 'special_eye_ch'],
-  ]
-  let id = 1
-  for (const [service, adultField, childField] of checks) {
-    const adult = p.value[adultField] as string | null
-    const child = p.value[childField] as string | null
-    if (YES_VALUES.includes(adult ?? '') || YES_VALUES.includes(child ?? '')) {
-      rows.push({ id: id++, service, adult, child, existing: [adult, child] })
-    }
-  }
-  return rows
+// Services exclusive to existing patients (no field is "Yes", but at least one is "Established Patients")
+const existingOnlyServices = computed<string[]>(() =>
+  ALL_SERVICES.filter(
+    ([, fields]) =>
+      !fields.some((f) => (props.location.properties[f] as string | null) === 'Yes') &&
+      fields.some((f) => (props.location.properties[f] as string | null) === 'Established Patients')
+  ).map(([label]) => label)
+)
+
+// Age groups served — mirrors the age-group filter (adults/children === 'Yes').
+const ageGroupServed = computed<string | null>(() => {
+  const servesAdults = p.value.adults === 'Yes'
+  const servesChildren = p.value.children === 'Yes'
+  if (servesAdults && servesChildren) return t('ageRange.servesBoth')
+  if (servesAdults) return t('ageRange.servesAdults')
+  if (servesChildren) return t('ageRange.servesChildren')
+  return null
 })
 
-// --- Other services ---
-interface OtherServiceRow {
-  id: number
-  service: string
-  value: string | null
-}
-
-const otherServices = computed<OtherServiceRow[]>(() => {
-  const rows: OtherServiceRow[] = []
-  const checks: [string, string][] = [
-    ['visitType.sports', 'primary_sports'],
-    ['visitType.prenatal', 'primary_prenatal'],
-    ['visitType.women', 'primary_women'],
-    ['specialty.mat', 'special_mat'],
-    ['specialty.podiatry', 'special_podiatry'],
-    ['specialty.nutrition', 'special_nutrition'],
-    ['specialty.tobacco', 'special_tobacco'],
-    ['visitType.telehealth', 'primary_telehealth'],
-    ['specialty.pharmacy', 'special_pharmacy'],
-  ]
-  let id = 1
-  for (const [service, field] of checks) {
-    const val = p.value[field] as string | null
-    if (YES_VALUES.includes(val ?? '')) {
-      rows.push({ id: id++, service, value: val })
-    }
-  }
-  return rows
+// One flowing line: the age groups served, then the caveat, as a single sentence.
+const patientsServedText = computed<string>(() => {
+  const parts: string[] = []
+  if (ageGroupServed.value) parts.push(ageGroupServed.value)
+  if (p.value.caveat_ad_ch) parts.push(translateCaveat(p.value.caveat_ad_ch))
+  return parts.join(' ')
 })
 
 // --- Hours ---
@@ -109,63 +108,58 @@ const DAY_I18N_KEYS: Record<(typeof DAYS)[number], string> = {
 const exceptionsByDay = computed(() => {
   const result: Record<string, string> = {}
   for (const day of DAYS) {
-    const exc = p.value[`hours_${day}_exceptions`] as string | null
+    const exc = props.location.properties[`hours_${day}_exceptions`] as string | null
     if (exc) result[day] = exc
   }
   return result
 })
 
-const exceptionsList = computed(() => {
-  const arr: string[] = []
-  for (const day of DAYS) {
-    const exc = p.value[`hours_${day}_exceptions`] as string | null
-    if (exc) arr.push(exc)
-  }
-  return [...new Set(arr)]
-})
-
 function parseTime(raw: string | null): string {
   if (!raw) return ''
-  return format(parseISO('2022-05-24T' + raw), 'h:mm aaaa')
+  const [hStr, mStr] = raw.split(':')
+  let h = parseInt(hStr)
+  const ampm = h >= 12 ? 'p.m.' : 'a.m.'
+  h = h % 12 || 12
+  return mStr === '00' ? `${h}\u00A0${ampm}` : `${h}:${mStr}\u00A0${ampm}`
 }
 
-function exceptionCounter(day: string): number | null {
+function getExceptionText(day: string): string | null {
   const exc = exceptionsByDay.value[day]
   if (!exc) return null
-  return 1 + exceptionsList.value.indexOf(exc)
+  const msgs = messages.value[locale.value] as Record<string, Record<string, string>>
+  return msgs?.exceptions?.[exc] ?? exc
 }
 
 function parseTimeRange(day: string): string {
-  const start = p.value[`hours_${day}_start`] as string | null
-  const end = p.value[`hours_${day}_end`] as string | null
-  const counter = exceptionCounter(day)
+  const props = p.value as unknown as Record<string, string | null>
+  const start = props[`hours_${day}_start`]
+  const end = props[`hours_${day}_end`]
   let val: string
   if (start && end) {
-    val = parseTime(start) + ' - ' + parseTime(end)
+    val = parseTime(start) + '\u00A0–\u00A0' + parseTime(end)
   } else {
     val = t('closed')
   }
-  if (counter) val += '*'.repeat(counter)
+  if (exceptionsByDay.value[day]) val += '*'
   return val
-}
-
-function parseException(exception: string, index: number): string {
-  const stars = '*'.repeat(index)
-  const msgs = messages.value[locale.value] as Record<string, Record<string, string>>
-  const translated = msgs?.exceptions?.[exception]
-  return stars + ' ' + (translated ?? exception)
 }
 
 // --- Tests ---
 const tests = computed(() => {
-  const fields = ['blood', 'sti', 'covid', 'mammo', 'xray']
-  return fields.filter((f) => p.value[`tests_${f}`] === 'Yes')
+  const fields: PrimaryCareField[] = [
+    'tests_blood',
+    'tests_sti',
+    'tests_covid',
+    'tests_mammo',
+    'tests_xray',
+  ]
+  return fields.filter((f) => props.location.properties[f] === 'Yes')
 })
 
 // --- Languages ---
 const languagesSpoken = computed<string[]>(() => {
-  if (!p.value.language) return []
-  return p.value.language.split(',').map((s) => s.trim())
+  if (!props.location.properties.languages) return []
+  return props.location.properties.languages.split(',').map((s) => s.trim())
 })
 
 function translateLanguage(lang: string): string {
@@ -178,7 +172,22 @@ function translateWarning(warning: string): string {
   return msgs?.warnings?.[warning] ?? warning
 }
 
+function translateCaveat(caveat: string): string {
+  const msgs = messages.value[locale.value] as Record<string, Record<string, string>>
+  return msgs?.caveats?.[caveat] ?? caveat
+}
+
 // --- Transit helpers ---
+const hasTransit = computed(() =>
+  Boolean(
+    p.value.transport_bus ||
+    p.value.transport_subway ||
+    p.value.transport_train ||
+    p.value.transport_trolley ||
+    p.value.transport_parking
+  )
+)
+
 function translateTransitList(raw: string | null, category: string): string {
   if (!raw) return ''
   const msgs = messages.value[locale.value] as Record<
@@ -199,173 +208,161 @@ function translateTransitList(raw: string | null, category: string): string {
 <template>
   <div class="location-detail content">
     <div class="detail-header">
-      <h2>{{ siteName() }}</h2>
+      <h2>{{ location.name }}</h2>
       <PhilaButton
-        :icon-definition="faXmark"
+        :icon="IconClose"
         :icon-only="true"
         variant="standard"
         size="small"
         class="detail-close-btn"
-        aria-label="Close details"
+        :aria-label="t('closeDetails')"
         @click="onClose"
       />
     </div>
 
     <div class="detail-body">
-      <!-- Warning callout -->
-      <div v-if="p.optional_info_general" class="warning-callout">
-        {{ translateWarning(p.optional_info_general) }}
-      </div>
+      <LocationTags :location="location" detail />
+      <span class="has-text-label-large">{{ $t('locationDetails') }}</span>
 
-      <!-- Contact info -->
-      <section class="contact-section">
-        <div v-if="p.address" class="contact-row">
-          <span class="contact-label">{{ fullAddress }}</span>
-        </div>
-        <div v-if="p.website" class="contact-row">
-          <a :href="p.website" target="_blank">{{ p.website }}</a>
-        </div>
-        <div v-if="p.med_phone_num" class="contact-row">
-          {{ p.med_phone_num }}
-        </div>
-      </section>
-
-      <!-- Transit -->
-      <section
-        v-if="
-          p.transport_bus ||
-          p.transport_subway ||
-          p.transport_train ||
-          p.transport_trolley ||
-          p.transport_parking
-        "
-        class="transit-section"
-      >
-        <div v-if="p.transport_bus">
-          <strong>{{ $t('transit.bus') }}:</strong> {{ p.transport_bus }}
-        </div>
-        <div v-if="p.transport_subway">
-          <strong>{{ $t('transit.subway.label') }}:</strong>
-          {{ translateTransitList(p.transport_subway, 'subway') }}
-        </div>
-        <div v-if="p.transport_train">
-          <strong>{{ $t('transit.regRail.label') }}:</strong>
-          {{ translateTransitList(p.transport_train, 'regRail') }}
-        </div>
-        <div v-if="p.transport_trolley">
-          <strong>{{ $t('transit.trolley') }}:</strong>
-          {{ p.transport_trolley }}
-        </div>
-        <div v-if="p.transport_parking">
-          <strong>{{ $t('transit.car.label') }}:</strong>
-          {{ translateTransitList(p.transport_parking, 'car') }}
-        </div>
-      </section>
-
-      <!-- Languages -->
-      <section v-if="languagesSpoken.length">
-        <strong>{{ $t('languagesSpoken') }}:</strong>
-        {{ languagesSpoken.map(translateLanguage).join(', ') }}
-      </section>
-
-      <!-- Age-specific services table -->
-      <section>
-        <h3>{{ $t('ageSpecificServices') }}</h3>
-        <p>{{ $t('cards.table1Intro') }}</p>
-        <table v-if="ageSpecificServices.length" class="data-table">
-          <thead>
-            <tr>
-              <th>{{ $t('service') }}</th>
-              <th class="center">{{ $t('ageRange.adult') }}</th>
-              <th class="center">{{ $t('ageRange.child') }}</th>
-              <th class="center">
-                {{ $t('patientType.patient_type_existing_only') }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="row in ageSpecificServices" :key="row.id">
-              <td>{{ $t(row.service) }}</td>
-              <td class="center">
-                {{ YES_VALUES.includes(row.adult ?? '') ? '✓' : '' }}
-              </td>
-              <td class="center">
-                {{ YES_VALUES.includes(row.child ?? '') ? '✓' : '' }}
-              </td>
-              <td class="center">
-                {{ row.existing.includes('Established Patients') ? '✓' : '' }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <p v-else>{{ $t('tableNoData.noSpecializedServices') }}</p>
-      </section>
-
-      <!-- Other services table -->
-      <section>
-        <h3>{{ $t('otherServices') }}</h3>
-        <p>{{ $t('cards.table2Intro') }}</p>
-        <table v-if="otherServices.length" class="data-table">
-          <thead>
-            <tr>
-              <th>{{ $t('service') }}</th>
-              <th class="center">{{ $t('patientType.patient_type_new') }}</th>
-              <th class="center">
-                {{ $t('patientType.patient_type_existing') }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="row in otherServices" :key="row.id">
-              <td>{{ $t(row.service) }}</td>
-              <td class="center">{{ row.value === 'Yes' ? '✓' : '' }}</td>
-              <td class="center">
-                {{ YES_VALUES.includes(row.value ?? '') ? '✓' : '' }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <p v-else>{{ $t('tableNoData.noOtherServices') }}</p>
-      </section>
-
-      <!-- Hours table -->
-      <section>
-        <h3>{{ $t('hours') }}</h3>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>{{ $t('daysOfTheWeek') }}</th>
-              <th>{{ $t('schedule') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="day in DAYS" :key="day">
-              <td>{{ $t(DAY_I18N_KEYS[day]) }}</td>
-              <td>{{ parseTimeRange(day) }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <div v-if="exceptionsList.length" class="exceptions">
-          <div v-for="(exc, i) in exceptionsList" :key="i">
-            {{ parseException(exc, i + 1) }}
+      <!-- Contact: phone, website, address — icon + value, no headers -->
+      <div class="detail-columns detail-zone">
+        <div class="detail-col-left">
+          <div v-if="p.med_phone_num" class="icon-row">
+            <Icon :icon="IconPhone" inline decorative class="row-icon" />
+            <PhilaLink :href="`tel:${p.med_phone_num}`" size="small">
+              {{ p.med_phone_num }}
+            </PhilaLink>
+          </div>
+          <div v-if="p.url_appt" class="icon-row">
+            <Icon :icon="IconGlobe" inline decorative class="row-icon" />
+            <PhilaLink :href="p.url_appt" size="small" target="_blank" rel="noopener noreferrer">
+              {{ $t('providerWebsite') }}
+            </PhilaLink>
           </div>
         </div>
+        <div class="detail-col-right">
+          <div class="icon-row">
+            <Icon :icon="IconLocationDot" inline decorative class="row-icon" />
+            <PhilaLink :href="mapsUrl()" size="small" target="_blank" rel="noopener noreferrer">
+              {{ fullAddress }}
+            </PhilaLink>
+          </div>
+        </div>
+      </div>
+
+      <!-- Languages spoken + transit options — icon + header + content -->
+      <div class="detail-columns detail-zone detail-zone--divided">
+        <div class="detail-col-left">
+          <div v-if="languagesSpoken.length" class="detail-cell">
+            <div class="cell-header">
+              <Icon :icon="IconLanguage" inline decorative class="row-icon" />
+              <span class="has-text-label-small cell-label">{{ $t('languages.category') }}</span>
+            </div>
+            <span class="has-text-body-small">
+              {{ languagesSpoken.map(translateLanguage).join(', ') }}
+            </span>
+          </div>
+        </div>
+        <div class="detail-col-right">
+          <div v-if="hasTransit" class="detail-cell">
+            <div class="cell-header">
+              <Icon :icon="IconBus" inline decorative class="row-icon" />
+              <span class="has-text-label-small cell-label">{{ $t('transitOptions') }}</span>
+            </div>
+            <div class="cell-content cell-list">
+              <span v-if="location.properties.transport_bus" class="has-text-body-small">
+                {{ $t('transit.bus') }}: {{ location.properties.transport_bus }}
+              </span>
+              <span v-if="location.properties.transport_subway" class="has-text-body-small">
+                {{ $t('transit.subway.label') }}:
+                {{ translateTransitList(location.properties.transport_subway, 'subway') }}
+              </span>
+              <span v-if="location.properties.transport_train" class="has-text-body-small">
+                {{ $t('transit.regRail.label') }}:
+                {{ translateTransitList(location.properties.transport_train, 'regRail') }}
+              </span>
+              <span v-if="location.properties.transport_trolley" class="has-text-body-small">
+                {{ $t('transit.trolley') }}: {{ location.properties.transport_trolley }}
+              </span>
+              <span v-if="location.properties.transport_parking" class="has-text-body-small">
+                {{ $t('transit.car.label') }}:
+                {{ translateTransitList(location.properties.transport_parking, 'car') }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hours — full width -->
+      <div class="detail-cell detail-zone detail-zone--divided">
+        <div class="cell-header">
+          <Icon :icon="IconClock" inline decorative class="row-icon" />
+          <span class="has-text-label-small cell-label">{{ $t('hours') }}</span>
+        </div>
+        <div class="cell-content hours-list">
+          <div v-for="day in DAYS" :key="day" class="hours-entry">
+            <div class="hours-row">
+              <span class="has-text-body-small hours-day">{{ $t(DAY_I18N_KEYS[day]) }}</span>
+              <span class="has-text-body-small">{{ parseTimeRange(day) }}</span>
+            </div>
+            <span v-if="getExceptionText(day)" class="has-text-body-extra-small hours-exception">
+              * {{ getExceptionText(day) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Warning callout -->
+      <div v-if="location.properties.optional_info_general" class="warning-callout">
+        {{ translateWarning(location.properties.optional_info_general) }}
+      </div>
+
+      <span class="has-text-label-large detail-zone--divided">{{ $t('servicesAvailable') }}</span>
+      <span v-if="location.properties.walk_ins_sick === 'Yes'" class="has-text-body-small">
+        {{ $t('patientType.patient_type_new_subtext') }}
+      </span>
+
+      <!-- Patients served -->
+      <section v-if="patientsServedText" class="services-section">
+        <span class="has-text-label-small cell-label">{{ $t('patientsServed') }}</span>
+        <span class="has-text-body-small">{{ patientsServedText }}</span>
+      </section>
+
+      <!-- New patient services -->
+      <section v-if="newPatientServices.length" class="services-section">
+        <span class="has-text-label-small cell-label">{{
+          $t('patientType.patient_type_new')
+        }}</span>
+        <ul class="service-list">
+          <li v-for="label in newPatientServices" :key="label" class="has-text-body-small">
+            {{ $t(label) }}
+          </li>
+        </ul>
+      </section>
+
+      <!-- Existing patient only services -->
+      <section v-if="existingOnlyServices.length" class="services-section">
+        <span class="has-text-label-small cell-label">{{
+          $t('patientType.patient_type_existing_only')
+        }}</span>
+        <span class="has-text-body-small">{{
+          $t('patientType.patient_type_existing_only_subtext')
+        }}</span>
+        <ul class="service-list">
+          <li v-for="label in existingOnlyServices" :key="label" class="has-text-body-small">
+            {{ $t(label) }}
+          </li>
+        </ul>
       </section>
 
       <!-- Tests -->
-      <section>
-        <h3>{{ $t('tests.category') }}</h3>
-        <ul v-if="tests.length">
-          <li v-for="test in tests" :key="test">{{ $t(`tests.${test}`) }}</li>
+      <section v-if="tests.length" class="services-section">
+        <span class="has-text-label-small cell-label">{{ $t('tests.category') }}</span>
+        <ul class="service-list">
+          <li v-for="test in tests" :key="test" class="has-text-body-small">
+            {{ $t(test.replace('_', '.')) }}
+          </li>
         </ul>
-        <p v-else>{{ $t('tests.noTests') }}</p>
-      </section>
-
-      <!-- Sliding scale -->
-      <section>
-        <h3>{{ $t('slidingScale') }}</h3>
-        <p>{{ $t('slidingScaleExplanation') }}</p>
-        <p>{{ p.sliding_scale ?? $t('slidingScaleNull') }}</p>
       </section>
     </div>
   </div>
@@ -376,6 +373,7 @@ function translateTransitList(raw: string | null, category: string): string {
   display: flex;
   flex-direction: column;
   height: 100%;
+  container-type: inline-size;
 }
 
 .detail-header {
@@ -389,6 +387,7 @@ function translateTransitList(raw: string | null, category: string): string {
 
 .detail-header h2 {
   font-size: 1.25rem;
+  line-height: 1.4;
   margin: 0;
   flex: 1;
 }
@@ -408,6 +407,123 @@ function translateTransitList(raw: string | null, category: string): string {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  color: var(--Schemes-On-Surface-High);
+}
+
+.detail-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px), (max-width: 1064px) and (max-height: 600px) {
+  .detail-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@container (max-width: 500px) {
+  .detail-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detail-col-left,
+.detail-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detail-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Indent the data under the section header so it lines up past the header icon. */
+.detail-cell > :not(.cell-header) {
+  padding-left: calc(var(--Label-Default-font-label-default-size) + 0.5rem);
+}
+
+/* Contact section: an icon next to the value (phone, website, address), no header. */
+.icon-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+/* Languages / transit / hours: an icon next to the section header. */
+.cell-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.row-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.icon-row .row-icon {
+  /* nudge down to sit on the first line of the value */
+  margin-top: 0.15rem;
+}
+
+.cell-header .row-icon {
+  font-size: var(--Label-Default-font-label-default-size);
+}
+
+/* Gray divider above the zones that follow the contact section. */
+.detail-zone--divided {
+  border-top: 1px solid var(--Schemes-Outline-Variant, rgba(0, 0, 0, 0.12));
+  padding-top: 1.5rem;
+}
+
+/* Make the bold headers a step larger than the body text below them, so the
+   hierarchy comes from larger headers rather than shrinking the content. */
+.cell-label {
+  color: var(--Schemes-On-Surface-High);
+  font-size: var(--Label-Default-font-label-default-size) !important;
+}
+
+.cell-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hours-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
+.hours-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.hours-exception {
+  display: block;
+  /* Wrap before the time column instead of running the full width. */
+  max-width: 65%;
+}
+
+.services-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border-top: 1px solid var(--Schemes-Outline-Variant, rgba(0, 0, 0, 0.12));
+  padding-top: 1.5rem;
+}
+
+/* No divider above the first section — it sits right under the "Services
+   available" heading. */
+.services-section:first-of-type {
+  border-top: none;
+  padding-top: 0;
 }
 
 .warning-callout {
@@ -417,43 +533,19 @@ function translateTransitList(raw: string | null, category: string): string {
   padding: 0.75rem 1rem;
 }
 
-.contact-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+.service-list {
+  margin: 0;
+  padding-left: 1.5rem;
+  list-style-type: disc;
 }
 
-.transit-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+/* Reset the global ul/li spacing (li gets a large margin-bottom by default). */
+.service-list li {
+  margin: 0;
+  padding: 0;
 }
 
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 0.5rem;
-}
-
-.data-table th,
-.data-table td {
-  border: 1px solid #ddd;
-  padding: 0.5rem;
-  text-align: left;
-}
-
-.data-table th {
-  background: #f5f5f5;
-  font-weight: 600;
-}
-
-.center {
-  text-align: center;
-}
-
-.exceptions {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  color: #666;
+.service-list li + li {
+  margin-top: var(--spacing-xs);
 }
 </style>

@@ -1,5 +1,6 @@
 import { ref, computed, onBeforeMount, type Ref, type ComputedRef } from 'vue'
-import { faWater, faCamera } from '@fortawesome/pro-solid-svg-icons'
+import { IconWater, IconCamera } from '@phila/phila-ui-core/icons'
+import { PinboardUtilities } from '@pinboard/ui'
 import type { MapCardProps } from '@phila/phila-ui-cards'
 import type { LocationPanelDTO, OemLocation } from '@/types'
 
@@ -23,7 +24,15 @@ export function useLocations(): {
     const locations: LocationPanelDTO[] = import.meta.env.DEV
       ? await getLocationsDev(errorMessage)
       : await getLocationsProxy(errorMessage)
+    const seenSlugs = new Map<string, number>()
     oemLocations.value = Array.from(locations, (loc) => {
+      // Stable, readable id from the name for selection + ?location= deep-links. The flood-API
+      // device id (loc.id, used to fetch readings) is kept separately as deviceId.
+      const base = PinboardUtilities.slugify(loc.name) || 'location'
+      const n = seenSlugs.get(base) ?? 0
+      seenSlugs.set(base, n + 1)
+      const id = n === 0 ? base : `${base}-${n + 1}`
+
       const cardInfo: MapCardProps = {
         heading: loc.name,
         subheader: undefined,
@@ -32,7 +41,8 @@ export function useLocations(): {
       }
 
       const oemLocation: OemLocation = {
-        id: loc.id,
+        id,
+        deviceId: loc.id,
         name: loc.name,
         latitude: loc.latitude,
         longitude: loc.longitude,
@@ -56,13 +66,13 @@ export function useLocations(): {
 
 function getLocationTags(loc: LocationPanelDTO): NonNullable<MapCardProps['tags']> {
   if (loc.deviceType === 'Camera') {
-    return [{ text: 'Camera', color: 'purple' as const, iconDefinition: faCamera }]
+    return [{ text: 'Camera', color: 'purple' as const, icon: IconCamera }]
   }
   const gaugeValue =
     Number.isNaN(loc.gaugeHeight) || loc.gaugeHeight === -9999.9
       ? 'No data'
       : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
-  return [{ text: 'Gauge', color: 'blue' as const, iconDefinition: faWater }, { text: gaugeValue }]
+  return [{ text: 'Gauge', color: 'blue' as const, icon: IconWater }, { text: gaugeValue }]
 }
 
 async function getLocationsProxy(errorMessageRef: Ref) {

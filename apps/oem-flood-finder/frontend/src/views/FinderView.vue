@@ -3,8 +3,7 @@
 import { computed, ref, watch } from 'vue'
 
 // 3rd party imports
-import { faGauge, faCamera } from '@fortawesome/free-solid-svg-icons'
-import { faLocationDot } from '@fortawesome/pro-solid-svg-icons'
+import { IconGauge, IconCamera, IconLocationDot } from '@phila/phila-ui-core/icons'
 
 // philly ui imports
 // pinboard imports
@@ -61,7 +60,7 @@ const locationFilterMode = ref<Filters>('all')
 const visitedIds = ref(new Set<string>())
 const visibleFloodLayers = ref<FloodLayerId[]>([])
 const { oemLocations, isLoading, errorMessage } = useLocations()
-const { userLocation, userLocationState } = PinboardComposables.useUserLocation(true)
+const { userLocation, userLocationState } = PinboardComposables.useUserLocation(true, true)
 const locationSortMode = ref<SortMode>(
   ['located', 'watching'].includes(userLocationState.value) ? 'DistAsc' : '',
 )
@@ -242,7 +241,7 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
         >
           <MapIconTextPin
             :zoom="zoom"
-            :icon="isGauge(loc) ? faGauge : faCamera"
+            :icon="isGauge(loc) ? IconGauge : IconCamera"
             :text="
               loc.locationCardInfo.tags?.[1]?.text !== 'No data'
                 ? (loc.locationCardInfo.tags?.[1]?.text ?? '')
@@ -262,7 +261,7 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
           key="searchOrUserLocation"
           :lng-lat="[searchOrUserLocation.longitude, searchOrUserLocation.latitude]"
         >
-          <MapIconTextPin :zoom="zoom" :icon="faLocationDot" color-theme="light-tertiary" />
+          <MapIconTextPin :zoom="zoom" :icon="IconLocationDot" color-theme="light-tertiary" />
         </MapMarker>
       </div>
     </template>

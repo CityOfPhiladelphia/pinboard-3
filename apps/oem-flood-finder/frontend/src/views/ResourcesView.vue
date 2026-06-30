@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router'
 import { Logo } from '@phila/phila-ui-logo'
 import { PhilaLink } from '@phila/phila-ui-link'
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import { IconChevronLeft } from '@phila/phila-ui-core/icons'
 import { PinboardComposables } from '@pinboard/ui'
 
 const router = useRouter()
@@ -19,7 +19,7 @@ const isMobile = PinboardComposables.useIsMobile()
             <PhilaLink
               href="/"
               text="Back to map"
-              :icon-definition="faChevronLeft"
+              :icon="IconChevronLeft"
               @click.prevent="router.push('/')"
             />
             <h1>Flood information and resources</h1>

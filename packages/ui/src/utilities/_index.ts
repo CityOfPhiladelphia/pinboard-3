@@ -3,9 +3,9 @@ Central file to simplify importing functions into app projects.
 Contains references to exported functions and useful constants and regular expressions
 */
 
-import { getBrowserType } from './getBrowserType'
 import { getHaversineDistance } from './getHaversineDistance'
 import { hasLocationData } from './hasLocationData'
+import { slugify } from './slugify'
 
 const StreetAddress: Readonly<RegExp> =
   /^(?:\d{1,5}(?:-\d{1,5})?[A-Za-z]{0,3} )(?:(?:(?:[NnSs](?:[Oo][RrUu][Tt][Hh])?)|(?:[EeWw](?:[AaEe][Ss][Tt])?)){0,2} )?\w+ \w{2,}$/
@@ -16,9 +16,9 @@ const StreetIntersection: Readonly<RegExp> =
 const Zipcode: Readonly<RegExp> = /^\d{5}(?:-\d{4})?$/
 
 export {
-  getBrowserType,
   getHaversineDistance,
   hasLocationData,
+  slugify,
   StreetAddress,
   StreetIntersection,
   Zipcode,

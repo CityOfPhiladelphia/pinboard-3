@@ -1,9 +1,11 @@
 <script setup lang="ts">
 // vue imports
 import { useSlots, inject, ref, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 // 3rd party imports
-import { faMap } from '@fortawesome/pro-solid-svg-icons'
+import { IconMap } from '@phila/phila-ui-core/icons'
 
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
@@ -20,7 +22,8 @@ import LocationsPanel from './LocationsPanel.vue'
 import { FilterChipGroup } from '@phila/phila-ui-filter-chip'
 import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
-// pinboard composables imports
+// pinboard composables and utilities imports
+import { hasLocationData } from '../utilities/hasLocationData'
 
 // type imports
 import type {
@@ -32,12 +35,12 @@ import type {
   UserLocationState,
 } from '../types'
 import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
-import { hasLocationData } from '../utilities/hasLocationData'
 
 // slots
 defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
+  'location-card'?(props: { location: BasicLocation }): unknown
   'location-detail'?(props: { location: BasicLocation; onClose: () => void }): unknown
   'map-content'?(props: {
     locations: BasicLocation[]
@@ -94,12 +97,9 @@ const emit = defineEmits<{
   'update:filterValues': [value: FilterValues]
 }>()
 
-// filter state
-const allFiltersOpen = ref(false)
-
-function onFilterValues(value: FilterValues) {
-  emit('update:filterValues', value)
-}
+const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 
 // component variables
 const snapPoints = [15, 50, 100]
@@ -125,6 +125,8 @@ const locationsPanelRef = ref<{
 } | null>(null)
 const mapPanelRef = ref<{ panTo: (coordinates: LatLon) => void } | null>(null)
 const searchString = ref<string>('')
+// filter state
+const allFiltersOpen = ref(false)
 
 // computed refs
 const bottomSheetPercent = computed(() => bottomSheetRef.value?.displayPercent ?? snapPoints[0])
@@ -147,16 +149,108 @@ const selectedLocationId = computed(() =>
 
 const locationCountLabel = computed(() => {
   const message = props.locations.length
-    ? `${props.locations.length} item${props.locations.length > 1 ? 's' : ''}`
-    : 'No locations match'
+    ? t('pinboard.itemCount', { count: props.locations.length }, props.locations.length)
+    : t('pinboard.noLocations')
   return props.isLoading || message
 })
 
+// Filter chips in use bubble up to sit right after the (pinned) Sort chip. The
+// order is a snapshot recomputed only at safe moments — initial load, a chip's
+// dropdown closing, and the All-Filters panel closing — never live while a
+// dropdown is open, so a chip never moves out from under its own popover.
+const chipOrderKeys = ref<string[]>([])
+
+function recomputeChipOrder() {
+  const all = props.filters ?? []
+  const values = props.filterValues ?? {}
+  const isActive = (key: string) => {
+    const v = values[key]
+    return v && typeof v === 'object' ? Object.values(v).some(Boolean) : v === true
+  }
+  const pinned = all.filter((f) => f.excludeFromCount)
+  const rest = all.filter((f) => !f.excludeFromCount)
+  chipOrderKeys.value = [
+    ...pinned,
+    ...rest.filter((f) => isActive(f.key)),
+    ...rest.filter((f) => !isActive(f.key)),
+  ].map((f) => f.key)
+}
+
+// Map the snapshot order onto the current filter definitions, so locale/label
+// changes still flow through while the order stays put. Any filter not yet in the
+// snapshot falls back to source order at the end.
+const orderedChipFilters = computed(() => {
+  const all = props.filters ?? []
+  if (!chipOrderKeys.value.length) return all
+  const byKey = new Map(all.map((f) => [f.key, f]))
+  const ordered = chipOrderKeys.value
+    .map((k) => byKey.get(k))
+    .filter((f): f is FilterDefinition => !!f)
+  const known = new Set(chipOrderKeys.value)
+  return [...ordered, ...all.filter((f) => !known.has(f.key))]
+})
+
+// Seed on load and refresh on locale (filters) changes. Otherwise the order only
+// updates on dropdown-close / panel-close (wired in the template + watcher below).
+watch(
+  () => props.filters,
+  () => recomputeChipOrder(),
+  { immediate: true }
+)
+
 // watchers
 watch(selectedLocation, (loc) => {
-  if (loc && props.isMobile) {
-    bottomSheetRef.value?.snapTo(snapPoints.length - 1)
+  if (loc) {
+    // Mutual exclusion: the detail panel and the filter panel share the left
+    // slot, so selecting a location closes the filter panel. Covers every
+    // selection path (map click, list click, URL/back-forward nav).
+    allFiltersOpen.value = false
+    if (props.isMobile) {
+      bottomSheetRef.value?.snapTo(snapPoints.length - 1)
+    }
   }
+})
+
+// Defensive: enforce the "one left panel at a time" invariant in state. Not
+// reachable in the current UI (an open detail overlay covers the Filters
+// button), but keeps the invariant if the structural cleanup (bead
+// pinboard-3-nag) later makes filters reachable with a detail open. Desktop
+// only: on mobile the filter panel is full-screen and leaving the detail in
+// state returns the user to it when the filters close.
+watch(allFiltersOpen, (open) => {
+  if (open && !props.isMobile) {
+    handleCloseLocationDetail()
+  }
+  // Reorder chips to reflect what was toggled in the panel, once it's closed.
+  if (!open) recomputeChipOrder()
+})
+
+// Reflect the selected location in the URL as ?location=<id>. push (not replace) so Back walks
+// the selection history. Guarded so it never re-pushes a value the URL already has — that guard
+// is also what stops it looping with the route → selection watcher below.
+watch(selectedLocationId, (id) => {
+  const desired = id ?? undefined
+  if (route.query.location === desired) return
+  const query = { ...route.query }
+  if (desired === undefined) delete query.location
+  else query.location = desired
+  router.push({ query })
+})
+
+// The URL is the source of truth for selection. Resolve ?location= against the loaded locations:
+// on initial mount (immediate), when the data finishes loading, and on Back/Forward. An absent or
+// unknown id clears the selection (graceful). Direct set (not selectLocation) so it doesn't re-push;
+// it also intentionally skips the deselect/visited-tracking emit — URL-driven nav doesn't mark visited.
+function resolveLocationFromRoute() {
+  const param = route.query.location
+  const id = typeof param === 'string' ? param : undefined
+  if (id === selectedLocationId.value) return
+  const match = id ? props.locations.find((loc) => loc.id === id) : undefined
+  selectedLocation.value = match ?? undefined
+  if (match) mapPanelRef.value?.panTo(match)
+}
+watch([() => route.query.location, () => props.locations], resolveLocationFromRoute, {
+  immediate: true,
 })
 
 watch(
@@ -244,6 +338,10 @@ function handleCloseLocationDetail() {
   }
 }
 
+function handleApplyFilter(value: FilterValues) {
+  emit('update:filterValues', value)
+}
+
 // utility functions
 const effectiveMapConfig = (() => {
   // Merge mobile overrides into the map config ONCE at setup — not reactively.
@@ -303,16 +401,27 @@ const effectiveMapConfig = (() => {
             <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
               <div class="filter-chip-bar">
                 <FilterChipGroup
-                  :filters="filters"
-                  :model-value="filterValues ?? {}"
+                  :filters="orderedChipFilters"
+                  :model-value="filterValues"
                   color="white"
                   filter-button
+                  :filter-button-text="t('pinboard.filters')"
+                  :reset-text="t('pinboard.reset')"
                   :elevated="isMobile && chipsOnMap"
-                  @update:model-value="onFilterValues"
+                  @update:model-value="handleApplyFilter"
                   @open-filters="allFiltersOpen = true"
+                  @dropdown-close="recomputeChipOrder"
                 />
               </div>
             </Teleport>
+          </template>
+          <template #list-header>
+            <div v-if="!isMobile" class="location-list-header">
+              <span>{{ locationCountLabel }}</span>
+            </div>
+          </template>
+          <template v-if="$slots['location-card']" #location-card="{ location }">
+            <slot name="location-card" :location="location" />
           </template>
         </LocationsPanel>
       </Teleport>
@@ -350,24 +459,25 @@ const effectiveMapConfig = (() => {
       <div id="mobile-map-search-filter" class="mobile-map-search-filter"></div>
     </div>
 
-    <Teleport to="#app" :disabled="!isMobile">
-      <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
-        <FilterPanel
-          v-if="allFiltersOpen"
-          :filters="filters"
-          :model-value="filterValues ?? {}"
-          @update:model-value="onFilterValues"
-          @close="allFiltersOpen = false"
-        />
-      </div>
-    </Teleport>
+    <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
+      <FilterPanel
+        v-if="allFiltersOpen"
+        :filters="filters"
+        :model-value="filterValues"
+        :full-screen="isMobile"
+        :title="t('pinboard.allFilters')"
+        :reset-text="t('pinboard.reset')"
+        @update:model-value="handleApplyFilter"
+        @close="allFiltersOpen = false"
+      />
+    </div>
   </div>
   <BottomSheet
     ref="bottomSheetRef"
     v-model="bottomSheetOpen"
     :snap-points="snapPoints"
-    :collapse-label="selectedLocation ? '' : 'Map view'"
-    :collapse-icon="selectedLocation ? undefined : faMap"
+    :collapse-label="selectedLocation ? '' : t('pinboard.mapView')"
+    :collapse-icon="selectedLocation ? undefined : IconMap"
     class="mobile-bottom-sheet"
   >
     <div class="bottom-sheet-stack">
@@ -431,6 +541,13 @@ const effectiveMapConfig = (() => {
   align-items: center;
   justify-content: space-between;
   padding: 0 1rem;
+  font-family: var(--Body-Default-font-body-default-family);
+  font-weight: 700;
+}
+
+/* Desktop: item count above the locations list (mirrors the mobile sheet count). */
+.location-list-header {
+  padding: 0.75rem 1rem 0.5rem;
   font-family: var(--Body-Default-font-body-default-family);
   font-weight: 700;
 }
@@ -577,14 +694,11 @@ const effectiveMapConfig = (() => {
     padding: 10px 0;
   }
 
-  /* Full-screen modal that covers the bottom sheet and map, rather than a
-     slide-over panel trapped inside the finder panel. */
-  .all-filters-overlay {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    z-index: 1100;
-    box-shadow: none;
+  /* Mobile: FilterPanel renders its own full-screen takeover (teleported to
+     <body>, above the header). The desktop slide-over wrapper is inert here —
+     the v-if'd FilterPanel still mounts and teleports itself out. */
+  .all-filters-overlay.open {
+    display: none;
   }
 }
 </style>

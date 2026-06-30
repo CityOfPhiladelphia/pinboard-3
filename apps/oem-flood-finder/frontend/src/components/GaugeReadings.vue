@@ -6,12 +6,12 @@ import { PhlTabNav, PhlTab } from '@phila/phila-ui-tabs'
 import { computed, ref, type Ref } from 'vue'
 import { Icon } from '@phila/phila-ui-core'
 import {
-  faRaindrops,
-  faDropletDegree,
-  faCloudDrizzle,
-  faTemperatureFull,
-  faGauge,
-} from '@fortawesome/pro-solid-svg-icons'
+  IconGauge,
+  IconCloudRain,
+  IconDroplet,
+  IconCloudShowersHeavy,
+  IconTemperatureFull,
+} from '@phila/phila-ui-core/icons'
 import { PinboardComposables } from '@pinboard/ui'
 
 const props = defineProps<{
@@ -109,7 +109,7 @@ const snapshotTimestamp = computed(() => {
       <div style="font-weight: bold">Weather details</div>
       <div class="weather-details">
         <div>
-          <Icon :icon-definition="faRaindrops" size="extra-small" />
+          <Icon :icon="IconCloudRain" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Rainfall</div>
             <div class="has-text-body-small">{{ readingState.data[0].rainfall }} in</div>
@@ -117,7 +117,7 @@ const snapshotTimestamp = computed(() => {
         </div>
 
         <div>
-          <Icon :icon-definition="faDropletDegree" size="extra-small" />
+          <Icon :icon="IconDroplet" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Water Temperature</div>
             <div class="has-text-body-small">
@@ -131,7 +131,7 @@ const snapshotTimestamp = computed(() => {
         </div>
 
         <div>
-          <Icon :icon-definition="faCloudDrizzle" size="extra-small" />
+          <Icon :icon="IconCloudShowersHeavy" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Rain Intensity</div>
             <div class="has-text-body-small">{{ readingState.data[0].rainIntensity }} in/hr</div>
@@ -139,7 +139,7 @@ const snapshotTimestamp = computed(() => {
         </div>
 
         <div>
-          <Icon :icon-definition="faTemperatureFull" size="extra-small" />
+          <Icon :icon="IconTemperatureFull" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Air Temperature</div>
             <div class="has-text-body-small">
@@ -153,7 +153,7 @@ const snapshotTimestamp = computed(() => {
         </div>
 
         <div>
-          <Icon :icon-definition="faGauge" size="extra-small" />
+          <Icon :icon="IconGauge" size="extra-small" />
           <div style="margin-left: var(--spacing-s)">
             <div class="has-text-label-small" style="color: #666">Barometric Pressure</div>
             <div class="has-text-body-small">
