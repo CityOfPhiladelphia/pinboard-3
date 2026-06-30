@@ -4,6 +4,7 @@ export default {
     noLocations: 'No locations match',
     mapView: 'Map view',
     filters: 'Filters',
+    allFilters: 'All filters',
     sort: 'Sort',
     sortBy: 'Sort: {label}',
     sortClosest: 'Closest to furthest',

@@ -5,6 +5,7 @@ export default {
     noLocations: 'Нет совпадений',
     mapView: 'Посмотреть на карте',
     filters: 'Фильтр',
+    allFilters: 'Все фильтры',
     sort: 'Сортировать',
     sortBy: 'Сортировка: {label}',
     sortClosest: 'От ближайших к дальним',

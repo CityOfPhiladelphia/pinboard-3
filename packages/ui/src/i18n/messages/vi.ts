@@ -5,6 +5,7 @@ export default {
     noLocations: 'Không có kết quả phù hợp',
     mapView: 'Xem bản đồ',
     filters: 'Bộ lọc',
+    allFilters: 'Tất cả bộ lọc',
     sort: 'Sắp xếp',
     sortBy: 'Sắp xếp: {label}',
     sortClosest: 'Từ gần nhất đến xa nhất',

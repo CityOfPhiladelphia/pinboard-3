@@ -117,7 +117,7 @@ export default {
   },
   patientType: {
     category: 'Elegibilidade',
-    patient_type_new: 'Todos os pacientes',
+    patient_type_new: 'Pacientes novos ou existentes',
     patient_type_new_subtext:
       'Alguns desses serviços podem estar disponíveis sem hora marcada. Entre em contato com o provedor para obter mais informações.',
     patient_type_existing: 'Pacientes estabelecidos',

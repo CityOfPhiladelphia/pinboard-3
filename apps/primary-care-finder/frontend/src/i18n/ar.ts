@@ -117,7 +117,7 @@ export default {
   },
   patientType: {
     category: 'الأهلية',
-    patient_type_new: 'جميع المرضى',
+    patient_type_new: 'المرضى الجدد أو الحاليون',
     patient_type_new_subtext:
       'قد تتوفر بعض هذه الخدمات بدون موعد. اتصل بمقدم الخدمة لمزيد من المعلومات.',
     patient_type_existing: 'مرضى حاليون',

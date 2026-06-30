@@ -5,6 +5,7 @@ export default {
     noLocations: 'Nenhum resultado corresponde',
     mapView: 'Visualizar mapa',
     filters: 'Filtrar',
+    allFilters: 'Todos os filtros',
     sort: 'Ordenar',
     sortBy: 'Ordenar: {label}',
     sortClosest: 'Do mais próximo ao mais distante',

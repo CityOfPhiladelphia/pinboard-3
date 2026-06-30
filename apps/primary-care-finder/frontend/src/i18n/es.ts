@@ -118,7 +118,7 @@ export default {
   },
   patientType: {
     category: 'Elegibilidad',
-    patient_type_new: 'Todos los pacientes',
+    patient_type_new: 'Pacientes nuevos o existentes',
     patient_type_new_subtext:
       'Es posible que algunos de estos servicios estén disponibles sin cita previa. Comuníquese con el proveedor para obtener más información.',
     patient_type_existing: 'Pacientes establecidos',

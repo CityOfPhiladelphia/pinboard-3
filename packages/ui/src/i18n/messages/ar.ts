@@ -5,6 +5,7 @@ export default {
     noLocations: 'لا توجد نتائج مطابقة',
     mapView: 'عرض الخريطة',
     filters: 'فلتر',
+    allFilters: 'جميع الفلاتر',
     sort: 'فرز',
     sortBy: 'فرز: {label}',
     sortClosest: 'من الأقرب إلى الأبعد',

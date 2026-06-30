@@ -5,6 +5,7 @@ export default {
     noLocations: 'Hakuna matokeo yanayolingana',
     mapView: 'Tazama ramani',
     filters: 'Chujio',
+    allFilters: 'Vichujio vyote',
     sort: 'Panga',
     sortBy: 'Panga: {label}',
     sortClosest: 'Kutoka karibu hadi mbali',

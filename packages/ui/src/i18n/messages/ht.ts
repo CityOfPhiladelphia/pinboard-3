@@ -5,6 +5,7 @@ export default {
     noLocations: 'Pa gen rezilta ki koresponn',
     mapView: 'Gade kat jeyografik',
     filters: 'Filtre',
+    allFilters: 'Tout filtè yo',
     sort: 'Triye',
     sortBy: 'Triye: {label}',
     sortClosest: 'Pi pre a pi lwen',

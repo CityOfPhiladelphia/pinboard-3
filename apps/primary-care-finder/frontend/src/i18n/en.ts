@@ -94,7 +94,7 @@ export default {
   },
   patientType: {
     category: 'Eligibility',
-    patient_type_new: 'For all patients',
+    patient_type_new: 'For new or existing patients',
     patient_type_new_subtext:
       'Some of these services may be available for walk-ins. Contact the provider for more information.',
     patient_type_existing: 'Established patients',
