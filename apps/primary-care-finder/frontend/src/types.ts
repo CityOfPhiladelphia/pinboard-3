@@ -207,16 +207,6 @@ export type LanguagesFilter =
   | 'vietnamese'
   | 'yoruba'
 
-export interface PrimaryCareFilterValues {
-  sort: SortMode
-  ageGroup: AgeGroupFilter[]
-  waitTime: WaitTimeFilter[]
-  visitType: VisitTypeFilter[]
-  specialty: SpecialtyFilter[]
-  tests: TestsFilter[]
-  languages: LanguagesFilter[]
-}
-
 export interface PrimaryCareFilters extends Record<string, Record<string, boolean>> {
   sort: {
     distance: boolean

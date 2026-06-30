@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, toRaw } from 'vue'
+import { computed, ref, toRaw, type ComputedRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   PinboardBody,
@@ -18,38 +18,99 @@ import type { FilterValues, PinboardTypes } from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
 import { useFilterChipDefinitions } from '@/composables/filters/useFilterChipDefinitions.ts'
 import { useFilterLogic } from '@/composables/filters/useFilterLogic'
-import {
-  filterKeys,
-  visitTypeOptions,
-  specialtyOptions,
-  testsOptions,
-} from '@/composables/filters/filterKeysValues'
 import LocationCard from '@/components/LocationCard.vue'
 import LocationDetail from '@/components/LocationDetail.vue'
 import { IconLocationDot } from '@phila/phila-ui-core/icons'
 import type {
-  AgeGroupFilter,
-  LanguagesFilter,
   PrimaryCareFilters,
-  PrimaryCareFilterValues,
   PrimaryCareLocation,
   PrimaryCareResponse,
-  SpecialtyFilter,
-  TestsFilter,
-  VisitTypeFilter,
-  WaitTimeFilter,
+  SortMode,
 } from '@/types'
 
 import { sortLocations } from '@/utilities/sortLocations'
 
-const emptyFilters: PrimaryCareFilterValues = {
-  sort: '',
-  ageGroup: [],
-  waitTime: [],
-  visitType: [],
-  specialty: [],
-  tests: [],
-  languages: [],
+const emptyFilters: PrimaryCareFilters = {
+  sort: {
+    distance: false,
+    name: false,
+  },
+  ageGroup: {
+    adult: false,
+    children: false,
+  },
+  visitType: {
+    blood: false,
+    covid: false,
+    dental: false,
+    eye: false,
+    mammo: false,
+    mat: false,
+    mental: false,
+    nutrition: false,
+    pharmacy: false,
+    podiatry: false,
+    primaryPrenatal: false,
+    primarySick: false,
+    primarySports: false,
+    primaryTelehealth: false,
+    primaryVaccines: false,
+    primaryWell: false,
+    primaryWomen: false,
+    sti: false,
+    tobacco: false,
+    xray: false,
+  },
+  waitTime: {
+    sameDay: false,
+    twoMonths: false,
+    weekSick: false,
+    weekWell: false,
+  },
+  languages: {
+    amharic: false,
+    arabic: false,
+    asl: false,
+    bengali: false,
+    burmese: false,
+    cambodian: false,
+    cantonese: false,
+    chinese: false,
+    english: false,
+    fanta: false,
+    filipino: false,
+    french: false,
+    frenchcreole: false,
+    fula: false,
+    gujarati: false,
+    haitiancreole: false,
+    hebrew: false,
+    hindi: false,
+    indonesian: false,
+    karen: false,
+    khmer: false,
+    kinyarwanda: false,
+    kirundi: false,
+    koloqua: false,
+    korean: false,
+    lebanese: false,
+    malayalam: false,
+    malaysian: false,
+    mandarin: false,
+    nepali: false,
+    portuguese: false,
+    punjabi: false,
+    shanghainese: false,
+    sinhalese: false,
+    spanish: false,
+    swahili: false,
+    tagalog: false,
+    taiwanese: false,
+    telugu: false,
+    urdu: false,
+    vietnamese: false,
+    yoruba: false,
+  }
 }
 
 const { t } = useI18n()
@@ -78,37 +139,7 @@ const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
   zipcodePolygon,
   finishedZipFetch
 )
-const filterState = ref<PrimaryCareFilterValues>(emptyFilters)
-
-const VISIT_TYPE_SET = new Set<string>(Object.values(visitTypeOptions))
-const SPECIALTY_SET = new Set<string>(Object.values(specialtyOptions))
-const TESTS_SET = new Set<string>(Object.values(testsOptions))
-
-function activeKeys(map: boolean | Record<string, boolean> | undefined): string[] {
-  if (!map || typeof map !== 'object') return []
-  return Object.entries(map)
-    .filter(([, v]) => v)
-    .map(([k]) => k)
-}
-
-function toMap(arr: string[]): Record<string, boolean> {
-  return Object.fromEntries(arr.map((v) => [v, true]))
-}
-
-const filterValuesForProp = computed<FilterValues>(() => ({
-  sort: {
-    distance: filterState.value.sort.includes('distance'),
-    name: filterState.value.sort.includes('name'),
-  },
-  [filterKeys.ageGroup]: toMap(filterState.value.ageGroup),
-  [filterKeys.waitTime]: toMap(filterState.value.waitTime),
-  [filterKeys.visitType]: toMap([
-    ...filterState.value.visitType,
-    ...filterState.value.specialty,
-    ...filterState.value.tests,
-  ]),
-  [filterKeys.languages]: toMap(filterState.value.languages),
-}))
+const filterState = ref<PrimaryCareFilters>(emptyFilters)
 
 const { filterLogicalValue } = useFilterLogic(locations, filterState)
 
@@ -155,6 +186,10 @@ const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
   return undefined
 })
 
+const sortMode: ComputedRef<SortMode> = computed(() => {
+  return filterState.value.sort.name ? 'name' : filterState.value.sort.distance ? 'distance' : ''
+})
+
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
   let result = filterLogicalValue.value.length
     ? applyFilters(locationsWithDistance.value)
@@ -173,7 +208,7 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
   }
 
   return filterState.value.sort
-    ? sortLocations(result, searchOrUserLocation, filterState.value.sort)
+    ? sortLocations(result, searchOrUserLocation, sortMode)
     : result
 })
 
@@ -243,17 +278,7 @@ function handleGeolocateError(error: Error | GeolocationPositionError) {
 }
 
 function handleApplyFilter(values: FilterValues) {
-  const filters = values as PrimaryCareFilters
-  const allVisitType = activeKeys(filters[filterKeys.visitType])
-  filterState.value = {
-    sort: filters.sort.distance ? 'distance' : filters.sort.name ? 'name' : '',
-    ageGroup: activeKeys(filters[filterKeys.ageGroup]) as AgeGroupFilter[],
-    waitTime: activeKeys(filters[filterKeys.waitTime]) as WaitTimeFilter[],
-    visitType: allVisitType.filter((v) => VISIT_TYPE_SET.has(v)) as VisitTypeFilter[],
-    specialty: allVisitType.filter((v) => SPECIALTY_SET.has(v)) as SpecialtyFilter[],
-    tests: allVisitType.filter((v) => TESTS_SET.has(v)) as TestsFilter[],
-    languages: activeKeys(filters[filterKeys.languages]) as LanguagesFilter[],
-  }
+  filterState.value = values as PrimaryCareFilters
 }
 
 function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
@@ -272,7 +297,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
     :geojson="filteredGeojson"
     :is-mobile="isMobile"
     :filters="filterChipDefinitions"
-    :filter-values="filterValuesForProp"
+    :filter-values="filterState"
     @search="handleSearchSubmit"
     @update:filter-values="handleApplyFilter"
   >
