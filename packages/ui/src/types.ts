@@ -88,9 +88,8 @@ export interface CartoResponse {
   rows: CartoResponseFields[]
 }
 
-export interface ArcgisFeature {
+export interface GeoJsonFeature {
   type: 'Feature'
-  id: number
   geometry: {
     type: string
     coordinates: LongitudeLatitude
@@ -98,18 +97,13 @@ export interface ArcgisFeature {
   properties: unknown
 }
 
-export interface CartoFeature {
-  type: 'Feature'
-  geometry: {
-    type: string
-    coordinates: LongitudeLatitude
-  }
-  properties: unknown
+export interface ArcgisFeature extends GeoJsonFeature {
+  id: number
 }
 
 export interface GeoJSONFeatureCollectionResponse {
   type: 'FeatureCollection'
-  features: ArcgisFeature[] | CartoFeature[]
+  features: ArcgisFeature[] | GeoJsonFeature[]
 }
 
 // type GeoJsonGeometryType =

@@ -1,7 +1,7 @@
-import type { PinboardTypes } from '@pinboard/ui'
+import type { FilterChoiceBitfield, FilterValues, PinboardTypes } from '@pinboard/ui'
 
 export interface PrimaryCareProperties {
-  cartodb_id: number | null
+  cartodb_id: number
   objectid: number | null
   event_id: number | null
   project_id: number | null
@@ -132,7 +132,7 @@ export interface PrimaryCareProperties {
 
 export type PrimaryCareField = keyof PrimaryCareProperties
 
-export interface PrimaryCareFeature extends PinboardTypes.CartoFeature {
+export interface PrimaryCareFeature extends PinboardTypes.GeoJsonFeature {
   properties: PrimaryCareProperties
 }
 
@@ -207,7 +207,7 @@ export type LanguagesFilter =
   | 'vietnamese'
   | 'yoruba'
 
-export interface PrimaryCareFilters extends Record<string, Record<string, boolean>> {
+export interface PrimaryCareFilters extends FilterValues {
   sort: {
     distance: boolean
     name: boolean
@@ -287,5 +287,123 @@ export interface PrimaryCareFilters extends Record<string, Record<string, boolea
     urdu: boolean
     vietnamese: boolean
     yoruba: boolean
+  }
+}
+
+export interface PrimaryCareFilterLogic {
+  bufferLength: number
+  checked: boolean
+  operation: '&'
+  childFilters: {
+    ageGroup: {
+      bufferLength: number
+      checked: boolean
+      operation: '&'
+      childFilters: {
+        adult: FilterChoiceBitfield
+        children: FilterChoiceBitfield
+      }
+    }
+    languages: {
+      bufferLength: number
+      checked: boolean
+      operation: '&'
+      childFilters: {
+        amharic: FilterChoiceBitfield
+        arabic: FilterChoiceBitfield
+        asl: FilterChoiceBitfield
+        bengali: FilterChoiceBitfield
+        burmese: FilterChoiceBitfield
+        cambodian: FilterChoiceBitfield
+        cantonese: FilterChoiceBitfield
+        chinese: FilterChoiceBitfield
+        english: FilterChoiceBitfield
+        fanta: FilterChoiceBitfield
+        filipino: FilterChoiceBitfield
+        french: FilterChoiceBitfield
+        frenchcreole: FilterChoiceBitfield
+        fula: FilterChoiceBitfield
+        gujarati: FilterChoiceBitfield
+        haitiancreole: FilterChoiceBitfield
+        hebrew: FilterChoiceBitfield
+        hindi: FilterChoiceBitfield
+        indonesian: FilterChoiceBitfield
+        karen: FilterChoiceBitfield
+        khmer: FilterChoiceBitfield
+        kinyarwanda: FilterChoiceBitfield
+        kirundi: FilterChoiceBitfield
+        koloqua: FilterChoiceBitfield
+        korean: FilterChoiceBitfield
+        lebanese: FilterChoiceBitfield
+        malayalam: FilterChoiceBitfield
+        malaysian: FilterChoiceBitfield
+        mandarin: FilterChoiceBitfield
+        nepali: FilterChoiceBitfield
+        portuguese: FilterChoiceBitfield
+        punjabi: FilterChoiceBitfield
+        shanghainese: FilterChoiceBitfield
+        sinhalese: FilterChoiceBitfield
+        spanish: FilterChoiceBitfield
+        swahili: FilterChoiceBitfield
+        tagalog: FilterChoiceBitfield
+        taiwanese: FilterChoiceBitfield
+        telugu: FilterChoiceBitfield
+        urdu: FilterChoiceBitfield
+        vietnamese: FilterChoiceBitfield
+        yoruba: FilterChoiceBitfield
+      }
+    }
+    specialty: {
+      bufferLength: number
+      checked: boolean
+      operation: '&'
+      childFilters: {
+        mental: FilterChoiceBitfield
+        dental: FilterChoiceBitfield
+        eye: FilterChoiceBitfield
+        podiatry: FilterChoiceBitfield
+        mat: FilterChoiceBitfield
+        nutrition: FilterChoiceBitfield
+        tobacco: FilterChoiceBitfield
+        pharmacy: FilterChoiceBitfield
+      }
+    }
+    tests: {
+      bufferLength: number
+      checked: boolean
+      operation: '&'
+      childFilters: {
+        blood: FilterChoiceBitfield
+        sti: FilterChoiceBitfield
+        covid: FilterChoiceBitfield
+        mammo: FilterChoiceBitfield
+        xray: FilterChoiceBitfield
+      }
+    }
+    visitType: {
+      bufferLength: number
+      checked: boolean
+      operation: '&'
+      childFilters: {
+        primaryWell: FilterChoiceBitfield
+        primarySick: FilterChoiceBitfield
+        primarySports: FilterChoiceBitfield
+        primaryPrenatal: FilterChoiceBitfield
+        primaryWomen: FilterChoiceBitfield
+        primaryTelehealth: FilterChoiceBitfield
+        primaryVaccines: FilterChoiceBitfield
+      }
+    }
+    waitTime: {
+      bufferLength: number
+      checked: boolean
+      operation: '&'
+      childFilters: {
+        sameDay: FilterChoiceBitfield
+        weekWell: FilterChoiceBitfield
+        weekSick: FilterChoiceBitfield
+        twoMonths: FilterChoiceBitfield
+      }
+    }
   }
 }

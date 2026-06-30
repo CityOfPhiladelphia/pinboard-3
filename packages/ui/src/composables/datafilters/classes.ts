@@ -6,7 +6,7 @@ import type {
   IFilterGroup,
 } from './types'
 
-export class FilterChoiceBitfield {
+class FilterChoiceBitfield {
   private bitfield: Uint32Array
   private checked: boolean = false
 
@@ -122,4 +122,4 @@ class FilterGroup {
   }
 }
 
-export { FilterChoiceBitfieldGroup, FilterGroup }
+export { FilterChoiceBitfieldGroup, FilterGroup, FilterChoiceBitfield }

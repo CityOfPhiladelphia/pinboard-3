@@ -706,5 +706,5 @@ export function useFilterLogic(
     filterLogicalValue.value = filterLogic.value.getBitfield()
   })
 
-  return { filterLogicalValue }
+  return { filterLogicalValue, filterLogic }
 }

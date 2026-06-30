@@ -22,6 +22,7 @@ import LocationCard from '@/components/LocationCard.vue'
 import LocationDetail from '@/components/LocationDetail.vue'
 import { IconLocationDot } from '@phila/phila-ui-core/icons'
 import type {
+  PrimaryCareFilterLogic,
   PrimaryCareFilters,
   PrimaryCareLocation,
   PrimaryCareResponse,
@@ -141,7 +142,85 @@ const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
 )
 const filterState = ref<PrimaryCareFilters>(emptyFilters)
 
-const { filterLogicalValue } = useFilterLogic(locations, filterState)
+const { filterLogicalValue, filterLogic } = useFilterLogic(locations, filterState)
+
+const keywordToFilterMap = computed(() => {
+  const logicalValues = filterLogic.value as unknown as PrimaryCareFilterLogic
+  const keywordMap: Record<string, Uint32Array> = {
+    adult: logicalValues.childFilters.ageGroup.childFilters.adult.getBitfield(),
+    children: logicalValues.childFilters.ageGroup.childFilters.children.getBitfield(),
+    blood: logicalValues.childFilters.tests.childFilters.blood.getBitfield(),
+    covid: logicalValues.childFilters.tests.childFilters.covid.getBitfield(),
+    sti: logicalValues.childFilters.tests.childFilters.sti.getBitfield(),
+    mammo: logicalValues.childFilters.tests.childFilters.mammo.getBitfield(),
+    xray: logicalValues.childFilters.tests.childFilters.xray.getBitfield(),
+    dental: logicalValues.childFilters.specialty.childFilters.dental.getBitfield(),
+    eye: logicalValues.childFilters.specialty.childFilters.eye.getBitfield(),
+    mat: logicalValues.childFilters.specialty.childFilters.mat.getBitfield(),
+    mental: logicalValues.childFilters.specialty.childFilters.mental.getBitfield(),
+    nutrition: logicalValues.childFilters.specialty.childFilters.nutrition.getBitfield(),
+    pharmacy: logicalValues.childFilters.specialty.childFilters.pharmacy.getBitfield(),
+    podiatry: logicalValues.childFilters.specialty.childFilters.podiatry.getBitfield(),
+    tobacco: logicalValues.childFilters.specialty.childFilters.tobacco.getBitfield(),
+    primaryPrenatal:
+      logicalValues.childFilters.visitType.childFilters.primaryPrenatal.getBitfield(),
+    primarySick: logicalValues.childFilters.visitType.childFilters.primarySick.getBitfield(),
+    primarySports: logicalValues.childFilters.visitType.childFilters.primarySports.getBitfield(),
+    primaryTelehealth:
+      logicalValues.childFilters.visitType.childFilters.primaryTelehealth.getBitfield(),
+    primaryVaccines:
+      logicalValues.childFilters.visitType.childFilters.primaryVaccines.getBitfield(),
+    primaryWell: logicalValues.childFilters.visitType.childFilters.primaryWell.getBitfield(),
+    primaryWomen: logicalValues.childFilters.visitType.childFilters.primaryWomen.getBitfield(),
+    sameDay: logicalValues.childFilters.waitTime.childFilters.sameDay.getBitfield(),
+    twoMonths: logicalValues.childFilters.waitTime.childFilters.twoMonths.getBitfield(),
+    weekSick: logicalValues.childFilters.waitTime.childFilters.weekSick.getBitfield(),
+    weekWell: logicalValues.childFilters.waitTime.childFilters.weekWell.getBitfield(),
+    amharic: logicalValues.childFilters.languages.childFilters.amharic.getBitfield(),
+    arabic: logicalValues.childFilters.languages.childFilters.arabic.getBitfield(),
+    asl: logicalValues.childFilters.languages.childFilters.asl.getBitfield(),
+    bengali: logicalValues.childFilters.languages.childFilters.bengali.getBitfield(),
+    burmese: logicalValues.childFilters.languages.childFilters.burmese.getBitfield(),
+    cambodian: logicalValues.childFilters.languages.childFilters.cambodian.getBitfield(),
+    cantonese: logicalValues.childFilters.languages.childFilters.cantonese.getBitfield(),
+    chinese: logicalValues.childFilters.languages.childFilters.chinese.getBitfield(),
+    english: logicalValues.childFilters.languages.childFilters.english.getBitfield(),
+    fanta: logicalValues.childFilters.languages.childFilters.fanta.getBitfield(),
+    filipino: logicalValues.childFilters.languages.childFilters.filipino.getBitfield(),
+    french: logicalValues.childFilters.languages.childFilters.french.getBitfield(),
+    frenchcreole: logicalValues.childFilters.languages.childFilters.frenchcreole.getBitfield(),
+    fula: logicalValues.childFilters.languages.childFilters.fula.getBitfield(),
+    gujarati: logicalValues.childFilters.languages.childFilters.gujarati.getBitfield(),
+    haitiancreole: logicalValues.childFilters.languages.childFilters.haitiancreole.getBitfield(),
+    hebrew: logicalValues.childFilters.languages.childFilters.hebrew.getBitfield(),
+    hindi: logicalValues.childFilters.languages.childFilters.hindi.getBitfield(),
+    indonesian: logicalValues.childFilters.languages.childFilters.indonesian.getBitfield(),
+    karen: logicalValues.childFilters.languages.childFilters.karen.getBitfield(),
+    khmer: logicalValues.childFilters.languages.childFilters.khmer.getBitfield(),
+    kinyarwanda: logicalValues.childFilters.languages.childFilters.kinyarwanda.getBitfield(),
+    kirundi: logicalValues.childFilters.languages.childFilters.kirundi.getBitfield(),
+    koloqua: logicalValues.childFilters.languages.childFilters.koloqua.getBitfield(),
+    korean: logicalValues.childFilters.languages.childFilters.korean.getBitfield(),
+    lebanese: logicalValues.childFilters.languages.childFilters.lebanese.getBitfield(),
+    malayalam: logicalValues.childFilters.languages.childFilters.malayalam.getBitfield(),
+    malaysian: logicalValues.childFilters.languages.childFilters.malaysian.getBitfield(),
+    mandarin: logicalValues.childFilters.languages.childFilters.mandarin.getBitfield(),
+    nepali: logicalValues.childFilters.languages.childFilters.nepali.getBitfield(),
+    portuguese: logicalValues.childFilters.languages.childFilters.portuguese.getBitfield(),
+    punjabi: logicalValues.childFilters.languages.childFilters.punjabi.getBitfield(),
+    shanghainese: logicalValues.childFilters.languages.childFilters.shanghainese.getBitfield(),
+    sinhalese: logicalValues.childFilters.languages.childFilters.sinhalese.getBitfield(),
+    spanish: logicalValues.childFilters.languages.childFilters.spanish.getBitfield(),
+    swahili: logicalValues.childFilters.languages.childFilters.swahili.getBitfield(),
+    tagalog: logicalValues.childFilters.languages.childFilters.tagalog.getBitfield(),
+    taiwanese: logicalValues.childFilters.languages.childFilters.taiwanese.getBitfield(),
+    telugu: logicalValues.childFilters.languages.childFilters.telugu.getBitfield(),
+    urdu: logicalValues.childFilters.languages.childFilters.urdu.getBitfield(),
+    vietnamese: logicalValues.childFilters.languages.childFilters.vietnamese.getBitfield(),
+    yoruba: logicalValues.childFilters.languages.childFilters.yoruba.getBitfield(),
+  }
+  return keywordMap
+})
 
 const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   const { latitude, longitude } = userLocation.value
@@ -160,10 +239,14 @@ const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   }))
 })
 
+const sortMode: ComputedRef<SortMode> = computed(() => {
+  return filterState.value.sort.name ? 'name' : filterState.value.sort.distance ? 'distance' : ''
+})
+
 const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
   if (geojson.value?.features) {
     let result = filterLogicalValue.value.length
-      ? applyFilters(geojson.value.features)
+      ? applyFilters(geojson.value.features, filterLogicalValue.value)
       : geojson.value.features
 
     if (keywordsForSearch.value) {
@@ -174,7 +257,13 @@ const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
         .filter(Boolean)
       result = result.filter((loc) => {
         const haystack = JSON.stringify(Object.values(loc.properties)).toLowerCase()
-        return terms.some((term) => haystack.includes(term))
+        return terms.some((term) => {
+          const keywordBits =
+            keywordToFilterMap.value?.[term] &&
+            keywordToFilterMap.value[term][Math.floor((loc.properties.cartodb_id - 1) / 32)] &
+              (1 << Math.floor((loc.properties.cartodb_id - 1) % 32))
+          return haystack.includes(term) || keywordBits
+        })
       })
     }
 
@@ -186,13 +275,9 @@ const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
   return undefined
 })
 
-const sortMode: ComputedRef<SortMode> = computed(() => {
-  return filterState.value.sort.name ? 'name' : filterState.value.sort.distance ? 'distance' : ''
-})
-
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
   let result = filterLogicalValue.value.length
-    ? applyFilters(locationsWithDistance.value)
+    ? applyFilters(locationsWithDistance.value, filterLogicalValue.value)
     : locationsWithDistance.value
 
   if (keywordsForSearch.value) {
@@ -203,20 +288,26 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
       .filter(Boolean)
     result = result.filter((loc) => {
       const haystack = JSON.stringify(Object.values(loc.properties)).toLowerCase()
-      return terms.some((term) => haystack.includes(term))
+      return terms.some((term) => {
+        const keywordBits =
+          keywordToFilterMap.value?.[term] &&
+          keywordToFilterMap.value[term][Math.floor((Number(loc.id) - 1) / 32)] &
+            (1 << Math.floor((Number(loc.id) - 1) % 32))
+        return haystack.includes(term) || keywordBits
+      })
     })
   }
 
   return filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
 })
 
-function applyFilters<T>(arr: T[]): T[] {
+function applyFilters<T>(arr: T[], bits: Uint32Array): T[] {
   const shiftDirection = shiftLeft()
   const filtered: T[] = []
   let checkBit = 1
   let offset = 0
   arr.forEach((item) => {
-    if (checkBit & filterLogicalValue.value[offset]) {
+    if (checkBit & bits[offset]) {
       filtered.push(item)
     }
 

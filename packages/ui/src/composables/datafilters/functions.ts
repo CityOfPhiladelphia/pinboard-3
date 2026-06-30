@@ -69,7 +69,7 @@ export function createOptionBitmask(
 
 export const bitarrayBitwiseOperator = (
   bitarrayIn1: Uint32Array | null,
-  otherBitarrays: Uint32Array[],
+  otherBitarrays: Uint32Array | Uint32Array[],
   operation: BitWiseOperation = '|'
 ) => {
   otherBitarrays = Array.isArray(otherBitarrays)
