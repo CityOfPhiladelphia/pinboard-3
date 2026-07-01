@@ -1,0 +1,27 @@
+{
+  "name": "flood-monitoring-app",
+  "version": "1.0.0",
+  "description": "Playwright automation for flood monitoring app",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:headless": "npx playwright test --headless",
+    "test:report": "npx playwright show-report",
+    "format": "prettier --write .",
+    "postinstall": "npx playwright install --with-deps"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.55.1",
+    "@types/node": "^25.6.0",
+    "prettier": "^3.6.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}
