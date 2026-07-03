@@ -1,4 +1,4 @@
-import { ref, onMounted, type Ref } from 'vue'
+import { ref, type Ref, onBeforeMount } from 'vue'
 import type { PrimaryCareLocation, PrimaryCareResponse, PrimaryCareFeature } from '@/types'
 
 const CARTO_URL = `https://phl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM pdph_primary_care_finder WHERE "record" <> 'test'`
@@ -24,7 +24,7 @@ export function useLocations(): {
       }
 
       const geojsonData = (await response.json()) as PrimaryCareResponse
-      locations.value = geojsonData.features.map((feature: PrimaryCareFeature) => ({
+      locations.value = geojsonData.features.map((feature) => ({
         id: String(feature.properties.cartodb_id),
         name: (feature.properties.record ?? feature.properties.address ?? '').replace(
           /Womens/,
@@ -54,6 +54,7 @@ export function useLocations(): {
     }
   }
 
-  onMounted(fetchLocations)
+  onBeforeMount(fetchLocations)
+
   return { locations, isLoading, errorMessage, geojson }
 }
