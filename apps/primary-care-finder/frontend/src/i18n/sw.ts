@@ -282,8 +282,8 @@ export default {
     'Exclusively serves adolescents and young adults (ages 13-26).':
       'Hutumikia pekee vijana balehe na vijana wazima (wenye umri wa miaka 13-26).',
     'Exclusively serves people living with HIV.': 'Hutumikia pekee watu wanaoishi na VVU.',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      'Hutumikia pekee wanajamii wahamiaji wa Latine wasio na bima ya afya katika Philadelphia. Hakuna uchunguzi wa afya kwa ajili ya kazi. Huduma kwa watoto zimepunguzwa kwa meno, macho, na afya ya akili.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      'Hutumikia pekee wanajamii wahamiaji wa Latine wasio na bima ya afya katika Philadelphia. Hakuna uchunguzi wa afya kwa ajili ya kazi. Huduma kwa watoto zimepunguzwa kwa macho na afya ya akili.',
     'Services for children are limited to dental, mental health, and vaccines.':
       'Huduma kwa watoto zimepunguzwa kwa meno, afya ya akili, na chanjo.',
     'Special focus on LGBTQ+ ': 'Inaangazia hasa LGBTQ+',

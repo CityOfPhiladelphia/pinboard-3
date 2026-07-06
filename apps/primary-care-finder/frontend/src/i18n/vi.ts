@@ -281,8 +281,8 @@ export default {
     'Exclusively serves adolescents and young adults (ages 13-26).':
       'Chỉ phục vụ thanh thiếu niên và người trẻ tuổi (từ 13 đến 26 tuổi).',
     'Exclusively serves people living with HIV.': 'Chỉ phục vụ người sống chung với HIV.',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      'Chỉ phục vụ những thành viên không có bảo hiểm thuộc cộng đồng người nhập cư gốc Latinh ở Philadelphia. Không khám sức khỏe để đi làm. Dịch vụ cho trẻ em chỉ giới hạn ở nha khoa, chăm sóc mắt và sức khỏe tâm thần.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      'Chỉ phục vụ những thành viên không có bảo hiểm thuộc cộng đồng người nhập cư gốc Latinh ở Philadelphia. Không khám sức khỏe để đi làm. Dịch vụ cho trẻ em chỉ giới hạn ở chăm sóc mắt và sức khỏe tâm thần.',
     'Services for children are limited to dental, mental health, and vaccines.':
       'Dịch vụ cho trẻ em chỉ giới hạn ở nha khoa, sức khỏe tâm thần và tiêm chủng.',
     'Special focus on LGBTQ+ ': 'Đặc biệt chú trọng đến cộng đồng LGBTQ+',

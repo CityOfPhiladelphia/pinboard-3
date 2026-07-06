@@ -283,8 +283,8 @@ export default {
       'Atiende exclusivamente a adolescentes y adultos jóvenes (de 13 a 26 años).',
     'Exclusively serves people living with HIV.':
       'Atiende exclusivamente a personas que viven con VIH.',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      'Atiende exclusivamente a miembros sin seguro médico de la comunidad inmigrante latine de Filadelfia. No se realizan exámenes físicos para el trabajo. Los servicios para niños se limitan a atención dental, cuidado de la vista y salud mental.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      'Atiende exclusivamente a miembros sin seguro médico de la comunidad inmigrante latine de Filadelfia. No se realizan exámenes físicos para el trabajo. Los servicios para niños se limitan a cuidado de la vista y salud mental.',
     'Services for children are limited to dental, mental health, and vaccines.':
       'Los servicios para niños se limitan a atención dental, salud mental y vacunas.',
     'Special focus on LGBTQ+ ': 'Enfoque especial en personas LGBTQ+',

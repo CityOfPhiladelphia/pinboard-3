@@ -281,8 +281,8 @@ export default {
     'Exclusively serves adolescents and young adults (ages 13-26).':
       'Sèvi sèlman adolesan ak jèn granmoun (ki gen 13 a 26 an).',
     'Exclusively serves people living with HIV.': 'Sèvi sèlman moun k ap viv ak VIH.',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      'Sèvi sèlman manm kominote imigran Latine nan Filadèlfi ki pa gen asirans. Pa gen egzamen fizik pou travay. Sèvis pou timoun yo limite ak dan, swen je, ak sante mantal.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      'Sèvi sèlman manm kominote imigran Latine nan Filadèlfi ki pa gen asirans. Pa gen egzamen fizik pou travay. Sèvis pou timoun yo limite ak swen je ak sante mantal.',
     'Services for children are limited to dental, mental health, and vaccines.':
       'Sèvis pou timoun yo limite ak dan, sante mantal, ak vaksen.',
     'Special focus on LGBTQ+ ': 'Konsantrasyon espesyal sou LGBTQ+',

@@ -267,8 +267,8 @@ export default {
     'Exclusively serves adolescents and young adults (ages 13-26).':
       'Exclusively serves adolescents and young adults (ages 13-26).',
     'Exclusively serves people living with HIV.': 'Exclusively serves people living with HIV.',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      "Exclusively serves uninsured members of Philadelphia's Latine immigrant community. No work physicals. Services for children are limited to dental, eye care, and mental health.",
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      "Exclusively serves uninsured members of Philadelphia's Latine immigrant community. No work physicals. Services for children are limited to eye care and mental health.",
     'Services for children are limited to dental, mental health, and vaccines.':
       'Services for children are limited to dental, mental health, and vaccines.',
     'Special focus on LGBTQ+ ': 'Special focus on LGBTQ+',

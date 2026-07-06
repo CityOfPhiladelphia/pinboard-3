@@ -277,8 +277,8 @@ export default {
     'Exclusively serves adolescents and young adults (ages 13-26).':
       '仅为青少年和青年（13-26岁）提供服务。',
     'Exclusively serves people living with HIV.': '仅为艾滋病病毒感染者提供服务。',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      '仅为费城拉丁裔移民社区中没有医疗保险的成员提供服务。不提供就业体检。为儿童提供的服务仅限于牙科、眼科和心理健康。',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      '仅为费城拉丁裔移民社区中没有医疗保险的成员提供服务。不提供就业体检。为儿童提供的服务仅限于眼科和心理健康。',
     'Services for children are limited to dental, mental health, and vaccines.':
       '为儿童提供的服务仅限于牙科、心理健康和疫苗接种。',
     'Special focus on LGBTQ+ ': '特别关注 LGBTQ+',
