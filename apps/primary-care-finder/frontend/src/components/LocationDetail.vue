@@ -271,21 +271,23 @@ function translateTransitList(raw: string | null, category: string): string {
             </div>
             <div class="cell-content cell-list">
               <span v-if="location.properties.transport_bus" class="has-text-body-small">
-                {{ $t('transit.bus') }}: {{ location.properties.transport_bus }}
+                <span class="transit-mode">{{ $t('transit.bus') }}:</span>
+                {{ location.properties.transport_bus }}
               </span>
               <span v-if="location.properties.transport_subway" class="has-text-body-small">
-                {{ $t('transit.subway.label') }}:
+                <span class="transit-mode">{{ $t('transit.subway.label') }}:</span>
                 {{ translateTransitList(location.properties.transport_subway, 'subway') }}
               </span>
               <span v-if="location.properties.transport_train" class="has-text-body-small">
-                {{ $t('transit.regRail.label') }}:
+                <span class="transit-mode">{{ $t('transit.regRail.label') }}:</span>
                 {{ translateTransitList(location.properties.transport_train, 'regRail') }}
               </span>
               <span v-if="location.properties.transport_trolley" class="has-text-body-small">
-                {{ $t('transit.trolley') }}: {{ location.properties.transport_trolley }}
+                <span class="transit-mode">{{ $t('transit.trolley') }}:</span>
+                {{ location.properties.transport_trolley }}
               </span>
               <span v-if="location.properties.transport_parking" class="has-text-body-small">
-                {{ $t('transit.car.label') }}:
+                <span class="transit-mode">{{ $t('transit.car.label') }}:</span>
                 {{ translateTransitList(location.properties.transport_parking, 'car') }}
               </span>
             </div>
@@ -485,6 +487,11 @@ function translateTransitList(raw: string | null, category: string): string {
 .cell-label {
   color: var(--Schemes-On-Surface-High);
   font-size: var(--Label-Default-font-label-default-size) !important;
+}
+
+/* Bold the transit mode prefix (e.g. "Bus:", "Subway:") before its value. */
+.transit-mode {
+  font-weight: 700;
 }
 
 .cell-list {
