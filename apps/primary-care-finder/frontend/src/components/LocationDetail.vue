@@ -221,7 +221,7 @@ function translateTransitList(raw: string | null, category: string): string {
       <span class="has-text-label-large">{{ $t('locationDetails') }}</span>
 
       <!-- Contact: phone, website, address — icon + value, no headers -->
-      <div class="detail-columns detail-zone">
+      <div class="detail-columns detail-columns--contact detail-zone">
         <div class="detail-col-left">
           <div v-if="p.med_phone_num" class="icon-row">
             <Icon :icon="IconPhone" inline decorative class="row-icon" />
@@ -424,6 +424,12 @@ function translateTransitList(raw: string | null, category: string): string {
   .detail-columns {
     grid-template-columns: 1fr;
   }
+}
+
+/* The contact row (phone/website + address) keeps its two columns even on
+   mobile, so the address stays on the right instead of stacking. */
+.detail-columns--contact {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
 .detail-col-left,
