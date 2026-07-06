@@ -88,7 +88,7 @@ const detailTags = computed<TagConfig[]>(() => {
       ? { text: t('tags.telehealth'), color: 'purple', icon: IconVideo }
       : null,
     props.location.properties.transport_parking &&
-    /GP|PL|OS(?!T)/.test(props.location.properties.transport_parking)
+    /GP|FG|OS(?!T)/.test(props.location.properties.transport_parking)
       ? { text: t('tags.parking'), color: 'blue', icon: IconCar }
       : null,
     props.location.properties.special_pharmacy === 'Yes'
