@@ -373,7 +373,11 @@ const effectiveMapConfig = (() => {
         {{ errorMessage }}
       </div>
 
-      <div v-if="isLoading" class="loading-list">
+      <!-- Skeleton cards only on desktop, where the list lives in this left panel.
+           On mobile the list is in the bottom sheet, so these would flash in the
+           map area and then vanish — show nothing here and let the map's own
+           loading state and the sheet's "Loading data…" label cover it. -->
+      <div v-if="isLoading && !isMobile" class="loading-list">
         <MapCard v-for="n in 5" :key="n" :is-loading="true" />
       </div>
 
