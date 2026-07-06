@@ -2,6 +2,7 @@
 import { PhilaLink } from '@pinboard/ui'
 import { IconPhone, IconLocationDot, IconGlobe } from '@phila/phila-ui-core/icons'
 import type { PrimaryCareLocation } from '@/types'
+import { formatFullAddress } from '@/utilities/formatAddress'
 import LocationTags from './LocationTags.vue'
 
 defineProps<{
@@ -43,7 +44,7 @@ function mapsUrl(location: PrimaryCareLocation): string {
         class="card-link"
         @click.stop
       >
-        {{ location.properties.address }}
+        {{ formatFullAddress(location.properties) }}
       </PhilaLink>
       <PhilaLink
         v-if="location.properties.website"

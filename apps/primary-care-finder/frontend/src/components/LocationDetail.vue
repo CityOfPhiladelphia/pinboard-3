@@ -5,6 +5,7 @@ import type { PrimaryCareField, PrimaryCareLocation } from '@/types'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { PhilaLink, Icon } from '@pinboard/ui'
 import LocationTags from './LocationTags.vue'
+import { formatFullAddress } from '@/utilities/formatAddress'
 import {
   IconClose,
   IconPhone,
@@ -24,12 +25,7 @@ const { t, locale, messages } = useI18n()
 
 const p = computed(() => props.location.properties)
 
-const fullAddress = computed(() => {
-  let addr = props.location.properties.address
-  if (props.location.properties.address_2) addr += ', ' + props.location.properties.address_2
-  addr += ', Philadelphia, PA ' + props.location.properties.zip_code
-  return addr
-})
+const fullAddress = computed(() => formatFullAddress(p.value))
 
 function mapsUrl(): string {
   const parts = [
