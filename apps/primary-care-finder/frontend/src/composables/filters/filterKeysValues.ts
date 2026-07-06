@@ -66,7 +66,6 @@ export const languageOptions: Record<string, LanguagesFilter> = {
   languageOption5: 'cambodian',
   languageOption6: 'cantonese',
   languageOption7: 'chinese',
-  languageOption8: 'english',
   languageOption9: 'fanta',
   languageOption10: 'filipino',
   languageOption11: 'french',

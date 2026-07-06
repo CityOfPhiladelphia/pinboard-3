@@ -76,7 +76,6 @@ const emptyFilters: PrimaryCareFilters = {
     cambodian: false,
     cantonese: false,
     chinese: false,
-    english: false,
     fanta: false,
     filipino: false,
     french: false,
