@@ -5,6 +5,7 @@ export default {
     checkHours: 'Check hours',
     weekendHours: 'Weekend hours',
     openAfter6: 'Open after 6pm',
+    eveningHours: 'Evening hours',
     walkIns: 'Walk-ins available',
     telehealth: 'Telehealth',
     parking: 'Parking on site',

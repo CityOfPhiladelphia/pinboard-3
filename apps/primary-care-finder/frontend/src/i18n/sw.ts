@@ -6,6 +6,7 @@ export default {
     checkHours: 'Angalia saa za kazi',
     weekendHours: 'Saa za kazi za wikendi',
     openAfter6: 'Imefunguliwa baada ya saa 6 jioni',
+    eveningHours: 'Saa za kazi za jioni',
     walkIns: 'Bila miadi',
     telehealth: 'Huduma ya afya kwa njia ya mtandao',
     parking: 'Maegesho ya gari hapa',

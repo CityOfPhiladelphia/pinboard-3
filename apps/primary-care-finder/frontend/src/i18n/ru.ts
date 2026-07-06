@@ -6,6 +6,7 @@ export default {
     checkHours: 'Уточните часы работы',
     weekendHours: 'Часы работы в выходные',
     openAfter6: 'Открыто после 18:00',
+    eveningHours: 'Вечерние часы работы',
     walkIns: 'Без записи',
     telehealth: 'Телемедицина',
     parking: 'Парковка на месте',

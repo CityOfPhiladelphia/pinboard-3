@@ -6,6 +6,7 @@ export default {
     checkHours: 'Xem giờ làm việc',
     weekendHours: 'Giờ làm việc cuối tuần',
     openAfter6: 'Mở cửa sau 6 giờ tối',
+    eveningHours: 'Giờ làm việc buổi tối',
     walkIns: 'Khám không cần hẹn',
     telehealth: 'Khám bệnh từ xa',
     parking: 'Có chỗ đậu xe tại chỗ',

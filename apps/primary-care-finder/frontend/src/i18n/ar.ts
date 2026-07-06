@@ -6,6 +6,7 @@ export default {
     checkHours: 'تحقق من ساعات العمل',
     weekendHours: 'ساعات عمل نهاية الأسبوع',
     openAfter6: 'مفتوح بعد الساعة 6 مساءً',
+    eveningHours: 'ساعات العمل المسائية',
     walkIns: 'بدون موعد',
     telehealth: 'الرعاية الصحية عن بُعد',
     parking: 'موقف سيارات في الموقع',

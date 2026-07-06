@@ -6,6 +6,7 @@ export default {
     checkHours: 'Tcheke orè',
     weekendHours: 'Orè wikenn',
     openAfter6: 'Ouvè apre 6è diswa',
+    eveningHours: 'Orè aswè',
     walkIns: 'San randevou',
     telehealth: 'Telesante',
     parking: 'Pakin sou plas',

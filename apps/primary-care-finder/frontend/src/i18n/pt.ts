@@ -6,6 +6,7 @@ export default {
     checkHours: 'Verificar horário',
     weekendHours: 'Horário de fim de semana',
     openAfter6: 'Aberto após as 18h',
+    eveningHours: 'Horário noturno',
     walkIns: 'Atendimento sem hora marcada',
     telehealth: 'Telessaúde',
     parking: 'Estacionamento no local',

@@ -6,6 +6,7 @@ export default {
     checkHours: '查看营业时间',
     weekendHours: '周末营业时间',
     openAfter6: '晚上6点后营业',
+    eveningHours: '晚间营业时间',
     walkIns: '无需预约',
     telehealth: '远程医疗',
     parking: '现场停车',

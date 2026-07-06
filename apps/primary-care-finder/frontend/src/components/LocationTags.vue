@@ -98,7 +98,12 @@ const detailTags = computed<TagConfig[]>(() => {
       ? { text: t('tags.weekendHours'), color: 'blue', icon: IconClock }
       : null,
     props.location.properties.evening_hrs === 'Yes'
-      ? { text: t('tags.openAfter6'), color: 'blue', icon: IconClock }
+      ? {
+          text: t('tags.eveningHours'),
+          color: 'blue',
+          icon: IconClock,
+          tooltip: t('tags.openAfter6'),
+        }
       : null,
   ]
   return candidates.filter((t): t is TagConfig => t !== null)
@@ -141,7 +146,12 @@ const cardTags = computed<TagConfig[]>(() => {
       ? { text: t('tags.weekendHours'), color: 'blue', icon: IconClock }
       : null,
     !!todayEnd && todayEnd >= '18:00:00'
-      ? { text: t('tags.openAfter6'), color: 'blue', icon: IconClock }
+      ? {
+          text: t('tags.eveningHours'),
+          color: 'blue',
+          icon: IconClock,
+          tooltip: t('tags.openAfter6'),
+        }
       : null,
   ]
 
