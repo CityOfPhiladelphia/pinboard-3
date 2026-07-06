@@ -12,6 +12,7 @@ import {
   IconClock,
 } from '@phila/phila-ui-core/icons'
 import type { PrimaryCareLocation } from '@/types'
+import { useNow } from '@/composables/useNow'
 
 const props = defineProps<{
   location: PrimaryCareLocation
@@ -20,6 +21,10 @@ const props = defineProps<{
 }>()
 
 const { t, locale, messages } = useI18n()
+
+// Reactive clock so open/closed status re-evaluates as time passes (e.g. a site
+// closing at 5 flips to "Closed" without needing a reload).
+const clock = useNow()
 
 const DAYS = ['sun', 'mon', 'tues', 'wed', 'thurs', 'fri', 'sat'] as const
 
@@ -47,7 +52,7 @@ function formatTime(t: string): string {
 }
 
 const todaysHoursTooltip = computed<string>(() => {
-  const dayKey = DAYS[new Date().getDay()]
+  const dayKey = DAYS[clock.value.getDay()]
   const start = props.location.properties[`hours_${dayKey}_start`] as string | null
   const end = props.location.properties[`hours_${dayKey}_end`] as string | null
   if (!start || !end) return t('tags.todayClosed')
@@ -55,7 +60,7 @@ const todaysHoursTooltip = computed<string>(() => {
 })
 
 const hoursStatus = computed<'openNow' | 'closed' | 'checkHours'>(() => {
-  const now = new Date()
+  const now = clock.value
   const dayKey = DAYS[now.getDay()]
   const start = props.location.properties[`hours_${dayKey}_start`] as string | null
   const end = props.location.properties[`hours_${dayKey}_end`] as string | null
@@ -110,7 +115,7 @@ const detailTags = computed<TagConfig[]>(() => {
 })
 
 const todaysException = computed<string | undefined>(() => {
-  const dayKey = DAYS[new Date().getDay()]
+  const dayKey = DAYS[clock.value.getDay()]
   const exc = props.location.properties[`hours_${dayKey}_exceptions`] as string | null
   if (!exc) return undefined
   const msgs = messages.value[locale.value] as Record<string, Record<string, string>>
@@ -118,7 +123,7 @@ const todaysException = computed<string | undefined>(() => {
 })
 
 const cardTags = computed<TagConfig[]>(() => {
-  const now = new Date()
+  const now = clock.value
   const dayKey = DAYS[now.getDay()]
   const todayEnd = props.location.properties[`hours_${dayKey}_end`] as string | null
 
