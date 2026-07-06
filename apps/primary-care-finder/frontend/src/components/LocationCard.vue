@@ -24,16 +24,30 @@ function mapsUrl(location: PrimaryCareLocation): string {
     </span>
     <LocationTags :location="location" class="card-tags" />
     <div class="card-links">
-      <PhilaLink
-        v-if="location.properties.med_phone_num"
-        :href="`tel:${location.properties.med_phone_num}`"
-        :icon="IconPhone"
-        size="small"
-        class="card-link"
-        @click.stop
-      >
-        {{ location.properties.med_phone_num }}
-      </PhilaLink>
+      <div class="card-links-primary">
+        <PhilaLink
+          v-if="location.properties.med_phone_num"
+          :href="`tel:${location.properties.med_phone_num}`"
+          :icon="IconPhone"
+          size="small"
+          class="card-link"
+          @click.stop
+        >
+          {{ location.properties.med_phone_num }}
+        </PhilaLink>
+        <PhilaLink
+          v-if="location.properties.website"
+          :href="location.properties.website"
+          :icon="IconGlobe"
+          size="small"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="card-link"
+          @click.stop
+        >
+          {{ $t('providerWebsite') }}
+        </PhilaLink>
+      </div>
       <PhilaLink
         v-if="location.properties.address"
         :href="mapsUrl(location)"
@@ -45,18 +59,6 @@ function mapsUrl(location: PrimaryCareLocation): string {
         @click.stop
       >
         {{ formatFullAddress(location.properties) }}
-      </PhilaLink>
-      <PhilaLink
-        v-if="location.properties.website"
-        :href="location.properties.website"
-        :icon="IconGlobe"
-        size="small"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="card-link card-link--full"
-        @click.stop
-      >
-        {{ $t('providerWebsite') }}
       </PhilaLink>
     </div>
   </div>
@@ -75,12 +77,22 @@ function mapsUrl(location: PrimaryCareLocation): string {
   color: var(--Schemes-On-Surface-Variant, #666);
 }
 
+/* Two columns: the phone + website stack on the left, the address on the right —
+   the address wraps within its column and stays there at every width. */
 .card-links {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-items: start;
   justify-items: start;
   gap: 0.25rem 0.5rem;
   margin-top: 0.25rem;
+}
+
+.card-links-primary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
 }
 
 /* The link is a flex row (.phila-link). min-width:0 lets the grid column shrink and
@@ -100,18 +112,6 @@ function mapsUrl(location: PrimaryCareLocation): string {
 .card-link :deep(.phila-icon-core) {
   color: var(--Schemes-On-Surface-Low);
   flex-shrink: 0;
-}
-
-.card-link--full {
-  grid-column: 1 / -1;
-}
-
-/* Mobile: stack the links so each gets its own full-width line — the address then
-   has the whole card width instead of half. */
-@media (max-width: 768px) {
-  .card-links {
-    grid-template-columns: 1fr;
-  }
 }
 
 .card-tags {
