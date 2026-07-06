@@ -72,6 +72,12 @@ function mapsUrl(location: PrimaryCareLocation): string {
   gap: 0.25rem;
 }
 
+/* The site name is a span, so it misses the design system's h1-h6 heading
+   balancing. Balance it here to match the detail panel's heading. */
+.card-heading {
+  text-wrap: balance;
+}
+
 .card-distance {
   font-size: 0.875rem;
   color: var(--Schemes-On-Surface-Variant, #666);
