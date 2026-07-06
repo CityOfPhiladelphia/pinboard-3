@@ -17,7 +17,7 @@ export default {
     todayClosed: 'Сегодня: закрыто',
     todayHours: 'Сегодня: {range}',
   },
-  providerWebsite: 'Веб-сайт медицинского центра',
+  providerWebsite: 'Веб-сайт',
   website: 'Сайт',
   hours: 'Часы работы',
   languagesSpoken: 'Языки, на которых говорит персонал',

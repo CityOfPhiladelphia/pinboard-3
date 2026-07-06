@@ -17,7 +17,7 @@ export default {
     todayClosed: 'اليوم: مغلق',
     todayHours: 'اليوم: {range}',
   },
-  providerWebsite: 'موقع المركز الصحي',
+  providerWebsite: 'الموقع الإلكتروني',
   website: 'الموقع الإلكتروني',
   hours: 'ساعات',
   languagesSpoken: 'اللغات التي يتحدث بها الموظفون',

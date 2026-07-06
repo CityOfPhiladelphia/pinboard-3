@@ -17,7 +17,7 @@ export default {
     todayClosed: 'Hoje: Fechado',
     todayHours: 'Hoje: {range}',
   },
-  providerWebsite: 'Site do centro de saúde',
+  providerWebsite: 'Site',
   website: 'Site',
   hours: 'Horas',
   languagesSpoken: 'Idiomas falados pela equipe',

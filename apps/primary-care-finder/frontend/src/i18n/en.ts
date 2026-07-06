@@ -16,7 +16,7 @@ export default {
     todayClosed: 'Today: Closed',
     todayHours: 'Today: {range}',
   },
-  providerWebsite: 'Health center website',
+  providerWebsite: 'Website',
   locationDetails: 'Location details',
   contact: 'Contact',
   website: 'Website',

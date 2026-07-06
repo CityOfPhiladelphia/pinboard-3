@@ -17,7 +17,7 @@ export default {
     todayClosed: 'Jodi a: Fèmen',
     todayHours: 'Jodi a: {range}',
   },
-  providerWebsite: 'Sitwèb sant sante a',
+  providerWebsite: 'Sitwèb',
   website: 'Sit wèb',
   hours: 'Èdtan',
   languagesSpoken: 'Lang pale pa anplwaye',

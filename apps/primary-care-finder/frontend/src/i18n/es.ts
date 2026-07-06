@@ -17,7 +17,7 @@ export default {
     todayClosed: 'Hoy: Cerrado',
     todayHours: 'Hoy: {range}',
   },
-  providerWebsite: 'Sitio web del centro de salud',
+  providerWebsite: 'Sitio web',
   website: 'Sitio web',
   hours: 'Horario',
   languagesSpoken: 'Idiomas que habla el personal',

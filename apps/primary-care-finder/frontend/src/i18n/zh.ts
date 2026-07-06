@@ -17,7 +17,7 @@ export default {
     todayClosed: '今天：已关闭',
     todayHours: '今天：{range}',
   },
-  providerWebsite: '健康中心网站',
+  providerWebsite: '网站',
   website: '网站',
   hours: '时间',
   languagesSpoken: '工作人员使用的语言',

@@ -17,7 +17,7 @@ export default {
     todayClosed: 'Hôm nay: Đã đóng cửa',
     todayHours: 'Hôm nay: {range}',
   },
-  providerWebsite: 'Trang web của trung tâm y tế',
+  providerWebsite: 'Trang web',
   website: 'Trang web',
   hours: 'Số giờ',
   languagesSpoken: 'Ngôn ngữ nhân viên sử dụng',

@@ -17,7 +17,7 @@ export default {
     todayClosed: 'Leo: Imefungwa',
     todayHours: 'Leo: {range}',
   },
-  providerWebsite: 'Tovuti ya kituo cha afya',
+  providerWebsite: 'Tovuti',
   website: 'Tovuti',
   hours: 'Masaa',
   languagesSpoken: 'Lugha zinazozungumzwa na wafanyakazi',
