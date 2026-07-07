@@ -395,10 +395,13 @@ function translateTransitList(raw: string | null, category: string): string {
 }
 
 /* Actions + close as one cluster, so the print/share buttons sit as close to
-   the ✕ as they are to each other. */
+   the ✕ as they are to each other. Pinned to the top of the header so the row
+   stays a constant distance from the top no matter how many lines the site
+   name wraps to. */
 .detail-header-actions {
   display: flex;
   align-items: center;
+  align-self: flex-start;
   gap: 0.25rem;
   flex-shrink: 0;
 }
