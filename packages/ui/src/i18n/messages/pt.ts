@@ -13,6 +13,8 @@ export default {
     reset: 'Redefinir',
     apply: 'Aplicar',
     print: 'Imprimir',
+    share: 'Compartilhar',
+    copiedUrl: 'URL copiado para a área de transferência',
     infoPage: {
       backToMap: 'Voltar ao mapa',
       onThisPage: 'Nesta página',

@@ -13,6 +13,8 @@ export default {
     reset: 'Weka upya',
     apply: 'Tumia',
     print: 'Chapisha',
+    share: 'Shiriki',
+    copiedUrl: 'URL inakiliwa kwenye clipboard',
     infoPage: {
       backToMap: 'Rudi kwenye ramani',
       onThisPage: 'Kwenye ukurasa huu',

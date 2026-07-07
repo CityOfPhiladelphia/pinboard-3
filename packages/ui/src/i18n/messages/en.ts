@@ -12,6 +12,8 @@ export default {
     reset: 'Reset',
     apply: 'Apply',
     print: 'Print',
+    share: 'Share',
+    copiedUrl: 'URL copied to clipboard',
     infoPage: {
       backToMap: 'Back to map',
       onThisPage: 'On this page',

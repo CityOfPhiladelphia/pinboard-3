@@ -13,6 +13,8 @@ export default {
     reset: 'Reinisyalize',
     apply: 'Aplike',
     print: 'Enprime',
+    share: 'Pataje',
+    copiedUrl: 'URL kopye nan clipboard',
     infoPage: {
       backToMap: 'Tounen nan kat la',
       onThisPage: 'Sou paj sa a',

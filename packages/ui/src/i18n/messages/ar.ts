@@ -13,6 +13,8 @@ export default {
     reset: 'إعادة تعيين',
     apply: 'تطبيق',
     print: 'طباعة',
+    share: 'شارك',
+    copiedUrl: 'تم نسخ عنوان URL إلى الحافظة',
     infoPage: {
       backToMap: 'العودة إلى الخريطة',
       onThisPage: 'في هذه الصفحة',

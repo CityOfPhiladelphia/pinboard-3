@@ -13,6 +13,8 @@ export default {
     reset: 'Đặt lại',
     apply: 'Áp dụng',
     print: 'In',
+    share: 'Chia sẻ',
+    copiedUrl: 'URL được sao chép vào clipboard',
     infoPage: {
       backToMap: 'Quay lại bản đồ',
       onThisPage: 'Trên trang này',

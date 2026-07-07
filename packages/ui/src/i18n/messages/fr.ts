@@ -13,6 +13,8 @@ export default {
     reset: 'Réinitialiser',
     apply: 'Appliquer',
     print: 'Imprimer',
+    share: 'Partager',
+    copiedUrl: 'URL copiée dans le presse-papiers',
     infoPage: {
       backToMap: 'Retour à la carte',
       onThisPage: 'Sur cette page',

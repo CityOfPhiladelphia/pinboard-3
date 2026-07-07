@@ -13,6 +13,8 @@ export default {
     reset: 'Сбросить',
     apply: 'Применить',
     print: 'Распечатать',
+    share: 'Поделись',
+    copiedUrl: 'URL-адрес скопирован в буфер обмена',
     infoPage: {
       backToMap: 'Вернуться к карте',
       onThisPage: 'На этой странице',

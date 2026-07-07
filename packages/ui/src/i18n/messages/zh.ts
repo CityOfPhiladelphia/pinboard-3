@@ -13,6 +13,8 @@ export default {
     reset: '重置',
     apply: '应用',
     print: '打印',
+    share: '分享',
+    copiedUrl: 'URL 已复制到剪贴板',
     infoPage: {
       backToMap: '返回地图',
       onThisPage: '本页内容',
