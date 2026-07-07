@@ -59,6 +59,8 @@ function handleKeydown(event: KeyboardEvent) {
       break
     }
     case 'Enter': {
+      const target = event.target as HTMLElement
+      if (target.closest('.search-suggestion-remove')) break
       event.preventDefault()
       if (activeIndex.value >= 0) {
         emit('select', props.suggestions[activeIndex.value])

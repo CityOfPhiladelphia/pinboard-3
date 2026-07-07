@@ -102,7 +102,13 @@ function handleSearchChange(search: string) {
 
 function submitSearch() {
   const term = searchString.value.trim()
-  if (term) addRecentSearch(term)
+  if (term) {
+    addRecentSearch(term)
+    if (term !== searchString.value) {
+      searchString.value = term
+      emit('searchString', term)
+    }
+  }
   emit('search')
 }
 
@@ -116,6 +122,8 @@ function handleSuggestionSelect(suggestion: string) {
 
 function handleSuggestionRemove(term: string) {
   removeRecentSearch(term)
+  // Keep focus in the search area so the dropdown stays open for removing more.
+  focusSearchInput()
 }
 
 function handleSearchKeydown(event: KeyboardEvent) {
