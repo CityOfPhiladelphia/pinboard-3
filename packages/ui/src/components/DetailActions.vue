@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, onBeforeUnmount } from 'vue'
+import { ref, nextTick, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { PhilaButton } from '@phila/phila-ui-button'
+import { Tooltip } from '@phila/phila-ui-tooltip'
 import { IconPrint, IconShareNodes, IconCheck } from '@phila/phila-ui-core/icons'
 
 defineProps<{
@@ -10,20 +11,31 @@ defineProps<{
 
 const { t } = useI18n()
 
+// How long the "copied" confirmation stays up after a share click.
+const COPIED_MS = 5000
+
+const shareTip = ref<{ show: () => void; hide: () => void } | null>(null)
 const copied = ref(false)
 let resetTimer: ReturnType<typeof setTimeout> | undefined
 
 async function handleShare() {
   try {
     await navigator.clipboard.writeText(window.location.href)
-    copied.value = true
-    if (resetTimer) clearTimeout(resetTimer)
-    resetTimer = setTimeout(() => {
-      copied.value = false
-    }, 2000)
   } catch {
-    // Clipboard unavailable (e.g. insecure context) — leave the button as-is.
+    // Clipboard unavailable (e.g. insecure context) — don't show a false confirmation.
+    return
   }
+  copied.value = true
+  // While `copied`, the tooltip's trigger flips to "click" so it has no
+  // mouseleave auto-hide; wait for that to bind before forcing it open, then
+  // it stays up until the timer (or an outside click / Esc) dismisses it.
+  await nextTick()
+  shareTip.value?.show()
+  if (resetTimer) clearTimeout(resetTimer)
+  resetTimer = setTimeout(() => {
+    copied.value = false
+    shareTip.value?.hide()
+  }, COPIED_MS)
 }
 
 onBeforeUnmount(() => {
@@ -33,28 +45,33 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="detail-actions">
-    <PhilaButton
-      :icon="copied ? IconCheck : IconShareNodes"
-      :icon-only="true"
-      variant="standard"
-      size="small"
-      :aria-label="t('pinboard.share')"
-      :title="copied ? t('pinboard.copiedUrl') : t('pinboard.share')"
-      @click="handleShare"
-    />
+    <Tooltip ref="shareTip" type="plain" :trigger="copied ? 'click' : 'hover'">
+      <PhilaButton
+        :icon="copied ? IconCheck : IconShareNodes"
+        :icon-only="true"
+        variant="standard"
+        size="small"
+        :aria-label="t('pinboard.share')"
+        @click="handleShare"
+      />
+      <template #body>{{ copied ? t('pinboard.copiedUrl') : t('pinboard.share') }}</template>
+    </Tooltip>
+
     <span class="detail-actions-status" aria-live="polite">{{
       copied ? t('pinboard.copiedUrl') : ''
     }}</span>
-    <PhilaButton
-      v-if="onPrint"
-      :icon="IconPrint"
-      :icon-only="true"
-      variant="standard"
-      size="small"
-      :aria-label="t('pinboard.print')"
-      :title="t('pinboard.print')"
-      @click="onPrint"
-    />
+
+    <Tooltip v-if="onPrint" type="plain" trigger="hover">
+      <PhilaButton
+        :icon="IconPrint"
+        :icon-only="true"
+        variant="standard"
+        size="small"
+        :aria-label="t('pinboard.print')"
+        @click="onPrint"
+      />
+      <template #body>{{ t('pinboard.print') }}</template>
+    </Tooltip>
   </div>
 </template>
 
