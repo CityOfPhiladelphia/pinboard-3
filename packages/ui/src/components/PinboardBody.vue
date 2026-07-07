@@ -10,6 +10,7 @@ import { IconMap } from '@phila/phila-ui-core/icons'
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
+import '../styles/print.css'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { MapCard } from '@phila/phila-ui-cards'
 
