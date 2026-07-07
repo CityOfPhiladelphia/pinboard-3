@@ -10,6 +10,7 @@ const app = createApp(App)
 app.use(i18n)
 app.use(
   createPinboard({
+    appId: 'primary-care',
     mobileFilterPlacement: 'map',
     map: {
       center: [-75.16, 39.95],
