@@ -12,6 +12,7 @@ export default {
     sortShareLocation: 'شارك موقعك للفرز حسب المسافة',
     reset: 'إعادة تعيين',
     apply: 'تطبيق',
+    print: 'طباعة',
     infoPage: {
       backToMap: 'العودة إلى الخريطة',
       onThisPage: 'في هذه الصفحة',

@@ -12,6 +12,7 @@ export default {
     sortShareLocation: 'Chia sẻ vị trí của bạn để sắp xếp theo khoảng cách',
     reset: 'Đặt lại',
     apply: 'Áp dụng',
+    print: 'In',
     infoPage: {
       backToMap: 'Quay lại bản đồ',
       onThisPage: 'Trên trang này',

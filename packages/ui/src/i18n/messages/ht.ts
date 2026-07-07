@@ -12,6 +12,7 @@ export default {
     sortShareLocation: 'Pataje kote ou ye pou triye pa distans',
     reset: 'Reinisyalize',
     apply: 'Aplike',
+    print: 'Enprime',
     infoPage: {
       backToMap: 'Tounen nan kat la',
       onThisPage: 'Sou paj sa a',

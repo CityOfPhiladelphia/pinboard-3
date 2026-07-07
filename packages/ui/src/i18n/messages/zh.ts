@@ -12,6 +12,7 @@ export default {
     sortShareLocation: '共享您的位置以按距离排序',
     reset: '重置',
     apply: '应用',
+    print: '打印',
     infoPage: {
       backToMap: '返回地图',
       onThisPage: '本页内容',

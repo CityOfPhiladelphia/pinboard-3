@@ -12,6 +12,7 @@ export default {
     sortShareLocation: 'Shiriki eneo lako ili kupanga kwa umbali',
     reset: 'Weka upya',
     apply: 'Tumia',
+    print: 'Chapisha',
     infoPage: {
       backToMap: 'Rudi kwenye ramani',
       onThisPage: 'Kwenye ukurasa huu',
