@@ -1,24 +1,36 @@
 import { ref, onUnmounted, type Ref } from 'vue'
 
-// A shared "current time" that ticks once a minute so anything depending on it
-// (e.g. a location's open/closed status) re-evaluates on its own instead of
-// freezing at the value it had when the page loaded. One timer for the whole
-// app, reference-counted so it stops when nothing is using it.
+// A shared "current time" that ticks at the top of each minute so anything
+// depending on it (e.g. a location's open/closed status) re-evaluates on its own
+// instead of freezing at the value it had when the page loaded. One timer for the
+// whole app, reference-counted so it stops when nothing is using it.
 const now = ref<Date>(new Date())
-let timer: ReturnType<typeof setInterval> | null = null
+let tickTimeout: ReturnType<typeof setTimeout> | null = null
 let consumers = 0
 
-function start(): void {
-  if (timer) return
-  timer = setInterval(() => {
+// A hair past the minute boundary, so `new Date()` has definitely crossed into
+// the new minute before we read it.
+const TICK_MARGIN_MS = 50
+
+// Fire at the next wall-clock minute (:00), then re-align each tick so the timing
+// never drifts away from the minute boundary.
+function scheduleTick(): void {
+  const msUntilNextMinute = 60_000 - (Date.now() % 60_000) + TICK_MARGIN_MS
+  tickTimeout = setTimeout(() => {
     now.value = new Date()
-  }, 60_000)
+    scheduleTick()
+  }, msUntilNextMinute)
+}
+
+function start(): void {
+  if (tickTimeout) return
+  scheduleTick()
 }
 
 function stop(): void {
-  if (timer) {
-    clearInterval(timer)
-    timer = null
+  if (tickTimeout) {
+    clearTimeout(tickTimeout)
+    tickTimeout = null
   }
 }
 
