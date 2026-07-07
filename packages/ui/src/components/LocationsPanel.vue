@@ -1,12 +1,9 @@
 <script setup lang="ts">
 // vue imports
 import { ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 // philly ui imports
 import { MapCard } from '@phila/phila-ui-cards'
-import { Icon } from '@phila/phila-ui-core'
-import { IconPrint } from '@phila/phila-ui-core/icons'
 
 // pinboard component imports
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
@@ -30,7 +27,6 @@ const props = defineProps<{
   locationSearch: string | undefined
   locationFilter: LocationFilterOption[] | undefined
   locationSort: SortLocationsOptions | undefined
-  allowPrint?: boolean
 }>()
 
 // emits
@@ -42,10 +38,7 @@ const emit = defineEmits<{
   sortOption: [sort: string]
   hover: [id: string]
   'hover-end': []
-  print: [location: BasicLocation]
 }>()
-
-const { t } = useI18n()
 
 // component variables
 
@@ -130,56 +123,44 @@ defineExpose({ scrollToCard })
 
   <div v-else ref="listRef" class="location-list">
     <template v-for="location in locations" :key="location.id">
-      <div class="location-card-slot">
-        <div
-          v-if="$slots['location-card']"
-          :data-location-id="location.id"
-          :class="[
-            'location-card',
-            'location-card--custom',
-            {
-              'location-card--hovered': hoveredId === location.id,
-              'location-card--selected': selectedId === location.id,
-            },
-          ]"
-          tabindex="0"
-          @click="emit('select', location)"
-          @mouseenter="emit('hover', location.id)"
-          @mouseleave="emit('hover-end')"
-          @keydown.enter="pendingKeydown = true"
-          @keyup.enter="handleCardKeyup(location)"
-        >
-          <slot name="location-card" :location="location" />
-        </div>
-        <MapCard
-          v-else
-          :data-location-id="location.id"
-          v-bind="location.locationCardInfo"
-          :class="[
-            'location-card',
-            {
-              'location-card--hovered': hoveredId === location.id,
-              'location-card--selected': selectedId === location.id,
-            },
-          ]"
-          tabindex="0"
-          @click="emit('select', location)"
-          @mouseenter="emit('hover', location.id)"
-          @mouseleave="emit('hover-end')"
-          @keydown.enter="pendingKeydown = true"
-          @keyup.enter="handleCardKeyup(location)"
-        />
-        <button
-          v-if="allowPrint && !isMobile"
-          class="card-print-btn"
-          type="button"
-          :aria-label="t('pinboard.print')"
-          :title="t('pinboard.print')"
-          @click.stop="emit('print', location)"
-        >
-          <Icon :icon="IconPrint" decorative />
-        </button>
+      <div
+        v-if="$slots['location-card']"
+        :data-location-id="location.id"
+        :class="[
+          'location-card',
+          'location-card--custom',
+          {
+            'location-card--hovered': hoveredId === location.id,
+            'location-card--selected': selectedId === location.id,
+          },
+        ]"
+        tabindex="0"
+        @click="emit('select', location)"
+        @mouseenter="emit('hover', location.id)"
+        @mouseleave="emit('hover-end')"
+        @keydown.enter="pendingKeydown = true"
+        @keyup.enter="handleCardKeyup(location)"
+      >
+        <slot name="location-card" :location="location" />
       </div>
+      <MapCard
+        v-else
+        :data-location-id="location.id"
+        v-bind="location.locationCardInfo"
+        :class="[
+          'location-card',
+          {
+            'location-card--hovered': hoveredId === location.id,
+            'location-card--selected': selectedId === location.id,
+          },
+        ]"
+        tabindex="0"
+        @click="emit('select', location)"
+        @mouseenter="emit('hover', location.id)"
+        @mouseleave="emit('hover-end')"
+        @keydown.enter="pendingKeydown = true"
+        @keyup.enter="handleCardKeyup(location)"
+      />
     </template>
   </div>
 </template>
@@ -202,35 +183,6 @@ defineExpose({ scrollToCard })
 .location-card {
   cursor: pointer;
   flex-shrink: 0;
-}
-
-.location-card-slot {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-}
-
-.card-print-btn {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  border: 1px solid var(--Schemes-Border, #a9a9a9);
-  border-radius: var(--scale-200, 4px);
-  background: var(--Schemes-On-Primary, #fff);
-  color: var(--Schemes-Primary, #1976d2);
-  cursor: pointer;
-}
-
-.card-print-btn:hover {
-  background: var(--Schemes-Surface-Container-Low, #f5f5f5);
 }
 
 .location-card--custom {

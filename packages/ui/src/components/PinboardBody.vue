@@ -42,7 +42,11 @@ defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
   'location-card'?(props: { location: BasicLocation }): unknown
-  'location-detail'?(props: { location: BasicLocation; onClose: () => void }): unknown
+  'location-detail'?(props: {
+    location: BasicLocation
+    onClose: () => void
+    onPrint?: () => void
+  }): unknown
   'map-content'?(props: {
     locations: BasicLocation[]
     geojson: unknown
@@ -75,7 +79,6 @@ const props = withDefaults(
     geojson?: unknown
     filters?: FilterDefinition[]
     filterValues?: FilterValues
-    allowPrint?: boolean
   }>(),
   {
     waitForUserLocation: false,
@@ -87,7 +90,6 @@ const props = withDefaults(
     geojson: undefined,
     filters: undefined,
     filterValues: undefined,
-    allowPrint: false,
   }
 )
 
@@ -388,6 +390,7 @@ const effectiveMapConfig = (() => {
       name="location-detail"
       :location="selectedLocation"
       :on-close="handleCloseLocationDetail"
+      :on-print="() => handlePrint(selectedLocation!)"
     />
   </div>
   <div class="finder-panel">
@@ -418,9 +421,7 @@ const effectiveMapConfig = (() => {
           :hovered-id="hoveredLocationId"
           :selected-id="selectedLocationId"
           :is-mobile="isMobile"
-          :allow-print="allowPrint"
           @select="handleSelect"
-          @print="handlePrint"
           @hover="handleHover"
           @hover-end="handleHoverEnd"
           @search-string="handleSearchChange"
