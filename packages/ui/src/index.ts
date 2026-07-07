@@ -1,6 +1,6 @@
 import './styles/global.css'
 export { createPinboard } from './plugin'
-export { PinboardBody, PinboardShell, PinboardInfoPage } from './components/_index'
+export { PinboardBody, PinboardShell, PinboardInfoPage, DetailActions } from './components/_index'
 export * as PinboardComposables from './composables/_index'
 export * as PinboardUtilities from './utilities/_index'
 export { createPinboardRouter } from './router/createPinboardRouter'
