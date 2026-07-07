@@ -65,6 +65,11 @@ onBeforeUnmount(() => {
   gap: 0.25rem;
 }
 
+/* Match the detail's close button rather than the default primary (blue). */
+.detail-actions :deep(svg) {
+  color: var(--Schemes-On-Primary-Container);
+}
+
 /* Visually-hidden live region announcing the copy confirmation to screen readers. */
 .detail-actions-status {
   position: absolute;

@@ -206,16 +206,18 @@ function translateTransitList(raw: string | null, category: string): string {
   <div class="location-detail content">
     <div class="detail-header">
       <h2>{{ location.name }}</h2>
-      <DetailActions :on-print="onPrint" />
-      <PhilaButton
-        :icon="IconClose"
-        :icon-only="true"
-        variant="standard"
-        size="small"
-        class="detail-close-btn"
-        :aria-label="t('closeDetails')"
-        @click="onClose"
-      />
+      <div class="detail-header-actions">
+        <DetailActions :on-print="onPrint" />
+        <PhilaButton
+          :icon="IconClose"
+          :icon-only="true"
+          variant="standard"
+          size="small"
+          class="detail-close-btn"
+          :aria-label="t('closeDetails')"
+          @click="onClose"
+        />
+      </div>
     </div>
 
     <div class="detail-body">
@@ -390,6 +392,15 @@ function translateTransitList(raw: string | null, category: string): string {
   line-height: 1.4;
   margin: 0;
   flex: 1;
+}
+
+/* Actions + close as one cluster, so the print/share buttons sit as close to
+   the ✕ as they are to each other. */
+.detail-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
 }
 
 .detail-close-btn {
