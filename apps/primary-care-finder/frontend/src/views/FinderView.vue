@@ -293,7 +293,6 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
     :location-panel-search="t('searchPlaceholder')"
     :geojson="filteredGeojson"
     :is-mobile="isMobile"
-    :allow-print="true"
     :filters="filterChipDefinitions"
     :filter-values="filterState"
     @search="handleSearchSubmit"
@@ -312,8 +311,12 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
       <LocationCard :location="asPrimaryCareLocation(location)" />
     </template>
 
-    <template #location-detail="{ location, onClose }">
-      <LocationDetail :location="asPrimaryCareLocation(location)" :on-close="onClose" />
+    <template #location-detail="{ location, onClose, onPrint }">
+      <LocationDetail
+        :location="asPrimaryCareLocation(location)"
+        :on-close="onClose"
+        :on-print="onPrint"
+      />
     </template>
 
     <template

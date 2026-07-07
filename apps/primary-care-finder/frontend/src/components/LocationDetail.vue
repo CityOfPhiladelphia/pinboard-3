@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { PrimaryCareField, PrimaryCareLocation } from '@/types'
 import { PhilaButton } from '@phila/phila-ui-button'
-import { PhilaLink, Icon } from '@pinboard/ui'
+import { PhilaLink, Icon, DetailActions } from '@pinboard/ui'
 import LocationTags from './LocationTags.vue'
 import { formatFullAddress } from '@/utilities/formatAddress'
 import {
@@ -19,6 +19,7 @@ import {
 const props = defineProps<{
   location: PrimaryCareLocation
   onClose: () => void
+  onPrint?: () => void
 }>()
 
 const { t, locale, messages } = useI18n()
@@ -205,6 +206,7 @@ function translateTransitList(raw: string | null, category: string): string {
   <div class="location-detail content">
     <div class="detail-header">
       <h2>{{ location.name }}</h2>
+      <DetailActions :on-print="onPrint" />
       <PhilaButton
         :icon="IconClose"
         :icon-only="true"
