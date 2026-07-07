@@ -8,8 +8,11 @@
 }
 
 @media print {
-  /* Hide the entire app; show only the teleported print container. */
-  body > *:not(.pinboard-print-container) {
+  /* Hide the entire app; show only the teleported print container.
+     Gated on the container's presence so a plain browser print (Ctrl+P,
+     no print-button click) falls through to normal behavior instead of
+     printing a blank page. */
+  body:has(.pinboard-print-container) > *:not(.pinboard-print-container) {
     display: none !important;
   }
 
