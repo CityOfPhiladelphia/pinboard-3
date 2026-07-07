@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // vue imports
-import { useSlots, inject, ref, computed, watch } from 'vue'
+import { useSlots, inject, ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -75,6 +75,7 @@ const props = withDefaults(
     geojson?: unknown
     filters?: FilterDefinition[]
     filterValues?: FilterValues
+    allowPrint?: boolean
   }>(),
   {
     waitForUserLocation: false,
@@ -86,6 +87,7 @@ const props = withDefaults(
     geojson: undefined,
     filters: undefined,
     filterValues: undefined,
+    allowPrint: false,
   }
 )
 
@@ -128,6 +130,28 @@ const mapPanelRef = ref<{ panTo: (coordinates: LatLon) => void } | null>(null)
 const searchString = ref<string>('')
 // filter state
 const allFiltersOpen = ref(false)
+
+// print
+const printIds = ref<string[]>([])
+const printLocations = computed(() =>
+  printIds.value
+    .map((id) => props.locations.find((loc) => loc.id === id))
+    .filter((loc): loc is BasicLocation => loc !== undefined)
+)
+const noop = () => {}
+
+function handlePrint(location: BasicLocation) {
+  printIds.value = [location.id]
+  // Wait for the print container to render the detail before opening the dialog.
+  nextTick(() => window.print())
+}
+
+function clearPrint() {
+  printIds.value = []
+}
+
+onMounted(() => window.addEventListener('afterprint', clearPrint))
+onBeforeUnmount(() => window.removeEventListener('afterprint', clearPrint))
 
 // computed refs
 const bottomSheetPercent = computed(() => bottomSheetRef.value?.displayPercent ?? snapPoints[0])
@@ -394,7 +418,9 @@ const effectiveMapConfig = (() => {
           :hovered-id="hoveredLocationId"
           :selected-id="selectedLocationId"
           :is-mobile="isMobile"
+          :allow-print="allowPrint"
           @select="handleSelect"
+          @print="handlePrint"
           @hover="handleHover"
           @hover-end="handleHoverEnd"
           @search-string="handleSearchChange"
@@ -505,6 +531,13 @@ const effectiveMapConfig = (() => {
       </div>
     </div>
   </BottomSheet>
+  <Teleport to="body">
+    <div v-if="printIds.length" class="pinboard-print-container">
+      <div v-for="loc in printLocations" :key="loc.id" class="pinboard-print-item">
+        <slot name="location-detail" :location="loc" :on-close="noop" />
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>
