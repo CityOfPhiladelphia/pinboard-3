@@ -14,6 +14,8 @@ export default {
     apply: '应用',
     print: '打印',
     share: '分享',
+    recentSearches: 'Recent searches',
+    removeRecentSearch: 'Remove',
     copiedUrl: 'URL 已复制到剪贴板',
     infoPage: {
       backToMap: '返回地图',

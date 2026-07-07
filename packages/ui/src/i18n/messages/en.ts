@@ -13,6 +13,8 @@ export default {
     apply: 'Apply',
     print: 'Print',
     share: 'Share',
+    recentSearches: 'Recent searches',
+    removeRecentSearch: 'Remove',
     copiedUrl: 'URL copied to clipboard',
     infoPage: {
       backToMap: 'Back to map',

@@ -14,6 +14,8 @@ export default {
     apply: 'تطبيق',
     print: 'طباعة',
     share: 'شارك',
+    recentSearches: 'Recent searches',
+    removeRecentSearch: 'Remove',
     copiedUrl: 'تم نسخ عنوان URL إلى الحافظة',
     infoPage: {
       backToMap: 'العودة إلى الخريطة',

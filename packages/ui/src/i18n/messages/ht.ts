@@ -14,6 +14,8 @@ export default {
     apply: 'Aplike',
     print: 'Enprime',
     share: 'Pataje',
+    recentSearches: 'Recent searches',
+    removeRecentSearch: 'Remove',
     copiedUrl: 'URL kopye nan clipboard',
     infoPage: {
       backToMap: 'Tounen nan kat la',

@@ -14,6 +14,8 @@ export default {
     apply: 'Áp dụng',
     print: 'In',
     share: 'Chia sẻ',
+    recentSearches: 'Recent searches',
+    removeRecentSearch: 'Remove',
     copiedUrl: 'URL được sao chép vào clipboard',
     infoPage: {
       backToMap: 'Quay lại bản đồ',

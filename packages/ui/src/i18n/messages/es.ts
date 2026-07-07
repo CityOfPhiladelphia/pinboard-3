@@ -14,6 +14,8 @@ export default {
     apply: 'Aplicar',
     print: 'Imprimir',
     share: 'Compartir',
+    recentSearches: 'Recent searches',
+    removeRecentSearch: 'Remove',
     copiedUrl: 'URL copiada al portapapeles',
     infoPage: {
       backToMap: 'Volver al mapa',
