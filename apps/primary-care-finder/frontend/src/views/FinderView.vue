@@ -293,6 +293,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
     :location-panel-search="t('searchPlaceholder')"
     :geojson="filteredGeojson"
     :is-mobile="isMobile"
+    :allow-print="true"
     :filters="filterChipDefinitions"
     :filter-values="filterState"
     @search="handleSearchSubmit"
