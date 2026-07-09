@@ -137,7 +137,7 @@ defineExpose({ focusFirst })
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--spacing-xs, 0.5rem);
   padding: var(--spacing-2xs, 0.25rem) var(--spacing-xs, 0.5rem);
   cursor: pointer;
   color: var(--Schemes-On-Surface, #000);

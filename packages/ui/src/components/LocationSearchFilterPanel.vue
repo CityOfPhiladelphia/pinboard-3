@@ -100,7 +100,7 @@ function handleSearchChange(search: string) {
   searchString.value = search
 }
 
-function submitSearch() {
+function handleSearchSubmit() {
   const term = searchString.value.trim()
   if (term) {
     addRecentSearch(term)
@@ -116,7 +116,7 @@ function handleSuggestionSelect(suggestion: string) {
   dismissSuggestions()
   searchString.value = suggestion
   emit('searchString', suggestion)
-  submitSearch()
+  handleSearchSubmit()
   focusSearchInput()
 }
 
@@ -179,7 +179,7 @@ function focusSearchInput() {
           :placeholder="searchPlaceholder"
           :elevated="elevatedSearch"
           @update:model-value="handleSearchChange"
-          @search="submitSearch"
+          @search="handleSearchSubmit"
         />
         <SearchSuggestions
           ref="suggestionsRef"

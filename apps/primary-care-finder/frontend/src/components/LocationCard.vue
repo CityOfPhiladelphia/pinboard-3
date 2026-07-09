@@ -79,7 +79,7 @@ function mapsUrl(location: PrimaryCareLocation): string {
 }
 
 .card-distance {
-  font-size: 0.875rem;
+  font-size: var(--Body-Small-font-body-small-size);
   color: var(--Schemes-On-Surface-Variant, #666);
 }
 
