@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // vue imports
-import { useSlots, inject, ref, computed, watch } from 'vue'
+import { useSlots, inject, ref, computed, watch, toRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -10,6 +10,7 @@ import { IconMap } from '@phila/phila-ui-core/icons'
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
+import '../styles/print.css'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { MapCard } from '@phila/phila-ui-cards'
 
@@ -24,6 +25,7 @@ import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
 // pinboard composables and utilities imports
 import { hasLocationData } from '../utilities/hasLocationData'
+import { usePrint } from '../composables/usePrint'
 
 // type imports
 import type {
@@ -41,7 +43,11 @@ defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
   'location-card'?(props: { location: BasicLocation }): unknown
-  'location-detail'?(props: { location: BasicLocation; onClose: () => void }): unknown
+  'location-detail'?(props: {
+    location: BasicLocation
+    onClose: () => void
+    onPrint?: () => void
+  }): unknown
   'map-content'?(props: {
     locations: BasicLocation[]
     geojson: unknown
@@ -127,6 +133,10 @@ const mapPanelRef = ref<{ panTo: (coordinates: LatLon) => void } | null>(null)
 const searchString = ref<string>('')
 // filter state
 const allFiltersOpen = ref(false)
+
+// print
+const { printIds, printLocations, print } = usePrint(toRef(props, 'locations'))
+const noop = () => {}
 
 // computed refs
 const bottomSheetPercent = computed(() => bottomSheetRef.value?.displayPercent ?? snapPoints[0])
@@ -363,6 +373,7 @@ const effectiveMapConfig = (() => {
       name="location-detail"
       :location="selectedLocation"
       :on-close="handleCloseLocationDetail"
+      :on-print="() => print(selectedLocation!)"
     />
   </div>
   <div class="finder-panel">
@@ -373,7 +384,11 @@ const effectiveMapConfig = (() => {
         {{ errorMessage }}
       </div>
 
-      <div v-if="isLoading" class="loading-list">
+      <!-- Skeleton cards only on desktop, where the list lives in this left panel.
+           On mobile the list is in the bottom sheet, so these would flash in the
+           map area and then vanish — show nothing here and let the map's own
+           loading state and the sheet's "Loading data…" label cover it. -->
+      <div v-if="isLoading && !isMobile" class="loading-list">
         <MapCard v-for="n in 5" :key="n" :is-loading="true" />
       </div>
 
@@ -500,6 +515,13 @@ const effectiveMapConfig = (() => {
       </div>
     </div>
   </BottomSheet>
+  <Teleport to="body">
+    <div v-if="printIds.length" class="pinboard-print-container">
+      <div v-for="loc in printLocations" :key="loc.id" class="pinboard-print-item">
+        <slot name="location-detail" :location="loc" :on-close="noop" />
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>

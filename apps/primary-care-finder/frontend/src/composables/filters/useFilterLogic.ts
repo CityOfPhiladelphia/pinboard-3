@@ -264,11 +264,6 @@ export function useFilterLogic(
         matches: [languageOptions.languageOption7],
         matchingFunction: matchOptionInString,
       },
-      [languageOptions.languageOption8]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption8],
-        matchingFunction: matchOptionInString,
-      },
       [languageOptions.languageOption9]: {
         dataFields: ['languages'],
         matches: [languageOptions.languageOption9],
@@ -600,9 +595,6 @@ export function useFilterLogic(
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption7
     ].setChecked(filterState.value.languages.chinese)
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption8
-    ].setChecked(filterState.value.languages.english)
     filterLogic.value.childFilters[filterKeys.languages].childFilters[
       languageOptions.languageOption9
     ].setChecked(filterState.value.languages.fanta)

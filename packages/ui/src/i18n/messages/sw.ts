@@ -12,6 +12,11 @@ export default {
     sortShareLocation: 'Shiriki eneo lako ili kupanga kwa umbali',
     reset: 'Weka upya',
     apply: 'Tumia',
+    print: 'Chapisha',
+    share: 'Shiriki',
+    recentSearches: 'Recent searches',
+    removeRecentSearch: 'Remove',
+    copiedUrl: 'URL inakiliwa kwenye clipboard',
     infoPage: {
       backToMap: 'Rudi kwenye ramani',
       onThisPage: 'Kwenye ukurasa huu',

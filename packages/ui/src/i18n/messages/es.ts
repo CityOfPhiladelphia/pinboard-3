@@ -12,6 +12,11 @@ export default {
     sortShareLocation: 'Comparte tu ubicación para ordenar por distancia',
     reset: 'Restablecer',
     apply: 'Aplicar',
+    print: 'Imprimir',
+    share: 'Compartir',
+    recentSearches: 'Recent searches',
+    removeRecentSearch: 'Remove',
+    copiedUrl: 'URL copiada al portapapeles',
     infoPage: {
       backToMap: 'Volver al mapa',
       onThisPage: 'En esta página',

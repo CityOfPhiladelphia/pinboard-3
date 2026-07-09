@@ -12,6 +12,11 @@ export default {
     sortShareLocation: 'Partagez votre position pour classer par distance',
     reset: 'Réinitialiser',
     apply: 'Appliquer',
+    print: 'Imprimer',
+    share: 'Partager',
+    recentSearches: 'Recent searches',
+    removeRecentSearch: 'Remove',
+    copiedUrl: 'URL copiée dans le presse-papiers',
     infoPage: {
       backToMap: 'Retour à la carte',
       onThisPage: 'Sur cette page',

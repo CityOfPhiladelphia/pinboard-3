@@ -6,6 +6,7 @@ export default {
     checkHours: 'تحقق من ساعات العمل',
     weekendHours: 'ساعات عمل نهاية الأسبوع',
     openAfter6: 'مفتوح بعد الساعة 6 مساءً',
+    eveningHours: 'ساعات العمل المسائية',
     walkIns: 'بدون موعد',
     telehealth: 'الرعاية الصحية عن بُعد',
     parking: 'موقف سيارات في الموقع',
@@ -16,7 +17,7 @@ export default {
     todayClosed: 'اليوم: مغلق',
     todayHours: 'اليوم: {range}',
   },
-  providerWebsite: 'موقع المركز الصحي',
+  providerWebsite: 'الموقع الإلكتروني',
   website: 'الموقع الإلكتروني',
   hours: 'ساعات',
   languagesSpoken: 'اللغات التي يتحدث بها الموظفون',
@@ -282,8 +283,8 @@ export default {
       'يخدم المراهقين والشباب حصرياً (من سن 13 إلى 26).',
     'Exclusively serves people living with HIV.':
       'يخدم حصرياً الأشخاص المتعايشين مع فيروس نقص المناعة البشرية (HIV).',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      'يخدم حصرياً أفراد مجتمع المهاجرين اللاتينيين غير المؤمَّن عليهم في فيلادلفيا. لا توجد فحوصات طبية للعمل. الخدمات المقدمة للأطفال تقتصر على طب الأسنان والعناية بالعيون والصحة النفسية.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      'يخدم حصرياً أفراد مجتمع المهاجرين اللاتينيين غير المؤمَّن عليهم في فيلادلفيا. لا توجد فحوصات طبية للعمل. الخدمات المقدمة للأطفال تقتصر على العناية بالعيون والصحة النفسية.',
     'Services for children are limited to dental, mental health, and vaccines.':
       'الخدمات المقدمة للأطفال تقتصر على طب الأسنان والصحة النفسية واللقاحات.',
     'Special focus on LGBTQ+ ': 'تركيز خاص على مجتمع LGBTQ+',
@@ -361,6 +362,8 @@ export default {
     'On second and fourth Saturday of the month, clinic is open from 8:30 a.m. - 1 p.m. for dental services':
       'في يومي السبت الثاني والرابع من الشهر، تفتح العيادة أبوابها من الساعة 8:30 صباحًا حتى الساعة 1 ظهرًا لخدمات طب الأسنان',
     'Evening telehealth services 5 p.m. - 8 p.m.':
+      'خدمات الرعاية الصحية عن بعد المسائية من الساعة 5 مساءً حتى الساعة 8 مساءً',
+    'Evening telehealth services available 5 p.m. - 8 p.m.':
       'خدمات الرعاية الصحية عن بعد المسائية من الساعة 5 مساءً حتى الساعة 8 مساءً',
     'Evening Telehealth service 5 p.m. to 7 p.m.':
       'خدمة الرعاية الصحية عن بعد المسائية من الساعة 5 مساءً حتى 7 مساءً',

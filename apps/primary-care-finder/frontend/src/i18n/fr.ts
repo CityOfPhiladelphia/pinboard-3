@@ -6,6 +6,7 @@ export default {
     checkHours: 'Vérifier les horaires',
     weekendHours: 'Horaires du week-end',
     openAfter6: 'Ouvert après 18 h',
+    eveningHours: 'Horaires du soir',
     walkIns: 'Sans rendez-vous',
     telehealth: 'Télésanté',
     parking: 'Stationnement sur place',
@@ -16,7 +17,7 @@ export default {
     todayClosed: "Aujourd'hui : Fermé",
     todayHours: "Aujourd'hui : {range}",
   },
-  providerWebsite: 'Site web du centre de santé',
+  providerWebsite: 'Site web',
   website: 'Site web',
   hours: 'Heures',
   languagesSpoken: 'Langues parlées par le personnel',
@@ -282,8 +283,8 @@ export default {
       'Accueille exclusivement les adolescents et jeunes adultes (âgés de 13 à 26 ans).',
     'Exclusively serves people living with HIV.':
       'Accueille exclusivement les personnes vivant avec le VIH.',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      'Accueille exclusivement les membres sans assurance maladie de la communauté immigrée latino-américaine de Philadelphie. Pas de visites médicales du travail. Les services pour les enfants se limitent aux soins dentaires, aux soins oculaires et à la santé mentale.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      'Accueille exclusivement les membres sans assurance maladie de la communauté immigrée latino-américaine de Philadelphie. Pas de visites médicales du travail. Les services pour les enfants se limitent aux soins oculaires et à la santé mentale.',
     'Services for children are limited to dental, mental health, and vaccines.':
       'Les services pour les enfants se limitent aux soins dentaires, à la santé mentale et aux vaccins.',
     'Special focus on LGBTQ+ ': 'Attention particulière portée aux personnes LGBTQ+',

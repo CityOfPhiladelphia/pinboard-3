@@ -1,0 +1,45 @@
+/* Print isolation for the card-print feature.
+   Un-scoped on purpose: these rules must reach body-level siblings, which a
+   component-scoped <style scoped> block cannot. They have no effect on screen —
+   the container is display:none until the browser enters print. */
+
+.pinboard-print-container {
+  display: none;
+}
+
+@media print {
+  /* Hide the entire app; show only the teleported print container.
+     Gated on the container's presence so a plain browser print (Ctrl+P,
+     no print-button click) falls through to normal behavior instead of
+     printing a blank page. */
+  body:has(.pinboard-print-container) > *:not(.pinboard-print-container) {
+    display: none !important;
+  }
+
+  .pinboard-print-container {
+    display: block !important;
+  }
+
+  /* The detail was authored to fill a scrolling panel (height:100%,
+     overflow:auto, container queries) — flatten it for paper. */
+  .pinboard-print-container,
+  .pinboard-print-container * {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Don't print interactive chrome (e.g. the detail's close button). */
+  .pinboard-print-container button {
+    display: none !important;
+  }
+
+  /* One location per printed page (matters once multi-print is added). */
+  .pinboard-print-item {
+    break-after: page;
+  }
+
+  .pinboard-print-item:last-child {
+    break-after: auto;
+  }
+}
