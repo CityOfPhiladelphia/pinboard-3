@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // vue imports
-import { useSlots, inject, ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { useSlots, inject, ref, computed, watch, toRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -25,6 +25,7 @@ import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
 // pinboard composables and utilities imports
 import { hasLocationData } from '../utilities/hasLocationData'
+import { usePrint } from '../composables/usePrint'
 
 // type imports
 import type {
@@ -134,26 +135,8 @@ const searchString = ref<string>('')
 const allFiltersOpen = ref(false)
 
 // print
-const printIds = ref<string[]>([])
-const printLocations = computed(() =>
-  printIds.value
-    .map((id) => props.locations.find((loc) => loc.id === id))
-    .filter((loc): loc is BasicLocation => loc !== undefined)
-)
+const { printIds, printLocations, print } = usePrint(toRef(props, 'locations'))
 const noop = () => {}
-
-function handlePrint(location: BasicLocation) {
-  printIds.value = [location.id]
-  // Wait for the print container to render the detail before opening the dialog.
-  nextTick(() => window.print())
-}
-
-function clearPrint() {
-  printIds.value = []
-}
-
-onMounted(() => window.addEventListener('afterprint', clearPrint))
-onBeforeUnmount(() => window.removeEventListener('afterprint', clearPrint))
 
 // computed refs
 const bottomSheetPercent = computed(() => bottomSheetRef.value?.displayPercent ?? snapPoints[0])
@@ -390,7 +373,7 @@ const effectiveMapConfig = (() => {
       name="location-detail"
       :location="selectedLocation"
       :on-close="handleCloseLocationDetail"
-      :on-print="() => handlePrint(selectedLocation!)"
+      :on-print="() => print(selectedLocation!)"
     />
   </div>
   <div class="finder-panel">

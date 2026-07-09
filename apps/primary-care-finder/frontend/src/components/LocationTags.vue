@@ -1,7 +1,7 @@
 ﻿<script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Tags, Tooltip } from '@pinboard/ui'
+import { Tags, Tooltip, PinboardComposables } from '@pinboard/ui'
 import type { TagColor } from '@phila/phila-ui-tags'
 import type { IconComponent } from '@phila/phila-ui-core'
 import {
@@ -12,7 +12,6 @@ import {
   IconClock,
 } from '@phila/phila-ui-core/icons'
 import type { PrimaryCareLocation } from '@/types'
-import { useNow } from '@/composables/useNow'
 
 const props = defineProps<{
   location: PrimaryCareLocation
@@ -24,7 +23,7 @@ const { t, locale, messages } = useI18n()
 
 // Reactive clock so open/closed status re-evaluates as time passes (e.g. a site
 // closing at 5 flips to "Closed" without needing a reload).
-const clock = useNow()
+const clock = PinboardComposables.useNow()
 
 const DAYS = ['sun', 'mon', 'tues', 'wed', 'thurs', 'fri', 'sat'] as const
 

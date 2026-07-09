@@ -13,7 +13,11 @@ let consumers = 0
 const TICK_MARGIN_MS = 50
 
 // Fire at the next wall-clock minute (:00), then re-align each tick so the timing
-// never drifts away from the minute boundary.
+// never drifts away from the minute boundary. This is deliberately a
+// self-rescheduling setTimeout rather than setInterval: setInterval fires at a
+// fixed offset from when it started (wherever inside the minute that happened to
+// be) and accumulates drift, whereas recomputing the delay each tick keeps us
+// landing on :00 so open/closed status flips exactly on the minute.
 function scheduleTick(): void {
   const msUntilNextMinute = 60_000 - (Date.now() % 60_000) + TICK_MARGIN_MS
   tickTimeout = setTimeout(() => {
