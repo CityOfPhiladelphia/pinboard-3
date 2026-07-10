@@ -143,8 +143,20 @@ export interface PrimaryCareResponse extends PinboardTypes.GeoJSONFeatureCollect
 export type PrimaryCareLocation = PinboardTypes.BasicLocation & Omit<PrimaryCareFeature, 'type'>
 
 export type SortMode = '' | 'distance' | 'name'
+
+export type AgeGroupField = 'adults' | 'children'
 export type AgeGroupFilter = 'adult' | 'children'
-export type WaitTimeFilter = 'sameDay' | 'weekWell' | 'weekSick' | 'twoMonths'
+
+export type WaitTimeFilter = 'sameDay' | 'weekSick' | 'weekWell' | 'twoMonths'
+
+export type VisitTypeField =
+  | 'primary_well'
+  | 'primary_sick'
+  | 'primary_sports'
+  | 'primary_prenatal'
+  | 'primary_women'
+  | 'primary_telehealth'
+  | 'primary_vacc'
 export type VisitTypeFilter =
   | 'primaryWell'
   | 'primarySick'
@@ -153,6 +165,16 @@ export type VisitTypeFilter =
   | 'primaryWomen'
   | 'primaryTelehealth'
   | 'primaryVaccines'
+
+export type SpecialtyField =
+  | 'special_mental'
+  | 'special_dental'
+  | 'special_eye'
+  | 'special_podiatry'
+  | 'special_mat'
+  | 'special_nutrition'
+  | 'special_tobacco'
+  | 'special_pharmacy'
 export type SpecialtyFilter =
   | 'mental'
   | 'dental'
@@ -162,7 +184,10 @@ export type SpecialtyFilter =
   | 'nutrition'
   | 'tobacco'
   | 'pharmacy'
+
+export type TestsField = 'tests_blood' | 'tests_sti' | 'tests_covid' | 'tests_mammo' | 'tests_xray'
 export type TestsFilter = 'blood' | 'sti' | 'covid' | 'mammo' | 'xray'
+
 export type LanguagesFilter =
   | 'asl'
   | 'amharic'
@@ -253,6 +278,7 @@ export interface PrimaryCareFilters extends FilterValues {
     cambodian: boolean
     cantonese: boolean
     chinese: boolean
+    english: boolean
     fanta: boolean
     filipino: boolean
     french: boolean

@@ -5,12 +5,7 @@ export * as PinboardComposables from './composables/_index'
 export * as PinboardUtilities from './utilities/_index'
 export { createPinboardRouter } from './router/createPinboardRouter'
 export type * as PinboardTypes from './types'
-export type {
-  BitWiseOperation,
-  MatchingFunction,
-  IFilterChoiceBitfieldGroup,
-  IFilterGroup,
-} from './composables/datafilters/types'
+export type * from './composables/datafilters/types'
 export { getBufferSize, shiftLeft } from './composables/datafilters/functions'
 export {
   FilterChoiceBitfieldGroup,
