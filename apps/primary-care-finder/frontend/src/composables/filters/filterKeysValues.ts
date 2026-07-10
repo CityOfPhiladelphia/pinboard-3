@@ -1,7 +1,6 @@
 import type {
   AgeGroupField,
   AgeGroupFilter,
-  LanguagesFilter,
   SpecialtyField,
   SpecialtyFilter,
   TestsField,
@@ -25,7 +24,7 @@ export const ageGroupOptions: Record<AgeGroupField, AgeGroupFilter> = {
   children: 'children',
 }
 
-export const waitOptions: WaitTimeFilter[] = ['sameDay', 'weekSick', 'weekWell', 'twoMonths']
+export const waitOptions = ['sameDay', 'weekSick', 'weekWell', 'twoMonths'] as const
 
 export const visitTypeOptions: Record<VisitTypeField, VisitTypeFilter> = {
   primary_well: 'primaryWell',
@@ -56,7 +55,7 @@ export const testsOptions: Record<TestsField, TestsFilter> = {
   tests_xray: 'xray',
 }
 
-export const languageOptions: LanguagesFilter[] = [
+export const languageOptions = [
   'asl',
   'amharic',
   'arabic',
@@ -99,4 +98,4 @@ export const languageOptions: LanguagesFilter[] = [
   'urdu',
   'vietnamese',
   'yoruba',
-]
+] as const

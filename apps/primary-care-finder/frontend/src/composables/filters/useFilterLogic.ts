@@ -18,10 +18,17 @@ import {
   type MatchingFunction,
 } from '@pinboard/ui'
 import type {
+  AgeGroupFilter,
+  LanguagesFilter,
+  PrimaryCareFilterKey,
+  PrimaryCareFilterLogic,
   PrimaryCareFilters,
   PrimaryCareLocation,
   PrimaryCareProperties,
+  SpecialtyFilter,
   TestsFilter,
+  VisitTypeFilter,
+  WaitTimeFilter,
 } from '@/types'
 
 export function useFilterLogic(
@@ -60,76 +67,55 @@ export function useFilterLogic(
     )
   }
 
-  const waitTimeFilterParams: Omit<
-    IFilterChoiceBitfieldGroup,
-    'data' | 'bufferLength' | 'operation'
-  > = {
-    choices: {
-      [waitOptions[0]]: {
-        dataFields: ['walk_ins_sick', 'sick_adult_wait', 'sick_child_wait'],
-        matches: ['Yes', 'Same day'],
-        matchingFunction: matchFieldsToOptions,
-      },
-      [waitOptions[1]]: {
-        dataFields: ['walk_ins_sick', 'sick_adult_wait', 'sick_child_wait'],
-        matches: ['Yes', 'Same day', 'Less than one week'],
-        matchingFunction: matchFieldsToOptions,
-      },
-      [waitOptions[2]]: {
-        dataFields: ['well_adult_wait', 'well_child_wait'],
-        matches: ['Same day', 'Less than one week'],
-        matchingFunction: matchFieldsToOptions,
-      },
-      [waitOptions[3]]: {
-        dataFields: [
-          'walk_ins_sick',
-          'sick_adult_wait',
-          'sick_child_wait',
-          'well_adult_wait',
-          'well_child_wait',
-          'other_services_adult_wait',
-          'other_services_child_wait',
-        ],
-        matches: ['Yes', 'Same day', 'Less than one week', 'Less than two months'],
-        matchingFunction: matchFieldsToOptions,
-      },
-    },
-  }
-
   const filterLogic = computed(() => {
-    const commonParams = {
+    const commonParams: Omit<IFilterChoiceBitfieldGroup, 'choices'> = {
       data: locations.value as unknown as Record<string, unknown>[],
-      operation: '&' as BitWiseOperation,
+      operation: '&',
       bufferLength: getBufferSize(locations.value.length),
     }
-    const ageGroupFilter = new FilterChoiceBitfieldGroup({
-      ...commonParams,
-      choices: choicesFromObject(ageGroupOptions, matchYes, matchFieldsToOptions),
-    })
-    const waitTimeFilter = new FilterChoiceBitfieldGroup({
-      ...commonParams,
-      ...waitTimeFilterParams,
+
+    const sameDayParams: Omit<IFilterChoiceBitfield, 'data' | 'bufferLength'> = {
+      dataFields: ['walk_ins_sick', 'sick_adult_wait', 'sick_child_wait'],
+      matches: ['Yes', 'Same day'],
+      matchingFunction: matchFieldsToOptions,
+    }
+    const weekSickParams: Omit<IFilterChoiceBitfield, 'data' | 'bufferLength'> = {
+      dataFields: sameDayParams.dataFields,
+      matches: ['Yes', 'Same day', 'Less than one week'],
+      matchingFunction: matchFieldsToOptions,
+    }
+
+    const weekWellParams: Omit<IFilterChoiceBitfield, 'data' | 'bufferLength'> = {
+      dataFields: ['well_adult_wait', 'well_child_wait'],
+      matches: ['Same day', 'Less than one week'],
+      matchingFunction: matchFieldsToOptions,
+    }
+
+    const twoMonthsParams: Omit<IFilterChoiceBitfield, 'data' | 'bufferLength'> = {
+      dataFields: [
+        'walk_ins_sick',
+        'sick_adult_wait',
+        'sick_child_wait',
+        'well_adult_wait',
+        'well_child_wait',
+        'other_services_adult_wait',
+        'other_services_child_wait',
+      ],
+      matches: ['Yes', 'Same day', 'Less than one week', 'Less than two months'],
+      matchingFunction: matchFieldsToOptions,
+    }
+
+    const waitTimeFilter = makeFilterChoiceBitfieldGroup(commonParams, {
+      [waitOptions[0]]: sameDayParams,
+      [waitOptions[1]]: weekSickParams,
+      [waitOptions[2]]: weekWellParams,
+      [waitOptions[3]]: twoMonthsParams,
     })
 
-    const visitTypeFilter = new FilterChoiceBitfieldGroup({
-      ...commonParams,
-      choices: choicesFromObject(visitTypeOptions, matchYesEstPat, matchFieldsToOptions),
-    })
-
-    const specialtyFilter = new FilterChoiceBitfieldGroup({
-      ...commonParams,
-      choices: choicesFromObject(specialtyOptions, matchYesEstPat, matchFieldsToOptions),
-    })
-
-    const testsFilter = new FilterChoiceBitfieldGroup({
-      ...commonParams,
-      choices: choicesFromObject(testsOptions, matchYesEstPat, matchFieldsToOptions),
-    })
-
-    const languageFilter = new FilterChoiceBitfieldGroup({
-      ...commonParams,
-      choices: Object.fromEntries(
-        Array.from(Object.values(languageOptions), (lang) => [
+    const languageFilter = makeFilterChoiceBitfieldGroup(
+      commonParams,
+      Object.fromEntries(
+        Array.from(languageOptions, (lang) => [
           lang,
           {
             dataFields: ['languages'],
@@ -137,8 +123,25 @@ export function useFilterLogic(
             matchingFunction: matchOptionInString,
           },
         ])
-      ),
-    })
+      )
+    )
+
+    const ageGroupFilter = makeFilterChoiceBitfieldGroup(
+      commonParams,
+      choicesFromObject(ageGroupOptions, matchYes, matchFieldsToOptions)
+    )
+    const visitTypeFilter = makeFilterChoiceBitfieldGroup(
+      commonParams,
+      choicesFromObject(visitTypeOptions, matchYesEstPat, matchFieldsToOptions)
+    )
+    const specialtyFilter = makeFilterChoiceBitfieldGroup(
+      commonParams,
+      choicesFromObject(specialtyOptions, matchYesEstPat, matchFieldsToOptions)
+    )
+    const testsFilter = makeFilterChoiceBitfieldGroup(
+      commonParams,
+      choicesFromObject(testsOptions, matchYesEstPat, matchFieldsToOptions)
+    )
 
     const filterLogicGroup = new FilterGroup({
       operation: commonParams.operation,
@@ -152,6 +155,7 @@ export function useFilterLogic(
         [filterKeys.languages]: languageFilter,
       },
     })
+
     return filterLogicGroup
   })
 
@@ -183,6 +187,27 @@ export function useFilterLogic(
         filterState.value.visitType[filter]
       )
     )
+
+    // function setAllChecked(
+    //   arr:
+    //     | AgeGroupFilter[]
+    //     | WaitTimeFilter[]
+    //     | VisitTypeFilter[]
+    //     | SpecialtyFilter[]
+    //     | TestsFilter[]
+    //     | LanguagesFilter[],
+    //   logicalFilterKey: string,
+    //   filterChipKey: keyof Pick<
+    //     PrimaryCareFilters,
+    //     'ageGroup' | 'visitType' | 'waitTime' | 'languages'
+    //   >
+    // ): void {
+    //   arr.forEach((filter) =>
+    //     filterLogic.value.childFilters[logicalFilterKey].childFilters[filter].setChecked(
+    //       filterState.value[filterChipKey][filter]
+    //     )
+    //   )
+    // }
 
     // tests
     Object.values(testsOptions).forEach((filter) =>
@@ -219,4 +244,14 @@ function choicesFromObject(
       },
     ])
   )
+}
+
+function makeFilterChoiceBitfieldGroup(
+  commonParams: Omit<IFilterChoiceBitfieldGroup, 'choices'>,
+  choices: Record<string, Omit<IFilterChoiceBitfield, 'data' | 'bufferLength'>>
+): FilterChoiceBitfieldGroup {
+  return new FilterChoiceBitfieldGroup({
+    ...commonParams,
+    choices: choices,
+  })
 }
