@@ -172,6 +172,7 @@ export type LanguagesFilter =
   | 'cambodian'
   | 'cantonese'
   | 'chinese'
+  | 'english'
   | 'fanta'
   | 'filipino'
   | 'french'

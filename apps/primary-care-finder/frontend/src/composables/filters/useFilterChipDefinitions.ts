@@ -98,6 +98,7 @@ export function useFilterChipDefinitions() {
         { text: t('languages.cambodian'), value: languageOptions.languageOption5 },
         { text: t('languages.cantonese'), value: languageOptions.languageOption6 },
         { text: t('languages.chinese'), value: languageOptions.languageOption7 },
+        { text: t('languages.english'), value: languageOptions.languageOption8 },
         { text: t('languages.fanta'), value: languageOptions.languageOption9 },
         { text: t('languages.filipino'), value: languageOptions.languageOption10 },
         { text: t('languages.french'), value: languageOptions.languageOption11 },
