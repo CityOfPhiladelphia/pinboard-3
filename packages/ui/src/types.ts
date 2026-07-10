@@ -49,6 +49,8 @@ export interface PinboardConfig {
   map?: MapConfig
   /** Where the filter chips sit on mobile: 'map' (under the search bar) or 'sheet' (in the bottom sheet). Defaults to 'sheet'. */
   mobileFilterPlacement?: 'map' | 'sheet'
+  /** Namespaces per-app browser storage (e.g. recent searches) so same-origin finders don't share it. */
+  appId?: string
 }
 
 export interface AlertBanner {

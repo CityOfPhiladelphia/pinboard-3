@@ -77,7 +77,6 @@ const emptyFilters: PrimaryCareFilters = {
     cambodian: false,
     cantonese: false,
     chinese: false,
-    english: false,
     fanta: false,
     filipino: false,
     french: false,
@@ -405,8 +404,12 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
       <LocationCard :location="asPrimaryCareLocation(location)" />
     </template>
 
-    <template #location-detail="{ location, onClose }">
-      <LocationDetail :location="asPrimaryCareLocation(location)" :on-close="onClose" />
+    <template #location-detail="{ location, onClose, onPrint }">
+      <LocationDetail
+        :location="asPrimaryCareLocation(location)"
+        :on-close="onClose"
+        :on-print="onPrint"
+      />
     </template>
 
     <template

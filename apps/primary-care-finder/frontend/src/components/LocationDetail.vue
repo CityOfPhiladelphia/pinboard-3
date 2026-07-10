@@ -3,8 +3,9 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { PrimaryCareField, PrimaryCareLocation, PrimaryCareProperties } from '@/types'
 import { PhilaButton } from '@phila/phila-ui-button'
-import { PhilaLink, Icon } from '@pinboard/ui'
+import { PhilaLink, Icon, DetailActions } from '@pinboard/ui'
 import LocationTags from './LocationTags.vue'
+import { formatFullAddress } from '@/utilities/formatAddress'
 import {
   IconClose,
   IconPhone,
@@ -18,16 +19,12 @@ import {
 const props = defineProps<{
   location: PrimaryCareLocation
   onClose: () => void
+  onPrint?: () => void
 }>()
 
 const { t, locale, messages } = useI18n()
 
-const fullAddress = computed(() => {
-  let addr = props.location.properties.address
-  if (props.location.properties.address_2) addr += ', ' + props.location.properties.address_2
-  addr += ', Philadelphia, PA ' + props.location.properties.zip_code
-  return addr
-})
+const fullAddress = computed(() => formatFullAddress(props.location.properties))
 
 function mapsUrl(): string {
   const parts = [
@@ -219,15 +216,18 @@ function translateTransitList(raw: string | null, category: string): string {
   <div class="location-detail content">
     <div class="detail-header">
       <h2>{{ location.name }}</h2>
-      <PhilaButton
-        :icon="IconClose"
-        :icon-only="true"
-        variant="standard"
-        size="small"
-        class="detail-close-btn"
-        :aria-label="t('closeDetails')"
-        @click="onClose"
-      />
+      <div class="detail-header-actions">
+        <DetailActions :on-print="onPrint" />
+        <PhilaButton
+          :icon="IconClose"
+          :icon-only="true"
+          variant="standard"
+          size="small"
+          class="detail-close-btn"
+          :aria-label="t('closeDetails')"
+          @click="onClose"
+        />
+      </div>
     </div>
 
     <div class="detail-body">
@@ -235,7 +235,7 @@ function translateTransitList(raw: string | null, category: string): string {
       <span class="has-text-label-large">{{ t('locationDetails') }}</span>
 
       <!-- Contact: phone, website, address — icon + value, no headers -->
-      <div class="detail-columns detail-zone">
+      <div class="detail-columns detail-columns--contact detail-zone">
         <div class="detail-col-left">
           <div v-if="location.properties.med_phone_num" class="icon-row">
             <Icon :icon="IconPhone" inline decorative class="row-icon" />
@@ -286,21 +286,23 @@ function translateTransitList(raw: string | null, category: string): string {
             </div>
             <div class="cell-content cell-list">
               <span v-if="location.properties.transport_bus" class="has-text-body-small">
-                {{ t('transit.bus') }}: {{ location.properties.transport_bus }}
+                <span class="transit-mode">{{ $t('transit.bus') }}:</span>
+                {{ location.properties.transport_bus }}
               </span>
               <span v-if="location.properties.transport_subway" class="has-text-body-small">
-                {{ t('transit.subway.label') }}:
+                <span class="transit-mode">{{ $t('transit.subway.label') }}:</span>
                 {{ translateTransitList(location.properties.transport_subway, 'subway') }}
               </span>
               <span v-if="location.properties.transport_train" class="has-text-body-small">
-                {{ t('transit.regRail.label') }}:
+                <span class="transit-mode">{{ $t('transit.regRail.label') }}:</span>
                 {{ translateTransitList(location.properties.transport_train, 'regRail') }}
               </span>
               <span v-if="location.properties.transport_trolley" class="has-text-body-small">
-                {{ t('transit.trolley') }}: {{ location.properties.transport_trolley }}
+                <span class="transit-mode">{{ $t('transit.trolley') }}:</span>
+                {{ location.properties.transport_trolley }}
               </span>
               <span v-if="location.properties.transport_parking" class="has-text-body-small">
-                {{ t('transit.car.label') }}:
+                <span class="transit-mode">{{ $t('transit.car.label') }}:</span>
                 {{ translateTransitList(location.properties.transport_parking, 'car') }}
               </span>
             </div>
@@ -405,6 +407,18 @@ function translateTransitList(raw: string | null, category: string): string {
   flex: 1;
 }
 
+/* Actions + close as one cluster, so the print/share buttons sit as close to
+   the ✕ as they are to each other. Pinned to the top of the header so the row
+   stays a constant distance from the top no matter how many lines the site
+   name wraps to. */
+.detail-header-actions {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
 .detail-close-btn {
   flex-shrink: 0;
 }
@@ -439,6 +453,12 @@ function translateTransitList(raw: string | null, category: string): string {
   .detail-columns {
     grid-template-columns: 1fr;
   }
+}
+
+/* The contact row (phone/website + address) keeps its two columns even on
+   mobile, so the address stays on the right instead of stacking. */
+.detail-columns--contact {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
 .detail-col-left,
@@ -498,6 +518,11 @@ function translateTransitList(raw: string | null, category: string): string {
 .cell-label {
   color: var(--Schemes-On-Surface-High);
   font-size: var(--Label-Default-font-label-default-size) !important;
+}
+
+/* Bold the transit mode prefix (e.g. "Bus:", "Subway:") before its value. */
+.transit-mode {
+  font-weight: 700;
 }
 
 .cell-list {

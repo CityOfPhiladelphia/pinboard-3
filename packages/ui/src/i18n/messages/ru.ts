@@ -12,6 +12,11 @@ export default {
     sortShareLocation: 'Поделитесь местоположением для сортировки по расстоянию',
     reset: 'Сбросить',
     apply: 'Применить',
+    print: 'Распечатать',
+    share: 'Поделись',
+    recentSearches: 'Recent searches',
+    removeRecentSearch: 'Remove',
+    copiedUrl: 'URL-адрес скопирован в буфер обмена',
     infoPage: {
       backToMap: 'Вернуться к карте',
       onThisPage: 'На этой странице',

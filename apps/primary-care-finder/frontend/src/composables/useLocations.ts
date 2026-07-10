@@ -1,4 +1,5 @@
-import { ref, type Ref, onBeforeMount } from 'vue'
+import { onBeforeMount, ref, type Ref } from 'vue'
+import { PinboardUtilities } from '@pinboard/ui'
 import type { PrimaryCareLocation, PrimaryCareResponse, PrimaryCareFeature } from '@/types'
 
 const CARTO_URL = `https://phl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM pdph_primary_care_finder WHERE "record" <> 'test'`
@@ -24,8 +25,22 @@ export function useLocations(): {
       }
 
       const geojsonData = (await response.json()) as PrimaryCareResponse
-      locations.value = geojsonData.features.map((feature) => ({
-        id: String(feature.properties.cartodb_id),
+
+      // Stable, readable id per site: slug of the name. cartodb_id churns on the daily Carto
+      // reload, so a row id makes shared/bookmarked deep-links rot. Deduped so two sites that
+      // slug identically stay unique. The map highlights by feature id, so both outputs use it.
+      const seenSlugs = new Map<string, number>()
+      const ids = geojsonData.features.map((feature: PrimaryCareFeature) => {
+        const rawName = String(feature.properties.record ?? feature.properties.address ?? '')
+        const base =
+          PinboardUtilities.slugify(rawName.replace(/^City of Philadelphia - /, '')) || 'location'
+        const n = seenSlugs.get(base) ?? 0
+        seenSlugs.set(base, n + 1)
+        return n === 0 ? base : `${base}-${n + 1}`
+      })
+
+      locations.value = geojsonData.features.map((feature: PrimaryCareFeature, i: number) => ({
+        id: ids[i],
         name: (feature.properties.record ?? feature.properties.address ?? '').replace(
           /Womens/,
           "Women's"
@@ -42,9 +57,9 @@ export function useLocations(): {
 
       geojson.value = {
         type: 'FeatureCollection' as const,
-        features: geojsonData.features.map((feature: PrimaryCareFeature) => ({
+        features: geojsonData.features.map((feature: PrimaryCareFeature, i: number) => ({
           ...feature,
-          properties: { ...feature.properties, id: String(feature.properties.cartodb_id) },
+          properties: { ...feature.properties, id: ids[i] },
         })),
       }
     } catch {

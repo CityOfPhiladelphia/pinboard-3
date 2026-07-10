@@ -1,7 +1,7 @@
 ﻿<script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Tags, Tooltip } from '@pinboard/ui'
+import { Tags, Tooltip, PinboardComposables } from '@pinboard/ui'
 import type { TagColor } from '@phila/phila-ui-tags'
 import type { IconComponent } from '@phila/phila-ui-core'
 import {
@@ -20,6 +20,10 @@ const props = defineProps<{
 }>()
 
 const { t, locale, messages } = useI18n()
+
+// Reactive clock so open/closed status re-evaluates as time passes (e.g. a site
+// closing at 5 flips to "Closed" without needing a reload).
+const clock = PinboardComposables.useNow()
 
 const DAYS = ['sun', 'mon', 'tues', 'wed', 'thurs', 'fri', 'sat'] as const
 
@@ -47,7 +51,7 @@ function formatTime(t: string): string {
 }
 
 const todaysHoursTooltip = computed<string>(() => {
-  const dayKey = DAYS[new Date().getDay()]
+  const dayKey = DAYS[clock.value.getDay()]
   const start = props.location.properties[`hours_${dayKey}_start`] as string | null
   const end = props.location.properties[`hours_${dayKey}_end`] as string | null
   if (!start || !end) return t('tags.todayClosed')
@@ -55,7 +59,7 @@ const todaysHoursTooltip = computed<string>(() => {
 })
 
 const hoursStatus = computed<'openNow' | 'closed' | 'checkHours'>(() => {
-  const now = new Date()
+  const now = clock.value
   const dayKey = DAYS[now.getDay()]
   const start = props.location.properties[`hours_${dayKey}_start`] as string | null
   const end = props.location.properties[`hours_${dayKey}_end`] as string | null
@@ -88,7 +92,7 @@ const detailTags = computed<TagConfig[]>(() => {
       ? { text: t('tags.telehealth'), color: 'purple', icon: IconVideo }
       : null,
     props.location.properties.transport_parking &&
-    /GP|PL|OS(?!T)/.test(props.location.properties.transport_parking)
+    /GP|FG|OS(?!T)/.test(props.location.properties.transport_parking)
       ? { text: t('tags.parking'), color: 'blue', icon: IconCar }
       : null,
     props.location.properties.special_pharmacy === 'Yes'
@@ -98,14 +102,19 @@ const detailTags = computed<TagConfig[]>(() => {
       ? { text: t('tags.weekendHours'), color: 'blue', icon: IconClock }
       : null,
     props.location.properties.evening_hrs === 'Yes'
-      ? { text: t('tags.openAfter6'), color: 'blue', icon: IconClock }
+      ? {
+          text: t('tags.eveningHours'),
+          color: 'blue',
+          icon: IconClock,
+          tooltip: t('tags.openAfter6'),
+        }
       : null,
   ]
   return candidates.filter((t): t is TagConfig => t !== null)
 })
 
 const todaysException = computed<string | undefined>(() => {
-  const dayKey = DAYS[new Date().getDay()]
+  const dayKey = DAYS[clock.value.getDay()]
   const exc = props.location.properties[`hours_${dayKey}_exceptions`] as string | null
   if (!exc) return undefined
   const msgs = messages.value[locale.value] as Record<string, Record<string, string>>
@@ -113,7 +122,7 @@ const todaysException = computed<string | undefined>(() => {
 })
 
 const cardTags = computed<TagConfig[]>(() => {
-  const now = new Date()
+  const now = clock.value
   const dayKey = DAYS[now.getDay()]
   const todayEnd = props.location.properties[`hours_${dayKey}_end`] as string | null
 
@@ -141,7 +150,12 @@ const cardTags = computed<TagConfig[]>(() => {
       ? { text: t('tags.weekendHours'), color: 'blue', icon: IconClock }
       : null,
     !!todayEnd && todayEnd >= '18:00:00'
-      ? { text: t('tags.openAfter6'), color: 'blue', icon: IconClock }
+      ? {
+          text: t('tags.eveningHours'),
+          color: 'blue',
+          icon: IconClock,
+          tooltip: t('tags.openAfter6'),
+        }
       : null,
   ]
 

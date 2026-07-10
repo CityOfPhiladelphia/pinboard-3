@@ -6,6 +6,7 @@ export default {
     checkHours: '查看营业时间',
     weekendHours: '周末营业时间',
     openAfter6: '晚上6点后营业',
+    eveningHours: '晚间营业时间',
     walkIns: '无需预约',
     telehealth: '远程医疗',
     parking: '现场停车',
@@ -16,7 +17,7 @@ export default {
     todayClosed: '今天：已关闭',
     todayHours: '今天：{range}',
   },
-  providerWebsite: '健康中心网站',
+  providerWebsite: '网站',
   website: '网站',
   hours: '时间',
   languagesSpoken: '工作人员使用的语言',
@@ -277,8 +278,8 @@ export default {
     'Exclusively serves adolescents and young adults (ages 13-26).':
       '仅为青少年和青年（13-26岁）提供服务。',
     'Exclusively serves people living with HIV.': '仅为艾滋病病毒感染者提供服务。',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      '仅为费城拉丁裔移民社区中没有医疗保险的成员提供服务。不提供就业体检。为儿童提供的服务仅限于牙科、眼科和心理健康。',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      '仅为费城拉丁裔移民社区中没有医疗保险的成员提供服务。不提供就业体检。为儿童提供的服务仅限于眼科和心理健康。',
     'Services for children are limited to dental, mental health, and vaccines.':
       '为儿童提供的服务仅限于牙科、心理健康和疫苗接种。',
     'Special focus on LGBTQ+ ': '特别关注 LGBTQ+',

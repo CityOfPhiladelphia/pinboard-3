@@ -172,7 +172,6 @@ export type LanguagesFilter =
   | 'cambodian'
   | 'cantonese'
   | 'chinese'
-  | 'english'
   | 'fanta'
   | 'filipino'
   | 'french'
@@ -253,7 +252,6 @@ export interface PrimaryCareFilters extends FilterValues {
     cambodian: boolean
     cantonese: boolean
     chinese: boolean
-    english: boolean
     fanta: boolean
     filipino: boolean
     french: boolean
