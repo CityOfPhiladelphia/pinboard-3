@@ -202,7 +202,7 @@ export function useFilterLogic(
 }
 
 function choicesFromObject(
-  obj: Object,
+  obj: object,
   matches: string[],
   matchingFunction: MatchingFunction
 ): Record<string, Omit<IFilterChoiceBitfield, 'data' | 'bufferLength'>> {
