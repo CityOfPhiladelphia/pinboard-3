@@ -313,35 +313,36 @@ const sortMode: ComputedRef<SortMode> = computed(() => {
 })
 
 const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
-  if (geojson.value?.features) {
-    let result = filterLogicalValue.value.length
-      ? applyFilters(geojson.value.features, filterLogicalValue.value)
-      : geojson.value.features
-
-    if (keywordsForSearch.value) {
-      const terms = keywordsForSearch.value
-        .replace(/[!-/:-@[-`{-~]/g, ' ')
-        .toLocaleLowerCase()
-        .split(' ')
-        .filter(Boolean)
-      result = result.filter((loc, i) => {
-        const haystack = JSON.stringify(Object.values(loc.properties)).toLocaleLowerCase()
-        return terms.some((term) => {
-          const keywordBits =
-            keywordToFilterMap.value?.[term] &&
-            keywordToFilterMap.value[term][Math.floor(i / 32)] &
-              (1 << Math.floor(i % 32))
-          return haystack.includes(term) || keywordBits
-        })
-      })
-    }
-
-    return {
-      type: 'FeatureCollection',
-      features: result,
-    }
+  if (!(geojson.value && geojson.value?.features)) {
+    return undefined
   }
-  return undefined
+
+  let result = filterLogicalValue.value.length
+    ? applyFilters(geojson.value.features, filterLogicalValue.value)
+    : geojson.value.features
+
+  if (keywordsForSearch.value) {
+    const terms = keywordsForSearch.value
+      .replace(/[!-/:-@[-`{-~]/g, ' ')
+      .toLocaleLowerCase()
+      .split(' ')
+      .filter(Boolean)
+    result = result.filter((loc) => {
+      const haystack = JSON.stringify(Object.values(loc.properties)).toLocaleLowerCase()
+      return terms.some((term) => {
+        const keywordBits = geojson.value ?
+          keywordToFilterMap.value?.[term] &&
+          keywordToFilterMap.value[term][Math.floor(geojson.value.features.indexOf(loc) / 32)] &
+            (1 << Math.floor(geojson.value.features.indexOf(loc)  % 32)) : 0
+        return haystack.includes(term) || keywordBits
+      })
+    })
+  }
+
+  return {
+    type: 'FeatureCollection',
+    features: result,
+  }
 })
 
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
@@ -355,13 +356,15 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
       .toLocaleLowerCase()
       .split(' ')
       .filter(Boolean)
-    result = result.filter((loc, i) => {
+    result = result.filter((loc) => {
       const haystack = JSON.stringify(Object.values(loc.properties)).toLocaleLowerCase()
       return terms.some((term) => {
         const keywordBits =
           keywordToFilterMap.value?.[term] &&
-          keywordToFilterMap.value[term][Math.floor(i / 32)] &
-            (1 << Math.floor(i % 32))
+          keywordToFilterMap.value[term][
+            Math.floor(locationsWithDistance.value.indexOf(loc) / 32)
+          ] &
+            (1 << Math.floor(locationsWithDistance.value.indexOf(loc) % 32))
         return haystack.includes(term) || keywordBits
       })
     })
@@ -369,8 +372,6 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
 
   return filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
 })
-
-
 
 function handleSearchSubmit(locationSearchString: string) {
   switch (true) {
