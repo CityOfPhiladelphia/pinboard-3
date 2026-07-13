@@ -38,6 +38,7 @@ class FilterChoiceBitfieldGroup {
   private operation: BitWiseOperation
   private bufferLength: number
   private checked: boolean = false
+
   constructor(params: IFilterChoiceBitfieldGroup) {
     this.operation = params.operation
     this.bufferLength = params.bufferLength
@@ -88,6 +89,7 @@ class FilterGroup {
   private operation: BitWiseOperation
   private bufferLength: number
   private checked: boolean = false
+
   constructor(params: IFilterGroup) {
     this.operation = params.operation
     this.childFilters = params.childFilters
