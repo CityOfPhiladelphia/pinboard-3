@@ -100,7 +100,100 @@ onBeforeUnmount(() => {
     :feedback-href="feedbackHref"
     @update:locale="setLocale"
   >
+<<<<<<< HEAD
     <RouterView />
+=======
+    <template #info-body>
+      <span class="has-text-body-small">
+        This tool helps Philadelphia residents find free and low-cost primary care providers near
+        them. Search by location, filter by services, and view details like hours, transit options,
+        and available tests.
+      </span>
+    </template>
+
+    <PinboardBody
+      v-model:filter-values="filterValues"
+      :locations="filteredLocations"
+      :search-or-user-location="userLocation"
+      :is-loading="isLoading"
+      :error-message="errorMessage"
+      :location-panel-search="searchPlaceholderText"
+      :geojson="geojson"
+      :is-mobile="isMobile"
+      :filters="filterDefinitions"
+      @search="handleSearchSubmit"
+    >
+      <template #location-card="{ location }">
+        <LocationCard :location="location" />
+      </template>
+
+      <template #location-detail="{ location, onClose }">
+        <LocationDetail :location="asPrimaryCareLocation(location)" :on-close="onClose" />
+      </template>
+
+      <template
+        #map-content="{
+          geojson,
+          hoveredId,
+          selectedId,
+          mobileControlsTarget,
+          onHover,
+          onHoverEnd,
+          onSelect,
+        }"
+      >
+        <MapNavigationControl v-if="!isMobile" position="bottom-right" />
+        <BasemapToggle
+          position="top-right"
+          :teleport-to="isMobile ? mobileControlsTarget : undefined"
+        />
+        <!-- No @error handler by design: GeolocationButton shows its own callout
+             when location is blocked; other geolocation errors are non-blocking
+             since the finder works without location. -->
+        <GeolocationButton
+          position="bottom-right"
+          :teleport-to="isMobile ? mobileControlsTarget : undefined"
+          @located="handleGeolocate"
+        />
+
+        <CircleLayer
+          v-if="geojson"
+          id="locations"
+          :source="{ type: 'geojson', data: toRaw(geojson) as any }"
+          :paint="{
+            'circle-radius': [
+              'case',
+              ['==', ['get', 'id'], selectedId ?? ''],
+              12,
+              ['==', ['get', 'id'], hoveredId ?? ''],
+              10,
+              7,
+            ],
+            'circle-color': [
+              'case',
+              ['==', ['get', 'id'], selectedId ?? ''],
+              '#0D47A1',
+              ['==', ['get', 'id'], hoveredId ?? ''],
+              '#1976D2',
+              '#1976D2',
+            ],
+            'circle-stroke-color': '#ffffff',
+            'circle-stroke-width': 2,
+          }"
+          @mouseenter="(e: any) => onHover(e.features?.[0]?.properties?.id)"
+          @mouseleave="onHoverEnd"
+          @click="
+            (e: any) => {
+              const feature = e.features?.[0]
+              if (!feature) return
+              const loc = locationsWithDistance.find((l) => l.id === feature.properties?.id)
+              if (loc) onSelect(loc)
+            }
+          "
+        />
+      </template>
+    </PinboardBody>
+>>>>>>> 8936801 (removes console.log if error occurs, leaves note about reasoning)
   </PinboardShell>
 
   <Teleport to="body">

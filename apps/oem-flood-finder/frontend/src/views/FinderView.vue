@@ -165,10 +165,6 @@ function handleGeolocate(data: { latitude: number; longitude: number; accuracy: 
   userLocation.value = { latitude: data.latitude, longitude: data.longitude }
 }
 
-function handleGeolocateError(error: Error | GeolocationPositionError) {
-  console.log(error)
-}
-
 function asOemLocation(location: PinboardTypes.BasicLocation) {
   return location as OemLocation
 }
@@ -210,12 +206,14 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
     >
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />
       <BasemapToggle position="top-right" :teleport-to="isMobile ? mobileControlsTarget : null" />
+      <!-- No @error handler by design: GeolocationButton shows its own callout
+           when location is blocked; other geolocation errors are non-blocking
+           since the finder works without location. -->
       <GeolocationButton
         :position="isMobile ? 'top-right' : 'bottom-right'"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
         :show-location-marker="false"
         @located="handleGeolocate"
-        @error="handleGeolocateError"
       />
 
       <FillLayer
