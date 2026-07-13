@@ -330,10 +330,11 @@ const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
     result = result.filter((loc) => {
       const haystack = JSON.stringify(Object.values(loc.properties)).toLocaleLowerCase()
       return terms.some((term) => {
-        const keywordBits = geojson.value ?
-          keywordToFilterMap.value?.[term] &&
-          keywordToFilterMap.value[term][Math.floor(geojson.value.features.indexOf(loc) / 32)] &
-            (1 << Math.floor(geojson.value.features.indexOf(loc)  % 32)) : 0
+        const keywordBits = geojson.value
+          ? keywordToFilterMap.value?.[term] &&
+            keywordToFilterMap.value[term][Math.floor(geojson.value.features.indexOf(loc) / 32)] &
+              (1 << Math.floor(geojson.value.features.indexOf(loc) % 32))
+          : 0
         return haystack.includes(term) || keywordBits
       })
     })
