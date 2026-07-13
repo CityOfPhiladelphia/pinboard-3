@@ -12,7 +12,7 @@ import {
   PinboardComposables,
   PinboardUtilities,
   Callout,
-  shiftLeft,
+  applyFilters,
 } from '@pinboard/ui'
 import type { FilterValues, PinboardTypes } from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
@@ -22,6 +22,7 @@ import LocationCard from '@/components/LocationCard.vue'
 import LocationDetail from '@/components/LocationDetail.vue'
 import { IconLocationDot } from '@phila/phila-ui-core/icons'
 import type {
+  PrimaryCareFilterLogic,
   PrimaryCareFilters,
   PrimaryCareLocation,
   PrimaryCareResponse,
@@ -76,6 +77,7 @@ const emptyFilters: PrimaryCareFilters = {
     cambodian: false,
     cantonese: false,
     chinese: false,
+    english: false,
     fanta: false,
     filipino: false,
     french: false,
@@ -140,7 +142,154 @@ const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
 )
 const filterState = ref<PrimaryCareFilters>(emptyFilters)
 
-const { filterLogicalValue } = useFilterLogic(locations, filterState)
+const { filterLogicalValue, filterLogic } = useFilterLogic(locations, filterState)
+
+const keywordToFilterMap = computed(() => {
+  const logicalValues = filterLogic.value as unknown as PrimaryCareFilterLogic
+  const keywordMap: Record<string, Uint32Array> = {
+    [t('ageRange.adult').toLocaleLowerCase()]:
+      logicalValues.childFilters.ageGroup.childFilters.adult.getBitfield(),
+    [t('ageRange.adults').toLocaleLowerCase()]:
+      logicalValues.childFilters.ageGroup.childFilters.adult.getBitfield(),
+    [t('ageRange.child').toLocaleLowerCase()]:
+      logicalValues.childFilters.ageGroup.childFilters.children.getBitfield(),
+    [t('ageRange.children').toLocaleLowerCase()]:
+      logicalValues.childFilters.ageGroup.childFilters.children.getBitfield(),
+    [t('tests.blood').toLocaleLowerCase()]:
+      logicalValues.childFilters.tests.childFilters.blood.getBitfield(),
+    [t('tests.covid').toLocaleLowerCase()]:
+      logicalValues.childFilters.tests.childFilters.covid.getBitfield(),
+    [t('tests.sti').toLocaleLowerCase()]:
+      logicalValues.childFilters.tests.childFilters.sti.getBitfield(),
+    [t('tests.mammo').toLocaleLowerCase()]:
+      logicalValues.childFilters.tests.childFilters.mammo.getBitfield(),
+    [t('tests.xray').toLocaleLowerCase()]:
+      logicalValues.childFilters.tests.childFilters.xray.getBitfield(),
+    [t('specialty.dental').toLocaleLowerCase()]:
+      logicalValues.childFilters.specialty.childFilters.dental.getBitfield(),
+    [t('specialty.eye').toLocaleLowerCase()]:
+      logicalValues.childFilters.specialty.childFilters.eye.getBitfield(),
+    [t('specialty.mat').toLocaleLowerCase()]:
+      logicalValues.childFilters.specialty.childFilters.mat.getBitfield(),
+    [t('specialty.mental').toLocaleLowerCase()]:
+      logicalValues.childFilters.specialty.childFilters.mental.getBitfield(),
+    [t('specialty.nutrition').toLocaleLowerCase()]:
+      logicalValues.childFilters.specialty.childFilters.nutrition.getBitfield(),
+    [t('specialty.pharmacy').toLocaleLowerCase()]:
+      logicalValues.childFilters.specialty.childFilters.pharmacy.getBitfield(),
+    [t('specialty.podiatry').toLocaleLowerCase()]:
+      logicalValues.childFilters.specialty.childFilters.podiatry.getBitfield(),
+    [t('specialty.tobacco').toLocaleLowerCase()]:
+      logicalValues.childFilters.specialty.childFilters.tobacco.getBitfield(),
+    [t('visitType.prenatal').toLocaleLowerCase()]:
+      logicalValues.childFilters.visitType.childFilters.primaryPrenatal.getBitfield(),
+    [t('visitType.sick').toLocaleLowerCase()]:
+      logicalValues.childFilters.visitType.childFilters.primarySick.getBitfield(),
+    [t('visitType.sports').toLocaleLowerCase()]:
+      logicalValues.childFilters.visitType.childFilters.primarySports.getBitfield(),
+    [t('visitType.telehealth').toLocaleLowerCase()]:
+      logicalValues.childFilters.visitType.childFilters.primaryTelehealth.getBitfield(),
+    [t('visitType.vaccine').toLocaleLowerCase()]:
+      logicalValues.childFilters.visitType.childFilters.primaryVaccines.getBitfield(),
+    [t('visitType.well').toLocaleLowerCase()]:
+      logicalValues.childFilters.visitType.childFilters.primaryWell.getBitfield(),
+    [t('visitType.women').toLocaleLowerCase()]:
+      logicalValues.childFilters.visitType.childFilters.primaryWomen.getBitfield(),
+    [t('waitTime.walkIn').toLocaleLowerCase()]:
+      logicalValues.childFilters.waitTime.childFilters.sameDay.getBitfield(),
+    [t('waitTime.oneWeekWell').toLocaleLowerCase()]:
+      logicalValues.childFilters.waitTime.childFilters.twoMonths.getBitfield(),
+    [t('waitTime.oneWeekSick').toLocaleLowerCase()]:
+      logicalValues.childFilters.waitTime.childFilters.weekSick.getBitfield(),
+    [t('waitTime.twoMonths').toLocaleLowerCase()]:
+      logicalValues.childFilters.waitTime.childFilters.weekWell.getBitfield(),
+    [t('languages.amharic').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.amharic.getBitfield(),
+    [t('languages.arabic').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.arabic.getBitfield(),
+    [t('languages.asl').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.asl.getBitfield(),
+    [t('languages.bengali').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.bengali.getBitfield(),
+    [t('languages.burmese').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.burmese.getBitfield(),
+    [t('languages.cambodian').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.cambodian.getBitfield(),
+    [t('languages.cantonese').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.cantonese.getBitfield(),
+    [t('languages.chinese').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.chinese.getBitfield(),
+    [t('languages.english').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.english.getBitfield(),
+    [t('languages.fanta').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.fanta.getBitfield(),
+    [t('languages.filipino').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.filipino.getBitfield(),
+    [t('languages.french').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.french.getBitfield(),
+    [t('languages.frenchcreole').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.frenchcreole.getBitfield(),
+    [t('languages.fula').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.fula.getBitfield(),
+    [t('languages.gujarati').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.gujarati.getBitfield(),
+    [t('languages.haitiancreole').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.haitiancreole.getBitfield(),
+    [t('languages.hebrew').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.hebrew.getBitfield(),
+    [t('languages.hindi').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.hindi.getBitfield(),
+    [t('languages.indonesian').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.indonesian.getBitfield(),
+    [t('languages.karen').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.karen.getBitfield(),
+    [t('languages.khmer').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.khmer.getBitfield(),
+    [t('languages.kinyarwanda').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.kinyarwanda.getBitfield(),
+    [t('languages.kirundi').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.kirundi.getBitfield(),
+    [t('languages.koloqua').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.koloqua.getBitfield(),
+    [t('languages.korean').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.korean.getBitfield(),
+    [t('languages.lebanese').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.lebanese.getBitfield(),
+    [t('languages.malayalam').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.malayalam.getBitfield(),
+    [t('languages.malaysian').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.malaysian.getBitfield(),
+    [t('languages.mandarin').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.mandarin.getBitfield(),
+    [t('languages.nepali').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.nepali.getBitfield(),
+    [t('languages.portuguese').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.portuguese.getBitfield(),
+    [t('languages.punjabi').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.punjabi.getBitfield(),
+    [t('languages.shanghainese').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.shanghainese.getBitfield(),
+    [t('languages.sinhalese').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.sinhalese.getBitfield(),
+    [t('languages.spanish').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.spanish.getBitfield(),
+    [t('languages.swahili').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.swahili.getBitfield(),
+    [t('languages.tagalog').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.tagalog.getBitfield(),
+    [t('languages.taiwanese').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.taiwanese.getBitfield(),
+    [t('languages.telugu').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.telugu.getBitfield(),
+    [t('languages.urdu').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.urdu.getBitfield(),
+    [t('languages.vietnamese').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.vietnamese.getBitfield(),
+    [t('languages.yoruba').toLocaleLowerCase()]:
+      logicalValues.childFilters.languages.childFilters.yoruba.getBitfield(),
+  }
+  return keywordMap
+})
 
 const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   const { latitude, longitude } = userLocation.value
@@ -159,75 +308,71 @@ const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   }))
 })
 
-const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
-  if (geojson.value?.features) {
-    let result = filterLogicalValue.value.length
-      ? applyFilters(geojson.value.features)
-      : geojson.value.features
-
-    if (keywordsForSearch.value) {
-      const terms = keywordsForSearch.value
-        .replace(/\W+/g, ' ')
-        .toLowerCase()
-        .split(' ')
-        .filter(Boolean)
-      result = result.filter((loc) => {
-        const haystack = JSON.stringify(Object.values(loc.properties)).toLowerCase()
-        return terms.some((term) => haystack.includes(term))
-      })
-    }
-
-    return {
-      type: 'FeatureCollection',
-      features: result,
-    }
-  }
-  return undefined
-})
-
 const sortMode: ComputedRef<SortMode> = computed(() => {
   return filterState.value.sort.name ? 'name' : filterState.value.sort.distance ? 'distance' : ''
 })
 
+const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
+  if (!(geojson.value && geojson.value?.features)) {
+    return undefined
+  }
+
+  let result = filterLogicalValue.value.length
+    ? applyFilters(geojson.value.features, filterLogicalValue.value)
+    : geojson.value.features
+
+  if (keywordsForSearch.value) {
+    const terms = keywordsForSearch.value
+      .replace(/[!-/:-@[-`{-~]/g, ' ')
+      .toLocaleLowerCase()
+      .split(' ')
+      .filter(Boolean)
+    result = result.filter((loc) => {
+      const haystack = JSON.stringify(Object.values(loc.properties)).toLocaleLowerCase()
+      return terms.some((term) => {
+        const keywordBits = geojson.value
+          ? keywordToFilterMap.value?.[term] &&
+            keywordToFilterMap.value[term][Math.floor(geojson.value.features.indexOf(loc) / 32)] &
+              (1 << Math.floor(geojson.value.features.indexOf(loc) % 32))
+          : 0
+        return haystack.includes(term) || keywordBits
+      })
+    })
+  }
+
+  return {
+    type: 'FeatureCollection',
+    features: result,
+  }
+})
+
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
   let result = filterLogicalValue.value.length
-    ? applyFilters(locationsWithDistance.value)
+    ? applyFilters(locationsWithDistance.value, filterLogicalValue.value)
     : locationsWithDistance.value
 
   if (keywordsForSearch.value) {
     const terms = keywordsForSearch.value
-      .replace(/\W+/g, ' ')
-      .toLowerCase()
+      .replace(/[!-/:-@[-`{-~]/g, ' ')
+      .toLocaleLowerCase()
       .split(' ')
       .filter(Boolean)
     result = result.filter((loc) => {
-      const haystack = JSON.stringify(Object.values(loc.properties)).toLowerCase()
-      return terms.some((term) => haystack.includes(term))
+      const haystack = JSON.stringify(Object.values(loc.properties)).toLocaleLowerCase()
+      return terms.some((term) => {
+        const keywordBits =
+          keywordToFilterMap.value?.[term] &&
+          keywordToFilterMap.value[term][
+            Math.floor(locationsWithDistance.value.indexOf(loc) / 32)
+          ] &
+            (1 << Math.floor(locationsWithDistance.value.indexOf(loc) % 32))
+        return haystack.includes(term) || keywordBits
+      })
     })
   }
 
   return filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
 })
-
-function applyFilters<T>(arr: T[]): T[] {
-  const shiftDirection = shiftLeft()
-  const filtered: T[] = []
-  let checkBit = 1
-  let offset = 0
-  arr.forEach((item) => {
-    if (checkBit & filterLogicalValue.value[offset]) {
-      filtered.push(item)
-    }
-
-    if (checkBit & 0x8000_0000) {
-      checkBit = 1
-      offset++
-    } else {
-      checkBit = shiftDirection ? checkBit << 1 : checkBit >> 1
-    }
-  })
-  return filtered
-}
 
 function handleSearchSubmit(locationSearchString: string) {
   switch (true) {

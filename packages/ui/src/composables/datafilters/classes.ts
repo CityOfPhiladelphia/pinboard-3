@@ -6,7 +6,7 @@ import type {
   IFilterGroup,
 } from './types'
 
-export class FilterChoiceBitfield {
+class FilterChoiceBitfield {
   private bitfield: Uint32Array
   private checked: boolean = false
 
@@ -34,10 +34,11 @@ export class FilterChoiceBitfield {
 }
 
 class FilterChoiceBitfieldGroup {
-  childFilters: Record<string, FilterChoiceBitfield> = {}
+  private childFilters: Record<string, FilterChoiceBitfield> = {}
   private operation: BitWiseOperation
   private bufferLength: number
   private checked: boolean = false
+
   constructor(params: IFilterChoiceBitfieldGroup) {
     this.operation = params.operation
     this.bufferLength = params.bufferLength
@@ -50,6 +51,10 @@ class FilterChoiceBitfieldGroup {
         matchingFunction: choice[1].matchingFunction,
       })
     })
+  }
+
+  getChildFilter(filterName: string) {
+    return this.childFilters[filterName]
   }
 
   getChecked() {
@@ -80,14 +85,19 @@ class FilterChoiceBitfieldGroup {
 }
 
 class FilterGroup {
-  childFilters: Record<string, FilterChoiceBitfieldGroup | FilterGroup>
+  private childFilters: Record<string, FilterChoiceBitfieldGroup | FilterGroup>
   private operation: BitWiseOperation
   private bufferLength: number
   private checked: boolean = false
+
   constructor(params: IFilterGroup) {
     this.operation = params.operation
     this.childFilters = params.childFilters
     this.bufferLength = params.bufferLength
+  }
+
+  getChildFilter(filterName: string) {
+    return this.childFilters[filterName]
   }
 
   getBufferLength() {
@@ -122,4 +132,4 @@ class FilterGroup {
   }
 }
 
-export { FilterChoiceBitfieldGroup, FilterGroup }
+export { FilterChoiceBitfieldGroup, FilterGroup, FilterChoiceBitfield }

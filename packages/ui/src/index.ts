@@ -5,14 +5,13 @@ export * as PinboardComposables from './composables/_index'
 export * as PinboardUtilities from './utilities/_index'
 export { createPinboardRouter } from './router/createPinboardRouter'
 export type * as PinboardTypes from './types'
-export type {
-  BitWiseOperation,
-  MatchingFunction,
-  IFilterChoiceBitfieldGroup,
-  IFilterGroup,
-} from './composables/datafilters/types'
-export { getBufferSize, shiftLeft } from './composables/datafilters/functions'
-export { FilterChoiceBitfieldGroup, FilterGroup } from './composables/datafilters/classes'
+export type * from './composables/datafilters/types'
+export { getBufferSize, applyFilters } from './composables/datafilters/functions'
+export {
+  FilterChoiceBitfieldGroup,
+  FilterGroup,
+  FilterChoiceBitfield,
+} from './composables/datafilters/classes'
 export type * as PinboardFilterTypes from './composables/datafilters/types'
 
 // Re-export map-core layer components so apps use the same MapLibre instance as PhilaMap

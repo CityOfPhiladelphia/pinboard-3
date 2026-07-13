@@ -1,7 +1,7 @@
 ﻿<script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { PrimaryCareField, PrimaryCareLocation } from '@/types'
+import type { PrimaryCareField, PrimaryCareLocation, PrimaryCareProperties } from '@/types'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { PhilaLink, Icon, DetailActions } from '@pinboard/ui'
 import LocationTags from './LocationTags.vue'
@@ -24,9 +24,7 @@ const props = defineProps<{
 
 const { t, locale, messages } = useI18n()
 
-const p = computed(() => props.location.properties)
-
-const fullAddress = computed(() => formatFullAddress(p.value))
+const fullAddress = computed(() => formatFullAddress(props.location.properties))
 
 function mapsUrl(): string {
   const parts = [
@@ -56,6 +54,28 @@ const ALL_SERVICES: [string, PrimaryCareField[]][] = [
   ['specialty.pharmacy', ['special_pharmacy']],
 ]
 
+// const keywordsTranslated = computed(() => {
+//   const unique = new Set([
+//     patientsServedText.value,
+//     ...languagesSpoken.value.map(translateLanguage),
+//     ...DAYS.flatMap((day) => getExceptionText(day)).filter(Boolean),
+//     ...newPatientServices.value.flatMap((item) => t(item).replace(/[!-/:-@[-`{-~]/g, ' ').split(/\s+/)),
+//     ...existingOnlyServices.value.flatMap((item) => t(item).replace(/[!-/:-@[-`{-~]/g, ' ').split(/\s+/)),
+//     ...props.location.properties.transport_parking ? [translateTransitList(props.location.properties.transport_parking, 'car'), t('transit.car.label')] : [],
+//     ...props.location.properties.transport_bus ? [props.location.properties.transport_bus, t('transit.bus')] : [],
+//     ...props.location.properties.transport_trolley ? [props.location.properties.transport_trolley, t('transit.trolley')] : [],
+//     ...props.location.properties.transport_subway ? [translateTransitList(props.location.properties.transport_subway, 'subway'), t('transit.subway.label')] : [],
+//     ...props.location.properties.transport_train ? [translateTransitList(props.location.properties.transport_train, 'regRail'), t('transit.regRail.label')] : [],
+//     translateWarning(props.location.properties.optional_info_general ?? ''),
+//   ].flatMap((item) =>
+//     item
+//       .toLocaleLowerCase()
+//       .replace(/[!-/:-@[-`{-~]/g, ' ')
+//       .split(/\s+/)
+//   ))
+//   return [...unique].filter(Boolean)
+// })
+
 // Services available to new patients or walk-ins (any field is "Yes")
 const newPatientServices = computed<string[]>(() =>
   ALL_SERVICES.filter(([, fields]) =>
@@ -72,22 +92,15 @@ const existingOnlyServices = computed<string[]>(() =>
   ).map(([label]) => label)
 )
 
-// Age groups served — mirrors the age-group filter (adults/children === 'Yes').
-const ageGroupServed = computed<string | null>(() => {
-  const servesAdults = p.value.adults === 'Yes'
-  const servesChildren = p.value.children === 'Yes'
-  if (servesAdults && servesChildren) return t('ageRange.servesBoth')
-  if (servesAdults) return t('ageRange.servesAdults')
-  if (servesChildren) return t('ageRange.servesChildren')
-  return null
-})
-
 // One flowing line: the age groups served, then the caveat, as a single sentence.
 const patientsServedText = computed<string>(() => {
-  const parts: string[] = []
-  if (ageGroupServed.value) parts.push(ageGroupServed.value)
-  if (p.value.caveat_ad_ch) parts.push(translateCaveat(p.value.caveat_ad_ch))
-  return parts.join(' ')
+  const servesAdults = props.location.properties.adults === 'Yes' ? t('ageRange.servesAdults') : ''
+  const servesChildren =
+    props.location.properties.children === 'Yes' ? t('ageRange.servesChildren') : ''
+  const agesServed =
+    servesAdults && servesChildren ? t('ageRange.servesBoth') : servesAdults || servesChildren
+  const text = `${agesServed}${props.location.properties.caveat_ad_ch ? ` ${translateCaveat(props.location.properties.caveat_ad_ch)}` : ''}`
+  return text
 })
 
 // --- Hours ---
@@ -120,25 +133,22 @@ function parseTime(raw: string | null): string {
   return mStr === '00' ? `${h}\u00A0${ampm}` : `${h}:${mStr}\u00A0${ampm}`
 }
 
-function getExceptionText(day: string): string | null {
-  const exc = exceptionsByDay.value[day]
-  if (!exc) return null
+function getExceptionText(day: string): string {
+  const exc = exceptionsByDay.value[day] ? exceptionsByDay.value[day].replace(/^\*|\s+$/g, '') : ''
   const msgs = messages.value[locale.value] as Record<string, Record<string, string>>
-  return msgs?.exceptions?.[exc] ?? exc
+  return exc ? msgs?.exceptions?.[exc] : exc
 }
 
 function parseTimeRange(day: string): string {
-  const props = p.value as unknown as Record<string, string | null>
-  const start = props[`hours_${day}_start`]
-  const end = props[`hours_${day}_end`]
-  let val: string
-  if (start && end) {
-    val = parseTime(start) + '\u00A0–\u00A0' + parseTime(end)
-  } else {
-    val = t('closed')
-  }
-  if (exceptionsByDay.value[day]) val += '*'
-  return val
+  const start = props.location.properties[`hours_${day}_start` as keyof PrimaryCareProperties]
+  const end = props.location.properties[`hours_${day}_end` as keyof PrimaryCareProperties]
+  const val =
+    start && end
+      ? parseTime(start ? String(start) : null) +
+        '\u00A0–\u00A0' +
+        parseTime(end ? String(end) : null)
+      : t('closed')
+  return exceptionsByDay.value[day] ? val + '*' : val
 }
 
 // --- Tests ---
@@ -177,11 +187,11 @@ function translateCaveat(caveat: string): string {
 // --- Transit helpers ---
 const hasTransit = computed(() =>
   Boolean(
-    p.value.transport_bus ||
-    p.value.transport_subway ||
-    p.value.transport_train ||
-    p.value.transport_trolley ||
-    p.value.transport_parking
+    props.location.properties.transport_bus ||
+    props.location.properties.transport_subway ||
+    props.location.properties.transport_train ||
+    props.location.properties.transport_trolley ||
+    props.location.properties.transport_parking
   )
 )
 
@@ -222,21 +232,26 @@ function translateTransitList(raw: string | null, category: string): string {
 
     <div class="detail-body">
       <LocationTags :location="location" detail />
-      <span class="has-text-label-large">{{ $t('locationDetails') }}</span>
+      <span class="has-text-label-large">{{ t('locationDetails') }}</span>
 
       <!-- Contact: phone, website, address — icon + value, no headers -->
       <div class="detail-columns detail-columns--contact detail-zone">
         <div class="detail-col-left">
-          <div v-if="p.med_phone_num" class="icon-row">
+          <div v-if="location.properties.med_phone_num" class="icon-row">
             <Icon :icon="IconPhone" inline decorative class="row-icon" />
-            <PhilaLink :href="`tel:${p.med_phone_num}`" size="small">
-              {{ p.med_phone_num }}
+            <PhilaLink :href="`tel:${location.properties.med_phone_num}`" size="small">
+              {{ location.properties.med_phone_num }}
             </PhilaLink>
           </div>
-          <div v-if="p.url_appt" class="icon-row">
+          <div v-if="location.properties.url_appt" class="icon-row">
             <Icon :icon="IconGlobe" inline decorative class="row-icon" />
-            <PhilaLink :href="p.url_appt" size="small" target="_blank" rel="noopener noreferrer">
-              {{ $t('providerWebsite') }}
+            <PhilaLink
+              :href="location.properties.url_appt"
+              size="small"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {{ t('providerWebsite') }}
             </PhilaLink>
           </div>
         </div>
@@ -256,7 +271,7 @@ function translateTransitList(raw: string | null, category: string): string {
           <div v-if="languagesSpoken.length" class="detail-cell">
             <div class="cell-header">
               <Icon :icon="IconLanguage" inline decorative class="row-icon" />
-              <span class="has-text-label-small cell-label">{{ $t('languages.category') }}</span>
+              <span class="has-text-label-small cell-label">{{ t('languages.category') }}</span>
             </div>
             <span class="has-text-body-small">
               {{ languagesSpoken.map(translateLanguage).join(', ') }}
@@ -267,7 +282,7 @@ function translateTransitList(raw: string | null, category: string): string {
           <div v-if="hasTransit" class="detail-cell">
             <div class="cell-header">
               <Icon :icon="IconBus" inline decorative class="row-icon" />
-              <span class="has-text-label-small cell-label">{{ $t('transitOptions') }}</span>
+              <span class="has-text-label-small cell-label">{{ t('transitOptions') }}</span>
             </div>
             <div class="cell-content cell-list">
               <span v-if="location.properties.transport_bus" class="has-text-body-small">
@@ -299,12 +314,12 @@ function translateTransitList(raw: string | null, category: string): string {
       <div class="detail-cell detail-zone detail-zone--divided">
         <div class="cell-header">
           <Icon :icon="IconClock" inline decorative class="row-icon" />
-          <span class="has-text-label-small cell-label">{{ $t('hours') }}</span>
+          <span class="has-text-label-small cell-label">{{ t('hours') }}</span>
         </div>
         <div class="cell-content hours-list">
           <div v-for="day in DAYS" :key="day" class="hours-entry">
             <div class="hours-row">
-              <span class="has-text-body-small hours-day">{{ $t(DAY_I18N_KEYS[day]) }}</span>
+              <span class="has-text-body-small hours-day">{{ t(DAY_I18N_KEYS[day]) }}</span>
               <span class="has-text-body-small">{{ parseTimeRange(day) }}</span>
             </div>
             <span v-if="getExceptionText(day)" class="has-text-body-extra-small hours-exception">
@@ -319,25 +334,23 @@ function translateTransitList(raw: string | null, category: string): string {
         {{ translateWarning(location.properties.optional_info_general) }}
       </div>
 
-      <span class="has-text-label-large detail-zone--divided">{{ $t('servicesAvailable') }}</span>
+      <span class="has-text-label-large detail-zone--divided">{{ t('servicesAvailable') }}</span>
       <span v-if="location.properties.walk_ins_sick === 'Yes'" class="has-text-body-small">
-        {{ $t('patientType.patient_type_new_subtext') }}
+        {{ t('patientType.patient_type_new_subtext') }}
       </span>
 
       <!-- Patients served -->
       <section v-if="patientsServedText" class="services-section">
-        <span class="has-text-label-small cell-label">{{ $t('patientsServed') }}</span>
+        <span class="has-text-label-small cell-label">{{ t('patientsServed') }}</span>
         <span class="has-text-body-small">{{ patientsServedText }}</span>
       </section>
 
       <!-- New patient services -->
       <section v-if="newPatientServices.length" class="services-section">
-        <span class="has-text-label-small cell-label">{{
-          $t('patientType.patient_type_new')
-        }}</span>
+        <span class="has-text-label-small cell-label">{{ t('patientType.patient_type_new') }}</span>
         <ul class="service-list">
           <li v-for="label in newPatientServices" :key="label" class="has-text-body-small">
-            {{ $t(label) }}
+            {{ t(label) }}
           </li>
         </ul>
       </section>
@@ -345,24 +358,24 @@ function translateTransitList(raw: string | null, category: string): string {
       <!-- Existing patient only services -->
       <section v-if="existingOnlyServices.length" class="services-section">
         <span class="has-text-label-small cell-label">{{
-          $t('patientType.patient_type_existing_only')
+          t('patientType.patient_type_existing_only')
         }}</span>
         <span class="has-text-body-small">{{
-          $t('patientType.patient_type_existing_only_subtext')
+          t('patientType.patient_type_existing_only_subtext')
         }}</span>
         <ul class="service-list">
           <li v-for="label in existingOnlyServices" :key="label" class="has-text-body-small">
-            {{ $t(label) }}
+            {{ t(label) }}
           </li>
         </ul>
       </section>
 
       <!-- Tests -->
       <section v-if="tests.length" class="services-section">
-        <span class="has-text-label-small cell-label">{{ $t('tests.category') }}</span>
+        <span class="has-text-label-small cell-label">{{ t('tests.category') }}</span>
         <ul class="service-list">
           <li v-for="test in tests" :key="test" class="has-text-body-small">
-            {{ $t(test.replace('_', '.')) }}
+            {{ t(test.replace('_', '.')) }}
           </li>
         </ul>
       </section>

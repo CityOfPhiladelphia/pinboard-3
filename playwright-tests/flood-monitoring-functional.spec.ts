@@ -121,8 +121,7 @@ const floodMonitoringApp = (page: Page) => ({
   searchBox: () => page.getByRole('textbox', { name: ROLES.searchTextboxName }),
 
   // Search button locator
-  searchButton: () =>
-    page.getByRole('button', { name: ROLES.searchButtonName }),
+  searchButton: () => page.getByRole('button', { name: ROLES.searchButtonName }),
 
   // Top filter group locator
   filterGroup: () => page.getByRole('group'),
@@ -176,35 +175,29 @@ const floodMonitoringApp = (page: Page) => ({
     }),
 
   // Dismiss tooltip button locator
-  dismissTooltipButton: () =>
-    page.getByRole('button', { name: ROLES.dismissTooltipName }),
+  dismissTooltipButton: () => page.getByRole('button', { name: ROLES.dismissTooltipName }),
 
   // Learn more link inside About tooltip
   learnMoreLink: () => page.getByRole('link', { name: 'Learn more' }),
 
   // Imagery toggle button locator
-  imageryButton: () =>
-    page.getByRole('button', { name: ROLES.imageryButtonName }),
+  imageryButton: () => page.getByRole('button', { name: ROLES.imageryButtonName }),
 
   // Show my location button locator
   // This locator may not always exist depending on the app state
-  locationButton: () =>
-    page.getByRole('button', { name: ROLES.locationButtonName }),
+  locationButton: () => page.getByRole('button', { name: ROLES.locationButtonName }),
 
   // Terms of use footer link locator
   termsOfUseFooterLink: () => page.getByRole('link', { name: 'Terms of use' }),
 
   // Right to know footer link locator
-  rightToKnowFooterLink: () =>
-    page.getByRole('link', { name: 'Right to know' }),
+  rightToKnowFooterLink: () => page.getByRole('link', { name: 'Right to know' }),
 
   // Privacy Policy footer link locator
-  privacyPolicyFooterLink: () =>
-    page.getByRole('link', { name: 'Privacy Policy' }),
+  privacyPolicyFooterLink: () => page.getByRole('link', { name: 'Privacy Policy' }),
 
   // Accessibility footer link locator
-  accessibilityFooterLink: () =>
-    page.getByRole('link', { name: 'Accessibility' }),
+  accessibilityFooterLink: () => page.getByRole('link', { name: 'Accessibility' }),
 
   // Feedback footer link locator
   feedbackFooterLink: () => page.getByRole('link', { name: 'Feedback' }),
@@ -367,9 +360,7 @@ test.beforeEach(async ({ page, context }, testInfo) => {
 // =====================================================
 
 // Test that the main landing page loads with the core UI elements
-test('Landing page displays main flood monitoring elements', async ({
-  page,
-}) => {
+test('Landing page displays main flood monitoring elements', async ({ page }) => {
   // Create locator helper object
   const app = floodMonitoringApp(page)
 
@@ -428,10 +419,7 @@ test('About this tool tooltip opens and can be dismissed', async ({ page }) => {
   await app.infoButton().click()
 
   // Show the test banner again in case UI changes affected it
-  await showTestNameOnPage(
-    page,
-    'About this tool tooltip opens and can be dismissed'
-  )
+  await showTestNameOnPage(page, 'About this tool tooltip opens and can be dismissed')
 
   // Verify About tooltip heading is visible
   await expect(app.aboutTitle()).toBeVisible()
@@ -495,9 +483,7 @@ test('Search accepts a valid address or keyword', async ({ page }) => {
 })
 
 // Test that search can be cleared, reused, and ZIP code updates mileage
-test('Search can be cleared and reused with ZIP code mileage update', async ({
-  page,
-}) => {
+test('Search can be cleared and reused with ZIP code mileage update', async ({ page }) => {
   // Create locator helper object
   const app = floodMonitoringApp(page)
 
@@ -511,10 +497,7 @@ test('Search can be cleared and reused with ZIP code mileage update', async ({
   const milesAfterFirstSearch = await getMilesText(page)
 
   // Print mileage values after first search in terminal
-  console.log(
-    `Miles after ${TEST_DATA.firstMileageSearch} search:`,
-    milesAfterFirstSearch
-  )
+  console.log(`Miles after ${TEST_DATA.firstMileageSearch} search:`, milesAfterFirstSearch)
 
   // Enter ZIP code search value
   await searchByValue(page, TEST_DATA.zipCodeSearch)
@@ -523,10 +506,7 @@ test('Search can be cleared and reused with ZIP code mileage update', async ({
   const milesAfterZipSearch = await getMilesText(page)
 
   // Print mileage values after ZIP code search in terminal
-  console.log(
-    `Miles after ${TEST_DATA.zipCodeSearch} ZIP search:`,
-    milesAfterZipSearch
-  )
+  console.log(`Miles after ${TEST_DATA.zipCodeSearch} ZIP search:`, milesAfterZipSearch)
 
   // Verify finder panel is still visible after ZIP code search
   await expect(app.finderPanel()).toBeVisible()
@@ -536,9 +516,7 @@ test('Search can be cleared and reused with ZIP code mileage update', async ({
 })
 
 // Test that multiple Philadelphia ZIP code searches update mileage values
-test('Multiple Philadelphia ZIP code searches update mileage values', async ({
-  page,
-}) => {
+test('Multiple Philadelphia ZIP code searches update mileage values', async ({ page }) => {
   // Store the previous ZIP code mileage values for comparison
   let previousMilesValues: string[] | null = null
 
@@ -598,9 +576,7 @@ test('Camera filter can be selected', async ({ page }) => {
 })
 
 // Test that All filter can be selected after another filter
-test('All filter can be selected after choosing another filter', async ({
-  page,
-}) => {
+test('All filter can be selected after choosing another filter', async ({ page }) => {
   // Create locator helper object
   const app = floodMonitoringApp(page)
 
@@ -672,9 +648,7 @@ test('Imagery toggle is available and clickable', async ({ page }) => {
 })
 
 // Test that Show my location button is visible and clickable if the app provides it
-test('Show my location button is available and clickable if present', async ({
-  page,
-}) => {
+test('Show my location button is available and clickable if present', async ({ page }) => {
   // Create locator helper object
   const app = floodMonitoringApp(page)
 

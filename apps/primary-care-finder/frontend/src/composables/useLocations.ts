@@ -1,4 +1,4 @@
-import { ref, onMounted, type Ref } from 'vue'
+import { onBeforeMount, ref, type Ref } from 'vue'
 import { PinboardUtilities } from '@pinboard/ui'
 import type { PrimaryCareLocation, PrimaryCareResponse, PrimaryCareFeature } from '@/types'
 
@@ -69,6 +69,7 @@ export function useLocations(): {
     }
   }
 
-  onMounted(fetchLocations)
+  onBeforeMount(fetchLocations)
+
   return { locations, isLoading, errorMessage, geojson }
 }

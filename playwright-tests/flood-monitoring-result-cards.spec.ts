@@ -129,8 +129,7 @@ const floodMonitoringApp = (page: Page) => ({
   searchBox: () => page.getByRole('textbox', { name: ROLES.searchTextboxName }),
 
   // Search button locator
-  searchButton: () =>
-    page.getByRole('button', { name: ROLES.searchButtonName }),
+  searchButton: () => page.getByRole('button', { name: ROLES.searchButtonName }),
 
   // Top filter group locator
   filterGroup: () => page.getByRole('group'),
@@ -173,8 +172,7 @@ const floodMonitoringApp = (page: Page) => ({
   body: () => page.locator('body'),
 
   // Dismiss tooltip button locator
-  dismissTooltipButton: () =>
-    page.getByRole('button', { name: ROLES.dismissTooltipName }),
+  dismissTooltipButton: () => page.getByRole('button', { name: ROLES.dismissTooltipName }),
 
   // Possible close buttons for selected result detail panel
   closeResultButtonByLabel: () =>
@@ -351,8 +349,7 @@ async function resetFilterToAll(page: Page) {
   })
 
   // Check if All filter is already selected
-  const isAllSelected =
-    (await app.allFilter().getAttribute('aria-pressed')) === 'true'
+  const isAllSelected = (await app.allFilter().getAttribute('aria-pressed')) === 'true'
 
   // Click All filter only if it is not already selected
   if (!isAllSelected) {
@@ -371,10 +368,7 @@ async function resetFilterToAll(page: Page) {
 // Search by keyword
 // Returns true when result cards exist
 // Returns false when no result cards exist
-async function searchByValue(
-  page: Page,
-  searchValue: string
-): Promise<boolean> {
+async function searchByValue(page: Page, searchValue: string): Promise<boolean> {
   // Create locator helper object
   const app = floodMonitoringApp(page)
 
@@ -466,10 +460,7 @@ async function getVisibleResultNames(page: Page): Promise<string[]> {
   const uniqueVisibleResultNames: string[] = [...new Set(visibleResultNames)]
 
   // Print visible result names
-  console.log(
-    'Visible result names found after search:',
-    uniqueVisibleResultNames
-  )
+  console.log('Visible result names found after search:', uniqueVisibleResultNames)
 
   // Return unique visible result names
   return uniqueVisibleResultNames
@@ -510,9 +501,7 @@ async function isCameraCard(card: Locator) {
 // Verify Gauge details inside a result card before clicking
 async function verifyGaugeCard(card: Locator, resultName: string) {
   // Verify Gauge tag is visible
-  await expect(
-    card.getByRole('button', { name: ROLES.gaugeName }).first()
-  ).toBeVisible({
+  await expect(card.getByRole('button', { name: ROLES.gaugeName }).first()).toBeVisible({
     timeout: WAIT_TIMES.resultCardTimeout,
   })
 
@@ -528,9 +517,7 @@ async function verifyGaugeCard(card: Locator, resultName: string) {
 // Verify Camera details inside a result card before clicking
 async function verifyCameraCard(card: Locator, resultName: string) {
   // Verify Camera tag is visible
-  await expect(
-    card.getByRole('button', { name: ROLES.cameraName }).first()
-  ).toBeVisible({
+  await expect(card.getByRole('button', { name: ROLES.cameraName }).first()).toBeVisible({
     timeout: WAIT_TIMES.resultCardTimeout,
   })
 
@@ -639,12 +626,7 @@ async function verifyGaugeDetailPanel(
   })
 
   // Soft-check Last Updated text if available
-  await softCheckDetailText(
-    page,
-    'Last updated text',
-    TEXT_PATTERNS.lastUpdated,
-    resultName
-  )
+  await softCheckDetailText(page, 'Last updated text', TEXT_PATTERNS.lastUpdated, resultName)
 
   // Soft-check Current Snapshot/Image text if available
   await softCheckDetailText(
@@ -655,11 +637,7 @@ async function verifyGaugeDetailPanel(
   )
 
   // Wait for snapshot/image/video if available
-  await waitForSnapshotOrVideoIfAvailable(
-    page,
-    resultName,
-    mediaCountBeforeClick
-  )
+  await waitForSnapshotOrVideoIfAvailable(page, resultName, mediaCountBeforeClick)
 
   // Check if Graph button/tab is available
   const graphVisible = await app
@@ -745,19 +723,10 @@ async function verifyCameraDetailPanel(
   )
 
   // Soft-check Last Updated text if available
-  await softCheckDetailText(
-    page,
-    'Camera last updated text',
-    TEXT_PATTERNS.lastUpdated,
-    resultName
-  )
+  await softCheckDetailText(page, 'Camera last updated text', TEXT_PATTERNS.lastUpdated, resultName)
 
   // Wait for snapshot/image/video if available
-  await waitForSnapshotOrVideoIfAvailable(
-    page,
-    resultName,
-    mediaCountBeforeClick
-  )
+  await waitForSnapshotOrVideoIfAvailable(page, resultName, mediaCountBeforeClick)
 
   // Print successful Camera detail verification
   console.log(`Camera detail panel verified: ${resultName}`)
@@ -953,10 +922,7 @@ test('Visible Gauge and Camera results can be clicked and detail panels verified
   console.log(`Visible result cards found: ${visibleResultNames.length}`)
 
   // Limit how many results this test will verify
-  const resultNamesToVerify = visibleResultNames.slice(
-    0,
-    TEST_DATA.maxResultsToVerify
-  )
+  const resultNamesToVerify = visibleResultNames.slice(0, TEST_DATA.maxResultsToVerify)
 
   // Print limited result count in terminal
   console.log(
@@ -1017,9 +983,7 @@ test('Visible Gauge and Camera results can be clicked and detail panels verified
 
     // Fail if card is neither Gauge nor Camera
     else {
-      throw new Error(
-        `Result card "${resultName}" is neither Gauge nor Camera.`
-      )
+      throw new Error(`Result card "${resultName}" is neither Gauge nor Camera.`)
     }
 
     // Wait before moving to the next result card
