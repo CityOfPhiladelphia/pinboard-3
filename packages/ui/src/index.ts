@@ -6,7 +6,7 @@ export * as PinboardUtilities from './utilities/_index'
 export { createPinboardRouter } from './router/createPinboardRouter'
 export type * as PinboardTypes from './types'
 export type * from './composables/datafilters/types'
-export { getBufferSize, shiftLeft } from './composables/datafilters/functions'
+export { getBufferSize, applyFilters } from './composables/datafilters/functions'
 export {
   FilterChoiceBitfieldGroup,
   FilterGroup,

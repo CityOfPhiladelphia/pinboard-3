@@ -1,34 +1,16 @@
 import type { BitWiseOperation, MatchingFunction } from './types'
 
-/*
-    // HELPER FUNCTIONS
-    */
-export const getBufferSize = (dataLength: number) => {
-  return Math.ceil(dataLength / 32)
-}
-
-export const getAllUniqueValuesFromStringField = (
-  dataProperties: Record<string, string>[],
-  field: string,
-  delim: string
-) => {
-  const unique = new Set()
-  for (const item of dataProperties) {
-    item[field].split(delim).forEach((substring) => unique.add(substring.trim()))
-  }
-  return [...unique]
-}
-
-export function shiftLeft() {
+function getShiftDirection() {
   const a = 0x02
   let b = a
   b <<= 1
   return b > a
 }
 
-/*
-    // BIT MANIPULATING FUNCTIONS
-    */
+export const getBufferSize = (dataLength: number) => {
+  return Math.ceil(dataLength / 32)
+}
+
 export function createOptionBitmask(
   data: Record<string, unknown>[],
   bufferSize: number,
@@ -40,7 +22,7 @@ export function createOptionBitmask(
     throw new Error('Data too large to fit into buffer')
   }
   const bitarray = new Uint32Array(bufferSize) // bitArray for holding set bits
-  const shiftDirection = shiftLeft()
+  const shiftDirection = getShiftDirection()
   let accumulator = 0 // accumulate set bits before being pushed into buffer
   let offset = 0 // tracks the offset for setting a bit in the accumulator
   let setBit = 1 // gets shifted to the left once every cycle to set bits in the accumulator
@@ -70,7 +52,7 @@ export function createOptionBitmask(
 export const bitarrayBitwiseOperator = (
   bitarrayIn1: Uint32Array | null,
   otherBitarrays: Uint32Array | Uint32Array[],
-  operation: BitWiseOperation = '|'
+  operation: BitWiseOperation
 ) => {
   otherBitarrays = Array.isArray(otherBitarrays)
     ? otherBitarrays.filter(Boolean)
@@ -121,21 +103,22 @@ export const getUniformBitarray = (bufferLength: number, oneOrZero: 1 | 0) => {
   return new Uint32Array(bufferLength).fill(oneOrZero ? 0xffffffff : 0)
 }
 
-/*
-    // INPUT FUNCTIONS FOR GETTING BITFIELDS
-    */
-export const matchFieldToOptions = (
-  item: Record<string, unknown>,
-  fieldName: string,
-  valuesToMatch: unknown[]
-) => {
-  return valuesToMatch.includes(item[fieldName])
-}
+export function applyFilters<T>(arr: T[], bits: Uint32Array): T[] {
+  const shiftDirection = getShiftDirection()
+  const filtered: T[] = []
+  let checkBit = 1
+  let offset = 0
+  arr.forEach((item) => {
+    if (checkBit & bits[offset]) {
+      filtered.push(item)
+    }
 
-export const matchOptionInString = (
-  item: Record<string, string>,
-  fieldName: string,
-  option: string
-) => {
-  return item[fieldName].toLowerCase().trim().includes(option[0])
+    if (checkBit & 0x8000_0000) {
+      checkBit = 1
+      offset++
+    } else {
+      checkBit = shiftDirection ? checkBit << 1 : checkBit >> 1
+    }
+  })
+  return filtered
 }

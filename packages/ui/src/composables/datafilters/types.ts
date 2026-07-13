@@ -3,7 +3,11 @@ import { FilterChoiceBitfieldGroup, FilterGroup } from './classes'
 export type BitWiseOperation = '&' | '|' | '^'
 
 export interface MatchingFunction {
-  <T>(item: Record<string, unknown>, dataFields: string[], matchValues: T[]): boolean
+  <U extends Record<string, unknown>, T>(
+    item: U,
+    dataFields: (keyof object)[],
+    matchValues: T[]
+  ): boolean
 }
 
 export interface IFilterChoiceBitfield {

@@ -12,7 +12,7 @@ import {
   PinboardComposables,
   PinboardUtilities,
   Callout,
-  shiftLeft,
+  applyFilters,
 } from '@pinboard/ui'
 import type { FilterValues, PinboardTypes } from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
@@ -324,13 +324,13 @@ const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
         .toLocaleLowerCase()
         .split(' ')
         .filter(Boolean)
-      result = result.filter((loc) => {
+      result = result.filter((loc, i) => {
         const haystack = JSON.stringify(Object.values(loc.properties)).toLocaleLowerCase()
         return terms.some((term) => {
           const keywordBits =
             keywordToFilterMap.value?.[term] &&
-            keywordToFilterMap.value[term][Math.floor((loc.properties.cartodb_id - 1) / 32)] &
-              (1 << Math.floor((loc.properties.cartodb_id - 1) % 32))
+            keywordToFilterMap.value[term][Math.floor(i / 32)] &
+              (1 << Math.floor(i % 32))
           return haystack.includes(term) || keywordBits
         })
       })
@@ -355,14 +355,13 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
       .toLocaleLowerCase()
       .split(' ')
       .filter(Boolean)
-    result = result.filter((loc) => {
-
+    result = result.filter((loc, i) => {
       const haystack = JSON.stringify(Object.values(loc.properties)).toLocaleLowerCase()
       return terms.some((term) => {
         const keywordBits =
           keywordToFilterMap.value?.[term] &&
-          keywordToFilterMap.value[term][Math.floor((Number(loc.properties.cartodb_id) - 1) / 32)] &
-            (1 << Math.floor((Number(loc.properties.cartodb_id) - 1) % 32))
+          keywordToFilterMap.value[term][Math.floor(i / 32)] &
+            (1 << Math.floor(i % 32))
         return haystack.includes(term) || keywordBits
       })
     })
@@ -371,25 +370,7 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
   return filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
 })
 
-function applyFilters<T>(arr: T[], bits: Uint32Array): T[] {
-  const shiftDirection = shiftLeft()
-  const filtered: T[] = []
-  let checkBit = 1
-  let offset = 0
-  arr.forEach((item) => {
-    if (checkBit & bits[offset]) {
-      filtered.push(item)
-    }
 
-    if (checkBit & 0x8000_0000) {
-      checkBit = 1
-      offset++
-    } else {
-      checkBit = shiftDirection ? checkBit << 1 : checkBit >> 1
-    }
-  })
-  return filtered
-}
 
 function handleSearchSubmit(locationSearchString: string) {
   switch (true) {
