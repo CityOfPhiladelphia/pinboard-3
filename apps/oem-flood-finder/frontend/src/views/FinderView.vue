@@ -13,6 +13,7 @@ import {
   MapIconTextPin,
   MapNavigationControl,
   BasemapToggle,
+  GeolocationButton,
   FillLayer,
   MapCheckboxLegend,
   PinboardComposables,
@@ -160,6 +161,14 @@ function handleDeselect(id: string) {
   visitedIds.value.add(id)
 }
 
+function handleGeolocate(data: { latitude: number; longitude: number; accuracy: number }) {
+  userLocation.value = { latitude: data.latitude, longitude: data.longitude }
+}
+
+function handleGeolocateError(error: Error | GeolocationPositionError) {
+  console.log(error)
+}
+
 function asOemLocation(location: PinboardTypes.BasicLocation) {
   return location as OemLocation
 }
@@ -201,6 +210,13 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
     >
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />
       <BasemapToggle position="top-right" :teleport-to="isMobile ? mobileControlsTarget : null" />
+      <GeolocationButton
+        :position="isMobile ? 'top-right' : 'bottom-right'"
+        :teleport-to="isMobile ? mobileControlsTarget : undefined"
+        :show-location-marker="false"
+        @located="handleGeolocate"
+        @error="handleGeolocateError"
+      />
 
       <FillLayer
         v-for="id in FLOOD_LAYER_IDS"

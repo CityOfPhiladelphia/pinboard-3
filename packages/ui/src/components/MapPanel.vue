@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, defineComponent } from 'vue'
 import { Map as PhilaMap } from '@phila/phila-ui-map-core'
-import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css' // shouldn't the style be bundled with the component?
+// map-core ships a single combined stylesheet instead of injecting CSS per
+// component (libInjectCss is disabled there, because it extracted maplibre's CSS
+// into component chunks). This one file bundles every map-core component's styles
+// plus maplibre's own CSS, so importing it once here is required and covers it all.
+import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css'
 import type { MapConfig, BasicLocation, LatLon } from '../types'
 
 const props = defineProps<{
