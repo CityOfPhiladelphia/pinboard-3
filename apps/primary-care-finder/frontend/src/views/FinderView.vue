@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, toRaw, type ComputedRef } from 'vue'
+import { computed, ref, toRaw } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   PinboardBody,
@@ -308,7 +308,7 @@ const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   }))
 })
 
-const sortMode: ComputedRef<SortMode> = computed(() => {
+const sortMode = computed<SortMode>(() => {
   return filterState.value.sort.name ? 'name' : filterState.value.sort.distance ? 'distance' : ''
 })
 
