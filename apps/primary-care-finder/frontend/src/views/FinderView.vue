@@ -22,6 +22,7 @@ import LocationCard from '@/components/LocationCard.vue'
 import LocationDetail from '@/components/LocationDetail.vue'
 import { IconLocationDot } from '@phila/phila-ui-core/icons'
 import type {
+  PrimaryCareFilterLogic,
   PrimaryCareFilters,
   PrimaryCareLocation,
   PrimaryCareResponse,
@@ -144,7 +145,7 @@ const filterState = ref<PrimaryCareFilters>(emptyFilters)
 const { filterLogicalValue, filterLogic } = useFilterLogic(locations, filterState)
 
 const keywordToFilterMap = computed(() => {
-  const logicalValues = filterLogic.value
+  const logicalValues = filterLogic.value as unknown as PrimaryCareFilterLogic
   const keywordMap: Record<string, Uint32Array> = {
     [t('ageRange.adult').toLocaleLowerCase()]:
       logicalValues.childFilters.ageGroup.childFilters.adult.getBitfield(),

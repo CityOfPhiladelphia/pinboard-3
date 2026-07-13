@@ -33,7 +33,7 @@ class FilterChoiceBitfield {
   }
 }
 
-class FilterSet {
+abstract class FilterSet {
   protected childFilters: Record<
     string,
     FilterChoiceBitfield | FilterChoiceBitfieldGroup | FilterGroup
@@ -95,7 +95,7 @@ class FilterChoiceBitfieldGroup extends FilterSet {
   }
 }
 
-abstract class FilterGroup extends FilterSet {
+class FilterGroup extends FilterSet {
   childFilters: Record<string, FilterChoiceBitfieldGroup | FilterGroup>
 
   constructor(params: IFilterGroup) {

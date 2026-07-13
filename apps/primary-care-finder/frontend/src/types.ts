@@ -1,4 +1,9 @@
-import { FilterGroup, type FilterValues, type PinboardTypes } from '@pinboard/ui'
+import type {
+  BitWiseOperation,
+  FilterChoiceBitfield,
+  FilterValues,
+  PinboardTypes,
+} from '@pinboard/ui'
 import { languageOptions, waitOptions } from './composables/filters/filterKeysValues'
 
 type YesOrNo = 'Yes' | 'No'
@@ -187,4 +192,46 @@ export interface PrimaryCareFilters extends FilterValues {
   languages: Record<LanguagesFilter, boolean>
 }
 
-export class PrimaryCareFilterLogic extends FilterGroup {}
+export interface PrimaryCareFilterLogic {
+  bufferLength: number
+  checked: boolean
+  operation: BitWiseOperation
+  childFilters: {
+    ageGroup: {
+      bufferLength: number
+      checked: boolean
+      operation: BitWiseOperation
+      childFilters: Record<AgeGroupFilter, FilterChoiceBitfield>
+    }
+    languages: {
+      bufferLength: number
+      checked: boolean
+      operation: BitWiseOperation
+      childFilters: Record<LanguagesFilter, FilterChoiceBitfield>
+    }
+    specialty: {
+      bufferLength: number
+      checked: boolean
+      operation: BitWiseOperation
+      childFilters: Record<SpecialtyFilter, FilterChoiceBitfield>
+    }
+    tests: {
+      bufferLength: number
+      checked: boolean
+      operation: BitWiseOperation
+      childFilters: Record<TestsFilter, FilterChoiceBitfield>
+    }
+    visitType: {
+      bufferLength: number
+      checked: boolean
+      operation: BitWiseOperation
+      childFilters: Record<VisitTypeFilter, FilterChoiceBitfield>
+    }
+    waitTime: {
+      bufferLength: number
+      checked: boolean
+      operation: BitWiseOperation
+      childFilters: Record<WaitTimeFilter, FilterChoiceBitfield>
+    }
+  }
+}

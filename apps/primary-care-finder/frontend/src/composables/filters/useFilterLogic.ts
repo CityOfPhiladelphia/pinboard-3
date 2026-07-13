@@ -10,17 +10,13 @@ import {
 } from './filterKeysValues'
 import {
   FilterChoiceBitfieldGroup,
+  FilterGroup,
   getBufferSize,
   type IFilterChoiceBitfield,
   type IFilterChoiceBitfieldGroup,
   type MatchingFunction,
 } from '@pinboard/ui'
-import {
-  PrimaryCareFilterLogic,
-  type PrimaryCareFilters,
-  type PrimaryCareLocation,
-  type PrimaryCareProperties,
-} from '@/types'
+import type { PrimaryCareFilters, PrimaryCareLocation, PrimaryCareProperties } from '@/types'
 
 export function useFilterLogic(
   locations: Ref<PrimaryCareLocation[]>,
@@ -134,7 +130,7 @@ export function useFilterLogic(
       choicesFromObject(testsOptions, matchYesEstPat, matchFieldsToOptions)
     )
 
-    const filterLogicGroup = new PrimaryCareFilterLogic({
+    const filterLogicGroup = new FilterGroup({
       operation: commonParams.operation,
       bufferLength: commonParams.bufferLength,
       childFilters: {
