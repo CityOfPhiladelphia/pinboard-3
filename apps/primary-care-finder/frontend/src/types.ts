@@ -192,6 +192,8 @@ export interface PrimaryCareFilters extends FilterValues {
   languages: Record<LanguagesFilter, boolean>
 }
 
+type a = keyof Pick<PrimaryCareFilters, 'ageGroup' | 'visitType' | 'waitTime' | 'languages'>
+
 export interface PrimaryCareFilterLogic {
   bufferLength: number
   checked: boolean

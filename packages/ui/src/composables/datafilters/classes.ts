@@ -34,7 +34,7 @@ class FilterChoiceBitfield {
 }
 
 class FilterChoiceBitfieldGroup {
-  childFilters: Record<string, FilterChoiceBitfield> = {}
+  private childFilters: Record<string, FilterChoiceBitfield> = {}
   private operation: BitWiseOperation
   private bufferLength: number
   private checked: boolean = false
@@ -50,6 +50,10 @@ class FilterChoiceBitfieldGroup {
         matchingFunction: choice[1].matchingFunction,
       })
     })
+  }
+
+  getChildFilter(filterName: string) {
+    return this.childFilters[filterName]
   }
 
   getChecked() {
@@ -80,7 +84,7 @@ class FilterChoiceBitfieldGroup {
 }
 
 class FilterGroup {
-  childFilters: Record<string, FilterChoiceBitfieldGroup | FilterGroup>
+  private childFilters: Record<string, FilterChoiceBitfieldGroup | FilterGroup>
   private operation: BitWiseOperation
   private bufferLength: number
   private checked: boolean = false
@@ -88,6 +92,10 @@ class FilterGroup {
     this.operation = params.operation
     this.childFilters = params.childFilters
     this.bufferLength = params.bufferLength
+  }
+
+  getChildFilter(filterName: string) {
+    return this.childFilters[filterName]
   }
 
   getBufferLength() {

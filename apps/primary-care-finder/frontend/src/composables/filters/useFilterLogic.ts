@@ -12,24 +12,11 @@ import {
   FilterChoiceBitfieldGroup,
   FilterGroup,
   getBufferSize,
-  type BitWiseOperation,
   type IFilterChoiceBitfield,
   type IFilterChoiceBitfieldGroup,
   type MatchingFunction,
 } from '@pinboard/ui'
-import type {
-  AgeGroupFilter,
-  LanguagesFilter,
-  PrimaryCareFilterKey,
-  PrimaryCareFilterLogic,
-  PrimaryCareFilters,
-  PrimaryCareLocation,
-  PrimaryCareProperties,
-  SpecialtyFilter,
-  TestsFilter,
-  VisitTypeFilter,
-  WaitTimeFilter,
-} from '@/types'
+import type { PrimaryCareFilters, PrimaryCareLocation, PrimaryCareProperties } from '@/types'
 
 export function useFilterLogic(
   locations: Ref<PrimaryCareLocation[]>,
@@ -162,65 +149,50 @@ export function useFilterLogic(
   watchEffect(() => {
     // age group
     Object.values(ageGroupOptions).forEach((filter) =>
-      filterLogic.value.childFilters[filterKeys.ageGroup].childFilters[filter].setChecked(
-        filterState.value.ageGroup[filter]
-      )
+      filterLogic.value
+        .getChildFilter(filterKeys.ageGroup)
+        .getChildFilter(filter)
+        .setChecked(filterState.value.ageGroup[filter])
     )
 
     // wait time
     waitOptions.forEach((filter) =>
-      filterLogic.value.childFilters[filterKeys.waitTime].childFilters[filter].setChecked(
-        filterState.value.waitTime[filter]
-      )
+      filterLogic.value
+        .getChildFilter(filterKeys.waitTime)
+        .getChildFilter(filter)
+        .setChecked(filterState.value.waitTime[filter])
     )
 
     // visit type
     Object.values(visitTypeOptions).forEach((filter) =>
-      filterLogic.value.childFilters[filterKeys.visitType].childFilters[filter].setChecked(
-        filterState.value.visitType[filter]
-      )
+      filterLogic.value
+        .getChildFilter(filterKeys.visitType)
+        .getChildFilter(filter)
+        .setChecked(filterState.value.visitType[filter])
     )
 
     // specialty
     Object.values(specialtyOptions).forEach((filter) =>
-      filterLogic.value.childFilters[filterKeys.specialty].childFilters[filter].setChecked(
-        filterState.value.visitType[filter]
-      )
+      filterLogic.value
+        .getChildFilter(filterKeys.specialty)
+        .getChildFilter(filter)
+        .setChecked(filterState.value.visitType[filter])
     )
-
-    // function setAllChecked(
-    //   arr:
-    //     | AgeGroupFilter[]
-    //     | WaitTimeFilter[]
-    //     | VisitTypeFilter[]
-    //     | SpecialtyFilter[]
-    //     | TestsFilter[]
-    //     | LanguagesFilter[],
-    //   logicalFilterKey: string,
-    //   filterChipKey: keyof Pick<
-    //     PrimaryCareFilters,
-    //     'ageGroup' | 'visitType' | 'waitTime' | 'languages'
-    //   >
-    // ): void {
-    //   arr.forEach((filter) =>
-    //     filterLogic.value.childFilters[logicalFilterKey].childFilters[filter].setChecked(
-    //       filterState.value[filterChipKey][filter]
-    //     )
-    //   )
-    // }
 
     // tests
     Object.values(testsOptions).forEach((filter) =>
-      filterLogic.value.childFilters[filterKeys.tests].childFilters[filter].setChecked(
-        filterState.value.visitType[filter]
-      )
+      filterLogic.value
+        .getChildFilter(filterKeys.tests)
+        .getChildFilter(filter)
+        .setChecked(filterState.value.visitType[filter])
     )
 
     // languages
     languageOptions.forEach((filter) =>
-      filterLogic.value.childFilters[filterKeys.languages].childFilters[filter].setChecked(
-        filterState.value.languages[filter]
-      )
+      filterLogic.value
+        .getChildFilter(filterKeys.languages)
+        .getChildFilter(filter)
+        .setChecked(filterState.value.languages[filter])
     )
 
     filterLogicalValue.value = filterLogic.value.getBitfield()

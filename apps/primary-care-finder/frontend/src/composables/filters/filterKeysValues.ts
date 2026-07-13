@@ -7,7 +7,6 @@ import type {
   TestsFilter,
   VisitTypeField,
   VisitTypeFilter,
-  WaitTimeFilter,
 } from '@/types'
 
 export const filterKeys = {
