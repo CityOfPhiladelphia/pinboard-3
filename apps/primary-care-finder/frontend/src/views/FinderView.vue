@@ -356,12 +356,13 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
       .split(' ')
       .filter(Boolean)
     result = result.filter((loc) => {
+
       const haystack = JSON.stringify(Object.values(loc.properties)).toLocaleLowerCase()
       return terms.some((term) => {
         const keywordBits =
           keywordToFilterMap.value?.[term] &&
-          keywordToFilterMap.value[term][Math.floor((Number(loc.id) - 1) / 32)] &
-            (1 << Math.floor((Number(loc.id) - 1) % 32))
+          keywordToFilterMap.value[term][Math.floor((Number(loc.properties.cartodb_id) - 1) / 32)] &
+            (1 << Math.floor((Number(loc.properties.cartodb_id) - 1) % 32))
         return haystack.includes(term) || keywordBits
       })
     })
