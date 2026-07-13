@@ -33,28 +33,18 @@ class FilterChoiceBitfield {
   }
 }
 
-class FilterChoiceBitfieldGroup {
-  private childFilters: Record<string, FilterChoiceBitfield> = {}
-  private operation: BitWiseOperation
-  private bufferLength: number
-  private checked: boolean = false
+class FilterSet {
+  protected childFilters: Record<
+    string,
+    FilterChoiceBitfield | FilterChoiceBitfieldGroup | FilterGroup
+  >
+  protected operation: BitWiseOperation
+  protected bufferLength: number
+  protected checked: boolean = false
 
-  constructor(params: IFilterChoiceBitfieldGroup) {
+  constructor(params: { operation: BitWiseOperation; bufferLength: number }) {
     this.operation = params.operation
     this.bufferLength = params.bufferLength
-    Object.entries(params.choices).forEach((choice) => {
-      this.childFilters[choice[0]] = new FilterChoiceBitfield({
-        data: params.data,
-        bufferLength: params.bufferLength,
-        dataFields: choice[1].dataFields,
-        matches: choice[1].matches,
-        matchingFunction: choice[1].matchingFunction,
-      })
-    })
-  }
-
-  getChildFilter(filterName: string) {
-    return this.childFilters[filterName]
   }
 
   getChecked() {
@@ -67,41 +57,6 @@ class FilterChoiceBitfieldGroup {
     for (const choice of Object.values(this.childFilters)) {
       this.checked = this.checked || choice.getChecked()
     }
-  }
-
-  getBitfield(): Uint32Array {
-    if (this.getChecked()) {
-      const checkedBitfields: Uint32Array[] = []
-      Object.values(this.childFilters).forEach((choice) => {
-        if (choice.getChecked()) {
-          checkedBitfields.push(choice.getBitfield())
-        }
-      })
-      return bitarrayBitwiseOperator(null, checkedBitfields, this.operation)
-    }
-
-    return getUniformBitarray(this.bufferLength, 0)
-  }
-}
-
-class FilterGroup {
-  private childFilters: Record<string, FilterChoiceBitfieldGroup | FilterGroup>
-  private operation: BitWiseOperation
-  private bufferLength: number
-  private checked: boolean = false
-
-  constructor(params: IFilterGroup) {
-    this.operation = params.operation
-    this.childFilters = params.childFilters
-    this.bufferLength = params.bufferLength
-  }
-
-  getChildFilter(filterName: string) {
-    return this.childFilters[filterName]
-  }
-
-  getBufferLength() {
-    return this.bufferLength
   }
 
   getBitfield(): Uint32Array {
@@ -117,18 +72,39 @@ class FilterGroup {
 
     return getUniformBitarray(this.bufferLength, this.operation === '&' ? 1 : 0)
   }
+}
 
-  getChecked() {
-    this.setChecked()
-    return this.checked
+class FilterChoiceBitfieldGroup extends FilterSet {
+  childFilters: Record<string, FilterChoiceBitfield> = {}
+
+  constructor(params: IFilterChoiceBitfieldGroup) {
+    super(params)
+    Object.entries(params.choices).forEach((choice) => {
+      this.childFilters[choice[0]] = new FilterChoiceBitfield({
+        data: params.data,
+        bufferLength: params.bufferLength,
+        dataFields: choice[1].dataFields,
+        matches: choice[1].matches,
+        matchingFunction: choice[1].matchingFunction,
+      })
+    })
   }
 
-  setChecked() {
-    this.checked = false
-    for (const choice of Object.values(this.childFilters)) {
-      choice.setChecked()
-      this.checked = this.checked || choice.getChecked()
-    }
+  getChildFilter(filterName: string) {
+    return this.childFilters[filterName]
+  }
+}
+
+abstract class FilterGroup extends FilterSet {
+  childFilters: Record<string, FilterChoiceBitfieldGroup | FilterGroup>
+
+  constructor(params: IFilterGroup) {
+    super(params)
+    this.childFilters = params.childFilters
+  }
+
+  getChildFilter(filterName: string) {
+    return this.childFilters[filterName]
   }
 }
 
