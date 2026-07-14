@@ -135,7 +135,9 @@ const keywordToFilterMap = computed(() => {
     .forEach((key) => {
       t(`waitTime.${key}`)
         .toLocaleLowerCase()
+        .replace(/\W+/g, ' ')
         .split(' ')
+        .filter(Boolean)
         .forEach(
           (word) =>
             (keywordMap[word] =
@@ -148,7 +150,9 @@ const keywordToFilterMap = computed(() => {
     .forEach((key) => {
       t(`visitType.${key}`)
         .toLocaleLowerCase()
+        .replace(/\W+/g, ' ')
         .split(' ')
+        .filter(Boolean)
         .forEach(
           (word) =>
             (keywordMap[word] =
@@ -163,7 +167,9 @@ const keywordToFilterMap = computed(() => {
     .forEach((key) => {
       t(`specialty.${key}`)
         .toLocaleLowerCase()
+        .replace(/\W+/g, ' ')
         .split(' ')
+        .filter(Boolean)
         .forEach(
           (word) =>
             (keywordMap[word] =
@@ -178,7 +184,9 @@ const keywordToFilterMap = computed(() => {
     .forEach((key) => {
       t(`tests.${key}`)
         .toLocaleLowerCase()
+        .replace(/\W+/g, ' ')
         .split(' ')
+        .filter(Boolean)
         .forEach(
           (word) =>
             (keywordMap[word] =
