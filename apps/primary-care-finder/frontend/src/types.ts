@@ -195,27 +195,27 @@ export interface PrimaryCareFilters extends FilterValues {
   languages: Record<LanguagesFilter, boolean>
 }
 
-interface ageRangeFilterLogic extends FilterChoiceBitfieldGroup {
+export interface ageRangeFilterLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<AgeRangeFilter, FilterChoiceBitfield>
 }
 
-interface LanguagesFilterLogic extends FilterChoiceBitfieldGroup {
+export interface LanguagesFilterLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<LanguagesFilter, FilterChoiceBitfield>
 }
 
-interface SpecialtyFilterLogic extends FilterChoiceBitfieldGroup {
+export interface SpecialtyFilterLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<SpecialtyFilter, FilterChoiceBitfield>
 }
 
-interface TestsFilterLogic extends FilterChoiceBitfieldGroup {
+export interface TestsFilterLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<TestsFilter, FilterChoiceBitfield>
 }
 
-interface VisitTypeFilterLogic extends FilterChoiceBitfieldGroup {
+export interface VisitTypeFilterLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<VisitTypeFilter, FilterChoiceBitfield>
 }
 
-interface WaitTimeFilterLogic extends FilterChoiceBitfieldGroup {
+export interface WaitTimeFilterLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<WaitTimeFilter, FilterChoiceBitfield>
 }
 
