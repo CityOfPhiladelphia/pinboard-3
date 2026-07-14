@@ -27,9 +27,13 @@ import type {
   PrimaryCareLocation,
   PrimaryCareResponse,
   SortMode,
+  SpecialtyFilter,
+  TestsFilter,
+  VisitTypeFilter,
+  WaitTimeFilter,
 } from '@/types'
-
 import { sortLocations } from '@/utilities/sortLocations'
+import * as en from '../i18n/en'
 
 const defaultFilterState: PrimaryCareFilters = {
   sort: {
@@ -104,29 +108,9 @@ const filterState = ref<PrimaryCareFilters>(defaultFilterState)
 const { filterLogicalValue, filterLogic } = useFilterLogic(locations, languages, filterState)
 
 const keywordToFilterMap = computed(() => {
-  // console.log(messages.value.en.visitType)
-  // const a = Object.keys(messages.value.en.visitType).filter((key) => key !== 'category')
-  // console.log(a)
-  // const b = Array.from(a, (key) => {
-  //   return t(`visitType.${key}`).toLocaleLowerCase().split(' ').map((word) => {word: })
-  // })
-
-  // const b = Object.fromEntries(a, ([key, val]) => []
-  // })
-
-  // [t('visitType.prenatal').toLocaleLowerCase()]:
-  //     logicalValues.childFilters.visitType.childFilters.primaryPrenatal.getBitfield(),
   const logicalValues = filterLogic.value as PrimaryCareFilterLogic
-  const keywordMap: Record<string, Uint32Array> = {
-    [t('waitTime.walkIn').toLocaleLowerCase()]:
-      logicalValues.childFilters.waitTime.childFilters.walkIn.getBitfield(),
-    [t('waitTime.oneWeekWell').toLocaleLowerCase()]:
-      logicalValues.childFilters.waitTime.childFilters.twoMonths.getBitfield(),
-    [t('waitTime.oneWeekSick').toLocaleLowerCase()]:
-      logicalValues.childFilters.waitTime.childFilters.oneWeekSick.getBitfield(),
-    [t('waitTime.twoMonths').toLocaleLowerCase()]:
-      logicalValues.childFilters.waitTime.childFilters.oneWeekWell.getBitfield(),
 
+  const keywordMap: Record<string, Uint32Array> = {
     [t('ageRange.adult').toLocaleLowerCase()]:
       logicalValues.childFilters.ageRange.childFilters.adult.getBitfield(),
     [t('ageRange.adults').toLocaleLowerCase()]:
@@ -135,49 +119,6 @@ const keywordToFilterMap = computed(() => {
       logicalValues.childFilters.ageRange.childFilters.children.getBitfield(),
     [t('ageRange.children').toLocaleLowerCase()]:
       logicalValues.childFilters.ageRange.childFilters.children.getBitfield(),
-
-    [t('tests.blood').toLocaleLowerCase()]:
-      logicalValues.childFilters.tests.childFilters.blood.getBitfield(),
-    [t('tests.covid').toLocaleLowerCase()]:
-      logicalValues.childFilters.tests.childFilters.covid.getBitfield(),
-    [t('tests.sti').toLocaleLowerCase()]:
-      logicalValues.childFilters.tests.childFilters.sti.getBitfield(),
-    [t('tests.mammo').toLocaleLowerCase()]:
-      logicalValues.childFilters.tests.childFilters.mammo.getBitfield(),
-    [t('tests.xray').toLocaleLowerCase()]:
-      logicalValues.childFilters.tests.childFilters.xray.getBitfield(),
-
-    [t('specialty.dental').toLocaleLowerCase()]:
-      logicalValues.childFilters.specialty.childFilters.dental.getBitfield(),
-    [t('specialty.eye').toLocaleLowerCase()]:
-      logicalValues.childFilters.specialty.childFilters.eye.getBitfield(),
-    [t('specialty.mat').toLocaleLowerCase()]:
-      logicalValues.childFilters.specialty.childFilters.mat.getBitfield(),
-    [t('specialty.mental').toLocaleLowerCase()]:
-      logicalValues.childFilters.specialty.childFilters.mental.getBitfield(),
-    [t('specialty.nutrition').toLocaleLowerCase()]:
-      logicalValues.childFilters.specialty.childFilters.nutrition.getBitfield(),
-    [t('specialty.pharmacy').toLocaleLowerCase()]:
-      logicalValues.childFilters.specialty.childFilters.pharmacy.getBitfield(),
-    [t('specialty.podiatry').toLocaleLowerCase()]:
-      logicalValues.childFilters.specialty.childFilters.podiatry.getBitfield(),
-    [t('specialty.tobacco').toLocaleLowerCase()]:
-      logicalValues.childFilters.specialty.childFilters.tobacco.getBitfield(),
-
-    [t('visitType.prenatal').toLocaleLowerCase()]:
-      logicalValues.childFilters.visitType.childFilters.prenatal.getBitfield(),
-    [t('visitType.sick').toLocaleLowerCase()]:
-      logicalValues.childFilters.visitType.childFilters.sick.getBitfield(),
-    [t('visitType.sports').toLocaleLowerCase()]:
-      logicalValues.childFilters.visitType.childFilters.sports.getBitfield(),
-    [t('visitType.telehealth').toLocaleLowerCase()]:
-      logicalValues.childFilters.visitType.childFilters.telehealth.getBitfield(),
-    [t('visitType.vaccine').toLocaleLowerCase()]:
-      logicalValues.childFilters.visitType.childFilters.vaccine.getBitfield(),
-    [t('visitType.well').toLocaleLowerCase()]:
-      logicalValues.childFilters.visitType.childFilters.well.getBitfield(),
-    [t('visitType.women').toLocaleLowerCase()]:
-      logicalValues.childFilters.visitType.childFilters.women.getBitfield(),
 
     ...Object.fromEntries(
       Array.from(languages.value, (lang) => {
@@ -188,8 +129,82 @@ const keywordToFilterMap = computed(() => {
       })
     ),
   }
+
+  Object.keys(en.default.waitTime)
+    .filter((key) => !['category'].includes(key))
+    .forEach((key) => {
+      t(`waitTime.${key}`)
+        .toLocaleLowerCase()
+        .split(' ')
+        .forEach(
+          (word) =>
+            (keywordMap[word] =
+              logicalValues.childFilters.waitTime.childFilters[key as WaitTimeFilter].getBitfield())
+        )
+    })
+
+  Object.keys(en.default.visitType)
+    .filter((key) => !['category'].includes(key))
+    .forEach((key) => {
+      t(`visitType.${key}`)
+        .toLocaleLowerCase()
+        .split(' ')
+        .forEach(
+          (word) =>
+            (keywordMap[word] =
+              logicalValues.childFilters.visitType.childFilters[
+                key as VisitTypeFilter
+              ].getBitfield())
+        )
+    })
+
+  Object.keys(en.default.specialty)
+    .filter((key) => !['category'].includes(key))
+    .forEach((key) => {
+      t(`specialty.${key}`)
+        .toLocaleLowerCase()
+        .split(' ')
+        .forEach(
+          (word) =>
+            (keywordMap[word] =
+              logicalValues.childFilters.specialty.childFilters[
+                key as SpecialtyFilter
+              ].getBitfield())
+        )
+    })
+
+  Object.keys(en.default.tests)
+    .filter((key) => !['category', 'noTests'].includes(key))
+    .forEach((key) => {
+      t(`tests.${key}`)
+        .toLocaleLowerCase()
+        .split(' ')
+        .forEach(
+          (word) =>
+            (keywordMap[word] =
+              logicalValues.childFilters.tests.childFilters[key as TestsFilter].getBitfield())
+        )
+    })
+
   return keywordMap
 })
+
+// function mapFilterKeywordsToFilters<>(keywordMap: Record<string, Uint32Array>, filterKey: FilterKey, filterValues: PrimaryCareFilterLogic) {
+//   Object.keys(en.default[filterKey])
+//     .filter((key) => !['category'].includes(key))
+//     .forEach((key) => {
+//       t(`${filterKey}.${key}`)
+//         .toLocaleLowerCase()
+//         .split(' ')
+//         .forEach(
+//           (word) =>
+//             (keywordMap[word] =
+//               filterValues.childFilters[filterKey].childFilters[
+//                 key
+//               ].getBitfield())
+//         )
+//     })
+// }
 
 const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   const { latitude, longitude } = userLocation.value
