@@ -14,7 +14,7 @@ import {
   Callout,
   applyFilters,
 } from '@pinboard/ui'
-import type { FilterChoiceBitfieldGroup, FilterValues, PinboardTypes } from '@pinboard/ui'
+import type { FilterValues, PinboardTypes } from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
 import { useFilterChipDefinitions } from '@/composables/filters/useFilterChipDefinitions.ts'
 import { useFilterLogic } from '@/composables/filters/useFilterLogic'
@@ -22,20 +22,15 @@ import LocationCard from '@/components/LocationCard.vue'
 import LocationDetail from '@/components/LocationDetail.vue'
 import { IconLocationDot } from '@phila/phila-ui-core/icons'
 import type {
-  FilterKey,
   PrimaryCareFilterLogic,
   PrimaryCareFilters,
   PrimaryCareLocation,
   PrimaryCareResponse,
   SortMode,
   SpecialtyFilter,
-  SpecialtyFilterLogic,
   TestsFilter,
-  TestsFilterLogic,
   VisitTypeFilter,
-  VisitTypeFilterLogic,
   WaitTimeFilter,
-  WaitTimeFilterLogic,
 } from '@/types'
 import { sortLocations } from '@/utilities/sortLocations'
 
@@ -147,70 +142,63 @@ const keywordToFilterMap = computed(() => {
       )
   })
 
-  Object.keys(logicalValues.childFilters.visitType.childFilters)
-    .forEach((key) => {
-      t(`visitType.${key}`)
-        .toLocaleLowerCase()
-        .replace(/\W+/g, ' ')
-        .split(' ')
-        .filter(Boolean)
-        .forEach(
-          (word) =>
-            (keywordMap[word] =
-              logicalValues.childFilters.visitType.childFilters[
-                key as VisitTypeFilter
-              ].getBitfield())
-        )
-    })
+  Object.keys(logicalValues.childFilters.visitType.childFilters).forEach((key) => {
+    t(`visitType.${key}`)
+      .toLocaleLowerCase()
+      .replace(/\W+/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .forEach(
+        (word) =>
+          (keywordMap[word] =
+            logicalValues.childFilters.visitType.childFilters[key as VisitTypeFilter].getBitfield())
+      )
+  })
 
-  Object.keys(logicalValues.childFilters.specialty.childFilters)
-    .forEach((key) => {
-      t(`specialty.${key}`)
-        .toLocaleLowerCase()
-        .replace(/\W+/g, ' ')
-        .split(' ')
-        .filter(Boolean)
-        .forEach(
-          (word) =>
-            (keywordMap[word] =
-              logicalValues.childFilters.specialty.childFilters[
-                key as SpecialtyFilter
-              ].getBitfield())
-        )
-    })
+  Object.keys(logicalValues.childFilters.specialty.childFilters).forEach((key) => {
+    t(`specialty.${key}`)
+      .toLocaleLowerCase()
+      .replace(/\W+/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .forEach(
+        (word) =>
+          (keywordMap[word] =
+            logicalValues.childFilters.specialty.childFilters[key as SpecialtyFilter].getBitfield())
+      )
+  })
 
-  Object.keys(logicalValues.childFilters.tests.childFilters)
-    .forEach((key) => {
-      t(`tests.${key}`)
-        .toLocaleLowerCase()
-        .replace(/\W+/g, ' ')
-        .split(' ')
-        .filter(Boolean)
-        .forEach(
-          (word) =>
-            (keywordMap[word] =
-              logicalValues.childFilters.tests.childFilters[key as TestsFilter].getBitfield())
-        )
-    })
+  Object.keys(logicalValues.childFilters.tests.childFilters).forEach((key) => {
+    t(`tests.${key}`)
+      .toLocaleLowerCase()
+      .replace(/\W+/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .forEach(
+        (word) =>
+          (keywordMap[word] =
+            logicalValues.childFilters.tests.childFilters[key as TestsFilter].getBitfield())
+      )
+  })
 
   return keywordMap
 })
 
-function mapFilterTextToFilterLogic(filterGroupFieldKey: PrimaryCareFilterLogic, childFilterFieldKeys: (keyof SpecialtyFilter | keyof TestsFilter | keyof VisitTypeFilter | keyof WaitTimeFilter)[], keywordMap: Record<string, Uint32Array>, logicalValues: PrimaryCareFilterLogic) {
-childFilterFieldKeys
-    .forEach((key) => {
-      t(`${filterGroupFieldKey}.${String(key)}`)
-        .toLocaleLowerCase()
-        .replace(/\W+/g, ' ')
-        .split(' ')
-        .filter(Boolean)
-        .forEach(
-          (word) =>
-            (keywordMap[word] =
-              logicalValues.childFilters[filterGroupFieldKey].childFilters[key].getBitfield())
-        )
-    })
-}
+// function mapFilterTextToFilterLogic(filterGroupFieldKey: PrimaryCareFilterLogic, childFilterFieldKeys: (keyof SpecialtyFilter | keyof TestsFilter | keyof VisitTypeFilter | keyof WaitTimeFilter)[], keywordMap: Record<string, Uint32Array>, logicalValues: PrimaryCareFilterLogic) {
+// childFilterFieldKeys
+//     .forEach((key) => {
+//       t(`${filterGroupFieldKey}.${String(key)}`)
+//         .toLocaleLowerCase()
+//         .replace(/\W+/g, ' ')
+//         .split(' ')
+//         .filter(Boolean)
+//         .forEach(
+//           (word) =>
+//             (keywordMap[word] =
+//               logicalValues.childFilters[filterGroupFieldKey].childFilters[key].getBitfield())
+//         )
+//     })
+// }
 
 const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   const { latitude, longitude } = userLocation.value
