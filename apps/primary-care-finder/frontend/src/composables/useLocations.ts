@@ -2,7 +2,7 @@ import { onBeforeMount, ref, type Ref } from 'vue'
 import { PinboardUtilities } from '@pinboard/ui'
 import type { PrimaryCareLocation, PrimaryCareResponse, PrimaryCareFeature } from '@/types'
 
-const CARTO_RECORDS_QUERY = `https://phl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT cartodb_id AS id, * FROM pdph_primary_care_finder WHERE "record" <> 'test'`
+const CARTO_RECORDS_QUERY = `https://phl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM pdph_primary_care_finder WHERE "record" <> 'test'`
 const CARTO_LANGUAGES_QUERY = `https://phl.carto.com/api/v2/sql?q=SELECT ARRAY( SELECT DISTINCT trim(unnest(string_to_array(lower(concat_ws(',', VARIADIC array_agg(languages))), ','))) AS language ORDER BY language) AS languages FROM pdph_primary_care_finder WHERE "record" <> 'test'`
 
 export function useLocations(): {

@@ -203,9 +203,14 @@ const keywordToFilterMap = computed(() => {
       logicalValues.childFilters.waitTime.childFilters.weekSick.getBitfield(),
     [t('waitTime.twoMonths').toLocaleLowerCase()]:
       logicalValues.childFilters.waitTime.childFilters.weekWell.getBitfield(),
-      ...Object.fromEntries(Array.from(languages.value, (lang) => {
-        return [t(`languages.${lang}`).toLocaleLowerCase(), logicalValues.childFilters.languages.childFilters[lang].getBitfield()]
-      }))
+    ...Object.fromEntries(
+      Array.from(languages.value, (lang) => {
+        return [
+          t(`languages.${lang}`).toLocaleLowerCase(),
+          logicalValues.childFilters.languages.childFilters[lang].getBitfield(),
+        ]
+      })
+    ),
   }
   return keywordMap
 })

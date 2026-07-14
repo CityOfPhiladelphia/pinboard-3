@@ -1,12 +1,11 @@
 import type {
-  BitWiseOperation,
   FilterChoiceBitfield,
   FilterChoiceBitfieldGroup,
   FilterGroup,
   FilterValues,
   PinboardTypes,
 } from '@pinboard/ui'
-import { languageOptions, waitOptions } from './composables/filters/filterKeysValues'
+import { waitOptions } from './composables/filters/filterKeysValues'
 
 type YesOrNo = 'Yes' | 'No'
 type YesOrNoOrEstablishedPatients = YesOrNo | 'Established Patients'

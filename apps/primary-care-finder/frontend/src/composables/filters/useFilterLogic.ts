@@ -6,7 +6,6 @@ import {
   visitTypeOptions,
   specialtyOptions,
   testsOptions,
-  languageOptions,
 } from './filterKeysValues'
 import {
   FilterChoiceBitfieldGroup,
