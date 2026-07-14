@@ -1,16 +1,18 @@
 import type {
-  AgeGroupField,
-  AgeGroupFilter,
+  AgeRangeField,
+  AgeRangeFilter,
+  FilterKey,
   SpecialtyField,
   SpecialtyFilter,
   TestsField,
   TestsFilter,
   VisitTypeField,
   VisitTypeFilter,
+  WaitTimeFilter,
 } from '@/types'
 
-export const filterKeys = {
-  ageGroup: 'ageGroup',
+export const filterKeys: Record<FilterKey, FilterKey> = {
+  ageRange: 'ageRange',
   waitTime: 'waitTime',
   visitType: 'visitType',
   specialty: 'specialty',
@@ -18,21 +20,21 @@ export const filterKeys = {
   languages: 'languages',
 }
 
-export const ageGroupOptions: Record<AgeGroupField, AgeGroupFilter> = {
+export const ageRangeOptions: Record<AgeRangeField, AgeRangeFilter> = {
   adults: 'adult',
   children: 'children',
 }
 
-export const waitOptions = ['sameDay', 'weekSick', 'weekWell', 'twoMonths'] as const
+export const waitOptions: WaitTimeFilter[] = ['walkIn', 'oneWeekSick', 'oneWeekWell', 'twoMonths']
 
 export const visitTypeOptions: Record<VisitTypeField, VisitTypeFilter> = {
-  primary_well: 'primaryWell',
-  primary_sick: 'primarySick',
-  primary_sports: 'primarySports',
-  primary_prenatal: 'primaryPrenatal',
-  primary_women: 'primaryWomen',
-  primary_telehealth: 'primaryTelehealth',
-  primary_vacc: 'primaryVaccines',
+  primary_well: 'well',
+  primary_sick: 'sick',
+  primary_sports: 'sports',
+  primary_prenatal: 'prenatal',
+  primary_women: 'women',
+  primary_telehealth: 'telehealth',
+  primary_vacc: 'vaccine',
 }
 
 export const specialtyOptions: Record<SpecialtyField, SpecialtyFilter> = {

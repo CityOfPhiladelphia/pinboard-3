@@ -31,12 +31,12 @@ import type {
 
 import { sortLocations } from '@/utilities/sortLocations'
 
-const emptyFilters: PrimaryCareFilters = {
+const defaultFilterState: PrimaryCareFilters = {
   sort: {
     distance: false,
     name: false,
   },
-  ageGroup: {
+  ageRange: {
     adult: false,
     children: false,
   },
@@ -51,66 +51,25 @@ const emptyFilters: PrimaryCareFilters = {
     nutrition: false,
     pharmacy: false,
     podiatry: false,
-    primaryPrenatal: false,
-    primarySick: false,
-    primarySports: false,
-    primaryTelehealth: false,
-    primaryVaccines: false,
-    primaryWell: false,
-    primaryWomen: false,
+    prenatal: false,
+    sick: false,
+    sports: false,
+    telehealth: false,
+    vaccine: false,
+    well: false,
+    women: false,
     sti: false,
     tobacco: false,
     xray: false,
   },
   waitTime: {
-    sameDay: false,
+    walkIn: false,
     twoMonths: false,
-    weekSick: false,
-    weekWell: false,
+    oneWeekSick: false,
+    oneWeekWell: false,
   },
   languages: {
-    amharic: false,
-    arabic: false,
-    asl: false,
-    bengali: false,
-    burmese: false,
-    cambodian: false,
-    cantonese: false,
-    chinese: false,
     english: false,
-    fanta: false,
-    filipino: false,
-    french: false,
-    frenchcreole: false,
-    fula: false,
-    gujarati: false,
-    haitiancreole: false,
-    hebrew: false,
-    hindi: false,
-    indonesian: false,
-    karen: false,
-    khmer: false,
-    kinyarwanda: false,
-    kirundi: false,
-    koloqua: false,
-    korean: false,
-    lebanese: false,
-    malayalam: false,
-    malaysian: false,
-    mandarin: false,
-    nepali: false,
-    portuguese: false,
-    punjabi: false,
-    shanghainese: false,
-    sinhalese: false,
-    spanish: false,
-    swahili: false,
-    tagalog: false,
-    taiwanese: false,
-    telugu: false,
-    urdu: false,
-    vietnamese: false,
-    yoruba: false,
   },
 }
 
@@ -140,21 +99,43 @@ const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
   zipcodePolygon,
   finishedZipFetch
 )
-const filterState = ref<PrimaryCareFilters>(emptyFilters)
+const filterState = ref<PrimaryCareFilters>(defaultFilterState)
 
 const { filterLogicalValue, filterLogic } = useFilterLogic(locations, languages, filterState)
 
 const keywordToFilterMap = computed(() => {
+  // console.log(messages.value.en.visitType)
+  // const a = Object.keys(messages.value.en.visitType).filter((key) => key !== 'category')
+  // console.log(a)
+  // const b = Array.from(a, (key) => {
+  //   return t(`visitType.${key}`).toLocaleLowerCase().split(' ').map((word) => {word: })
+  // })
+
+  // const b = Object.fromEntries(a, ([key, val]) => []
+  // })
+
+  // [t('visitType.prenatal').toLocaleLowerCase()]:
+  //     logicalValues.childFilters.visitType.childFilters.primaryPrenatal.getBitfield(),
   const logicalValues = filterLogic.value as PrimaryCareFilterLogic
   const keywordMap: Record<string, Uint32Array> = {
+    [t('waitTime.walkIn').toLocaleLowerCase()]:
+      logicalValues.childFilters.waitTime.childFilters.walkIn.getBitfield(),
+    [t('waitTime.oneWeekWell').toLocaleLowerCase()]:
+      logicalValues.childFilters.waitTime.childFilters.twoMonths.getBitfield(),
+    [t('waitTime.oneWeekSick').toLocaleLowerCase()]:
+      logicalValues.childFilters.waitTime.childFilters.oneWeekSick.getBitfield(),
+    [t('waitTime.twoMonths').toLocaleLowerCase()]:
+      logicalValues.childFilters.waitTime.childFilters.oneWeekWell.getBitfield(),
+
     [t('ageRange.adult').toLocaleLowerCase()]:
-      logicalValues.childFilters.ageGroup.childFilters.adult.getBitfield(),
+      logicalValues.childFilters.ageRange.childFilters.adult.getBitfield(),
     [t('ageRange.adults').toLocaleLowerCase()]:
-      logicalValues.childFilters.ageGroup.childFilters.adult.getBitfield(),
+      logicalValues.childFilters.ageRange.childFilters.adult.getBitfield(),
     [t('ageRange.child').toLocaleLowerCase()]:
-      logicalValues.childFilters.ageGroup.childFilters.children.getBitfield(),
+      logicalValues.childFilters.ageRange.childFilters.children.getBitfield(),
     [t('ageRange.children').toLocaleLowerCase()]:
-      logicalValues.childFilters.ageGroup.childFilters.children.getBitfield(),
+      logicalValues.childFilters.ageRange.childFilters.children.getBitfield(),
+
     [t('tests.blood').toLocaleLowerCase()]:
       logicalValues.childFilters.tests.childFilters.blood.getBitfield(),
     [t('tests.covid').toLocaleLowerCase()]:
@@ -165,6 +146,7 @@ const keywordToFilterMap = computed(() => {
       logicalValues.childFilters.tests.childFilters.mammo.getBitfield(),
     [t('tests.xray').toLocaleLowerCase()]:
       logicalValues.childFilters.tests.childFilters.xray.getBitfield(),
+
     [t('specialty.dental').toLocaleLowerCase()]:
       logicalValues.childFilters.specialty.childFilters.dental.getBitfield(),
     [t('specialty.eye').toLocaleLowerCase()]:
@@ -181,28 +163,22 @@ const keywordToFilterMap = computed(() => {
       logicalValues.childFilters.specialty.childFilters.podiatry.getBitfield(),
     [t('specialty.tobacco').toLocaleLowerCase()]:
       logicalValues.childFilters.specialty.childFilters.tobacco.getBitfield(),
+
     [t('visitType.prenatal').toLocaleLowerCase()]:
-      logicalValues.childFilters.visitType.childFilters.primaryPrenatal.getBitfield(),
+      logicalValues.childFilters.visitType.childFilters.prenatal.getBitfield(),
     [t('visitType.sick').toLocaleLowerCase()]:
-      logicalValues.childFilters.visitType.childFilters.primarySick.getBitfield(),
+      logicalValues.childFilters.visitType.childFilters.sick.getBitfield(),
     [t('visitType.sports').toLocaleLowerCase()]:
-      logicalValues.childFilters.visitType.childFilters.primarySports.getBitfield(),
+      logicalValues.childFilters.visitType.childFilters.sports.getBitfield(),
     [t('visitType.telehealth').toLocaleLowerCase()]:
-      logicalValues.childFilters.visitType.childFilters.primaryTelehealth.getBitfield(),
+      logicalValues.childFilters.visitType.childFilters.telehealth.getBitfield(),
     [t('visitType.vaccine').toLocaleLowerCase()]:
-      logicalValues.childFilters.visitType.childFilters.primaryVaccines.getBitfield(),
+      logicalValues.childFilters.visitType.childFilters.vaccine.getBitfield(),
     [t('visitType.well').toLocaleLowerCase()]:
-      logicalValues.childFilters.visitType.childFilters.primaryWell.getBitfield(),
+      logicalValues.childFilters.visitType.childFilters.well.getBitfield(),
     [t('visitType.women').toLocaleLowerCase()]:
-      logicalValues.childFilters.visitType.childFilters.primaryWomen.getBitfield(),
-    [t('waitTime.walkIn').toLocaleLowerCase()]:
-      logicalValues.childFilters.waitTime.childFilters.sameDay.getBitfield(),
-    [t('waitTime.oneWeekWell').toLocaleLowerCase()]:
-      logicalValues.childFilters.waitTime.childFilters.twoMonths.getBitfield(),
-    [t('waitTime.oneWeekSick').toLocaleLowerCase()]:
-      logicalValues.childFilters.waitTime.childFilters.weekSick.getBitfield(),
-    [t('waitTime.twoMonths').toLocaleLowerCase()]:
-      logicalValues.childFilters.waitTime.childFilters.weekWell.getBitfield(),
+      logicalValues.childFilters.visitType.childFilters.women.getBitfield(),
+
     ...Object.fromEntries(
       Array.from(languages.value, (lang) => {
         return [

@@ -4,7 +4,7 @@ import type { FilterDefinition } from '@pinboard/ui'
 import { IconSort } from '@phila/phila-ui-core/icons'
 import {
   filterKeys,
-  ageGroupOptions,
+  ageRangeOptions,
   waitOptions,
   visitTypeOptions,
   specialtyOptions,
@@ -26,12 +26,12 @@ export function useFilterChipDefinitions(languages: Ref<string[]>) {
       ],
     },
     {
-      key: filterKeys.ageGroup,
+      key: filterKeys.ageRange,
       label: t('ageRange.category'),
       multiple: true,
       choices: [
-        { text: t('ageRange.adult'), value: ageGroupOptions.adults },
-        { text: t('ageRange.child'), value: ageGroupOptions.children },
+        { text: t('ageRange.adult'), value: ageRangeOptions.adults },
+        { text: t('ageRange.child'), value: ageRangeOptions.children },
       ],
     },
     {

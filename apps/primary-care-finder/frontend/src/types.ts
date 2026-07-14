@@ -5,7 +5,7 @@ import type {
   FilterValues,
   PinboardTypes,
 } from '@pinboard/ui'
-import { waitOptions } from './composables/filters/filterKeysValues'
+import * as en from './i18n/en'
 
 type YesOrNo = 'Yes' | 'No'
 type YesOrNoOrEstablishedPatients = YesOrNo | 'Established Patients'
@@ -125,13 +125,26 @@ export type PrimaryCareLocation = PinboardTypes.BasicLocation & Omit<PrimaryCare
 
 export type SortMode = '' | 'distance' | 'name'
 
-export type AgeGroupField = 'adults' | 'children'
+export type FilterKey = 'ageRange' | 'waitTime' | 'visitType' | 'specialty' | 'tests' | 'languages'
 
-export type AgeGroupFilter = 'adult' | 'children'
+export type AgeRangeField = Extract<keyof PrimaryCareProperties, 'adults' | 'children'>
 
-export type WaitTimeFilter = (typeof waitOptions)[number]
+export type AgeRangeFilter = Extract<keyof typeof en.default.ageRange, 'adult' | 'children'>
 
-export type VisitTypeField =
+export type WaitTimeField = Extract<
+  keyof PrimaryCareProperties,
+  | 'walk_ins_sick'
+  | 'sick_adult_wait'
+  | 'sick_child_wait'
+  | 'well_adult_wait'
+  | 'well_child_wait'
+  | 'other_services_adult_wait'
+  | 'other_services_child_wait'
+>
+export type WaitTimeFilter = Exclude<keyof typeof en.default.waitTime, 'category'>
+
+export type VisitTypeField = Extract<
+  keyof PrimaryCareProperties,
   | 'primary_well'
   | 'primary_sick'
   | 'primary_sports'
@@ -139,17 +152,11 @@ export type VisitTypeField =
   | 'primary_women'
   | 'primary_telehealth'
   | 'primary_vacc'
+>
+export type VisitTypeFilter = Exclude<keyof typeof en.default.visitType, 'category'>
 
-export type VisitTypeFilter =
-  | 'primaryWell'
-  | 'primarySick'
-  | 'primarySports'
-  | 'primaryPrenatal'
-  | 'primaryWomen'
-  | 'primaryTelehealth'
-  | 'primaryVaccines'
-
-export type SpecialtyField =
+export type SpecialtyField = Extract<
+  keyof PrimaryCareProperties,
   | 'special_mental'
   | 'special_dental'
   | 'special_eye'
@@ -158,24 +165,19 @@ export type SpecialtyField =
   | 'special_nutrition'
   | 'special_tobacco'
   | 'special_pharmacy'
+>
+export type SpecialtyFilter = Exclude<keyof typeof en.default.specialty, 'category'>
 
-export type SpecialtyFilter =
-  | 'mental'
-  | 'dental'
-  | 'eye'
-  | 'podiatry'
-  | 'mat'
-  | 'nutrition'
-  | 'tobacco'
-  | 'pharmacy'
-
-export type TestsField = 'tests_blood' | 'tests_sti' | 'tests_covid' | 'tests_mammo' | 'tests_xray'
-export type TestsFilter = 'blood' | 'sti' | 'covid' | 'mammo' | 'xray'
+export type TestsField = Extract<
+  keyof PrimaryCareProperties,
+  'tests_blood' | 'tests_sti' | 'tests_covid' | 'tests_mammo' | 'tests_xray'
+>
+export type TestsFilter = Exclude<keyof typeof en.default.tests, 'category' | 'noTests'>
 
 export type LanguagesFilter = string
 
 export type PrimaryCareFilterKey =
-  | AgeGroupFilter
+  | AgeRangeFilter
   | WaitTimeFilter
   | VisitTypeFilter
   | SpecialtyFilter
@@ -187,14 +189,14 @@ export interface PrimaryCareFilters extends FilterValues {
     distance: boolean
     name: boolean
   }
-  ageGroup: Record<AgeGroupFilter, boolean>
+  ageRange: Record<AgeRangeFilter, boolean>
   visitType: Record<VisitTypeFilter | SpecialtyFilter | TestsFilter, boolean>
   waitTime: Record<WaitTimeFilter, boolean>
   languages: Record<LanguagesFilter, boolean>
 }
 
-interface AgeGroupFilterLogic extends FilterChoiceBitfieldGroup {
-  childFilters: Record<AgeGroupFilter, FilterChoiceBitfield>
+interface ageRangeFilterLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<AgeRangeFilter, FilterChoiceBitfield>
 }
 
 interface LanguagesFilterLogic extends FilterChoiceBitfieldGroup {
@@ -219,7 +221,7 @@ interface WaitTimeFilterLogic extends FilterChoiceBitfieldGroup {
 
 export interface PrimaryCareFilterLogic extends FilterGroup {
   childFilters: {
-    ageGroup: AgeGroupFilterLogic
+    ageRange: ageRangeFilterLogic
     languages: LanguagesFilterLogic
     specialty: SpecialtyFilterLogic
     tests: TestsFilterLogic
