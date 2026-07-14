@@ -1,4 +1,4 @@
-import { ref, computed, onBeforeMount, type Ref, type ComputedRef } from 'vue'
+import { ref, computed, markRaw, onBeforeMount, type Ref, type ComputedRef } from 'vue'
 import { IconWater, IconCamera } from '@phila/phila-ui-core/icons'
 import { PinboardUtilities } from '@pinboard/ui'
 import type { MapCardProps } from '@phila/phila-ui-cards'
@@ -66,13 +66,13 @@ export function useLocations(): {
 
 function getLocationTags(loc: LocationPanelDTO): NonNullable<MapCardProps['tags']> {
   if (loc.deviceType === 'Camera') {
-    return [{ text: 'Camera', color: 'purple' as const, icon: IconCamera }]
+    return [{ text: 'Camera', color: 'purple' as const, icon: markRaw(IconCamera) }]
   }
   const gaugeValue =
     Number.isNaN(loc.gaugeHeight) || loc.gaugeHeight === -9999.9
       ? 'No data'
       : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
-  return [{ text: 'Gauge', color: 'blue' as const, icon: IconWater }, { text: gaugeValue }]
+  return [{ text: 'Gauge', color: 'blue' as const, icon: markRaw(IconWater) }, { text: gaugeValue }]
 }
 
 async function getLocationsProxy(errorMessageRef: Ref) {
