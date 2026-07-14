@@ -219,15 +219,6 @@ interface WaitTimeFilterLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<WaitTimeFilter, FilterChoiceBitfield>
 }
 
-// interface PrimaryChildFilters extends Record<FilterKey, FilterChoiceBitfieldGroup> {
-//   ageRange: ageRangeFilterLogic
-//   languages: LanguagesFilterLogic
-//   specialty: SpecialtyFilterLogic
-//   tests: TestsFilterLogic
-//   visitType: VisitTypeFilterLogic
-//   waitTime: WaitTimeFilterLogic
-// }
-
 export interface PrimaryCareFilterLogic extends FilterGroup {
   childFilters: {
     ageRange: ageRangeFilterLogic

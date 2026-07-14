@@ -189,23 +189,6 @@ const keywordToFilterMap = computed(() => {
   return keywordMap
 })
 
-// function mapFilterKeywordsToFilters<>(keywordMap: Record<string, Uint32Array>, filterKey: FilterKey, filterValues: PrimaryCareFilterLogic) {
-//   Object.keys(en.default[filterKey])
-//     .filter((key) => !['category'].includes(key))
-//     .forEach((key) => {
-//       t(`${filterKey}.${key}`)
-//         .toLocaleLowerCase()
-//         .split(' ')
-//         .forEach(
-//           (word) =>
-//             (keywordMap[word] =
-//               filterValues.childFilters[filterKey].childFilters[
-//                 key
-//               ].getBitfield())
-//         )
-//     })
-// }
-
 const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   const { latitude, longitude } = userLocation.value
   return locations.value.map((loc) => ({
