@@ -1,4 +1,4 @@
-import { computed } from 'vue'
+import { computed, type Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { FilterDefinition } from '@pinboard/ui'
 import { IconSort } from '@phila/phila-ui-core/icons'
@@ -9,10 +9,9 @@ import {
   visitTypeOptions,
   specialtyOptions,
   testsOptions,
-  languageOptions,
 } from './filterKeysValues'
 
-export function useFilterChipDefinitions() {
+export function useFilterChipDefinitions(languages: Ref<string[]>) {
   const { t } = useI18n()
   const filterChipDefinitions = computed<FilterDefinition[]>(() => [
     {
@@ -89,7 +88,7 @@ export function useFilterChipDefinitions() {
       key: filterKeys.languages,
       label: t('languages.category'),
       multiple: true,
-      choices: Array.from(languageOptions, (lang) => {
+      choices: Array.from(languages.value, (lang) => {
         return { text: t(`languages.${lang}`), value: lang }
       }),
     },

@@ -20,6 +20,7 @@ import type { PrimaryCareFilters, PrimaryCareLocation, PrimaryCareProperties } f
 
 export function useFilterLogic(
   locations: Ref<PrimaryCareLocation[]>,
+  languages: Ref<string[]>,
   filterState: Ref<PrimaryCareFilters>
 ) {
   const filterLogicalValue = ref<Uint32Array>(new Uint32Array())
@@ -102,7 +103,7 @@ export function useFilterLogic(
     const languageFilter = makeFilterChoiceBitfieldGroup(
       commonParams,
       Object.fromEntries(
-        Array.from(languageOptions, (lang) => [
+        Array.from(languages.value, (lang) => [
           lang,
           {
             dataFields: ['languages'],
@@ -188,7 +189,7 @@ export function useFilterLogic(
     )
 
     // languages
-    languageOptions.forEach((filter) =>
+    languages.value.forEach((filter) =>
       filterLogic.value
         .getChildFilter(filterKeys.languages)
         .getChildFilter(filter)

@@ -2,29 +2,34 @@ import { onBeforeMount, ref, type Ref } from 'vue'
 import { PinboardUtilities } from '@pinboard/ui'
 import type { PrimaryCareLocation, PrimaryCareResponse, PrimaryCareFeature } from '@/types'
 
-const CARTO_URL = `https://phl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM pdph_primary_care_finder WHERE "record" <> 'test'`
+const CARTO_RECORDS_QUERY = `https://phl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT cartodb_id AS id, * FROM pdph_primary_care_finder WHERE "record" <> 'test'`
+const CARTO_LANGUAGES_QUERY = `https://phl.carto.com/api/v2/sql?q=SELECT ARRAY( SELECT DISTINCT trim(unnest(string_to_array(lower(concat_ws(',', VARIADIC array_agg(languages))), ','))) AS language ORDER BY language) AS languages FROM pdph_primary_care_finder WHERE "record" <> 'test'`
 
 export function useLocations(): {
   locations: Ref<PrimaryCareLocation[]>
+  languages: Ref<string[]>
   isLoading: Ref<string | false>
   errorMessage: Ref<string | null>
   geojson: Ref<PrimaryCareResponse | undefined>
 } {
   const locations = ref<PrimaryCareLocation[]>([])
+  const languages = ref<string[]>([])
   const isLoading = ref<string | false>('Loading data...')
   const errorMessage = ref<string | null>(null)
   const geojson = ref<PrimaryCareResponse | undefined>(undefined)
 
   async function fetchLocations() {
     try {
-      const response = await fetch(encodeURI(CARTO_URL))
+      const response = await fetch(encodeURI(CARTO_RECORDS_QUERY))
+      const langResponse = await fetch(encodeURI(CARTO_LANGUAGES_QUERY))
 
-      if (!response.ok) {
+      if (!response.ok || !langResponse.ok) {
         errorMessage.value = 'Error retrieving primary care sites'
         return
       }
 
       const geojsonData = (await response.json()) as PrimaryCareResponse
+      languages.value = (await langResponse.json()).rows[0].languages
 
       // Stable, readable id per site: slug of the name. cartodb_id churns on the daily Carto
       // reload, so a row id makes shared/bookmarked deep-links rot. Deduped so two sites that
@@ -71,5 +76,5 @@ export function useLocations(): {
 
   onBeforeMount(fetchLocations)
 
-  return { locations, isLoading, errorMessage, geojson }
+  return { locations, languages, isLoading, errorMessage, geojson }
 }

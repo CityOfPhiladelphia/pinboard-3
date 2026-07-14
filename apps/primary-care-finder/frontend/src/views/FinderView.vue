@@ -116,8 +116,8 @@ const emptyFilters: PrimaryCareFilters = {
 
 const { t } = useI18n()
 const isMobile = PinboardComposables.useIsMobile()
-const { filterChipDefinitions } = useFilterChipDefinitions()
-const { locations, isLoading, errorMessage, geojson } = useLocations()
+const { locations, languages, isLoading, errorMessage, geojson } = useLocations()
+const { filterChipDefinitions } = useFilterChipDefinitions(languages)
 const calloutOpen = ref(true)
 // Location is requested only when the user clicks the geolocation button, which
 // emits to handleGeolocate. The shared useUserLocation composable prompts on load,
@@ -142,10 +142,10 @@ const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
 )
 const filterState = ref<PrimaryCareFilters>(emptyFilters)
 
-const { filterLogicalValue, filterLogic } = useFilterLogic(locations, filterState)
+const { filterLogicalValue, filterLogic } = useFilterLogic(locations, languages, filterState)
 
 const keywordToFilterMap = computed(() => {
-  const logicalValues = filterLogic.value as unknown as PrimaryCareFilterLogic
+  const logicalValues = filterLogic.value as PrimaryCareFilterLogic
   const keywordMap: Record<string, Uint32Array> = {
     [t('ageRange.adult').toLocaleLowerCase()]:
       logicalValues.childFilters.ageGroup.childFilters.adult.getBitfield(),
@@ -203,90 +203,9 @@ const keywordToFilterMap = computed(() => {
       logicalValues.childFilters.waitTime.childFilters.weekSick.getBitfield(),
     [t('waitTime.twoMonths').toLocaleLowerCase()]:
       logicalValues.childFilters.waitTime.childFilters.weekWell.getBitfield(),
-    [t('languages.amharic').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.amharic.getBitfield(),
-    [t('languages.arabic').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.arabic.getBitfield(),
-    [t('languages.asl').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.asl.getBitfield(),
-    [t('languages.bengali').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.bengali.getBitfield(),
-    [t('languages.burmese').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.burmese.getBitfield(),
-    [t('languages.cambodian').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.cambodian.getBitfield(),
-    [t('languages.cantonese').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.cantonese.getBitfield(),
-    [t('languages.chinese').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.chinese.getBitfield(),
-    [t('languages.english').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.english.getBitfield(),
-    [t('languages.fanta').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.fanta.getBitfield(),
-    [t('languages.filipino').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.filipino.getBitfield(),
-    [t('languages.french').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.french.getBitfield(),
-    [t('languages.frenchcreole').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.frenchcreole.getBitfield(),
-    [t('languages.fula').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.fula.getBitfield(),
-    [t('languages.gujarati').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.gujarati.getBitfield(),
-    [t('languages.haitiancreole').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.haitiancreole.getBitfield(),
-    [t('languages.hebrew').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.hebrew.getBitfield(),
-    [t('languages.hindi').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.hindi.getBitfield(),
-    [t('languages.indonesian').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.indonesian.getBitfield(),
-    [t('languages.karen').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.karen.getBitfield(),
-    [t('languages.khmer').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.khmer.getBitfield(),
-    [t('languages.kinyarwanda').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.kinyarwanda.getBitfield(),
-    [t('languages.kirundi').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.kirundi.getBitfield(),
-    [t('languages.koloqua').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.koloqua.getBitfield(),
-    [t('languages.korean').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.korean.getBitfield(),
-    [t('languages.lebanese').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.lebanese.getBitfield(),
-    [t('languages.malayalam').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.malayalam.getBitfield(),
-    [t('languages.malaysian').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.malaysian.getBitfield(),
-    [t('languages.mandarin').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.mandarin.getBitfield(),
-    [t('languages.nepali').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.nepali.getBitfield(),
-    [t('languages.portuguese').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.portuguese.getBitfield(),
-    [t('languages.punjabi').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.punjabi.getBitfield(),
-    [t('languages.shanghainese').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.shanghainese.getBitfield(),
-    [t('languages.sinhalese').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.sinhalese.getBitfield(),
-    [t('languages.spanish').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.spanish.getBitfield(),
-    [t('languages.swahili').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.swahili.getBitfield(),
-    [t('languages.tagalog').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.tagalog.getBitfield(),
-    [t('languages.taiwanese').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.taiwanese.getBitfield(),
-    [t('languages.telugu').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.telugu.getBitfield(),
-    [t('languages.urdu').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.urdu.getBitfield(),
-    [t('languages.vietnamese').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.vietnamese.getBitfield(),
-    [t('languages.yoruba').toLocaleLowerCase()]:
-      logicalValues.childFilters.languages.childFilters.yoruba.getBitfield(),
+      ...Object.fromEntries(Array.from(languages.value, (lang) => {
+        return [t(`languages.${lang}`).toLocaleLowerCase(), logicalValues.childFilters.languages.childFilters[lang].getBitfield()]
+      }))
   }
   return keywordMap
 })

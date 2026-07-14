@@ -1,6 +1,8 @@
 import type {
   BitWiseOperation,
   FilterChoiceBitfield,
+  FilterChoiceBitfieldGroup,
+  FilterGroup,
   FilterValues,
   PinboardTypes,
 } from '@pinboard/ui'
@@ -171,7 +173,7 @@ export type SpecialtyFilter =
 export type TestsField = 'tests_blood' | 'tests_sti' | 'tests_covid' | 'tests_mammo' | 'tests_xray'
 export type TestsFilter = 'blood' | 'sti' | 'covid' | 'mammo' | 'xray'
 
-export type LanguagesFilter = (typeof languageOptions)[number]
+export type LanguagesFilter = string
 
 export type PrimaryCareFilterKey =
   | AgeGroupFilter
@@ -192,46 +194,37 @@ export interface PrimaryCareFilters extends FilterValues {
   languages: Record<LanguagesFilter, boolean>
 }
 
-export interface PrimaryCareFilterLogic {
-  bufferLength: number
-  checked: boolean
-  operation: BitWiseOperation
+interface AgeGroupFilterLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<AgeGroupFilter, FilterChoiceBitfield>
+}
+
+interface LanguagesFilterLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<LanguagesFilter, FilterChoiceBitfield>
+}
+
+interface SpecialtyFilterLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<SpecialtyFilter, FilterChoiceBitfield>
+}
+
+interface TestsFilterLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<TestsFilter, FilterChoiceBitfield>
+}
+
+interface VisitTypeFilterLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<VisitTypeFilter, FilterChoiceBitfield>
+}
+
+interface WaitTimeFilterLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<WaitTimeFilter, FilterChoiceBitfield>
+}
+
+export interface PrimaryCareFilterLogic extends FilterGroup {
   childFilters: {
-    ageGroup: {
-      bufferLength: number
-      checked: boolean
-      operation: BitWiseOperation
-      childFilters: Record<AgeGroupFilter, FilterChoiceBitfield>
-    }
-    languages: {
-      bufferLength: number
-      checked: boolean
-      operation: BitWiseOperation
-      childFilters: Record<LanguagesFilter, FilterChoiceBitfield>
-    }
-    specialty: {
-      bufferLength: number
-      checked: boolean
-      operation: BitWiseOperation
-      childFilters: Record<SpecialtyFilter, FilterChoiceBitfield>
-    }
-    tests: {
-      bufferLength: number
-      checked: boolean
-      operation: BitWiseOperation
-      childFilters: Record<TestsFilter, FilterChoiceBitfield>
-    }
-    visitType: {
-      bufferLength: number
-      checked: boolean
-      operation: BitWiseOperation
-      childFilters: Record<VisitTypeFilter, FilterChoiceBitfield>
-    }
-    waitTime: {
-      bufferLength: number
-      checked: boolean
-      operation: BitWiseOperation
-      childFilters: Record<WaitTimeFilter, FilterChoiceBitfield>
-    }
+    ageGroup: AgeGroupFilterLogic
+    languages: LanguagesFilterLogic
+    specialty: SpecialtyFilterLogic
+    tests: TestsFilterLogic
+    visitType: VisitTypeFilterLogic
+    waitTime: WaitTimeFilterLogic
   }
 }
