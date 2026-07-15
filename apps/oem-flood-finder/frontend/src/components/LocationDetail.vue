@@ -15,7 +15,7 @@ const props = defineProps<{
 }>()
 
 const readingState = useLocationDetail(
-  () => props.location.deviceId,
+  () => props.location.id,
   () => props.location.deviceType,
 )
 

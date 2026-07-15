@@ -9,7 +9,7 @@ export function sortLocations(
 ) {
   locations = toValue(locations)
   locations.forEach((location) => {
-    location.locationCardInfo.subheader = PinboardUtilities.hasLocationData(currentLocation.value)
+    location.distance = PinboardUtilities.hasLocationData(currentLocation.value)
       ? `${PinboardUtilities.getHaversineDistance(
           { latitude: location.latitude, longitude: location.longitude },
           {
@@ -19,6 +19,8 @@ export function sortLocations(
           1,
         )} mi`
       : undefined
+
+    location.locationCardInfo.subheader = location.distance
   })
 
   switch (
@@ -32,9 +34,7 @@ export function sortLocations(
     }
     case 'DistAsc': {
       locations.sort(
-        (a, b) =>
-          Number(a.locationCardInfo.subheader?.replace(' mi', '')) -
-          Number(b.locationCardInfo.subheader?.replace(' mi', '')),
+        (a, b) => Number(a.distance?.replace(' mi', '')) - Number(b.distance?.replace(' mi', '')),
       )
       break
     }

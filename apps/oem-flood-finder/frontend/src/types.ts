@@ -31,32 +31,21 @@ export interface Flood {
 
 type DeviceType = 'Aware' | 'Usgs' | 'Camera'
 
-export type LocationPanelDTO = {
-  lastUpdated: string
-  gaugeHeight: number
-  gaugeHeightUnit: string
-  thumbnailUrl: string
-  pictureTimestampUTC: string
-  cameraStreamUrl: string
-  deviceType: DeviceType
-  actionStage: number
-  minorStage: number
-  moderateStage: number
-  majorStage: number
-} & PinboardTypes.BasicLocation
-
 export interface OemFields {
-  /** Flood-API device id, used to fetch readings. Decoupled from the slug `id`. */
-  deviceId: string
   deviceType: DeviceType
-  lastUpdated: Date | null
-  actionStage: number
-  minorStage: number
-  moderateStage: number
-  majorStage: number
-  cameraStreamUrl: string
+  lastUpdated: Date
+  gaugeHeight: number | null
+  gaugeHeightUnit: 'in' | null
+  actionStage: number | null
+  minorStage: number | null
+  moderateStage: number | null
+  majorStage: number | null
   pictureTimestampUTC: Date | null
+  thumbnailUrl: string
+  cameraStreamUrl: string | null
 }
+
+export type LocationPanelDTO = OemFields & Omit<PinboardTypes.BasicLocation, 'locationCardInfo'>
 
 export type OemLocation = PinboardTypes.BasicLocation & OemFields
 

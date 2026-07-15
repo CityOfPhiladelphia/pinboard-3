@@ -202,8 +202,8 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
             :zoom="zoom"
             :icon="isGauge(loc) ? IconGauge : IconCamera"
             :text="
-              loc.locationCardInfo.tags?.[1]?.text !== 'No data'
-                ? (loc.locationCardInfo.tags?.[1]?.text ?? '')
+              isGauge(loc) && !(Number.isNaN(loc.gaugeHeight) || loc.gaugeHeight === -9999.9)
+                ? String(loc.gaugeHeight)
                 : ''
             "
             :color-theme="isGauge(loc) ? 'light-primary' : 'light-purple'"
@@ -227,10 +227,4 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
   </PinboardBody>
 </template>
 
-<style scoped>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-</style>
+<style scoped></style>

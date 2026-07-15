@@ -64,7 +64,7 @@ async function getGaugeReadingsDev(
 ) {
   const myHeaders = new Headers()
   myHeaders.append('x-api-key', import.meta.env.VITE_FLOOD_API_KEY || '')
-
+  console.log(toValue(id))
   const response = await fetch(
     `${import.meta.env.VITE_FLOOD_API_BASE_URL}/${toValue(deviceType).toLowerCase()}/reading/${toValue(id)}`,
     {
