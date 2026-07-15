@@ -20,8 +20,10 @@ export function useLocations(): {
 
   async function fetchLocations() {
     try {
-      const response = await fetch(encodeURI(CARTO_RECORDS_QUERY))
-      const langResponse = await fetch(encodeURI(CARTO_LANGUAGES_QUERY))
+      const [response, langResponse] = await Promise.all([
+        fetch(encodeURI(CARTO_RECORDS_QUERY)),
+        fetch(encodeURI(CARTO_LANGUAGES_QUERY)),
+      ])
 
       if (!response.ok || !langResponse.ok) {
         errorMessage.value = 'Error retrieving primary care sites'

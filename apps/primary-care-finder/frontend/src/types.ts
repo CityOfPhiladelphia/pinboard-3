@@ -129,7 +129,7 @@ export type FilterKey = 'ageRange' | 'waitTime' | 'visitType' | 'specialty' | 't
 
 export type AgeRangeField = Extract<keyof PrimaryCareProperties, 'adults' | 'children'>
 
-export type AgeRangeFilter = Extract<keyof typeof en.default.ageRange, 'adult' | 'children'>
+export type AgeRangeFilterKey = Extract<keyof typeof en.default.ageRange, 'adult' | 'children'>
 
 export type WaitTimeField = Extract<
   keyof PrimaryCareProperties,
@@ -141,7 +141,7 @@ export type WaitTimeField = Extract<
   | 'other_services_adult_wait'
   | 'other_services_child_wait'
 >
-export type WaitTimeFilter = Exclude<keyof typeof en.default.waitTime, 'category'>
+export type WaitTimeFilterKey = Exclude<keyof typeof en.default.waitTime, 'category'>
 
 export type VisitTypeField = Extract<
   keyof PrimaryCareProperties,
@@ -153,7 +153,7 @@ export type VisitTypeField = Extract<
   | 'primary_telehealth'
   | 'primary_vacc'
 >
-export type VisitTypeFilter = Exclude<keyof typeof en.default.visitType, 'category'>
+export type VisitTypeFilterKey = Exclude<keyof typeof en.default.visitType, 'category'>
 
 export type SpecialtyField = Extract<
   keyof PrimaryCareProperties,
@@ -172,60 +172,70 @@ export type TestsField = Extract<
   keyof PrimaryCareProperties,
   'tests_blood' | 'tests_sti' | 'tests_covid' | 'tests_mammo' | 'tests_xray'
 >
-export type TestsFilter = Exclude<keyof typeof en.default.tests, 'category' | 'noTests'>
+export type TestsFilterKey = Exclude<keyof typeof en.default.tests, 'category' | 'noTests'>
 
-export type LanguagesFilter = string
+export type LanguagesFilterKey = string
 
 export type PrimaryCareFilterKey =
-  | AgeRangeFilter
-  | WaitTimeFilter
-  | VisitTypeFilter
+  | AgeRangeFilterKey
+  | WaitTimeFilterKey
+  | VisitTypeFilterKey
   | SpecialtyFilter
-  | TestsFilter
-  | LanguagesFilter
+  | TestsFilterKey
+  | LanguagesFilterKey
 
 export interface PrimaryCareFilters extends FilterValues {
   sort: {
     distance: boolean
     name: boolean
   }
-  ageRange: Record<AgeRangeFilter, boolean>
-  visitType: Record<VisitTypeFilter | SpecialtyFilter | TestsFilter, boolean>
-  waitTime: Record<WaitTimeFilter, boolean>
-  languages: Record<LanguagesFilter, boolean>
+  ageRange: Record<AgeRangeFilterKey, boolean>
+  visitType: Record<VisitTypeFilterKey | SpecialtyFilter | TestsFilterKey, boolean>
+  waitTime: Record<WaitTimeFilterKey, boolean>
+  languages: Record<LanguagesFilterKey, boolean>
 }
 
-export interface ageRangeFilterLogic extends FilterChoiceBitfieldGroup {
-  childFilters: Record<AgeRangeFilter, FilterChoiceBitfield>
+export interface AgeRangeFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<AgeRangeFilterKey, FilterChoiceBitfield>
 }
 
-export interface LanguagesFilterLogic extends FilterChoiceBitfieldGroup {
-  childFilters: Record<LanguagesFilter, FilterChoiceBitfield>
+export interface LanguagesFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<LanguagesFilterKey, FilterChoiceBitfield>
 }
 
 export interface SpecialtyFilterLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<SpecialtyFilter, FilterChoiceBitfield>
 }
 
-export interface TestsFilterLogic extends FilterChoiceBitfieldGroup {
-  childFilters: Record<TestsFilter, FilterChoiceBitfield>
+export interface TestsFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<TestsFilterKey, FilterChoiceBitfield>
 }
 
-export interface VisitTypeFilterLogic extends FilterChoiceBitfieldGroup {
-  childFilters: Record<VisitTypeFilter, FilterChoiceBitfield>
+export interface VisitTypeFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<VisitTypeFilterKey, FilterChoiceBitfield>
 }
 
-export interface WaitTimeFilterLogic extends FilterChoiceBitfieldGroup {
-  childFilters: Record<WaitTimeFilter, FilterChoiceBitfield>
+export interface WaitTimeFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<WaitTimeFilterKey, FilterChoiceBitfield>
 }
+
+type PricareFilterChild = Record<
+  FilterKey,
+  | AgeRangeFilterKeyLogic
+  | LanguagesFilterKeyLogic
+  | SpecialtyFilterLogic
+  | TestsFilterKeyLogic
+  | VisitTypeFilterKeyLogic
+  | WaitTimeFilterKeyLogic
+>
 
 export interface PrimaryCareFilterLogic extends FilterGroup {
   childFilters: {
-    ageRange: ageRangeFilterLogic
-    languages: LanguagesFilterLogic
+    ageRange: AgeRangeFilterKeyLogic
+    languages: LanguagesFilterKeyLogic
     specialty: SpecialtyFilterLogic
-    tests: TestsFilterLogic
-    visitType: VisitTypeFilterLogic
-    waitTime: WaitTimeFilterLogic
+    tests: TestsFilterKeyLogic
+    visitType: VisitTypeFilterKeyLogic
+    waitTime: WaitTimeFilterKeyLogic
   }
 }
