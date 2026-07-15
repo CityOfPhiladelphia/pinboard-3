@@ -1,14 +1,14 @@
 import type {
   AgeRangeField,
-  AgeRangeFilter,
+  AgeRangeFilterKey,
   FilterKey,
   SpecialtyField,
-  SpecialtyFilter,
+  SpecialtyFilterKey,
   TestsField,
-  TestsFilter,
+  TestsFilterKey,
   VisitTypeField,
-  VisitTypeFilter,
-  WaitTimeFilter,
+  VisitTypeFilterKey,
+  WaitTimeFilterKey,
 } from '@/types'
 
 export const filterKeys: Record<FilterKey, FilterKey> = {
@@ -20,14 +20,19 @@ export const filterKeys: Record<FilterKey, FilterKey> = {
   languages: 'languages',
 }
 
-export const ageRangeOptions: Record<AgeRangeField, AgeRangeFilter> = {
+export const ageRangeOptions: Record<AgeRangeField, AgeRangeFilterKey> = {
   adults: 'adult',
   children: 'children',
 }
 
-export const waitOptions: WaitTimeFilter[] = ['walkIn', 'oneWeekSick', 'oneWeekWell', 'twoMonths']
+export const waitOptions: WaitTimeFilterKey[] = [
+  'walkIn',
+  'oneWeekSick',
+  'oneWeekWell',
+  'twoMonths',
+]
 
-export const visitTypeOptions: Record<VisitTypeField, VisitTypeFilter> = {
+export const visitTypeOptions: Record<VisitTypeField, VisitTypeFilterKey> = {
   primary_well: 'well',
   primary_sick: 'sick',
   primary_sports: 'sports',
@@ -37,7 +42,7 @@ export const visitTypeOptions: Record<VisitTypeField, VisitTypeFilter> = {
   primary_vacc: 'vaccine',
 }
 
-export const specialtyOptions: Record<SpecialtyField, SpecialtyFilter> = {
+export const specialtyOptions: Record<SpecialtyField, SpecialtyFilterKey> = {
   special_mental: 'mental',
   special_dental: 'dental',
   special_eye: 'eye',
@@ -48,7 +53,7 @@ export const specialtyOptions: Record<SpecialtyField, SpecialtyFilter> = {
   special_pharmacy: 'pharmacy',
 }
 
-export const testsOptions: Record<TestsField, TestsFilter> = {
+export const testsOptions: Record<TestsField, TestsFilterKey> = {
   tests_blood: 'blood',
   tests_sti: 'sti',
   tests_covid: 'covid',
