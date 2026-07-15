@@ -138,7 +138,9 @@ const keywordToFilterMap = computed(() => {
       .forEach(
         (word) =>
           (keywordMap[word] =
-            logicalValues.childFilters.waitTime.childFilters[key as WaitTimeFilterKey].getBitfield())
+            logicalValues.childFilters.waitTime.childFilters[
+              key as WaitTimeFilterKey
+            ].getBitfield())
       )
   })
 
@@ -151,7 +153,9 @@ const keywordToFilterMap = computed(() => {
       .forEach(
         (word) =>
           (keywordMap[word] =
-            logicalValues.childFilters.visitType.childFilters[key as VisitTypeFilterKey].getBitfield())
+            logicalValues.childFilters.visitType.childFilters[
+              key as VisitTypeFilterKey
+            ].getBitfield())
       )
   })
 
@@ -164,7 +168,9 @@ const keywordToFilterMap = computed(() => {
       .forEach(
         (word) =>
           (keywordMap[word] =
-            logicalValues.childFilters.specialty.childFilters[key as SpecialtyFilterKey].getBitfield())
+            logicalValues.childFilters.specialty.childFilters[
+              key as SpecialtyFilterKey
+            ].getBitfield())
       )
   })
 
@@ -183,22 +189,6 @@ const keywordToFilterMap = computed(() => {
 
   return keywordMap
 })
-
-// function mapFilterTextToFilterLogic(filterGroupFieldKey: keyof PrimaryCareFilterLogic["childFilters"], childFilterFieldKeys: (keyof SpecialtyFilter | keyof TestsFilter | keyof VisitTypeFilter | keyof WaitTimeFilter)[], keywordMap: Record<string, Uint32Array>, logicalValues: PrimaryCareFilterLogic) {
-// childFilterFieldKeys
-//     .forEach((key) => {
-//       t(`${filterGroupFieldKey}.${String(key)}`)
-//         .toLocaleLowerCase()
-//         .replace(/\W+/g, ' ')
-//         .split(' ')
-//         .filter(Boolean)
-//         .forEach(
-//           (word) =>
-//             (keywordMap[word] =
-//               logicalValues.childFilters[filterGroupFieldKey].childFilters[key].getBitfield())
-//         )
-//     })
-// }
 
 const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   const { latitude, longitude } = userLocation.value

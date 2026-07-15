@@ -1,4 +1,5 @@
 import { onBeforeMount, ref, type Ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { PinboardUtilities } from '@pinboard/ui'
 import type { PrimaryCareLocation, PrimaryCareResponse, PrimaryCareFeature } from '@/types'
 
@@ -12,6 +13,7 @@ export function useLocations(): {
   errorMessage: Ref<string | null>
   geojson: Ref<PrimaryCareResponse | undefined>
 } {
+  const { t } = useI18n()
   const locations = ref<PrimaryCareLocation[]>([])
   const languages = ref<string[]>([])
   const isLoading = ref<string | false>('Loading data...')
@@ -25,9 +27,13 @@ export function useLocations(): {
         fetch(encodeURI(CARTO_LANGUAGES_QUERY)),
       ])
 
-      if (!response.ok || !langResponse.ok) {
-        errorMessage.value = 'Error retrieving primary care sites'
+      if (!response.ok) {
+        errorMessage.value = t('error.fetchSites')
         return
+      }
+
+      if (!langResponse.ok) {
+        errorMessage.value = t('error.fetchLanguges')
       }
 
       const geojsonData = (await response.json()) as PrimaryCareResponse

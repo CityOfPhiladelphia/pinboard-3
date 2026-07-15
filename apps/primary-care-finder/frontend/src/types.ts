@@ -166,7 +166,7 @@ export type SpecialtyField = Extract<
   | 'special_tobacco'
   | 'special_pharmacy'
 >
-export type SpecialtyFilter = Exclude<keyof typeof en.default.specialty, 'category'>
+export type SpecialtyFilterKey = Exclude<keyof typeof en.default.specialty, 'category'>
 
 export type TestsField = Extract<
   keyof PrimaryCareProperties,
@@ -180,7 +180,7 @@ export type PrimaryCareFilterKey =
   | AgeRangeFilterKey
   | WaitTimeFilterKey
   | VisitTypeFilterKey
-  | SpecialtyFilter
+  | SpecialtyFilterKey
   | TestsFilterKey
   | LanguagesFilterKey
 
@@ -190,7 +190,7 @@ export interface PrimaryCareFilters extends FilterValues {
     name: boolean
   }
   ageRange: Record<AgeRangeFilterKey, boolean>
-  visitType: Record<VisitTypeFilterKey | SpecialtyFilter | TestsFilterKey, boolean>
+  visitType: Record<VisitTypeFilterKey | SpecialtyFilterKey | TestsFilterKey, boolean>
   waitTime: Record<WaitTimeFilterKey, boolean>
   languages: Record<LanguagesFilterKey, boolean>
 }
@@ -203,8 +203,8 @@ export interface LanguagesFilterKeyLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<LanguagesFilterKey, FilterChoiceBitfield>
 }
 
-export interface SpecialtyFilterLogic extends FilterChoiceBitfieldGroup {
-  childFilters: Record<SpecialtyFilter, FilterChoiceBitfield>
+export interface SpecialtyFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<SpecialtyFilterKey, FilterChoiceBitfield>
 }
 
 export interface TestsFilterKeyLogic extends FilterChoiceBitfieldGroup {
@@ -219,21 +219,11 @@ export interface WaitTimeFilterKeyLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<WaitTimeFilterKey, FilterChoiceBitfield>
 }
 
-type PricareFilterChild = Record<
-  FilterKey,
-  | AgeRangeFilterKeyLogic
-  | LanguagesFilterKeyLogic
-  | SpecialtyFilterLogic
-  | TestsFilterKeyLogic
-  | VisitTypeFilterKeyLogic
-  | WaitTimeFilterKeyLogic
->
-
 export interface PrimaryCareFilterLogic extends FilterGroup {
   childFilters: {
     ageRange: AgeRangeFilterKeyLogic
     languages: LanguagesFilterKeyLogic
-    specialty: SpecialtyFilterLogic
+    specialty: SpecialtyFilterKeyLogic
     tests: TestsFilterKeyLogic
     visitType: VisitTypeFilterKeyLogic
     waitTime: WaitTimeFilterKeyLogic
