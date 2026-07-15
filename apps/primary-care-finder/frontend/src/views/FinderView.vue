@@ -14,7 +14,7 @@ import {
   Callout,
   applyFilters,
 } from '@pinboard/ui'
-import type { FilterValues, PinboardTypes } from '@pinboard/ui'
+import type { FilterChoiceBitfieldGroup, FilterValues, PinboardTypes } from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
 import { useFilterChipDefinitions } from '@/composables/filters/useFilterChipDefinitions.ts'
 import { useFilterLogic } from '@/composables/filters/useFilterLogic'
@@ -27,10 +27,6 @@ import type {
   PrimaryCareLocation,
   PrimaryCareResponse,
   SortMode,
-  SpecialtyFilterKey,
-  TestsFilterKey,
-  VisitTypeFilterKey,
-  WaitTimeFilterKey,
 } from '@/types'
 import { sortLocations } from '@/utilities/sortLocations'
 
@@ -84,24 +80,13 @@ const calloutOpen = ref(true)
 // Location is requested only when the user clicks the geolocation button, which
 // emits to handleGeolocate. The shared useUserLocation composable prompts on load,
 // which the primary care finder intentionally avoids.
-const userLocation = ref<PinboardTypes.LatLon>({
-  latitude: NaN,
-  longitude: NaN,
-})
-const addressForSearch = ref<string>('')
-const { addressCoordinates, finishedAddressFetch } =
-  PinboardComposables.useSearchAddress(addressForSearch)
-const zipcodeForSearch = ref<string>('')
-const { zipcodePolygon, finishedZipFetch } = PinboardComposables.useSearchZipcode(zipcodeForSearch)
-const keywordsForSearch = ref<string>('')
-const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
-const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
+const {
   userLocation,
-  addressCoordinates,
-  finishedAddressFetch,
-  zipcodePolygon,
-  finishedZipFetch
-)
+  keywordsForSearch,
+  locationSearchMode,
+  searchOrUserLocation,
+  handleSearchSubmit,
+} = PinboardComposables.useUserAndSearchLocations()
 const filterState = ref<PrimaryCareFilters>(defaultFilterState)
 
 const { filterLogicalValue, filterLogic } = useFilterLogic(locations, languages, filterState)
@@ -110,82 +95,18 @@ const keywordToFilterMap = computed(() => {
   const logicalValues = filterLogic.value as PrimaryCareFilterLogic
 
   const keywordMap: Record<string, Uint32Array> = {
-    [t('ageRange.adult').toLocaleLowerCase()]:
-      logicalValues.childFilters.ageRange.childFilters.adult.getBitfield(),
     [t('ageRange.adults').toLocaleLowerCase()]:
       logicalValues.childFilters.ageRange.childFilters.adult.getBitfield(),
     [t('ageRange.child').toLocaleLowerCase()]:
       logicalValues.childFilters.ageRange.childFilters.children.getBitfield(),
-    [t('ageRange.children').toLocaleLowerCase()]:
-      logicalValues.childFilters.ageRange.childFilters.children.getBitfield(),
-
-    ...Object.fromEntries(
-      Array.from(languages.value, (lang) => {
-        return [
-          t(`languages.${lang}`).toLocaleLowerCase(),
-          logicalValues.childFilters.languages.childFilters[lang].getBitfield(),
-        ]
-      })
-    ),
   }
 
-  Object.keys(logicalValues.childFilters.waitTime.childFilters).forEach((key) => {
-    t(`waitTime.${key}`)
-      .toLocaleLowerCase()
-      .replace(/\W+/g, ' ')
-      .split(' ')
-      .filter(Boolean)
-      .forEach(
-        (word) =>
-          (keywordMap[word] =
-            logicalValues.childFilters.waitTime.childFilters[
-              key as WaitTimeFilterKey
-            ].getBitfield())
-      )
-  })
-
-  Object.keys(logicalValues.childFilters.visitType.childFilters).forEach((key) => {
-    t(`visitType.${key}`)
-      .toLocaleLowerCase()
-      .replace(/\W+/g, ' ')
-      .split(' ')
-      .filter(Boolean)
-      .forEach(
-        (word) =>
-          (keywordMap[word] =
-            logicalValues.childFilters.visitType.childFilters[
-              key as VisitTypeFilterKey
-            ].getBitfield())
-      )
-  })
-
-  Object.keys(logicalValues.childFilters.specialty.childFilters).forEach((key) => {
-    t(`specialty.${key}`)
-      .toLocaleLowerCase()
-      .replace(/\W+/g, ' ')
-      .split(' ')
-      .filter(Boolean)
-      .forEach(
-        (word) =>
-          (keywordMap[word] =
-            logicalValues.childFilters.specialty.childFilters[
-              key as SpecialtyFilterKey
-            ].getBitfield())
-      )
-  })
-
-  Object.keys(logicalValues.childFilters.tests.childFilters).forEach((key) => {
-    t(`tests.${key}`)
-      .toLocaleLowerCase()
-      .replace(/\W+/g, ' ')
-      .split(' ')
-      .filter(Boolean)
-      .forEach(
-        (word) =>
-          (keywordMap[word] =
-            logicalValues.childFilters.tests.childFilters[key as TestsFilterKey].getBitfield())
-      )
-  })
+  mapFilterTextToFilterLogic(keywordMap, 'ageRange', logicalValues.childFilters.ageRange)
+  mapFilterTextToFilterLogic(keywordMap, 'languages', logicalValues.childFilters.languages)
+  mapFilterTextToFilterLogic(keywordMap, 'waitTime', logicalValues.childFilters.waitTime)
+  mapFilterTextToFilterLogic(keywordMap, 'visitType', logicalValues.childFilters.visitType)
+  mapFilterTextToFilterLogic(keywordMap, 'specialty', logicalValues.childFilters.specialty)
+  mapFilterTextToFilterLogic(keywordMap, 'tests', logicalValues.childFilters.tests)
 
   return keywordMap
 })
@@ -273,37 +194,19 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
   return filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
 })
 
-function handleSearchSubmit(locationSearchString: string) {
-  switch (true) {
-    case PinboardUtilities.StreetAddress.test(locationSearchString):
-    case PinboardUtilities.StreetIntersection.test(locationSearchString): {
-      locationSearchMode.value = 'address'
-      addressForSearch.value = locationSearchString
-      zipcodeForSearch.value = ''
-      keywordsForSearch.value = ''
-      break
-    }
-    case PinboardUtilities.Zipcode.test(locationSearchString): {
-      locationSearchMode.value = 'zipcode'
-      zipcodeForSearch.value = locationSearchString
-      addressForSearch.value = ''
-      keywordsForSearch.value = ''
-      break
-    }
-    case locationSearchString !== '': {
-      locationSearchMode.value = 'keyword'
-      keywordsForSearch.value = locationSearchString
-      addressForSearch.value = ''
-      zipcodeForSearch.value = ''
-      break
-    }
-    default: {
-      locationSearchMode.value = undefined
-      addressForSearch.value = locationSearchString
-      zipcodeForSearch.value = locationSearchString
-      keywordsForSearch.value = locationSearchString
-    }
-  }
+function mapFilterTextToFilterLogic(
+  keywordMap: Record<string, Uint32Array>,
+  filterGroupFieldKey: keyof PrimaryCareFilterLogic['childFilters'],
+  filterLogic: FilterChoiceBitfieldGroup
+) {
+  Object.keys(filterLogic.childFilters).forEach((key) => {
+    t(`${filterGroupFieldKey}.${String(key)}`)
+      .toLocaleLowerCase()
+      .replace(/\W+/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .forEach((word) => (keywordMap[word] = filterLogic.childFilters[key].getBitfield()))
+  })
 }
 
 function handleGeolocate(locationData: { latitude: number; longitude: number; accuracy: number }) {

@@ -8,7 +8,7 @@ import type {
 } from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
-export function useUserLocation(promptOnPageLoad: boolean, watchLocation: boolean) {
+export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation: boolean = false) {
   const userLocation = ref<LatLon>({
     latitude: NaN,
     longitude: NaN,

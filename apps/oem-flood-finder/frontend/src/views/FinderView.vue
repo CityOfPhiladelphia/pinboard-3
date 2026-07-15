@@ -49,29 +49,21 @@ const sortLocationsOptions: PinboardTypes.SortLocationsOptions = {
 }
 
 // refs
-const addressForSearch = ref<string>('')
-const { addressCoordinates, finishedAddressFetch } =
-  PinboardComposables.useSearchAddress(addressForSearch)
-const zipcodeForSearch = ref<string>('')
-const { zipcodePolygon, finishedZipFetch } = PinboardComposables.useSearchZipcode(zipcodeForSearch)
-const keywordsForSearch = ref<string>('')
-const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
 const locationFilterMode = ref<Filters>('all')
 const visitedIds = ref(new Set<string>())
 const visibleFloodLayers = ref<FloodLayerId[]>([])
 const { oemLocations, isLoading, errorMessage } = useLocations()
-const { userLocation, userLocationState } = PinboardComposables.useUserLocation(true, true)
+const {
+  userLocation,
+  userLocationState,
+  keywordsForSearch,
+  locationSearchMode,
+  searchOrUserLocation,
+  handleSearchSubmit,
+} = PinboardComposables.useUserAndSearchLocations(true, true)
 const locationSortMode = ref<SortMode>(
   ['located', 'watching'].includes(userLocationState.value) ? 'DistAsc' : '',
 )
-const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
-  userLocation,
-  addressCoordinates,
-  finishedAddressFetch,
-  zipcodePolygon,
-  finishedZipFetch,
-)
-
 const isMobile = PinboardComposables.useIsMobile()
 
 // computed refs
@@ -118,39 +110,6 @@ function handleLocationFilterChange(selectedFilter: string) {
 
 function handleLocationSortChange(sortLocationsOption: string) {
   locationSortMode.value = sortLocationsOption as SortMode
-}
-
-function handleSearchSubmit(locationSearchString: string) {
-  switch (true) {
-    case PinboardUtilities.StreetAddress.test(locationSearchString):
-    case PinboardUtilities.StreetIntersection.test(locationSearchString): {
-      locationSearchMode.value = 'address'
-      addressForSearch.value = locationSearchString
-      zipcodeForSearch.value = ''
-      keywordsForSearch.value = ''
-      break
-    }
-    case PinboardUtilities.Zipcode.test(locationSearchString): {
-      locationSearchMode.value = 'zipcode'
-      zipcodeForSearch.value = locationSearchString
-      addressForSearch.value = ''
-      keywordsForSearch.value = ''
-      break
-    }
-    case locationSearchString !== '': {
-      locationSearchMode.value = 'keyword'
-      keywordsForSearch.value = locationSearchString
-      addressForSearch.value = ''
-      zipcodeForSearch.value = ''
-      break
-    }
-    default: {
-      locationSearchMode.value = undefined
-      addressForSearch.value = locationSearchString
-      zipcodeForSearch.value = locationSearchString
-      keywordsForSearch.value = locationSearchString
-    }
-  }
 }
 
 function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
