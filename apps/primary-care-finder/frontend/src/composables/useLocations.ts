@@ -34,11 +34,11 @@ export function useLocations(): {
 
       if (!langResponse.ok) {
         errorMessage.value = t('error.fetchLanguges')
+      } else {
+        languages.value = (await langResponse.json())?.rows[0]?.languages || []
       }
 
       const geojsonData = (await response.json()) as PrimaryCareResponse
-      languages.value = (await langResponse.json()).rows[0].languages
-
       // Stable, readable id per site: slug of the name. cartodb_id churns on the daily Carto
       // reload, so a row id makes shared/bookmarked deep-links rot. Deduped so two sites that
       // slug identically stay unique. The map highlights by feature id, so both outputs use it.
