@@ -1,12 +1,11 @@
 import { computed, ref, watchEffect, type Ref } from 'vue'
 import {
   filterKeys,
-  ageGroupOptions,
+  ageRangeOptions,
   waitOptions,
   visitTypeOptions,
   specialtyOptions,
   testsOptions,
-  languageOptions,
 } from './filterKeysValues'
 import {
   FilterChoiceBitfieldGroup,
@@ -16,10 +15,17 @@ import {
   type IFilterChoiceBitfieldGroup,
   type MatchingFunction,
 } from '@pinboard/ui'
-import type { PrimaryCareFilters, PrimaryCareLocation, PrimaryCareProperties } from '@/types'
+import type {
+  FilterKey,
+  PrimaryCareFilters,
+  PrimaryCareLocation,
+  PrimaryCareProperties,
+  WaitTimeField,
+} from '@/types'
 
 export function useFilterLogic(
   locations: Ref<PrimaryCareLocation[]>,
+  languages: Ref<string[]>,
   filterState: Ref<PrimaryCareFilters>
 ) {
   const filterLogicalValue = ref<Uint32Array>(new Uint32Array())
@@ -87,7 +93,7 @@ export function useFilterLogic(
         'well_child_wait',
         'other_services_adult_wait',
         'other_services_child_wait',
-      ],
+      ] as WaitTimeField[],
       matches: ['Yes', 'Same day', 'Less than one week', 'Less than two months'],
       matchingFunction: matchFieldsToOptions,
     }
@@ -102,7 +108,7 @@ export function useFilterLogic(
     const languageFilter = makeFilterChoiceBitfieldGroup(
       commonParams,
       Object.fromEntries(
-        Array.from(languageOptions, (lang) => [
+        Array.from(languages.value, (lang) => [
           lang,
           {
             dataFields: ['languages'],
@@ -113,9 +119,9 @@ export function useFilterLogic(
       )
     )
 
-    const ageGroupFilter = makeFilterChoiceBitfieldGroup(
+    const ageRangeFilter = makeFilterChoiceBitfieldGroup(
       commonParams,
-      choicesFromObject(ageGroupOptions, matchYes, matchFieldsToOptions)
+      choicesFromObject(ageRangeOptions, matchYes, matchFieldsToOptions)
     )
     const visitTypeFilter = makeFilterChoiceBitfieldGroup(
       commonParams,
@@ -134,13 +140,13 @@ export function useFilterLogic(
       operation: commonParams.operation,
       bufferLength: commonParams.bufferLength,
       childFilters: {
-        [filterKeys.ageGroup]: ageGroupFilter,
-        [filterKeys.waitTime]: waitTimeFilter,
-        [filterKeys.visitType]: visitTypeFilter,
-        [filterKeys.specialty]: specialtyFilter,
-        [filterKeys.tests]: testsFilter,
-        [filterKeys.languages]: languageFilter,
-      },
+        ageRange: ageRangeFilter,
+        waitTime: waitTimeFilter,
+        visitType: visitTypeFilter,
+        specialty: specialtyFilter,
+        tests: testsFilter,
+        languages: languageFilter,
+      } as Record<FilterKey, FilterChoiceBitfieldGroup>,
     })
 
     return filterLogicGroup
@@ -148,11 +154,11 @@ export function useFilterLogic(
 
   watchEffect(() => {
     // age group
-    Object.values(ageGroupOptions).forEach((filter) =>
+    Object.values(ageRangeOptions).forEach((filter) =>
       filterLogic.value
-        .getChildFilter(filterKeys.ageGroup)
+        .getChildFilter(filterKeys.ageRange)
         .getChildFilter(filter)
-        .setChecked(filterState.value.ageGroup[filter])
+        .setChecked(filterState.value.ageRange[filter])
     )
 
     // wait time
@@ -188,7 +194,7 @@ export function useFilterLogic(
     )
 
     // languages
-    languageOptions.forEach((filter) =>
+    languages.value.forEach((filter) =>
       filterLogic.value
         .getChildFilter(filterKeys.languages)
         .getChildFilter(filter)

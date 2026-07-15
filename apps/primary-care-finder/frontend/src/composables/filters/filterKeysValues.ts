@@ -1,16 +1,18 @@
 import type {
-  AgeGroupField,
-  AgeGroupFilter,
+  AgeRangeField,
+  AgeRangeFilterKey,
+  FilterKey,
   SpecialtyField,
-  SpecialtyFilter,
+  SpecialtyFilterKey,
   TestsField,
-  TestsFilter,
+  TestsFilterKey,
   VisitTypeField,
-  VisitTypeFilter,
+  VisitTypeFilterKey,
+  WaitTimeFilterKey,
 } from '@/types'
 
-export const filterKeys = {
-  ageGroup: 'ageGroup',
+export const filterKeys: Record<FilterKey, FilterKey> = {
+  ageRange: 'ageRange',
   waitTime: 'waitTime',
   visitType: 'visitType',
   specialty: 'specialty',
@@ -18,24 +20,29 @@ export const filterKeys = {
   languages: 'languages',
 }
 
-export const ageGroupOptions: Record<AgeGroupField, AgeGroupFilter> = {
+export const ageRangeOptions: Record<AgeRangeField, AgeRangeFilterKey> = {
   adults: 'adult',
   children: 'children',
 }
 
-export const waitOptions = ['sameDay', 'weekSick', 'weekWell', 'twoMonths'] as const
+export const waitOptions: WaitTimeFilterKey[] = [
+  'walkIn',
+  'oneWeekSick',
+  'oneWeekWell',
+  'twoMonths',
+]
 
-export const visitTypeOptions: Record<VisitTypeField, VisitTypeFilter> = {
-  primary_well: 'primaryWell',
-  primary_sick: 'primarySick',
-  primary_sports: 'primarySports',
-  primary_prenatal: 'primaryPrenatal',
-  primary_women: 'primaryWomen',
-  primary_telehealth: 'primaryTelehealth',
-  primary_vacc: 'primaryVaccines',
+export const visitTypeOptions: Record<VisitTypeField, VisitTypeFilterKey> = {
+  primary_well: 'well',
+  primary_sick: 'sick',
+  primary_sports: 'sports',
+  primary_prenatal: 'prenatal',
+  primary_women: 'women',
+  primary_telehealth: 'telehealth',
+  primary_vacc: 'vaccine',
 }
 
-export const specialtyOptions: Record<SpecialtyField, SpecialtyFilter> = {
+export const specialtyOptions: Record<SpecialtyField, SpecialtyFilterKey> = {
   special_mental: 'mental',
   special_dental: 'dental',
   special_eye: 'eye',
@@ -46,55 +53,10 @@ export const specialtyOptions: Record<SpecialtyField, SpecialtyFilter> = {
   special_pharmacy: 'pharmacy',
 }
 
-export const testsOptions: Record<TestsField, TestsFilter> = {
+export const testsOptions: Record<TestsField, TestsFilterKey> = {
   tests_blood: 'blood',
   tests_sti: 'sti',
   tests_covid: 'covid',
   tests_mammo: 'mammo',
   tests_xray: 'xray',
 }
-
-export const languageOptions = [
-  'asl',
-  'amharic',
-  'arabic',
-  'bengali',
-  'burmese',
-  'cambodian',
-  'cantonese',
-  'chinese',
-  'english',
-  'fanta',
-  'filipino',
-  'french',
-  'frenchcreole',
-  'fula',
-  'gujarati',
-  'haitiancreole',
-  'hebrew',
-  'hindi',
-  'indonesian',
-  'karen',
-  'khmer',
-  'kinyarwanda',
-  'kirundi',
-  'koloqua',
-  'korean',
-  'lebanese',
-  'malayalam',
-  'malaysian',
-  'mandarin',
-  'nepali',
-  'portuguese',
-  'punjabi',
-  'shanghainese',
-  'sinhalese',
-  'spanish',
-  'swahili',
-  'tagalog',
-  'taiwanese',
-  'telugu',
-  'urdu',
-  'vietnamese',
-  'yoruba',
-] as const

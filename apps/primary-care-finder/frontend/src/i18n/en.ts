@@ -41,6 +41,10 @@ export default {
     aboutBody:
       'This tool helps Philadelphia residents find free and low-cost primary care providers near them. Search by location, filter by services, and view details like hours, transit options, and available tests.',
   },
+  error: {
+    fetchSites: 'Error retrieving primary care sites',
+    fetchLanguges: 'Error retrieving languages spoken',
+  },
   filters: {
     sort: 'Sort',
     distance: 'Distance',
@@ -154,9 +158,9 @@ export default {
     portugese: 'Portuguese',
     punjabi: 'Punjabi',
     'brazilian portuguese': 'Brazilian Portuguese',
-    'french creole': 'Haitian Creole',
-    'french-creole': 'Haitian Creole',
-    frenchcreole: 'Haitian Creole',
+    'french creole': 'French Creole',
+    'french-creole': 'French Creole',
+    frenchcreole: 'French Creole',
     fula: 'Fula',
     karen: 'Karen',
     koloqua: 'Koloqua',

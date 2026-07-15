@@ -1,10 +1,11 @@
 import type {
-  BitWiseOperation,
   FilterChoiceBitfield,
+  FilterChoiceBitfieldGroup,
+  FilterGroup,
   FilterValues,
   PinboardTypes,
 } from '@pinboard/ui'
-import { languageOptions, waitOptions } from './composables/filters/filterKeysValues'
+import * as en from './i18n/en'
 
 type YesOrNo = 'Yes' | 'No'
 type YesOrNoOrEstablishedPatients = YesOrNo | 'Established Patients'
@@ -124,13 +125,26 @@ export type PrimaryCareLocation = PinboardTypes.BasicLocation & Omit<PrimaryCare
 
 export type SortMode = '' | 'distance' | 'name'
 
-export type AgeGroupField = 'adults' | 'children'
+export type FilterKey = 'ageRange' | 'waitTime' | 'visitType' | 'specialty' | 'tests' | 'languages'
 
-export type AgeGroupFilter = 'adult' | 'children'
+export type AgeRangeField = Extract<keyof PrimaryCareProperties, 'adults' | 'children'>
 
-export type WaitTimeFilter = (typeof waitOptions)[number]
+export type AgeRangeFilterKey = Extract<keyof typeof en.default.ageRange, 'adult' | 'children'>
 
-export type VisitTypeField =
+export type WaitTimeField = Extract<
+  keyof PrimaryCareProperties,
+  | 'walk_ins_sick'
+  | 'sick_adult_wait'
+  | 'sick_child_wait'
+  | 'well_adult_wait'
+  | 'well_child_wait'
+  | 'other_services_adult_wait'
+  | 'other_services_child_wait'
+>
+export type WaitTimeFilterKey = Exclude<keyof typeof en.default.waitTime, 'category'>
+
+export type VisitTypeField = Extract<
+  keyof PrimaryCareProperties,
   | 'primary_well'
   | 'primary_sick'
   | 'primary_sports'
@@ -138,17 +152,11 @@ export type VisitTypeField =
   | 'primary_women'
   | 'primary_telehealth'
   | 'primary_vacc'
+>
+export type VisitTypeFilterKey = Exclude<keyof typeof en.default.visitType, 'category'>
 
-export type VisitTypeFilter =
-  | 'primaryWell'
-  | 'primarySick'
-  | 'primarySports'
-  | 'primaryPrenatal'
-  | 'primaryWomen'
-  | 'primaryTelehealth'
-  | 'primaryVaccines'
-
-export type SpecialtyField =
+export type SpecialtyField = Extract<
+  keyof PrimaryCareProperties,
   | 'special_mental'
   | 'special_dental'
   | 'special_eye'
@@ -157,81 +165,67 @@ export type SpecialtyField =
   | 'special_nutrition'
   | 'special_tobacco'
   | 'special_pharmacy'
+>
+export type SpecialtyFilterKey = Exclude<keyof typeof en.default.specialty, 'category'>
 
-export type SpecialtyFilter =
-  | 'mental'
-  | 'dental'
-  | 'eye'
-  | 'podiatry'
-  | 'mat'
-  | 'nutrition'
-  | 'tobacco'
-  | 'pharmacy'
+export type TestsField = Extract<
+  keyof PrimaryCareProperties,
+  'tests_blood' | 'tests_sti' | 'tests_covid' | 'tests_mammo' | 'tests_xray'
+>
+export type TestsFilterKey = Exclude<keyof typeof en.default.tests, 'category' | 'noTests'>
 
-export type TestsField = 'tests_blood' | 'tests_sti' | 'tests_covid' | 'tests_mammo' | 'tests_xray'
-export type TestsFilter = 'blood' | 'sti' | 'covid' | 'mammo' | 'xray'
-
-export type LanguagesFilter = (typeof languageOptions)[number]
+export type LanguagesFilterKey = string
 
 export type PrimaryCareFilterKey =
-  | AgeGroupFilter
-  | WaitTimeFilter
-  | VisitTypeFilter
-  | SpecialtyFilter
-  | TestsFilter
-  | LanguagesFilter
+  | AgeRangeFilterKey
+  | WaitTimeFilterKey
+  | VisitTypeFilterKey
+  | SpecialtyFilterKey
+  | TestsFilterKey
+  | LanguagesFilterKey
 
 export interface PrimaryCareFilters extends FilterValues {
   sort: {
     distance: boolean
     name: boolean
   }
-  ageGroup: Record<AgeGroupFilter, boolean>
-  visitType: Record<VisitTypeFilter | SpecialtyFilter | TestsFilter, boolean>
-  waitTime: Record<WaitTimeFilter, boolean>
-  languages: Record<LanguagesFilter, boolean>
+  ageRange: Record<AgeRangeFilterKey, boolean>
+  visitType: Record<VisitTypeFilterKey | SpecialtyFilterKey | TestsFilterKey, boolean>
+  waitTime: Record<WaitTimeFilterKey, boolean>
+  languages: Record<LanguagesFilterKey, boolean>
 }
 
-export interface PrimaryCareFilterLogic {
-  bufferLength: number
-  checked: boolean
-  operation: BitWiseOperation
+export interface AgeRangeFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<AgeRangeFilterKey, FilterChoiceBitfield>
+}
+
+export interface LanguagesFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<LanguagesFilterKey, FilterChoiceBitfield>
+}
+
+export interface SpecialtyFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<SpecialtyFilterKey, FilterChoiceBitfield>
+}
+
+export interface TestsFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<TestsFilterKey, FilterChoiceBitfield>
+}
+
+export interface VisitTypeFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<VisitTypeFilterKey, FilterChoiceBitfield>
+}
+
+export interface WaitTimeFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<WaitTimeFilterKey, FilterChoiceBitfield>
+}
+
+export interface PrimaryCareFilterLogic extends FilterGroup {
   childFilters: {
-    ageGroup: {
-      bufferLength: number
-      checked: boolean
-      operation: BitWiseOperation
-      childFilters: Record<AgeGroupFilter, FilterChoiceBitfield>
-    }
-    languages: {
-      bufferLength: number
-      checked: boolean
-      operation: BitWiseOperation
-      childFilters: Record<LanguagesFilter, FilterChoiceBitfield>
-    }
-    specialty: {
-      bufferLength: number
-      checked: boolean
-      operation: BitWiseOperation
-      childFilters: Record<SpecialtyFilter, FilterChoiceBitfield>
-    }
-    tests: {
-      bufferLength: number
-      checked: boolean
-      operation: BitWiseOperation
-      childFilters: Record<TestsFilter, FilterChoiceBitfield>
-    }
-    visitType: {
-      bufferLength: number
-      checked: boolean
-      operation: BitWiseOperation
-      childFilters: Record<VisitTypeFilter, FilterChoiceBitfield>
-    }
-    waitTime: {
-      bufferLength: number
-      checked: boolean
-      operation: BitWiseOperation
-      childFilters: Record<WaitTimeFilter, FilterChoiceBitfield>
-    }
+    ageRange: AgeRangeFilterKeyLogic
+    languages: LanguagesFilterKeyLogic
+    specialty: SpecialtyFilterKeyLogic
+    tests: TestsFilterKeyLogic
+    visitType: VisitTypeFilterKeyLogic
+    waitTime: WaitTimeFilterKeyLogic
   }
 }
