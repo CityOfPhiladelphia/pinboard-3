@@ -71,6 +71,7 @@ const tableData = computed((): Record<string, unknown>[] => {
 
 const snapshotTimestamp = computed(() => {
   const timestamp = props.location.pictureTimestampUTC
+  console.log(timestamp)
 
   return new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/New_York',
@@ -173,7 +174,7 @@ const snapshotTimestamp = computed(() => {
     <template v-if="location.deviceType === 'Aware' && 0 in readingState.data">
       <h6 style="padding: var(--spacing-xxl) 0 0 0">Current Snapshot</h6>
       <img style="padding: 1rem 0 0 0" :src="location.thumbnailUrl" width="400px" />
-      <div class="has-text-body-extra-small">Timestamp: {{ snapshotTimestamp }}</div>
+      <div class="has-text-body-extra-small">Timestamp: {{ location.pictureTimestampUTC }}</div>
     </template>
   </div>
 
