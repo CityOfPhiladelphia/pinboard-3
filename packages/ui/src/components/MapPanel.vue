@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="PinboardLocation">
 import { ref, computed, defineComponent } from 'vue'
 import { Map as PhilaMap } from '@phila/phila-ui-map-core'
 // map-core ships a single combined stylesheet instead of injecting CSS per
@@ -6,11 +6,11 @@ import { Map as PhilaMap } from '@phila/phila-ui-map-core'
 // into component chunks). This one file bundles every map-core component's styles
 // plus maplibre's own CSS, so importing it once here is required and covers it all.
 import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css'
-import type { MapConfig, BasicLocation, LatLon } from '../types'
+import type { MapConfig, LatLon } from '../types'
 
 const props = defineProps<{
   config?: MapConfig
-  locations?: BasicLocation[]
+  locations?: PinboardLocation[]
   geojson?: unknown
   hoveredId?: string | null
   selectedId?: string | null
@@ -18,11 +18,11 @@ const props = defineProps<{
   isMobile?: boolean
   onHover?: (id: string) => void
   onHoverEnd?: () => void
-  onSelect?: (loc: BasicLocation) => void
+  onSelect?: (loc: PinboardLocation) => void
   mobileControlsTarget?: HTMLDivElement | null
   mobileControlsTargetLeft?: HTMLDivElement | null
   mapContentSlot?: (props: {
-    locations: BasicLocation[]
+    locations: PinboardLocation[]
     geojson: unknown
     map: unknown
     zoom: number

@@ -62,8 +62,11 @@ export interface BasicLocation extends LatLon {
   id: string
   name: string
   distance?: string | undefined
-  locationCardInfo: MapCardProps | ((location: BasicLocation) => MapCardProps)
 }
+
+export type MapCardPropsGetter<PinboardLocation extends BasicLocation> = (
+  location: PinboardLocation
+) => MapCardProps
 
 export interface LocationFilterOption {
   readonly value: string

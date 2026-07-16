@@ -1,9 +1,9 @@
 <script setup lang="ts">
 // vue imports
-import { computed, ref, watch } from 'vue'
+import { computed, markRaw, ref, watch } from 'vue'
 
 // 3rd party imports
-import { IconGauge, IconCamera, IconLocationDot } from '@phila/phila-ui-core/icons'
+import { IconGauge, IconCamera, IconLocationDot, IconWater } from '@phila/phila-ui-core/icons'
 
 // philly ui imports
 // pinboard imports
@@ -35,6 +35,7 @@ import {
 import LocationDetail from '@/components/LocationDetail.vue'
 import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation, SortMode } from '@/types'
+import type { MapCardProps } from '@phila/phila-ui-cards'
 
 // app variables
 const searchPlaceholderText = 'Search by address, zipcode, or keyword...'
@@ -124,14 +125,32 @@ function handleGeolocate(data: { latitude: number; longitude: number; accuracy: 
   userLocation.value = { latitude: data.latitude, longitude: data.longitude }
 }
 
-function asOemLocation(location: PinboardTypes.BasicLocation) {
-  return location as OemLocation
+function getLocationTags(loc: OemLocation): NonNullable<MapCardProps['tags']> {
+  if (loc.deviceType === 'Camera') {
+    return [{ text: 'Camera', color: 'purple' as const, icon: markRaw(IconCamera) }]
+  }
+  const gaugeValue =
+    Number.isNaN(loc.gaugeHeight) || loc.gaugeHeight === -9999.9
+      ? 'No data'
+      : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
+  return [{ text: 'Gauge', color: 'blue' as const, icon: markRaw(IconWater) }, { text: gaugeValue }]
 }
+
+function getMapCardProps(location: OemLocation): MapCardProps {
+  return {
+    heading: location.name,
+    subheader: location.distance,
+    tags: getLocationTags(location),
+    src: location.thumbnailUrl,
+  }
+}
+
 </script>
 
 <template>
   <PinboardBody
     :locations="currentLocations"
+    :get-map-card-props="getMapCardProps"
     :search-or-user-location="searchOrUserLocation"
     :is-loading="isLoading"
     :error-message="errorMessage"
@@ -148,7 +167,7 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
     @deselect="handleDeselect"
   >
     <template #location-detail="{ location, onClose }">
-      <LocationDetail :on-close="onClose" :location="asOemLocation(location)" />
+      <LocationDetail :on-close="onClose" :location="location" />
     </template>
 
     <template

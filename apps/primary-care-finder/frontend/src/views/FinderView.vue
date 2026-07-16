@@ -228,11 +228,20 @@ function handleApplyFilter(values: FilterValues) {
 function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
   return location as PrimaryCareLocation
 }
+
+function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
+  return {
+    heading: String(location.properties.record ?? location.properties.address ?? ''),
+    subheader: location.distance,
+    body: String(location.properties.address ?? ''),
+  } satisfies MapCardProps
+}
 </script>
 
 <template>
   <PinboardBody
     :locations="filteredLocations"
+    :get-map-card-props="getMapCardProps"
     :search-or-user-location="searchOrUserLocation"
     :location-search-mode="locationSearchMode"
     :is-loading="isLoading"

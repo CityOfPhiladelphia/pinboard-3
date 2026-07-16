@@ -31,7 +31,7 @@ export interface Flood {
 
 type DeviceType = 'Aware' | 'Usgs' | 'Camera'
 
-export interface OemFields {
+export interface OemLocation extends PinboardTypes.BasicLocation {
   deviceType: DeviceType
   lastUpdated: Date
   gaugeHeight: number | null
@@ -44,10 +44,6 @@ export interface OemFields {
   thumbnailUrl: string
   cameraStreamUrl: string | null
 }
-
-export type LocationPanelDTO = OemFields & Omit<PinboardTypes.BasicLocation, 'locationCardInfo'>
-
-export type OemLocation = PinboardTypes.BasicLocation & OemFields
 
 export interface UsgsReadingDTO {
   validTimeUTC: string

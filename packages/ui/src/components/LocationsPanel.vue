@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="PinboardLocation extends BasicLocation">
 // vue imports
 import { ref, watch } from 'vue'
 
@@ -12,13 +12,15 @@ import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 import type {
   BasicLocation,
   LocationFilterOption,
+  MapCardPropsGetter,
   SortLocationsOptions,
   UserLocationState,
 } from '../types'
 
 // props
 const props = defineProps<{
-  locations: BasicLocation[]
+  locations: PinboardLocation[]
+  getMapCardProps: MapCardPropsGetter<PinboardLocation>
   isMobile: boolean
   hoveredId: string | undefined
   selectedId: string | undefined
@@ -31,7 +33,7 @@ const props = defineProps<{
 
 // emits
 const emit = defineEmits<{
-  select: [location: BasicLocation]
+  select: [location: PinboardLocation]
   search: []
   searchString: [search: string]
   selectedFilter: [filter: string]
@@ -73,7 +75,7 @@ function handleSearchChange(searchString: string) {
   emit('searchString', searchString)
 }
 
-function handleCardKeyup(location: BasicLocation) {
+function handleCardKeyup(location: PinboardLocation) {
   if (pendingKeydown.value) {
     emit('select', location)
     pendingKeydown.value = false
@@ -146,7 +148,7 @@ defineExpose({ scrollToCard })
       <MapCard
         v-else
         :data-location-id="location.id"
-        v-bind="location.locationCardInfo"
+        v-bind="getMapCardProps(location)"
         :class="[
           'location-card',
           {

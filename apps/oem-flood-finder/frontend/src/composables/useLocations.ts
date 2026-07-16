@@ -1,7 +1,5 @@
-import { ref, computed, markRaw, onBeforeMount, type Ref, type ComputedRef } from 'vue'
-import { IconWater, IconCamera } from '@phila/phila-ui-core/icons'
-import type { MapCardProps } from '@phila/phila-ui-cards'
-import type { LocationPanelDTO, OemLocation } from '@/types'
+import { ref, computed, onBeforeMount, type Ref, type ComputedRef } from 'vue'
+import type { OemLocation } from '@/types'
 
 export function useLocations(): {
   oemLocations: Ref<OemLocation[]>
@@ -20,37 +18,13 @@ export function useLocations(): {
   })
 
   onBeforeMount(async () => {
-    const locations: LocationPanelDTO[] = import.meta.env.DEV
+    oemLocations.value = import.meta.env.DEV
       ? await getLocationsDev(errorMessage)
       : await getLocationsProxy(errorMessage)
-    oemLocations.value = Array.from(locations, (loc) => {
-      const cardInfo: MapCardProps = {
-        heading: loc.name,
-        tags: getLocationTags(loc),
-        src: loc.thumbnailUrl,
-      }
-
-      const oemLocation: OemLocation = {
-        ...loc,
-        locationCardInfo: cardInfo,
-      }
-      return oemLocation
-    })
     hasData.value = true
   })
 
   return { oemLocations, isLoading, errorMessage }
-}
-
-function getLocationTags(loc: LocationPanelDTO): NonNullable<MapCardProps['tags']> {
-  if (loc.deviceType === 'Camera') {
-    return [{ text: 'Camera', color: 'purple' as const, icon: markRaw(IconCamera) }]
-  }
-  const gaugeValue =
-    Number.isNaN(loc.gaugeHeight) || loc.gaugeHeight === -9999.9
-      ? 'No data'
-      : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
-  return [{ text: 'Gauge', color: 'blue' as const, icon: markRaw(IconWater) }, { text: gaugeValue }]
 }
 
 async function getLocationsProxy(errorMessageRef: Ref) {

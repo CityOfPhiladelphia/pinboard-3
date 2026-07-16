@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="PinboardLocation extends BasicLocation">
 // vue imports
 import { useSlots, inject, ref, computed, watch, toRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -32,6 +32,7 @@ import type {
   BasicLocation,
   LatLon,
   LocationFilterOption,
+  MapCardPropsGetter,
   SearchMode,
   SortLocationsOptions,
   UserLocationState,
@@ -42,14 +43,14 @@ import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
-  'location-card'?(props: { location: BasicLocation }): unknown
+  'location-card'?(props: { location: PinboardLocation }): unknown
   'location-detail'?(props: {
-    location: BasicLocation
+    location: PinboardLocation
     onClose: () => void
     onPrint?: () => void
   }): unknown
   'map-content'?(props: {
-    locations: BasicLocation[]
+    locations: PinboardLocation[]
     geojson: unknown
     map: unknown
     zoom: number
@@ -59,14 +60,15 @@ defineSlots<{
     mobileControlsTargetLeft: HTMLDivElement | null
     onHover: (id: string) => void
     onHoverEnd: () => void
-    onSelect: (loc: BasicLocation) => void
+    onSelect: (loc: PinboardLocation) => void
   }): unknown
 }>()
 
 // props
 const props = withDefaults(
   defineProps<{
-    locations: BasicLocation[]
+    locations: PinboardLocation[]
+    getMapCardProps: MapCardPropsGetter<PinboardLocation>
     isMobile: boolean
     errorMessage: string | null
     searchOrUserLocation: LatLon
@@ -117,7 +119,7 @@ const slots: Record<string, any> = useSlots()
 
 // refs
 const hoveredLocationId = ref<string | undefined>(undefined)
-const selectedLocation = ref<BasicLocation | undefined>(undefined)
+const selectedLocation = ref<PinboardLocation | undefined>(undefined)
 const bottomSheetOpen = ref(true)
 const bottomSheetRef = ref<{
   snapTo: (index: number) => void
@@ -286,7 +288,7 @@ function handleHoverEnd() {
   hoveredLocationId.value = undefined
 }
 
-function selectLocation(location: BasicLocation) {
+function selectLocation(location: PinboardLocation) {
   // Swapping to a different location counts as "viewing" the outgoing one —
   // emit deselect so consumers can mark it as visited.
   if (selectedLocation.value && selectedLocation.value.id !== location.id) {
@@ -295,12 +297,12 @@ function selectLocation(location: BasicLocation) {
   selectedLocation.value = location
 }
 
-function handleSelect(location: BasicLocation) {
+function handleSelect(location: PinboardLocation) {
   selectLocation(location)
   mapPanelRef.value?.panTo(location)
 }
 
-function handleMapSelect(location: BasicLocation) {
+function handleMapSelect(location: PinboardLocation) {
   if (selectedLocation.value?.id === location.id) {
     handleCloseLocationDetail()
   } else {
@@ -368,12 +370,12 @@ const effectiveMapConfig = (() => {
 </script>
 
 <template>
-  <div v-if="selectedLocation !== undefined && !isMobile" class="detail-overlay">
+  <div v-if="selectedLocation && !isMobile" class="detail-overlay">
     <slot
       name="location-detail"
       :location="selectedLocation"
       :on-close="handleCloseLocationDetail"
-      :on-print="() => print(selectedLocation!)"
+      :on-print="() => print(selectedLocation)"
     />
   </div>
   <div class="finder-panel">
@@ -396,6 +398,7 @@ const effectiveMapConfig = (() => {
         <LocationsPanel
           ref="locationsPanelRef"
           :locations="locations"
+          :get-map-card-props="getMapCardProps"
           :location-filter="locationPanelFilter"
           :location-search="locationPanelSearch"
           :location-sort="locationPanelSort"
