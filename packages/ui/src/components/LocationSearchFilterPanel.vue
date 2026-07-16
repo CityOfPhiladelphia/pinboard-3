@@ -100,6 +100,17 @@ function handleSearchChange(search: string) {
   searchString.value = search
 }
 
+// v-model does not update while an IME is composing, and Android predictive text
+// composes ordinary words — so searchString would sit stale until the keyboard
+// closed, and the suggestions never fetched. Read the value off the DOM instead.
+// Vue skips writing back to the input while composing, so the IME is unaffected.
+function handleSearchInput(event: Event) {
+  const target = event.target as HTMLElement
+  if (target.tagName === 'INPUT') {
+    searchString.value = (target as HTMLInputElement).value
+  }
+}
+
 function handleSearchSubmit() {
   const term = searchString.value.trim()
   if (term) {
@@ -173,6 +184,7 @@ function focusSearchInput() {
         @keydown="handleSearchKeydown"
         @focusout="handleSearchFocusOut"
         @focusin="handleSearchFocusIn"
+        @input="handleSearchInput"
       >
         <Search
           v-model="searchString"
