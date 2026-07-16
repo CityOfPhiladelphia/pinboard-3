@@ -61,8 +61,8 @@ export interface AlertBanner {
 export interface BasicLocation extends LatLon {
   id: string
   name: string
-  distance: string | undefined
-  locationCardInfo: MapCardProps
+  distance?: string | undefined
+  locationCardInfo: MapCardProps | ((location: BasicLocation) => MapCardProps)
 }
 
 export interface LocationFilterOption {
