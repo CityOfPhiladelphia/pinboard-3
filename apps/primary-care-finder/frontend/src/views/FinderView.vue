@@ -14,12 +14,7 @@ import {
   Callout,
   applyFilters,
 } from '@pinboard/ui'
-import type {
-  FilterChoiceBitfieldGroup,
-  FilterValues,
-  MapCardProps,
-  PinboardTypes,
-} from '@pinboard/ui'
+import type { FilterChoiceBitfieldGroup, FilterValues, MapCardProps } from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
 import { useFilterChipDefinitions } from '@/composables/filters/useFilterChipDefinitions.ts'
 import { useFilterLogic } from '@/composables/filters/useFilterLogic'
@@ -82,15 +77,13 @@ const isMobile = PinboardComposables.useIsMobile()
 const { locations, languages, isLoading, errorMessage, geojson } = useLocations()
 const { filterChipDefinitions } = useFilterChipDefinitions(languages)
 const calloutOpen = ref(true)
-// Location is requested only when the user clicks the geolocation button, which
-// emits to handleGeolocate. The shared useUserLocation composable prompts on load,
-// which the primary care finder intentionally avoids.
 const {
   keywordsForSearch,
   locationSearchMode,
   searchOrUserLocation,
   handleSearchSubmit,
   handleGeolocate,
+  handleGeolocateError,
 } = PinboardComposables.useUserAndSearchLocations()
 const filterState = ref<PrimaryCareFilters>(defaultFilterState)
 
@@ -195,16 +188,8 @@ function mapFilterTextToFilterLogic(
   })
 }
 
-function handleGeolocateError(error: Error | GeolocationPositionError) {
-  console.error(error)
-}
-
 function handleApplyFilter(values: FilterValues) {
   filterState.value = values as PrimaryCareFilters
-}
-
-function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
-  return location as PrimaryCareLocation
 }
 
 function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
@@ -242,15 +227,11 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
     </template>
 
     <template #location-card="{ location }">
-      <LocationCard :location="asPrimaryCareLocation(location)" />
+      <LocationCard :location="location" />
     </template>
 
     <template #location-detail="{ location, onClose, onPrint }">
-      <LocationDetail
-        :location="asPrimaryCareLocation(location)"
-        :on-close="onClose"
-        :on-print="onPrint"
-      />
+      <LocationDetail :location="location" :on-close="onClose" :on-print="onPrint" />
     </template>
 
     <template
@@ -272,6 +253,7 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
       <GeolocationButton
         :position="isMobile ? 'top-right' : 'bottom-right'"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
+        :show-location-marker="false"
         @located="handleGeolocate"
         @error="handleGeolocateError"
       />

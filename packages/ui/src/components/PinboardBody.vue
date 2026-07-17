@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="PinboardLocation extends BasicLocation">
 // vue imports
-import { useSlots, inject, ref, computed, watch, toRef } from 'vue'
+import { inject, ref, computed, watch, toRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -40,7 +40,7 @@ import type {
 import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 
 // slots
-defineSlots<{
+const slots = defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
   'location-card'?(props: { location: PinboardLocation }): unknown
@@ -114,8 +114,6 @@ const snapPoints = [15, 50, 100]
 const config = inject(PINBOARD_CONFIG_KEY)
 // Mobile: chips render under the on-map search bar when 'map', else in the bottom sheet.
 const chipsOnMap = computed(() => config?.mobileFilterPlacement === 'map')
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const slots: Record<string, any> = useSlots()
 
 // refs
 const hoveredLocationId = ref<string | undefined>(undefined)
@@ -373,9 +371,9 @@ const effectiveMapConfig = (() => {
   <div v-if="selectedLocation && !isMobile" class="detail-overlay">
     <slot
       name="location-detail"
-      :location="selectedLocation"
+      :location="selectedLocation.value"
       :on-close="handleCloseLocationDetail"
-      :on-print="() => print(selectedLocation)"
+      :on-print="() => print(selectedLocation.value)"
     />
   </div>
   <div class="finder-panel">
@@ -512,7 +510,7 @@ const effectiveMapConfig = (() => {
       <div v-if="selectedLocation" class="bottom-sheet-detail">
         <slot
           name="location-detail"
-          :location="selectedLocation"
+          :location="selectedLocation.value"
           :on-close="handleCloseLocationDetail"
         />
       </div>

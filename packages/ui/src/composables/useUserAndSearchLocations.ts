@@ -110,6 +110,10 @@ export function useUserAndSearchLocations(
     }
   }
 
+  function handleGeolocateError(error: Error | GeolocationPositionError) {
+    console.error(error)
+  }
+
   return {
     userLocation,
     userLocationState,
@@ -124,5 +128,6 @@ export function useUserAndSearchLocations(
     searchOrUserLocation,
     handleSearchSubmit,
     handleGeolocate,
+    handleGeolocateError,
   }
 }
