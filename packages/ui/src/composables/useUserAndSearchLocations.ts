@@ -20,6 +20,21 @@ export function useUserAndSearchLocations(
   const locationSearchMode = ref<SearchMode>(undefined)
   const searchOrUserLocation = ref<LatLon>(userLocation.value)
 
+  watch(
+    () => userLocation.value,
+    (newLoc) => {
+      if (
+        hasLocationData(newLoc) &&
+        !(
+          hasLocationData(zipcodePolygon.value.centroid) ||
+          hasLocationData(addressCoordinates.value)
+        )
+      ) {
+        searchOrUserLocation.value = userLocation.value
+      }
+    }
+  )
+
   watch(zipcodePolygon.value.centroid, (newLoc) => {
     if (!hasLocationData(newLoc)) {
       searchOrUserLocation.value = userLocation.value
@@ -83,6 +98,18 @@ export function useUserAndSearchLocations(
     }
   }
 
+  function handleGeolocate(locationData: {
+    latitude: number
+    longitude: number
+    accuracy: number
+  }) {
+    console.log('Geolocation Accuracy: ', locationData.accuracy)
+    userLocation.value = {
+      latitude: locationData.latitude,
+      longitude: locationData.longitude,
+    }
+  }
+
   return {
     userLocation,
     userLocationState,
@@ -96,5 +123,6 @@ export function useUserAndSearchLocations(
     locationSearchMode,
     searchOrUserLocation,
     handleSearchSubmit,
+    handleGeolocate,
   }
 }

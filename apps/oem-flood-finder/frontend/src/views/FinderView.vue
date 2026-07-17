@@ -19,6 +19,7 @@ import {
   PinboardComposables,
   PinboardUtilities,
   type PinboardTypes,
+  type MapCardProps,
 } from '@pinboard/ui'
 import {
   filterLocations,
@@ -35,7 +36,6 @@ import {
 import LocationDetail from '@/components/LocationDetail.vue'
 import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation, SortMode } from '@/types'
-import type { MapCardProps } from '@phila/phila-ui-cards'
 
 // app variables
 const searchPlaceholderText = 'Search by address, zipcode, or keyword...'
@@ -55,12 +55,12 @@ const visitedIds = ref(new Set<string>())
 const visibleFloodLayers = ref<FloodLayerId[]>([])
 const { oemLocations, isLoading, errorMessage } = useLocations()
 const {
-  userLocation,
   userLocationState,
   keywordsForSearch,
   locationSearchMode,
   searchOrUserLocation,
   handleSearchSubmit,
+  handleGeolocate,
 } = PinboardComposables.useUserAndSearchLocations(true, true)
 const locationSortMode = ref<SortMode>(
   ['located', 'watching'].includes(userLocationState.value) ? 'DistAsc' : '',
@@ -121,10 +121,6 @@ function handleDeselect(id: string) {
   visitedIds.value.add(id)
 }
 
-function handleGeolocate(data: { latitude: number; longitude: number; accuracy: number }) {
-  userLocation.value = { latitude: data.latitude, longitude: data.longitude }
-}
-
 function getLocationTags(loc: OemLocation): NonNullable<MapCardProps['tags']> {
   if (loc.deviceType === 'Camera') {
     return [{ text: 'Camera', color: 'purple' as const, icon: markRaw(IconCamera) }]
@@ -142,9 +138,8 @@ function getMapCardProps(location: OemLocation): MapCardProps {
     subheader: location.distance,
     tags: getLocationTags(location),
     src: location.thumbnailUrl,
-  }
+  } satisfies MapCardProps
 }
-
 </script>
 
 <template>

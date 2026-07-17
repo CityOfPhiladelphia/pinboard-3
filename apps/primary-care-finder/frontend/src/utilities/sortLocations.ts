@@ -10,6 +10,19 @@ export function sortLocations(
   locations = toValue(locations)
   currentLocation = toValue(currentLocation)
   sortMode = toValue(sortMode)
+  locations.forEach((location) => {
+    location.distance = PinboardUtilities.hasLocationData(currentLocation)
+      ? `${PinboardUtilities.getHaversineDistance(
+          { latitude: location.latitude, longitude: location.longitude },
+          {
+            latitude: currentLocation.latitude,
+            longitude: currentLocation.longitude,
+          },
+          1
+        )} mi`
+      : undefined
+  })
+
   switch (PinboardUtilities.hasLocationData(currentLocation) && !sortMode ? 'distance' : sortMode) {
     case 'name': {
       return sortAlpha(locations)

@@ -14,7 +14,12 @@ import {
   Callout,
   applyFilters,
 } from '@pinboard/ui'
-import type { FilterChoiceBitfieldGroup, FilterValues, PinboardTypes } from '@pinboard/ui'
+import type {
+  FilterChoiceBitfieldGroup,
+  FilterValues,
+  MapCardProps,
+  PinboardTypes,
+} from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
 import { useFilterChipDefinitions } from '@/composables/filters/useFilterChipDefinitions.ts'
 import { useFilterLogic } from '@/composables/filters/useFilterLogic'
@@ -81,11 +86,11 @@ const calloutOpen = ref(true)
 // emits to handleGeolocate. The shared useUserLocation composable prompts on load,
 // which the primary care finder intentionally avoids.
 const {
-  userLocation,
   keywordsForSearch,
   locationSearchMode,
   searchOrUserLocation,
   handleSearchSubmit,
+  handleGeolocate,
 } = PinboardComposables.useUserAndSearchLocations()
 const filterState = ref<PrimaryCareFilters>(defaultFilterState)
 
@@ -109,23 +114,6 @@ const keywordToFilterMap = computed(() => {
   mapFilterTextToFilterLogic(keywordMap, 'tests', logicalValues.childFilters.tests)
 
   return keywordMap
-})
-
-const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
-  const { latitude, longitude } = userLocation.value
-  return locations.value.map((loc) => ({
-    ...loc,
-    locationCardInfo: {
-      ...loc.locationCardInfo,
-      subheader: PinboardUtilities.hasLocationData(userLocation.value)
-        ? `${PinboardUtilities.getHaversineDistance(
-            { latitude: loc.latitude, longitude: loc.longitude },
-            { latitude, longitude },
-            1
-          )} mi`
-        : undefined,
-    },
-  }))
 })
 
 const sortMode = computed<SortMode>(() => {
@@ -168,8 +156,8 @@ const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
 
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
   let result = filterLogicalValue.value.length
-    ? applyFilters(locationsWithDistance.value, filterLogicalValue.value)
-    : locationsWithDistance.value
+    ? applyFilters(locations.value, filterLogicalValue.value)
+    : locations.value
 
   if (keywordsForSearch.value) {
     const terms = keywordsForSearch.value
@@ -182,10 +170,8 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
       return terms.some((term) => {
         const keywordBits =
           keywordToFilterMap.value?.[term] &&
-          keywordToFilterMap.value[term][
-            Math.floor(locationsWithDistance.value.indexOf(loc) / 32)
-          ] &
-            (1 << Math.floor(locationsWithDistance.value.indexOf(loc) % 32))
+          keywordToFilterMap.value[term][Math.floor(locations.value.indexOf(loc) / 32)] &
+            (1 << Math.floor(locations.value.indexOf(loc) % 32))
         return haystack.includes(term) || keywordBits
       })
     })
@@ -207,14 +193,6 @@ function mapFilterTextToFilterLogic(
       .filter(Boolean)
       .forEach((word) => (keywordMap[word] = filterLogic.childFilters[key].getBitfield()))
   })
-}
-
-function handleGeolocate(locationData: { latitude: number; longitude: number; accuracy: number }) {
-  console.log('Geolocation Accuracy: ', locationData.accuracy)
-  userLocation.value = {
-    latitude: locationData.latitude,
-    longitude: locationData.longitude,
-  }
 }
 
 function handleGeolocateError(error: Error | GeolocationPositionError) {
@@ -328,7 +306,7 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
           (e: any) => {
             const feature = e.features?.[0]
             if (!feature) return
-            const loc = locationsWithDistance.find((l) => l.id === feature.properties?.id)
+            const loc = locations.find((l) => l.id === feature.properties?.id)
             if (loc) onSelect(loc)
           }
         "
