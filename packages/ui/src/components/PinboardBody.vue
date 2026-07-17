@@ -365,15 +365,20 @@ const effectiveMapConfig = (() => {
   }
   return base
 })()
+
+function selectedLocationValue() {
+  return props.locations[props.locations.indexOf(selectedLocation.value)]
+}
+
 </script>
 
 <template>
   <div v-if="selectedLocation && !isMobile" class="detail-overlay">
     <slot
       name="location-detail"
-      :location="selectedLocation.value"
+      :location="selectedLocationValue()"
       :on-close="handleCloseLocationDetail"
-      :on-print="() => print(selectedLocation.value)"
+      :on-print="() => print(selectedLocationValue())"
     />
   </div>
   <div class="finder-panel">
@@ -510,7 +515,7 @@ const effectiveMapConfig = (() => {
       <div v-if="selectedLocation" class="bottom-sheet-detail">
         <slot
           name="location-detail"
-          :location="selectedLocation.value"
+          :location="selectedLocationValue()"
           :on-close="handleCloseLocationDetail"
         />
       </div>

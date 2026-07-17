@@ -1,5 +1,6 @@
 // packages/ui/src/types.ts
 import type { MapCardProps } from '@phila/phila-ui-cards'
+import type { Ref } from 'vue'
 
 export type Latitude = number
 export type Longitude = number
@@ -14,6 +15,18 @@ export interface LatLon {
 export interface ZipcodePolygon {
   centroid: LatLon
   nodes: LongitudeLatitude[]
+}
+
+export type SortMode = 'AlphaAsc' | 'AlphaDesc' | 'DistAsc' | 'DistDesc' | ''
+
+export type SortFunction<T> = (locations: Ref<T[]> | T[]) => T[]
+
+export interface CustomSort<T> extends Partial<Record<SortMode, SortFunction<T>>> {
+  AlphaAsc: SortFunction<T>
+  AlphaDesc: SortFunction<T>
+  DistAsc: SortFunction<T>
+  DistDesc: SortFunction<T>
+  default: SortFunction<T>
 }
 
 export type LocationPermissionState = 'granted' | 'prompt' | 'denied'

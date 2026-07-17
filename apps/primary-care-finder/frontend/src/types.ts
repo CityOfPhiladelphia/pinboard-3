@@ -121,7 +121,8 @@ export interface PrimaryCareResponse extends PinboardTypes.GeoJSONFeatureCollect
   features: PrimaryCareFeature[]
 }
 
-export type PrimaryCareLocation = PinboardTypes.BasicLocation & Omit<PrimaryCareFeature, 'type'>
+export interface PrimaryCareLocation
+  extends PinboardTypes.BasicLocation, Omit<PrimaryCareFeature, 'type'> {}
 
 export type SortMode = '' | 'distance' | 'name'
 

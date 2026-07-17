@@ -13,7 +13,7 @@ export function usePrint<PinboardLocation extends BasicLocation>(
   const printLocations = computed(() =>
     printIds.value
       .map((id) => locations.value.find((loc) => loc.id === id))
-      .filter((loc): loc is PinboardLocation => loc !== undefined)
+      .filter((loc) => loc !== undefined)
   )
 
   function print(location: PinboardLocation) {

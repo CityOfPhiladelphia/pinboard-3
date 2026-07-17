@@ -8,10 +8,8 @@ export function useUserAndSearchLocations(
   promptLocationOnPageLoad: boolean = false,
   watchLocation: boolean = false
 ) {
-  const { userLocation, userLocationState } = useUserLocation(
-    promptLocationOnPageLoad,
-    watchLocation
-  )
+  const { userLocation, userLocationState, endWatch, handleGeolocate, handleGeolocateError } =
+    useUserLocation(promptLocationOnPageLoad, watchLocation)
   const addressForSearch = ref<string>('')
   const { addressCoordinates, finishedAddressFetch } = useSearchAddress(addressForSearch)
   const zipcodeForSearch = ref<string>('')
@@ -98,22 +96,6 @@ export function useUserAndSearchLocations(
     }
   }
 
-  function handleGeolocate(locationData: {
-    latitude: number
-    longitude: number
-    accuracy: number
-  }) {
-    console.log('Geolocation Accuracy: ', locationData.accuracy)
-    userLocation.value = {
-      latitude: locationData.latitude,
-      longitude: locationData.longitude,
-    }
-  }
-
-  function handleGeolocateError(error: Error | GeolocationPositionError) {
-    console.error(error)
-  }
-
   return {
     userLocation,
     userLocationState,
@@ -127,6 +109,7 @@ export function useUserAndSearchLocations(
     locationSearchMode,
     searchOrUserLocation,
     handleSearchSubmit,
+    endWatch,
     handleGeolocate,
     handleGeolocateError,
   }

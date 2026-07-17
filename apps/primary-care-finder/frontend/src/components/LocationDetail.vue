@@ -54,28 +54,6 @@ const ALL_SERVICES: [string, PrimaryCareField[]][] = [
   ['specialty.pharmacy', ['special_pharmacy']],
 ]
 
-// const keywordsTranslated = computed(() => {
-//   const unique = new Set([
-//     patientsServedText.value,
-//     ...languagesSpoken.value.map(translateLanguage),
-//     ...DAYS.flatMap((day) => getExceptionText(day)).filter(Boolean),
-//     ...newPatientServices.value.flatMap((item) => t(item).replace(/[!-/:-@[-`{-~]/g, ' ').split(/\s+/)),
-//     ...existingOnlyServices.value.flatMap((item) => t(item).replace(/[!-/:-@[-`{-~]/g, ' ').split(/\s+/)),
-//     ...props.location.properties.transport_parking ? [translateTransitList(props.location.properties.transport_parking, 'car'), t('transit.car.label')] : [],
-//     ...props.location.properties.transport_bus ? [props.location.properties.transport_bus, t('transit.bus')] : [],
-//     ...props.location.properties.transport_trolley ? [props.location.properties.transport_trolley, t('transit.trolley')] : [],
-//     ...props.location.properties.transport_subway ? [translateTransitList(props.location.properties.transport_subway, 'subway'), t('transit.subway.label')] : [],
-//     ...props.location.properties.transport_train ? [translateTransitList(props.location.properties.transport_train, 'regRail'), t('transit.regRail.label')] : [],
-//     translateWarning(props.location.properties.optional_info_general ?? ''),
-//   ].flatMap((item) =>
-//     item
-//       .toLocaleLowerCase()
-//       .replace(/[!-/:-@[-`{-~]/g, ' ')
-//       .split(/\s+/)
-//   ))
-//   return [...unique].filter(Boolean)
-// })
-
 // Services available to new patients or walk-ins (any field is "Yes")
 const newPatientServices = computed<string[]>(() =>
   ALL_SERVICES.filter(([, fields]) =>
