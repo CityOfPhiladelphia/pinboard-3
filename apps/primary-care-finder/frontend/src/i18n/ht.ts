@@ -6,6 +6,7 @@ export default {
     checkHours: 'Tcheke orè',
     weekendHours: 'Orè wikenn',
     openAfter6: 'Ouvè apre 6è diswa',
+    eveningHours: 'Orè aswè',
     walkIns: 'San randevou',
     telehealth: 'Telesante',
     parking: 'Pakin sou plas',
@@ -16,10 +17,10 @@ export default {
     todayClosed: 'Jodi a: Fèmen',
     todayHours: 'Jodi a: {range}',
   },
-  providerWebsite: 'Sitwèb founisè a',
+  providerWebsite: 'Sitwèb',
   website: 'Sit wèb',
   hours: 'Èdtan',
-  languagesSpoken: 'Lang pale',
+  languagesSpoken: 'Lang pale pa anplwaye',
   daysOfTheWeek: 'Jou nan semèn nan',
   Monday: 'Lendi',
   Tuesday: 'Madi',
@@ -117,7 +118,7 @@ export default {
   },
   patientType: {
     category: 'Elijiblite',
-    patient_type_new: 'Nouvo pasyan yo',
+    patient_type_new: 'Nouvo pasyan oswa pasyan ki egziste deja',
     patient_type_new_subtext:
       'Kèk nan sèvis sa yo ka disponib san randevou. Kontakte founisè a pou plis enfòmasyon.',
     patient_type_existing: 'Pasyan etabli',
@@ -221,7 +222,7 @@ export default {
     dental: 'Dantè',
     eye: 'Swen je',
     podiatry: 'Poddyatri',
-    mat: 'Tretman ki ede medikaman',
+    mat: 'Tretman ki ede medikaman (MAT)',
     nutrition: 'Konsèy sou nitrisyon',
     tobacco: 'Ede kite tabak',
     pharmacy: 'Famasi sou plas',
@@ -281,8 +282,8 @@ export default {
     'Exclusively serves adolescents and young adults (ages 13-26).':
       'Sèvi sèlman adolesan ak jèn granmoun (ki gen 13 a 26 an).',
     'Exclusively serves people living with HIV.': 'Sèvi sèlman moun k ap viv ak VIH.',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      'Sèvi sèlman manm kominote imigran Latine nan Filadèlfi ki pa gen asirans. Pa gen egzamen fizik pou travay. Sèvis pou timoun yo limite ak dan, swen je, ak sante mantal.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      'Sèvi sèlman manm kominote imigran Latine nan Filadèlfi ki pa gen asirans. Pa gen egzamen fizik pou travay. Sèvis pou timoun yo limite ak swen je ak sante mantal.',
     'Services for children are limited to dental, mental health, and vaccines.':
       'Sèvis pou timoun yo limite ak dan, sante mantal, ak vaksen.',
     'Special focus on LGBTQ+ ': 'Konsantrasyon espesyal sou LGBTQ+',

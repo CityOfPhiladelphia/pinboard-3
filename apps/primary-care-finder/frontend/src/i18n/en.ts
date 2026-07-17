@@ -5,6 +5,7 @@ export default {
     checkHours: 'Check hours',
     weekendHours: 'Weekend hours',
     openAfter6: 'Open after 6pm',
+    eveningHours: 'Evening hours',
     walkIns: 'Walk-ins available',
     telehealth: 'Telehealth',
     parking: 'Parking on site',
@@ -15,7 +16,7 @@ export default {
     todayClosed: 'Today: Closed',
     todayHours: 'Today: {range}',
   },
-  providerWebsite: 'Provider website',
+  providerWebsite: 'Website',
   locationDetails: 'Location details',
   contact: 'Contact',
   website: 'Website',
@@ -30,16 +31,19 @@ export default {
     linkText: 'Learn more about getting care',
   },
   app: {
-    title: 'Primary care finder',
+    name: 'Primary care finder',
     subtitle: 'Free and low-cost medical care in Philadelphia',
     noResults:
       'No health centers found. Please check your spelling or remove some of your filters, and try again.',
     viewList: 'View list',
     viewMap: 'View map',
-    name: 'Primary Care Finder',
     aboutTitle: 'About this tool',
     aboutBody:
       'This tool helps Philadelphia residents find free and low-cost primary care providers near them. Search by location, filter by services, and view details like hours, transit options, and available tests.',
+  },
+  error: {
+    fetchSites: 'Error retrieving primary care sites',
+    fetchLanguges: 'Error retrieving languages spoken',
   },
   filters: {
     sort: 'Sort',
@@ -95,7 +99,7 @@ export default {
   },
   patientType: {
     category: 'Eligibility',
-    patient_type_new: 'For new patients',
+    patient_type_new: 'For new or existing patients',
     patient_type_new_subtext:
       'Some of these services may be available for walk-ins. Contact the provider for more information.',
     patient_type_existing: 'Established patients',
@@ -104,7 +108,7 @@ export default {
       'You may need to become a patient at a health center before you can access some services. This is also called establishing care.',
   },
   visitType: {
-    category: 'Primary care',
+    category: 'Visit type',
     well: 'Well visit',
     sick: 'Sick visit',
     sports: 'Sports physicals',
@@ -154,9 +158,9 @@ export default {
     portugese: 'Portuguese',
     punjabi: 'Punjabi',
     'brazilian portuguese': 'Brazilian Portuguese',
-    'french creole': 'Haitian Creole',
-    'french-creole': 'Haitian Creole',
-    frenchcreole: 'Haitian Creole',
+    'french creole': 'French Creole',
+    'french-creole': 'French Creole',
+    frenchcreole: 'French Creole',
     fula: 'Fula',
     karen: 'Karen',
     koloqua: 'Koloqua',
@@ -208,7 +212,7 @@ export default {
     dental: 'Dental',
     eye: 'Eye care',
     podiatry: 'Podiatry',
-    mat: 'Medication-assisted treatment',
+    mat: 'Medication-assisted treatment (MAT)',
     nutrition: 'Nutrition counseling',
     tobacco: 'Help quitting tobacco',
     pharmacy: 'On-site pharmacy',
@@ -268,8 +272,8 @@ export default {
     'Exclusively serves adolescents and young adults (ages 13-26).':
       'Exclusively serves adolescents and young adults (ages 13-26).',
     'Exclusively serves people living with HIV.': 'Exclusively serves people living with HIV.',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      "Exclusively serves uninsured members of Philadelphia's Latine immigrant community. No work physicals. Services for children are limited to dental, eye care, and mental health.",
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      "Exclusively serves uninsured members of Philadelphia's Latine immigrant community. No work physicals. Services for children are limited to eye care and mental health.",
     'Services for children are limited to dental, mental health, and vaccines.':
       'Services for children are limited to dental, mental health, and vaccines.',
     'Special focus on LGBTQ+ ': 'Special focus on LGBTQ+',
@@ -387,7 +391,7 @@ export default {
   hours: 'Hours',
   daysOfTheWeek: 'Day',
   schedule: 'Schedule',
-  languagesSpoken: 'Languages spoken',
+  languagesSpoken: 'Languages spoken by staff',
   english: 'English',
   noInfo: 'No information available',
   Monday: 'Monday',

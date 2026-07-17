@@ -1,25 +1,32 @@
 import { computed, ref, watchEffect, type Ref } from 'vue'
 import {
   filterKeys,
-  ageGroupOptions,
+  ageRangeOptions,
   waitOptions,
   visitTypeOptions,
   specialtyOptions,
   testsOptions,
-  languageOptions,
 } from './filterKeysValues'
 import {
   FilterChoiceBitfieldGroup,
   FilterGroup,
   getBufferSize,
+  type IFilterChoiceBitfield,
   type IFilterChoiceBitfieldGroup,
   type MatchingFunction,
 } from '@pinboard/ui'
-import type { PrimaryCareFilterValues, PrimaryCareLocation, PrimaryCareProperties } from '@/types'
+import type {
+  FilterKey,
+  PrimaryCareFilters,
+  PrimaryCareLocation,
+  PrimaryCareProperties,
+  WaitTimeField,
+} from '@/types'
 
 export function useFilterLogic(
   locations: Ref<PrimaryCareLocation[]>,
-  filterState: Ref<PrimaryCareFilterValues>
+  languages: Ref<string[]>,
+  filterState: Ref<PrimaryCareFilters>
 ) {
   const filterLogicalValue = ref<Uint32Array>(new Uint32Array())
   const matchYes = ['Yes']
@@ -53,658 +60,176 @@ export function useFilterLogic(
     )
   }
 
-  const ageGroupFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
-    operation: '&',
-    choices: {
-      [ageGroupOptions.ageGroupOption0]: {
-        dataFields: ['adults'],
-        matches: matchYes,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [ageGroupOptions.ageGroupOption1]: {
-        dataFields: ['children'],
-        matches: matchYes,
-        matchingFunction: matchFieldsToOptions,
-      },
-    },
-  }
-
-  const visitTypeFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
-    operation: '&',
-    choices: {
-      [visitTypeOptions.visitTypeOption0]: {
-        dataFields: ['primary_well'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [visitTypeOptions.visitTypeOption1]: {
-        dataFields: ['primary_sick'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [visitTypeOptions.visitTypeOption2]: {
-        dataFields: ['primary_sports'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [visitTypeOptions.visitTypeOption3]: {
-        dataFields: ['primary_prenatal'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [visitTypeOptions.visitTypeOption4]: {
-        dataFields: ['primary_women'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [visitTypeOptions.visitTypeOption5]: {
-        dataFields: ['primary_telehealth'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [visitTypeOptions.visitTypeOption6]: {
-        dataFields: ['primary_vacc'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-    },
-  }
-
-  const specialtyFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
-    operation: '&',
-    choices: {
-      [specialtyOptions.specialtyOption0]: {
-        dataFields: ['special_mental'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [specialtyOptions.specialtyOption1]: {
-        dataFields: ['special_dental'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [specialtyOptions.specialtyOption2]: {
-        dataFields: ['special_eye'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [specialtyOptions.specialtyOption3]: {
-        dataFields: ['special_podiatry'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [specialtyOptions.specialtyOption4]: {
-        dataFields: ['special_mat'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [specialtyOptions.specialtyOption5]: {
-        dataFields: ['special_nutrition'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [specialtyOptions.specialtyOption6]: {
-        dataFields: ['special_tobacco'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [specialtyOptions.specialtyOption7]: {
-        dataFields: ['special_pharmacy'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-    },
-  }
-
-  const testsFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
-    operation: '&',
-    choices: {
-      [testsOptions.testsOption0]: {
-        dataFields: ['tests_blood'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [testsOptions.testsOption1]: {
-        dataFields: ['tests_sti'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [testsOptions.testsOption2]: {
-        dataFields: ['tests_covid'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [testsOptions.testsOption3]: {
-        dataFields: ['tests_mammo'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-      [testsOptions.testsOption4]: {
-        dataFields: ['tests_xray'],
-        matches: matchYesEstPat,
-        matchingFunction: matchFieldsToOptions,
-      },
-    },
-  }
-
-  const waitTimeFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
-    operation: '&',
-    choices: {
-      [waitOptions.waitOption0]: {
-        dataFields: ['walk_ins_sick', 'sick_adult_wait', 'sick_child_wait'],
-        matches: ['Yes', 'Same day'],
-        matchingFunction: matchFieldsToOptions,
-      },
-      [waitOptions.waitOption1]: {
-        dataFields: ['well_adult_wait', 'well_child_wait'],
-        matches: ['Same day', 'Less than one week'],
-        matchingFunction: matchFieldsToOptions,
-      },
-      [waitOptions.waitOption2]: {
-        dataFields: ['walk_ins_sick', 'sick_adult_wait', 'sick_child_wait'],
-        matches: ['Yes', 'Same day', 'Less than one week'],
-        matchingFunction: matchFieldsToOptions,
-      },
-      [waitOptions.waitOption3]: {
-        dataFields: [
-          'walk_ins_sick',
-          'sick_adult_wait',
-          'sick_child_wait',
-          'well_adult_wait',
-          'well_child_wait',
-          'other_services_adult_wait',
-          'other_services_child_wait',
-        ],
-        matches: ['Yes', 'Same day', 'Less than one week', 'Less than two months'],
-        matchingFunction: matchFieldsToOptions,
-      },
-    },
-  }
-
-  const languageFilterParams: Omit<IFilterChoiceBitfieldGroup, 'data' | 'bufferLength'> = {
-    operation: '&',
-    choices: {
-      [languageOptions.languageOption0]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption0],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption1]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption1],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption2]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption2],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption3]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption3],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption4]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption4],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption5]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption5],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption6]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption6],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption7]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption7],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption8]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption8],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption9]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption9],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption10]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption10],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption11]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption11],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption12]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption12],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption13]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption13],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption14]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption14],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption15]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption15],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption16]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption16],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption17]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption17],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption18]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption18],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption19]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption19],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption20]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption20],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption21]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption21],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption22]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption22],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption23]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption23],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption24]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption24],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption25]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption25],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption26]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption26],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption27]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption27],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption28]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption28],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption29]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption29],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption30]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption30],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption31]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption31],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption32]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption32],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption33]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption33],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption34]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption34],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption35]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption35],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption36]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption36],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption37]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption37],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption38]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption38],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption39]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption39],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption40]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption40],
-        matchingFunction: matchOptionInString,
-      },
-      [languageOptions.languageOption41]: {
-        dataFields: ['languages'],
-        matches: [languageOptions.languageOption41],
-        matchingFunction: matchOptionInString,
-      },
-    },
-  }
-
   const filterLogic = computed(() => {
-    const commonParams = {
+    const commonParams: Omit<IFilterChoiceBitfieldGroup, 'choices'> = {
       data: locations.value as unknown as Record<string, unknown>[],
+      operation: '&',
       bufferLength: getBufferSize(locations.value.length),
     }
-    const ageGroupFilter = new FilterChoiceBitfieldGroup({
-      ...commonParams,
-      ...ageGroupFilterParams,
-    })
-    const waitTimeFilter = new FilterChoiceBitfieldGroup({
-      ...commonParams,
-      ...waitTimeFilterParams,
+
+    const sameDayParams: Omit<IFilterChoiceBitfield, 'data' | 'bufferLength'> = {
+      dataFields: ['walk_ins_sick', 'sick_adult_wait', 'sick_child_wait'],
+      matches: ['Yes', 'Same day'],
+      matchingFunction: matchFieldsToOptions,
+    }
+    const weekSickParams: Omit<IFilterChoiceBitfield, 'data' | 'bufferLength'> = {
+      dataFields: sameDayParams.dataFields,
+      matches: ['Yes', 'Same day', 'Less than one week'],
+      matchingFunction: matchFieldsToOptions,
+    }
+
+    const weekWellParams: Omit<IFilterChoiceBitfield, 'data' | 'bufferLength'> = {
+      dataFields: ['well_adult_wait', 'well_child_wait'],
+      matches: ['Same day', 'Less than one week'],
+      matchingFunction: matchFieldsToOptions,
+    }
+
+    const twoMonthsParams: Omit<IFilterChoiceBitfield, 'data' | 'bufferLength'> = {
+      dataFields: [
+        'walk_ins_sick',
+        'sick_adult_wait',
+        'sick_child_wait',
+        'well_adult_wait',
+        'well_child_wait',
+        'other_services_adult_wait',
+        'other_services_child_wait',
+      ] as WaitTimeField[],
+      matches: ['Yes', 'Same day', 'Less than one week', 'Less than two months'],
+      matchingFunction: matchFieldsToOptions,
+    }
+
+    const waitTimeFilter = makeFilterChoiceBitfieldGroup(commonParams, {
+      [waitOptions[0]]: sameDayParams,
+      [waitOptions[1]]: weekSickParams,
+      [waitOptions[2]]: weekWellParams,
+      [waitOptions[3]]: twoMonthsParams,
     })
 
-    const visitTypeFilter = new FilterChoiceBitfieldGroup({
-      ...commonParams,
-      ...visitTypeFilterParams,
-    })
+    const languageFilter = makeFilterChoiceBitfieldGroup(
+      commonParams,
+      Object.fromEntries(
+        Array.from(languages.value, (lang) => [
+          lang,
+          {
+            dataFields: ['languages'],
+            matches: [lang],
+            matchingFunction: matchOptionInString,
+          },
+        ])
+      )
+    )
 
-    const specialtyFilter = new FilterChoiceBitfieldGroup({
-      ...commonParams,
-      ...specialtyFilterParams,
-    })
-
-    const testsFilter = new FilterChoiceBitfieldGroup({
-      ...commonParams,
-      ...testsFilterParams,
-    })
-
-    const languageFilter = new FilterChoiceBitfieldGroup({
-      ...commonParams,
-      ...languageFilterParams,
-    })
+    const ageRangeFilter = makeFilterChoiceBitfieldGroup(
+      commonParams,
+      choicesFromObject(ageRangeOptions, matchYes, matchFieldsToOptions)
+    )
+    const visitTypeFilter = makeFilterChoiceBitfieldGroup(
+      commonParams,
+      choicesFromObject(visitTypeOptions, matchYesEstPat, matchFieldsToOptions)
+    )
+    const specialtyFilter = makeFilterChoiceBitfieldGroup(
+      commonParams,
+      choicesFromObject(specialtyOptions, matchYesEstPat, matchFieldsToOptions)
+    )
+    const testsFilter = makeFilterChoiceBitfieldGroup(
+      commonParams,
+      choicesFromObject(testsOptions, matchYesEstPat, matchFieldsToOptions)
+    )
 
     const filterLogicGroup = new FilterGroup({
-      operation: '&',
+      operation: commonParams.operation,
       bufferLength: commonParams.bufferLength,
       childFilters: {
-        [filterKeys.ageGroup]: ageGroupFilter,
-        [filterKeys.waitTime]: waitTimeFilter,
-        [filterKeys.visitType]: visitTypeFilter,
-        [filterKeys.specialty]: specialtyFilter,
-        [filterKeys.tests]: testsFilter,
-        [filterKeys.languages]: languageFilter,
-      },
+        ageRange: ageRangeFilter,
+        waitTime: waitTimeFilter,
+        visitType: visitTypeFilter,
+        specialty: specialtyFilter,
+        tests: testsFilter,
+        languages: languageFilter,
+      } as Record<FilterKey, FilterChoiceBitfieldGroup>,
     })
+
     return filterLogicGroup
   })
 
   watchEffect(() => {
     // age group
-    filterLogic.value.childFilters[filterKeys.ageGroup].childFilters[
-      ageGroupOptions.ageGroupOption0
-    ].setChecked(filterState.value.ageGroup.includes(ageGroupOptions.ageGroupOption0))
-    filterLogic.value.childFilters[filterKeys.ageGroup].childFilters[
-      ageGroupOptions.ageGroupOption1
-    ].setChecked(filterState.value.ageGroup.includes(ageGroupOptions.ageGroupOption1))
+    Object.values(ageRangeOptions).forEach((filter) =>
+      filterLogic.value
+        .getChildFilter(filterKeys.ageRange)
+        .getChildFilter(filter)
+        .setChecked(filterState.value.ageRange[filter])
+    )
 
     // wait time
-    filterLogic.value.childFilters[filterKeys.waitTime].childFilters[
-      waitOptions.waitOption0
-    ].setChecked(filterState.value.waitTime.includes(waitOptions.waitOption0))
-    filterLogic.value.childFilters[filterKeys.waitTime].childFilters[
-      waitOptions.waitOption1
-    ].setChecked(filterState.value.waitTime.includes(waitOptions.waitOption1))
-    filterLogic.value.childFilters[filterKeys.waitTime].childFilters[
-      waitOptions.waitOption2
-    ].setChecked(filterState.value.waitTime.includes(waitOptions.waitOption2))
-    filterLogic.value.childFilters[filterKeys.waitTime].childFilters[
-      waitOptions.waitOption3
-    ].setChecked(filterState.value.waitTime.includes(waitOptions.waitOption3))
+    waitOptions.forEach((filter) =>
+      filterLogic.value
+        .getChildFilter(filterKeys.waitTime)
+        .getChildFilter(filter)
+        .setChecked(filterState.value.waitTime[filter])
+    )
 
     // visit type
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
-      visitTypeOptions.visitTypeOption0
-    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption0))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
-      visitTypeOptions.visitTypeOption1
-    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption1))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
-      visitTypeOptions.visitTypeOption2
-    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption2))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
-      visitTypeOptions.visitTypeOption3
-    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption3))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
-      visitTypeOptions.visitTypeOption4
-    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption4))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
-      visitTypeOptions.visitTypeOption5
-    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption5))
-    filterLogic.value.childFilters[filterKeys.visitType].childFilters[
-      visitTypeOptions.visitTypeOption6
-    ].setChecked(filterState.value.visitType.includes(visitTypeOptions.visitTypeOption6))
+    Object.values(visitTypeOptions).forEach((filter) =>
+      filterLogic.value
+        .getChildFilter(filterKeys.visitType)
+        .getChildFilter(filter)
+        .setChecked(filterState.value.visitType[filter])
+    )
 
     // specialty
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      specialtyOptions.specialtyOption0
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption0))
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      specialtyOptions.specialtyOption1
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption1))
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      specialtyOptions.specialtyOption2
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption2))
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      specialtyOptions.specialtyOption3
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption3))
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      specialtyOptions.specialtyOption4
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption4))
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      specialtyOptions.specialtyOption5
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption5))
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      specialtyOptions.specialtyOption6
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption6))
-    filterLogic.value.childFilters[filterKeys.specialty].childFilters[
-      specialtyOptions.specialtyOption7
-    ].setChecked(filterState.value.specialty.includes(specialtyOptions.specialtyOption7))
+    Object.values(specialtyOptions).forEach((filter) =>
+      filterLogic.value
+        .getChildFilter(filterKeys.specialty)
+        .getChildFilter(filter)
+        .setChecked(filterState.value.visitType[filter])
+    )
 
     // tests
-    filterLogic.value.childFilters[filterKeys.tests].childFilters[
-      testsOptions.testsOption0
-    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption0))
-    filterLogic.value.childFilters[filterKeys.tests].childFilters[
-      testsOptions.testsOption1
-    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption1))
-    filterLogic.value.childFilters[filterKeys.tests].childFilters[
-      testsOptions.testsOption2
-    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption2))
-    filterLogic.value.childFilters[filterKeys.tests].childFilters[
-      testsOptions.testsOption3
-    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption3))
-    filterLogic.value.childFilters[filterKeys.tests].childFilters[
-      testsOptions.testsOption4
-    ].setChecked(filterState.value.tests.includes(testsOptions.testsOption4))
+    Object.values(testsOptions).forEach((filter) =>
+      filterLogic.value
+        .getChildFilter(filterKeys.tests)
+        .getChildFilter(filter)
+        .setChecked(filterState.value.visitType[filter])
+    )
 
     // languages
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption0
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption0))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption1
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption1))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption2
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption2))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption3
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption3))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption4
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption4))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption5
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption5))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption6
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption6))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption7
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption7))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption8
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption8))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption9
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption9))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption10
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption10))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption11
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption11))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption12
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption12))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption13
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption13))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption14
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption14))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption15
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption15))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption16
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption16))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption17
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption17))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption18
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption18))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption19
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption19))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption20
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption20))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption21
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption21))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption22
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption22))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption23
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption23))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption24
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption24))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption25
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption25))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption26
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption26))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption27
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption27))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption28
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption28))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption29
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption29))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption30
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption30))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption31
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption31))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption32
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption32))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption33
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption33))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption34
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption34))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption35
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption35))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption36
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption36))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption37
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption37))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption38
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption38))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption39
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption39))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption40
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption40))
-    filterLogic.value.childFilters[filterKeys.languages].childFilters[
-      languageOptions.languageOption41
-    ].setChecked(filterState.value.languages.includes(languageOptions.languageOption41))
+    languages.value.forEach((filter) =>
+      filterLogic.value
+        .getChildFilter(filterKeys.languages)
+        .getChildFilter(filter)
+        .setChecked(filterState.value.languages[filter])
+    )
 
     filterLogicalValue.value = filterLogic.value.getBitfield()
   })
 
-  return { filterLogicalValue }
+  return { filterLogicalValue, filterLogic }
+}
+
+function choicesFromObject(
+  obj: object,
+  matches: string[],
+  matchingFunction: MatchingFunction
+): Record<string, Omit<IFilterChoiceBitfield, 'data' | 'bufferLength'>> {
+  return Object.fromEntries(
+    Array.from(Object.entries(obj), ([dataField, filterName]) => [
+      filterName,
+      {
+        dataFields: [dataField],
+        matches: matches,
+        matchingFunction: matchingFunction,
+      },
+    ])
+  )
+}
+
+function makeFilterChoiceBitfieldGroup(
+  commonParams: Omit<IFilterChoiceBitfieldGroup, 'choices'>,
+  choices: Record<string, Omit<IFilterChoiceBitfield, 'data' | 'bufferLength'>>
+): FilterChoiceBitfieldGroup {
+  return new FilterChoiceBitfieldGroup({
+    ...commonParams,
+    choices: choices,
+  })
 }

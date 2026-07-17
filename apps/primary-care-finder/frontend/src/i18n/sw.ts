@@ -6,6 +6,7 @@ export default {
     checkHours: 'Angalia saa za kazi',
     weekendHours: 'Saa za kazi za wikendi',
     openAfter6: 'Imefunguliwa baada ya saa 6 jioni',
+    eveningHours: 'Saa za kazi za jioni',
     walkIns: 'Bila miadi',
     telehealth: 'Huduma ya afya kwa njia ya mtandao',
     parking: 'Maegesho ya gari hapa',
@@ -16,10 +17,10 @@ export default {
     todayClosed: 'Leo: Imefungwa',
     todayHours: 'Leo: {range}',
   },
-  providerWebsite: 'Tovuti ya mtoa huduma',
+  providerWebsite: 'Tovuti',
   website: 'Tovuti',
   hours: 'Masaa',
-  languagesSpoken: 'Lugha zinazozungum',
+  languagesSpoken: 'Lugha zinazozungumzwa na wafanyakazi',
   daysOfTheWeek: 'Siku ya wiki',
   Monday: 'Jumatatu',
   Tuesday: 'Jumanne',
@@ -118,7 +119,7 @@ export default {
   },
   patientType: {
     category: 'Kustahiki',
-    patient_type_new: 'Wagonjwa wapya',
+    patient_type_new: 'Wagonjwa wapya au waliopo',
     patient_type_new_subtext:
       'Baadhi ya huduma hizi zinaweza kupatikana bila miadi. Wasiliana na mtoa huduma kwa maelezo zaidi.',
     patient_type_existing: 'Wagonjwa walioanzishwa',
@@ -222,7 +223,7 @@ export default {
     dental: 'Meno',
     eye: 'Utunzaji wa macho',
     podiatry: 'Matibabu ya miguu',
-    mat: 'Matibabu ya matumizi ya dawa',
+    mat: 'Matibabu ya matumizi ya dawa (MAT)',
     nutrition: 'Ushauri wa lishe',
     tobacco: 'Msaada wa kuacha tumbaku',
     pharmacy: 'Duka la dawa kwenye eneo',
@@ -282,8 +283,8 @@ export default {
     'Exclusively serves adolescents and young adults (ages 13-26).':
       'Hutumikia pekee vijana balehe na vijana wazima (wenye umri wa miaka 13-26).',
     'Exclusively serves people living with HIV.': 'Hutumikia pekee watu wanaoishi na VVU.',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      'Hutumikia pekee wanajamii wahamiaji wa Latine wasio na bima ya afya katika Philadelphia. Hakuna uchunguzi wa afya kwa ajili ya kazi. Huduma kwa watoto zimepunguzwa kwa meno, macho, na afya ya akili.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      'Hutumikia pekee wanajamii wahamiaji wa Latine wasio na bima ya afya katika Philadelphia. Hakuna uchunguzi wa afya kwa ajili ya kazi. Huduma kwa watoto zimepunguzwa kwa macho na afya ya akili.',
     'Services for children are limited to dental, mental health, and vaccines.':
       'Huduma kwa watoto zimepunguzwa kwa meno, afya ya akili, na chanjo.',
     'Special focus on LGBTQ+ ': 'Inaangazia hasa LGBTQ+',

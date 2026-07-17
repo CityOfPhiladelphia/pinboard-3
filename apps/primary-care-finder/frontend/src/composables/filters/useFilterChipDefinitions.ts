@@ -1,128 +1,103 @@
-import { computed } from 'vue'
+import { computed, type Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { FilterDefinition } from '@pinboard/ui'
 import { IconSort } from '@phila/phila-ui-core/icons'
 import {
   filterKeys,
-  ageGroupOptions,
+  ageRangeOptions,
   waitOptions,
   visitTypeOptions,
   specialtyOptions,
   testsOptions,
-  languageOptions,
 } from './filterKeysValues'
 
-export function useFilterChipDefinitions() {
+export function useFilterChipDefinitions(languages: Ref<string[]>) {
   const { t } = useI18n()
-  const filterChipDefinitions = computed<FilterDefinition[]>(() => [
-    {
-      key: 'sort',
-      label: t('filters.sort'),
-      multiple: false,
-      excludeFromCount: true,
-      icon: IconSort,
-      choices: [
-        { text: t('filters.distance'), value: 'distance' },
-        { text: t('filters.name'), value: 'name' },
-      ],
-    },
-    {
-      key: filterKeys.ageGroup,
-      label: t('ageRange.category'),
-      multiple: true,
-      choices: [
-        { text: t('ageRange.adult'), value: ageGroupOptions.ageGroupOption0 },
-        { text: t('ageRange.child'), value: ageGroupOptions.ageGroupOption1 },
-      ],
-    },
-    {
-      key: filterKeys.visitType,
-      label: t('visitType.category'),
-      multiple: true,
-      choices: [
-        { text: t('visitType.well'), value: visitTypeOptions.visitTypeOption0 },
-        { text: t('visitType.sick'), value: visitTypeOptions.visitTypeOption1 },
-        { text: t('visitType.sports'), value: visitTypeOptions.visitTypeOption2 },
-        { text: t('visitType.prenatal'), value: visitTypeOptions.visitTypeOption3 },
-        { text: t('visitType.women'), value: visitTypeOptions.visitTypeOption4 },
-        { text: t('visitType.telehealth'), value: visitTypeOptions.visitTypeOption5 },
-        { text: t('visitType.vaccine'), value: visitTypeOptions.visitTypeOption6 },
-        { text: t('specialty.mental'), value: specialtyOptions.specialtyOption0 },
-        { text: t('specialty.dental'), value: specialtyOptions.specialtyOption1 },
-        { text: t('specialty.eye'), value: specialtyOptions.specialtyOption2 },
-        { text: t('specialty.podiatry'), value: specialtyOptions.specialtyOption3 },
-        { text: t('specialty.mat'), value: specialtyOptions.specialtyOption4 },
-        { text: t('specialty.nutrition'), value: specialtyOptions.specialtyOption5 },
-        { text: t('specialty.tobacco'), value: specialtyOptions.specialtyOption6 },
-        { text: t('specialty.pharmacy'), value: specialtyOptions.specialtyOption7 },
-        { text: t('tests.blood'), value: testsOptions.testsOption0 },
-        { text: t('tests.sti'), value: testsOptions.testsOption1 },
-        { text: t('tests.covid'), value: testsOptions.testsOption2 },
-        { text: t('tests.mammo'), value: testsOptions.testsOption3 },
-        { text: t('tests.xray'), value: testsOptions.testsOption4 },
-      ],
-    },
-    {
-      key: filterKeys.waitTime,
-      label: t('waitTime.category'),
-      multiple: true,
-      choices: [
-        { text: t('waitTime.walkIn'), value: waitOptions.waitOption0 },
-        { text: t('waitTime.oneWeekSick'), value: waitOptions.waitOption1 },
-        { text: t('waitTime.oneWeekWell'), value: waitOptions.waitOption2 },
-        { text: t('waitTime.twoMonths'), value: waitOptions.waitOption3 },
-      ],
-    },
-    {
-      key: filterKeys.languages,
-      label: t('languages.category'),
-      multiple: true,
-      choices: [
-        { text: t('languages.asl'), value: languageOptions.languageOption0 },
-        { text: t('languages.amharic'), value: languageOptions.languageOption1 },
-        { text: t('languages.arabic'), value: languageOptions.languageOption2 },
-        { text: t('languages.bengali'), value: languageOptions.languageOption3 },
-        { text: t('languages.burmese'), value: languageOptions.languageOption4 },
-        { text: t('languages.cambodian'), value: languageOptions.languageOption5 },
-        { text: t('languages.cantonese'), value: languageOptions.languageOption6 },
-        { text: t('languages.chinese'), value: languageOptions.languageOption7 },
-        { text: t('languages.english'), value: languageOptions.languageOption8 },
-        { text: t('languages.fanta'), value: languageOptions.languageOption9 },
-        { text: t('languages.filipino'), value: languageOptions.languageOption10 },
-        { text: t('languages.french'), value: languageOptions.languageOption11 },
-        { text: t('languages.frenchcreole'), value: languageOptions.languageOption12 },
-        { text: t('languages.fula'), value: languageOptions.languageOption13 },
-        { text: t('languages.gujarati'), value: languageOptions.languageOption14 },
-        { text: t('languages.haitiancreole'), value: languageOptions.languageOption15 },
-        { text: t('languages.hebrew'), value: languageOptions.languageOption16 },
-        { text: t('languages.hindi'), value: languageOptions.languageOption17 },
-        { text: t('languages.indonesian'), value: languageOptions.languageOption18 },
-        { text: t('languages.karen'), value: languageOptions.languageOption19 },
-        { text: t('languages.khmer'), value: languageOptions.languageOption20 },
-        { text: t('languages.kinyarwanda'), value: languageOptions.languageOption21 },
-        { text: t('languages.kirundi'), value: languageOptions.languageOption22 },
-        { text: t('languages.koloqua'), value: languageOptions.languageOption23 },
-        { text: t('languages.korean'), value: languageOptions.languageOption24 },
-        { text: t('languages.lebanese'), value: languageOptions.languageOption25 },
-        { text: t('languages.malayalam'), value: languageOptions.languageOption26 },
-        { text: t('languages.malaysian'), value: languageOptions.languageOption27 },
-        { text: t('languages.mandarin'), value: languageOptions.languageOption28 },
-        { text: t('languages.nepali'), value: languageOptions.languageOption29 },
-        { text: t('languages.portuguese'), value: languageOptions.languageOption30 },
-        { text: t('languages.punjabi'), value: languageOptions.languageOption31 },
-        { text: t('languages.shanghainese'), value: languageOptions.languageOption32 },
-        { text: t('languages.sinhalese'), value: languageOptions.languageOption33 },
-        { text: t('languages.spanish'), value: languageOptions.languageOption34 },
-        { text: t('languages.swahili'), value: languageOptions.languageOption35 },
-        { text: t('languages.tagalog'), value: languageOptions.languageOption36 },
-        { text: t('languages.taiwanese'), value: languageOptions.languageOption37 },
-        { text: t('languages.telugu'), value: languageOptions.languageOption38 },
-        { text: t('languages.urdu'), value: languageOptions.languageOption39 },
-        { text: t('languages.vietnamese'), value: languageOptions.languageOption40 },
-        { text: t('languages.yoruba'), value: languageOptions.languageOption41 },
-      ],
-    },
-  ])
+  const filterChipDefinitions = computed<FilterDefinition[]>(() => {
+    const chipDefinitions: FilterDefinition[] = [
+      {
+        key: 'sort',
+        label: t('filters.sort'),
+        multiple: false,
+        excludeFromCount: true,
+        icon: IconSort,
+        choices: [
+          { text: t('filters.distance'), value: 'distance' },
+          { text: t('filters.name'), value: 'name' },
+        ],
+      },
+      {
+        key: filterKeys.ageRange,
+        label: t('ageRange.category'),
+        multiple: true,
+        choices: [
+          { text: t('ageRange.adult'), value: ageRangeOptions.adults },
+          { text: t('ageRange.child'), value: ageRangeOptions.children },
+        ],
+      },
+      {
+        key: filterKeys.visitType,
+        label: t('visitType.category'),
+        multiple: true,
+        choices: [
+          {
+            text: t('visitType.well'),
+            value: visitTypeOptions.primary_well,
+            tooltip: t('tooltips.well'),
+          },
+          { text: t('visitType.sick'), value: visitTypeOptions.primary_sick },
+          { text: t('visitType.sports'), value: visitTypeOptions.primary_sports },
+          { text: t('visitType.prenatal'), value: visitTypeOptions.primary_prenatal },
+          {
+            text: t('visitType.women'),
+            value: visitTypeOptions.primary_women,
+            tooltip: t('tooltips.women'),
+          },
+          { text: t('visitType.telehealth'), value: visitTypeOptions.primary_telehealth },
+          { text: t('visitType.vaccine'), value: visitTypeOptions.primary_vacc },
+          { text: t('specialty.mental'), value: specialtyOptions.special_mental },
+          { text: t('specialty.dental'), value: specialtyOptions.special_dental },
+          { text: t('specialty.eye'), value: specialtyOptions.special_eye },
+          { text: t('specialty.podiatry'), value: specialtyOptions.special_podiatry },
+          {
+            text: t('specialty.mat'),
+            value: specialtyOptions.special_mat,
+            tooltip: t('tooltips.mat'),
+          },
+          { text: t('specialty.nutrition'), value: specialtyOptions.special_nutrition },
+          { text: t('specialty.tobacco'), value: specialtyOptions.special_tobacco },
+          { text: t('specialty.pharmacy'), value: specialtyOptions.special_pharmacy },
+          { text: t('tests.blood'), value: testsOptions.tests_blood },
+          { text: t('tests.sti'), value: testsOptions.tests_sti },
+          { text: t('tests.covid'), value: testsOptions.tests_covid },
+          { text: t('tests.mammo'), value: testsOptions.tests_mammo },
+          { text: t('tests.xray'), value: testsOptions.tests_xray },
+        ],
+      },
+      {
+        key: filterKeys.waitTime,
+        label: t('waitTime.category'),
+        multiple: true,
+        choices: [
+          { text: t('waitTime.walkIn'), value: waitOptions[0] },
+          { text: t('waitTime.oneWeekSick'), value: waitOptions[1] },
+          { text: t('waitTime.oneWeekWell'), value: waitOptions[2] },
+          { text: t('waitTime.twoMonths'), value: waitOptions[3] },
+        ],
+      },
+    ]
+    if (languages.value.length) {
+      chipDefinitions.push({
+        key: filterKeys.languages,
+        label: t('languages.category'),
+        multiple: true,
+        choices: Array.from(languages.value, (lang) => {
+          return { text: t(`languages.${lang}`), value: lang }
+        }),
+      })
+    }
+    return chipDefinitions
+  })
 
   return { filterChipDefinitions }
 }

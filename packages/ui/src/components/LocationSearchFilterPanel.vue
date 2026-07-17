@@ -16,6 +16,7 @@ To render a feature:
 <script setup lang="ts">
 // vue imports
 import { ref, computed, inject } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 // 3rd party imports
 // philly ui imports
@@ -28,6 +29,7 @@ import SearchSuggestions from './SearchSuggestions.vue'
 
 // pinboard composables imports
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
+import { useRecentSearches } from '../composables/useRecentSearches'
 import { PINBOARD_CONFIG_KEY } from '../plugin'
 
 // type imports
@@ -62,6 +64,21 @@ const config = inject(PINBOARD_CONFIG_KEY)
 // Elevate the floating search only when the cluster sits over the map (mobile + map placement).
 const elevatedSearch = computed(() => props.isMobile && config?.mobileFilterPlacement === 'map')
 
+const { t } = useI18n()
+const {
+  recentSearches,
+  add: addRecentSearch,
+  remove: removeRecentSearch,
+} = useRecentSearches(config?.appId)
+const searchFocused = ref(false)
+
+// Empty field → recent searches; typing → AIS autocomplete.
+const dropdownSuggestions = computed(() => {
+  if (!searchFocused.value) return []
+  return searchString.value ? searchSuggestions.value : recentSearches.value
+})
+const showingRecents = computed(() => !searchString.value)
+
 // computed refs
 const sortChoices = computed<SortPanelOption[]>(() => {
   const opts = props.sortOptions ?? {}
@@ -83,17 +100,46 @@ function handleSearchChange(search: string) {
   searchString.value = search
 }
 
+// v-model does not update while an IME is composing, and Android predictive text
+// composes ordinary words — so searchString would sit stale until the keyboard
+// closed, and the suggestions never fetched. Read the value off the DOM instead.
+// Vue skips writing back to the input while composing, so the IME is unaffected.
+function handleSearchInput(event: Event) {
+  const target = event.target as HTMLElement
+  if (target.tagName === 'INPUT') {
+    searchString.value = (target as HTMLInputElement).value
+  }
+}
+
+function handleSearchSubmit() {
+  const term = searchString.value.trim()
+  if (term) {
+    addRecentSearch(term)
+    if (term !== searchString.value) {
+      searchString.value = term
+      emit('searchString', term)
+    }
+  }
+  emit('search')
+}
+
 function handleSuggestionSelect(suggestion: string) {
   dismissSuggestions()
   searchString.value = suggestion
   emit('searchString', suggestion)
-  emit('search')
+  handleSearchSubmit()
+  focusSearchInput()
+}
+
+function handleSuggestionRemove(term: string) {
+  removeRecentSearch(term)
+  // Keep focus in the search area so the dropdown stays open for removing more.
   focusSearchInput()
 }
 
 function handleSearchKeydown(event: KeyboardEvent) {
   const target = event.target as HTMLElement
-  if (event.key === 'ArrowDown' && searchSuggestions.value.length && target.tagName === 'INPUT') {
+  if (event.key === 'ArrowDown' && dropdownSuggestions.value.length && target.tagName === 'INPUT') {
     event.preventDefault()
     suggestionsRef.value?.focusFirst()
   }
@@ -106,11 +152,13 @@ function handleSuggestionDismiss() {
 function handleSearchFocusOut(event: FocusEvent) {
   const relatedTarget = event.relatedTarget as HTMLElement | null
   if (!searchWrapperRef.value?.contains(relatedTarget)) {
+    searchFocused.value = false
     hideSuggestions()
   }
 }
 
 function handleSearchFocusIn(event: FocusEvent) {
+  searchFocused.value = true
   const relatedTarget = event.relatedTarget as HTMLElement | null
   if (!searchWrapperRef.value?.contains(relatedTarget)) {
     refetchSuggestions()
@@ -136,19 +184,24 @@ function focusSearchInput() {
         @keydown="handleSearchKeydown"
         @focusout="handleSearchFocusOut"
         @focusin="handleSearchFocusIn"
+        @input="handleSearchInput"
       >
         <Search
           v-model="searchString"
           :placeholder="searchPlaceholder"
           :elevated="elevatedSearch"
           @update:model-value="handleSearchChange"
-          @search="emit('search')"
+          @search="handleSearchSubmit"
         />
         <SearchSuggestions
           ref="suggestionsRef"
-          :suggestions="searchSuggestions"
+          :suggestions="dropdownSuggestions"
+          :heading="showingRecents ? t('pinboard.recentSearches') : undefined"
+          :removable="showingRecents"
+          :remove-label="t('pinboard.removeRecentSearch')"
           @select="handleSuggestionSelect"
           @dismiss="handleSuggestionDismiss"
+          @remove="handleSuggestionRemove"
         />
       </div>
       <LocationFilter

@@ -6,6 +6,7 @@ export default {
     checkHours: 'Consultar horario',
     weekendHours: 'Horario de fin de semana',
     openAfter6: 'Abierto después de las 6 p. m.',
+    eveningHours: 'Horario de noche',
     walkIns: 'Atención sin cita',
     telehealth: 'Telesalud',
     parking: 'Estacionamiento en el lugar',
@@ -16,10 +17,10 @@ export default {
     todayClosed: 'Hoy: Cerrado',
     todayHours: 'Hoy: {range}',
   },
-  providerWebsite: 'Sitio web del proveedor',
+  providerWebsite: 'Sitio web',
   website: 'Sitio web',
   hours: 'Horario',
-  languagesSpoken: 'Idiomas hablados',
+  languagesSpoken: 'Idiomas que habla el personal',
   daysOfTheWeek: 'Día de la semana',
   Monday: 'Lunes',
   Tuesday: 'Martes',
@@ -118,7 +119,7 @@ export default {
   },
   patientType: {
     category: 'Elegibilidad',
-    patient_type_new: 'Pacientes nuevos',
+    patient_type_new: 'Pacientes nuevos o existentes',
     patient_type_new_subtext:
       'Es posible que algunos de estos servicios estén disponibles sin cita previa. Comuníquese con el proveedor para obtener más información.',
     patient_type_existing: 'Pacientes establecidos',
@@ -222,7 +223,7 @@ export default {
     dental: 'Odontología',
     eye: 'Oftalmología',
     podiatry: 'Podiatría',
-    mat: 'Tratamiento asistido por medicamentos',
+    mat: 'Tratamiento asistido por medicamentos (MAT)',
     nutrition: 'Asesoramiento nutricional',
     tobacco: 'Ayuda para dejar de fumar',
     pharmacy: 'Farmacia en el sitio',
@@ -283,8 +284,8 @@ export default {
       'Atiende exclusivamente a adolescentes y adultos jóvenes (de 13 a 26 años).',
     'Exclusively serves people living with HIV.':
       'Atiende exclusivamente a personas que viven con VIH.',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      'Atiende exclusivamente a miembros sin seguro médico de la comunidad inmigrante latine de Filadelfia. No se realizan exámenes físicos para el trabajo. Los servicios para niños se limitan a atención dental, cuidado de la vista y salud mental.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      'Atiende exclusivamente a miembros sin seguro médico de la comunidad inmigrante latine de Filadelfia. No se realizan exámenes físicos para el trabajo. Los servicios para niños se limitan a cuidado de la vista y salud mental.',
     'Services for children are limited to dental, mental health, and vaccines.':
       'Los servicios para niños se limitan a atención dental, salud mental y vacunas.',
     'Special focus on LGBTQ+ ': 'Enfoque especial en personas LGBTQ+',

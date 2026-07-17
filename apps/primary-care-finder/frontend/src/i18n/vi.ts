@@ -6,6 +6,7 @@ export default {
     checkHours: 'Xem giờ làm việc',
     weekendHours: 'Giờ làm việc cuối tuần',
     openAfter6: 'Mở cửa sau 6 giờ tối',
+    eveningHours: 'Giờ làm việc buổi tối',
     walkIns: 'Khám không cần hẹn',
     telehealth: 'Khám bệnh từ xa',
     parking: 'Có chỗ đậu xe tại chỗ',
@@ -16,10 +17,10 @@ export default {
     todayClosed: 'Hôm nay: Đã đóng cửa',
     todayHours: 'Hôm nay: {range}',
   },
-  providerWebsite: 'Trang web của nhà cung cấp',
+  providerWebsite: 'Trang web',
   website: 'Trang web',
   hours: 'Số giờ',
-  languagesSpoken: 'Ngôn ngữ được sử dụng',
+  languagesSpoken: 'Ngôn ngữ nhân viên sử dụng',
   daysOfTheWeek: 'Ngày trong tuần',
   Monday: 'Thứ Hai',
   Tuesday: 'Thứ Ba',
@@ -119,7 +120,7 @@ export default {
   },
   patientType: {
     category: 'Đủ điều kiện',
-    patient_type_new: 'Bệnh nhân mới',
+    patient_type_new: 'Bệnh nhân mới hoặc hiện tại',
     patient_type_new_subtext:
       'Một số dịch vụ này có thể được cung cấp cho bệnh nhân không cần hẹn trước. Liên hệ với nhà cung cấp để biết thêm thông tin.',
     patient_type_existing: 'Bệnh nhân đã được thiết lập hồ sơ',
@@ -221,7 +222,7 @@ export default {
     dental: 'Răng miệng',
     eye: 'Chăm sóc mắt',
     podiatry: 'Chuyên khoa chân',
-    mat: 'Điều trị hỗ trợ dùng thuốc',
+    mat: 'Điều trị hỗ trợ dùng thuốc (MAT)',
     nutrition: 'Tư vấn dinh dưỡng',
     tobacco: 'Hỗ trợ cai thuốc lá',
     pharmacy: 'Nhà thuốc tại chỗ',
@@ -281,8 +282,8 @@ export default {
     'Exclusively serves adolescents and young adults (ages 13-26).':
       'Chỉ phục vụ thanh thiếu niên và người trẻ tuổi (từ 13 đến 26 tuổi).',
     'Exclusively serves people living with HIV.': 'Chỉ phục vụ người sống chung với HIV.',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      'Chỉ phục vụ những thành viên không có bảo hiểm thuộc cộng đồng người nhập cư gốc Latinh ở Philadelphia. Không khám sức khỏe để đi làm. Dịch vụ cho trẻ em chỉ giới hạn ở nha khoa, chăm sóc mắt và sức khỏe tâm thần.',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      'Chỉ phục vụ những thành viên không có bảo hiểm thuộc cộng đồng người nhập cư gốc Latinh ở Philadelphia. Không khám sức khỏe để đi làm. Dịch vụ cho trẻ em chỉ giới hạn ở chăm sóc mắt và sức khỏe tâm thần.',
     'Services for children are limited to dental, mental health, and vaccines.':
       'Dịch vụ cho trẻ em chỉ giới hạn ở nha khoa, sức khỏe tâm thần và tiêm chủng.',
     'Special focus on LGBTQ+ ': 'Đặc biệt chú trọng đến cộng đồng LGBTQ+',

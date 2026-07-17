@@ -1,7 +1,18 @@
-import type { PinboardTypes } from '@pinboard/ui'
+import type {
+  FilterChoiceBitfield,
+  FilterChoiceBitfieldGroup,
+  FilterGroup,
+  FilterValues,
+  PinboardTypes,
+} from '@pinboard/ui'
+import * as en from './i18n/en'
+
+type YesOrNo = 'Yes' | 'No'
+type YesOrNoOrEstablishedPatients = YesOrNo | 'Established Patients'
+type WaitTime = 'Same day' | 'Less than one week' | 'Less than two months' | 'More than two months'
 
 export interface PrimaryCareProperties {
-  cartodb_id: number | null
+  cartodb_id: number
   objectid: number | null
   event_id: number | null
   project_id: number | null
@@ -29,9 +40,9 @@ export interface PrimaryCareProperties {
   url_appt: string | null
   url_payment: string | null
 
-  cost_insurance: 'Yes' | 'No' | null
-  cost_medicaid: 'Yes' | 'No' | null
-  cost_sliding_scale: 'Yes' | 'No' | null
+  cost_insurance: YesOrNo | null
+  cost_medicaid: YesOrNo | null
+  cost_sliding_scale: YesOrNo | null
   sliding_scale: string | null
 
   optional_info_general: string | null
@@ -57,82 +68,52 @@ export interface PrimaryCareProperties {
   hours_wed_end: string | null
   hours_wed_exceptions: string | null
   hours_wed_start: string | null
-  evening_hrs: 'Yes' | 'No' | null
+  evening_hrs: YesOrNo | null
   later_hours_day: 'M' | 'T' | 'W' | 'R' | 'F' | null
-  weekend_hrs: 'Yes' | 'No' | null
+  weekend_hrs: YesOrNo | null
   temporary_closure: string | null
 
-  adults: 'Yes' | 'No' | null
-  children: 'Yes' | 'No' | null
+  adults: YesOrNo | null
+  children: YesOrNo | null
   caveat_ad_ch: string | null
 
-  primary_prenatal: 'Yes' | 'Established Patients' | 'No' | null
-  primary_sick: 'Yes' | 'Established Patients' | 'No' | null
-  primary_telehealth: 'Yes' | 'Established Patients' | 'No' | null
-  primary_vacc: 'Yes' | 'Established Patients' | 'No' | null
-  primary_well: 'Yes' | 'Established Patients' | 'No' | null
-  primary_women: 'Yes' | 'Established Patients' | 'No' | null
-  primary_sports: 'Yes' | 'Established Patients' | 'No' | null
+  primary_prenatal: YesOrNoOrEstablishedPatients | null
+  primary_sick: YesOrNoOrEstablishedPatients | null
+  primary_telehealth: YesOrNoOrEstablishedPatients | null
+  primary_vacc: YesOrNoOrEstablishedPatients | null
+  primary_well: YesOrNoOrEstablishedPatients | null
+  primary_women: YesOrNoOrEstablishedPatients | null
+  primary_sports: YesOrNoOrEstablishedPatients | null
 
-  special_dental: 'Yes' | 'Established Patients' | 'No' | null
-  special_eye: 'Yes' | 'Established Patients' | 'No' | null
-  special_mat: 'Yes' | 'Established Patients' | 'No' | null
-  special_mental: 'Yes' | 'Established Patients' | 'No' | null
-  special_nutrition: 'Yes' | 'Established Patients' | 'No' | null
-  special_pharmacy: 'Yes' | 'Established Patients' | 'No' | null
-  special_podiatry: 'Yes' | 'Established Patients' | 'No' | null
-  special_tobacco: 'Yes' | 'Established Patients' | 'No' | null
+  special_dental: YesOrNoOrEstablishedPatients | null
+  special_eye: YesOrNoOrEstablishedPatients | null
+  special_mat: YesOrNoOrEstablishedPatients | null
+  special_mental: YesOrNoOrEstablishedPatients | null
+  special_nutrition: YesOrNoOrEstablishedPatients | null
+  special_pharmacy: YesOrNoOrEstablishedPatients | null
+  special_podiatry: YesOrNoOrEstablishedPatients | null
+  special_tobacco: YesOrNoOrEstablishedPatients | null
 
-  tests_blood: 'Yes' | 'No' | null
-  tests_covid: 'Yes' | 'No' | null
-  tests_mammo: 'Yes' | 'No' | null
-  tests_sti: 'Yes' | 'No' | null
-  tests_xray: 'Yes' | 'No' | null
+  tests_blood: YesOrNo | null
+  tests_covid: YesOrNo | null
+  tests_mammo: YesOrNo | null
+  tests_sti: YesOrNo | null
+  tests_xray: YesOrNo | null
 
-  walk_ins_sick: 'Yes' | 'No' | null
-  sick_adult_wait:
-    | 'Same day'
-    | 'Less than one week'
-    | 'Less than two months'
-    | 'More than two months'
-    | null
-  sick_child_wait:
-    | 'Same day'
-    | 'Less than one week'
-    | 'Less than two months'
-    | 'More than two months'
-    | null
-  well_adult_wait:
-    | 'Same day'
-    | 'Less than one week'
-    | 'Less than two months'
-    | 'More than two months'
-    | null
-  well_child_wait:
-    | 'Same day'
-    | 'Less than one week'
-    | 'Less than two months'
-    | 'More than two months'
-    | null
-  other_services_adult_wait:
-    | 'Same day'
-    | 'Less than one week'
-    | 'Less than two months'
-    | 'More than two months'
-    | null
-  other_services_child_wait:
-    | 'Same day'
-    | 'Less than one week'
-    | 'Less than two months'
-    | 'More than two months'
-    | null
+  walk_ins_sick: YesOrNo | null
+  sick_adult_wait: WaitTime | null
+  sick_child_wait: WaitTime | null
+  well_adult_wait: WaitTime | null
+  well_child_wait: WaitTime | null
+  other_services_adult_wait: WaitTime | null
+  other_services_child_wait: WaitTime | null
 
   languages: string | null
 }
 
 export type PrimaryCareField = keyof PrimaryCareProperties
 
-export interface PrimaryCareFeature extends PinboardTypes.CartoFeature {
+export interface PrimaryCareFeature extends PinboardTypes.GeoJsonFeature {
   properties: PrimaryCareProperties
 }
 
@@ -143,159 +124,108 @@ export interface PrimaryCareResponse extends PinboardTypes.GeoJSONFeatureCollect
 export type PrimaryCareLocation = PinboardTypes.BasicLocation & Omit<PrimaryCareFeature, 'type'>
 
 export type SortMode = '' | 'distance' | 'name'
-export type AgeGroupFilter = 'adult' | 'children'
-export type WaitTimeFilter = 'sameDay' | 'weekWell' | 'weekSick' | 'twoMonths'
-export type VisitTypeFilter =
-  | 'primaryWell'
-  | 'primarySick'
-  | 'primarySports'
-  | 'primaryPrenatal'
-  | 'primaryWomen'
-  | 'primaryTelehealth'
-  | 'primaryVaccines'
-export type SpecialtyFilter =
-  | 'mental'
-  | 'dental'
-  | 'eye'
-  | 'podiatry'
-  | 'mat'
-  | 'nutrition'
-  | 'tobacco'
-  | 'pharmacy'
-export type TestsFilter = 'blood' | 'sti' | 'covid' | 'mammo' | 'xray'
-export type LanguagesFilter =
-  | 'asl'
-  | 'amharic'
-  | 'arabic'
-  | 'bengali'
-  | 'burmese'
-  | 'cambodian'
-  | 'cantonese'
-  | 'chinese'
-  | 'english'
-  | 'fanta'
-  | 'filipino'
-  | 'french'
-  | 'frenchcreole'
-  | 'fula'
-  | 'gujarati'
-  | 'haitiancreole'
-  | 'hebrew'
-  | 'hindi'
-  | 'indonesian'
-  | 'karen'
-  | 'khmer'
-  | 'kinyarwanda'
-  | 'kirundi'
-  | 'koloqua'
-  | 'korean'
-  | 'lebanese'
-  | 'malayalam'
-  | 'malaysian'
-  | 'mandarin'
-  | 'nepali'
-  | 'portuguese'
-  | 'punjabi'
-  | 'shanghainese'
-  | 'sinhalese'
-  | 'spanish'
-  | 'swahili'
-  | 'tagalog'
-  | 'taiwanese'
-  | 'telugu'
-  | 'urdu'
-  | 'vietnamese'
-  | 'yoruba'
 
-export interface PrimaryCareFilterValues {
-  sort: SortMode
-  ageGroup: AgeGroupFilter[]
-  waitTime: WaitTimeFilter[]
-  visitType: VisitTypeFilter[]
-  specialty: SpecialtyFilter[]
-  tests: TestsFilter[]
-  languages: LanguagesFilter[]
-}
+export type FilterKey = 'ageRange' | 'waitTime' | 'visitType' | 'specialty' | 'tests' | 'languages'
 
-export interface PrimaryCareFilters extends Record<string, Record<string, boolean>> {
+export type AgeRangeField = Extract<keyof PrimaryCareProperties, 'adults' | 'children'>
+
+export type AgeRangeFilterKey = Extract<keyof typeof en.default.ageRange, 'adult' | 'children'>
+
+export type WaitTimeField = Extract<
+  keyof PrimaryCareProperties,
+  | 'walk_ins_sick'
+  | 'sick_adult_wait'
+  | 'sick_child_wait'
+  | 'well_adult_wait'
+  | 'well_child_wait'
+  | 'other_services_adult_wait'
+  | 'other_services_child_wait'
+>
+export type WaitTimeFilterKey = Exclude<keyof typeof en.default.waitTime, 'category'>
+
+export type VisitTypeField = Extract<
+  keyof PrimaryCareProperties,
+  | 'primary_well'
+  | 'primary_sick'
+  | 'primary_sports'
+  | 'primary_prenatal'
+  | 'primary_women'
+  | 'primary_telehealth'
+  | 'primary_vacc'
+>
+export type VisitTypeFilterKey = Exclude<keyof typeof en.default.visitType, 'category'>
+
+export type SpecialtyField = Extract<
+  keyof PrimaryCareProperties,
+  | 'special_mental'
+  | 'special_dental'
+  | 'special_eye'
+  | 'special_podiatry'
+  | 'special_mat'
+  | 'special_nutrition'
+  | 'special_tobacco'
+  | 'special_pharmacy'
+>
+export type SpecialtyFilterKey = Exclude<keyof typeof en.default.specialty, 'category'>
+
+export type TestsField = Extract<
+  keyof PrimaryCareProperties,
+  'tests_blood' | 'tests_sti' | 'tests_covid' | 'tests_mammo' | 'tests_xray'
+>
+export type TestsFilterKey = Exclude<keyof typeof en.default.tests, 'category' | 'noTests'>
+
+export type LanguagesFilterKey = string
+
+export type PrimaryCareFilterKey =
+  | AgeRangeFilterKey
+  | WaitTimeFilterKey
+  | VisitTypeFilterKey
+  | SpecialtyFilterKey
+  | TestsFilterKey
+  | LanguagesFilterKey
+
+export interface PrimaryCareFilters extends FilterValues {
   sort: {
     distance: boolean
     name: boolean
   }
-  ageGroup: {
-    adult: boolean
-    children: boolean
-  }
-  visitType: {
-    blood: boolean
-    covid: boolean
-    dental: boolean
-    eye: boolean
-    mammo: boolean
-    mat: boolean
-    mental: boolean
-    nutrition: boolean
-    pharmacy: boolean
-    podiatry: boolean
-    primaryPrenatal: boolean
-    primarySick: boolean
-    primarySports: boolean
-    primaryTelehealth: boolean
-    primaryVaccines: boolean
-    primaryWell: boolean
-    primaryWomen: boolean
-    sti: boolean
-    tobacco: boolean
-    xray: boolean
-  }
-  waitTime: {
-    sameDay: boolean
-    twoMonths: boolean
-    weekSick: boolean
-    weekWell: boolean
-  }
-  languages: {
-    amharic: boolean
-    arabic: boolean
-    asl: boolean
-    bengali: boolean
-    burmese: boolean
-    cambodian: boolean
-    cantonese: boolean
-    chinese: boolean
-    english: boolean
-    fanta: boolean
-    filipino: boolean
-    french: boolean
-    frenchcreole: boolean
-    fula: boolean
-    gujarati: boolean
-    haitiancreole: boolean
-    hebrew: boolean
-    hindi: boolean
-    indonesian: boolean
-    karen: boolean
-    khmer: boolean
-    kinyarwanda: boolean
-    kirundi: boolean
-    koloqua: boolean
-    korean: boolean
-    lebanese: boolean
-    malayalam: boolean
-    malaysian: boolean
-    mandarin: boolean
-    nepali: boolean
-    portuguese: boolean
-    punjabi: boolean
-    shanghainese: boolean
-    sinhalese: boolean
-    spanish: boolean
-    swahili: boolean
-    tagalog: boolean
-    taiwanese: boolean
-    telugu: boolean
-    urdu: boolean
-    vietnamese: boolean
-    yoruba: boolean
+  ageRange: Record<AgeRangeFilterKey, boolean>
+  visitType: Record<VisitTypeFilterKey | SpecialtyFilterKey | TestsFilterKey, boolean>
+  waitTime: Record<WaitTimeFilterKey, boolean>
+  languages: Record<LanguagesFilterKey, boolean>
+}
+
+export interface AgeRangeFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<AgeRangeFilterKey, FilterChoiceBitfield>
+}
+
+export interface LanguagesFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<LanguagesFilterKey, FilterChoiceBitfield>
+}
+
+export interface SpecialtyFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<SpecialtyFilterKey, FilterChoiceBitfield>
+}
+
+export interface TestsFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<TestsFilterKey, FilterChoiceBitfield>
+}
+
+export interface VisitTypeFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<VisitTypeFilterKey, FilterChoiceBitfield>
+}
+
+export interface WaitTimeFilterKeyLogic extends FilterChoiceBitfieldGroup {
+  childFilters: Record<WaitTimeFilterKey, FilterChoiceBitfield>
+}
+
+export interface PrimaryCareFilterLogic extends FilterGroup {
+  childFilters: {
+    ageRange: AgeRangeFilterKeyLogic
+    languages: LanguagesFilterKeyLogic
+    specialty: SpecialtyFilterKeyLogic
+    tests: TestsFilterKeyLogic
+    visitType: VisitTypeFilterKeyLogic
+    waitTime: WaitTimeFilterKeyLogic
   }
 }

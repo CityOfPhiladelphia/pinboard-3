@@ -6,6 +6,7 @@ export default {
     checkHours: '查看营业时间',
     weekendHours: '周末营业时间',
     openAfter6: '晚上6点后营业',
+    eveningHours: '晚间营业时间',
     walkIns: '无需预约',
     telehealth: '远程医疗',
     parking: '现场停车',
@@ -16,10 +17,10 @@ export default {
     todayClosed: '今天：已关闭',
     todayHours: '今天：{range}',
   },
-  providerWebsite: '提供者网站',
+  providerWebsite: '网站',
   website: '网站',
   hours: '时间',
-  languagesSpoken: '使用的语言',
+  languagesSpoken: '工作人员使用的语言',
   daysOfTheWeek: '日期',
   Monday: '星期一',
   Tuesday: '星期二',
@@ -116,7 +117,7 @@ export default {
   },
   patientType: {
     category: '资格',
-    patient_type_new: '新患者',
+    patient_type_new: '新患者或现有患者',
     patient_type_new_subtext: '其中一些服务可能无需预约即可获得。请联系提供方了解更多信息。',
     patient_type_existing: '已建立医患关系的患者',
     patient_type_existing_only: '必须在现场建立医患关系',
@@ -217,7 +218,7 @@ export default {
     dental: '牙科',
     eye: '眼科',
     podiatry: '足科',
-    mat: '药物辅助治疗',
+    mat: '药物辅助治疗 (MAT)',
     nutrition: '营养咨询',
     tobacco: '戒烟帮助',
     pharmacy: '机构隶属药房',
@@ -277,8 +278,8 @@ export default {
     'Exclusively serves adolescents and young adults (ages 13-26).':
       '仅为青少年和青年（13-26岁）提供服务。',
     'Exclusively serves people living with HIV.': '仅为艾滋病病毒感染者提供服务。',
-    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to dental, eye care, and mental health.":
-      '仅为费城拉丁裔移民社区中没有医疗保险的成员提供服务。不提供就业体检。为儿童提供的服务仅限于牙科、眼科和心理健康。',
+    "Exclusively serves uninsured members of Philadelphia's Latine immigrant community.  No work physicals.  Services for children are limited to eye care and mental health.":
+      '仅为费城拉丁裔移民社区中没有医疗保险的成员提供服务。不提供就业体检。为儿童提供的服务仅限于眼科和心理健康。',
     'Services for children are limited to dental, mental health, and vaccines.':
       '为儿童提供的服务仅限于牙科、心理健康和疫苗接种。',
     'Special focus on LGBTQ+ ': '特别关注 LGBTQ+',

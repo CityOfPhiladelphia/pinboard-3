@@ -13,6 +13,7 @@ import {
   MapIconTextPin,
   MapNavigationControl,
   BasemapToggle,
+  GeolocationButton,
   FillLayer,
   MapCheckboxLegend,
   PinboardComposables,
@@ -160,6 +161,10 @@ function handleDeselect(id: string) {
   visitedIds.value.add(id)
 }
 
+function handleGeolocate(data: { latitude: number; longitude: number; accuracy: number }) {
+  userLocation.value = { latitude: data.latitude, longitude: data.longitude }
+}
+
 function asOemLocation(location: PinboardTypes.BasicLocation) {
   return location as OemLocation
 }
@@ -201,6 +206,15 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
     >
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />
       <BasemapToggle position="top-right" :teleport-to="isMobile ? mobileControlsTarget : null" />
+      <!-- No @error handler by design: GeolocationButton shows its own callout
+           when location is blocked; other geolocation errors are non-blocking
+           since the finder works without location. -->
+      <GeolocationButton
+        :position="isMobile ? 'top-right' : 'bottom-right'"
+        :teleport-to="isMobile ? mobileControlsTarget : undefined"
+        :show-location-marker="false"
+        @located="handleGeolocate"
+      />
 
       <FillLayer
         v-for="id in FLOOD_LAYER_IDS"

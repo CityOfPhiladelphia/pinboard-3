@@ -12,50 +12,74 @@ import {
   PinboardComposables,
   PinboardUtilities,
   Callout,
-  shiftLeft,
+  applyFilters,
 } from '@pinboard/ui'
 import type { FilterValues, PinboardTypes } from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
 import { useFilterChipDefinitions } from '@/composables/filters/useFilterChipDefinitions.ts'
 import { useFilterLogic } from '@/composables/filters/useFilterLogic'
-import {
-  filterKeys,
-  visitTypeOptions,
-  specialtyOptions,
-  testsOptions,
-} from '@/composables/filters/filterKeysValues'
 import LocationCard from '@/components/LocationCard.vue'
 import LocationDetail from '@/components/LocationDetail.vue'
 import { IconLocationDot } from '@phila/phila-ui-core/icons'
 import type {
-  AgeGroupFilter,
-  LanguagesFilter,
+  PrimaryCareFilterLogic,
   PrimaryCareFilters,
-  PrimaryCareFilterValues,
   PrimaryCareLocation,
   PrimaryCareResponse,
-  SpecialtyFilter,
-  TestsFilter,
-  VisitTypeFilter,
-  WaitTimeFilter,
+  SortMode,
+  SpecialtyFilterKey,
+  TestsFilterKey,
+  VisitTypeFilterKey,
+  WaitTimeFilterKey,
 } from '@/types'
-
 import { sortLocations } from '@/utilities/sortLocations'
 
-const emptyFilters: PrimaryCareFilterValues = {
-  sort: '',
-  ageGroup: [],
-  waitTime: [],
-  visitType: [],
-  specialty: [],
-  tests: [],
-  languages: [],
+const defaultFilterState: PrimaryCareFilters = {
+  sort: {
+    distance: false,
+    name: false,
+  },
+  ageRange: {
+    adult: false,
+    children: false,
+  },
+  visitType: {
+    blood: false,
+    covid: false,
+    dental: false,
+    eye: false,
+    mammo: false,
+    mat: false,
+    mental: false,
+    nutrition: false,
+    pharmacy: false,
+    podiatry: false,
+    prenatal: false,
+    sick: false,
+    sports: false,
+    telehealth: false,
+    vaccine: false,
+    well: false,
+    women: false,
+    sti: false,
+    tobacco: false,
+    xray: false,
+  },
+  waitTime: {
+    walkIn: false,
+    twoMonths: false,
+    oneWeekSick: false,
+    oneWeekWell: false,
+  },
+  languages: {
+    english: false,
+  },
 }
 
 const { t } = useI18n()
 const isMobile = PinboardComposables.useIsMobile()
-const { filterChipDefinitions } = useFilterChipDefinitions()
-const { locations, isLoading, errorMessage, geojson } = useLocations()
+const { locations, languages, isLoading, errorMessage, geojson } = useLocations()
+const { filterChipDefinitions } = useFilterChipDefinitions(languages)
 const calloutOpen = ref(true)
 // Location is requested only when the user clicks the geolocation button, which
 // emits to handleGeolocate. The shared useUserLocation composable prompts on load,
@@ -78,35 +102,93 @@ const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
   zipcodePolygon,
   finishedZipFetch
 )
-const filterState = ref<PrimaryCareFilterValues>(emptyFilters)
+const filterState = ref<PrimaryCareFilters>(defaultFilterState)
 
-const VISIT_TYPE_SET = new Set<string>(Object.values(visitTypeOptions))
-const SPECIALTY_SET = new Set<string>(Object.values(specialtyOptions))
-const TESTS_SET = new Set<string>(Object.values(testsOptions))
+const { filterLogicalValue, filterLogic } = useFilterLogic(locations, languages, filterState)
 
-function activeKeys(map: boolean | Record<string, boolean> | undefined): string[] {
-  if (!map || typeof map !== 'object') return []
-  return Object.entries(map)
-    .filter(([, v]) => v)
-    .map(([k]) => k)
-}
+const keywordToFilterMap = computed(() => {
+  const logicalValues = filterLogic.value as PrimaryCareFilterLogic
 
-function toMap(arr: string[]): Record<string, boolean> {
-  return Object.fromEntries(arr.map((v) => [v, true]))
-}
+  const keywordMap: Record<string, Uint32Array> = {
+    [t('ageRange.adult').toLocaleLowerCase()]:
+      logicalValues.childFilters.ageRange.childFilters.adult.getBitfield(),
+    [t('ageRange.adults').toLocaleLowerCase()]:
+      logicalValues.childFilters.ageRange.childFilters.adult.getBitfield(),
+    [t('ageRange.child').toLocaleLowerCase()]:
+      logicalValues.childFilters.ageRange.childFilters.children.getBitfield(),
+    [t('ageRange.children').toLocaleLowerCase()]:
+      logicalValues.childFilters.ageRange.childFilters.children.getBitfield(),
 
-const filterValuesForProp = computed<FilterValues>(() => ({
-  [filterKeys.ageGroup]: toMap(filterState.value.ageGroup),
-  [filterKeys.waitTime]: toMap(filterState.value.waitTime),
-  [filterKeys.visitType]: toMap([
-    ...filterState.value.visitType,
-    ...filterState.value.specialty,
-    ...filterState.value.tests,
-  ]),
-  [filterKeys.languages]: toMap(filterState.value.languages),
-}))
+    ...Object.fromEntries(
+      Array.from(languages.value, (lang) => {
+        return [
+          t(`languages.${lang}`).toLocaleLowerCase(),
+          logicalValues.childFilters.languages.childFilters[lang].getBitfield(),
+        ]
+      })
+    ),
+  }
 
-const { filterLogicalValue } = useFilterLogic(locations, filterState)
+  Object.keys(logicalValues.childFilters.waitTime.childFilters).forEach((key) => {
+    t(`waitTime.${key}`)
+      .toLocaleLowerCase()
+      .replace(/\W+/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .forEach(
+        (word) =>
+          (keywordMap[word] =
+            logicalValues.childFilters.waitTime.childFilters[
+              key as WaitTimeFilterKey
+            ].getBitfield())
+      )
+  })
+
+  Object.keys(logicalValues.childFilters.visitType.childFilters).forEach((key) => {
+    t(`visitType.${key}`)
+      .toLocaleLowerCase()
+      .replace(/\W+/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .forEach(
+        (word) =>
+          (keywordMap[word] =
+            logicalValues.childFilters.visitType.childFilters[
+              key as VisitTypeFilterKey
+            ].getBitfield())
+      )
+  })
+
+  Object.keys(logicalValues.childFilters.specialty.childFilters).forEach((key) => {
+    t(`specialty.${key}`)
+      .toLocaleLowerCase()
+      .replace(/\W+/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .forEach(
+        (word) =>
+          (keywordMap[word] =
+            logicalValues.childFilters.specialty.childFilters[
+              key as SpecialtyFilterKey
+            ].getBitfield())
+      )
+  })
+
+  Object.keys(logicalValues.childFilters.tests.childFilters).forEach((key) => {
+    t(`tests.${key}`)
+      .toLocaleLowerCase()
+      .replace(/\W+/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .forEach(
+        (word) =>
+          (keywordMap[word] =
+            logicalValues.childFilters.tests.childFilters[key as TestsFilterKey].getBitfield())
+      )
+  })
+
+  return keywordMap
+})
 
 const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   const { latitude, longitude } = userLocation.value
@@ -125,73 +207,71 @@ const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
   }))
 })
 
+const sortMode = computed<SortMode>(() => {
+  return filterState.value.sort.name ? 'name' : filterState.value.sort.distance ? 'distance' : ''
+})
+
 const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
-  if (geojson.value?.features) {
-    let result = filterLogicalValue.value.length
-      ? applyFilters(geojson.value.features)
-      : geojson.value.features
-
-    if (keywordsForSearch.value) {
-      const terms = keywordsForSearch.value
-        .replace(/\W+/g, ' ')
-        .toLowerCase()
-        .split(' ')
-        .filter(Boolean)
-      result = result.filter((loc) => {
-        const haystack = JSON.stringify(Object.values(loc)).toLowerCase()
-        return terms.some((term) => haystack.includes(term))
-      })
-    }
-
-    return {
-      type: 'FeatureCollection',
-      features: result,
-    }
+  if (!(geojson.value && geojson.value?.features)) {
+    return undefined
   }
-  return undefined
+
+  let result = filterLogicalValue.value.length
+    ? applyFilters(geojson.value.features, filterLogicalValue.value)
+    : geojson.value.features
+
+  if (keywordsForSearch.value) {
+    const terms = keywordsForSearch.value
+      .replace(/[!-/:-@[-`{-~]/g, ' ')
+      .toLocaleLowerCase()
+      .split(' ')
+      .filter(Boolean)
+    result = result.filter((loc) => {
+      const haystack = JSON.stringify(Object.values(loc.properties)).toLocaleLowerCase()
+      return terms.some((term) => {
+        const keywordBits = geojson.value
+          ? keywordToFilterMap.value?.[term] &&
+            keywordToFilterMap.value[term][Math.floor(geojson.value.features.indexOf(loc) / 32)] &
+              (1 << Math.floor(geojson.value.features.indexOf(loc) % 32))
+          : 0
+        return haystack.includes(term) || keywordBits
+      })
+    })
+  }
+
+  return {
+    type: 'FeatureCollection',
+    features: result,
+  }
 })
 
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
-  console.log(filterLogicalValue.value)
-  console.log(filterState.value)
   let result = filterLogicalValue.value.length
-    ? applyFilters(locationsWithDistance.value)
+    ? applyFilters(locationsWithDistance.value, filterLogicalValue.value)
     : locationsWithDistance.value
 
   if (keywordsForSearch.value) {
     const terms = keywordsForSearch.value
-      .replace(/\W+/g, ' ')
-      .toLowerCase()
+      .replace(/[!-/:-@[-`{-~]/g, ' ')
+      .toLocaleLowerCase()
       .split(' ')
       .filter(Boolean)
     result = result.filter((loc) => {
-      const haystack = JSON.stringify(Object.values(loc)).toLowerCase()
-      return terms.some((term) => haystack.includes(term))
+      const haystack = JSON.stringify(Object.values(loc.properties)).toLocaleLowerCase()
+      return terms.some((term) => {
+        const keywordBits =
+          keywordToFilterMap.value?.[term] &&
+          keywordToFilterMap.value[term][
+            Math.floor(locationsWithDistance.value.indexOf(loc) / 32)
+          ] &
+            (1 << Math.floor(locationsWithDistance.value.indexOf(loc) % 32))
+        return haystack.includes(term) || keywordBits
+      })
     })
   }
 
-  return filterState.value.sort
-    ? sortLocations(result, searchOrUserLocation, filterState.value.sort)
-    : result
+  return filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
 })
-
-function applyFilters<T>(arr: T[]): T[] {
-  const shiftDirection = shiftLeft()
-  const filtered: T[] = []
-  let check = 1
-  let offset = 0
-  arr.forEach((item) => {
-    if (check & filterLogicalValue.value[offset]) {
-      filtered.push(item)
-    }
-    check = shiftDirection ? check << 1 : check >> 1
-    if (check < 0) {
-      check = 1
-      offset++
-    }
-  })
-  return filtered
-}
 
 function handleSearchSubmit(locationSearchString: string) {
   switch (true) {
@@ -239,17 +319,7 @@ function handleGeolocateError(error: Error | GeolocationPositionError) {
 }
 
 function handleApplyFilter(values: FilterValues) {
-  const filters = values as PrimaryCareFilters
-  const allVisitType = activeKeys(filters[filterKeys.visitType])
-  filterState.value = {
-    sort: filters.sort.distance ? 'distance' : filters.sort.name ? 'name' : '',
-    ageGroup: activeKeys(filters[filterKeys.ageGroup]) as AgeGroupFilter[],
-    waitTime: activeKeys(filters[filterKeys.waitTime]) as WaitTimeFilter[],
-    visitType: allVisitType.filter((v) => VISIT_TYPE_SET.has(v)) as VisitTypeFilter[],
-    specialty: allVisitType.filter((v) => SPECIALTY_SET.has(v)) as SpecialtyFilter[],
-    tests: allVisitType.filter((v) => TESTS_SET.has(v)) as TestsFilter[],
-    languages: activeKeys(filters[filterKeys.languages]) as LanguagesFilter[],
-  }
+  filterState.value = values as PrimaryCareFilters
 }
 
 function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
@@ -259,7 +329,6 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
 
 <template>
   <PinboardBody
-    :filter-values="filterValuesForProp"
     :locations="filteredLocations"
     :search-or-user-location="searchOrUserLocation"
     :location-search-mode="locationSearchMode"
@@ -269,6 +338,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
     :geojson="filteredGeojson"
     :is-mobile="isMobile"
     :filters="filterChipDefinitions"
+    :filter-values="filterState"
     @search="handleSearchSubmit"
     @update:filter-values="handleApplyFilter"
   >
@@ -285,8 +355,12 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
       <LocationCard :location="asPrimaryCareLocation(location)" />
     </template>
 
-    <template #location-detail="{ location, onClose }">
-      <LocationDetail :location="asPrimaryCareLocation(location)" :on-close="onClose" />
+    <template #location-detail="{ location, onClose, onPrint }">
+      <LocationDetail
+        :location="asPrimaryCareLocation(location)"
+        :on-close="onClose"
+        :on-print="onPrint"
+      />
     </template>
 
     <template

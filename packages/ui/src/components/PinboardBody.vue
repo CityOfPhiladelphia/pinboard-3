@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // vue imports
-import { useSlots, inject, ref, computed, watch } from 'vue'
+import { useSlots, inject, ref, computed, watch, toRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -10,6 +10,7 @@ import { IconMap } from '@phila/phila-ui-core/icons'
 // philly ui imports
 import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
+import '../styles/print.css'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { MapCard } from '@phila/phila-ui-cards'
 
@@ -24,6 +25,7 @@ import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
 // pinboard composables and utilities imports
 import { hasLocationData } from '../utilities/hasLocationData'
+import { usePrint } from '../composables/usePrint'
 
 // type imports
 import type {
@@ -41,7 +43,11 @@ defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
   'location-card'?(props: { location: BasicLocation }): unknown
-  'location-detail'?(props: { location: BasicLocation; onClose: () => void }): unknown
+  'location-detail'?(props: {
+    location: BasicLocation
+    onClose: () => void
+    onPrint?: () => void
+  }): unknown
   'map-content'?(props: {
     locations: BasicLocation[]
     geojson: unknown
@@ -128,6 +134,10 @@ const searchString = ref<string>('')
 // filter state
 const allFiltersOpen = ref(false)
 
+// print
+const { printIds, printLocations, print } = usePrint(toRef(props, 'locations'))
+const noop = () => {}
+
 // computed refs
 const bottomSheetPercent = computed(() => bottomSheetRef.value?.displayPercent ?? snapPoints[0])
 
@@ -154,6 +164,50 @@ const locationCountLabel = computed(() => {
   return props.isLoading || message
 })
 
+// Filter chips in use bubble up to sit right after the (pinned) Sort chip. The
+// order is a snapshot recomputed only at safe moments — initial load, a chip's
+// dropdown closing, and the All-Filters panel closing — never live while a
+// dropdown is open, so a chip never moves out from under its own popover.
+const chipOrderKeys = ref<string[]>([])
+
+function recomputeChipOrder() {
+  const all = props.filters ?? []
+  const values = props.filterValues ?? {}
+  const isActive = (key: string) => {
+    const v = values[key]
+    return v && typeof v === 'object' ? Object.values(v).some(Boolean) : v === true
+  }
+  const pinned = all.filter((f) => f.excludeFromCount)
+  const rest = all.filter((f) => !f.excludeFromCount)
+  chipOrderKeys.value = [
+    ...pinned,
+    ...rest.filter((f) => isActive(f.key)),
+    ...rest.filter((f) => !isActive(f.key)),
+  ].map((f) => f.key)
+}
+
+// Map the snapshot order onto the current filter definitions, so locale/label
+// changes still flow through while the order stays put. Any filter not yet in the
+// snapshot falls back to source order at the end.
+const orderedChipFilters = computed(() => {
+  const all = props.filters ?? []
+  if (!chipOrderKeys.value.length) return all
+  const byKey = new Map(all.map((f) => [f.key, f]))
+  const ordered = chipOrderKeys.value
+    .map((k) => byKey.get(k))
+    .filter((f): f is FilterDefinition => !!f)
+  const known = new Set(chipOrderKeys.value)
+  return [...ordered, ...all.filter((f) => !known.has(f.key))]
+})
+
+// Seed on load and refresh on locale (filters) changes. Otherwise the order only
+// updates on dropdown-close / panel-close (wired in the template + watcher below).
+watch(
+  () => props.filters,
+  () => recomputeChipOrder(),
+  { immediate: true }
+)
+
 // watchers
 watch(selectedLocation, (loc) => {
   if (loc) {
@@ -177,6 +231,8 @@ watch(allFiltersOpen, (open) => {
   if (open && !props.isMobile) {
     handleCloseLocationDetail()
   }
+  // Reorder chips to reflect what was toggled in the panel, once it's closed.
+  if (!open) recomputeChipOrder()
 })
 
 // Reflect the selected location in the URL as ?location=<id>. push (not replace) so Back walks
@@ -317,6 +373,7 @@ const effectiveMapConfig = (() => {
       name="location-detail"
       :location="selectedLocation"
       :on-close="handleCloseLocationDetail"
+      :on-print="() => print(selectedLocation!)"
     />
   </div>
   <div class="finder-panel">
@@ -327,7 +384,11 @@ const effectiveMapConfig = (() => {
         {{ errorMessage }}
       </div>
 
-      <div v-if="isLoading" class="loading-list">
+      <!-- Skeleton cards only on desktop, where the list lives in this left panel.
+           On mobile the list is in the bottom sheet, so these would flash in the
+           map area and then vanish — show nothing here and let the map's own
+           loading state and the sheet's "Loading data…" label cover it. -->
+      <div v-if="isLoading && !isMobile" class="loading-list">
         <MapCard v-for="n in 5" :key="n" :is-loading="true" />
       </div>
 
@@ -355,13 +416,16 @@ const effectiveMapConfig = (() => {
             <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
               <div class="filter-chip-bar">
                 <FilterChipGroup
-                  :filters="filters"
+                  :filters="orderedChipFilters"
                   :model-value="filterValues"
                   color="white"
                   filter-button
+                  :filter-button-text="t('pinboard.filters')"
+                  :reset-text="t('pinboard.reset')"
                   :elevated="isMobile && chipsOnMap"
                   @update:model-value="handleApplyFilter"
                   @open-filters="allFiltersOpen = true"
+                  @dropdown-close="recomputeChipOrder"
                 />
               </div>
             </Teleport>
@@ -416,6 +480,8 @@ const effectiveMapConfig = (() => {
         :filters="filters"
         :model-value="filterValues"
         :full-screen="isMobile"
+        :title="t('pinboard.allFilters')"
+        :reset-text="t('pinboard.reset')"
         @update:model-value="handleApplyFilter"
         @close="allFiltersOpen = false"
       />
@@ -449,6 +515,13 @@ const effectiveMapConfig = (() => {
       </div>
     </div>
   </BottomSheet>
+  <Teleport to="body">
+    <div v-if="printIds.length" class="pinboard-print-container">
+      <div v-for="loc in printLocations" :key="loc.id" class="pinboard-print-item">
+        <slot name="location-detail" :location="loc" :on-close="noop" />
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>

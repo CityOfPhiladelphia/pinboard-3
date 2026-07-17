@@ -49,6 +49,8 @@ export interface PinboardConfig {
   map?: MapConfig
   /** Where the filter chips sit on mobile: 'map' (under the search bar) or 'sheet' (in the bottom sheet). Defaults to 'sheet'. */
   mobileFilterPlacement?: 'map' | 'sheet'
+  /** Namespaces per-app browser storage (e.g. recent searches) so same-origin finders don't share it. */
+  appId?: string
 }
 
 export interface AlertBanner {
@@ -88,9 +90,8 @@ export interface CartoResponse {
   rows: CartoResponseFields[]
 }
 
-export interface ArcgisFeature {
+export interface GeoJsonFeature {
   type: 'Feature'
-  id: number
   geometry: {
     type: string
     coordinates: LongitudeLatitude
@@ -98,18 +99,13 @@ export interface ArcgisFeature {
   properties: unknown
 }
 
-export interface CartoFeature {
-  type: 'Feature'
-  geometry: {
-    type: string
-    coordinates: LongitudeLatitude
-  }
-  properties: unknown
+export interface ArcgisFeature extends GeoJsonFeature {
+  id: number
 }
 
 export interface GeoJSONFeatureCollectionResponse {
   type: 'FeatureCollection'
-  features: ArcgisFeature[] | CartoFeature[]
+  features: ArcgisFeature[] | GeoJsonFeature[]
 }
 
 // type GeoJsonGeometryType =
