@@ -24,7 +24,7 @@ import { Search } from '@phila/phila-ui-search'
 
 // pinboard component imports
 import LocationFilter from './LocationFilter.vue'
-import SortPanel, { type SortPanelOption } from './SortPanel.vue'
+import SortPanel from './SortPanel.vue'
 import SearchSuggestions from './SearchSuggestions.vue'
 
 // pinboard composables imports
@@ -33,7 +33,7 @@ import { useRecentSearches } from '../composables/useRecentSearches'
 import { PINBOARD_CONFIG_KEY } from '../plugin'
 
 // type imports
-import type { LocationFilterOption, SortLocationsOptions, UserLocationState } from '../types'
+import type { LocationFilterOption, SortLocationsOptions, SortMode, UserLocationState } from '../types'
 
 // props
 const props = defineProps<{
@@ -49,11 +49,11 @@ const emit = defineEmits<{
   search: []
   searchString: [search: string]
   selectedFilter: [filter: string]
-  sortOption: [sort: string]
+  sortOption: [sort: SortMode]
 }>()
 
 // refs
-const appliedSort = ref<string | null>(null)
+const appliedSort = ref<SortMode>('')
 const searchString = ref<string>('')
 const searchWrapperRef = ref<HTMLElement | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
@@ -80,19 +80,15 @@ const dropdownSuggestions = computed(() => {
 const showingRecents = computed(() => !searchString.value)
 
 // computed refs
-const sortChoices = computed<SortPanelOption[]>(() => {
-  const opts = props.sortOptions ?? {}
-  return Object.entries(opts).map(([value, label]) => ({ value, label }))
-})
 
 // event handlers
 function handleFilterChange(option: string) {
   emit('selectedFilter', option)
 }
 
-function handleSortChange(value: string | null) {
+function handleSortChange(value: SortMode) {
   appliedSort.value = value
-  emit('sortOption', value ?? '')
+  emit('sortOption', value)
 }
 
 function handleSearchChange(search: string) {
@@ -216,7 +212,7 @@ function focusSearchInput() {
     <Teleport to="#bottom-sheet-sort" :disabled="!isMobile">
       <div v-if="sortOptions" class="location-sort">
         <SortPanel
-          :sort-options="sortChoices"
+          :sort-options="sortOptions"
           :applied-sort="appliedSort"
           :user-location-state="props.userLocationState"
           :is-mobile="isMobile"

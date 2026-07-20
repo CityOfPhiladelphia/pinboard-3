@@ -74,5 +74,3 @@ export type ReadingState =
   | { kind: 'No Call Needed' }
 
 export type Filters = 'all' | 'gauges' | 'cameras'
-
-export type SortMode = 'AlphaAsc' | 'DistAsc' | ''

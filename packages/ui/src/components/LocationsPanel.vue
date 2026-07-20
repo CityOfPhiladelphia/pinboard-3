@@ -14,6 +14,7 @@ import type {
   LocationFilterOption,
   MapCardPropsGetter,
   SortLocationsOptions,
+  SortMode,
   UserLocationState,
 } from '../types'
 
@@ -37,7 +38,7 @@ const emit = defineEmits<{
   search: []
   searchString: [search: string]
   selectedFilter: [filter: string]
-  sortOption: [sort: string]
+  sortOption: [sort: SortMode]
   hover: [id: string]
   'hover-end': []
 }>()
@@ -67,7 +68,7 @@ function handleFilterChange(selectedFilter: string) {
   emit('selectedFilter', selectedFilter)
 }
 
-function handleSortChange(sortOption: string) {
+function handleSortChange(sortOption: SortMode) {
   emit('sortOption', sortOption)
 }
 

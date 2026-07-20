@@ -35,6 +35,7 @@ import type {
   MapCardPropsGetter,
   SearchMode,
   SortLocationsOptions,
+  SortMode,
   UserLocationState,
 } from '../types'
 import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
@@ -100,7 +101,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   search: [search: string]
   selectedLocationsFilter: [filter: string]
-  sortLocationsOption: [sort: string]
+  sortLocationsOption: [sort: SortMode]
   deselect: [locationId: string]
   'update:filterValues': [value: FilterValues]
 }>()
@@ -312,7 +313,7 @@ function handleLocationFilterChange(selectedLocationsFilter: string) {
   emit('selectedLocationsFilter', selectedLocationsFilter)
 }
 
-function handleLocationSortChange(sortLocationsOption: string) {
+function handleLocationSortChange(sortLocationsOption: SortMode) {
   emit('sortLocationsOption', sortLocationsOption)
 }
 

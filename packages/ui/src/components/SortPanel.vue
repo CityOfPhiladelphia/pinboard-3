@@ -5,33 +5,28 @@ import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Radio } from '@phila/phila-ui-radio'
 import { PhilaButton, CloseButton } from '@phila/phila-ui-button'
 import { IconSort } from '@phila/phila-ui-core/icons'
-import type { UserLocationState } from '../types'
-
-export interface SortPanelOption {
-  value: string
-  label: string
-}
+import type { SortLocationsOptions, SortMode, UserLocationState } from '../types'
 
 const props = defineProps<{
-  sortOptions: SortPanelOption[]
-  appliedSort: string | null
+  sortOptions: SortLocationsOptions
+  appliedSort: SortMode
   userLocationState: UserLocationState
   isMobile: boolean
 }>()
 
 const emit = defineEmits<{
-  'update:appliedSort': [value: string | null]
+  'update:appliedSort': [value: SortMode]
 }>()
 
 const { t } = useI18n()
 
 const panelOpen = ref(false)
-const pendingSelection = ref<string | undefined>(undefined)
+const pendingSelection = ref<SortMode>('')
 
 const triggerLabel = computed(() => {
-  if (!props.appliedSort) return t('pinboard.sort')
-  const match = props.sortOptions.find((o) => o.value === props.appliedSort)
-  return match ? t('pinboard.sortBy', { label: match.label }) : t('pinboard.sort')
+  return props.appliedSort
+    ? t('pinboard.sortBy', { label: props.sortOptions[props.appliedSort] })
+    : t('pinboard.sort')
 })
 
 const locationAvailable = computed(() => {
@@ -39,7 +34,7 @@ const locationAvailable = computed(() => {
 })
 
 function openPanel() {
-  pendingSelection.value = props.appliedSort ?? undefined
+  pendingSelection.value = props.appliedSort
   panelOpen.value = true
 }
 
@@ -48,12 +43,12 @@ function closePanel() {
 }
 
 function applySort() {
-  emit('update:appliedSort', pendingSelection.value ?? null)
+  emit('update:appliedSort', pendingSelection.value)
   closePanel()
 }
 
 function resetSort() {
-  emit('update:appliedSort', null)
+  emit('update:appliedSort', '')
   closePanel()
 }
 
@@ -88,7 +83,7 @@ function handleKeydown(e: KeyboardEvent) {
 }
 
 watch(panelOpen, (isOpen) => {
-  if (isOpen) {
+  if (isOpen && !props.isMobile) {
     recomputeAnchor()
     document.addEventListener('mousedown', handleDocumentClick)
     document.addEventListener('keydown', handleKeydown)
@@ -110,10 +105,9 @@ watch(panelOpen, (isOpen) => {
       <span>{{ triggerLabel }}</span>
     </button>
   </div>
-  <Teleport to="body">
-    <div v-if="panelOpen && isMobile" class="sort-panel-scrim" />
+  <Teleport v-if="panelOpen" to="body">
     <BottomSheet
-      v-if="panelOpen && isMobile"
+      v-if="isMobile"
       :model-value="true"
       :snap-points="[35]"
       :show-handle="false"
@@ -125,19 +119,31 @@ watch(panelOpen, (isOpen) => {
         }
       "
     >
-      <div ref="formEl" class="sort-panel-form sort-panel-form--mobile">
-        <CloseButton class="sort-panel-close" @click="closePanel" />
+      <div id="sort-options-mobile"></div>
+    </BottomSheet>
+    <Teleport to="#sort-options-mobile" :disabled="!isMobile">
+      <div
+        ref="formEl"
+        :style="!isMobile ? anchorStyle : ''"
+        class="sort-panel-form"
+        :class="{ 'sort-panel-form-mobile': isMobile }"
+      >
+        <CloseButton v-if="isMobile" class="sort-panel-close" @click="closePanel" />
         <ul class="sort-panel-options">
-          <li v-for="option in sortOptions" :key="option.value" class="sort-panel-option">
+          <li
+            v-for="[value, label] in Object.entries(sortOptions)"
+            :key="value"
+            class="sort-panel-option"
+          >
             <Radio
               name="sort-panel-radio"
-              :value="option.value"
-              :text="option.label"
-              :model-value="pendingSelection ?? ''"
-              :disabled="option.value === 'DistAsc' && !locationAvailable"
-              @update:model-value="pendingSelection = $event"
+              :value="value"
+              :text="label"
+              :model-value="pendingSelection"
+              :disabled="value === 'DistAsc' && !locationAvailable"
+              @update:model-value="pendingSelection = $event as SortMode"
             />
-            <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
+            <p v-if="value === 'DistAsc'" class="sort-panel-hint">
               {{ locationAvailable ? t('pinboard.sortClosest') : t('pinboard.sortShareLocation') }}
             </p>
           </li>
@@ -151,32 +157,7 @@ watch(panelOpen, (isOpen) => {
           }}</PhilaButton>
         </div>
       </div>
-    </BottomSheet>
-    <div v-else-if="panelOpen" ref="formEl" class="sort-panel-form" :style="anchorStyle">
-      <ul class="sort-panel-options">
-        <li v-for="option in sortOptions" :key="option.value" class="sort-panel-option">
-          <Radio
-            name="sort-panel-radio"
-            :value="option.value"
-            :text="option.label"
-            :model-value="pendingSelection ?? ''"
-            :disabled="option.value === 'DistAsc' && !locationAvailable"
-            @update:model-value="pendingSelection = $event"
-          />
-          <p v-if="option.value === 'DistAsc'" class="sort-panel-hint">
-            {{ locationAvailable ? t('pinboard.sortClosest') : t('pinboard.sortShareLocation') }}
-          </p>
-        </li>
-      </ul>
-      <div class="sort-panel-actions">
-        <PhilaButton variant="text" size="extra-small" @click="resetSort">{{
-          t('pinboard.reset')
-        }}</PhilaButton>
-        <PhilaButton variant="primary" size="small" @click="applySort">{{
-          t('pinboard.apply')
-        }}</PhilaButton>
-      </div>
-    </div>
+    </Teleport>
   </Teleport>
 </template>
 
@@ -251,18 +232,11 @@ watch(panelOpen, (isOpen) => {
   border-top: 1px solid var(--Schemes-Outline-Variant, #e0e0e0);
 }
 
-.sort-panel-form--mobile {
+.sort-panel-form-mobile {
   width: 100%;
   background: transparent;
   box-shadow: none;
   border-radius: 0;
-}
-
-.sort-panel-scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: rgba(0, 0, 0, 0.25);
 }
 
 .sort-panel-close {

@@ -84,7 +84,7 @@ const {
   handleSearchSubmit,
   handleGeolocate,
   handleGeolocateError,
-} = PinboardComposables.useUserAndSearchLocations()
+} = PinboardComposables.useUserAndSearchLocations(locations)
 const filterState = ref<PrimaryCareFilters>(defaultFilterState)
 
 const { filterLogicalValue, filterLogic } = useFilterLogic(locations, languages, filterState)
