@@ -1,14 +1,12 @@
 import { toValue, type Ref } from 'vue'
-import type { BasicLocation, CustomSort, LatLon, SortMode } from '../types'
+import type { BasicLocation, CustomSort, SortMode } from '../types'
 
 export function sortLocations<PinboardLocation extends BasicLocation>(
   locations: Ref<PinboardLocation[]> | PinboardLocation[],
-  currentLocation: Ref<LatLon> | LatLon,
   sortMode: Ref<SortMode> | SortMode,
   customSort?: CustomSort<PinboardLocation>
 ) {
   locations = toValue(locations)
-  currentLocation = toValue(currentLocation)
   sortMode = toValue(sortMode)
 
   switch (sortMode) {
