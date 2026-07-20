@@ -168,7 +168,7 @@ watch(panelOpen, (isOpen) => {
 
 .sort-panel-trigger {
   display: inline-flex;
-  align-items: center;
+  align-content: center;
   gap: var(--spacing-xs);
   height: var(--scale-400, 2rem);
   padding: var(--scale-75) var(--spacing-xs);

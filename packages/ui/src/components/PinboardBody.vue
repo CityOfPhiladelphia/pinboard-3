@@ -373,8 +373,8 @@ function selectedLocationValue() {
 </script>
 
 <template>
-  <div v-if="selectedLocation && !isMobile" id="detail-overlay-desktop"></div>
-  <div class="finder-panel">
+  <div v-if="selectedLocation && !isMobile" id="detail-overlay-desktop" />
+  <div class="finder-panel" :class="isMobile ? 'finder-panel-mobile' : 'finder-panel-desktop'">
     <div class="finder-panel-locations">
       <slot name="locations-header" />
 
@@ -441,7 +441,7 @@ function selectedLocationValue() {
       </Teleport>
     </div>
 
-    <div class="finder-panel-map">
+    <div :class="isMobile ? 'finder-panel-map' : ''">
       <MapPanel
         ref="mapPanelRef"
         :config="effectiveMapConfig"
@@ -473,7 +473,7 @@ function selectedLocationValue() {
       <div id="mobile-map-search-filter" class="mobile-map-search-filter" />
     </div>
 
-    <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
+    <div v-if="filters" class="all-filters-overlay" :style="{ 'display': allFiltersOpen && !isMobile ? 'block' : 'none' }">
       <FilterPanel
         v-if="allFiltersOpen"
         :filters="filters"
@@ -492,6 +492,7 @@ function selectedLocationValue() {
     :snap-points="snapPoints"
     :collapse-label="selectedLocation ? '' : t('pinboard.mapView')"
     :collapse-icon="selectedLocation ? undefined : IconMap"
+    :style="{ 'display': isMobile ? 'block' : 'none' }"
     class="mobile-bottom-sheet"
   >
     <div class="bottom-sheet-stack">
@@ -529,11 +530,18 @@ function selectedLocationValue() {
 
 <style scoped>
 .finder-panel {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
   width: 100%;
   height: 100%;
   position: relative;
+}
+
+.finder-panel-desktop {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+
+.finder-panel-mobile {
+display: block;
 }
 
 .finder-panel-locations {
@@ -542,6 +550,11 @@ function selectedLocationValue() {
   border-right: 1px solid #ccc;
   overflow: hidden;
 }
+
+.finder-panel-map {
+    width: 100%;
+    height: 100%;
+  }
 
 .status-message--error {
   color: var(--Schemes-Error, #b3261e);
@@ -555,10 +568,6 @@ function selectedLocationValue() {
   gap: 0.75rem;
   padding: 0.5rem 1rem 1rem 1rem;
   scrollbar-width: none;
-}
-
-.finder-panel-map {
-  overflow: hidden;
 }
 
 .location-sheet-header {
@@ -575,10 +584,6 @@ function selectedLocationValue() {
   padding: 0.75rem 1rem 0.5rem;
   font-family: var(--Body-Default-font-body-default-family);
   font-weight: 700;
-}
-
-.mobile-bottom-sheet {
-  display: none;
 }
 
 .detail-overlay {
@@ -656,30 +661,9 @@ function selectedLocationValue() {
   z-index: 12;
   background: var(--Schemes-Surface-Bright, #fff);
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
-  display: none;
 }
 
-.all-filters-overlay.open {
-  display: block;
-}
-
-/* Keep in sync with the matchMedia query in useIsMobile.ts */
-@media (max-width: 768px), (max-width: 1064px) and (max-height: 600px) {
-  .finder-panel {
-    position: relative;
-    display: block;
-  }
-
-  .finder-panel-map {
-    width: 100%;
-    height: 100%;
-  }
-
-  .mobile-bottom-sheet {
-    display: block;
-  }
-
-  .mobile-controls-float {
+.mobile-controls-float {
     position: absolute;
     right: 10px;
     z-index: 10;
@@ -718,12 +702,4 @@ function selectedLocationValue() {
     z-index: 2;
     padding: 10px 0;
   }
-
-  /* Mobile: FilterPanel renders its own full-screen takeover (teleported to
-     <body>, above the header). The desktop slide-over wrapper is inert here —
-     the v-if'd FilterPanel still mounts and teleports itself out. */
-  .all-filters-overlay.open {
-    display: none;
-  }
-}
 </style>
