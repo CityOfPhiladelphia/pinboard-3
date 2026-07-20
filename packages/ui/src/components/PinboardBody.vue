@@ -470,7 +470,7 @@ function selectedLocationValue() {
         class="mobile-controls-float-left"
         :style="mobileControlsStyle"
       />
-      <div id="mobile-map-search-filter" class="mobile-map-search-filter"></div>
+      <div id="mobile-map-search-filter" class="mobile-map-search-filter" />
     </div>
 
     <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
@@ -499,9 +499,9 @@ function selectedLocationValue() {
         <slot name="locations-header" />
         <div class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
-          <div id="bottom-sheet-sort"></div>
+          <div id="bottom-sheet-sort" />
         </div>
-        <div id="locations-panel-mobile"></div>
+        <div id="locations-panel-mobile" />
       </div>
 
       <div v-if="selectedLocation">

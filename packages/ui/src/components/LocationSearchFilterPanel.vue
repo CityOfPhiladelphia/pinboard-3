@@ -33,7 +33,12 @@ import { useRecentSearches } from '../composables/useRecentSearches'
 import { PINBOARD_CONFIG_KEY } from '../plugin'
 
 // type imports
-import type { LocationFilterOption, SortLocationsOptions, SortMode, UserLocationState } from '../types'
+import type {
+  LocationFilterOption,
+  SortLocationsOptions,
+  SortMode,
+  UserLocationState,
+} from '../types'
 
 // props
 const props = defineProps<{

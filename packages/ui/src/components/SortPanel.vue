@@ -119,7 +119,7 @@ watch(panelOpen, (isOpen) => {
         }
       "
     >
-      <div id="sort-options-mobile"></div>
+      <div id="sort-options-mobile" />
     </BottomSheet>
     <Teleport to="#sort-options-mobile" :disabled="!isMobile">
       <div
