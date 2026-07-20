@@ -369,18 +369,10 @@ const effectiveMapConfig = (() => {
 function selectedLocationValue() {
   return props.locations[props.locations.indexOf(selectedLocation.value)]
 }
-
 </script>
 
 <template>
-  <div v-if="selectedLocation && !isMobile" class="detail-overlay">
-    <slot
-      name="location-detail"
-      :location="selectedLocationValue()"
-      :on-close="handleCloseLocationDetail"
-      :on-print="() => print(selectedLocationValue())"
-    />
-  </div>
+  <div v-if="selectedLocation && !isMobile" id="detail-overlay-desktop"></div>
   <div class="finder-panel">
     <div class="finder-panel-locations">
       <slot name="locations-header" />
@@ -508,16 +500,20 @@ function selectedLocationValue() {
           <span>{{ locationCountLabel }}</span>
           <div id="bottom-sheet-sort"></div>
         </div>
-
         <div id="locations-panel-mobile"></div>
       </div>
 
-      <div v-if="selectedLocation" class="bottom-sheet-detail">
-        <slot
-          name="location-detail"
-          :location="selectedLocationValue()"
-          :on-close="handleCloseLocationDetail"
-        />
+      <div v-if="selectedLocation">
+        <Teleport to="#detail-overlay-desktop" :disabled="isMobile">
+          <div :class="isMobile ? 'bottom-sheet-detail' : 'detail-overlay'">
+            <slot
+              name="location-detail"
+              :location="selectedLocationValue()"
+              :on-close="handleCloseLocationDetail"
+              :on-print="isMobile ? undefined : () => print(selectedLocationValue())"
+            />
+          </div>
+        </Teleport>
       </div>
     </div>
   </BottomSheet>
