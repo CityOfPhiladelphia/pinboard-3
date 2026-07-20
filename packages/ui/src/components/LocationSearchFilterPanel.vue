@@ -253,6 +253,15 @@ function focusSearchInput() {
   width: 100%;
 }
 
+.location-search.mobile :deep(.state-layer) {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.location-search.mobile :deep(.phila-text-field) {
+  padding: 0 var(--scale-small, 0.5rem);
+}
+
 .location-filters {
   grid-area: filters;
   padding: 0rem 0rem 0rem 1rem;
@@ -269,24 +278,5 @@ function focusSearchInput() {
   grid-area: sort;
   margin-left: auto;
   padding: 0rem 1rem 1.25rem 0rem;
-}
-
-@media (max-width: 768px) {
-  .location-search {
-    padding: 0.6rem 1.5rem 0.25rem 1.5rem;
-  }
-
-  .location-filters {
-    padding: 0rem 0rem 0rem 1.6rem;
-  }
-
-  .location-search :deep(.state-layer) {
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  .location-search :deep(.phila-text-field) {
-    padding: 0 var(--scale-small, 0.5rem);
-  }
 }
 </style>

@@ -126,7 +126,9 @@ function onSheetPointerUp() {
            (phila-ui-4 bead map-core-k8c) gates the default on a search-panel slot.
            Must contain a real (non-comment) node: Vue renders the slot's default content
            when an overriding slot is empty, so a hidden span is what actually suppresses it. -->
-      <template #navbar-search><span hidden /></template>
+      <template #navbar-search>
+        <span hidden />
+      </template>
 
       <!-- Only show the hamburger when the app provides a mobile nav. AppHeader renders
            the burger by default; suppress it otherwise so apps without a mobile nav (e.g.
@@ -134,7 +136,9 @@ function onSheetPointerUp() {
            "burger only if mobile-nav" behavior; same root cause as bead map-core-k8c.
            Hidden span (not empty) because Vue renders a slot's default content when the
            overriding slot is empty. -->
-      <template v-if="!$slots['mobile-nav']" #navbar-toggle><span hidden /></template>
+      <template v-if="!$slots['mobile-nav']" #navbar-toggle>
+        <span hidden />
+      </template>
 
       <template v-if="$slots['mobile-nav']" #mobile-nav>
         <MobileNavPanel>
