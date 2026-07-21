@@ -63,7 +63,11 @@ vi.mock('@phila/phila-ui-filter-chip', () => ({
 }))
 
 vi.mock('@phila/phila-ui-filter-panel', () => ({
-  FilterPanel: formStub('FilterPanel', ['filters', 'modelValue', 'fullScreen', 'title'], 'title'),
+  FilterPanel: formStub(
+    'FilterPanel',
+    ['filters', 'modelValue', 'fullScreen', 'title', 'searchable'],
+    'title',
+  ),
 }))
 
 vi.mock('@phila/phila-ui-button', () => ({

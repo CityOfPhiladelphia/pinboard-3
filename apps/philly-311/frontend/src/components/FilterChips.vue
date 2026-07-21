@@ -91,6 +91,7 @@ function onPanelUpdate(next: FilterValues) {
       :filters="panelFilters"
       :model-value="panelValues"
       :full-screen="true"
+      :searchable="false"
       @update:model-value="onPanelUpdate"
       @close="closePanel"
     />

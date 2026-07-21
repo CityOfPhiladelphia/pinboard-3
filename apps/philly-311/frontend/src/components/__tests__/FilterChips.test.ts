@@ -94,6 +94,12 @@ describe('FilterChips', () => {
     expect(w.findComponent(FilterPanel).exists()).toBe(false)
   })
 
+  it('disables the panel search box (no design for it)', async () => {
+    const w = mountChips()
+    await w.findComponent(FilterChipGroup).vm.$emit('open-filters')
+    expect(w.findComponent(FilterPanel).props('searchable')).toBe(false)
+  })
+
   it('passes a single-select service-type filter definition to the panel', async () => {
     const w = mountChips()
     await w.findComponent(FilterChipGroup).vm.$emit('open-filters')
