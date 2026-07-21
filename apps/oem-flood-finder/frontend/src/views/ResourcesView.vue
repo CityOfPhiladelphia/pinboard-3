@@ -115,7 +115,7 @@ const router = useRouter()
               </ul>
             </div>
 
-            <div class="subsection-container mobile-footer-links">
+            <div class="subsection-container" :style="{ display: isMobile ? 'flex' : 'none' }">
               <div class="mobile-footer-heading">
                 <Logo bell-only />
                 <component :is="isMobile ? 'h6' : 'h5'">About phila.gov</component>
@@ -167,6 +167,10 @@ const router = useRouter()
   align-items: center;
 }
 
+.content-area.mobile {
+    padding: 1.5rem 1rem 0 1rem;
+  }
+
 .section {
   display: flex;
   width: 100%;
@@ -176,6 +180,11 @@ const router = useRouter()
   align-items: flex-start;
   gap: var(--spacing-4xl, 4rem);
 }
+
+.section.mobile {
+    gap: var(--spacing-2xl, 2rem);
+    padding-bottom: var(--spacing-2xl, 2rem);
+  }
 
 .intro-text-container {
   display: flex;
@@ -210,9 +219,7 @@ const router = useRouter()
   width: 100%;
 }
 
-.mobile-footer-links {
-  display: none;
-}
+
 
 .mobile-footer-heading {
   display: flex;
@@ -221,18 +228,4 @@ const router = useRouter()
   font-size: 1.25rem;
 }
 
-@media (max-width: 768px) {
-  .content-area {
-    padding: 1.5rem 1rem 0 1rem;
-  }
-
-  .section {
-    gap: var(--spacing-2xl, 2rem);
-    padding-bottom: var(--spacing-2xl, 2rem);
-  }
-
-  .mobile-footer-links {
-    display: flex;
-  }
-}
 </style>
