@@ -28,6 +28,7 @@ const diameterPx = computed(
         width: `${diameterPx.toFixed(2)}px`,
         height: `${diameterPx.toFixed(2)}px`,
         transform: 'translateY(50%)',
+        pointerEvents: 'none',
       }"
     />
   </MapMarker>

@@ -40,6 +40,15 @@ describe('LocationAccuracyCircle', () => {
     )
   })
 
+  it('does not intercept pointer events, so pins underneath stay clickable', () => {
+    const w = mount(LocationAccuracyCircle, {
+      props: { latitude: 39.95, longitude: -75.16, accuracy: 10, zoom: 16 },
+    })
+    expect(w.find('.location-accuracy-circle').attributes('style')).toContain(
+      'pointer-events: none',
+    )
+  })
+
   it('sizes the circle div to the pixel diameter of the accuracy radius', () => {
     const w = mount(LocationAccuracyCircle, {
       props: { latitude: 39.95, longitude: -75.16, accuracy: 10, zoom: 16 },
