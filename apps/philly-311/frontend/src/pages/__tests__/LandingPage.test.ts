@@ -213,6 +213,15 @@ describe('LandingPage', () => {
     })
   })
 
+  it('joins BasemapToggle to the bottom-right desktop control stack with GeolocationButton', async () => {
+    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    await flushPromises()
+    expect(w.findComponent({ name: 'BasemapToggle' }).attributes('position')).toBe('bottom-right')
+    expect(w.findComponent({ name: 'GeolocationButton' }).attributes('position')).toBe(
+      'bottom-right',
+    )
+  })
+
   it('selecting a category chip filters the location list; "All Filters" restores it', async () => {
     const w = mount(LandingPage, { global: { stubs: globalStubs } })
     await flushPromises()

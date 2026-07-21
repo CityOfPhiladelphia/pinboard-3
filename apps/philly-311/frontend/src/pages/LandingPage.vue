@@ -86,7 +86,7 @@ async function onSearch(query: string) {
       <MapConstraints v-if="map" :map="map" />
       <MapNavigationControl v-if="!isMobile" position="bottom-right" />
       <BasemapToggle
-        position="top-right"
+        position="bottom-right"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
       />
       <GeolocationButton
