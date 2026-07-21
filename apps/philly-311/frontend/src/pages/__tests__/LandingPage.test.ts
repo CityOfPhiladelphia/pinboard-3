@@ -17,6 +17,7 @@ vi.mock('@pinboard/ui', () => {
       'errorMessage',
       'locationPanelFilter',
       'locationPanelSearch',
+      'locationPanelCountNoun',
     ],
     emits: ['search'],
     setup:
@@ -28,6 +29,7 @@ vi.mock('@pinboard/ui', () => {
             class: 'panel-filter-debug',
             'data-filter-set': String(props.locationPanelFilter != null),
           }),
+          h('div', { class: 'count-noun-debug' }, String(props.locationPanelCountNoun ?? '')),
           h('div', { class: 'header' }, slots['locations-header']?.()),
           h('div', { class: 'filters' }, slots['locations-filters']?.()),
           h(
@@ -161,6 +163,12 @@ describe('LandingPage', () => {
     const w = mount(LandingPage, { global: { stubs: globalStubs } })
     await flushPromises()
     expect(w.find('.panel-filter-debug').attributes('data-filter-set')).toBe('false')
+  })
+
+  it('Pinboard receives "report" as the count noun for the desktop count line', async () => {
+    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    await flushPromises()
+    expect(w.find('.count-noun-debug').text()).toBe('report')
   })
 
   it('location-card slot renders ReportListingCard for known report and plain text for unknown', async () => {

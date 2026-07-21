@@ -80,6 +80,7 @@ const props = withDefaults(
     locationPanelSearch?: string
     locationPanelSort?: SortLocationsOptions
     locationSearchMode?: SearchMode
+    locationPanelCountNoun?: string
     geojson?: unknown
     filters?: FilterDefinition[]
     filterValues?: FilterValues
@@ -91,6 +92,7 @@ const props = withDefaults(
     locationPanelSearch: undefined,
     locationPanelSort: undefined,
     locationSearchMode: undefined,
+    locationPanelCountNoun: undefined,
     geojson: undefined,
     filters: undefined,
     filterValues: undefined,
@@ -398,6 +400,7 @@ function selectedLocationValue() {
           :location-filter="locationPanelFilter"
           :location-search="locationPanelSearch"
           :location-sort="locationPanelSort"
+          :count-noun="!isMobile ? locationPanelCountNoun : undefined"
           :user-location-state="userLocationState"
           :wait-for-user-location="waitForUserLocation"
           :hovered-id="hoveredLocationId"
@@ -433,7 +436,7 @@ function selectedLocationValue() {
             <slot name="locations-filters" />
           </template>
           <template #list-header>
-            <div v-if="!isMobile" class="location-list-header">
+            <div v-if="!isMobile && !locationPanelCountNoun" class="location-list-header">
               <span>{{ locationCountLabel }}</span>
             </div>
           </template>

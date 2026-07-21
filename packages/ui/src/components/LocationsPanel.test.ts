@@ -137,3 +137,39 @@ describe('LocationsPanel - filters slot', () => {
     expect(w.find('.my-filters').exists()).toBe(false)
   })
 })
+
+describe('LocationsPanel - count label', () => {
+  it('does not render a count line when countNoun is not provided', () => {
+    const w = mountDefault()
+    expect(w.find('.location-count').exists()).toBe(false)
+  })
+
+  it('renders the pluralized count with the given noun', () => {
+    const w = mountDefault({ countNoun: 'report' })
+    expect(w.find('.location-count').text()).toBe('2 reports')
+  })
+
+  it('renders the singular noun for a single result', () => {
+    const w = mountDefault({ locations: [locations()[0]], countNoun: 'report' })
+    expect(w.find('.location-count').text()).toBe('1 report')
+  })
+
+  it('shows "No locations match" when there are no results', () => {
+    const w = mountDefault({ locations: [], countNoun: 'report' })
+    expect(w.find('.location-count').text()).toBe('No locations match')
+  })
+
+  it('renders the count line between the filters slot and the location list', () => {
+    const w = mount(LocationsPanel, {
+      props: { locations: locations(), countNoun: 'report' },
+      slots: { filters: '<div class="my-filters">Chips</div>' },
+      global: { stubs: { MapCard: MapCardStub } },
+    })
+    const html = w.html()
+    const filtersIdx = html.indexOf('my-filters')
+    const countIdx = html.indexOf('location-count')
+    const listIdx = html.indexOf('location-list')
+    expect(filtersIdx).toBeLessThan(countIdx)
+    expect(countIdx).toBeLessThan(listIdx)
+  })
+})

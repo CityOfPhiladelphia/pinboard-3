@@ -32,6 +32,7 @@ async function onSearch(query: string) {
     :is-loading="finder.isLoading.value"
     :error-message="finder.errorMessage.value"
     :location-panel-search="searchPlaceholder"
+    location-panel-count-noun="report"
     @search="onSearch"
   >
     <template #locations-header>
