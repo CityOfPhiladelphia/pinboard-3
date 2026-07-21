@@ -1,5 +1,6 @@
 // ABOUTME: Tests for App — Map/Reports/Answers header nav links, the "Report an
-// ABOUTME: issue" CTA, the login trigger, and the phila .content wrapper.
+// ABOUTME: issue" CTA, the login trigger, the sub-footer links, and the phila
+// ABOUTME: .content wrapper.
 import { describe, it, expect, vi } from 'vitest'
 import { defineComponent, h } from 'vue'
 import { mount, RouterLinkStub } from '@vue/test-utils'
@@ -14,6 +15,7 @@ vi.mock('@pinboard/ui', () => ({
         h('div', [
           h('div', { 'data-test': 'navbar-end' }, slots['navbar-end']?.()),
           h('div', { 'data-test': 'mobile-nav' }, slots['mobile-nav']?.()),
+          h('div', { 'data-test': 'sub-footer' }, slots['sub-footer']?.()),
           slots.default?.(),
         ])
     },
@@ -69,5 +71,25 @@ describe('App', () => {
   it('wraps routed pages in a phila .content region', () => {
     const w = mountApp()
     expect(w.find('.content.app-content').exists()).toBe(true)
+  })
+
+  it('adds a Feedback link alongside the standard sub-footer legal links', () => {
+    const w = mountApp()
+    const subFooter = w.find('[data-test="sub-footer"]')
+    const links = subFooter.findAll('a')
+    expect(links.map((a) => a.text())).toEqual([
+      'Terms of use',
+      'Right to know',
+      'Privacy Policy',
+      'Accessibility',
+      'Feedback',
+    ])
+    expect(links.map((a) => a.attributes('href'))).toEqual([
+      'https://www.phila.gov/terms-of-use/',
+      'https://www.phila.gov/open-records-policy/',
+      'https://www.phila.gov/privacypolicy/',
+      'https://www.phila.gov/accessibility-policy/',
+      'https://www.phila.gov/feedback/',
+    ])
   })
 })

@@ -32,6 +32,15 @@ const navLinks = [
       <PhilaButton variant="primary" to="/report">Report an issue</PhilaButton>
       <button type="button" class="navbar-login" @click="signIn()">Login / Sign up</button>
     </template>
+    <template #sub-footer>
+      <a class="sub-footer-link" href="https://www.phila.gov/terms-of-use/">Terms of use</a>
+      <a class="sub-footer-link" href="https://www.phila.gov/open-records-policy/">Right to know</a>
+      <a class="sub-footer-link" href="https://www.phila.gov/privacypolicy/">Privacy Policy</a>
+      <a class="sub-footer-link" href="https://www.phila.gov/accessibility-policy/"
+        >Accessibility</a
+      >
+      <a class="sub-footer-link" href="https://www.phila.gov/feedback/">Feedback</a>
+    </template>
     <div class="content app-content">
       <RouterView />
     </div>
@@ -43,6 +52,10 @@ const navLinks = [
    without introducing a layout box that would break the full-height map. */
 .app-content {
   display: contents;
+}
+
+.sub-footer-link {
+  font-weight: 400;
 }
 
 .navbar-login {
