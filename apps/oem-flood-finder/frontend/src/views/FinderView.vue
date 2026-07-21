@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // vue imports
-import { computed, markRaw, ref, watch } from 'vue'
+import { computed, inject, markRaw, ref, watch } from 'vue'
 
 // 3rd party imports
 import { IconGauge, IconCamera, IconLocationDot, IconWater } from '@phila/phila-ui-core/icons'
@@ -20,6 +20,7 @@ import {
   PinboardUtilities,
   type PinboardTypes,
   type MapCardProps,
+  IS_MOBILE_KEY,
 } from '@pinboard/ui'
 import {
   filterLocations,
@@ -65,7 +66,7 @@ const {
 const locationSortMode = ref<PinboardTypes.SortMode>(
   ['located', 'watching'].includes(userLocationState.value) ? 'DistAsc' : '',
 )
-const isMobile = PinboardComposables.useIsMobile()
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 
 // computed refs
 const currentLocations = computed(() => {

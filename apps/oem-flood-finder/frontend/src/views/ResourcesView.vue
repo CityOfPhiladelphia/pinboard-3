@@ -3,11 +3,13 @@ import { useRouter } from 'vue-router'
 import { Logo } from '@phila/phila-ui-logo'
 import { PhilaLink } from '@phila/phila-ui-link'
 import { IconChevronLeft } from '@phila/phila-ui-core/icons'
-import { PinboardComposables } from '@pinboard/ui'
+import { IS_MOBILE_KEY } from '@pinboard/ui'
+import { inject, ref } from 'vue'
 
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 const router = useRouter()
 
-const isMobile = PinboardComposables.useIsMobile()
+
 </script>
 
 <template>

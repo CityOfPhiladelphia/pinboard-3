@@ -2,7 +2,6 @@ import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute } from 'vue-router'
 import { languageCodes } from '@pinboard/ui'
 
-const STORAGE_KEY = 'pcf.locale'
 const DEFAULT_LOCALE = 'en'
 
 function isValid(code: string | null): code is string {
@@ -10,7 +9,7 @@ function isValid(code: string | null): code is string {
 }
 
 /** Resolves the initial locale: ?lang= → localStorage → browser language → default. */
-export function resolveInitialLocale(
+function resolveInitialLocale(
   search: string,
   stored: string | null,
   browserLanguages: readonly string[] = []
@@ -32,7 +31,9 @@ function getBrowserLanguages(): readonly string[] {
   return (navigator.languages ?? [navigator.language]).filter(Boolean)
 }
 
-export function useLocale() {
+export function useLocale(appKey: string) {
+  const STORAGE_KEY = `${appKey}.locale`
+
   const { locale } = useI18n()
   const router = useRouter()
   const route = useRoute()

@@ -1,20 +1,17 @@
 <script setup lang="ts">
-import { PinboardShell, NavbarInfo, PinboardComposables } from '@pinboard/ui'
+import { PinboardShell, NavbarInfo, PinboardComposables, IS_MOBILE_KEY } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { CloseButton } from '@phila/phila-ui-button'
 import { useEverbridgeNotifications } from './composables/useEverbridgeNotifications'
 import type { AlertBanner } from './types'
-import {
-  computed,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  useTemplateRef,
-  watch,
-  type ComputedRef,
-} from 'vue'
+import { computed, inject, onMounted, ref, useTemplateRef, type ComputedRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+const { infoSheetOpen, isDraggingSheet, dragY, openInfoSheet, closeInfoSheet, onSheetPointerDown } =
+  PinboardComposables.useInitPinboardApp()
+
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 
 const { everbridgeNotifications } = useEverbridgeNotifications(1)
 
@@ -36,72 +33,12 @@ const alertBanner: ComputedRef<AlertBanner | null> = computed(() => {
   return null
 })
 
-const infoSheetOpen = ref(false)
-
-/* Capture-phase click on the wrapper runs before the inner Tooltip's
- * bubble-phase listener, so stopPropagation suppresses the tooltip and
- * we open the bottom sheet instead. */
-function openInfoSheet(event: Event) {
-  event.preventDefault()
-  event.stopPropagation()
-  infoSheetOpen.value = true
-}
-
-function closeInfoSheet() {
-  infoSheetOpen.value = false
-  dragY.value = 0
-}
-
-/* Drag-down-to-dismiss. BottomSheet's built-in drag is snap-point based
- * and a single snap point ([60]) clamps it to no movement, so we layer
- * our own pointer tracking on top: translate the sheet to follow the
- * pointer, dismiss past DRAG_DISMISS_THRESHOLD on release, otherwise
- * spring back. Clicks (zero delta) pass through. */
-const DRAG_DISMISS_THRESHOLD = 160
-const dragY = ref(0)
-const isDraggingSheet = ref(false)
-let dragStartY = 0
-
-function onSheetPointerDown(e: PointerEvent) {
-  dragStartY = e.clientY
-  dragY.value = 0
-  isDraggingSheet.value = true
-  document.addEventListener('pointermove', onSheetPointerMove)
-  document.addEventListener('pointerup', onSheetPointerUp)
-  document.addEventListener('pointercancel', onSheetPointerUp)
-}
-
-function onSheetPointerMove(e: PointerEvent) {
-  if (!isDraggingSheet.value) return
-  dragY.value = Math.max(0, e.clientY - dragStartY)
-}
-
-function onSheetPointerUp() {
-  if (!isDraggingSheet.value) return
-  isDraggingSheet.value = false
-  document.removeEventListener('pointermove', onSheetPointerMove)
-  document.removeEventListener('pointerup', onSheetPointerUp)
-  document.removeEventListener('pointercancel', onSheetPointerUp)
-  if (dragY.value > DRAG_DISMISS_THRESHOLD) {
-    closeInfoSheet()
-  } else {
-    dragY.value = 0
-  }
-}
-
-const isMobile = PinboardComposables.useIsMobile()
-
-watch(isMobile, (mobile) => {
-  if (!mobile) infoSheetOpen.value = false
-})
-
 const route = useRoute()
 const router = useRouter()
 const navbarInfo = useTemplateRef<InstanceType<typeof NavbarInfo>>('navbarInfo')
 
 onMounted(async () => {
   await router.isReady()
-
   if (route.path === '/') {
     if (isMobile.value) {
       infoSheetOpen.value = true
@@ -109,12 +46,6 @@ onMounted(async () => {
       navbarInfo.value?.show()
     }
   }
-})
-
-onBeforeUnmount(() => {
-  document.removeEventListener('pointermove', onSheetPointerMove)
-  document.removeEventListener('pointerup', onSheetPointerUp)
-  document.removeEventListener('pointercancel', onSheetPointerUp)
 })
 </script>
 

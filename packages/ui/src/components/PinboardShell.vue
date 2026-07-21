@@ -7,11 +7,11 @@ import { Icon } from '@phila/phila-ui-core'
 import { IconCircleInfo } from '@phila/phila-ui-core/icons'
 import MobileNavPanel from './MobileNavPanel.vue'
 import PinboardSubFooter from './PinboardSubFooter.vue'
-import { ref, watch } from 'vue'
+import { inject, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { VNode } from 'vue'
 import type { NavbarBrandProps, Language } from '@phila/phila-ui-app-header'
-import { useIsMobile } from '../composables/useIsMobile'
+import { IS_MOBILE_KEY } from '../keys.ts'
 
 defineProps<{
   title: string
@@ -38,7 +38,7 @@ defineSlots<{
   'sub-footer'?(): VNode[]
 }>()
 
-const isMobile = useIsMobile()
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 const infoSheetOpen = ref(false)
 const navbarInfoRef = ref<{ hide: () => void } | null>(null)
 const route = useRoute()

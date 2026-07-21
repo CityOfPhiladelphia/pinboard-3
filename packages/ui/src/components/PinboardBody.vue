@@ -15,7 +15,7 @@ import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { MapCard } from '@phila/phila-ui-cards'
 
 // import pinboard config
-import { PINBOARD_CONFIG_KEY } from '../plugin'
+import { PINBOARD_CONFIG_KEY } from '../keys'
 
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
@@ -373,7 +373,7 @@ function selectedLocationValue() {
 </script>
 
 <template>
-  <div v-if="selectedLocation && !isMobile" id="detail-overlay-desktop" />
+  <div id="detail-overlay-desktop" />
   <div class="finder-panel" :class="isMobile ? 'finder-panel-mobile' : 'finder-panel-desktop'">
     <div class="finder-panel-locations">
       <slot name="locations-header" />

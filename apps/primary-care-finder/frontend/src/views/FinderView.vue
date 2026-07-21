@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, toRaw } from 'vue'
+import { computed, inject, ref, toRaw } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   PinboardBody,
@@ -13,6 +13,7 @@ import {
   PinboardUtilities,
   Callout,
   applyFilters,
+  IS_MOBILE_KEY,
 } from '@pinboard/ui'
 import type { FilterChoiceBitfieldGroup, FilterValues, MapCardProps } from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
@@ -72,8 +73,8 @@ const defaultFilterState: PrimaryCareFilters = {
   },
 }
 
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 const { t } = useI18n()
-const isMobile = PinboardComposables.useIsMobile()
 const { locations, languages, isLoading, errorMessage, geojson } = useLocations()
 const { filterChipDefinitions } = useFilterChipDefinitions(languages)
 const calloutOpen = ref(true)

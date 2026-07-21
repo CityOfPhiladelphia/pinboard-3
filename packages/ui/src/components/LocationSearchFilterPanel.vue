@@ -30,7 +30,7 @@ import SearchSuggestions from './SearchSuggestions.vue'
 // pinboard composables imports
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 import { useRecentSearches } from '../composables/useRecentSearches'
-import { PINBOARD_CONFIG_KEY } from '../plugin'
+import { PINBOARD_CONFIG_KEY } from '../keys.ts'
 
 // type imports
 import type {

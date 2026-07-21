@@ -1,8 +1,7 @@
 // packages/ui/src/plugin.ts
-import type { Plugin, InjectionKey } from 'vue'
+import type { Plugin } from 'vue'
 import type { PinboardConfig } from './types'
-
-export const PINBOARD_CONFIG_KEY: InjectionKey<PinboardConfig> = Symbol('pinboard-config')
+import { PINBOARD_CONFIG_KEY } from './keys'
 
 export function createPinboard(config: PinboardConfig): Plugin {
   return {
