@@ -40,8 +40,11 @@ const props = defineProps<{
 const mapRef = ref<typeof PhilaMap | null>(null)
 const zoom = ref(props.config?.zoom ?? 14)
 
+// The underlying maplibre instance exposed by the <Map> component, once loaded.
+const liveMap = computed(() => mapRef.value?.map ?? null)
+
 function panTo(coordinates: LatLon) {
-  const mapInstance = mapRef.value?.map
+  const mapInstance = liveMap.value
   if (mapInstance) {
     mapInstance.setCenter([coordinates.longitude, coordinates.latitude])
     mapInstance.setZoom(14)
@@ -53,7 +56,7 @@ defineExpose({ panTo })
 const slotProps = computed(() => ({
   locations: props.locations,
   geojson: props.geojson,
-  map: (mapRef.value as { map?: unknown } | null)?.map ?? null,
+  map: liveMap.value,
   zoom: zoom.value,
   isMobile: props.isMobile ?? false,
   hoveredId: props.hoveredId ?? null,

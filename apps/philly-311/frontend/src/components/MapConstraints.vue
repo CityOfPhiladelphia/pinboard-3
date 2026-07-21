@@ -15,4 +15,4 @@ watch(
 )
 </script>
 
-<template><!-- render-nothing --></template>
+<template><slot /></template>
