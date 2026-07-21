@@ -1,7 +1,7 @@
 <!-- ABOUTME: The 311 reports finder — Pinboard map + list of nearby reports with
      service-type filter chips, geolocation-seeded load, and inline report detail. -->
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { Pinboard, MapNavigationControl, GeolocationButton, BasemapToggle } from '@pinboard/ui'
 import { useReportFinder } from '@/composables/useReportFinder'
 import ReportDetail from '@/components/ReportDetail.vue'
@@ -11,9 +11,16 @@ import FilterChips from '@/components/FilterChips.vue'
 import ReportListingCard from '@/components/ReportListingCard.vue'
 import MapConstraints from '@/components/MapConstraints.vue'
 import ClusteredMarkers from '@/components/ClusteredMarkers.vue'
+import LocationAccuracyCircle from '@/components/LocationAccuracyCircle.vue'
 
 const finder = useReportFinder()
 const searchPlaceholder = 'Search by address or ZIP'
+
+const locatedFix = ref<{ latitude: number; longitude: number; accuracy: number } | null>(null)
+
+function onLocated(data: { longitude: number; latitude: number; accuracy: number }) {
+  locatedFix.value = data
+}
 
 onMounted(() => {
   void finder.init()
@@ -85,6 +92,14 @@ async function onSearch(query: string) {
       <GeolocationButton
         :position="isMobile ? 'top-right' : 'bottom-right'"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
+        @located="onLocated"
+      />
+      <LocationAccuracyCircle
+        v-if="locatedFix"
+        :latitude="locatedFix.latitude"
+        :longitude="locatedFix.longitude"
+        :accuracy="locatedFix.accuracy"
+        :zoom="zoom"
       />
       <ClusteredMarkers
         :locations="finder.locations.value"

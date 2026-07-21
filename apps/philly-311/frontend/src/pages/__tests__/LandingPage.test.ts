@@ -193,6 +193,26 @@ describe('LandingPage', () => {
     expect(ensureLoaded).not.toHaveBeenCalled()
   })
 
+  it('renders the accuracy circle after a geolocation fix, absent before', async () => {
+    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    await flushPromises()
+    expect(w.findComponent({ name: 'LocationAccuracyCircle' }).exists()).toBe(false)
+
+    await w
+      .findComponent({ name: 'GeolocationButton' })
+      .vm.$emit('located', { longitude: -75.16, latitude: 39.95, accuracy: 12 })
+    await flushPromises()
+
+    const circle = w.findComponent({ name: 'LocationAccuracyCircle' })
+    expect(circle.exists()).toBe(true)
+    expect(circle.props()).toMatchObject({
+      latitude: 39.95,
+      longitude: -75.16,
+      accuracy: 12,
+      zoom: 12,
+    })
+  })
+
   it('selecting a category chip filters the location list; "All Filters" restores it', async () => {
     const w = mount(LandingPage, { global: { stubs: globalStubs } })
     await flushPromises()
