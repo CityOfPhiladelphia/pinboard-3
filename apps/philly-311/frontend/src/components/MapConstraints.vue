@@ -2,7 +2,7 @@
      by calling setMaxBounds and setMinZoom once the map prop is available. -->
 <script setup lang="ts">
 import { watch } from 'vue'
-import { PHILLY_MAP_BOUNDS } from '@/composables/useMapBounds'
+import { PHILLY_MAP_BOUNDS, PHILLY_MIN_ZOOM } from '@/composables/useMapBounds'
 
 interface BoundedMap {
   setMaxBounds: (b: [[number, number], [number, number]]) => void
@@ -17,11 +17,11 @@ watch(
     if (m) {
       const map = m as BoundedMap
       map.setMaxBounds(PHILLY_MAP_BOUNDS)
-      map.setMinZoom(10.5)
+      map.setMinZoom(PHILLY_MIN_ZOOM)
     }
   },
   { immediate: true },
 )
 </script>
 
-<template></template>
+<template><slot /></template>

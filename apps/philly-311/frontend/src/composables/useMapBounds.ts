@@ -16,8 +16,12 @@ export const PHILLY_MAP_BOUNDS: [[number, number], [number, number]] = [
   [-74.92, 40.16], // NE corner [lng, lat]
 ]
 
+/** Keeps the whole bounded area filling the viewport; below this the CityBasemap has no useful detail. */
+export const PHILLY_MIN_ZOOM = 10.5
+
 interface MaplibreBounded {
   setMaxBounds: (bounds: [[number, number], [number, number]]) => void
+  setMinZoom: (zoom: number) => void
 }
 
 /**
@@ -64,6 +68,7 @@ export function useMapBounds<T extends MapVMComponent | null | undefined>(
     ({ m, loaded }) => {
       if (m && loaded) {
         m.setMaxBounds(bounds)
+        m.setMinZoom(PHILLY_MIN_ZOOM)
       }
     },
     { immediate: true },
