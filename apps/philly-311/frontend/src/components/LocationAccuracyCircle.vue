@@ -1,7 +1,8 @@
 <!-- ABOUTME: Translucent circle at the user's geolocated position, sized from the
-     fix's accuracy radius. MapMarker anchors slot content at its bottom edge, so
-     the marker is offset down by the pixel radius to recenter the circle on the
-     fix instead of pointing at it like a pin. -->
+     fix's accuracy radius. MapMarker anchors slot content at its bottom edge and
+     only reads its `offset` prop once at creation (not reactive), so recentering
+     can't go through offset — instead the circle shifts itself down by half its
+     own height via a CSS percentage transform, which stays correct at any diameter. -->
 <script setup lang="ts">
 import { computed } from 'vue'
 import { MapMarker } from '@pinboard/ui'
@@ -14,15 +15,20 @@ const props = defineProps<{
   zoom: number
 }>()
 
-const radiusPx = computed(() => accuracyRadiusPixels(props.accuracy, props.latitude, props.zoom))
-const diameterPx = computed(() => radiusPx.value * 2)
+const diameterPx = computed(
+  () => accuracyRadiusPixels(props.accuracy, props.latitude, props.zoom) * 2,
+)
 </script>
 
 <template>
-  <MapMarker :lng-lat="[longitude, latitude]" :offset="[0, radiusPx]">
+  <MapMarker :lng-lat="[longitude, latitude]">
     <div
       class="location-accuracy-circle"
-      :style="{ width: `${diameterPx.toFixed(2)}px`, height: `${diameterPx.toFixed(2)}px` }"
+      :style="{
+        width: `${diameterPx.toFixed(2)}px`,
+        height: `${diameterPx.toFixed(2)}px`,
+        transform: 'translateY(50%)',
+      }"
     />
   </MapMarker>
 </template>
