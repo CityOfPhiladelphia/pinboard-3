@@ -6,14 +6,24 @@ import '@pinboard/ui/style.css'
 import '@/assets/a11y.css'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { useAuth } from '@phila/sso-vue'
+import { useRoute } from 'vue-router'
+import type { NavLink } from '@pinboard/ui'
 
+const route = useRoute()
 const { signIn } = useAuth()
 
-const navLinks = [
+const navLinks: NavLink[] = [
   { text: 'Map', href: '/' },
   { text: 'Reports', href: '/reports' },
   { text: 'Answers', href: '/answers' },
 ]
+
+// Mirrors authGuard's redirect mechanism (router/index.ts) so a header-initiated
+// login returns the user to where they clicked from, not '/' or a stale guard redirect.
+function login() {
+  sessionStorage.setItem('auth:redirectTo', route.fullPath)
+  signIn()
+}
 </script>
 
 <template>
@@ -30,7 +40,7 @@ const navLinks = [
   >
     <template #navbar-end>
       <PhilaButton variant="primary" to="/report">Report an issue</PhilaButton>
-      <button type="button" class="navbar-login" @click="signIn()">Login / Sign up</button>
+      <button type="button" class="navbar-login" @click="login()">Login / Sign up</button>
     </template>
     <template #sub-footer>
       <a class="sub-footer-link" href="https://www.phila.gov/terms-of-use/">Terms of use</a>
