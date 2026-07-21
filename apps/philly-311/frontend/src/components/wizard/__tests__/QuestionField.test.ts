@@ -192,7 +192,7 @@ describe('QuestionField update:modelValue emissions', () => {
     const w = mount(QuestionField, {
       props: { question: make({ type: 'picklist', options: ['A', 'B'] }), modelValue: '' },
     })
-    await w.findComponent(RadioGroup).vm.$emit('update:modelValue', 'B')
+    await w.findComponent(RadioGroup).vm.$emit('update:modelValue', { A: false, B: true })
     expect(w.emitted('update:modelValue')?.[0]?.[0]).toBe('B')
   })
 
@@ -203,20 +203,20 @@ describe('QuestionField update:modelValue emissions', () => {
         modelValue: '',
       },
     })
-    await w.findComponent(CheckboxGroup).vm.$emit('update:modelValue', ['A', 'C'])
+    await w.findComponent(CheckboxGroup).vm.$emit('update:modelValue', { A: true, B: false, C: true })
     const emitted = w.emitted('update:modelValue')?.[0]?.[0] as string
     expect(typeof emitted).toBe('string')
     expect(emitted.split(';').sort()).toEqual(['A', 'C'])
   })
 
-  it('parses existing semicolon-joined modelValue into array for CheckboxGroup', () => {
+  it('parses existing semicolon-joined modelValue into a checked-record for CheckboxGroup', () => {
     const w = mount(QuestionField, {
       props: {
         question: make({ type: 'multipicklist', options: ['A', 'B', 'C'] }),
         modelValue: 'A;B',
       },
     })
-    expect(w.findComponent(CheckboxGroup).props('modelValue')).toEqual(['A', 'B'])
+    expect(w.findComponent(CheckboxGroup).props('modelValue')).toEqual({ A: true, B: true, C: false })
   })
 
   it('emits "true"/"false" strings for Switch', async () => {

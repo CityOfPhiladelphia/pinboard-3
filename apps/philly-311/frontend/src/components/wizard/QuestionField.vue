@@ -32,15 +32,28 @@ const radioChoices = computed(() =>
 const checkboxChoices = computed(() =>
   (props.question.options ?? []).map((o) => ({ text: o, value: o })),
 )
-const checkboxValue = computed<string[]>(() =>
-  props.modelValue ? props.modelValue.split(';').filter(Boolean) : [],
+// RadioGroup/CheckboxGroup model a Record<choice value, checked>; the wizard
+// stores answers as strings ('A' / 'A;B'), so translate at this boundary.
+const radioValue = computed<Record<string, boolean>>(() =>
+  Object.fromEntries((props.question.options ?? []).map((o) => [o, o === props.modelValue])),
 )
+const checkboxValue = computed<Record<string, boolean>>(() => {
+  const checked = new Set(props.modelValue ? props.modelValue.split(';').filter(Boolean) : [])
+  return Object.fromEntries((props.question.options ?? []).map((o) => [o, checked.has(o)]))
+})
 
 function set(value: string) {
   emit('update:modelValue', value)
 }
-function setCheckbox(values: Array<string | number | boolean>) {
-  set(values.map(String).join(';'))
+function setRadio(record: Record<string, boolean>) {
+  set(Object.keys(record).find((k) => record[k]) ?? '')
+}
+function setCheckbox(record: Record<string, boolean>) {
+  set(
+    Object.keys(record)
+      .filter((k) => record[k])
+      .join(';'),
+  )
 }
 </script>
 
@@ -52,8 +65,8 @@ function setCheckbox(values: Array<string | number | boolean>) {
       v-if="useRadioGroup"
       :group-label="labelText"
       :choices="radioChoices"
-      :model-value="modelValue"
-      @update:model-value="set"
+      :model-value="radioValue"
+      @update:model-value="setRadio"
     />
 
     <!-- picklist (>4): native select -->
