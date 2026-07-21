@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useApi } from '@/composables/useApi'
 import ReviewSummary from '@/components/wizard/ReviewSummary.vue'
-import PillButton from '@/components/PillButton.vue'
+import { PhilaButton } from '@phila/phila-ui-button'
 import type { SubmitResponse } from '@/types/wizard'
 
 const GENERIC_ERROR = 'Something went wrong submitting your report. Please try again.'
@@ -52,7 +52,7 @@ async function submit() {
 
     <p v-if="errorMessage" class="review-step__error" role="alert">{{ errorMessage }}</p>
 
-    <PillButton
+    <PhilaButton
       type="button"
       class="review-step__submit"
       data-test="review-submit"
@@ -60,7 +60,7 @@ async function submit() {
       @click="submit"
     >
       {{ submitting ? 'Submitting…' : 'Submit report' }}
-    </PillButton>
+    </PhilaButton>
   </div>
 </template>
 

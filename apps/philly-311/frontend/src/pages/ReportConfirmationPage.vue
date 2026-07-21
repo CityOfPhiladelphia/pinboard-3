@@ -3,7 +3,7 @@
 <script setup lang="ts">
 import { onMounted, nextTick, ref } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
-import PillButton from '@/components/PillButton.vue'
+import { PhilaButton } from '@phila/phila-ui-button'
 
 const store = useReportSubmissionStore()
 const heading = ref<HTMLElement | null>(null)
@@ -24,7 +24,7 @@ onMounted(async () => {
       </p>
     </div>
     <div class="confirmation__actions">
-      <PillButton variant="primary" to="/report">Report another issue</PillButton>
+      <PhilaButton variant="primary" to="/report">Report another issue</PhilaButton>
       <RouterLink class="confirmation__link" to="/">See reports near you</RouterLink>
     </div>
   </div>

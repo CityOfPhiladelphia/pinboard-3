@@ -36,7 +36,7 @@ describe('ReportConfirmationPage', () => {
   it('links to a new report and to the finder', () => {
     useReportSubmissionStore().recordSubmission({ id: 'a1' })
     const hrefs = mountPage()
-      .findAll('a.router-link-stub')
+      .findAll('a')
       .map((a) => a.attributes('href'))
     expect(hrefs).toEqual(['/report', '/'])
   })

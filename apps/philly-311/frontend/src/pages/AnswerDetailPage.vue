@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router'
 import { useKnowledgeArticles, type Article } from '@/composables/useKnowledgeArticles'
 import { ApiError } from '@/composables/useApiError'
 import ArticleBody from '@/components/answers/ArticleBody.vue'
-import PillButton from '@/components/PillButton.vue'
+import { PhilaButton } from '@phila/phila-ui-button'
 
 const route = useRoute()
 const id = computed(() => route.params.id as string)
@@ -72,7 +72,7 @@ watch(id, () => {
         This article doesn't have any content yet.
         <RouterLink to="/answers">Browse other answers</RouterLink>.
       </p>
-      <PillButton variant="primary" to="/report" class="answer-detail__cta" data-test="answer-cta">Start a report &rarr;</PillButton>
+      <PhilaButton variant="primary" to="/report" class="answer-detail__cta" data-test="answer-cta">Start a report &rarr;</PhilaButton>
     </article>
   </main>
 </template>

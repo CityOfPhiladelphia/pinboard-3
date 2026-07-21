@@ -6,7 +6,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useKnowledgeArticles, type Article } from '@/composables/useKnowledgeArticles'
 import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
 import ArticleCard from '@/components/answers/ArticleCard.vue'
-import PillButton from '@/components/PillButton.vue'
+import { PhilaButton } from '@phila/phila-ui-button'
 
 const k = useKnowledgeArticles()
 
@@ -102,9 +102,9 @@ onMounted(loadInitial)
       </li>
     </ul>
 
-    <PillButton
+    <PhilaButton
       v-if="nextPageToken && !isSearching"
-      variant="outline"
+      variant="secondary"
       type="button"
       class="answers__more"
       :disabled="isLoading"
@@ -112,7 +112,7 @@ onMounted(loadInitial)
       @click="loadMore"
     >
       Load more
-    </PillButton>
+    </PhilaButton>
   </main>
 </template>
 

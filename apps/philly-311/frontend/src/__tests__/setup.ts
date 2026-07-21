@@ -56,6 +56,17 @@ vi.mock('@phila/phila-ui-tags', () => ({
 
 vi.mock('@phila/phila-ui-button', () => ({
   CloseButton: stub('CloseButton', 'button'),
+  // Mirrors the real PhilaButton's two render modes: link (`to`) vs event button.
+  PhilaButton: defineComponent({
+    name: 'PhilaButton',
+    props: { to: { type: [String, Object], default: undefined } },
+    setup(props, { slots }) {
+      return () =>
+        props.to !== undefined
+          ? h('a', { href: props.to }, slots.default?.())
+          : h('button', {}, slots.default?.())
+    },
+  }),
 }))
 
 vi.mock('@phila/phila-ui-app-header', () => ({

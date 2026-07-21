@@ -7,7 +7,7 @@ import { useServiceTypes } from '@/composables/useServiceTypes'
 import { useWizardValidity } from '@/composables/useWizardValidity'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { visibleQuestions } from '@/utils/conditional'
-import PillButton from '@/components/PillButton.vue'
+import { PhilaButton } from '@phila/phila-ui-button'
 import ServiceTypeIcon from '@/components/ServiceTypeIcon.vue'
 import TypeSuggestions from '@/components/wizard/TypeSuggestions.vue'
 import TypeDirectory from '@/components/wizard/TypeDirectory.vue'
@@ -60,7 +60,7 @@ function change() {
     <p v-if="isLoading && !catalog.length" class="issue-step__status">Loading issue types…</p>
     <p v-else-if="error" class="issue-step__error" role="alert">
       {{ error.message || 'Could not load issue types.' }}
-      <PillButton variant="outline" class="issue-step__retry" data-test="retry-types" @click="retry">Retry</PillButton>
+      <PhilaButton variant="secondary" class="issue-step__retry" data-test="retry-types" @click="retry">Retry</PhilaButton>
     </p>
 
     <template v-else-if="!store.category">

@@ -8,7 +8,7 @@ import { reverseGeocode, type AisFeature } from '@/composables/useAis'
 import { getCurrentPosition } from '@/composables/useGeolocation'
 import { useWizardValidity } from '@/composables/useWizardValidity'
 import { isInPhilly } from '@/utils/bounds'
-import PillButton from '@/components/PillButton.vue'
+import { PhilaButton } from '@phila/phila-ui-button'
 import AddressSearch from '@/components/wizard/AddressSearch.vue'
 import LocationMap from '@/components/wizard/LocationMap.vue'
 
@@ -90,15 +90,15 @@ async function useMyLocation() {
     <div class="location-step__columns">
       <div class="location-step__form">
         <AddressSearch @select="onSelect" />
-        <PillButton
-          variant="outline"
+        <PhilaButton
+          variant="secondary"
           class="location-step__geolocate"
           data-test="use-my-location"
           :disabled="lookingUp"
           @click="useMyLocation"
         >
           {{ lookingUp ? 'Locating…' : 'Use my current location' }}
-        </PillButton>
+        </PhilaButton>
         <p v-if="store.location" class="location-step__chosen" data-test="chosen-address">
           <strong>{{
             store.location.address || `${store.location.lat}, ${store.location.lng}`

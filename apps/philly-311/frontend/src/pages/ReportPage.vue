@@ -5,7 +5,7 @@
 import { provide, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import StepIndicator from '@/components/wizard/StepIndicator.vue'
-import PillButton from '@/components/PillButton.vue'
+import { PhilaButton } from '@phila/phila-ui-button'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { WIZARD_CAN_ADVANCE_KEY } from '@/composables/useWizardValidity'
 
@@ -76,28 +76,28 @@ function resetWizard() {
       >
         Reset
       </button>
-      <PillButton
+      <PhilaButton
         v-else
-        variant="outline"
+        variant="secondary"
         data-test="wizard-back"
         :disabled="!prevPath"
         @click="goPrev"
-      >Back</PillButton>
+      >Back</PhilaButton>
 
       <div class="wizard__nav-right">
-        <PillButton
+        <PhilaButton
           v-if="isImageStep"
-          variant="outline"
+          variant="secondary"
           data-test="wizard-skip"
           @click="goNext"
-        >Skip</PillButton>
-        <PillButton
+        >Skip</PhilaButton>
+        <PhilaButton
           v-if="!isLast"
           variant="primary"
           data-test="wizard-next"
           :disabled="!canAdvance || !nextPath"
           @click="goNext"
-        >Next</PillButton>
+        >Next</PhilaButton>
       </div>
     </footer>
   </div>
