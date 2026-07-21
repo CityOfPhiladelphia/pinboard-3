@@ -1,9 +1,19 @@
 <!-- ABOUTME: Root component. Wraps every route in PinboardShell chrome inside a
-     phila .content region and surfaces the Answers entry in the navbar. -->
+     phila .content region and supplies the header's nav links and CTAs. -->
 <script setup lang="ts">
 import { PinboardShell } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import '@/assets/a11y.css'
+import { PhilaButton } from '@phila/phila-ui-button'
+import { useAuth } from '@phila/sso-vue'
+
+const { signIn } = useAuth()
+
+const navLinks = [
+  { text: 'Map', href: '/' },
+  { text: 'Reports', href: '/reports' },
+  { text: 'Answers', href: '/answers' },
+]
 </script>
 
 <template>
@@ -16,9 +26,11 @@ import '@/assets/a11y.css'
       customName: 'Philly 311',
       href: '/',
     }"
+    :links="navLinks"
   >
     <template #navbar-end>
-      <RouterLink class="navbar-answers" to="/answers">Answers</RouterLink>
+      <PhilaButton variant="primary" to="/report">Report an issue</PhilaButton>
+      <button type="button" class="navbar-login" @click="signIn()">Login / Sign up</button>
     </template>
     <div class="content app-content">
       <RouterView />
@@ -33,13 +45,16 @@ import '@/assets/a11y.css'
   display: contents;
 }
 
-.navbar-answers {
+.navbar-login {
+  background: none;
+  border: none;
   color: #fff;
+  font: inherit;
   font-weight: 600;
-  text-decoration: none;
+  cursor: pointer;
   padding: 0 var(--spacing-s, 0.75rem);
 }
-.navbar-answers:hover {
+.navbar-login:hover {
   text-decoration: underline;
 }
 </style>

@@ -10,7 +10,7 @@ import PinboardSubFooter from './PinboardSubFooter.vue'
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { VNode } from 'vue'
-import type { NavbarBrandProps, Language } from '@phila/phila-ui-app-header'
+import type { NavbarBrandProps, Language, NavLink } from '@phila/phila-ui-app-header'
 import { useIsMobile } from '../composables/useIsMobile'
 
 defineProps<{
@@ -24,6 +24,7 @@ defineProps<{
   infoTitle?: string
   infoLabel?: string
   infoHref?: string
+  links?: NavLink[]
 }>()
 
 const emit = defineEmits<{
@@ -109,7 +110,7 @@ function onSheetPointerUp() {
       id="pinboard-nav"
       :compact-mobile="true"
       :show-trusted-site="true"
-      :links="[]"
+      :links="links ?? []"
       :navbar-brand="{
         brandingImage: { src: '', href: '/', altText: title },
         brandingLink: logo ? undefined : { text: title, href: '/' },

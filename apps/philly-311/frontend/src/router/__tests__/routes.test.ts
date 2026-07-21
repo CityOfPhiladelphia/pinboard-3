@@ -36,4 +36,8 @@ describe('routes', () => {
     const resolved = r.resolve('/report/confirmation')
     expect(resolved.matched).toHaveLength(1) // standalone — no ReportPage parent
   })
+  it('resolves the reports stub page', () => {
+    const r = makeRouter()
+    expect(r.resolve('/reports').matched).toHaveLength(1)
+  })
 })
