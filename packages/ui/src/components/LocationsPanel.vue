@@ -8,6 +8,9 @@ import { MapCard } from '@phila/phila-ui-cards'
 // pinboard component imports
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 
+// pinboard utilities imports
+import { locationCountLabel } from '../utilities/locationCountLabel'
+
 // type imports
 import type {
   BasicLocation,
@@ -49,12 +52,9 @@ const emit = defineEmits<{
 const pendingKeydown = ref(false)
 const listRef = ref<HTMLElement | null>(null)
 // computed refs
-const countLabel = computed(() => {
-  if (!props.countNoun) return null
-  const n = props.locations.length
-  if (n === 0) return 'No locations match'
-  return `${n} ${props.countNoun}${n > 1 ? 's' : ''}`
-})
+const countLabel = computed(() =>
+  props.countNoun ? locationCountLabel(props.locations.length, props.countNoun) : null,
+)
 
 // watchers
 watch(
