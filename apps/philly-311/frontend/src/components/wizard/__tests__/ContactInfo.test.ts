@@ -39,7 +39,6 @@ describe('ContactInfo', () => {
     const store = useReportSubmissionStore()
     expect(store.contact.name).toBeUndefined()
     expect(store.contact.email).toBeUndefined()
-    expect(store.isEmpty).toBe(true)
   })
 
   it('prefills name and email when authenticated', async () => {
@@ -103,7 +102,7 @@ describe('ContactInfo', () => {
     expect(inputValue(w, 'input[autocomplete="email"]')).toBe('jane@phila.gov')
   })
 
-  it('clearing a field writes an empty string and isEmpty stays accurate', async () => {
+  it('clearing a field writes an empty string', async () => {
     const w = mount(ContactInfo)
     await flushPromises()
     await w.find('input[autocomplete="name"]').setValue('Bob')
@@ -111,6 +110,5 @@ describe('ContactInfo', () => {
     await flushPromises()
     const store = useReportSubmissionStore()
     expect(store.contact.name).toBe('')
-    expect(store.isEmpty).toBe(true)
   })
 })

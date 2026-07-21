@@ -1,4 +1,4 @@
-// ABOUTME: Tiny fuzzy matcher used by CategorySearch to rank service types.
+// ABOUTME: Tiny fuzzy scorer used to rank service types in the type directory.
 // ABOUTME: Scores: exact > word-prefix > substring > keyword-prefix > keyword-substring > 0.
 
 export function fuzzyScore(query: string, title: string, keywords: string[] = []): number {
@@ -16,22 +16,4 @@ export function fuzzyScore(query: string, title: string, keywords: string[] = []
     if (kw.includes(q)) return 20
   }
   return 0
-}
-
-export interface FuzzyMatchInput<T> {
-  item: T
-  title: string
-  keywords?: string[]
-}
-
-export function fuzzyMatch<T>(query: string, inputs: FuzzyMatchInput<T>[]): T[] {
-  if (!query.trim()) return []
-  const scored = inputs
-    .map(({ item, title, keywords }) => ({
-      item,
-      score: fuzzyScore(query, title, keywords ?? []),
-    }))
-    .filter((s) => s.score > 0)
-    .sort((a, b) => b.score - a.score)
-  return scored.map((s) => s.item)
 }

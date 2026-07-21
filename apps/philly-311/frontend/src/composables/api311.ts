@@ -32,19 +32,17 @@ export function buildUrl(base: string, path: string, query?: QueryParams): strin
   return qs ? `${url}?${qs}` : url
 }
 
-export function api311Url(path: string, query?: QueryParams): string {
+function api311Url(path: string, query?: QueryParams): string {
   return buildUrl(import.meta.env.VITE_API_BASE_URL ?? '', path, query)
 }
 
-export interface Api311HeaderOptions {
+interface Api311HeaderOptions {
   auth?: Auth
   forceRefreshToken?: boolean
   contentType?: string
 }
 
-export async function api311Headers(
-  opts: Api311HeaderOptions = {},
-): Promise<Record<string, string>> {
+async function api311Headers(opts: Api311HeaderOptions = {}): Promise<Record<string, string>> {
   const headers: Record<string, string> = { 'x-api-key': apiKey() }
   if (opts.contentType) headers['content-type'] = opts.contentType
   if (opts.auth?.isAuthenticated.value) {

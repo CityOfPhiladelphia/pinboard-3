@@ -89,12 +89,12 @@ describe('ReviewStep - submit', () => {
 
   it('records the submission and navigates to confirmation on success', async () => {
     const store = fillStore()
-    fetchData.mockResolvedValue({ id: 'a1', caseNumber: '311-0042', status: 'New' })
+    fetchData.mockResolvedValue({ id: 'a1', caseNumber: '311-0042' })
     const w = mount(ReviewStep)
     await w.find('[data-test="review-submit"]').trigger('click')
     await flushPromises()
     expect(store.submitted).toEqual({ id: 'a1', caseNumber: '311-0042' })
-    expect(store.isEmpty).toBe(true)
+    expect(store.category).toBeNull()
     expect(push).toHaveBeenCalledWith('/report/confirmation')
   })
 

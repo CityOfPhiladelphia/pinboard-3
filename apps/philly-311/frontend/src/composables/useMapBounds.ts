@@ -54,10 +54,7 @@ export function readExposed<T>(v: unknown): T | null {
  *   useMapBounds(phila);
  *   <PhilaMap ref="phila" ... />
  */
-export function useMapBounds<T extends MapVMComponent | null | undefined>(
-  mapRef: Ref<T>,
-  bounds: [[number, number], [number, number]] = PHILLY_MAP_BOUNDS,
-) {
+export function useMapBounds<T extends MapVMComponent | null | undefined>(mapRef: Ref<T>) {
   watch(
     () => {
       const c = mapRef.value
@@ -67,7 +64,7 @@ export function useMapBounds<T extends MapVMComponent | null | undefined>(
     },
     ({ m, loaded }) => {
       if (m && loaded) {
-        m.setMaxBounds(bounds)
+        m.setMaxBounds(PHILLY_MAP_BOUNDS)
         m.setMinZoom(PHILLY_MIN_ZOOM)
       }
     },

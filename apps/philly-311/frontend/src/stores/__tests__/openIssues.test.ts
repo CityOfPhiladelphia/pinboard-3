@@ -98,29 +98,17 @@ describe('useOpenIssuesStore', () => {
       expect(store.byId.has('001')).toBe(true)
       expect(store.byId.has('002')).toBe(true)
       expect(store.byId.has('003')).toBe(true)
-      expect(store.isStreaming).toBe(false)
       expect(store.error).toBeNull()
       expect(mockFetch).toHaveBeenCalledTimes(3)
     })
 
-    it('sets seed from the call argument', async () => {
-      const store = useOpenIssuesStore()
-      const mockFetch = vi
-        .fn()
-        .mockResolvedValueOnce(pageResult([])) // page 1: empty
-        .mockResolvedValueOnce(pageResult([])) // probe: empty → total=0
-      await store.ensureLoaded(SEED, { fetchPage: mockFetch })
-      expect(store.seed).toEqual(SEED)
-    })
-
-    it('single-page load: isStreaming never true', async () => {
+    it('single-page load makes no background paging calls', async () => {
       const store = useOpenIssuesStore()
       const mockFetch = vi
         .fn()
         .mockResolvedValueOnce(pageResult([makeReport('001')], null, 0)) // page 1: no next
         .mockResolvedValueOnce(pageResult([makeReport('001')], null, 0)) // probe: total=1
       await store.ensureLoaded(SEED, { fetchPage: mockFetch })
-      expect(store.isStreaming).toBe(false)
       expect(mockFetch).toHaveBeenCalledTimes(2)
     })
   })
@@ -134,7 +122,6 @@ describe('useOpenIssuesStore', () => {
       await store.ensureLoaded(SEED, { fetchPage: mockFetch })
 
       expect(store.isLoading).toBe(false)
-      expect(store.isStreaming).toBe(false)
       expect(store.reports).toHaveLength(0)
       expect(store.error).toBe(boom)
     })
@@ -160,7 +147,7 @@ describe('useOpenIssuesStore', () => {
   })
 
   describe('mid-stream error', () => {
-    it('keeps page-1 data, sets error, clears isStreaming', async () => {
+    it('keeps page-1 data and sets error', async () => {
       const store = useOpenIssuesStore()
       const r1 = makeReport('001')
       const boom = new Error('stream fail')
@@ -177,7 +164,6 @@ describe('useOpenIssuesStore', () => {
 
       expect(store.reports).toHaveLength(1)
       expect(store.reports[0].id).toBe('001')
-      expect(store.isStreaming).toBe(false)
       expect(store.isLoading).toBe(false)
       expect(store.error).toBe(boom)
     })
@@ -268,7 +254,7 @@ describe('useOpenIssuesStore', () => {
   })
 
   describe('changed seed on re-entry', () => {
-    it('updates seed but keeps data when cache is fresh and count is unchanged', async () => {
+    it('keeps data when cache is fresh and count is unchanged', async () => {
       const store = useOpenIssuesStore()
       await loadInitial(store)
 
@@ -279,7 +265,6 @@ describe('useOpenIssuesStore', () => {
         now: () => FIXED_NOW + 1_000,
       })
 
-      expect(store.seed).toEqual(ALT_SEED) // seed updated
       expect(store.reports).toHaveLength(1) // original data kept
       // Only the probe — no page reload
       expect(mockFetch).toHaveBeenCalledTimes(1)

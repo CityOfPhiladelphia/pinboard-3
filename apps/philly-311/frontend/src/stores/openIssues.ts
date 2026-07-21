@@ -12,8 +12,7 @@ import { CITYWIDE_RADIUS } from '@/utils/geoDefaults'
 
 const TTL_MS = 5 * 60_000
 const PAGE_LIMIT = 200
-// SOQL OFFSET cap mirrored from the backend — only the first 2000 nearest issues load;
-// full-city paging awaits the backend's future cursor pagination.
+// SOQL OFFSET cap mirrored from the backend — only the first 2000 nearest issues load.
 const OFFSET_CAP = 2000
 
 export interface EnsureLoadedOpts {
@@ -26,11 +25,9 @@ export interface EnsureLoadedOpts {
 export const useOpenIssuesStore = defineStore('openIssues', () => {
   const reports = ref<Report[]>([])
   const byId = ref(new Map<string, Report>())
-  const seed = ref<{ lat: number; lng: number } | null>(null)
   const total = ref<number | null>(null)
   const fetchedAt = ref<number | null>(null)
   const isLoading = ref(false)
-  const isStreaming = ref(false)
   const error = ref<Error | null>(null)
 
   // Not part of exposed state — tracks the in-flight Promise to prevent concurrent loads.
@@ -106,9 +103,6 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
 
     // Background paging driven by nextOffset from each page
     let next = page1.nextOffset
-    if (next === null || next >= OFFSET_CAP) return
-
-    isStreaming.value = true
     while (next !== null && next < OFFSET_CAP) {
       try {
         const page = await fetch({
@@ -128,11 +122,9 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
         next = page.nextOffset
       } catch (e) {
         error.value = e as Error
-        isStreaming.value = false
         return
       }
     }
-    isStreaming.value = false
   }
 
   async function _run(
@@ -176,8 +168,6 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
   ): Promise<void> {
     // CITYWIDE_RADIUS covers the full city from any in-bounds seed, so a seed change
     // mid-flight doesn't affect the completeness of the dataset being loaded.
-    seed.value = newSeed
-
     if (_inFlight) return _inFlight
 
     _inFlight = _run(newSeed, opts).finally(() => {
@@ -190,11 +180,9 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
   return {
     reports,
     byId,
-    seed,
     total,
     fetchedAt,
     isLoading,
-    isStreaming,
     error,
     ensureLoaded,
   }

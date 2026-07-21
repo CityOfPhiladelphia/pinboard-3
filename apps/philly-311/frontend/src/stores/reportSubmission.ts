@@ -38,18 +38,6 @@ const initial = (): State => ({
 
 export const useReportSubmissionStore = defineStore('reportSubmission', {
   state: initial,
-  getters: {
-    isEmpty: (s): boolean =>
-      !s.category &&
-      Object.keys(s.customFields).length === 0 &&
-      !s.location &&
-      !s.description &&
-      !s.photo &&
-      !s.contact.name &&
-      !s.contact.email &&
-      !s.contact.phone &&
-      !s.publicVisibility,
-  },
   actions: {
     setCategory(category: string | null) {
       // Clear customFields when category changes — answers don't carry across types.
@@ -57,7 +45,7 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
       this.category = category
     },
     setQuestion(field: string, value: string) {
-      if (value === '' || value === undefined || value === null) {
+      if (!value) {
         this.customFields = Object.fromEntries(
           Object.entries(this.customFields).filter(([key]) => key !== field),
         )

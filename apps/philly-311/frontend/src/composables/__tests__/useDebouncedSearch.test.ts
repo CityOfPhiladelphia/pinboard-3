@@ -21,13 +21,12 @@ describe('useDebouncedSearch', () => {
     vi.useRealTimers()
   })
 
-  it('debounces fetch by the configured delay', async () => {
+  it('debounces fetch', async () => {
     const fetcher = vi.fn(async (q: string) => [`hit:${q}`])
     let api!: ReturnType<typeof useDebouncedSearch<string[]>>
     harness(() => {
       api = useDebouncedSearch<string[]>({
         initial: [],
-        delay: 200,
         fetcher,
       })
       return {}
@@ -39,7 +38,7 @@ describe('useDebouncedSearch', () => {
     await nextTick()
 
     expect(fetcher).not.toHaveBeenCalled()
-    vi.advanceTimersByTime(199)
+    vi.advanceTimersByTime(249)
     await nextTick()
     expect(fetcher).not.toHaveBeenCalled()
     vi.advanceTimersByTime(1)
@@ -60,18 +59,18 @@ describe('useDebouncedSearch', () => {
     })
     let api!: ReturnType<typeof useDebouncedSearch<string[]>>
     harness(() => {
-      api = useDebouncedSearch<string[]>({ initial: [], delay: 50, fetcher })
+      api = useDebouncedSearch<string[]>({ initial: [], fetcher })
       return {}
     })
 
     api.query.value = 'a'
     await nextTick()
-    vi.advanceTimersByTime(50)
+    vi.advanceTimersByTime(250)
     await nextTick()
     // First fetch is in flight. Type a new query before it resolves.
     api.query.value = 'b'
     await nextTick()
-    vi.advanceTimersByTime(50)
+    vi.advanceTimersByTime(250)
     await nextTick()
     await Promise.resolve()
 
@@ -87,13 +86,13 @@ describe('useDebouncedSearch', () => {
     const fetcher = vi.fn(async (q: string) => [`hit:${q}`])
     let api!: ReturnType<typeof useDebouncedSearch<string[]>>
     harness(() => {
-      api = useDebouncedSearch<string[]>({ initial: [], delay: 100, fetcher })
+      api = useDebouncedSearch<string[]>({ initial: [], fetcher })
       return {}
     })
 
     api.query.value = 'foo'
     await nextTick()
-    vi.advanceTimersByTime(100)
+    vi.advanceTimersByTime(250)
     await nextTick()
     await Promise.resolve()
     expect(api.results.value).toEqual(['hit:foo'])
@@ -111,7 +110,6 @@ describe('useDebouncedSearch', () => {
     harness(() => {
       api = useDebouncedSearch<string[]>({
         initial: [],
-        delay: 50,
         fetcher: async () => ['shouldnt-run'],
         onEmpty,
       })
@@ -134,13 +132,13 @@ describe('useDebouncedSearch', () => {
     })
     let api!: ReturnType<typeof useDebouncedSearch<string[]>>
     harness(() => {
-      api = useDebouncedSearch<string[]>({ initial: [], delay: 10, fetcher })
+      api = useDebouncedSearch<string[]>({ initial: [], fetcher })
       return {}
     })
 
     api.query.value = 'x'
     await nextTick()
-    vi.advanceTimersByTime(10)
+    vi.advanceTimersByTime(250)
     await nextTick()
     await Promise.resolve()
     await Promise.resolve()
@@ -156,13 +154,13 @@ describe('useDebouncedSearch', () => {
     })
     let api!: ReturnType<typeof useDebouncedSearch<string[]>>
     harness(() => {
-      api = useDebouncedSearch<string[]>({ initial: [], delay: 10, fetcher })
+      api = useDebouncedSearch<string[]>({ initial: [], fetcher })
       return {}
     })
 
     api.query.value = 'x'
     await nextTick()
-    vi.advanceTimersByTime(10)
+    vi.advanceTimersByTime(250)
     await nextTick()
     await Promise.resolve()
     await Promise.resolve()
@@ -177,13 +175,13 @@ describe('useDebouncedSearch', () => {
     })
     let api!: ReturnType<typeof useDebouncedSearch<string[]>>
     const wrapper = harness(() => {
-      api = useDebouncedSearch<string[]>({ initial: [], delay: 50, fetcher })
+      api = useDebouncedSearch<string[]>({ initial: [], fetcher })
       return {}
     })
 
     api.query.value = 'foo'
     await nextTick()
-    vi.advanceTimersByTime(50)
+    vi.advanceTimersByTime(250)
     await nextTick()
     await Promise.resolve()
     expect(signal.aborted).toBe(false)
@@ -201,14 +199,14 @@ describe('useDebouncedSearch', () => {
     )
     let api!: ReturnType<typeof useDebouncedSearch<string[]>>
     harness(() => {
-      api = useDebouncedSearch<string[]>({ initial: [], delay: 10, fetcher })
+      api = useDebouncedSearch<string[]>({ initial: [], fetcher })
       return {}
     })
 
     api.query.value = 'q'
     await nextTick()
     expect(api.loading.value).toBe(true)
-    vi.advanceTimersByTime(10)
+    vi.advanceTimersByTime(250)
     await nextTick()
     expect(api.loading.value).toBe(true)
     resolveFetch(['ok'])

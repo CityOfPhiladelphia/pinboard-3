@@ -64,7 +64,6 @@ export function useKnowledgeArticles() {
 
   async function loadArticles(
     opts: {
-      pageSize?: number
       nextPageToken?: string
       /** Server-side full-text search (Salesforce SOSL across all article fields). */
       search?: string
@@ -73,7 +72,6 @@ export function useKnowledgeArticles() {
     const response = await api311Fetch({
       path: '/private/key/knowledge-articles',
       query: {
-        limit: opts.pageSize,
         offset: opts.nextPageToken,
         search: opts.search?.trim() || undefined,
       },

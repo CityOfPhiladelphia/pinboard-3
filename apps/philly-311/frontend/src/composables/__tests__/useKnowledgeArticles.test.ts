@@ -72,14 +72,6 @@ describe('useKnowledgeArticles.loadArticles', () => {
     expect(calledUrl.searchParams.get('offset')).toBe('50')
   })
 
-  it('passes pageSize as limit query param', async () => {
-    fetchMock.mockResolvedValueOnce(okResponse({ articles: [] }))
-    const { loadArticles } = useKnowledgeArticles()
-    await loadArticles({ pageSize: 25 })
-    const calledUrl = new URL(fetchMock.mock.calls[0][0] as string)
-    expect(calledUrl.searchParams.get('limit')).toBe('25')
-  })
-
   it('throws ApiError on 5xx response', async () => {
     fetchMock.mockResolvedValueOnce(errorResponse(500, { error: 'Internal Server Error' }))
     const { loadArticles } = useKnowledgeArticles()

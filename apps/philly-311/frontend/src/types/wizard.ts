@@ -1,11 +1,6 @@
 // ABOUTME: Shared types for the report submission wizard.
 // ABOUTME: Mirrors the API submit payload shape and the per-step form data.
 
-export interface LocationCoordinates {
-  latitude: number
-  longitude: number
-}
-
 export interface PhotoAsset {
   /** CloudFront URL returned by /classify (which doubles as the upload endpoint). */
   mediaUrl: string
@@ -26,7 +21,7 @@ export interface WizardLocation {
   lng: number
 }
 
-/** A photo-classification suggestion from /classify (caseType dropped — unused for now). */
+/** A photo-classification suggestion from /classify. */
 export interface PhotoSuggestion {
   serviceType: string
   confidence: number
@@ -50,7 +45,6 @@ export interface SubmitPayload {
 export interface SubmitResponse {
   id: string
   caseNumber?: string
-  status?: string
 }
 
 /** The slice of a successful submit kept for the confirmation page. */

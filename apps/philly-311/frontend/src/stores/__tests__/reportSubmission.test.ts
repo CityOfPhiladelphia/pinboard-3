@@ -1,5 +1,5 @@
 // ABOUTME: Tests for the report submission Pinia store.
-// ABOUTME: Covers state mutations, isEmpty getter, payload builder, and recordSubmission.
+// ABOUTME: Covers state mutations, payload builder, and recordSubmission.
 import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useReportSubmissionStore } from '../reportSubmission'
@@ -10,11 +10,6 @@ describe('useReportSubmissionStore', () => {
   })
 
   describe('initial state', () => {
-    it('isEmpty is true with default state', () => {
-      const store = useReportSubmissionStore()
-      expect(store.isEmpty).toBe(true)
-    })
-
     it('has correct default field values', () => {
       const store = useReportSubmissionStore()
       expect(store.category).toBeNull()
@@ -172,13 +167,6 @@ describe('useReportSubmissionStore', () => {
       expect(store.publicVisibility).toBe(false)
     })
 
-    it('isEmpty is true after reset', () => {
-      const store = useReportSubmissionStore()
-      store.setCategory('Pothole Repair')
-      store.reset()
-      expect(store.isEmpty).toBe(true)
-    })
-
     it('clears customFields and contact', () => {
       const store = useReportSubmissionStore()
       store.setQuestion('Color__c', 'Red')
@@ -193,66 +181,6 @@ describe('useReportSubmissionStore', () => {
       store.recordSubmission({ id: 'a1' })
       store.reset()
       expect(store.submitted).toBeNull()
-    })
-  })
-
-  describe('isEmpty', () => {
-    it('turns false when category is set', () => {
-      const store = useReportSubmissionStore()
-      store.setCategory('Pothole Repair')
-      expect(store.isEmpty).toBe(false)
-    })
-
-    it('turns false when description is set', () => {
-      const store = useReportSubmissionStore()
-      store.setDescription('some text')
-      expect(store.isEmpty).toBe(false)
-    })
-
-    it('turns false when location is set', () => {
-      const store = useReportSubmissionStore()
-      store.setLocation({ address: '1234 Main St', lat: 39.95, lng: -75.16 })
-      expect(store.isEmpty).toBe(false)
-    })
-
-    it('turns false when photo is set', () => {
-      const store = useReportSubmissionStore()
-      store.setPhoto({ mediaUrl: 'https://cdn.example.com/photo.jpg' })
-      expect(store.isEmpty).toBe(false)
-    })
-
-    it('turns false when contact name is set', () => {
-      const store = useReportSubmissionStore()
-      store.setContact({ name: 'Jane' })
-      expect(store.isEmpty).toBe(false)
-    })
-
-    it('turns false when contact email is set', () => {
-      const store = useReportSubmissionStore()
-      store.setContact({ email: 'jane@example.com' })
-      expect(store.isEmpty).toBe(false)
-    })
-
-    it('turns false when contact phone is set', () => {
-      const store = useReportSubmissionStore()
-      store.setContact({ phone: '555-1234' })
-      expect(store.isEmpty).toBe(false)
-    })
-
-    it('turns false when publicVisibility is true', () => {
-      const store = useReportSubmissionStore()
-      store.setPrivacy(true)
-      expect(store.isEmpty).toBe(false)
-    })
-
-    it('turns false when customFields is non-empty', () => {
-      const store = useReportSubmissionStore()
-      // setQuestion requires a category to be set first (setCategory clears customFields
-      // on change). Set category and question, then verify isEmpty reflects the customFields.
-      store.setCategory('Pothole Repair')
-      store.setQuestion('severity', 'high')
-      expect(Object.keys(store.customFields).length).toBeGreaterThan(0)
-      expect(store.isEmpty).toBe(false)
     })
   })
 
@@ -401,7 +329,6 @@ describe('useReportSubmissionStore', () => {
       expect(store.publicVisibility).toBe(false)
       expect(store.photo).toBeNull()
       expect(store.photoSuggestions).toEqual([])
-      expect(store.isEmpty).toBe(true)
     })
   })
 })

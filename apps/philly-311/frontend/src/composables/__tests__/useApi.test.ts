@@ -89,27 +89,6 @@ describe('useApi - headers', () => {
   })
 })
 
-describe('useApi - requireAuth', () => {
-  it('errors before fetch when requireAuth is true and not authenticated', async () => {
-    const { fetchData, error } = useApi({ url: '/x', requireAuth: true })
-    const result = await fetchData()
-    expect(result).toBeNull()
-    expect(fetchMock).not.toHaveBeenCalled()
-    expect(error.value?.status).toBe(401)
-    expect(error.value?.message).toMatch(/auth/i)
-  })
-
-  it('proceeds when requireAuth is true and authenticated', async () => {
-    authState.isAuthenticated.value = true
-    authState.acquireToken.mockResolvedValueOnce('TOKEN_B')
-    fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ ok: 1 })))
-    const { fetchData, error } = useApi<{ ok: number }>({ url: '/x', requireAuth: true })
-    const result = await fetchData()
-    expect(error.value).toBeNull()
-    expect(result?.ok).toBe(1)
-  })
-})
-
 describe('useApi - 401 retry', () => {
   it('retries once with forceRefresh on 401 with bearer token', async () => {
     authState.isAuthenticated.value = true
@@ -118,13 +97,13 @@ describe('useApi - 401 retry', () => {
       .mockResolvedValueOnce(new Response(null, { status: 401 }))
       .mockResolvedValueOnce(new Response(JSON.stringify({ ok: 1 })))
 
-    const { fetchData, error, data } = useApi<{ ok: number }>({ url: '/x' })
-    await fetchData()
+    const { fetchData, error } = useApi<{ ok: number }>({ url: '/x' })
+    const result = await fetchData()
 
     expect(authState.acquireToken).toHaveBeenCalledTimes(2)
     expect(authState.acquireToken.mock.calls[1][0]).toEqual({ forceRefresh: true })
     expect(error.value).toBeNull()
-    expect(data.value?.ok).toBe(1)
+    expect(result?.ok).toBe(1)
   })
 
   it('surfaces 401 as fatal after second attempt also fails', async () => {
@@ -205,21 +184,22 @@ describe('useApi - lifecycle', () => {
     expect(isLoading.value).toBe(false)
   })
 
-  it('abort() cancels the in-flight request', async () => {
-    let signalRef: AbortSignal | undefined
+  it('a new fetchData aborts the previous in-flight request', async () => {
+    let firstSignal: AbortSignal | undefined
     fetchMock.mockImplementationOnce((_url, init) => {
-      signalRef = (init as RequestInit).signal as AbortSignal
+      firstSignal = (init as RequestInit).signal as AbortSignal
       return new Promise(() => {
         /* never resolves */
       })
     })
-    const { fetchData, abort } = useApi({ url: '/x' })
+    fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({})))
+    const { fetchData } = useApi({ url: '/x' })
     fetchData()
     // Header-building is async (auth check), so fetch is invoked on a
     // later microtask; wait for it to register the signal before asserting.
     await vi.waitFor(() => expect(fetchMock).toHaveBeenCalled())
-    expect(signalRef?.aborted).toBe(false)
-    abort()
-    expect(signalRef?.aborted).toBe(true)
+    expect(firstSignal?.aborted).toBe(false)
+    await fetchData()
+    expect(firstSignal?.aborted).toBe(true)
   })
 })

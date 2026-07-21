@@ -1,7 +1,7 @@
-// ABOUTME: Tests for the fuzzy scoring and matching utilities.
-// ABOUTME: Verifies scoring tiers, keyword fallback, ranking order, and empty-query behaviour.
+// ABOUTME: Tests for the fuzzy scoring utility.
+// ABOUTME: Verifies scoring tiers, keyword fallback, and empty-query behaviour.
 import { describe, it, expect } from 'vitest'
-import { fuzzyScore, fuzzyMatch, type FuzzyMatchInput } from '../fuzzy'
+import { fuzzyScore } from '../fuzzy'
 
 describe('fuzzyScore', () => {
   it('returns 0 for an empty query', () => {
@@ -54,62 +54,5 @@ describe('fuzzyScore', () => {
     const titleSub = fuzzyScore('hole', 'Pothole Repair', [])
     const kwPrefix = fuzzyScore('cra', 'Pothole Repair', ['crack'])
     expect(titleSub).toBeGreaterThanOrEqual(kwPrefix)
-  })
-})
-
-describe('fuzzyMatch', () => {
-  const inputs: FuzzyMatchInput<{ title: string }>[] = [
-    {
-      item: { title: 'Pothole Repair' },
-      title: 'Pothole Repair',
-      keywords: ['hole', 'crack', 'asphalt'],
-    },
-    {
-      item: { title: 'Illegal Dumping' },
-      title: 'Illegal Dumping',
-      keywords: ['garbage', 'fly tipping'],
-    },
-    {
-      item: { title: 'ADA Curb Ramp' },
-      title: 'ADA Curb Ramp',
-      keywords: ['wheelchair', 'accessible', 'disability'],
-    },
-  ]
-
-  it('returns an empty array for an empty query', () => {
-    expect(fuzzyMatch('', inputs)).toEqual([])
-  })
-
-  it('returns an empty array for a whitespace-only query', () => {
-    expect(fuzzyMatch('   ', inputs)).toEqual([])
-  })
-
-  it('returns items, not input wrappers', () => {
-    const results = fuzzyMatch('pothole', inputs)
-    expect(results[0]).toEqual({ title: 'Pothole Repair' })
-  })
-
-  it('puts the best match first: pothole → Pothole Repair before others', () => {
-    const results = fuzzyMatch('pothole', inputs)
-    expect(results[0]).toEqual({ title: 'Pothole Repair' })
-  })
-
-  it('matches via keyword: "wheelchair" → ADA Curb Ramp', () => {
-    const results = fuzzyMatch('wheelchair', inputs)
-    expect(results).toHaveLength(1)
-    expect(results[0]).toEqual({ title: 'ADA Curb Ramp' })
-  })
-
-  it('returns empty array when no inputs match', () => {
-    expect(fuzzyMatch('zzzz', inputs)).toEqual([])
-  })
-
-  it('ranks title-prefix match above keyword match', () => {
-    const mixed: FuzzyMatchInput<{ title: string }>[] = [
-      { item: { title: 'Crack Filling' }, title: 'Crack Filling', keywords: [] },
-      { item: { title: 'Pothole Repair' }, title: 'Pothole Repair', keywords: ['crack'] },
-    ]
-    const results = fuzzyMatch('crack', mixed)
-    expect(results[0]).toEqual({ title: 'Crack Filling' })
   })
 })

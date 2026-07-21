@@ -82,7 +82,9 @@ describe('wizardGuard', () => {
   })
   it('does not modify the store on a non-wizard route', () => {
     wizardGuard(makeRoute('/'))
-    expect(useReportSubmissionStore().isEmpty).toBe(true)
+    const store = useReportSubmissionStore()
+    expect(store.category).toBeNull()
+    expect(store.location).toBeNull()
   })
   it('redirects /report/confirmation to /report when nothing was submitted', () => {
     expect(wizardGuard(makeRoute('/report/confirmation'))).toBe('/report')

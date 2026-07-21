@@ -4,7 +4,7 @@
 const MAX_DIMENSION = 1024
 const JPEG_QUALITY = 0.6
 
-export function readAsDataUrl(file: File): Promise<string> {
+function readAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => resolve(reader.result as string)
@@ -13,7 +13,7 @@ export function readAsDataUrl(file: File): Promise<string> {
   })
 }
 
-export function loadImage(dataUrl: string): Promise<HTMLImageElement> {
+function loadImage(dataUrl: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image()
     img.onload = () => resolve(img)
@@ -22,13 +22,9 @@ export function loadImage(dataUrl: string): Promise<HTMLImageElement> {
   })
 }
 
-export function resizeToJpegDataUrl(
-  img: HTMLImageElement,
-  maxDimension = MAX_DIMENSION,
-  quality = JPEG_QUALITY,
-): string {
+export function resizeToJpegDataUrl(img: HTMLImageElement): string {
   const longest = Math.max(img.width, img.height)
-  const scale = longest > maxDimension ? maxDimension / longest : 1
+  const scale = longest > MAX_DIMENSION ? MAX_DIMENSION / longest : 1
   const targetW = Math.round(img.width * scale)
   const targetH = Math.round(img.height * scale)
 
@@ -38,7 +34,7 @@ export function resizeToJpegDataUrl(
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('Canvas 2D context unavailable')
   ctx.drawImage(img, 0, 0, targetW, targetH)
-  return canvas.toDataURL('image/jpeg', quality)
+  return canvas.toDataURL('image/jpeg', JPEG_QUALITY)
 }
 
 export async function processForClassify(file: File): Promise<string> {

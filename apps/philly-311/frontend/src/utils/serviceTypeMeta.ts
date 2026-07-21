@@ -1,7 +1,7 @@
-// ABOUTME: Per-service-type color + Material-Symbols icon mapping ported from
-// ABOUTME: native ServiceType.kt so map markers across web and native share a
-// ABOUTME: visual language. Falls back to a neutral gray + "help" glyph for
-// ABOUTME: unknown types, including any future service types added in Salesforce.
+// ABOUTME: Per-service-type color mapping ported from native ServiceType.kt so
+// ABOUTME: map markers across web and native share a visual language. Falls back
+// ABOUTME: to a neutral gray for unknown types, including any future service
+// ABOUTME: types added in Salesforce.
 
 const COLORS: Record<string, string> = {
   'Abandoned Vehicle': '#734db3',
@@ -60,72 +60,9 @@ const COLORS: Record<string, string> = {
   'Needle Collection': '#bf1a66',
 }
 
-const ICONS: Record<string, string> = {
-  'Abandoned Vehicle': 'directions_car',
-  'Abandoned Bike': 'pedal_bike',
-  'Illegal Dumping': 'delete',
-  'Rubbish Collection': 'delete_outline',
-  'Recyclables Collection': 'recycling',
-  'Sanitation Violation': 'warning',
-  'Dumpster Violation': 'no_backpack',
-  'Pothole Repair': 'construction',
-  'Cave-In Repair': 'arrow_downward',
-  Depression: 'arrow_circle_down',
-  'Ditch Repair': 'minimize',
-  'Push-Up': 'arrow_circle_up',
-  'Dangerous Sidewalk': 'directions_walk',
-  'ADA Curb Ramp': 'accessible',
-  'Line Striping': 'traffic',
-  'Street Light Outage': 'lightbulb_off',
-  'Alley Light Outage': 'nightlight_off',
-  'Street Light (Other)': 'lightbulb',
-  'Street Light(Other)': 'lightbulb',
-  'Traffic Signal Emergency': 'traffic_jam',
-  'Stop Sign Repair': 'stop_circle',
-  'Property Maintenance Exterior': 'apartment',
-  'Property Maintenance Interior': 'maps_home_work',
-  'Exterior High Weeds': 'grass',
-  'Building Structurally Dangerous (Occupied)': 'domain_verification',
-  'Building Structurally Dangerous (Vacant)': 'domain_disabled',
-  'Vacant Lot': 'crop_16_9',
-  'Vacant Property': 'home',
-  'Tree Maintenance': 'park',
-  'Street Trees': 'nature',
-  'Graffiti Removal': 'brush',
-  'Dead Animal in Street': 'pets',
-  'Residential Fire Safety Complaint': 'local_fire_department',
-  'Smoke Detector': 'sensors',
-  'Inlet Cleaning': 'water',
-  'Hydrant Knocked Down': 'opacity',
-  'Manhole Cover Missing': 'radio_button_unchecked',
-  'Manhole Other Problem': 'do_not_disturb',
-  'Homeless Encampment': 'cabin',
-  'Parks and Rec Safety and Maintenance': 'sports_handball',
-  'Demolition Complaint': 'handyman',
-  'Work Underway without Permits': 'warning_amber',
-  'Work Underway in violation of permit requirements': 'cancel',
-  Salting: 'ac_unit',
-  Shoveling: 'snowing',
-  'Icy Road Surface': 'device_thermostat',
-  'Snow Removal': 'snowshoeing',
-  'Complaint (Streets)': 'chat',
-  'Other (Streets)': 'more_horiz',
-  'Vendor Complaint': 'shopping_cart',
-  'Unlicensed Business Complaint': 'business_center',
-  'Short Term Rental Complaint': 'other_houses',
-  'Plastic Bag Complaint': 'shopping_bag',
-  'Needle Collection': 'vaccines',
-}
-
 const FALLBACK_COLOR = '#666673'
-const FALLBACK_ICON = 'help'
 
 export function serviceTypeColor(serviceType: string | undefined | null): string {
   if (!serviceType) return FALLBACK_COLOR
   return COLORS[serviceType] ?? FALLBACK_COLOR
-}
-
-export function serviceTypeIcon(serviceType: string | undefined | null): string {
-  if (!serviceType) return FALLBACK_ICON
-  return ICONS[serviceType] ?? FALLBACK_ICON
 }

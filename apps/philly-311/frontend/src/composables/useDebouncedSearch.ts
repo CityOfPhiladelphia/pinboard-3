@@ -3,10 +3,10 @@
 // ABOUTME: query changes, fires onEmpty (or resets) when the query clears.
 import { onBeforeUnmount, ref, watch, type Ref } from 'vue'
 
+const DEBOUNCE_MS = 250
+
 interface Options<T> {
   initial: T
-  /** Debounce delay in ms. Defaults to 250. */
-  delay?: number
   /**
    * Receives the trimmed query and an AbortSignal that fires when a newer
    * search starts or the component unmounts. Fetchers that can pass the
@@ -30,7 +30,6 @@ export interface UseDebouncedSearch<T> {
 }
 
 export function useDebouncedSearch<T>(opts: Options<T>): UseDebouncedSearch<T> {
-  const delay = opts.delay ?? 250
   const onEmpty = opts.onEmpty ?? (() => opts.initial)
 
   const query = ref('')
@@ -74,7 +73,7 @@ export function useDebouncedSearch<T>(opts: Options<T>): UseDebouncedSearch<T> {
       } finally {
         if (!ctl.signal.aborted) loading.value = false
       }
-    }, delay)
+    }, DEBOUNCE_MS)
   })
 
   onBeforeUnmount(cancel)
