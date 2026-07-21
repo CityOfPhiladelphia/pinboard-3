@@ -232,7 +232,12 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
     </template>
 
     <template #location-detail="{ location, onClose, onPrint }">
-      <LocationDetail :location="location" :is-mobile="isMobile" :on-close="onClose" :on-print="onPrint" />
+      <LocationDetail
+        :location="location"
+        :is-mobile="isMobile"
+        :on-close="onClose"
+        :on-print="onPrint"
+      />
     </template>
 
     <template

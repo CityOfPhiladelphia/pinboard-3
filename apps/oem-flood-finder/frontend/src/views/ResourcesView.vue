@@ -168,8 +168,8 @@ const router = useRouter()
 }
 
 .content-area.mobile {
-    padding: 1.5rem 1rem 0 1rem;
-  }
+  padding: 1.5rem 1rem 0 1rem;
+}
 
 .section {
   display: flex;
@@ -182,9 +182,9 @@ const router = useRouter()
 }
 
 .section.mobile {
-    gap: var(--spacing-2xl, 2rem);
-    padding-bottom: var(--spacing-2xl, 2rem);
-  }
+  gap: var(--spacing-2xl, 2rem);
+  padding-bottom: var(--spacing-2xl, 2rem);
+}
 
 .intro-text-container {
   display: flex;
@@ -219,13 +219,10 @@ const router = useRouter()
   width: 100%;
 }
 
-
-
 .mobile-footer-heading {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   font-size: 1.25rem;
 }
-
 </style>

@@ -36,7 +36,12 @@ function scrollToSection(id: string) {
           <slot />
         </div>
       </div>
-      <nav v-if="sections.length" class="info-toc" :class="{ mobile: isMobile }" :aria-label="t('pinboard.infoPage.onThisPage')">
+      <nav
+        v-if="sections.length"
+        class="info-toc"
+        :class="{ mobile: isMobile }"
+        :aria-label="t('pinboard.infoPage.onThisPage')"
+      >
         <h2 class="has-text-heading-6">{{ t('pinboard.infoPage.onThisPage') }}</h2>
         <ul>
           <li v-for="s in sections" :key="s.id">
@@ -152,5 +157,4 @@ function scrollToSection(id: string) {
 .info-toc a {
   margin: 0;
 }
-
 </style>
