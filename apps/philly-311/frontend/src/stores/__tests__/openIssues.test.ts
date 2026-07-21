@@ -16,7 +16,6 @@ function makeReport(id: string): Report {
     serviceType: 'Pothole',
     status: 'Open',
     address: '123 Main St',
-    distance: 0,
   }
 }
 

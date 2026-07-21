@@ -95,7 +95,6 @@ const initialReports: Report[] = [
     serviceType: 'Pothole Repair',
     status: 'Open',
     address: 'A',
-    distance: 100,
   },
   {
     id: '2',
@@ -105,7 +104,6 @@ const initialReports: Report[] = [
     serviceType: 'Graffiti Removal',
     status: 'Open',
     address: 'B',
-    distance: 200,
   },
 ]
 
@@ -117,7 +115,6 @@ import FilterChips from '@/components/FilterChips.vue'
 const globalStubs = {
   RouterLink: RouterLinkStub,
   FontAwesomeIcon: true,
-  Tags: { props: ['text', 'color'], template: '<span class="tags-stub">{{ text }}</span>' },
 }
 
 beforeEach(() => {

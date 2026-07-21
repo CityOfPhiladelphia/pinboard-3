@@ -18,7 +18,6 @@ const sample: Report = {
   serviceType: 'Pothole Repair',
   status: 'Open',
   address: 'A St',
-  distance: 100,
 }
 const other: Report = { ...sample, id: '2', serviceType: 'Illegal Dumping' }
 

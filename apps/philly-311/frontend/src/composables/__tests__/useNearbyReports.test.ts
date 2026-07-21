@@ -17,7 +17,6 @@ const ISSUE = {
   mediaUrl: 'https://img.example.test/photo.jpg',
   latitude: 39.95,
   longitude: -75.16,
-  distance: 0.3,
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-02T00:00:00Z',
   childCount: 0,

@@ -13,7 +13,6 @@ export interface Report {
   address: string
   mediaUrl?: string
   description?: string
-  distance: number
   createdAt?: string
 }
 
@@ -42,7 +41,6 @@ interface ApiNearbyIssue {
   mediaUrl: string | null
   latitude: number
   longitude: number
-  distance: number
   createdAt: string
   updatedAt: string
   childCount: number
@@ -58,7 +56,6 @@ function toReport(i: ApiNearbyIssue): Report {
     address: i.address,
     mediaUrl: i.mediaUrl ?? undefined,
     description: i.description,
-    distance: i.distance,
     createdAt: i.createdAt,
   }
 }

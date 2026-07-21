@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { reportToLocation, statusTagColor } from '../reportCard'
+import { reportToLocation, statusIconTreatment } from '../reportCard'
 import type { Report } from '@/composables/useNearbyReports'
 
 const base: Report = {
@@ -12,7 +12,6 @@ const base: Report = {
   address: '1234 Market St',
   mediaUrl: 'https://example.test/p.jpg',
   description: 'big pothole',
-  distance: 161,
 }
 
 describe('reportToLocation', () => {
@@ -26,10 +25,21 @@ describe('reportToLocation', () => {
   })
 })
 
-describe('statusTagColor', () => {
-  it('maps known statuses and defaults to grey', () => {
-    expect(statusTagColor('In Progress')).toBe('purple')
-    expect(statusTagColor('Closed')).toBe('green')
-    expect(statusTagColor('whatever')).toBe('grey')
+describe('statusIconTreatment', () => {
+  it('treats Closed and Resolved as resolved', () => {
+    expect(statusIconTreatment('Closed')).toBe('resolved')
+    expect(statusIconTreatment('Resolved')).toBe('resolved')
+  })
+
+  it('treats New, Open, and In Progress as open', () => {
+    expect(statusIconTreatment('New')).toBe('open')
+    expect(statusIconTreatment('Open')).toBe('open')
+    expect(statusIconTreatment('In Progress')).toBe('open')
+  })
+
+  it('returns null for missing status', () => {
+    expect(statusIconTreatment('')).toBeNull()
+    expect(statusIconTreatment(undefined)).toBeNull()
+    expect(statusIconTreatment(null)).toBeNull()
   })
 })

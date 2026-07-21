@@ -1,20 +1,17 @@
 // ABOUTME: Maps a 311 Report to a Pinboard BasicLocation for the finder's map and list;
-// ABOUTME: provides tag-color utilities for report status display.
+// ABOUTME: provides the status-icon treatment for report status display.
 import type { PinboardTypes } from '@pinboard/ui'
-import type { TagColor } from '@phila/phila-ui-tags'
 import type { Report } from '@/composables/useNearbyReports'
 
-const STATUS_COLORS: Record<string, TagColor> = {
-  New: 'blue',
-  Open: 'blue',
-  'In Progress': 'purple',
-  Closed: 'green',
-  Resolved: 'green',
-}
+export type StatusIconTreatment = 'resolved' | 'open'
 
-export function statusTagColor(status: string | undefined | null): TagColor {
-  if (!status) return 'grey'
-  return STATUS_COLORS[status] ?? 'grey'
+const RESOLVED_STATUSES = new Set(['Closed', 'Resolved'])
+
+export function statusIconTreatment(
+  status: string | undefined | null,
+): StatusIconTreatment | null {
+  if (!status) return null
+  return RESOLVED_STATUSES.has(status) ? 'resolved' : 'open'
 }
 
 export function reportToLocation(report: Report): PinboardTypes.BasicLocation {

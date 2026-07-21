@@ -1,22 +1,18 @@
 <!-- ABOUTME: Report listing card for the finder's left panel (Figma ".311 Report listing"):
-     photo + status tag overlay, service icon + type, address, date line, color dot, distance. -->
+     photo + service-type title with a status icon chip, address, timestamp. -->
 <script setup lang="ts">
 import { computed } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faImage } from '@fortawesome/pro-solid-svg-icons'
-import { Tags } from '@phila/phila-ui-tags'
+import { faImage, faCircleCheck, faClock } from '@fortawesome/pro-solid-svg-icons'
 import type { Report } from '@/composables/useNearbyReports'
-import { statusTagColor } from '@/utils/reportCard'
-import { serviceTypeIconDefinition } from '@/utils/reportIcon'
-import { serviceTypeColor } from '@/utils/serviceTypeMeta'
-import { formatDistance } from '@/utils/distance'
+import { statusIconTreatment } from '@/utils/reportCard'
 import { formatCardTimestamp } from '@/utils/datetime'
 
 const props = defineProps<{ report: Report }>()
 
 const timestamp = computed(() => formatCardTimestamp(props.report.createdAt))
-const distance = computed(() => formatDistance(props.report.distance))
-const typeColor = computed(() => serviceTypeColor(props.report.serviceType))
+const statusTreatment = computed(() => statusIconTreatment(props.report.status))
+const statusIcon = computed(() => (statusTreatment.value === 'resolved' ? faCircleCheck : faClock))
 </script>
 
 <template>
@@ -26,28 +22,22 @@ const typeColor = computed(() => serviceTypeColor(props.report.serviceType))
       <div v-else class="listing-card__photo listing-card__photo--placeholder">
         <FontAwesomeIcon :icon="faImage" />
       </div>
-      <Tags
-        v-if="report.status"
-        class="listing-card__status"
-        :text="report.status"
-        :color="statusTagColor(report.status)"
-      />
     </div>
-    <div class="listing-card__body">
+    <div class="listing-card__content">
       <p class="listing-card__title">
-        <FontAwesomeIcon
-          class="listing-card__type-icon"
-          :icon="serviceTypeIconDefinition(report.serviceType)"
-          :style="{ color: typeColor }"
-        />
-        {{ report.serviceType }}
+        <span class="listing-card__title-text">{{ report.serviceType }}</span>
+        <span
+          v-if="statusTreatment"
+          class="listing-card__status-icon"
+          :class="`listing-card__status-icon--${statusTreatment}`"
+          role="img"
+          :aria-label="report.status"
+        >
+          <FontAwesomeIcon :icon="statusIcon" aria-hidden="true" />
+        </span>
       </p>
       <p class="listing-card__address">{{ report.address }}</p>
       <p v-if="timestamp" class="listing-card__meta">{{ timestamp }}</p>
-    </div>
-    <div class="listing-card__aside">
-      <span class="listing-card__dot" :style="{ backgroundColor: typeColor }" />
-      <span v-if="distance" class="listing-card__distance">{{ distance }}</span>
     </div>
   </article>
 </template>
@@ -55,19 +45,18 @@ const typeColor = computed(() => serviceTypeColor(props.report.serviceType))
 <style scoped>
 .listing-card {
   display: flex;
+  align-items: center;
   gap: var(--spacing-s, 0.75rem);
   background: #fff;
-  border-radius: 8px;
-  padding: var(--spacing-s, 0.75rem);
+  border-bottom: 1px solid var(--Schemes-Border-low, #ccc);
 }
 .listing-card__media {
-  position: relative;
   flex: none;
 }
 .listing-card__photo {
-  width: 80px;
-  height: 80px;
-  border-radius: 6px;
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
   object-fit: cover;
 }
 .listing-card__photo--placeholder {
@@ -78,44 +67,58 @@ const typeColor = computed(() => serviceTypeColor(props.report.serviceType))
   color: var(--ui-color-grey-400, #a1a1a1);
   font-size: 1.5rem;
 }
-.listing-card__status {
-  position: absolute;
-  top: -8px;
-  left: -8px;
-}
-.listing-card__body {
+.listing-card__content {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-width: 0;
+  gap: 4px;
+  padding: 1rem 0;
 }
 .listing-card__title {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-weight: 700;
+  justify-content: space-between;
+  gap: 8px;
   margin: 0;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+  color: #000;
+}
+.listing-card__title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.listing-card__status-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+}
+.listing-card__status-icon--resolved {
+  background: var(--Schemes-Success-Container, #caecc8);
+  color: var(--Schemes-On-Success-Container, #07570f);
+}
+.listing-card__status-icon--open {
+  background: #e5cefa;
+  color: #030831;
 }
 .listing-card__address {
-  margin: 2px 0 0;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #000;
 }
 .listing-card__meta {
-  margin: 4px 0 0;
-  font-size: 0.875rem;
-  color: var(--ui-color-grey-700, #4a4a4a);
-}
-.listing-card__aside {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: space-between;
-  flex: none;
-}
-.listing-card__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-.listing-card__distance {
-  font-size: 0.875rem;
-  color: var(--ui-color-grey-700, #4a4a4a);
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: #636363;
 }
 </style>
