@@ -61,6 +61,7 @@ onMounted(async () => {
     }"
     :banner-title="alertBanner?.title"
     :banner-message="alertBanner?.body"
+    :is-mobile="isMobile"
   >
     <template #navbar-end>
       <div v-if="isMobile" class="navbar-info-mobile-wrap" @click.capture.stop="openInfoSheet">

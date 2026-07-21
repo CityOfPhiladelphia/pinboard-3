@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { PinboardInfoPage } from '@pinboard/ui'
+import { IS_MOBILE_KEY, PinboardInfoPage } from '@pinboard/ui'
 
 const { t } = useI18n()
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 
 const sections = computed(() => [
   { id: 'insurance', title: t('introPage.section2Title') },
@@ -15,7 +16,7 @@ const sections = computed(() => [
 </script>
 
 <template>
-  <PinboardInfoPage back-to="/" :sections="sections">
+  <PinboardInfoPage back-to="/" :sections="sections" :is-mobile="isMobile">
     <div class="intro-text-container">
       <h1 v-text="t('introPage.section1Title')" />
       <p class="main-description" v-text="t('introPage.p0')" />

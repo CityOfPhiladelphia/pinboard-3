@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import '@pinboard/ui/style.css'
-import { PinboardShell, PinboardComposables, languages } from '@pinboard/ui'
+import { PinboardShell, PinboardComposables, languages, IS_MOBILE_KEY } from '@pinboard/ui'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { CloseButton } from '@phila/phila-ui-button'
 import { useI18n } from 'vue-i18n'
+import { inject, ref } from 'vue'
 
 const { t } = useI18n()
 const {
@@ -15,6 +16,7 @@ const {
   closeInfoSheet,
   onSheetPointerDown,
 } = PinboardComposables.useInitPinboardApp('pcf')
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 
 const feedbackHref =
   'https://www.phila.gov/departments/department-of-public-health/about-us/contact-us/#send-us-a-message'
@@ -35,6 +37,7 @@ const feedbackHref =
     :languages="languages"
     :locale="locale"
     :feedback-href="feedbackHref"
+    :is-mobile="isMobile"
     @update:locale="setLocale"
   >
     <RouterView />

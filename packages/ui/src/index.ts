@@ -1,9 +1,9 @@
 import './styles/global.css'
 export { createPinboard } from './plugin'
+export { createPinboardRouter } from './router/createPinboardRouter'
 export { PinboardBody, PinboardShell, PinboardInfoPage, DetailActions } from './components/_index'
 export * as PinboardComposables from './composables/_index'
 export * as PinboardUtilities from './utilities/_index'
-export { createPinboardRouter } from './router/createPinboardRouter'
 export type * as PinboardTypes from './types'
 export type * from './composables/datafilters/types'
 export { getBufferSize, applyFilters } from './composables/datafilters/functions'
@@ -36,7 +36,6 @@ export { PhilaLink } from '@phila/phila-ui-link'
 export { Tags } from '@phila/phila-ui-tags'
 export { Tooltip } from '@phila/phila-ui-tooltip'
 export { NavbarInfo } from '@phila/phila-ui-app-header'
-
 export { Icon } from '@phila/phila-ui-core'
 export type { FilterDefinition, FilterValues, FilterChoice } from '@phila/phila-ui-core'
 
