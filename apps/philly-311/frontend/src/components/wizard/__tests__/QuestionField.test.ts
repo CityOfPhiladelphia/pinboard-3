@@ -203,7 +203,9 @@ describe('QuestionField update:modelValue emissions', () => {
         modelValue: '',
       },
     })
-    await w.findComponent(CheckboxGroup).vm.$emit('update:modelValue', { A: true, B: false, C: true })
+    await w
+      .findComponent(CheckboxGroup)
+      .vm.$emit('update:modelValue', { A: true, B: false, C: true })
     const emitted = w.emitted('update:modelValue')?.[0]?.[0] as string
     expect(typeof emitted).toBe('string')
     expect(emitted.split(';').sort()).toEqual(['A', 'C'])
@@ -216,7 +218,11 @@ describe('QuestionField update:modelValue emissions', () => {
         modelValue: 'A;B',
       },
     })
-    expect(w.findComponent(CheckboxGroup).props('modelValue')).toEqual({ A: true, B: true, C: false })
+    expect(w.findComponent(CheckboxGroup).props('modelValue')).toEqual({
+      A: true,
+      B: true,
+      C: false,
+    })
   })
 
   it('emits "true"/"false" strings for Switch', async () => {

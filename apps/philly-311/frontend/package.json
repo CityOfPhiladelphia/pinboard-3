@@ -29,6 +29,7 @@
     "@phila/phila-ui-collapse-panel": "0.2.0",
     "@phila/phila-ui-core": "3.0.0",
     "@phila/phila-ui-date-field": "^0.1.0",
+    "@phila/phila-ui-filter-chip": "1.1.0",
     "@phila/phila-ui-link": "1.1.0",
     "@phila/phila-ui-map-core": "1.1.1",
     "@phila/phila-ui-radio": "1.0.0",

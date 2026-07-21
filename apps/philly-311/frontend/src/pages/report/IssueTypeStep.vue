@@ -60,7 +60,13 @@ function change() {
     <p v-if="isLoading && !catalog.length" class="issue-step__status">Loading issue types…</p>
     <p v-else-if="error" class="issue-step__error" role="alert">
       {{ error.message || 'Could not load issue types.' }}
-      <PhilaButton variant="secondary" class="issue-step__retry" data-test="retry-types" @click="retry">Retry</PhilaButton>
+      <PhilaButton
+        variant="secondary"
+        class="issue-step__retry"
+        data-test="retry-types"
+        @click="retry"
+        >Retry</PhilaButton
+      >
     </p>
 
     <template v-else-if="!store.category">

@@ -82,22 +82,21 @@ function resetWizard() {
         data-test="wizard-back"
         :disabled="!prevPath"
         @click="goPrev"
-      >Back</PhilaButton>
+        >Back</PhilaButton
+      >
 
       <div class="wizard__nav-right">
-        <PhilaButton
-          v-if="isImageStep"
-          variant="secondary"
-          data-test="wizard-skip"
-          @click="goNext"
-        >Skip</PhilaButton>
+        <PhilaButton v-if="isImageStep" variant="secondary" data-test="wizard-skip" @click="goNext"
+          >Skip</PhilaButton
+        >
         <PhilaButton
           v-if="!isLast"
           variant="primary"
           data-test="wizard-next"
           :disabled="!canAdvance || !nextPath"
           @click="goNext"
-        >Next</PhilaButton>
+          >Next</PhilaButton
+        >
       </div>
     </footer>
   </div>

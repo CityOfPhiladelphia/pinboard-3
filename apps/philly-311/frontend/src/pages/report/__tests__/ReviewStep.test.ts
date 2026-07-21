@@ -101,7 +101,10 @@ describe('ReviewStep - submit', () => {
   it('shows the API error message and stays on failure', async () => {
     const store = fillStore()
     fetchData.mockImplementation(async () => {
-      apiError.value = new ApiError(400, 'latitude must be within Philadelphia bounds (39.86-40.14)')
+      apiError.value = new ApiError(
+        400,
+        'latitude must be within Philadelphia bounds (39.86-40.14)',
+      )
       return null
     })
     const w = mount(ReviewStep)

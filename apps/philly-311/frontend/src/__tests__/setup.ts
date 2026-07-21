@@ -54,6 +54,14 @@ vi.mock('@phila/phila-ui-tags', () => ({
   Tags: stub('Tags', 'span'),
 }))
 
+vi.mock('@phila/phila-ui-filter-chip', () => ({
+  FilterChipGroup: formStub(
+    'FilterChipGroup',
+    ['filters', 'modelValue', 'filterButton', 'filterButtonText', 'elevated'],
+    'filterButtonText',
+  ),
+}))
+
 vi.mock('@phila/phila-ui-button', () => ({
   CloseButton: stub('CloseButton', 'button'),
   // Mirrors the real PhilaButton's two render modes: link (`to`) vs event button.

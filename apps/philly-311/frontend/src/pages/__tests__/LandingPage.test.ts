@@ -112,6 +112,7 @@ const initialReports: Report[] = [
 let ensureLoaded: ReturnType<typeof vi.spyOn>
 
 import LandingPage from '../LandingPage.vue'
+import FilterChips from '@/components/FilterChips.vue'
 
 const globalStubs = {
   RouterLink: RouterLinkStub,
@@ -149,14 +150,12 @@ describe('LandingPage', () => {
   it('FilterChips receives only the service types present in the data, prevalence-sorted', async () => {
     const w = mount(LandingPage, { global: { stubs: globalStubs } })
     await flushPromises()
-    const chips = w.find('.header').findAll('button.filter-chips__chip')
-    // All Filters + one chip per service type in the data; tie on count breaks alphabetically.
-    expect(chips.map((c) => c.text())).toEqual([
-      'All Filters',
-      'Graffiti Removal',
-      'Pothole Repair',
-    ])
-    expect(chips[0].attributes('aria-pressed')).toBe('true')
+    const chips = w.findComponent(FilterChips)
+    // One option per service type in the data; tie on count breaks alphabetically.
+    expect(
+      (chips.props('options') as { value: string; label: string }[]).map((o) => o.value),
+    ).toEqual(['Graffiti Removal', 'Pothole Repair'])
+    expect(chips.props('modelValue')).toBe('all')
   })
 
   it('Pinboard does not receive locationPanelFilter', async () => {
@@ -192,18 +191,12 @@ describe('LandingPage', () => {
     await flushPromises()
     expect(w.find('.count').text()).toBe('2')
 
-    const chips = w.find('.header').findAll('button.filter-chips__chip')
-    const graffitiChip = chips.find((c) => c.text().includes('Graffiti Removal'))
-    expect(graffitiChip).toBeDefined()
-    if (!graffitiChip) return
-    await graffitiChip.trigger('click')
+    const chips = w.findComponent(FilterChips)
+    await chips.vm.$emit('update:modelValue', 'Graffiti Removal')
     await flushPromises()
     expect(w.find('.count').text()).toBe('1')
 
-    const allFiltersChip = chips.find((c) => c.text().includes('All Filters'))
-    expect(allFiltersChip).toBeDefined()
-    if (!allFiltersChip) return
-    await allFiltersChip.trigger('click')
+    await chips.vm.$emit('update:modelValue', 'all')
     await flushPromises()
     expect(w.find('.count').text()).toBe('2')
   })

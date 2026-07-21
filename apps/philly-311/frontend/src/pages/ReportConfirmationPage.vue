@@ -17,7 +17,9 @@ onMounted(async () => {
 <template>
   <div class="confirmation">
     <div class="confirmation__status" role="status">
-      <h1 ref="heading" tabindex="-1" class="confirmation__title">Thanks — your report was submitted.</h1>
+      <h1 ref="heading" tabindex="-1" class="confirmation__title">
+        Thanks — your report was submitted.
+      </h1>
       <p v-if="store.submitted" class="confirmation__ref">
         Reference number:
         <strong>{{ store.submitted.caseNumber || store.submitted.id }}</strong>

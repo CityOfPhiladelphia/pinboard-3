@@ -38,7 +38,12 @@ describe('LocationMap - recentering', () => {
   // exposed object in a proxy that auto-unwraps refs, so the template ref sees
   // `map` as the maplibre instance itself and `isLoaded` as a plain boolean.
   function mountWithExposedMap() {
-    const fakeMap = { flyTo: vi.fn(), getZoom: () => 12, setMaxBounds: vi.fn(), setMinZoom: vi.fn() }
+    const fakeMap = {
+      flyTo: vi.fn(),
+      getZoom: () => 12,
+      setMaxBounds: vi.fn(),
+      setMinZoom: vi.fn(),
+    }
     const MapStub = defineComponent({
       name: 'PhilaMapStub',
       setup(_, { expose, slots }) {

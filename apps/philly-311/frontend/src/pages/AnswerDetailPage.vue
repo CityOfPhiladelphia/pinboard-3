@@ -49,8 +49,7 @@ watch(id, () => {
 <template>
   <main class="answer-detail">
     <nav class="answer-detail__crumb" aria-label="Breadcrumb">
-      <RouterLink to="/">Home</RouterLink> /
-      <RouterLink to="/answers">Answers</RouterLink> /
+      <RouterLink to="/">Home</RouterLink> / <RouterLink to="/answers">Answers</RouterLink> /
       <span>{{ article?.title ?? 'Article' }}</span>
     </nav>
 
@@ -72,7 +71,9 @@ watch(id, () => {
         This article doesn't have any content yet.
         <RouterLink to="/answers">Browse other answers</RouterLink>.
       </p>
-      <PhilaButton variant="primary" to="/report" class="answer-detail__cta" data-test="answer-cta">Start a report &rarr;</PhilaButton>
+      <PhilaButton variant="primary" to="/report" class="answer-detail__cta" data-test="answer-cta"
+        >Start a report &rarr;</PhilaButton
+      >
     </article>
   </main>
 </template>
