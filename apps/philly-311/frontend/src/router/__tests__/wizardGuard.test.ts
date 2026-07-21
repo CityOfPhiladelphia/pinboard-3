@@ -1,15 +1,15 @@
 // ABOUTME: Tests for the wizardGuard route guard.
-// ABOUTME: Verifies category-gated redirects and pass-through behaviour.
+// ABOUTME: Verifies category deep-link seeding, gated redirects, and pass-through behaviour.
 import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { type RouteLocationNormalized } from 'vue-router'
 import { wizardGuard } from '../index'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 
-function makeRoute(path: string): RouteLocationNormalized {
+function makeRoute(path: string, query: Record<string, string> = {}): RouteLocationNormalized {
   return {
     path,
-    query: {},
+    query,
     fullPath: path,
     hash: '',
     name: undefined,
@@ -37,6 +37,29 @@ describe('wizardGuard', () => {
   it('allows deep steps once a category is set', () => {
     useReportSubmissionStore().setCategory('Pothole Repair')
     expect(wizardGuard(makeRoute('/report/location'))).toBe(true)
+  })
+  it('seeds category from a query param and allows', () => {
+    const result = wizardGuard(makeRoute('/report/issue-type', { category: 'Pothole Repair' }))
+    expect(result).toBe(true)
+    expect(useReportSubmissionStore().category).toBe('Pothole Repair')
+  })
+  it('overwrites a different query category and clears custom fields', () => {
+    const store = useReportSubmissionStore()
+    store.setCategory('Graffiti Removal')
+    store.setQuestion('Color__c', 'Red')
+    wizardGuard(makeRoute('/report/issue-type', { category: 'Pothole Repair' }))
+    expect(store.category).toBe('Pothole Repair')
+    expect(store.customFields).toEqual({})
+  })
+  it('preserves custom fields when the query category matches', () => {
+    const store = useReportSubmissionStore()
+    store.setCategory('Pothole Repair')
+    store.setQuestion('Severity__c', 'Deep')
+    wizardGuard(makeRoute('/report/issue-type', { category: 'Pothole Repair' }))
+    expect(store.customFields).toEqual({ Severity__c: 'Deep' })
+  })
+  it('satisfies the deep-step category gate via a category deep link', () => {
+    expect(wizardGuard(makeRoute('/report/details', { category: 'Pothole Repair' }))).toBe(true)
   })
   it('does not modify the store on a non-wizard route', () => {
     wizardGuard(makeRoute('/'))

@@ -62,6 +62,15 @@ export function wizardGuard(to: RouteLocationNormalized): true | string {
   // Confirmation is post-wizard: requires a recorded submission, skips the category gate.
   if (to.path === '/report/confirmation') return store.submitted ? true : '/report'
 
+  // External deep links (phila.gov service pages) may name a category in the
+  // query; apply it before the category gate so those links can satisfy it.
+  // A category in the URL wins over the store; setCategory clears customFields
+  // when the category actually changes, so old answers don't leak into the
+  // new questions.
+  if (typeof to.query.category === 'string' && to.query.category !== store.category) {
+    store.setCategory(to.query.category)
+  }
+
   // Issue type is always reachable (it's where a category is chosen); Image is optional.
   if (to.path === '/report/issue-type') return true
   // Deeper steps require a chosen category.
