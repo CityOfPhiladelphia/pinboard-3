@@ -23,17 +23,13 @@ const indexed = computed(() =>
     clickable: i + 1 <= props.completedThrough && i + 1 !== props.currentStep,
   })),
 )
-
-function onClick(step: { path: string; clickable: boolean }) {
-  if (step.clickable) emit('navigate', step.path)
-}
 </script>
 
 <template>
   <nav aria-label="Report progress" class="step-indicator">
     <ol>
       <li v-for="step in indexed" :key="step.n" :data-state="step.state">
-        <button v-if="step.clickable" type="button" @click="onClick(step)">
+        <button v-if="step.clickable" type="button" @click="emit('navigate', step.path)">
           <span class="sr-only">Step {{ step.n }} of {{ steps.length }}: </span>
           {{ step.title }}
         </button>

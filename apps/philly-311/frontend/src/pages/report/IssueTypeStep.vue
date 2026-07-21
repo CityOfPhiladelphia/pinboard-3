@@ -18,9 +18,6 @@ const { list, isLoading, error, load } = useServiceTypes()
 onMounted(() => {
   void load()
 })
-function retry() {
-  void load()
-}
 
 const catalog = computed(() => list.value ?? [])
 const selected = computed(() => catalog.value.find((s) => s.serviceType === store.category) ?? null)
@@ -64,7 +61,7 @@ function change() {
         variant="secondary"
         class="issue-step__retry"
         data-test="retry-types"
-        @click="retry"
+        @click="() => void load()"
         >Retry</PhilaButton
       >
     </p>

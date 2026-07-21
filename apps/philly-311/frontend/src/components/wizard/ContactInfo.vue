@@ -1,7 +1,7 @@
-<!-- ABOUTME: Optional contact fields, stored for later use (not yet sent on submit).
+<!-- ABOUTME: Optional contact fields, stored in the wizard (not included in the submit payload).
      If signed in, name/email prefill from the token once; user edits are never clobbered. -->
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useAuth } from '@phila/sso-vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 
@@ -21,8 +21,7 @@ function prefillFromAuth() {
   prefilled = true
 }
 
-onMounted(prefillFromAuth)
-watch(isAuthenticated, () => prefillFromAuth())
+watch(isAuthenticated, prefillFromAuth, { immediate: true })
 
 watch([name, email, phone], () => {
   store.setContact({ name: name.value, email: email.value, phone: phone.value })

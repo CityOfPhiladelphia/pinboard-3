@@ -2,11 +2,11 @@
      which stores the image (mediaUrl) and returns issue-type suggestions for step 2. Optional;
      Skip/Next both advance. -->
 <script setup lang="ts">
-import { inject, ref, type Ref } from 'vue'
+import { computed, ref } from 'vue'
 import { processForClassify } from '@/utils/photo'
 import { useApi } from '@/composables/useApi'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
-import { WIZARD_CAN_ADVANCE_KEY } from '@/composables/useWizardValidity'
+import { useWizardValidity } from '@/composables/useWizardValidity'
 
 interface ClassifyResponse {
   classifications: { serviceType: string; confidence: number; caseType: string }[]
@@ -14,8 +14,7 @@ interface ClassifyResponse {
 }
 
 const store = useReportSubmissionStore()
-const canAdvance = inject<Ref<boolean>>(WIZARD_CAN_ADVANCE_KEY)
-if (canAdvance) canAdvance.value = true // the step is optional
+useWizardValidity(computed(() => true)) // the step is optional
 
 const classifying = ref(false)
 const errorMessage = ref('')

@@ -21,7 +21,7 @@ onMounted(() => {
 
 async function onSearch(query: string) {
   const feature = await searchAddress(query)
-  if (feature) void finder.setCenter({ latitude: feature.lat, longitude: feature.lng })
+  if (feature) finder.setCenter({ latitude: feature.lat, longitude: feature.lng })
 }
 </script>
 

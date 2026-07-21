@@ -81,7 +81,6 @@ describe('fetchPage', () => {
       id: '00812345',
       lat: 39.95,
       lng: -75.16,
-      department: 'Streets',
       mediaUrl: 'https://img.example.test/photo.jpg',
     })
   })

@@ -1,5 +1,5 @@
 // ABOUTME: Vue Router setup for philly-311.
-// ABOUTME: Increment-1 route table; auth guard (sso-vue) + wizard guard (store).
+// ABOUTME: Route table; auth guard (sso-vue) + wizard guard (store).
 import {
   createRouter,
   createWebHistory,
@@ -61,27 +61,6 @@ export function wizardGuard(to: RouteLocationNormalized): true | string {
 
   // Confirmation is post-wizard: requires a recorded submission, skips the category gate.
   if (to.path === '/report/confirmation') return store.submitted ? true : '/report'
-
-  // Apply deep-link query params before the category gate so deep links
-  // can satisfy it. A category in the URL always wins over whatever's in
-  // the store — this is the
-  // path HeaderSearch takes when the user picks a different service
-  // type mid-flow. setCategory clears customFields when the category
-  // actually changes, so old answers don't leak into the new questions.
-  if (typeof to.query.category === 'string' && to.query.category !== store.category) {
-    store.setCategory(to.query.category)
-  }
-  const lat = Number(to.query.lat)
-  const lng = Number(to.query.lng)
-  if (
-    typeof to.query.lat === 'string' &&
-    typeof to.query.lng === 'string' &&
-    !Number.isNaN(lat) &&
-    !Number.isNaN(lng) &&
-    !store.location
-  ) {
-    store.setLocation({ address: '', lat, lng })
-  }
 
   // Issue type is always reachable (it's where a category is chosen); Image is optional.
   if (to.path === '/report/issue-type') return true

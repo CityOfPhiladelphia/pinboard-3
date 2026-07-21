@@ -15,27 +15,13 @@ const nextPageToken = ref<string | undefined>(undefined)
 const browseLoading = ref(false)
 const browseError = ref<string | null>(null)
 
-async function loadInitial() {
+// With a token, appends the next page; without one, (re)loads the first page.
+async function loadPage(token?: string) {
   browseLoading.value = true
   browseError.value = null
   try {
-    const result = await k.loadArticles()
-    items.value = result.items
-    nextPageToken.value = result.nextPageToken
-  } catch (err) {
-    browseError.value = (err as Error).message ?? 'Could not load articles.'
-  } finally {
-    browseLoading.value = false
-  }
-}
-
-async function loadMore() {
-  if (!nextPageToken.value) return
-  browseLoading.value = true
-  browseError.value = null
-  try {
-    const result = await k.loadArticles({ nextPageToken: nextPageToken.value })
-    items.value = [...items.value, ...result.items]
+    const result = await k.loadArticles(token ? { nextPageToken: token } : {})
+    items.value = token ? [...items.value, ...result.items] : result.items
     nextPageToken.value = result.nextPageToken
   } catch (err) {
     browseError.value = (err as Error).message ?? 'Could not load articles.'
@@ -54,7 +40,7 @@ const {
   initial: null,
   fetcher: async (q) => (await k.loadArticles({ search: q })).items,
   onEmpty: () => {
-    void loadInitial()
+    void loadPage()
     return null
   },
 })
@@ -64,7 +50,7 @@ const visible = computed(() => searchResults.value ?? items.value)
 const isLoading = computed(() => searchLoading.value || browseLoading.value)
 const errorMessage = computed(() => (isSearching.value ? searchError.value : browseError.value))
 
-onMounted(loadInitial)
+onMounted(loadPage)
 </script>
 
 <template>
@@ -109,7 +95,7 @@ onMounted(loadInitial)
       class="answers__more"
       :disabled="isLoading"
       data-test="answers-more"
-      @click="loadMore"
+      @click="loadPage(nextPageToken)"
     >
       Load more
     </PhilaButton>

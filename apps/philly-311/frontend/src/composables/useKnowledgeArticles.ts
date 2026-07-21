@@ -3,6 +3,7 @@
 import { useAuth } from '@phila/sso-vue'
 import { parseError } from './useApiError'
 import { api311Fetch } from './api311'
+import { parseLinkHeader } from './useNearbyReports'
 
 export interface Article {
   id: string
@@ -28,25 +29,6 @@ interface DetailResponse {
   lastPublishedAt: string
   url: string
   content: string
-}
-
-/** Parse the rel="next" link from a Link header, return the offset value or undefined. */
-function parseNextOffset(linkHeader: string | null): string | undefined {
-  if (!linkHeader) return undefined
-  const parts = linkHeader.split(',')
-  for (const part of parts) {
-    const match = part.match(/<([^>]+)>;\s*rel="next"/)
-    if (match && match[1]) {
-      try {
-        const url = new URL(match[1])
-        const offset = url.searchParams.get('offset')
-        return offset ?? undefined
-      } catch {
-        return undefined
-      }
-    }
-  }
-  return undefined
 }
 
 function mapDetailToArticle(r: DetailResponse): Article {
@@ -90,8 +72,8 @@ export function useKnowledgeArticles() {
       url: a.url,
     }))
 
-    const nextPageToken = parseNextOffset(response.headers.get('Link'))
-    return { items, nextPageToken }
+    const { next } = parseLinkHeader(response.headers.get('Link'))
+    return { items, nextPageToken: next === null ? undefined : String(next) }
   }
 
   async function loadArticle(id: string): Promise<Article | null> {

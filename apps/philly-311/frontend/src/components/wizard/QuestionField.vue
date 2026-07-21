@@ -26,10 +26,7 @@ const isLargePicklist = computed(
   () => props.question.type === 'picklist' && (props.question.options?.length ?? 0) > 4,
 )
 
-const radioChoices = computed(() =>
-  (props.question.options ?? []).map((o) => ({ text: o, value: o })),
-)
-const checkboxChoices = computed(() =>
+const choices = computed(() =>
   (props.question.options ?? []).map((o) => ({ text: o, value: o })),
 )
 // RadioGroup/CheckboxGroup model a Record<choice value, checked>; the wizard
@@ -64,7 +61,7 @@ function setCheckbox(record: Record<string, boolean>) {
     <RadioGroup
       v-if="useRadioGroup"
       :group-label="labelText"
-      :choices="radioChoices"
+      :choices="choices"
       :model-value="radioValue"
       @update:model-value="setRadio"
     />
@@ -88,7 +85,7 @@ function setCheckbox(record: Record<string, boolean>) {
     <CheckboxGroup
       v-else-if="question.type === 'multipicklist'"
       :group-label="labelText"
-      :choices="checkboxChoices"
+      :choices="choices"
       :model-value="checkboxValue"
       @update:model-value="setCheckbox"
     />

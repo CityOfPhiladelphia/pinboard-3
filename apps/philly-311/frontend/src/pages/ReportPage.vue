@@ -40,9 +40,6 @@ function goPrev() {
 function goNext() {
   if (canAdvance.value && nextPath.value) router.push(nextPath.value)
 }
-function jumpTo(path: string) {
-  router.push(path)
-}
 function resetWizard() {
   store.reset()
   router.push('/report')
@@ -59,7 +56,7 @@ function resetWizard() {
       :steps="STEPS"
       :current-step="currentStep"
       :completed-through="completedThrough"
-      @navigate="jumpTo"
+      @navigate="(path: string) => router.push(path)"
     />
 
     <section class="wizard__content">

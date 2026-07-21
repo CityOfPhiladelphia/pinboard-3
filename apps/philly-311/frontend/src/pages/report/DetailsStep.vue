@@ -1,5 +1,5 @@
 <!-- ABOUTME: Wizard step 4 — details: required description (10-char floor gates Next),
-     optional contact info (stored, not yet sent), and report visibility. -->
+     optional contact info (stored; not included in the submit payload), and report visibility. -->
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'

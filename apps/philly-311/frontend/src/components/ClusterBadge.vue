@@ -2,7 +2,6 @@
      Size tier class scales with magnitude: <10, <100, or ≥100. -->
 <script setup lang="ts">
 defineProps<{ count: number }>()
-defineEmits<{ click: [] }>()
 </script>
 
 <template>
@@ -13,7 +12,6 @@ defineEmits<{ click: [] }>()
       count < 10 ? 'cluster-badge--sm' : count < 100 ? 'cluster-badge--md' : 'cluster-badge--lg'
     "
     :aria-label="`${count} reports — zoom in`"
-    @click="$emit('click')"
   >
     {{ count }}
   </button>

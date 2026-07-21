@@ -1,5 +1,5 @@
 // ABOUTME: Quick check whether a lat/lng is roughly inside Philadelphia.
-// ABOUTME: Uses an axis-aligned bounding box; precise polygon comes later.
+// ABOUTME: Uses an axis-aligned bounding box, not the precise city polygon.
 
 const PHILLY_BOUNDS = {
   minLat: 39.867,

@@ -1,5 +1,5 @@
 /* ABOUTME: Global accessibility utilities shared across the app. */
-/* Matches StepIndicator's prior scoped definition (the stronger of the two removed copies). */
+/* Visually hides content while keeping it readable by screen readers. */
 .sr-only {
   position: absolute;
   width: 1px;

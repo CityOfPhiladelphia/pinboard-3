@@ -30,7 +30,7 @@ describe('AnswersPage', () => {
     loadArticles.mockResolvedValueOnce({ items: [a('1'), a('2')], nextPageToken: '25' })
     const w = mountPage()
     await flushPromises()
-    expect(loadArticles).toHaveBeenCalledWith()
+    expect(loadArticles).toHaveBeenCalledWith({})
     expect(w.text()).toContain('Article 1')
     expect(w.text()).toContain('Article 2')
     expect(w.find('[data-test="answers-more"]').exists()).toBe(true)
@@ -74,7 +74,7 @@ describe('AnswersPage', () => {
     loadArticles.mockResolvedValueOnce({ items: [a('1'), a('2')], nextPageToken: undefined })
     await w.find('input[type="search"]').setValue('')
     await flushPromises()
-    expect(loadArticles).toHaveBeenLastCalledWith()
+    expect(loadArticles).toHaveBeenLastCalledWith({})
     expect(w.text()).toContain('Article 2')
   })
 

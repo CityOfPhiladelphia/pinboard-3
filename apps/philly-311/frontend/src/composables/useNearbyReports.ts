@@ -1,25 +1,20 @@
-// ABOUTME: Nearby issues fetched from /private/key/nearby-issues. The API talks
-// ABOUTME: to the same Salesforce instance as /issues/:id so case-number IDs
-// ABOUTME: round-trip cleanly when a user clicks a marker for the detail page.
-// ABOUTME: Anonymous-ok route, so no auth handle is passed to api311Fetch.
+// ABOUTME: Nearby issues fetched from /private/key/nearby-issues, one page per call
+// ABOUTME: with Link-header offsets. Anonymous-ok route, so no auth handle is passed.
 import { api311Fetch } from './api311'
 import { parseError } from './useApiError'
 
 export interface Report {
-  /** 8-digit Salesforce CaseNumber. Use this as the path param on /issues/:id. */
+  /** 8-digit Salesforce CaseNumber. */
   id: string
-  caseNumber: string
   lat: number
   lng: number
   serviceType: string
   status: string
   address: string
-  department?: string
   mediaUrl?: string
   description?: string
   distance: number
   createdAt?: string
-  updatedAt?: string
 }
 
 export interface PageParams {
@@ -55,12 +50,16 @@ interface ApiNearbyIssue {
 
 function toReport(i: ApiNearbyIssue): Report {
   return {
-    ...i,
+    id: i.id,
     lat: i.latitude,
     lng: i.longitude,
     serviceType: i.serviceType ?? '',
-    department: i.department ?? undefined,
+    status: i.status,
+    address: i.address,
     mediaUrl: i.mediaUrl ?? undefined,
+    description: i.description,
+    distance: i.distance,
+    createdAt: i.createdAt,
   }
 }
 

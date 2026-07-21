@@ -1,7 +1,7 @@
 <!-- ABOUTME: Knowledge-article detail. Sanitized HTML body via ArticleBody; breadcrumb
      back to /answers; every article ends with a Start a report link into the wizard. -->
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useKnowledgeArticles, type Article } from '@/composables/useKnowledgeArticles'
 import { ApiError } from '@/composables/useApiError'
@@ -40,10 +40,7 @@ async function load() {
   }
 }
 
-onMounted(load)
-watch(id, () => {
-  void load()
-})
+watch(id, load, { immediate: true })
 </script>
 
 <template>

@@ -27,7 +27,7 @@ const top = computed(() => {
     <ul class="type-suggestions__list">
       <li v-for="s in top" :key="s.serviceType">
         <button type="button" class="type-suggestions__card" @click="emit('select', s.serviceType)">
-          <ServiceTypeIcon :service-type="s.serviceType" :size="36" />
+          <ServiceTypeIcon :service-type="s.serviceType" />
           <span class="type-suggestions__body">
             <span class="type-suggestions__name">{{ s.serviceType }}</span>
             <span class="type-suggestions__desc">{{ s.description }}</span>
