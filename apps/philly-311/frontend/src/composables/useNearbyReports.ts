@@ -39,7 +39,7 @@ export interface PageResult {
 interface ApiNearbyIssue {
   id: string
   caseNumber: string
-  serviceType: string
+  serviceType: string | null
   department: string | null
   status: string
   address: string
@@ -58,6 +58,7 @@ function toReport(i: ApiNearbyIssue): Report {
     ...i,
     lat: i.latitude,
     lng: i.longitude,
+    serviceType: i.serviceType ?? '',
     department: i.department ?? undefined,
     mediaUrl: i.mediaUrl ?? undefined,
   }

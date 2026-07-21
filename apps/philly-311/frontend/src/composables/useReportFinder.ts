@@ -48,6 +48,7 @@ export function useReportFinder(): UseReportFinder {
   const filterOptions = computed<{ value: string; label: string }[]>(() => {
     const counts = new Map<string, number>()
     for (const r of reports.value) {
+      if (!r.serviceType) continue
       counts.set(r.serviceType, (counts.get(r.serviceType) ?? 0) + 1)
     }
     return [...counts.entries()]

@@ -83,6 +83,20 @@ describe('useReportFinder', () => {
     ])
   })
 
+  it('excludes reports with no serviceType from filterOptions', async () => {
+    const store = useOpenIssuesStore()
+    store.$patch({
+      reports: [
+        { ...sample, id: 'a', serviceType: 'Pothole Repair' },
+        { ...sample, id: 'b', serviceType: '' },
+      ],
+    })
+    getCurrentPosition.mockResolvedValue(null)
+    const f = useReportFinder()
+    await f.init()
+    expect(f.filterOptions.value.map((o) => o.value)).toEqual(['Pothole Repair'])
+  })
+
   it('breaks count ties alphabetically and omits service types absent from the data', async () => {
     const store = useOpenIssuesStore()
     store.$patch({

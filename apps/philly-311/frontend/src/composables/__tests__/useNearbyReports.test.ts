@@ -86,6 +86,14 @@ describe('fetchPage', () => {
     })
   })
 
+  it('normalizes a null serviceType to an empty string', async () => {
+    fetchMock.mockResolvedValueOnce(okResponse({ issues: [{ ...ISSUE, serviceType: null }] }))
+
+    const result = await fetchPage({ lat: 39.95, lng: -75.16, radius: 800, limit: 50 })
+
+    expect(result.reports[0].serviceType).toBe('')
+  })
+
   it('returns null offsets when no Link header is present', async () => {
     fetchMock.mockResolvedValueOnce(okResponse({ issues: [] }))
 
