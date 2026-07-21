@@ -15,7 +15,6 @@ const report: Report = {
   status: 'In Progress',
   address: '1234 Market St',
   description: 'big hole',
-  distance: 160,
 }
 
 describe('ReportDetail', () => {
