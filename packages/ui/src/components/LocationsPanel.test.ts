@@ -115,3 +115,25 @@ describe('LocationsPanel - location-card slot branch', () => {
     expect(w.emitted('select')).toHaveLength(1)
   })
 })
+
+describe('LocationsPanel - filters slot', () => {
+  it('renders the filters slot between the search box and the location list', () => {
+    const w = mount(LocationsPanel, {
+      props: { locations: locations(), locationSearch: 'Search by address or ZIP' },
+      slots: { filters: '<div class="my-filters">Chips</div>' },
+      global: { stubs: { MapCard: MapCardStub } },
+    })
+    const html = w.html()
+    const searchIdx = html.indexOf('location-search')
+    const filtersIdx = html.indexOf('my-filters')
+    const listIdx = html.indexOf('location-list')
+    expect(searchIdx).toBeGreaterThan(-1)
+    expect(searchIdx).toBeLessThan(filtersIdx)
+    expect(filtersIdx).toBeLessThan(listIdx)
+  })
+
+  it('renders nothing extra when no filters slot content is given', () => {
+    const w = mountDefault()
+    expect(w.find('.my-filters').exists()).toBe(false)
+  })
+})

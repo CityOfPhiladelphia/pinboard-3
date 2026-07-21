@@ -29,6 +29,7 @@ vi.mock('@pinboard/ui', () => {
             'data-filter-set': String(props.locationPanelFilter != null),
           }),
           h('div', { class: 'header' }, slots['locations-header']?.()),
+          h('div', { class: 'filters' }, slots['locations-filters']?.()),
           h(
             'button',
             { class: 'do-search', onClick: () => emit('search', '1234 Market St') },
@@ -141,7 +142,8 @@ describe('LandingPage', () => {
     expect(header.text()).toContain('Submit a report to 311')
     expect(header.text()).toContain('Submit request')
     expect(header.text()).not.toContain('Trending articles')
-    expect(header.find('.filter-chips').exists()).toBe(true)
+    expect(header.find('.filter-chips').exists()).toBe(false)
+    expect(w.find('.filters').find('.filter-chips').exists()).toBe(true)
   })
 
   it('FilterChips receives only the service types present in the data, prevalence-sorted', async () => {

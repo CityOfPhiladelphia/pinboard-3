@@ -43,6 +43,7 @@ import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 const slots = defineSlots<{
   nav?(): unknown
   'locations-header'?: unknown
+  'locations-filters'?: unknown
   'location-card'?(props: { location: PinboardLocation }): unknown
   'location-detail'?(props: {
     location: PinboardLocation
@@ -428,6 +429,9 @@ function selectedLocationValue() {
               </div>
             </Teleport>
           </template>
+          <template v-if="slots['locations-filters']" #filters>
+            <slot name="locations-filters" />
+          </template>
           <template #list-header>
             <div v-if="!isMobile" class="location-list-header">
               <span>{{ locationCountLabel }}</span>
@@ -496,6 +500,7 @@ function selectedLocationValue() {
     <div class="bottom-sheet-stack">
       <div class="bottom-sheet-list-scroll" :class="{ 'is-hidden': selectedLocation }">
         <slot name="locations-header" />
+        <slot name="locations-filters" />
         <div class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
           <div id="bottom-sheet-sort"></div>

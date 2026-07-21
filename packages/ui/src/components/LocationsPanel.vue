@@ -108,6 +108,8 @@ defineExpose({ scrollToCard })
 
   <slot name="below-search" />
 
+  <slot name="filters" />
+
   <slot name="list-header" />
 
   <div

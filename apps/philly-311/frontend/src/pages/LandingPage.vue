@@ -36,6 +36,9 @@ async function onSearch(query: string) {
   >
     <template #locations-header>
       <ReportCallout />
+    </template>
+
+    <template #locations-filters>
       <FilterChips
         :options="finder.filterOptions.value"
         :model-value="finder.filter.value"
