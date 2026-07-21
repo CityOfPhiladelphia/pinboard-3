@@ -8,8 +8,6 @@ import { inject, ref } from 'vue'
 
 const isMobile = inject(IS_MOBILE_KEY, ref(false))
 const router = useRouter()
-
-
 </script>
 
 <template>

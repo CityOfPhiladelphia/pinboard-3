@@ -473,7 +473,11 @@ function selectedLocationValue() {
       <div id="mobile-map-search-filter" class="mobile-map-search-filter" />
     </div>
 
-    <div v-if="filters" class="all-filters-overlay" :style="{ 'display': allFiltersOpen && !isMobile ? 'block' : 'none' }">
+    <div
+      v-if="filters"
+      class="all-filters-overlay"
+      :style="{ display: allFiltersOpen && !isMobile ? 'block' : 'none' }"
+    >
       <FilterPanel
         v-if="allFiltersOpen"
         :filters="filters"
@@ -492,7 +496,7 @@ function selectedLocationValue() {
     :snap-points="snapPoints"
     :collapse-label="selectedLocation ? '' : t('pinboard.mapView')"
     :collapse-icon="selectedLocation ? undefined : IconMap"
-    :style="{ 'display': isMobile ? 'block' : 'none' }"
+    :style="{ display: isMobile ? 'block' : 'none' }"
     class="mobile-bottom-sheet"
   >
     <div class="bottom-sheet-stack">
@@ -541,7 +545,7 @@ function selectedLocationValue() {
 }
 
 .finder-panel-mobile {
-display: block;
+  display: block;
 }
 
 .finder-panel-locations {
@@ -552,9 +556,9 @@ display: block;
 }
 
 .finder-panel-map {
-    width: 100%;
-    height: 100%;
-  }
+  width: 100%;
+  height: 100%;
+}
 
 .status-message--error {
   color: var(--Schemes-Error, #b3261e);
@@ -664,42 +668,42 @@ display: block;
 }
 
 .mobile-controls-float {
-    position: absolute;
-    right: 10px;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 10px;
-    pointer-events: none;
-  }
+  position: absolute;
+  right: 10px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: none;
+}
 
-  .mobile-controls-float > :deep(*) {
-    pointer-events: auto;
-  }
+.mobile-controls-float > :deep(*) {
+  pointer-events: auto;
+}
 
-  .mobile-controls-float-left {
-    position: absolute;
-    left: 10px;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    pointer-events: none;
-  }
+.mobile-controls-float-left {
+  position: absolute;
+  left: 10px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  pointer-events: none;
+}
 
-  .mobile-controls-float-left > :deep(*) {
-    pointer-events: auto;
-  }
+.mobile-controls-float-left > :deep(*) {
+  pointer-events: auto;
+}
 
-  .mobile-map-search-filter {
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 2;
-    padding: 10px 0;
-  }
+.mobile-map-search-filter {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding: 10px 0;
+}
 </style>

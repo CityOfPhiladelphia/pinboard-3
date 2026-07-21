@@ -185,9 +185,9 @@ defineExpose({ scrollToCard })
 }
 
 .location-list.mobile {
-    padding: 1rem;
-    scrollbar-width: none;
-  }
+  padding: 1rem;
+  scrollbar-width: none;
+}
 
 .location-card {
   cursor: pointer;
