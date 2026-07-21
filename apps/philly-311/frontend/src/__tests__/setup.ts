@@ -62,6 +62,10 @@ vi.mock('@phila/phila-ui-filter-chip', () => ({
   ),
 }))
 
+vi.mock('@phila/phila-ui-filter-panel', () => ({
+  FilterPanel: formStub('FilterPanel', ['filters', 'modelValue', 'fullScreen', 'title'], 'title'),
+}))
+
 vi.mock('@phila/phila-ui-button', () => ({
   CloseButton: stub('CloseButton', 'button'),
   // Mirrors the real PhilaButton's two render modes: link (`to`) vs event button.

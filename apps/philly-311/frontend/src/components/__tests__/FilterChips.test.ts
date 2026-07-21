@@ -1,8 +1,9 @@
 // ABOUTME: Tests for FilterChips — adapts the finder's single-select string filter
-// ABOUTME: to FilterChipGroup toggle chips, incl. the All Filters reset button.
+// ABOUTME: to FilterChipGroup toggle chips and a FilterPanel opened via All Filters.
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { FilterChipGroup } from '@phila/phila-ui-filter-chip'
+import { FilterPanel } from '@phila/phila-ui-filter-panel'
 import type { FilterDefinition } from '@phila/phila-ui-core'
 import FilterChips from '../FilterChips.vue'
 
@@ -76,15 +77,79 @@ describe('FilterChips', () => {
     expect(w.emitted('update:modelValue')).toBeUndefined()
   })
 
-  it('resets to all when All Filters is pressed', async () => {
+  it('does not render the filter panel until All Filters is pressed', () => {
+    expect(mountChips().findComponent(FilterPanel).exists()).toBe(false)
+  })
+
+  it('opens the filter panel when All Filters is pressed', async () => {
+    const w = mountChips()
+    await w.findComponent(FilterChipGroup).vm.$emit('open-filters')
+    expect(w.findComponent(FilterPanel).exists()).toBe(true)
+  })
+
+  it('closes the filter panel when the panel emits close', async () => {
+    const w = mountChips()
+    await w.findComponent(FilterChipGroup).vm.$emit('open-filters')
+    await w.findComponent(FilterPanel).vm.$emit('close')
+    expect(w.findComponent(FilterPanel).exists()).toBe(false)
+  })
+
+  it('passes a single-select service-type filter definition to the panel', async () => {
+    const w = mountChips()
+    await w.findComponent(FilterChipGroup).vm.$emit('open-filters')
+    const filters = w.findComponent(FilterPanel).props('filters') as FilterDefinition[]
+    expect(filters).toEqual([
+      {
+        key: 'serviceType',
+        label: 'Service Type',
+        choices: [
+          { text: 'Pothole Repair', value: 'Pothole Repair' },
+          { text: 'Graffiti Removal', value: 'Graffiti Removal' },
+        ],
+      },
+    ])
+  })
+
+  it('maps the selected value into the panel model, in sync with the chips', async () => {
     const w = mountChips('Pothole Repair')
     await w.findComponent(FilterChipGroup).vm.$emit('open-filters')
+    expect(w.findComponent(FilterPanel).props('modelValue')).toEqual({
+      serviceType: { 'Pothole Repair': true, 'Graffiti Removal': false },
+    })
+  })
+
+  it('marks nothing selected in the panel when the filter is all', async () => {
+    const w = mountChips()
+    await w.findComponent(FilterChipGroup).vm.$emit('open-filters')
+    expect(w.findComponent(FilterPanel).props('modelValue')).toEqual({
+      serviceType: { 'Pothole Repair': false, 'Graffiti Removal': false },
+    })
+  })
+
+  it('emits the value picked in the panel', async () => {
+    const w = mountChips('Pothole Repair')
+    await w.findComponent(FilterChipGroup).vm.$emit('open-filters')
+    await w.findComponent(FilterPanel).vm.$emit('update:modelValue', {
+      serviceType: { 'Pothole Repair': false, 'Graffiti Removal': true },
+    })
+    expect(w.emitted('update:modelValue')?.[0]?.[0]).toBe('Graffiti Removal')
+  })
+
+  it('emits all when the panel selection is cleared', async () => {
+    const w = mountChips('Pothole Repair')
+    await w.findComponent(FilterChipGroup).vm.$emit('open-filters')
+    await w.findComponent(FilterPanel).vm.$emit('update:modelValue', {
+      serviceType: { 'Pothole Repair': false, 'Graffiti Removal': false },
+    })
     expect(w.emitted('update:modelValue')?.[0]?.[0]).toBe('all')
   })
 
-  it('does not re-emit all from All Filters when already unfiltered', async () => {
-    const w = mountChips()
+  it('does not emit when the panel echoes the current selection', async () => {
+    const w = mountChips('Pothole Repair')
     await w.findComponent(FilterChipGroup).vm.$emit('open-filters')
+    await w.findComponent(FilterPanel).vm.$emit('update:modelValue', {
+      serviceType: { 'Pothole Repair': true, 'Graffiti Removal': false },
+    })
     expect(w.emitted('update:modelValue')).toBeUndefined()
   })
 })
