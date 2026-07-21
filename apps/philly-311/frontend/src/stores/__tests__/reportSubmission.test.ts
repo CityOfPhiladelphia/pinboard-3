@@ -404,5 +404,4 @@ describe('useReportSubmissionStore', () => {
       expect(store.isEmpty).toBe(true)
     })
   })
-
 })

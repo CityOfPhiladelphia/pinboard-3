@@ -92,7 +92,11 @@ describe('AnswerDetailPage', () => {
 
   it('ignores a stale load that resolves after a newer navigation', async () => {
     let resolveFirst!: (v: unknown) => void
-    loadArticle.mockReturnValueOnce(new Promise((r) => { resolveFirst = r }))
+    loadArticle.mockReturnValueOnce(
+      new Promise((r) => {
+        resolveFirst = r
+      }),
+    )
     const router = makeRouter()
     await router.push('/answers/kA1')
     await router.isReady()

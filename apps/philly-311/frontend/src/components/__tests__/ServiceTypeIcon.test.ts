@@ -4,7 +4,9 @@ import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 
 vi.mock('@/utils/serviceTypeMeta', () => ({ serviceTypeColor: () => 'rgb(1, 2, 3)' }))
-vi.mock('@/utils/reportIcon', () => ({ serviceTypeIconDefinition: () => ({ iconName: 'x', prefix: 'fas' }) }))
+vi.mock('@/utils/reportIcon', () => ({
+  serviceTypeIconDefinition: () => ({ iconName: 'x', prefix: 'fas' }),
+}))
 
 import ServiceTypeIcon from '../ServiceTypeIcon.vue'
 

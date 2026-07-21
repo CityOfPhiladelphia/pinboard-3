@@ -59,7 +59,11 @@ const locationText = computed(() => {
     <section class="review-summary__section">
       <header class="review-summary__header">
         <h2 class="review-summary__heading">Issue type</h2>
-        <RouterLink class="review-summary__edit" to="/report/issue-type" aria-label="Edit issue type">
+        <RouterLink
+          class="review-summary__edit"
+          to="/report/issue-type"
+          aria-label="Edit issue type"
+        >
           Edit
         </RouterLink>
       </header>
