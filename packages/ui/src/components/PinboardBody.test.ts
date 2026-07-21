@@ -89,7 +89,9 @@ describe('PinboardBody - locations-filters slot forwarding (mobile bottom sheet)
 describe('PinboardBody - locationPanelCountNoun forwarding', () => {
   it('reaches the desktop LocationsPanel but not the mobile one', () => {
     const w = mountPinboardBody({ locationPanelCountNoun: 'report' })
-    const desktopCount = w.find('.finder-panel-locations').find('.location-count')
+    const desktopCount = w
+      .find('.finder-panel-locations')
+      .find('.location-count')
     expect(desktopCount.exists()).toBe(true)
     expect(desktopCount.text()).toBe('2 reports')
 
