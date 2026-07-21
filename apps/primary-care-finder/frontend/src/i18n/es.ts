@@ -84,7 +84,7 @@ export default {
     section2Title: 'Seguro y costo',
     p2: 'Estos centros de salud aceptan muchas formas de seguro. Esto incluye Medicare y Medicaid. Puede recibir atención aunque no tenga seguro. Si no tiene un seguro, pagará una pequeña tarifa según sus ingresos y el tamaño de su familia.',
     section25Title: '¿Necesitas ayuda para obtener un seguro médico?',
-    p25: "El programa BenePhilly de Filadelfia ofrece apoyo gratuito para ayudar a los residentes a solicitar un seguro médico. Para obtener más información, visite <a href='https://www.phila.gov/programs/benephilly/' target='_blank'>https://www.phila.gov/programs/benephilly.</a>",
+    p25: 'El programa BenePhilly de Filadelfia ofrece apoyo gratuito para ayudar a los residentes a solicitar un seguro médico. Para obtener más información, visite',
     section3Title: 'Acceso a idiomas',
     p3: 'Todos los centros de salud ofrecen servicios de interpretación por teléfono. Algunos también ofrecen interpretación en persona. Consulte los detalles de cada ubicación para ver una lista de todos los idiomas que habla el personal. También puede hacer una búsqueda por idioma específico.',
     section4Title: 'Programar la atención',
@@ -92,6 +92,7 @@ export default {
     section5Title: 'Actualizaciones al buscador',
     p5: 'Actualizamos la información de cada centro de salud cada tres meses. Si encuentra un error, puede informarnos al respecto a través de nuestro',
     feedbackForm: 'formulario de comentarios',
+    period: '.',
   },
   cards: {
     table1Intro:
