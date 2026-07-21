@@ -1,4 +1,4 @@
-<!-- ABOUTME: Landing-header callout: heading + lede + the primary "Start a report" CTA
+<!-- ABOUTME: Landing-header callout: heading + lede + the primary "Submit request" CTA
      (filled pill with an overlapping document illustration) routing to /report. -->
 <script setup lang="ts">
 import reportDocument from '@/assets/report-document.svg'
@@ -6,13 +6,20 @@ import reportDocument from '@/assets/report-document.svg'
 
 <template>
   <section class="report-callout">
-    <h2 class="report-callout__title">Report Issues Around You</h2>
+    <h2 class="report-callout__title">Submit a report to 311</h2>
     <p class="report-callout__lede">
-      See something that needs attention? Report it and help improve neighborhoods across
-      Philadelphia.
+      Let us know if there's a non-emergency issue that needs attention. The Philly311 team will
+      direct your report to the right department.
+      <a
+        class="report-callout__about-link"
+        href="https://www.phila.gov/departments/philly311/"
+        target="_blank"
+        rel="noopener"
+        >About Philly311.</a
+      >
     </p>
     <div class="report-callout__cta-row">
-      <RouterLink to="/report" class="report-callout__cta">Start a report</RouterLink>
+      <RouterLink to="/report" class="report-callout__cta">Submit request</RouterLink>
       <img class="report-callout__cta-icon" :src="reportDocument" alt="" aria-hidden="true" />
     </div>
   </section>
@@ -30,6 +37,11 @@ import reportDocument from '@/assets/report-document.svg'
 .report-callout__lede {
   margin: 0 0 var(--spacing-s, 0.75rem);
   color: var(--ui-color-grey-700, #4a4a4a);
+}
+.report-callout__about-link {
+  color: var(--ui-color-primary, #1034f4);
+  font-weight: 700;
+  text-decoration: underline;
 }
 .report-callout__cta-row {
   position: relative;

@@ -136,13 +136,13 @@ describe('LandingPage', () => {
     expect(ensureLoaded).toHaveBeenCalled()
   })
 
-  it('renders the report callout with "Start a report" CTA; trending articles are gone', async () => {
+  it('renders the report callout with "Submit request" CTA; trending articles are gone', async () => {
     searchAddress.mockResolvedValue(null)
     const w = mount(LandingPage, { global: { stubs: globalStubs } })
     await flushPromises()
     const header = w.find('.header')
-    expect(header.text()).toContain('Report Issues Around You')
-    expect(header.text()).toContain('Start a report')
+    expect(header.text()).toContain('Submit a report to 311')
+    expect(header.text()).toContain('Submit request')
     expect(header.text()).not.toContain('Trending articles')
     expect(header.find('.filter-chips').exists()).toBe(true)
   })
