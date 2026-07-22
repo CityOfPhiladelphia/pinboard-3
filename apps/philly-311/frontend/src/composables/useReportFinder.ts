@@ -33,8 +33,19 @@ export function useReportFinder(): UseReportFinder {
     latitude: DEFAULT_CENTER.lat,
     longitude: DEFAULT_CENTER.lng,
   })
+  // True once the center is a real user anchor (geolocation fix or searched
+  // address) rather than the default city center; gates distance sorting.
+  const hasAnchor = ref(false)
 
   const errorMessage = computed(() => error.value?.message ?? null)
+
+  // Ranking-only squared distance: equirectangular approximation is monotonic
+  // with great-circle distance at city scale, so ordering is exact for Philly.
+  function rankingDistance(loc: PinboardTypes.BasicLocation, from: PinboardTypes.LatLon): number {
+    const dLat = loc.latitude - from.latitude
+    const dLng = (loc.longitude - from.longitude) * Math.cos(from.latitude * (Math.PI / 180))
+    return dLat * dLat + dLng * dLng
+  }
 
   const locations = computed<PinboardTypes.BasicLocation[]>(() => {
     const list =
@@ -42,7 +53,11 @@ export function useReportFinder(): UseReportFinder {
         ? reports.value
         : reports.value.filter((r) => r.serviceType === filter.value)
 
-    return list.map(reportToLocation)
+    const mapped = list.map(reportToLocation)
+    if (!hasAnchor.value) return mapped
+
+    const from = searchOrUserLocation.value
+    return mapped.sort((a, b) => rankingDistance(a, from) - rankingDistance(b, from))
   })
 
   const filterOptions = computed<{ value: string; label: string }[]>(() => {
@@ -62,12 +77,14 @@ export function useReportFinder(): UseReportFinder {
 
   function setCenter(loc: PinboardTypes.LatLon): void {
     searchOrUserLocation.value = { latitude: loc.latitude, longitude: loc.longitude }
+    hasAnchor.value = true
   }
 
   async function init(): Promise<void> {
     const pos = await getCurrentPosition()
     const center = pos ?? DEFAULT_CENTER
     searchOrUserLocation.value = { latitude: center.lat, longitude: center.lng }
+    hasAnchor.value = pos !== null
     await store.ensureLoaded({ lat: center.lat, lng: center.lng })
   }
 

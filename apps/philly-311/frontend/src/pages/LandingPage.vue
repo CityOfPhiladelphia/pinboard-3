@@ -3,6 +3,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { Pinboard, MapNavigationControl, GeolocationButton, BasemapToggle } from '@pinboard/ui'
+import type { PinboardTypes } from '@pinboard/ui'
 import { useReportFinder } from '@/composables/useReportFinder'
 import ReportDetail from '@/components/ReportDetail.vue'
 import { searchAddress } from '@/composables/useAis'
@@ -15,6 +16,9 @@ import LocationAccuracyCircle from '@/components/LocationAccuracyCircle.vue'
 
 const finder = useReportFinder()
 const searchPlaceholder = 'Search by address or ZIP'
+// 'address' after a successful geocode — Pinboard pans the map to
+// searchOrUserLocation only while an address/zipcode search mode is set.
+const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
 
 const locatedFix = ref<{ latitude: number; longitude: number; accuracy: number } | null>(null)
 
@@ -28,7 +32,10 @@ onMounted(() => {
 
 async function onSearch(query: string) {
   const feature = await searchAddress(query)
-  if (feature) finder.setCenter({ latitude: feature.lat, longitude: feature.lng })
+  if (feature) {
+    locationSearchMode.value = 'address'
+    finder.setCenter({ latitude: feature.lat, longitude: feature.lng })
+  }
 }
 </script>
 
@@ -40,6 +47,7 @@ async function onSearch(query: string) {
     :error-message="finder.errorMessage.value"
     :location-panel-search="searchPlaceholder"
     location-panel-count-noun="report"
+    :location-search-mode="locationSearchMode"
     @search="onSearch"
   >
     <template #locations-header>

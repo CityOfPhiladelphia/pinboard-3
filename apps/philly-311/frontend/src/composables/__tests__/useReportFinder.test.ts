@@ -138,4 +138,36 @@ describe('useReportFinder', () => {
     expect(f.searchOrUserLocation.value).toEqual({ latitude: 40.1, longitude: -75.2 })
     expect(ensureLoaded).not.toHaveBeenCalled()
   })
+
+  describe('distance sorting', () => {
+    const far: Report = { ...sample, id: 'far', lat: 40.05, lng: -75.0 }
+    const near: Report = { ...sample, id: 'near', lat: 39.96, lng: -75.160001 }
+    const mid: Report = { ...sample, id: 'mid', lat: 39.99, lng: -75.1 }
+
+    beforeEach(() => {
+      useOpenIssuesStore().$patch({ reports: [far, near, mid] })
+    })
+
+    it('keeps API order when there is no geolocation fix and no search', async () => {
+      getCurrentPosition.mockResolvedValue(null)
+      const f = useReportFinder()
+      await f.init()
+      expect(f.locations.value.map((l) => l.id)).toEqual(['far', 'near', 'mid'])
+    })
+
+    it('sorts by distance from the geolocation fix after init', async () => {
+      getCurrentPosition.mockResolvedValue({ lat: 39.96, lng: -75.16 })
+      const f = useReportFinder()
+      await f.init()
+      expect(f.locations.value.map((l) => l.id)).toEqual(['near', 'mid', 'far'])
+    })
+
+    it('sorts by distance from the searched address after setCenter', async () => {
+      getCurrentPosition.mockResolvedValue(null)
+      const f = useReportFinder()
+      await f.init()
+      f.setCenter({ latitude: 40.05, longitude: -75.0001 })
+      expect(f.locations.value.map((l) => l.id)).toEqual(['far', 'mid', 'near'])
+    })
+  })
 })

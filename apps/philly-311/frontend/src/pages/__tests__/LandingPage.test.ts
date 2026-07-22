@@ -18,6 +18,7 @@ vi.mock('@pinboard/ui', () => {
       'locationPanelFilter',
       'locationPanelSearch',
       'locationPanelCountNoun',
+      'locationSearchMode',
     ],
     emits: ['search'],
     setup:
@@ -30,6 +31,7 @@ vi.mock('@pinboard/ui', () => {
             'data-filter-set': String(props.locationPanelFilter != null),
           }),
           h('div', { class: 'count-noun-debug' }, String(props.locationPanelCountNoun ?? '')),
+          h('div', { class: 'search-mode-debug' }, String(props.locationSearchMode ?? '')),
           h('div', { class: 'header' }, slots['locations-header']?.()),
           h('div', { class: 'filters' }, slots['locations-filters']?.()),
           h(
@@ -191,6 +193,26 @@ describe('LandingPage', () => {
     await flushPromises()
     expect(searchAddress).toHaveBeenCalledWith('1234 Market St')
     expect(ensureLoaded).not.toHaveBeenCalled()
+  })
+
+  it('sets address search mode after a successful geocode so the map pans', async () => {
+    searchAddress.mockResolvedValue({ lat: 39.9526, lng: -75.1652 })
+    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    await flushPromises()
+    expect(w.find('.search-mode-debug').text()).toBe('')
+
+    await w.find('.do-search').trigger('click')
+    await flushPromises()
+    expect(w.find('.search-mode-debug').text()).toBe('address')
+  })
+
+  it('leaves search mode unset when the geocode finds nothing', async () => {
+    searchAddress.mockResolvedValue(null)
+    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    await flushPromises()
+    await w.find('.do-search').trigger('click')
+    await flushPromises()
+    expect(w.find('.search-mode-debug').text()).toBe('')
   })
 
   it('renders the accuracy circle after a geolocation fix, absent before', async () => {
