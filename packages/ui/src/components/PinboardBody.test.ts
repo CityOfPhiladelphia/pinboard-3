@@ -98,4 +98,16 @@ describe('PinboardBody - locationPanelCountNoun forwarding', () => {
     const sheetCount = w.find('.bottom-sheet-stub').find('.location-count')
     expect(sheetCount.exists()).toBe(false)
   })
+
+  it('uses the noun in the mobile sheet header, defaulting to item', () => {
+    const withNoun = mountPinboardBody({ locationPanelCountNoun: 'report' })
+    expect(withNoun.find('.location-sheet-header').text()).toContain(
+      '2 reports'
+    )
+
+    const withoutNoun = mountPinboardBody()
+    expect(withoutNoun.find('.location-sheet-header').text()).toContain(
+      '2 items'
+    )
+  })
 })

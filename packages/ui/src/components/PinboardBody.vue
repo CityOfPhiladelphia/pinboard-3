@@ -25,6 +25,7 @@ import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
 // pinboard composables and utilities imports
 import { hasLocationData } from '../utilities/hasLocationData'
+import { locationCountLabel as formatLocationCount } from '../utilities/locationCountLabel'
 import { usePrint } from '../composables/usePrint'
 
 // type imports
@@ -160,12 +161,21 @@ const selectedLocationId = computed(() =>
   selectedLocation.value === undefined ? undefined : selectedLocation.value.id
 )
 
-const locationCountLabel = computed(() => {
+// Falls back to the i18n-driven generic label; apps that need a custom noun
+// (e.g. "report" instead of "item") pass locationPanelCountNoun and lose i18n
+// pluralization in exchange for that word, same tradeoff LocationsPanel makes.
+const defaultLocationCountLabel = computed(() => {
   const message = props.locations.length
     ? t('pinboard.itemCount', { count: props.locations.length }, props.locations.length)
     : t('pinboard.noLocations')
   return props.isLoading || message
 })
+
+const locationCountLabel = computed(() =>
+  props.locationPanelCountNoun
+    ? formatLocationCount(props.locations.length, props.locationPanelCountNoun)
+    : defaultLocationCountLabel.value
+)
 
 // Filter chips in use bubble up to sit right after the (pinned) Sort chip. The
 // order is a snapshot recomputed only at safe moments — initial load, a chip's
