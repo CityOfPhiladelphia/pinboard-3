@@ -52,3 +52,17 @@ export interface SubmittedReport {
   id: string
   caseNumber?: string
 }
+
+/** A locally saved, resumable snapshot of an in-progress report. */
+export interface ReportDraft {
+  id: string
+  savedAt: string
+  category: string | null
+  customFields: Record<string, string>
+  location: WizardLocation | null
+  description: string
+  contact: ContactInfo
+  publicVisibility: boolean
+  /** Uploaded photo URL only — blob preview URLs don't survive reload. */
+  mediaUrl?: string
+}
