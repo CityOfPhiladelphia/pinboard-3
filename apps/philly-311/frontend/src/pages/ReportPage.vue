@@ -1,13 +1,17 @@
 <!-- ABOUTME: Report-wizard shell. Renders a breadcrumb, the StepIndicator, the active
      child step via <router-view>, and contextual Reset/Skip/Back/Next controls.
-     canAdvance is provided to children; Next is disabled while the active step reports it cannot advance. -->
+     Next always stays enabled; canAdvance and showErrors are provided so an
+     invalid attempt surfaces the active step's error messages instead of
+     blocking the click. A step can register nav handlers to intercept
+     Back/Next before the shell changes routes. -->
 <script setup lang="ts">
 import { provide, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import StepIndicator from '@/components/wizard/StepIndicator.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
-import { WIZARD_CAN_ADVANCE_KEY } from '@/composables/useWizardValidity'
+import { WIZARD_CAN_ADVANCE_KEY, WIZARD_SHOW_ERRORS_KEY } from '@/composables/useWizardValidity'
+import { WIZARD_NAV_KEY, type WizardNavHandlers } from '@/composables/useWizardNav'
 
 const router = useRouter()
 const route = useRoute()
@@ -22,7 +26,11 @@ const STEPS = [
 ]
 
 const canAdvance = ref(true)
+const showErrors = ref(false)
+const navHandlers = ref<WizardNavHandlers | null>(null)
 provide(WIZARD_CAN_ADVANCE_KEY, canAdvance)
+provide(WIZARD_SHOW_ERRORS_KEY, showErrors)
+provide(WIZARD_NAV_KEY, navHandlers)
 
 const currentStep = computed(() => {
   const idx = STEPS.findIndex((s) => s.path === route.path)
@@ -35,10 +43,16 @@ const prevPath = computed(() => STEPS[currentStep.value - 2]?.path ?? null)
 const nextPath = computed(() => STEPS[currentStep.value]?.path ?? null)
 
 function goPrev() {
+  if (navHandlers.value?.back()) return
   if (prevPath.value) router.push(prevPath.value)
 }
 function goNext() {
-  if (canAdvance.value && nextPath.value) router.push(nextPath.value)
+  if (navHandlers.value?.next()) return
+  if (!canAdvance.value) {
+    showErrors.value = true
+    return
+  }
+  if (nextPath.value) router.push(nextPath.value)
 }
 function resetWizard() {
   store.reset()
@@ -90,7 +104,7 @@ function resetWizard() {
           v-if="!isLast"
           variant="primary"
           data-test="wizard-next"
-          :disabled="!canAdvance || !nextPath"
+          :disabled="!nextPath"
           @click="goNext"
           >Next</PhilaButton
         >

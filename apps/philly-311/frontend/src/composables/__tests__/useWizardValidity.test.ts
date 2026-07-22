@@ -1,12 +1,21 @@
 // ABOUTME: Tests useWizardValidity — mirrors a computed into wizard:canAdvance,
-// ABOUTME: resets to true before unmount, and is a no-op when not provided.
+// ABOUTME: clears wizard:showErrors once validity turns true, resets both
+// ABOUTME: before unmount, and is a no-op when not provided.
 import { describe, expect, it } from 'vitest'
 import { computed, defineComponent, h, provide, ref, type Ref } from 'vue'
 import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createMemoryHistory, RouterView } from 'vue-router'
-import { useWizardValidity, WIZARD_CAN_ADVANCE_KEY } from '../useWizardValidity'
+import {
+  useWizardValidity,
+  WIZARD_CAN_ADVANCE_KEY,
+  WIZARD_SHOW_ERRORS_KEY,
+} from '../useWizardValidity'
 
-function harness(canAdvance: Ref<boolean>, validityFn: () => boolean) {
+function harness(
+  canAdvance: Ref<boolean>,
+  validityFn: () => boolean,
+  showErrors: Ref<boolean> = ref(false),
+) {
   const Child = defineComponent({
     setup() {
       useWizardValidity(computed(validityFn))
@@ -22,7 +31,12 @@ function harness(canAdvance: Ref<boolean>, validityFn: () => boolean) {
     render: () => h(Child),
   })
   return mount(Root, {
-    global: { provide: { 'wizard:canAdvance': canAdvance } },
+    global: {
+      provide: {
+        [WIZARD_CAN_ADVANCE_KEY]: canAdvance,
+        [WIZARD_SHOW_ERRORS_KEY]: showErrors,
+      },
+    },
   })
 }
 
@@ -50,6 +64,27 @@ describe('useWizardValidity', () => {
     expect(canAdvance.value).toBe(false)
     wrapper.unmount()
     expect(canAdvance.value).toBe(true)
+  })
+
+  it('clears showErrors once validity turns true', async () => {
+    const canAdvance = ref(true)
+    const showErrors = ref(true)
+    const flag = ref(false)
+    harness(canAdvance, () => flag.value, showErrors)
+    expect(showErrors.value).toBe(true)
+    flag.value = true
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(showErrors.value).toBe(false)
+  })
+
+  it('resets showErrors to false on unmount', () => {
+    const canAdvance = ref(true)
+    const showErrors = ref(true)
+    const wrapper = harness(canAdvance, () => false, showErrors)
+    expect(showErrors.value).toBe(true)
+    wrapper.unmount()
+    expect(showErrors.value).toBe(false)
   })
 
   it('is a no-op when no provider exists', () => {
