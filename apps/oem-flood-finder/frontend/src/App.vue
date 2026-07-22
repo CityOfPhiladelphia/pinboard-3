@@ -1,17 +1,10 @@
 <script setup lang="ts">
-import { PinboardShell, NavbarInfo, PinboardComposables, IS_MOBILE_KEY } from '@pinboard/ui'
-import '@pinboard/ui/style.css'
-import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
-import { CloseButton } from '@phila/phila-ui-button'
+import { PinboardShell } from '@pinboard/ui'
 import { useEverbridgeNotifications } from './composables/useEverbridgeNotifications'
 import type { AlertBanner } from './types'
-import { computed, inject, onMounted, ref, useTemplateRef, type ComputedRef } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, type ComputedRef } from 'vue'
 
-const { infoSheetOpen, isDraggingSheet, dragY, openInfoSheet, closeInfoSheet, onSheetPointerDown } =
-  PinboardComposables.useInitPinboardApp()
-
-const isMobile = inject(IS_MOBILE_KEY, ref(false))
+const feedbackHref = 'https://phila.formstack.com/forms/oem_flood_monitoring_map_feedback'
 
 const { everbridgeNotifications } = useEverbridgeNotifications(1)
 
@@ -32,26 +25,15 @@ const alertBanner: ComputedRef<AlertBanner | null> = computed(() => {
   }
   return null
 })
-
-const route = useRoute()
-const router = useRouter()
-const navbarInfo = useTemplateRef<InstanceType<typeof NavbarInfo>>('navbarInfo')
-
-onMounted(async () => {
-  await router.isReady()
-  if (route.path === '/') {
-    if (isMobile.value) {
-      infoSheetOpen.value = true
-    } else {
-      navbarInfo.value?.show()
-    }
-  }
-})
 </script>
 
 <template>
   <PinboardShell
     title="Flood Monitoring Map"
+    info-title="About this tool"
+    info-message="This map allows residents to keep an eye on water levels in parts of the city and make informed decisions prior to, during, and after a flooding event."
+    info-link-text="Learn more"
+    info-href="resources"
     :logo="{
       variant: 'city',
       layout: 'single-line',
@@ -61,61 +43,10 @@ onMounted(async () => {
     }"
     :banner-title="alertBanner?.title"
     :banner-message="alertBanner?.body"
-    :is-mobile="isMobile"
+    :feedback-href="feedbackHref"
   >
-    <template #navbar-end>
-      <div v-if="isMobile" class="navbar-info-mobile-wrap" @click.capture.stop="openInfoSheet">
-        <NavbarInfo info-title="About this tool" label="About this tool" />
-      </div>
-      <NavbarInfo v-else ref="navbarInfo" info-title="About this tool" label="About this tool">
-        <span class="has-text-body-small">
-          This map allows residents to keep an eye on water levels in parts of the city and make
-          informed decisions prior to, during, and after a flooding event.
-          <a href="/resources">Learn more</a>
-        </span>
-      </NavbarInfo>
-    </template>
-
-    <template #sub-footer>
-      <a class="sub-footer-link" href="https://www.phila.gov/terms-of-use/">Terms of use</a>
-      <a class="sub-footer-link" href="https://www.phila.gov/open-records-policy/">Right to know</a>
-      <a class="sub-footer-link" href="https://www.phila.gov/privacypolicy/">Privacy Policy</a>
-      <a class="sub-footer-link" href="https://www.phila.gov/accessibility-policy/"
-        >Accessibility</a
-      >
-      <a
-        class="sub-footer-link"
-        target="_blank"
-        href="https://phila.formstack.com/forms/oem_flood_monitoring_map_feedback"
-        >Feedback</a
-      >
-    </template>
-
     <RouterView />
   </PinboardShell>
-
-  <Teleport to="body">
-    <Transition name="scrim-fade">
-      <div v-if="infoSheetOpen" class="info-sheet-scrim" @click="closeInfoSheet" />
-    </Transition>
-    <BottomSheet
-      v-if="infoSheetOpen"
-      v-model="infoSheetOpen"
-      class="info-sheet"
-      :class="{ 'info-sheet--dragging': isDraggingSheet }"
-      :style="{ zIndex: 101, '--drag-y': `${dragY}px` }"
-      :snap-points="[60]"
-      @pointerdown="onSheetPointerDown"
-    >
-      <CloseButton class="info-sheet-close" @click="closeInfoSheet" />
-      <h2 class="has-text-heading-5">About this tool</h2>
-      <span class="has-text-body-small">
-        This map allows residents to keep an eye on water levels in parts of the city and make
-        informed decisions prior to, during, and after a flooding event.
-        <a href="/resources">Learn more</a>
-      </span>
-    </BottomSheet>
-  </Teleport>
 </template>
 
 <style>

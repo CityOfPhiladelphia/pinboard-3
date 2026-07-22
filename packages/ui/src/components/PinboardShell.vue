@@ -3,14 +3,14 @@ import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader, NavbarInfo } from '@phila/phila-ui-app-header'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { CloseButton } from '@phila/phila-ui-button'
-import { Icon } from '@phila/phila-ui-core'
-import { IconCircleInfo } from '@phila/phila-ui-core/icons'
 import MobileNavPanel from './MobileNavPanel.vue'
 import PinboardSubFooter from './PinboardSubFooter.vue'
-import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { inject, onMounted, ref, useTemplateRef, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import type { VNode } from 'vue'
 import type { NavbarBrandProps, Language } from '@phila/phila-ui-app-header'
+import { useInitPinboardApp } from '../composables/_index.ts'
+import { IS_MOBILE_KEY } from '../keys.ts'
 
 defineProps<{
   title: string
@@ -20,10 +20,11 @@ defineProps<{
   languages?: Language[]
   locale?: string
   feedbackHref?: string
-  infoTitle?: string
+  infoTitle: string
   infoLabel?: string
-  infoHref?: string
-  isMobile: boolean
+  infoMessage: string
+  infoLinkText: string
+  infoHref: string
 }>()
 
 const emit = defineEmits<{
@@ -38,68 +39,33 @@ defineSlots<{
   'sub-footer'?(): VNode[]
 }>()
 
-const infoSheetOpen = ref(false)
-const navbarInfoRef = ref<{ hide: () => void } | null>(null)
+const { infoSheetOpen, isDraggingSheet, dragY, openInfoSheet, closeInfoSheet, onSheetPointerDown } =
+  useInitPinboardApp()
+
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
+const navbarInfo = useTemplateRef<InstanceType<typeof NavbarInfo>>('navbarInfo')
+const router = useRouter()
 const route = useRoute()
 
 watch(
   () => route.fullPath,
   () => {
-    navbarInfoRef.value?.hide()
+    navbarInfo.value?.hide()
     infoSheetOpen.value = false
   }
 )
 
-/* Capture-phase click on the wrapper runs before the inner Tooltip's
- * bubble-phase listener, so stopPropagation suppresses the tooltip and
- * we open the bottom sheet instead. */
-function openInfoSheet(event: Event) {
-  event.preventDefault()
-  event.stopPropagation()
-  infoSheetOpen.value = true
-}
+onMounted(async () => {
+  await router.isReady()
 
-function closeInfoSheet() {
-  infoSheetOpen.value = false
-  dragY.value = 0
-}
-
-/* Drag-down-to-dismiss. BottomSheet's built-in drag is snap-point based
- * and a single snap point ([60]) clamps it to no movement, so we layer
- * our own pointer tracking on top: translate the sheet to follow the
- * pointer, dismiss past DRAG_DISMISS_THRESHOLD on release, otherwise
- * spring back. Clicks (zero delta) pass through. */
-const DRAG_DISMISS_THRESHOLD = 160
-const dragY = ref(0)
-const isDraggingSheet = ref(false)
-let dragStartY = 0
-
-function onSheetPointerDown(e: PointerEvent) {
-  dragStartY = e.clientY
-  dragY.value = 0
-  isDraggingSheet.value = true
-  document.addEventListener('pointermove', onSheetPointerMove)
-  document.addEventListener('pointerup', onSheetPointerUp)
-  document.addEventListener('pointercancel', onSheetPointerUp)
-}
-
-function onSheetPointerMove(e: PointerEvent) {
-  if (!isDraggingSheet.value) return
-  dragY.value = Math.max(0, e.clientY - dragStartY)
-}
-
-function onSheetPointerUp() {
-  if (!isDraggingSheet.value) return
-  isDraggingSheet.value = false
-  document.removeEventListener('pointermove', onSheetPointerMove)
-  document.removeEventListener('pointerup', onSheetPointerUp)
-  document.removeEventListener('pointercancel', onSheetPointerUp)
-  if (dragY.value > DRAG_DISMISS_THRESHOLD) {
-    closeInfoSheet()
-  } else {
-    dragY.value = 0
+  if (route.path === '/') {
+    if (isMobile.value) {
+      infoSheetOpen.value = true
+    } else {
+      navbarInfo.value?.show()
+    }
   }
-}
+})
 </script>
 
 <template>
@@ -108,7 +74,6 @@ function onSheetPointerUp() {
       id="pinboard-nav"
       :compact-mobile="true"
       :show-trusted-site="true"
-      :links="[]"
       :navbar-brand="{
         brandingImage: { src: '', href: '/', altText: title },
         brandingLink: logo ? undefined : { text: title, href: '/' },
@@ -125,9 +90,7 @@ function onSheetPointerUp() {
            (phila-ui-4 bead map-core-k8c) gates the default on a search-panel slot.
            Must contain a real (non-comment) node: Vue renders the slot's default content
            when an overriding slot is empty, so a hidden span is what actually suppresses it. -->
-      <template #navbar-search>
-        <span hidden />
-      </template>
+      <template #navbar-search><span hidden /></template>
 
       <!-- Only show the hamburger when the app provides a mobile nav. AppHeader renders
            the burger by default; suppress it otherwise so apps without a mobile nav (e.g.
@@ -135,43 +98,29 @@ function onSheetPointerUp() {
            "burger only if mobile-nav" behavior; same root cause as bead map-core-k8c.
            Hidden span (not empty) because Vue renders a slot's default content when the
            overriding slot is empty. -->
-      <template v-if="!$slots['mobile-nav']" #navbar-toggle>
-        <span hidden />
-      </template>
-
-      <template v-if="$slots['mobile-nav']" #mobile-nav>
+      <template v-if="!$slots['mobile-nav']" #navbar-toggle><span hidden /></template>
+      <template v-else #mobile-nav>
         <MobileNavPanel>
           <slot name="mobile-nav" />
         </MobileNavPanel>
       </template>
       <template v-if="infoHref || infoTitle || $slots['navbar-end']" #navbar-end>
         <RouterLink v-if="infoHref" :to="infoHref" class="navbar-info-link">
-          <Icon
-            :icon="IconCircleInfo"
-            decorative
-            inline
-            size="small"
-            class="navbar-info-link__icon"
-          />
-          <span
-            v-if="infoLabel ?? infoTitle"
-            class="navbar-info-link__label has-text-body-default hidden-tablet"
-            >{{ infoLabel ?? infoTitle }}</span
-          >
-        </RouterLink>
-        <template v-else-if="infoTitle">
           <div v-if="isMobile" class="navbar-info-mobile-wrap" @click.capture.stop="openInfoSheet">
             <NavbarInfo :info-title="infoTitle" :label="infoLabel ?? infoTitle" />
           </div>
           <NavbarInfo
             v-else
-            ref="navbarInfoRef"
+            ref="navbarInfo"
             :info-title="infoTitle"
             :label="infoLabel ?? infoTitle"
           >
-            <slot name="info-body" />
+            <span class="has-text-body-small">
+              {{ infoMessage }}
+              <RouterLink :to="`/${infoHref}`">{{ infoLinkText }}</RouterLink>
+            </span>
           </NavbarInfo>
-        </template>
+        </RouterLink>
         <slot name="navbar-end" />
       </template>
     </AppHeader>
@@ -189,7 +138,7 @@ function onSheetPointerUp() {
     </AppFooter>
   </div>
 
-  <Teleport to="body">
+  <Teleport to="body" :disabled="!isMobile">
     <Transition name="pinboard-shell-scrim-fade">
       <div v-if="infoSheetOpen" class="pinboard-shell-info-scrim" @click="closeInfoSheet" />
     </Transition>
@@ -204,7 +153,10 @@ function onSheetPointerUp() {
     >
       <CloseButton class="pinboard-shell-info-close" @click="closeInfoSheet" />
       <h2 class="has-text-heading-5">{{ infoTitle }}</h2>
-      <slot name="info-body" />
+      <span class="has-text-body-small">
+        {{ infoMessage }}
+        <RouterLink :to="`/${infoHref}`" @click="closeInfoSheet">{{ infoLinkText }}</RouterLink>
+      </span>
     </BottomSheet>
   </Teleport>
 </template>

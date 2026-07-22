@@ -118,20 +118,14 @@ importers:
   apps/oem-flood-finder/frontend:
     dependencies:
       '@phila/phila-ui-bottom-sheet':
-        specifier: 0.1.0-beta.13
-        version: 0.1.0-beta.13(@fortawesome/fontawesome-svg-core@7.1.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.33(typescript@6.0.3)))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
+        specifier: 0.1.0-beta.14
+        version: 0.1.0-beta.14(@fortawesome/fontawesome-svg-core@7.1.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.33(typescript@6.0.3)))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-button':
         specifier: 2.3.0-beta.9
         version: 2.3.0-beta.9(@fortawesome/fontawesome-svg-core@7.1.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.33(typescript@6.0.3)))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-charts':
         specifier: 0.1.0-beta.12
         version: 0.1.0-beta.12(@fortawesome/fontawesome-svg-core@7.1.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.33(typescript@6.0.3)))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
-      '@phila/phila-ui-checkbox':
-        specifier: 0.1.1-beta.9
-        version: 0.1.1-beta.9(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
-      '@phila/phila-ui-collapse-panel':
-        specifier: 0.2.0-beta.8
-        version: 0.2.0-beta.8(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-core':
         specifier: 3.0.0-beta.8
         version: 3.0.0-beta.8(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
@@ -959,13 +953,6 @@ packages:
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-bottom-sheet@0.1.0-beta.13':
-    resolution: {integrity: sha512-AJvL7QLplEI12UXRSpxWMLWalE/0C1XCs3g7b6fIHqXXGgw/+9Q1ucFWmltpKyjK3eCnLzf50Jhlf+IhWpdubw==}
-    peerDependencies:
-      '@fortawesome/fontawesome-svg-core': '>=7.1.0'
-      '@fortawesome/vue-fontawesome': ^3.1.2
-      vue: ^3.0.0
-
   '@phila/phila-ui-bottom-sheet@0.1.0-beta.14':
     resolution: {integrity: sha512-FfrzgBShehjF5bT5YTDYjmNbSCJjd+UkEcxvTFLkQYVx7uYWFjd/wxVmzm+qXcA7Qn6aLNwry4V0fv09U8qLBg==}
     peerDependencies:
@@ -1016,11 +1003,6 @@ packages:
 
   '@phila/phila-ui-checkbox@1.0.0-beta.12':
     resolution: {integrity: sha512-fsDDAfEdwwS9cBUxx+aCdPPTzMKMK0tGXZKuxMwoInQ5iig4TazLSkxFLrI/dT7UKWTE6YFUCQd8W3MQAf8W2A==}
-    peerDependencies:
-      vue: ^3.0.0
-
-  '@phila/phila-ui-collapse-panel@0.2.0-beta.8':
-    resolution: {integrity: sha512-bfQF5jjcpVIpImcb9jAp3ElBoBgSmuBOqZc110xRygAk4sHKA1mXYoBeYLGwiRnf8lC6rNHzPMRJ5HczVxGJuw==}
     peerDependencies:
       vue: ^3.0.0
 
@@ -1565,7 +1547,7 @@ packages:
     resolution: {integrity: sha512-u9HHgfrq3AjXlysn0eINFnWQOJQLO9WN6VprZ8FXl7A2bYisv3Hui9Ij+7QZ41F/WYWarHjwBbXtD7dKg3uxbg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
-      vite: '>=6.4.2 <8'
+      vite: '>=7.3.2'
       vue: ^3.2.25
 
   '@volar/language-core@2.4.28':
@@ -2937,7 +2919,7 @@ packages:
     resolution: {integrity: sha512-9qTpOmZ2vHpvlI9hdVXAQ1Ry4I8GcBArU7aPi0qfIaV7fQIXy0L1nb6X4mFY2Gw0dYshHuLbIl0Ulb572SCjsQ==}
     engines: {node: '>=v14.21.3'}
     peerDependencies:
-      vite: '>=6.4.2 <8'
+      vite: '>=7.3.2'
 
   vite-plugin-vue-inspector@5.4.0:
     resolution: {integrity: sha512-Iq/024CydcE46FZqWPU4t4lw4uYOdLnFSO1RNxJVt2qY9zxIjmnkBqhHnYaReWM82kmNnaXs7OkfgRrV2GEjyw==}
@@ -3644,15 +3626,6 @@ snapshots:
       - '@fortawesome/vue-fontawesome'
       - vue-router
 
-  '@phila/phila-ui-bottom-sheet@0.1.0-beta.13(@fortawesome/fontawesome-svg-core@7.1.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.33(typescript@6.0.3)))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
-    dependencies:
-      '@fortawesome/fontawesome-svg-core': 7.1.0
-      '@fortawesome/vue-fontawesome': 3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.33(typescript@6.0.3))
-      '@phila/phila-ui-core': 3.0.0-beta.8(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
-      vue: 3.5.33(typescript@6.0.3)
-    transitivePeerDependencies:
-      - vue-router
-
   '@phila/phila-ui-bottom-sheet@0.1.0-beta.14(@fortawesome/fontawesome-svg-core@7.1.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.1.0)(vue@3.5.33(typescript@6.0.3)))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
     dependencies:
       '@fortawesome/fontawesome-svg-core': 7.1.0
@@ -3737,13 +3710,6 @@ snapshots:
     transitivePeerDependencies:
       - '@fortawesome/fontawesome-svg-core'
       - '@fortawesome/vue-fontawesome'
-      - vue-router
-
-  '@phila/phila-ui-collapse-panel@0.2.0-beta.8(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
-    dependencies:
-      '@phila/phila-ui-core': 3.0.0-beta.8(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
-      vue: 3.5.33(typescript@6.0.3)
-    transitivePeerDependencies:
       - vue-router
 
   '@phila/phila-ui-collapse-panel@0.2.0-beta.9(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
