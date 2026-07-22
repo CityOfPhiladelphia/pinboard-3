@@ -3,13 +3,11 @@
      toggle chips; the All Filters button opens a FilterPanel for the same
      single-select model. -->
 <script setup lang="ts">
-import { computed, h, ref } from 'vue'
-import type { FunctionalComponent, SVGAttributes } from 'vue'
+import { computed, ref } from 'vue'
 import { FilterChipGroup } from '@phila/phila-ui-filter-chip'
 import { FilterPanel } from '@phila/phila-ui-filter-panel'
 import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { serviceTypeIconDefinition } from '@/utils/reportIcon'
+import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import { serviceTypeColor } from '@/utils/serviceTypeMeta'
 
 const PANEL_FILTER_KEY = 'serviceType'
@@ -20,18 +18,13 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
-// FilterChipGroup icons are Vue functional components; wrap the FontAwesome
-// service-type definitions so the chips match the map markers.
-function chipIcon(label: string): FunctionalComponent<SVGAttributes> {
-  const definition = serviceTypeIconDefinition(label)
-  return (attrs) => h(FontAwesomeIcon, { ...attrs, icon: definition })
-}
-
 const filters = computed<FilterDefinition[]>(() =>
   props.options.map((o) => ({
     key: o.value,
     label: o.label,
-    icon: chipIcon(o.label),
+    // FilterChipGroup icons are Vue functional components; the shared cached
+    // wrapper keeps chips visually in sync with the map markers.
+    icon: serviceTypeIconComponent(o.label),
     iconColor: serviceTypeColor(o.label),
   })),
 )

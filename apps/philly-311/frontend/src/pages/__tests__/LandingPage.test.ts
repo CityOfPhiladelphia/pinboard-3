@@ -53,7 +53,7 @@ vi.mock('@pinboard/ui', () => {
           ),
           slots['map-content']?.({
             map: null,
-            zoom: 12,
+            zoom: 12.57,
             isMobile: false,
             hoveredId: null,
             selectedId: null,
@@ -209,8 +209,14 @@ describe('LandingPage', () => {
       latitude: 39.95,
       longitude: -75.16,
       accuracy: 12,
-      zoom: 12,
+      zoom: 12.57,
     })
+  })
+
+  it('passes rounded zoom to ClusteredMarkers so pins skip per-frame re-renders', async () => {
+    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    await flushPromises()
+    expect(w.findComponent({ name: 'ClusteredMarkers' }).props('zoom')).toBe(13)
   })
 
   it('joins BasemapToggle to the bottom-right desktop control stack with GeolocationButton', async () => {

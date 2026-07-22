@@ -1,5 +1,8 @@
 // ABOUTME: Resolve a 311 service type to a Fontawesome pin icon via common_categories;
 // ABOUTME: neutral location-dot fallback for any unmapped or missing service type.
+import { h } from 'vue'
+import type { FunctionalComponent, SVGAttributes } from 'vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import {
   faRoad,
@@ -38,4 +41,20 @@ const BY_TITLE: Record<string, IconDefinition> = Object.fromEntries(
 export function serviceTypeIconDefinition(serviceType: string | undefined | null): IconDefinition {
   if (!serviceType) return faLocationDot
   return BY_TITLE[serviceType] ?? faLocationDot
+}
+
+// Cached per definition so consumers get a stable component identity —
+// an unstable identity would remount the icon on every parent re-render.
+const ICON_COMPONENTS = new Map<IconDefinition, FunctionalComponent<SVGAttributes>>()
+
+export function serviceTypeIconComponent(
+  serviceType: string | undefined | null,
+): FunctionalComponent<SVGAttributes> {
+  const definition = serviceTypeIconDefinition(serviceType)
+  let component = ICON_COMPONENTS.get(definition)
+  if (!component) {
+    component = (attrs) => h(FontAwesomeIcon, { ...attrs, icon: definition })
+    ICON_COMPONENTS.set(definition, component)
+  }
+  return component
 }

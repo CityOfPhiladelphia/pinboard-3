@@ -5,7 +5,7 @@ import { computed, toRef } from 'vue'
 import { MapMarker, MapIconTextPin } from '@pinboard/ui'
 import type { PinboardTypes } from '@pinboard/ui'
 import { useClusters } from '@/composables/useClusters'
-import { serviceTypeIconDefinition } from '@/utils/reportIcon'
+import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import ClusterBadge from '@/components/ClusterBadge.vue'
 
 const props = defineProps<{
@@ -47,7 +47,7 @@ function onClusterClick(item: { id: number; lng: number; lat: number }) {
     <MapMarker v-else-if="locationById.get(item.id)" :lng-lat="[item.lng, item.lat]">
       <MapIconTextPin
         :zoom="zoom"
-        :icon="serviceTypeIconDefinition(locationById.get(item.id)!.name)"
+        :icon="serviceTypeIconComponent(locationById.get(item.id)!.name)"
         color-theme="light-primary"
         :hovered="hoveredId === item.id"
         :selected="selectedId === item.id"

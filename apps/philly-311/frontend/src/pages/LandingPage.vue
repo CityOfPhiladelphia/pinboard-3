@@ -101,9 +101,11 @@ async function onSearch(query: string) {
         :accuracy="locatedFix.accuracy"
         :zoom="zoom"
       />
+      <!-- Rounded zoom: clustering and pin sizing are integer-granular, and a
+           fractional zoom prop would re-render every marker per animation frame. -->
       <ClusteredMarkers
         :locations="finder.locations.value"
-        :zoom="zoom"
+        :zoom="Math.round(zoom)"
         :map="map"
         :hovered-id="hoveredId"
         :selected-id="selectedId"
