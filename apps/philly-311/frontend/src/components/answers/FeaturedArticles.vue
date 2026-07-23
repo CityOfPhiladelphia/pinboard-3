@@ -17,7 +17,11 @@ onMounted(async () => {
       direction: 'desc',
       limit: 4,
     })
-    articles.value = result.items
+    // The API ignores sort/direction/limit for list views and returns the
+    // whole Salesforce list; enforce "newest 4" here until it honors them.
+    articles.value = [...result.items]
+      .sort((x, y) => (y.lastPublishedAt ?? '').localeCompare(x.lastPublishedAt ?? ''))
+      .slice(0, 4)
   } catch {
     // A missing strip is preferable to an error banner over the hero.
     articles.value = []

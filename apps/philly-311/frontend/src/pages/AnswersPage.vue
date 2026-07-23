@@ -257,6 +257,10 @@ onMounted(loadPage)
   margin: 0;
   padding: 0;
 }
+.answers__list li {
+  /* Overrides the phila .content typography's 24px list-item margin. */
+  margin: 0;
+}
 .answers__status {
   margin: var(--spacing-m, 1rem) 0;
 }
