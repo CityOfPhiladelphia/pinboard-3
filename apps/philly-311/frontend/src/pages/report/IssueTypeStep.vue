@@ -1,17 +1,15 @@
 <!-- ABOUTME: Wizard step 2 — choose the issue type (photo recommendations + searchable
-     caseType-grouped directory) and answer its conditional questions. View derives from
-     store.category; Next is gated on required visible questions via useWizardValidity. -->
+     caseType-grouped directory). View derives from store.category; Next is gated on
+     a category being chosen via useWizardValidity. -->
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useServiceTypes } from '@/composables/useServiceTypes'
-import { useWizardValidity } from '@/composables/useWizardValidity'
+import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
-import { visibleQuestions } from '@/utils/conditional'
 import { PhilaButton } from '@phila/phila-ui-button'
 import ServiceTypeIcon from '@/components/ServiceTypeIcon.vue'
 import TypeSuggestions from '@/components/wizard/TypeSuggestions.vue'
 import TypeDirectory from '@/components/wizard/TypeDirectory.vue'
-import QuestionField from '@/components/wizard/QuestionField.vue'
 
 const store = useReportSubmissionStore()
 const { list, isLoading, error, load } = useServiceTypes()
@@ -21,24 +19,12 @@ onMounted(() => {
 
 const catalog = computed(() => list.value ?? [])
 const selected = computed(() => catalog.value.find((s) => s.serviceType === store.category) ?? null)
-const visible = computed(() =>
-  selected.value
-    ? visibleQuestions(selected.value.questions, store.customFields, selected.value.serviceType)
-    : [],
-)
-const hasRequired = computed(() => visible.value.some((q) => q.required))
 const hasSurvivingSuggestions = computed(() =>
   store.photoSuggestions.some((s) => catalog.value.some((c) => c.serviceType === s.serviceType)),
 )
 
-useWizardValidity(
-  computed(
-    () =>
-      !!store.category &&
-      !error.value &&
-      visible.value.every((q) => !q.required || (store.customFields[q.field] ?? '') !== ''),
-  ),
-)
+useWizardValidity(computed(() => !!store.category && !error.value))
+const showErrors = useWizardErrors()
 
 function pick(serviceType: string) {
   store.setCategory(serviceType)
@@ -53,6 +39,9 @@ function change() {
     <h1 class="issue-step__title">
       Issue type <span class="issue-step__required">* (required)</span>
     </h1>
+    <p v-if="showErrors && !store.category" class="issue-step__error" role="alert">
+      Select an issue type to continue
+    </p>
 
     <p v-if="isLoading && !catalog.length" class="issue-step__status">Loading issue types…</p>
     <p v-else-if="error" class="issue-step__error" role="alert">
@@ -91,22 +80,6 @@ function change() {
           Change
         </button>
       </div>
-
-      <p v-if="!visible.length" class="issue-step__status">
-        No additional details needed for this issue type.
-      </p>
-      <template v-else>
-        <p v-if="hasRequired" class="issue-step__legend">* Required</p>
-        <div class="issue-step__questions">
-          <QuestionField
-            v-for="q in visible"
-            :key="q.field"
-            :question="q"
-            :model-value="store.customFields[q.field] ?? ''"
-            @update:model-value="store.setQuestion(q.field, $event)"
-          />
-        </div>
-      </template>
     </template>
   </div>
 </template>
@@ -169,16 +142,6 @@ function change() {
   color: var(--ui-color-primary, #0f4d90);
   font-weight: 600;
   cursor: pointer;
-}
-.issue-step__questions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-m, 1rem);
-  max-width: 640px;
-}
-.issue-step__legend {
-  color: var(--ui-color-grey-700, #4a4a4a);
-  font-size: 0.875rem;
 }
 .issue-step__error {
   color: var(--ui-color-red, #c0392b);

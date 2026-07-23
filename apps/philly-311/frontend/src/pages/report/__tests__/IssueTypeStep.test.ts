@@ -1,12 +1,12 @@
-// ABOUTME: Tests IssueTypeStep — pick/questions view swap, validity gating, Change reset,
-// ABOUTME: conditional follow-ups, zero-question types, catalog error retry, suggestions band.
+// ABOUTME: Tests IssueTypeStep — pick/selected view swap, category-only validity gating,
+// ABOUTME: Change reset, catalog error retry, suggestions band, showErrors alert.
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { setActivePinia, createPinia } from 'pinia'
 import { ref } from 'vue'
 import type { ServiceType } from '@/types/api'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
-import { WIZARD_CAN_ADVANCE_KEY } from '@/composables/useWizardValidity'
+import { WIZARD_CAN_ADVANCE_KEY, WIZARD_SHOW_ERRORS_KEY } from '@/composables/useWizardValidity'
 
 const CATALOG: ServiceType[] = [
   {
@@ -53,9 +53,9 @@ vi.mock('@/composables/useServiceTypes', () => ({
 
 import IssueTypeStep from '../IssueTypeStep.vue'
 
-function mountStep(canAdvance = ref(false)) {
+function mountStep(canAdvance = ref(false), showErrors = ref(false)) {
   const w = mount(IssueTypeStep, {
-    global: { provide: { [WIZARD_CAN_ADVANCE_KEY]: canAdvance } },
+    global: { provide: { [WIZARD_CAN_ADVANCE_KEY]: canAdvance, [WIZARD_SHOW_ERRORS_KEY]: showErrors } },
   })
   return { w, canAdvance }
 }
@@ -93,42 +93,19 @@ describe('IssueTypeStep', () => {
     expect(w.text()).not.toContain('AI generated recommendations')
     expect(w.text()).toContain('All issue types')
   })
-  it('selecting from the directory writes the store and swaps to questions', async () => {
+  it('selecting from the directory writes the store and swaps to the selected view', async () => {
     const { w } = mountStep()
     const rows = w.findAll('button').filter((b) => b.text().includes('Pothole Repair'))
     await rows[0].trigger('click')
     expect(useReportSubmissionStore().category).toBe('Pothole Repair')
-    expect(w.text()).toContain('Severity')
     expect(w.text()).not.toContain('All issue types')
   })
-  it('gates canAdvance on required visible questions', async () => {
+  it('canAdvance becomes true as soon as a category is chosen', async () => {
     const store = useReportSubmissionStore()
-    const { w, canAdvance } = mountStep()
+    const { canAdvance } = mountStep()
     store.setCategory('Pothole Repair')
     await flushPromises()
-    expect(canAdvance.value).toBe(false)
-    store.setQuestion('Severity__c', 'Shallow')
-    await flushPromises()
     expect(canAdvance.value).toBe(true)
-    expect(w.text()).toContain('* Required')
-  })
-  it('reveals conditional follow-ups when the controller answer matches', async () => {
-    const store = useReportSubmissionStore()
-    const { w } = mountStep()
-    store.setCategory('Pothole Repair')
-    await flushPromises()
-    expect(w.text()).not.toContain('Depth detail')
-    store.setQuestion('Severity__c', 'Deep')
-    await flushPromises()
-    expect(w.text()).toContain('Depth detail')
-  })
-  it('zero-question types advance immediately with a no-details message', async () => {
-    const store = useReportSubmissionStore()
-    const { w, canAdvance } = mountStep()
-    store.setCategory('Graffiti Removal')
-    await flushPromises()
-    expect(canAdvance.value).toBe(true)
-    expect(w.text()).toContain('No additional details needed')
   })
   it('Change returns to the pick view and clears answers', async () => {
     const store = useReportSubmissionStore()
@@ -158,5 +135,22 @@ describe('IssueTypeStep', () => {
     expect(w.text()).toContain('boom')
     await w.find('[data-test="retry-types"]').trigger('click')
     expect(load).toHaveBeenCalledTimes(2) // mount + retry
+  })
+  it('shows a "select an issue type" alert when showErrors is true and no category is chosen', () => {
+    const { w } = mountStep(ref(false), ref(true))
+    const alert = w.find('[role="alert"]')
+    expect(alert.exists()).toBe(true)
+    expect(alert.text()).toContain('Select an issue type to continue')
+  })
+  it('hides the alert when showErrors is false', () => {
+    const { w } = mountStep(ref(false), ref(false))
+    expect(w.find('[role="alert"]').exists()).toBe(false)
+  })
+  it('hides the alert once a category is chosen, even with showErrors true', async () => {
+    const store = useReportSubmissionStore()
+    const { w } = mountStep(ref(false), ref(true))
+    store.setCategory('Pothole Repair')
+    await flushPromises()
+    expect(w.find('[role="alert"]').exists()).toBe(false)
   })
 })
