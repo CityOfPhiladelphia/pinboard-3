@@ -41,6 +41,16 @@ describe('AnswersPage', () => {
     expect(w.find('[aria-label="Breadcrumb"]').exists()).toBe(false)
   })
 
+  it('search field has the Figma placeholder and a decorative search icon', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    expect(w.find('input[type="search"]').attributes('placeholder')).toBe(
+      'Search by topic or keyword',
+    )
+    expect(w.find('.answers__search svg[aria-hidden="true"]').exists()).toBe(true)
+  })
+
   it('mounts the featured-articles strip below the hero', async () => {
     loadArticles.mockResolvedValueOnce({ items: [], nextPageToken: undefined })
     const w = mountPage()

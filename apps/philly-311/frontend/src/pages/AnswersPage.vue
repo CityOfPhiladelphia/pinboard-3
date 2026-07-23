@@ -9,6 +9,8 @@ import ArticleCard from '@/components/answers/ArticleCard.vue'
 import FeaturedArticles from '@/components/answers/FeaturedArticles.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
 import heroPhoto from '@/assets/answers-hero.jpg'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faMagnifyingGlass } from '@fortawesome/pro-solid-svg-icons'
 
 const k = useKnowledgeArticles()
 
@@ -71,13 +73,20 @@ onMounted(loadPage)
 
     <div class="answers__content">
     <label class="sr-only" for="answers-search">Search articles</label>
-    <input
-      id="answers-search"
-      v-model="query"
-      type="search"
-      class="answers__search"
-      placeholder="Search…"
-    />
+    <div class="answers__search">
+      <input
+        id="answers-search"
+        v-model="query"
+        type="search"
+        class="answers__search-input"
+        placeholder="Search by topic or keyword"
+      />
+      <FontAwesomeIcon
+        :icon="faMagnifyingGlass"
+        class="answers__search-icon"
+        aria-hidden="true"
+      />
+    </div>
 
     <p v-if="isLoading" class="answers__status">Loading articles&hellip;</p>
     <p v-else-if="errorMessage" role="alert" class="answers__status">
@@ -165,12 +174,24 @@ onMounted(loadPage)
   margin-bottom: var(--spacing-m, 1rem);
 }
 .answers__search {
+  position: relative;
+  margin-bottom: var(--spacing-l, 1.5rem);
+}
+.answers__search-input {
   width: 100%;
-  max-width: 480px;
-  padding: var(--spacing-s, 0.75rem);
+  padding: var(--spacing-s, 0.75rem) 3rem var(--spacing-s, 0.75rem) var(--spacing-s, 0.75rem);
+  background: #fff;
   border: 1px solid var(--ui-color-grey-300, #d6d6d6);
   border-radius: 8px;
-  margin-bottom: var(--spacing-l, 1.5rem);
+  font-size: 1rem;
+}
+.answers__search-icon {
+  position: absolute;
+  right: var(--spacing-s, 0.75rem);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ui-color-primary, #0f4d90);
+  pointer-events: none;
 }
 .answers__list {
   list-style: none;
