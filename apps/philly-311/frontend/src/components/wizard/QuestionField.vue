@@ -114,12 +114,14 @@ function setCheckbox(record: Record<string, boolean>) {
       ></textarea>
     </template>
 
-    <!-- date: DateField — forwards $attrs through its inner TextField to the native <input> -->
+    <!-- date: DateField — forwards $attrs through its inner TextField to the native <input>.
+         label always renders the real text (TextField's aria-label fallback only applies when
+         label is empty, and mergeProps in its dist build clobbers an explicit aria-label attr
+         anyway); hideLabel visually hides the rendered <label> via the :deep() rule below. -->
     <DateField
       v-else-if="question.type === 'date'"
       :id="fieldId"
-      :label="hideLabel ? '' : labelText"
-      :aria-label="hideLabel ? labelText : undefined"
+      :label="labelText"
       :model-value="modelValue"
       :aria-required="question.required || undefined"
       @update:model-value="set"
@@ -137,24 +139,28 @@ function setCheckbox(record: Record<string, boolean>) {
       @update:model-value="(v: string | number | boolean) => set(String(v))"
     />
 
-    <!-- number / currency / double: TextField — forwards $attrs to the native <input> -->
+    <!-- number / currency / double: TextField — forwards $attrs to the native <input>.
+         label always renders the real text (TextField's dist build clobbers an explicit
+         aria-label attr with its own, empty-when-labeled fallback); hideLabel visually hides
+         the rendered <label> via the :deep() rule below instead. -->
     <TextField
       v-else-if="['number', 'currency', 'double'].includes(question.type)"
       :id="fieldId"
-      :label="hideLabel ? '' : labelText"
-      :aria-label="hideLabel ? labelText : undefined"
+      :label="labelText"
       :model-value="modelValue"
       :imask-props="{ mask: Number }"
       :aria-required="question.required || undefined"
       @update:model-value="set"
     />
 
-    <!-- string / fallback: TextField — forwards $attrs to the native <input> -->
+    <!-- string / fallback: TextField — forwards $attrs to the native <input>.
+         label always renders the real text (TextField's dist build clobbers an explicit
+         aria-label attr with its own, empty-when-labeled fallback); hideLabel visually hides
+         the rendered <label> via the :deep() rule below instead. -->
     <TextField
       v-else
       :id="fieldId"
-      :label="hideLabel ? '' : labelText"
-      :aria-label="hideLabel ? labelText : undefined"
+      :label="labelText"
       :model-value="modelValue"
       :aria-required="question.required || undefined"
       @update:model-value="set"
@@ -171,11 +177,13 @@ function setCheckbox(record: Record<string, boolean>) {
   font-weight: 600;
 }
 
-/* RadioGroup/CheckboxGroup have no accessible-name prop of their own, so hideLabel can't
-   empty their group-label without losing it entirely. Instead the real text stays in the
-   DOM for screen readers and is only visually hidden here, matching src/assets/a11y.css's
-   .sr-only technique. */
-.question-field--bare-label :deep(.labels-container > span:first-child) {
+/* RadioGroup/CheckboxGroup have no accessible-name prop of their own, and TextField/DateField's
+   dist build clobbers an explicit aria-label attr, so hideLabel can't empty these labels
+   without losing the accessible name entirely. Instead the real text stays in the DOM for
+   screen readers and is only visually hidden here, matching src/assets/a11y.css's .sr-only
+   technique. */
+.question-field--bare-label :deep(.labels-container > span:first-child),
+.question-field--bare-label :deep(.phila-label) {
   position: absolute;
   width: 1px;
   height: 1px;

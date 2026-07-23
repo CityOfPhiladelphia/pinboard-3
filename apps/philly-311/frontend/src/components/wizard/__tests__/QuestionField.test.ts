@@ -286,7 +286,7 @@ describe('QuestionField error message', () => {
 })
 
 describe('QuestionField hideLabel', () => {
-  it('suppresses the visible label on a string TextField but preserves an accessible name via aria-label', () => {
+  it('hides the TextField label visually via a root class but keeps its accessible label prop', () => {
     const w = mount(QuestionField, {
       props: {
         question: make({ type: 'string', label: 'My Field' }),
@@ -294,10 +294,8 @@ describe('QuestionField hideLabel', () => {
         hideLabel: true,
       },
     })
-    expect(w.text()).not.toContain('My Field')
-    const tf = w.findComponent(TextField)
-    expect(tf.props('label')).toBe('')
-    expect(tf.attributes('aria-label')).toBe('My Field')
+    expect(w.find('.question-field').classes()).toContain('question-field--bare-label')
+    expect(w.findComponent(TextField).props('label')).toBe('My Field')
   })
 
   it('hides the RadioGroup label visually via a root class but keeps its accessible groupLabel text', () => {
@@ -310,5 +308,27 @@ describe('QuestionField hideLabel', () => {
     })
     expect(w.find('.question-field').classes()).toContain('question-field--bare-label')
     expect(w.findComponent(RadioGroup).props('groupLabel')).toBe('My Field')
+  })
+
+  it('adds sr-only to the native large-picklist select label', () => {
+    const w = mount(QuestionField, {
+      props: {
+        question: make({ type: 'picklist', options: ['A', 'B', 'C', 'D', 'E'], label: 'My Field' }),
+        modelValue: '',
+        hideLabel: true,
+      },
+    })
+    expect(w.find('label').classes()).toContain('sr-only')
+  })
+
+  it('adds sr-only to the native textarea label', () => {
+    const w = mount(QuestionField, {
+      props: {
+        question: make({ type: 'textarea', label: 'My Field' }),
+        modelValue: '',
+        hideLabel: true,
+      },
+    })
+    expect(w.find('label').classes()).toContain('sr-only')
   })
 })
