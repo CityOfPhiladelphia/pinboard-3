@@ -84,6 +84,30 @@ const CATALOG: ServiceType[] = [
       { field: 'Confirm__c', label: 'Confirm', type: 'boolean', required: false },
     ],
   },
+  {
+    serviceType: 'Shrink Mid Timer',
+    caseType: 'Test',
+    description: 'Fixture where the dependent question precedes its controller in the array',
+    recordTypeID: 'rt5',
+    department: 'Test',
+    questions: [
+      {
+        field: 'Y__c',
+        label: 'Y',
+        type: 'string',
+        required: false,
+        controllerName: 'X__c',
+        dependentValues: { a: ['first'] },
+      },
+      {
+        field: 'X__c',
+        label: 'X',
+        type: 'picklist',
+        required: false,
+        options: ['first', 'second'],
+      },
+    ],
+  },
 ]
 
 const list = ref<ServiceType[] | null>(CATALOG)
@@ -146,6 +170,17 @@ describe('DetailsStep - question screens', () => {
     const alert = w.find('[role="alert"]')
     expect(alert.exists()).toBe(true)
     expect(alert.text()).toBe('Add an answer to continue')
+  })
+
+  it('a required string question answered with only whitespace still shows the required message', async () => {
+    const store = useReportSubmissionStore()
+    store.setCategory('Illegal Dumping')
+    store.setQuestion('Location__c', '   ')
+    const { w, nav } = mountStep()
+    await flushPromises()
+    expect(nav.value?.next()).toBe(true)
+    await flushPromises()
+    expect(w.find('[role="alert"]').text()).toBe('Add an answer to continue')
   })
 
   it('passes hideLabel: true to QuestionField so the heading is not duplicated', async () => {
@@ -321,6 +356,32 @@ describe('DetailsStep - question screens', () => {
       // Still on Notes — the already-cancelled timer did not fire a second advance.
       expect(w.find('h1').text()).toContain('Notes')
     })
+
+    it('guards the pending timer against a stray final-screen error when the question list shrinks underneath it', async () => {
+      const store = useReportSubmissionStore()
+      store.setCategory('Shrink Mid Timer')
+      store.setQuestion('X__c', 'first') // seeds Y__c visible, so the initial order is [Y, X]
+      const { w, nav } = mountStep()
+      await nextTick()
+
+      expect(nav.value?.next()).toBe(true) // Y (optional, empty) -> X
+      await nextTick()
+      expect(w.find('h1').text()).toContain('X')
+
+      // Re-answering X to a value Y no longer depends on removes Y from the
+      // list. The index (still pointing at X's old slot) now falls off the
+      // end, so `current` goes null and the view flips to the final screen
+      // — synchronously, before the auto-advance timer ever fires.
+      await w.findComponent(QuestionField).vm.$emit('update:modelValue', 'second')
+      await nextTick()
+      expect(w.find('h1').text()).toBe('Details')
+
+      vi.advanceTimersByTime(300)
+      await nextTick()
+      // The stale timer must not have run next() against the (now absent)
+      // question and stamped a bogus "Add a description to continue" error.
+      expect(w.find('[role="alert"]').exists()).toBe(false)
+    })
   })
 })
 
@@ -385,6 +446,19 @@ describe('DetailsStep - final screen', () => {
     expect(alert.classes()).toContain('details-step__error')
     expect(alert.text()).toBe('Add a description to continue')
     expect(w.find('textarea').classes()).toContain('details-step__textarea--error')
+  })
+
+  it('typing in the description clears the error before any next() call', async () => {
+    useReportSubmissionStore().setCategory('Graffiti Removal')
+    const { w, nav } = mountStep()
+    await flushPromises()
+    expect(nav.value?.next()).toBe(true) // empty description -> error
+    await flushPromises()
+    expect(w.find('[role="alert"]').exists()).toBe(true)
+
+    await w.find('textarea').setValue('a')
+    await flushPromises()
+    expect(w.find('[role="alert"]').exists()).toBe(false)
   })
 })
 

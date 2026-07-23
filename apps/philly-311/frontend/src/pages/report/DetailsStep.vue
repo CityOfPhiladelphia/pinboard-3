@@ -36,7 +36,10 @@ watch(questions, (qs) => {
 })
 
 const description = ref(store.description)
-watch(description, (v) => store.setDescription(v))
+watch(description, (v) => {
+  store.setDescription(v)
+  error.value = ''
+})
 
 function requiredMessage(type: string): string {
   return type === 'picklist' || type === 'multipicklist'
@@ -58,7 +61,9 @@ function answer(field: string, value: string, type: string) {
   error.value = ''
   cancelAutoAdvance()
   if (value && type === 'picklist') {
-    timer = setTimeout(next, AUTO_ADVANCE_MS)
+    timer = setTimeout(() => {
+      if (current.value) next()
+    }, AUTO_ADVANCE_MS)
   }
 }
 
@@ -66,7 +71,7 @@ function next(): boolean {
   cancelAutoAdvance()
   if (current.value) {
     const q = current.value
-    if (q.required && !(store.customFields[q.field] ?? '')) {
+    if (q.required && !(store.customFields[q.field] ?? '').trim()) {
       error.value = requiredMessage(q.type)
       return true
     }
