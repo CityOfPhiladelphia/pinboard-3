@@ -1,7 +1,8 @@
 // ABOUTME: Tests for ReportPage wizard shell — stepper rendering, contextual
-// ABOUTME: nav controls (Skip/Back), Next advancing to the next step, an
+// ABOUTME: nav controls (Exit/Skip/Back), Next advancing to the next step, an
 // ABOUTME: always-enabled Next that surfaces errors on an invalid attempt,
-// ABOUTME: and step-registered nav handlers intercepting Back/Next.
+// ABOUTME: step-registered nav handlers intercepting Back/Next, and Exit
+// ABOUTME: saving a draft (with/without a photo) or discarding via ExitDialog.
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
@@ -117,10 +118,30 @@ describe('ReportPage shell', () => {
       description: 'Trash on the corner',
       publicVisibility: true,
     })
+    expect('mediaUrl' in myCases.drafts[0]).toBe(false)
     expect(submission.category).toBeNull()
     expect(submission.customFields).toEqual({})
     expect(submission.description).toBe('')
     expect(router.currentRoute.value.path).toBe('/')
+  })
+
+  it('includes mediaUrl in the saved draft when a photo was uploaded', async () => {
+    const router = makeRouter()
+    router.push('/report')
+    await router.isReady()
+    const w = mount(ReportPage, { global: { plugins: [router] } })
+    await flushPromises()
+
+    const submission = useReportSubmissionStore()
+    submission.setCategory('Illegal Dumping')
+    submission.setDescription('Trash on the corner')
+    submission.setPhoto({ mediaUrl: 'https://cdn.example/photo.jpg' })
+
+    await w.find('[data-test="wizard-exit"]').trigger('click')
+    await w.findComponent(ExitDialog).vm.$emit('save')
+    await flushPromises()
+
+    expect(useMyCasesStore().drafts[0].mediaUrl).toBe('https://cdn.example/photo.jpg')
   })
 
   it('resets the wizard and navigates home without saving when ExitDialog emits discard', async () => {
