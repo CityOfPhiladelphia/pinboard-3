@@ -6,7 +6,7 @@ import { computed, ref } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { reverseGeocode, type AisFeature } from '@/composables/useAis'
 import { getCurrentPosition } from '@/composables/useGeolocation'
-import { useWizardValidity } from '@/composables/useWizardValidity'
+import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { isInPhilly } from '@/utils/bounds'
 import { PhilaButton } from '@phila/phila-ui-button'
 import AddressSearch from '@/components/wizard/AddressSearch.vue'
@@ -16,9 +16,11 @@ const store = useReportSubmissionStore()
 const error = ref<string | null>(null)
 const lookingUp = ref(false)
 
-useWizardValidity(
-  computed(() => !!store.location && isInPhilly(store.location.lat, store.location.lng)),
+const isValidLocation = computed(
+  () => !!store.location && isInPhilly(store.location.lat, store.location.lng),
 )
+useWizardValidity(isValidLocation)
+const showErrors = useWizardErrors()
 
 // Each location intent increments this counter so that stale async resolutions
 // (slow geocodes, late geolocation callbacks) never clobber a newer selection.
@@ -86,6 +88,9 @@ async function useMyLocation() {
     <h1 class="location-step__title">
       Location <span class="location-step__required">* (required)</span>
     </h1>
+    <p v-if="showErrors && !isValidLocation" class="location-step__error" role="alert">
+      Choose a location to continue
+    </p>
 
     <div class="location-step__columns">
       <div class="location-step__form">

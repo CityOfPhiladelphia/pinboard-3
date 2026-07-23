@@ -6,7 +6,7 @@ import { ref } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import LocationStep from '../LocationStep.vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
-import { WIZARD_CAN_ADVANCE_KEY } from '@/composables/useWizardValidity'
+import { WIZARD_CAN_ADVANCE_KEY, WIZARD_SHOW_ERRORS_KEY } from '@/composables/useWizardValidity'
 
 const mockReverseGeocode = vi.fn()
 vi.mock('@/composables/useAis', () => ({
@@ -61,11 +61,13 @@ function deferred<T>() {
   return { promise, resolve, reject }
 }
 
-function mountStep(canAdvance = ref(false)) {
+function mountStep(canAdvance = ref(false), showErrors = ref(false)) {
   return {
     canAdvance,
     w: mount(LocationStep, {
-      global: { provide: { [WIZARD_CAN_ADVANCE_KEY]: canAdvance } },
+      global: {
+        provide: { [WIZARD_CAN_ADVANCE_KEY]: canAdvance, [WIZARD_SHOW_ERRORS_KEY]: showErrors },
+      },
     }),
   }
 }
@@ -283,6 +285,28 @@ describe('LocationStep - race conditions', () => {
 
     // Newer drag result must win
     expect(store.location?.address).toBe('DRAG B')
+  })
+})
+
+describe('LocationStep - showErrors alert', () => {
+  it('shows a "choose a location" alert when showErrors is true and no location is set', () => {
+    const { w } = mountStep(ref(false), ref(true))
+    const alert = w.find('[role="alert"]')
+    expect(alert.exists()).toBe(true)
+    expect(alert.text()).toContain('Choose a location to continue')
+  })
+
+  it('hides the alert when showErrors is false', () => {
+    const { w } = mountStep(ref(false), ref(false))
+    expect(w.find('[role="alert"]').exists()).toBe(false)
+  })
+
+  it('hides the alert once a valid in-Philly location is chosen, even with showErrors true', async () => {
+    const { w } = mountStep(ref(false), ref(true))
+    const store = useReportSubmissionStore()
+    store.setLocation({ address: '1234 MARKET ST', zipCode: '19107', lat: 39.9526, lng: -75.1652 })
+    await flushPromises()
+    expect(w.find('[role="alert"]').exists()).toBe(false)
   })
 })
 
