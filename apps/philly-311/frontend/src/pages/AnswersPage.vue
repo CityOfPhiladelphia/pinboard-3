@@ -132,8 +132,6 @@ onMounted(loadPage)
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  gap: var(--spacing-s, 0.75rem);
 }
 .answers__status {
   margin: var(--spacing-m, 1rem) 0;

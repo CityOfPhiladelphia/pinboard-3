@@ -21,4 +21,12 @@ describe('ArticleCard', () => {
     })
     expect(w.findComponent(RouterLinkStub).props('to')).toBe('/answers/kA123')
   })
+
+  it('shows a decorative trailing chevron', () => {
+    const w = mount(ArticleCard, {
+      props: { article },
+      global: { stubs: { RouterLink: RouterLinkStub } },
+    })
+    expect(w.find('svg[aria-hidden="true"].article-card__chevron').exists()).toBe(true)
+  })
 })
