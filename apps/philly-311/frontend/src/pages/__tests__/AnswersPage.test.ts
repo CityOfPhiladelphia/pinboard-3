@@ -26,6 +26,17 @@ afterEach(() => {
 })
 
 describe('AnswersPage', () => {
+  it('renders the hero banner with a decorative photo and no breadcrumb', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    const hero = w.find('.answers__hero')
+    expect(hero.exists()).toBe(true)
+    expect(hero.find('img[alt=""]').exists()).toBe(true)
+    expect(hero.find('h1').text()).toBe('Answers')
+    expect(w.find('[aria-label="Breadcrumb"]').exists()).toBe(false)
+  })
+
   it('loads and renders the first page of articles', async () => {
     loadArticles.mockResolvedValueOnce({ items: [a('1'), a('2')], nextPageToken: '25' })
     const w = mountPage()

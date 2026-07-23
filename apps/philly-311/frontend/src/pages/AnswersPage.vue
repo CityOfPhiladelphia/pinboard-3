@@ -7,6 +7,7 @@ import { useKnowledgeArticles, type Article } from '@/composables/useKnowledgeAr
 import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
 import ArticleCard from '@/components/answers/ArticleCard.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
+import heroPhoto from '@/assets/answers-hero.jpg'
 
 const k = useKnowledgeArticles()
 
@@ -55,15 +56,17 @@ onMounted(loadPage)
 
 <template>
   <main class="answers">
-    <nav class="answers__crumb" aria-label="Breadcrumb">
-      <RouterLink to="/">Home</RouterLink> / <span>Answers</span>
-    </nav>
+    <header class="answers__hero">
+      <img class="answers__hero-photo" :src="heroPhoto" alt="" />
+      <div class="answers__hero-text">
+        <h1>Answers</h1>
+        <p class="answers__intro">
+          Browse common questions and how to file specific kinds of requests.
+        </p>
+      </div>
+    </header>
 
-    <h1>Answers</h1>
-    <p class="answers__intro">
-      Browse common questions and how to file specific kinds of requests.
-    </p>
-
+    <div class="answers__content">
     <label class="sr-only" for="answers-search">Search articles</label>
     <input
       id="answers-search"
@@ -99,20 +102,50 @@ onMounted(loadPage)
     >
       Load more
     </PhilaButton>
+    </div>
   </main>
 </template>
 
 <style scoped>
 .answers {
-  max-width: 980px;
-  margin: 0 auto;
-  padding: var(--spacing-m, 1rem);
   height: 100%;
   overflow-y: auto;
 }
-.answers__crumb {
-  font-size: 0.875rem;
-  margin-bottom: var(--spacing-s, 0.75rem);
+.answers__hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 300px;
+  padding: var(--spacing-xl, 2rem);
+  color: #fff;
+}
+.answers__hero-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.answers__hero::after {
+  /* Legibility gradient over the photo, per Figma (transparent to black). */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75));
+}
+.answers__hero-text {
+  position: relative;
+  z-index: 1;
+}
+.answers__hero h1 {
+  color: #fff;
+  margin: 0 0 var(--spacing-xs, 0.5rem);
+}
+.answers__content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--spacing-xl, 2rem) var(--spacing-m, 1rem);
 }
 .answers__more {
   margin: var(--spacing-l, 1.5rem) 0;
