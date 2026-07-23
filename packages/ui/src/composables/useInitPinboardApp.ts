@@ -75,7 +75,6 @@ export function useInitPinboardApp(localeAppKey?: string) {
     locale,
     setLocale,
     infoSheetOpen,
-    isDraggingSheet,
     dragY,
     openInfoSheet,
     closeInfoSheet,

@@ -39,7 +39,6 @@ defineSlots<{
 const {
   isMobile,
   infoSheetOpen,
-  isDraggingSheet,
   dragY,
   openInfoSheet,
   closeInfoSheet,
@@ -109,24 +108,22 @@ onMounted(async () => {
           <slot name="mobile-nav" />
         </MobileNavPanel>
       </template>
-      <template v-if="infoHref || infoTitle || $slots['navbar-end']" #navbar-end>
-        <RouterLink v-if="infoHref" :to="infoHref" class="navbar-info-link">
-          <div v-if="isMobile" class="navbar-info-mobile-wrap" @click.capture.stop="openInfoSheet">
-            <NavbarInfo :info-title="infoTitle" :label="infoLabel ?? infoTitle" />
-          </div>
-          <NavbarInfo
-            v-else
-            ref="navbarInfo"
-            :info-title="infoTitle"
-            :label="infoLabel ?? infoTitle"
-          >
-            <span class="has-text-body-small">
-              {{ infoMessage }}
-              <RouterLink :to="`/${infoHref}`">{{ infoLinkText }}</RouterLink>
-            </span>
-          </NavbarInfo>
-        </RouterLink>
+
+      <template v-if="$slots['navbar-end']" #navbar-end>
         <slot name="navbar-end" />
+      </template>
+      <template v-else #navbar-end>
+        <NavbarInfo
+          v-bind="isMobile ? { onClickCapture: openInfoSheet } : {}"
+          ref="navbarInfo"
+          :info-title="infoTitle"
+          :label="infoLabel ?? infoTitle"
+        >
+          <span v-if="!isMobile" class="has-text-body-small">
+            {{ infoMessage }}
+            <RouterLink :to="`/${infoHref}`">{{ infoLinkText }}</RouterLink>
+          </span>
+        </NavbarInfo>
       </template>
     </AppHeader>
 
@@ -143,7 +140,7 @@ onMounted(async () => {
     </AppFooter>
   </div>
 
-  <Teleport to="body" :disabled="!isMobile">
+  <div v-if="isMobile">
     <Transition name="pinboard-shell-scrim-fade">
       <div v-if="infoSheetOpen" class="pinboard-shell-info-scrim" @click="closeInfoSheet" />
     </Transition>
@@ -151,7 +148,6 @@ onMounted(async () => {
       v-if="infoSheetOpen"
       v-model="infoSheetOpen"
       class="pinboard-shell-info-sheet"
-      :class="{ 'pinboard-shell-info-sheet--dragging': isDraggingSheet }"
       :style="{ zIndex: 101, '--drag-y': `${dragY}px` }"
       :snap-points="[60]"
       @pointerdown="onSheetPointerDown"
@@ -163,7 +159,7 @@ onMounted(async () => {
         <RouterLink :to="`/${infoHref}`" @click="closeInfoSheet">{{ infoLinkText }}</RouterLink>
       </span>
     </BottomSheet>
-  </Teleport>
+  </div>
 </template>
 
 <style scoped>
@@ -180,6 +176,41 @@ onMounted(async () => {
   overflow: hidden;
 }
 
+.pinboard :deep(.phila-navbar-brand) {
+  padding-left: var(--spacing-l);
+}
+
+/* Sheet sizes to its content; snap-points value is ignored visually.
+ * --drag-y is set inline by the drag handler; transform-only transition
+ * springs the sheet back when the user releases under threshold, while
+ * keeping height static (animating to auto doesn't work cleanly).
+ * NOTE: `.bottom-sheet` is @phila/phila-ui-bottom-sheet's internal class — a
+ * deliberate coupling; revisit if that package renames it. */
+.pinboard-shell-info-sheet :deep(.bottom-sheet) {
+  height: auto !important;
+  max-height: 90dvh;
+  padding: 0 var(--spacing-m) 50px;
+  transform: translateY(var(--drag-y, 0px));
+  transition: transform 0.25s ease-out;
+}
+
+.pinboard-shell-info-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.pinboard-shell-info-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+}
+
+.pinboard-shell-info-sheet h2 {
+  margin-bottom: var(--spacing-s);
+}
+
 @media (max-width: 768px), (max-width: 1064px) and (max-height: 600px) {
   .pinboard :deep(#trusted-site) {
     height: 2rem;
@@ -193,78 +224,5 @@ onMounted(async () => {
   .pinboard :deep(.phila-navbar-brand-link) {
     margin-left: var(--spacing-s);
   }
-}
-</style>
-
-<style>
-.phila-navbar-brand {
-  padding-left: var(--spacing-l);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/*
- * Shim for design-token rename: the locally-linked map-core bundles CSS that
- * references --dimension-core-600 (post-revamp name), but the published
- * phila-ui-core consumed by @pinboard/ui only defines --scale-600. Without
- * this shim, .phila-input .content's height collapses to auto and the search
- * bar squishes. Remove once phila-ui-core ships with the renamed token.
- */
-:root {
-  --dimension-core-600: 3rem;
-}
-
-#app {
-  height: 100dvh;
-}
-
-/* Teleported elements (scrim + bottom-sheet) live outside this component's
- * DOM scope, so scoped selectors won't reach them. Unscoped block required. */
-.pinboard-shell-info-scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: rgba(0, 0, 0, 0.25);
-}
-
-/* Sheet sizes to its content; snap-points value is ignored visually.
- * --drag-y is set inline by the drag handler; transform-only transition
- * springs the sheet back when the user releases under threshold, while
- * keeping height static (animating to auto doesn't work cleanly).
- * NOTE: `.bottom-sheet` is @phila/phila-ui-bottom-sheet's internal class — a
- * deliberate coupling; revisit if that package renames it. */
-.pinboard-shell-info-sheet .bottom-sheet {
-  height: auto !important;
-  max-height: 90dvh;
-  padding: 0 var(--spacing-m) 50px;
-  transform: translateY(var(--drag-y, 0px));
-  transition: transform 0.25s ease-out !important;
-}
-
-.pinboard-shell-info-sheet.pinboard-shell-info-sheet--dragging .bottom-sheet {
-  transition: none !important;
-}
-
-.pinboard-shell-scrim-fade-leave-active {
-  transition: opacity 0.25s ease-out;
-  pointer-events: none;
-}
-
-.pinboard-shell-scrim-fade-leave-to {
-  opacity: 0;
-}
-
-.pinboard-shell-info-close {
-  position: absolute;
-  top: 8px;
-  right: 12px;
-}
-
-.pinboard-shell-info-sheet h2 {
-  margin-bottom: var(--spacing-s);
 }
 </style>

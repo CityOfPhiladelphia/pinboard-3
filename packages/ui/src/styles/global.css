@@ -2,6 +2,9 @@
    bottom sheets) land outside the app wrapper, so they can't inherit a font
    set on a wrapper element. Setting it on body covers teleported content too. */
 body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: var(--Body-Default-font-body-default-family, 'Montserrat', sans-serif);
 }
 
@@ -13,4 +16,19 @@ optgroup,
 select,
 textarea {
   font-family: inherit;
+}
+
+/*
+ * Shim for design-token rename: the locally-linked map-core bundles CSS that
+ * references --dimension-core-600 (post-revamp name), but the published
+ * phila-ui-core consumed by @pinboard/ui only defines --scale-600. Without
+ * this shim, .phila-input .content's height collapses to auto and the search
+ * bar squishes. Remove once phila-ui-core ships with the renamed token.
+ */
+:root {
+  --dimension-core-600: 3rem;
+}
+
+#app {
+  height: 100dvh;
 }
