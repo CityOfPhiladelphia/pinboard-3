@@ -38,6 +38,7 @@
     "pinia": "^2.3.1",
     "supercluster": "^8.0.1",
     "vue": "^3.5.33",
+    "vue-i18n": "catalog:",
     "vue-router": "^5.0.6"
   },
   "devDependencies": {
