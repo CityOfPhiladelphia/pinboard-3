@@ -1,11 +1,10 @@
 import { onBeforeUnmount, onMounted, provide, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { useLocale } from './useLocale'
 import { useIsMobile } from './useIsMobile'
 import { IS_MOBILE_KEY } from '../keys'
 
-export function useInitPinboardApp(appKey?: string) {
-  const { locale, init, setLocale } = appKey ? useLocale(appKey) : {}
+export function useInitPinboardApp(localeAppKey?: string) {
+  const { locale, init, setLocale } = localeAppKey ? useLocale(localeAppKey) : {}
   if (init) init()
 
   const infoSheetOpen = ref(false)
@@ -63,16 +62,6 @@ export function useInitPinboardApp(appKey?: string) {
 
   watch(isMobile, (mobile) => {
     if (!mobile) infoSheetOpen.value = false
-  })
-
-  const route = useRoute()
-  const router = useRouter()
-
-  onMounted(async () => {
-    await router.isReady()
-    if (route.path === '/' && isMobile.value) {
-      infoSheetOpen.value = true
-    }
   })
 
   onBeforeUnmount(() => {

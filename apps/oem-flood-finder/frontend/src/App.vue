@@ -34,6 +34,7 @@ const alertBanner: ComputedRef<AlertBanner | null> = computed(() => {
     info-message="This map allows residents to keep an eye on water levels in parts of the city and make informed decisions prior to, during, and after a flooding event."
     info-link-text="Learn more"
     info-href="resources"
+    :translations="false"
     :logo="{
       variant: 'city',
       layout: 'single-line',
@@ -44,6 +45,7 @@ const alertBanner: ComputedRef<AlertBanner | null> = computed(() => {
     :banner-title="alertBanner?.title"
     :banner-message="alertBanner?.body"
     :feedback-href="feedbackHref"
+    :show-header-tooltip="true"
   >
     <RouterView />
   </PinboardShell>

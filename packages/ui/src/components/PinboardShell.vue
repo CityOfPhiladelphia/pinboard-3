@@ -8,27 +8,25 @@ import PinboardSubFooter from './PinboardSubFooter.vue'
 import { inject, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { VNode } from 'vue'
-import type { NavbarBrandProps, Language } from '@phila/phila-ui-app-header'
+import type { NavbarBrandProps } from '@phila/phila-ui-app-header'
 import { useInitPinboardApp } from '../composables/_index.ts'
 import { IS_MOBILE_KEY } from '../keys.ts'
+import { languages } from '../i18n/languages.ts'
 
-defineProps<{
+const props = defineProps<{
   title: string
   logo?: NavbarBrandProps['logo']
+  translations: boolean
   bannerTitle?: string
   bannerMessage?: string
-  languages?: Language[]
-  locale?: string
   feedbackHref?: string
   infoTitle: string
   infoLabel?: string
   infoMessage: string
   infoLinkText: string
   infoHref: string
-}>()
-
-const emit = defineEmits<{
-  'update:locale': [code: string]
+  localeAppKey?: string
+  showHeaderTooltip: boolean
 }>()
 
 defineSlots<{
@@ -39,7 +37,7 @@ defineSlots<{
   'sub-footer'?(): VNode[]
 }>()
 
-const { infoSheetOpen, isDraggingSheet, dragY, openInfoSheet, closeInfoSheet, onSheetPointerDown } =
+const { infoSheetOpen, isDraggingSheet, dragY, openInfoSheet, closeInfoSheet, onSheetPointerDown, locale, setLocale } =
   useInitPinboardApp()
 
 const isMobile = inject(IS_MOBILE_KEY, ref(false))
@@ -57,11 +55,10 @@ watch(
 
 onMounted(async () => {
   await router.isReady()
-
   if (route.path === '/') {
     if (isMobile.value) {
       infoSheetOpen.value = true
-    } else {
+    } else if (props.showHeaderTooltip) {
       navbarInfo.value?.show()
     }
   }
@@ -81,9 +78,9 @@ onMounted(async () => {
       }"
       :banner-title="bannerTitle"
       :banner-message="bannerMessage"
-      :languages="languages"
+      :languages="translations ? languages : undefined"
       :locale="locale"
-      @update:locale="emit('update:locale', $event)"
+      @update:locale="setLocale"
     >
       <!-- Suppress AppHeader's default search button: it renders by default but opens an
            empty panel since we don't wire up search. Temporary until the upstream fix
@@ -98,8 +95,8 @@ onMounted(async () => {
            "burger only if mobile-nav" behavior; same root cause as bead map-core-k8c.
            Hidden span (not empty) because Vue renders a slot's default content when the
            overriding slot is empty. -->
-      <template v-if="!$slots['mobile-nav']" #navbar-toggle><span hidden /></template>
-      <template v-else #mobile-nav>
+
+      <template #mobile-nav>
         <MobileNavPanel>
           <slot name="mobile-nav" />
         </MobileNavPanel>
