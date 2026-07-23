@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, ref, type Ref } from 'vue'
+import { onBeforeMount, onUnmounted, ref, type Ref } from 'vue'
 
 export const mobileMaxWidth = 768
 
@@ -13,7 +13,7 @@ export function useIsMobile(): Ref<boolean> {
     isMobile.value = e.matches
   }
 
-  onMounted(() => {
+  onBeforeMount(() => {
     mql.addEventListener('change', updateIsMobile)
   })
 

@@ -5,12 +5,11 @@ import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { CloseButton } from '@phila/phila-ui-button'
 import MobileNavPanel from './MobileNavPanel.vue'
 import PinboardSubFooter from './PinboardSubFooter.vue'
-import { inject, onMounted, ref, useTemplateRef, watch } from 'vue'
+import { onMounted, useTemplateRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { VNode } from 'vue'
 import type { NavbarBrandProps } from '@phila/phila-ui-app-header'
 import { useInitPinboardApp } from '../composables/_index.ts'
-import { IS_MOBILE_KEY } from '../keys.ts'
 import { languages } from '../i18n/languages.ts'
 
 const props = defineProps<{
@@ -32,15 +31,23 @@ const props = defineProps<{
 defineSlots<{
   default(): VNode[]
   'mobile-nav'(): VNode[]
-  'navbar-end'?(): VNode[]
-  'info-body'?(): VNode[]
-  'sub-footer'?(): VNode[]
+  'navbar-end'(): VNode[]
+  'info-body'(): VNode[]
+  'sub-footer'(): VNode[]
 }>()
 
-const { infoSheetOpen, isDraggingSheet, dragY, openInfoSheet, closeInfoSheet, onSheetPointerDown, locale, setLocale } =
-  useInitPinboardApp()
+const {
+  isMobile,
+  infoSheetOpen,
+  isDraggingSheet,
+  dragY,
+  openInfoSheet,
+  closeInfoSheet,
+  onSheetPointerDown,
+  locale,
+  setLocale,
+} = useInitPinboardApp()
 
-const isMobile = inject(IS_MOBILE_KEY, ref(false))
 const navbarInfo = useTemplateRef<InstanceType<typeof NavbarInfo>>('navbarInfo')
 const router = useRouter()
 const route = useRoute()
@@ -56,9 +63,10 @@ watch(
 onMounted(async () => {
   await router.isReady()
   if (route.path === '/') {
-    if (isMobile.value) {
-      infoSheetOpen.value = true
-    } else if (props.showHeaderTooltip) {
+    infoSheetOpen.value = isMobile.value
+    if (isMobile.value || !props.showHeaderTooltip) {
+      navbarInfo.value?.hide()
+    } else {
       navbarInfo.value?.show()
     }
   }
@@ -95,8 +103,8 @@ onMounted(async () => {
            "burger only if mobile-nav" behavior; same root cause as bead map-core-k8c.
            Hidden span (not empty) because Vue renders a slot's default content when the
            overriding slot is empty. -->
-
-      <template #mobile-nav>
+      <template v-if="!$slots['mobile-nav']" #navbar-toggle><span hidden /></template>
+      <template v-else #mobile-nav>
         <MobileNavPanel>
           <slot name="mobile-nav" />
         </MobileNavPanel>
@@ -126,7 +134,7 @@ onMounted(async () => {
       <slot />
     </main>
 
-    <AppFooter :sub-footer-only="true">
+    <AppFooter v-if="!isMobile" :sub-footer-only="true">
       <template #subFooterSlot>
         <slot name="sub-footer">
           <PinboardSubFooter :feedback-href="feedbackHref" />
@@ -172,51 +180,9 @@ onMounted(async () => {
   overflow: hidden;
 }
 
-.pinboard :deep(.phila-navbar) {
-  column-gap: var(--spacing-s);
-}
-
-.navbar-info-link {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  text-decoration: none;
-}
-
-.navbar-info-link__icon {
-  color: white;
-}
-
-.navbar-info-link__label {
-  color: var(--Extended-Colors-link-default);
-  text-decoration: underline;
-  font-weight: normal;
-}
-
-.navbar-info-link:hover .navbar-info-link__label {
-  color: var(--Extended-Colors-link-hover);
-  text-decoration-color: var(--Extended-Colors-link-hover);
-}
-
-.phila-navbar .phila-mobile-nav .nav-flyout {
-  flex: 0 0 25rem;
-  max-width: 25rem;
-  height: calc(100dvh - var(--nav-bottom));
-}
-
-.phila-navbar .phila-mobile-nav .nav-flyout .p-4 {
-  display: flex;
-  flex-direction: column;
-  row-gap: var(--spacing-m);
-}
-
 @media (max-width: 768px), (max-width: 1064px) and (max-height: 600px) {
-  .pinboard > :deep(footer) {
-    display: none;
-  }
-
   .pinboard :deep(#trusted-site) {
-    height: 2rem !important;
+    height: 2rem;
   }
 
   .pinboard :deep(.phila-navbar-logo.logo--single-line) {
@@ -225,12 +191,37 @@ onMounted(async () => {
   }
 
   .pinboard :deep(.phila-navbar-brand-link) {
-    margin-left: var(--spacing-s) !important;
+    margin-left: var(--spacing-s);
   }
 }
 </style>
 
 <style>
+.phila-navbar-brand {
+  padding-left: var(--spacing-l);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/*
+ * Shim for design-token rename: the locally-linked map-core bundles CSS that
+ * references --dimension-core-600 (post-revamp name), but the published
+ * phila-ui-core consumed by @pinboard/ui only defines --scale-600. Without
+ * this shim, .phila-input .content's height collapses to auto and the search
+ * bar squishes. Remove once phila-ui-core ships with the renamed token.
+ */
+:root {
+  --dimension-core-600: 3rem;
+}
+
+#app {
+  height: 100dvh;
+}
+
 /* Teleported elements (scrim + bottom-sheet) live outside this component's
  * DOM scope, so scoped selectors won't reach them. Unscoped block required. */
 .pinboard-shell-info-scrim {

@@ -1,4 +1,4 @@
-import { onBeforeUnmount, onMounted, provide, ref, watch } from 'vue'
+import { onBeforeUnmount, provide, ref, watch } from 'vue'
 import { useLocale } from './useLocale'
 import { useIsMobile } from './useIsMobile'
 import { IS_MOBILE_KEY } from '../keys'
@@ -71,6 +71,7 @@ export function useInitPinboardApp(localeAppKey?: string) {
   })
 
   return {
+    isMobile,
     locale,
     setLocale,
     infoSheetOpen,
