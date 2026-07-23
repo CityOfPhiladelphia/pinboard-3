@@ -1,9 +1,10 @@
 // ABOUTME: Tests for PinboardBody's slot-forwarding seam — the locations-filters
 // ABOUTME: slot and count-noun prop must actually reach LocationsPanel, per path.
-import { beforeAll, describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { mount, type VueWrapper } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import PinboardBody from './PinboardBody.vue'
-import type { BasicLocation } from '../types'
+import type { BasicLocation, MapCardPropsGetter } from '../types'
 
 // MapPanel pulls in the real @phila/phila-ui-map-core (maplibre) chain, which
 // isn't needed for these slot/prop-forwarding assertions and is noisy under jsdom.
@@ -29,15 +30,48 @@ function locations(): BasicLocation[] {
   ]
 }
 
-function mountPinboardBody(extraProps: Record<string, unknown> = {}) {
-  return mount(PinboardBody, {
+const getMapCardProps: MapCardPropsGetter<BasicLocation> = (location) => ({
+  heading: location.name,
+})
+
+const mounted: { wrapper: VueWrapper; container: HTMLElement }[] = []
+
+afterEach(() => {
+  mounted.forEach(({ wrapper, container }) => {
+    wrapper.unmount()
+    container.remove()
+  })
+  mounted.length = 0
+})
+
+// On mobile, LocationsPanel is Teleported to #locations-panel-mobile — an id
+// PinboardBody renders itself, inside the bottom sheet. Vue's Teleport can only
+// resolve a target that (a) already exists in the real `document` (hence
+// attachTo, not VTU's default detached container) and (b) was created in an
+// earlier patch than the Teleport itself. The real app satisfies (b) for free
+// because it boots with isLoading true and flips false once data loads, so the
+// bottom sheet (and #locations-panel-mobile within it) is already in the DOM
+// by the time Teleport activates. Mounting straight to isLoading: false skips
+// that first patch and Teleport fails to find its target — so every mount here
+// replays the same isLoading true → false sequence.
+async function mountPinboardBody(
+  extraProps: Record<string, unknown> & { isLoading?: string | false } = {}
+) {
+  const container = document.createElement('div')
+  document.body.appendChild(container)
+
+  const { isLoading = false, ...rest } = extraProps
+  const wrapper = mount(PinboardBody, {
+    attachTo: container,
     props: {
       locations: locations(),
+      getMapCardProps,
+      isMobile: false,
       searchOrUserLocation: { latitude: NaN, longitude: NaN },
-      isLoading: false,
+      isLoading: 'Loading locations…',
       errorMessage: null,
       locationPanelSearch: 'Search by address or ZIP',
-      ...extraProps,
+      ...rest,
     },
     slots: {
       'locations-header': '<div class="my-header">Header</div>',
@@ -47,22 +81,15 @@ function mountPinboardBody(extraProps: Record<string, unknown> = {}) {
       stubs: { MapCard: MapCardStub, BottomSheet: BottomSheetStub },
     },
   })
+  await wrapper.setProps({ isLoading })
+  await nextTick()
+  mounted.push({ wrapper: wrapper as VueWrapper, container })
+  return wrapper as VueWrapper
 }
 
-beforeAll(() => {
-  window.matchMedia =
-    window.matchMedia ??
-    vi.fn().mockImplementation((query: string) => ({
-      matches: false,
-      media: query,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    }))
-})
-
 describe('PinboardBody - locations-filters slot forwarding (desktop)', () => {
-  it('renders filters slot content between the search box and the location list', () => {
-    const w = mountPinboardBody()
+  it('renders filters slot content between the search box and the location list', async () => {
+    const w = await mountPinboardBody({ isMobile: false })
     const desktop = w.find('.finder-panel-locations')
     const html = desktop.html()
     const searchIdx = html.indexOf('location-search')
@@ -74,40 +101,46 @@ describe('PinboardBody - locations-filters slot forwarding (desktop)', () => {
   })
 })
 
+// The mobile-only DOM (behind the `isMobile: true` prop) is a single Teleported
+// LocationsPanel instance rather than a second separate mount — the Teleport's
+// target (#locations-panel-mobile) lives inside the bottom sheet, so setting
+// isMobile true moves the same LocationsPanel (and its forwarded filters slot)
+// there instead of a second component tree.
 describe('PinboardBody - locations-filters slot forwarding (mobile bottom sheet)', () => {
-  it('renders filters slot content after locations-header content', () => {
-    const w = mountPinboardBody()
+  it('renders filters slot content after locations-header content', async () => {
+    const w = await mountPinboardBody({ isMobile: true })
     const sheet = w.find('.bottom-sheet-stub')
     const html = sheet.html()
     const headerIdx = html.indexOf('my-header')
     const filtersIdx = html.indexOf('my-filters')
     expect(headerIdx).toBeGreaterThan(-1)
     expect(headerIdx).toBeLessThan(filtersIdx)
+    // LocationsPanel itself teleported into the sheet, not just the raw slot.
+    expect(sheet.findAll('.mapcard-stub')).toHaveLength(2)
   })
 })
 
 describe('PinboardBody - locationPanelCountNoun forwarding', () => {
-  it('reaches the desktop LocationsPanel but not the mobile one', () => {
-    const w = mountPinboardBody({ locationPanelCountNoun: 'report' })
-    const desktopCount = w
-      .find('.finder-panel-locations')
-      .find('.location-count')
-    expect(desktopCount.exists()).toBe(true)
-    expect(desktopCount.text()).toBe('2 reports')
-
-    const sheetCount = w.find('.bottom-sheet-stub').find('.location-count')
-    expect(sheetCount.exists()).toBe(false)
+  it('reaches LocationsPanel on desktop (isMobile: false)', async () => {
+    const w = await mountPinboardBody({ locationPanelCountNoun: 'report', isMobile: false })
+    const count = w.find('.location-count')
+    expect(count.exists()).toBe(true)
+    expect(count.text()).toBe('2 reports')
   })
 
-  it('uses the noun in the mobile sheet header, defaulting to item', () => {
-    const withNoun = mountPinboardBody({ locationPanelCountNoun: 'report' })
-    expect(withNoun.find('.location-sheet-header').text()).toContain(
-      '2 reports'
-    )
+  it('does not reach LocationsPanel on mobile (isMobile: true) — count-noun is desktop-only', async () => {
+    const w = await mountPinboardBody({ locationPanelCountNoun: 'report', isMobile: true })
+    // LocationsPanel really did teleport in and render its cards — the
+    // missing count-noun is the assertion under test, not a no-op mount.
+    expect(w.findAll('.mapcard-stub')).toHaveLength(2)
+    expect(w.find('.location-count').exists()).toBe(false)
+  })
 
-    const withoutNoun = mountPinboardBody()
-    expect(withoutNoun.find('.location-sheet-header').text()).toContain(
-      '2 items'
-    )
+  it('uses the noun in the mobile sheet header, defaulting to item', async () => {
+    const withNoun = await mountPinboardBody({ locationPanelCountNoun: 'report' })
+    expect(withNoun.find('.location-sheet-header').text()).toContain('2 reports')
+
+    const withoutNoun = await mountPinboardBody()
+    expect(withoutNoun.find('.location-sheet-header').text()).toContain('2 items')
   })
 })

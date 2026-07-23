@@ -3,7 +3,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import LocationsPanel from './LocationsPanel.vue'
-import type { BasicLocation } from '../types'
+import type { BasicLocation, MapCardPropsGetter } from '../types'
 
 const MapCardStub = {
   name: 'MapCard',
@@ -30,16 +30,35 @@ function locations(): BasicLocation[] {
   ]
 }
 
+// Mirrors how a consuming app derives MapCard props from its own location
+// shape; here it just forwards the fixture's locationCardInfo.
+const getMapCardProps: MapCardPropsGetter<BasicLocation> = (location) =>
+  location.locationCardInfo ?? { heading: location.name }
+
+// LocationsPanel's remaining props are required (not optional) even where their
+// type allows `undefined` — Vue/TS still needs the key present at every mount.
+const baseProps = {
+  getMapCardProps,
+  isMobile: false,
+  hoveredId: undefined,
+  selectedId: undefined,
+  waitForUserLocation: false,
+  userLocationState: 'unknown' as const,
+  locationSearch: undefined,
+  locationFilter: undefined,
+  locationSort: undefined,
+}
+
 function mountDefault(extra: Record<string, unknown> = {}) {
   return mount(LocationsPanel, {
-    props: { locations: locations(), ...extra },
+    props: { locations: locations(), ...baseProps, ...extra },
     global: { stubs: { MapCard: MapCardStub } },
   })
 }
 
 function mountWithSlot(extra: Record<string, unknown> = {}) {
   return mount(LocationsPanel, {
-    props: { locations: locations(), ...extra },
+    props: { locations: locations(), ...baseProps, ...extra },
     slots: {
       'location-card': `<template #location-card="{ location }">
         <span class="custom-card">{{ location.name }}</span>
@@ -119,7 +138,7 @@ describe('LocationsPanel - location-card slot branch', () => {
 describe('LocationsPanel - filters slot', () => {
   it('renders the filters slot between the search box and the location list', () => {
     const w = mount(LocationsPanel, {
-      props: { locations: locations(), locationSearch: 'Search by address or ZIP' },
+      props: { locations: locations(), ...baseProps, locationSearch: 'Search by address or ZIP' },
       slots: { filters: '<div class="my-filters">Chips</div>' },
       global: { stubs: { MapCard: MapCardStub } },
     })
@@ -161,7 +180,7 @@ describe('LocationsPanel - count label', () => {
 
   it('renders the count line between the filters slot and the location list', () => {
     const w = mount(LocationsPanel, {
-      props: { locations: locations(), countNoun: 'report' },
+      props: { locations: locations(), ...baseProps, countNoun: 'report' },
       slots: { filters: '<div class="my-filters">Chips</div>' },
       global: { stubs: { MapCard: MapCardStub } },
     })

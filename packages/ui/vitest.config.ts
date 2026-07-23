@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [vue()],
   test: {
     environment: 'jsdom',
+    setupFiles: ['./src/__tests__/setup.ts'],
     server: {
       deps: {
         inline: [/@phila\//],
