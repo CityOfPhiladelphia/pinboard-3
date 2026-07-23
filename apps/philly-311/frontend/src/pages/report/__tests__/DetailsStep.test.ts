@@ -31,6 +31,22 @@ const CATALOG: ServiceType[] = [
         type: 'string',
         required: false,
       },
+      {
+        field: 'Depth__c',
+        label: 'Depth detail',
+        type: 'string',
+        required: false,
+        controllerName: 'Severity__c',
+        dependentValues: { a: ['Deep'] },
+      },
+      {
+        field: 'FollowUp__c',
+        label: 'Follow-up notes',
+        type: 'string',
+        required: false,
+        controllerName: 'Severity__c',
+        dependentValues: { a: ['Deep'] },
+      },
     ],
   },
   {
@@ -40,6 +56,33 @@ const CATALOG: ServiceType[] = [
     recordTypeID: 'rt2',
     department: 'CLIP',
     questions: [],
+  },
+  {
+    serviceType: 'Illegal Dumping',
+    caseType: 'Sanitation',
+    description: 'Illegal dumping',
+    recordTypeID: 'rt3',
+    department: 'Sanitation',
+    questions: [
+      { field: 'Location__c', label: 'Location details', type: 'string', required: true },
+    ],
+  },
+  {
+    serviceType: 'Multi Q',
+    caseType: 'Test',
+    description: 'Fixture exercising non-picklist answer types',
+    recordTypeID: 'rt4',
+    department: 'Test',
+    questions: [
+      {
+        field: 'Choices__c',
+        label: 'Choices',
+        type: 'multipicklist',
+        required: false,
+        options: ['A', 'B'],
+      },
+      { field: 'Confirm__c', label: 'Confirm', type: 'boolean', required: false },
+    ],
   },
 ]
 
@@ -91,6 +134,52 @@ describe('DetailsStep - question screens', () => {
     expect(nav.value?.next()).toBe(true)
     await flushPromises()
     expect(w.text()).toContain('Select an option to continue')
+  })
+
+  it('next() on a required, empty NON-picklist question shows the generic message and returns true', async () => {
+    useReportSubmissionStore().setCategory('Illegal Dumping')
+    const { w, nav } = mountStep()
+    await flushPromises()
+    expect(w.find('h1').text()).toContain('Location details')
+    expect(nav.value?.next()).toBe(true)
+    await flushPromises()
+    const alert = w.find('[role="alert"]')
+    expect(alert.exists()).toBe(true)
+    expect(alert.text()).toBe('Add an answer to continue')
+  })
+
+  it('passes hideLabel: true to QuestionField so the heading is not duplicated', async () => {
+    useReportSubmissionStore().setCategory('Pothole Repair')
+    const { w } = mountStep()
+    await flushPromises()
+    expect(w.findComponent(QuestionField).props('hideLabel')).toBe(true)
+  })
+
+  it('clamps the index safely when an earlier controller answer change shrinks the question list', async () => {
+    const store = useReportSubmissionStore()
+    store.setCategory('Pothole Repair')
+    store.setQuestion('Severity__c', 'Deep')
+    const { w, nav } = mountStep()
+    await flushPromises()
+
+    expect(nav.value?.next()).toBe(true) // Severity -> Notes
+    await flushPromises()
+    expect(nav.value?.next()).toBe(true) // Notes -> Depth detail
+    await flushPromises()
+    expect(nav.value?.next()).toBe(true) // Depth detail -> Follow-up notes
+    await flushPromises()
+    expect(w.find('h1').text()).toContain('Follow-up notes')
+
+    // Something upstream (e.g. the user backing up and re-answering Severity)
+    // changes the controller answer — both dependent questions vanish.
+    store.setQuestion('Severity__c', 'Shallow')
+    await flushPromises()
+
+    // No crash, and the index was pulled back in bounds: a single back() lands
+    // on the last real remaining question instead of requiring two.
+    expect(nav.value?.back()).toBe(true)
+    await flushPromises()
+    expect(w.find('h1').text()).toContain('Notes')
   })
 
   it('back() steps back one question, and returns false at index 0', async () => {
@@ -163,6 +252,75 @@ describe('DetailsStep - question screens', () => {
       await nextTick()
       expect(w.find('h1').text()).toContain('Notes')
     })
+
+    it('a multipicklist answer does not auto-advance', async () => {
+      useReportSubmissionStore().setCategory('Multi Q')
+      const { w } = mountStep()
+      await nextTick()
+      expect(w.find('h1').text()).toContain('Choices')
+
+      await w.findComponent(QuestionField).vm.$emit('update:modelValue', 'A;B')
+      await nextTick()
+      vi.advanceTimersByTime(500)
+      await nextTick()
+      expect(w.find('h1').text()).toContain('Choices')
+    })
+
+    it('a boolean answer does not auto-advance', async () => {
+      useReportSubmissionStore().setCategory('Multi Q')
+      const { w, nav } = mountStep()
+      await nextTick()
+
+      expect(nav.value?.next()).toBe(true) // Choices (optional, empty) -> Confirm
+      await nextTick()
+      expect(w.find('h1').text()).toContain('Confirm')
+
+      await w.findComponent(QuestionField).vm.$emit('update:modelValue', 'true')
+      await nextTick()
+      vi.advanceTimersByTime(500)
+      await nextTick()
+      expect(w.find('h1').text()).toContain('Confirm')
+    })
+  })
+
+  describe('timer cancellation races', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+    })
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('back() before the auto-advance timer fires cancels it — no advance ever happens', async () => {
+      useReportSubmissionStore().setCategory('Pothole Repair')
+      const { w, nav } = mountStep()
+      await nextTick()
+
+      await w.findComponent(QuestionField).vm.$emit('update:modelValue', 'Shallow')
+      await nextTick()
+      expect(nav.value?.back()).toBe(false) // index 0: nothing to go back to, but cancels the pending timer
+
+      vi.advanceTimersByTime(500)
+      await nextTick()
+      expect(w.find('h1').text()).toContain('Severity')
+    })
+
+    it('a manual next() before the timer fires advances exactly once — the stale timer does not double-advance', async () => {
+      useReportSubmissionStore().setCategory('Pothole Repair')
+      const { w, nav } = mountStep()
+      await nextTick()
+
+      await w.findComponent(QuestionField).vm.$emit('update:modelValue', 'Shallow')
+      await nextTick()
+      expect(nav.value?.next()).toBe(true) // manual advance to Notes; cancels the pending auto-advance timer
+      await nextTick()
+      expect(w.find('h1').text()).toContain('Notes')
+
+      vi.advanceTimersByTime(500)
+      await nextTick()
+      // Still on Notes — the already-cancelled timer did not fire a second advance.
+      expect(w.find('h1').text()).toContain('Notes')
+    })
   })
 })
 
@@ -196,12 +354,37 @@ describe('DetailsStep - final screen', () => {
     expect(w.text()).toContain('Add a description to continue')
   })
 
+  it('next() with whitespace padding (13 raw / 7 trimmed chars) still fails the floor', async () => {
+    useReportSubmissionStore().setCategory('Graffiti Removal')
+    const { w, nav } = mountStep()
+    await flushPromises()
+    await w.find('textarea').setValue('   1234567   ')
+    expect(nav.value?.next()).toBe(true)
+    await flushPromises()
+    expect(w.find('[role="alert"]').text()).toBe('Add a description to continue')
+  })
+
   it('next() with a valid (10 trimmed chars) description returns false', async () => {
     useReportSubmissionStore().setCategory('Graffiti Removal')
     const { w, nav } = mountStep()
     await flushPromises()
     await w.find('textarea').setValue('1234567890')
     expect(nav.value?.next()).toBe(false)
+  })
+
+  it('renders the error under role=alert with details-step__error, and marks the textarea errored', async () => {
+    useReportSubmissionStore().setCategory('Graffiti Removal')
+    const { w, nav } = mountStep()
+    await flushPromises()
+    await w.find('textarea').setValue('short')
+    expect(nav.value?.next()).toBe(true)
+    await flushPromises()
+
+    const alert = w.find('[role="alert"]')
+    expect(alert.exists()).toBe(true)
+    expect(alert.classes()).toContain('details-step__error')
+    expect(alert.text()).toBe('Add a description to continue')
+    expect(w.find('textarea').classes()).toContain('details-step__textarea--error')
   })
 })
 
