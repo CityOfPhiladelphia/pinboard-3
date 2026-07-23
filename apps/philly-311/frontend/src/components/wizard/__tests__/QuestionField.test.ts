@@ -260,3 +260,55 @@ describe('QuestionField update:modelValue emissions', () => {
     expect(w.emitted('update:modelValue')?.[0]?.[0]).toBe('C')
   })
 })
+
+describe('QuestionField error message', () => {
+  it('renders the error in a role=alert element and adds the error class when error is set', () => {
+    const w = mount(QuestionField, {
+      props: {
+        question: make({ type: 'string' }),
+        modelValue: '',
+        error: 'Select an option to continue',
+      },
+    })
+    const alert = w.find('[role="alert"]')
+    expect(alert.exists()).toBe(true)
+    expect(alert.text()).toBe('Select an option to continue')
+    expect(w.find('.question-field').classes()).toContain('question-field--error')
+  })
+
+  it('renders no alert and no error class when error is absent', () => {
+    const w = mount(QuestionField, {
+      props: { question: make({ type: 'string' }), modelValue: '' },
+    })
+    expect(w.find('[role="alert"]').exists()).toBe(false)
+    expect(w.find('.question-field').classes()).not.toContain('question-field--error')
+  })
+})
+
+describe('QuestionField hideLabel', () => {
+  it('suppresses the visible label on a string TextField but preserves an accessible name via aria-label', () => {
+    const w = mount(QuestionField, {
+      props: {
+        question: make({ type: 'string', label: 'My Field' }),
+        modelValue: '',
+        hideLabel: true,
+      },
+    })
+    expect(w.text()).not.toContain('My Field')
+    const tf = w.findComponent(TextField)
+    expect(tf.props('label')).toBe('')
+    expect(tf.attributes('aria-label')).toBe('My Field')
+  })
+
+  it('hides the RadioGroup label visually via a root class but keeps its accessible groupLabel text', () => {
+    const w = mount(QuestionField, {
+      props: {
+        question: make({ type: 'picklist', options: ['A', 'B'], label: 'My Field' }),
+        modelValue: '',
+        hideLabel: true,
+      },
+    })
+    expect(w.find('.question-field').classes()).toContain('question-field--bare-label')
+    expect(w.findComponent(RadioGroup).props('groupLabel')).toBe('My Field')
+  })
+})

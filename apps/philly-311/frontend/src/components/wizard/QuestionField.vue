@@ -12,6 +12,8 @@ import type { QuestionField } from '@/types/api'
 const props = defineProps<{
   question: QuestionField
   modelValue: string
+  hideLabel?: boolean
+  error?: string
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
@@ -55,9 +57,15 @@ function setCheckbox(record: Record<string, boolean>) {
 </script>
 
 <template>
-  <div class="question-field" :data-type="question.type">
+  <div
+    class="question-field"
+    :class="{ 'question-field--error': !!error, 'question-field--bare-label': hideLabel }"
+    :data-type="question.type"
+  >
     <!-- picklist (≤4): RadioGroup -->
     <!-- phila-ui gap: RadioGroup has no required prop and doesn't forward $attrs to its <input type="radio"> elements -->
+    <!-- group-label always renders the real text (RadioGroup has no accessible-name prop of its
+         own); hideLabel visually hides it via the :deep() rule below instead of emptying it. -->
     <RadioGroup
       v-if="useRadioGroup"
       :group-label="labelText"
@@ -68,7 +76,9 @@ function setCheckbox(record: Record<string, boolean>) {
 
     <!-- picklist (>4): native select -->
     <template v-else-if="isLargePicklist">
-      <label :for="fieldId" class="question-field__label">{{ labelText }}</label>
+      <label :for="fieldId" class="question-field__label" :class="{ 'sr-only': hideLabel }">{{
+        labelText
+      }}</label>
       <select
         :id="fieldId"
         :value="modelValue"
@@ -92,7 +102,9 @@ function setCheckbox(record: Record<string, boolean>) {
 
     <!-- textarea: native -->
     <template v-else-if="question.type === 'textarea'">
-      <label :for="fieldId" class="question-field__label">{{ labelText }}</label>
+      <label :for="fieldId" class="question-field__label" :class="{ 'sr-only': hideLabel }">{{
+        labelText
+      }}</label>
       <textarea
         :id="fieldId"
         :value="modelValue"
@@ -106,7 +118,8 @@ function setCheckbox(record: Record<string, boolean>) {
     <DateField
       v-else-if="question.type === 'date'"
       :id="fieldId"
-      :label="labelText"
+      :label="hideLabel ? '' : labelText"
+      :aria-label="hideLabel ? labelText : undefined"
       :model-value="modelValue"
       :aria-required="question.required || undefined"
       @update:model-value="set"
@@ -128,7 +141,8 @@ function setCheckbox(record: Record<string, boolean>) {
     <TextField
       v-else-if="['number', 'currency', 'double'].includes(question.type)"
       :id="fieldId"
-      :label="labelText"
+      :label="hideLabel ? '' : labelText"
+      :aria-label="hideLabel ? labelText : undefined"
       :model-value="modelValue"
       :imask-props="{ mask: Number }"
       :aria-required="question.required || undefined"
@@ -139,11 +153,14 @@ function setCheckbox(record: Record<string, boolean>) {
     <TextField
       v-else
       :id="fieldId"
-      :label="labelText"
+      :label="hideLabel ? '' : labelText"
+      :aria-label="hideLabel ? labelText : undefined"
       :model-value="modelValue"
       :aria-required="question.required || undefined"
       @update:model-value="set"
     />
+
+    <p v-if="error" class="question-field__error" role="alert">{{ error }}</p>
   </div>
 </template>
 
@@ -151,6 +168,37 @@ function setCheckbox(record: Record<string, boolean>) {
 .question-field__label {
   display: block;
   margin-bottom: var(--spacing-xs, 4px);
+  font-weight: 600;
+}
+
+/* RadioGroup/CheckboxGroup have no accessible-name prop of their own, so hideLabel can't
+   empty their group-label without losing it entirely. Instead the real text stays in the
+   DOM for screen readers and is only visually hidden here, matching src/assets/a11y.css's
+   .sr-only technique. */
+.question-field--bare-label :deep(.labels-container > span:first-child) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.question-field--error {
+  background: #f8c9bd;
+  border-radius: 12px;
+  padding: 16px;
+}
+.question-field--error textarea,
+.question-field--error select {
+  border-color: #992100;
+}
+.question-field__error {
+  margin: var(--spacing-s, 0.75rem) 0 0;
+  color: #992100;
   font-weight: 600;
 }
 </style>
