@@ -121,7 +121,8 @@ export interface PrimaryCareResponse extends PinboardTypes.GeoJSONFeatureCollect
   features: PrimaryCareFeature[]
 }
 
-export type PrimaryCareLocation = PinboardTypes.BasicLocation & Omit<PrimaryCareFeature, 'type'>
+export interface PrimaryCareLocation
+  extends PinboardTypes.BasicLocation, Omit<PrimaryCareFeature, 'type'> {}
 
 export type SortMode = '' | 'distance' | 'name'
 
@@ -195,37 +196,37 @@ export interface PrimaryCareFilters extends FilterValues {
   languages: Record<LanguagesFilterKey, boolean>
 }
 
-export interface AgeRangeFilterKeyLogic extends FilterChoiceBitfieldGroup {
+export interface AgeRangeFilterLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<AgeRangeFilterKey, FilterChoiceBitfield>
 }
 
-export interface LanguagesFilterKeyLogic extends FilterChoiceBitfieldGroup {
+export interface LanguagesFilterLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<LanguagesFilterKey, FilterChoiceBitfield>
 }
 
-export interface SpecialtyFilterKeyLogic extends FilterChoiceBitfieldGroup {
+export interface SpecialtyFilterLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<SpecialtyFilterKey, FilterChoiceBitfield>
 }
 
-export interface TestsFilterKeyLogic extends FilterChoiceBitfieldGroup {
+export interface TestsFilterLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<TestsFilterKey, FilterChoiceBitfield>
 }
 
-export interface VisitTypeFilterKeyLogic extends FilterChoiceBitfieldGroup {
+export interface VisitTypeFilterLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<VisitTypeFilterKey, FilterChoiceBitfield>
 }
 
-export interface WaitTimeFilterKeyLogic extends FilterChoiceBitfieldGroup {
+export interface WaitTimeFilterLogic extends FilterChoiceBitfieldGroup {
   childFilters: Record<WaitTimeFilterKey, FilterChoiceBitfield>
 }
 
 export interface PrimaryCareFilterLogic extends FilterGroup {
   childFilters: {
-    ageRange: AgeRangeFilterKeyLogic
-    languages: LanguagesFilterKeyLogic
-    specialty: SpecialtyFilterKeyLogic
-    tests: TestsFilterKeyLogic
-    visitType: VisitTypeFilterKeyLogic
-    waitTime: WaitTimeFilterKeyLogic
+    ageRange: AgeRangeFilterLogic
+    languages: LanguagesFilterLogic
+    specialty: SpecialtyFilterLogic
+    tests: TestsFilterLogic
+    visitType: VisitTypeFilterLogic
+    waitTime: WaitTimeFilterLogic
   }
 }

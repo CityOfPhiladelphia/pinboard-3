@@ -10,6 +10,19 @@ export function sortLocations(
   locations = toValue(locations)
   currentLocation = toValue(currentLocation)
   sortMode = toValue(sortMode)
+  locations.forEach((location) => {
+    location.distance = PinboardUtilities.hasLocationData(currentLocation)
+      ? `${PinboardUtilities.getHaversineDistance(
+          { latitude: location.latitude, longitude: location.longitude },
+          {
+            latitude: currentLocation.latitude,
+            longitude: currentLocation.longitude,
+          },
+          1
+        )} mi`
+      : undefined
+  })
+
   switch (PinboardUtilities.hasLocationData(currentLocation) && !sortMode ? 'distance' : sortMode) {
     case 'name': {
       return sortAlpha(locations)
@@ -37,7 +50,7 @@ function sortAlpha(locations: PrimaryCareLocation[]) {
 function sortDistance(locations: PrimaryCareLocation[], currentLocation: PinboardTypes.LatLon) {
   currentLocation = toValue(currentLocation)
   locations.forEach((location) => {
-    location.locationCardInfo.subheader = PinboardUtilities.hasLocationData(currentLocation)
+    location.distance = PinboardUtilities.hasLocationData(currentLocation)
       ? `${PinboardUtilities.getHaversineDistance(
           { latitude: location.latitude, longitude: location.longitude },
           {
@@ -49,9 +62,7 @@ function sortDistance(locations: PrimaryCareLocation[], currentLocation: Pinboar
       : undefined
   })
   locations.sort(
-    (a, b) =>
-      Number(a.locationCardInfo.subheader?.replace(' mi', '')) -
-      Number(b.locationCardInfo.subheader?.replace(' mi', ''))
+    (a, b) => Number(a.distance?.replace(' mi', '')) - Number(b.distance?.replace(' mi', ''))
   )
   return locations
 }

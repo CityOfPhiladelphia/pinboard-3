@@ -14,7 +14,7 @@ import {
   Callout,
   applyFilters,
 } from '@pinboard/ui'
-import type { FilterValues, PinboardTypes } from '@pinboard/ui'
+import type { FilterChoiceBitfieldGroup, FilterValues, MapCardProps } from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
 import { useFilterChipDefinitions } from '@/composables/filters/useFilterChipDefinitions.ts'
 import { useFilterLogic } from '@/composables/filters/useFilterLogic'
@@ -27,10 +27,6 @@ import type {
   PrimaryCareLocation,
   PrimaryCareResponse,
   SortMode,
-  SpecialtyFilterKey,
-  TestsFilterKey,
-  VisitTypeFilterKey,
-  WaitTimeFilterKey,
 } from '@/types'
 import { sortLocations } from '@/utilities/sortLocations'
 
@@ -81,27 +77,14 @@ const isMobile = PinboardComposables.useIsMobile()
 const { locations, languages, isLoading, errorMessage, geojson } = useLocations()
 const { filterChipDefinitions } = useFilterChipDefinitions(languages)
 const calloutOpen = ref(true)
-// Location is requested only when the user clicks the geolocation button, which
-// emits to handleGeolocate. The shared useUserLocation composable prompts on load,
-// which the primary care finder intentionally avoids.
-const userLocation = ref<PinboardTypes.LatLon>({
-  latitude: NaN,
-  longitude: NaN,
-})
-const addressForSearch = ref<string>('')
-const { addressCoordinates, finishedAddressFetch } =
-  PinboardComposables.useSearchAddress(addressForSearch)
-const zipcodeForSearch = ref<string>('')
-const { zipcodePolygon, finishedZipFetch } = PinboardComposables.useSearchZipcode(zipcodeForSearch)
-const keywordsForSearch = ref<string>('')
-const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
-const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
-  userLocation,
-  addressCoordinates,
-  finishedAddressFetch,
-  zipcodePolygon,
-  finishedZipFetch
-)
+const {
+  keywordsForSearch,
+  locationSearchMode,
+  searchOrUserLocation,
+  handleSearchSubmit,
+  handleGeolocate,
+  handleGeolocateError,
+} = PinboardComposables.useUserAndSearchLocations()
 const filterState = ref<PrimaryCareFilters>(defaultFilterState)
 
 const { filterLogicalValue, filterLogic } = useFilterLogic(locations, languages, filterState)
@@ -110,101 +93,20 @@ const keywordToFilterMap = computed(() => {
   const logicalValues = filterLogic.value as PrimaryCareFilterLogic
 
   const keywordMap: Record<string, Uint32Array> = {
-    [t('ageRange.adult').toLocaleLowerCase()]:
-      logicalValues.childFilters.ageRange.childFilters.adult.getBitfield(),
     [t('ageRange.adults').toLocaleLowerCase()]:
       logicalValues.childFilters.ageRange.childFilters.adult.getBitfield(),
     [t('ageRange.child').toLocaleLowerCase()]:
       logicalValues.childFilters.ageRange.childFilters.children.getBitfield(),
-    [t('ageRange.children').toLocaleLowerCase()]:
-      logicalValues.childFilters.ageRange.childFilters.children.getBitfield(),
-
-    ...Object.fromEntries(
-      Array.from(languages.value, (lang) => {
-        return [
-          t(`languages.${lang}`).toLocaleLowerCase(),
-          logicalValues.childFilters.languages.childFilters[lang].getBitfield(),
-        ]
-      })
-    ),
   }
 
-  Object.keys(logicalValues.childFilters.waitTime.childFilters).forEach((key) => {
-    t(`waitTime.${key}`)
-      .toLocaleLowerCase()
-      .replace(/\W+/g, ' ')
-      .split(' ')
-      .filter(Boolean)
-      .forEach(
-        (word) =>
-          (keywordMap[word] =
-            logicalValues.childFilters.waitTime.childFilters[
-              key as WaitTimeFilterKey
-            ].getBitfield())
-      )
-  })
-
-  Object.keys(logicalValues.childFilters.visitType.childFilters).forEach((key) => {
-    t(`visitType.${key}`)
-      .toLocaleLowerCase()
-      .replace(/\W+/g, ' ')
-      .split(' ')
-      .filter(Boolean)
-      .forEach(
-        (word) =>
-          (keywordMap[word] =
-            logicalValues.childFilters.visitType.childFilters[
-              key as VisitTypeFilterKey
-            ].getBitfield())
-      )
-  })
-
-  Object.keys(logicalValues.childFilters.specialty.childFilters).forEach((key) => {
-    t(`specialty.${key}`)
-      .toLocaleLowerCase()
-      .replace(/\W+/g, ' ')
-      .split(' ')
-      .filter(Boolean)
-      .forEach(
-        (word) =>
-          (keywordMap[word] =
-            logicalValues.childFilters.specialty.childFilters[
-              key as SpecialtyFilterKey
-            ].getBitfield())
-      )
-  })
-
-  Object.keys(logicalValues.childFilters.tests.childFilters).forEach((key) => {
-    t(`tests.${key}`)
-      .toLocaleLowerCase()
-      .replace(/\W+/g, ' ')
-      .split(' ')
-      .filter(Boolean)
-      .forEach(
-        (word) =>
-          (keywordMap[word] =
-            logicalValues.childFilters.tests.childFilters[key as TestsFilterKey].getBitfield())
-      )
-  })
+  mapFilterTextToFilterLogic(keywordMap, 'ageRange', logicalValues.childFilters.ageRange)
+  mapFilterTextToFilterLogic(keywordMap, 'languages', logicalValues.childFilters.languages)
+  mapFilterTextToFilterLogic(keywordMap, 'waitTime', logicalValues.childFilters.waitTime)
+  mapFilterTextToFilterLogic(keywordMap, 'visitType', logicalValues.childFilters.visitType)
+  mapFilterTextToFilterLogic(keywordMap, 'specialty', logicalValues.childFilters.specialty)
+  mapFilterTextToFilterLogic(keywordMap, 'tests', logicalValues.childFilters.tests)
 
   return keywordMap
-})
-
-const locationsWithDistance = computed<PrimaryCareLocation[]>(() => {
-  const { latitude, longitude } = userLocation.value
-  return locations.value.map((loc) => ({
-    ...loc,
-    locationCardInfo: {
-      ...loc.locationCardInfo,
-      subheader: PinboardUtilities.hasLocationData(userLocation.value)
-        ? `${PinboardUtilities.getHaversineDistance(
-            { latitude: loc.latitude, longitude: loc.longitude },
-            { latitude, longitude },
-            1
-          )} mi`
-        : undefined,
-    },
-  }))
 })
 
 const sortMode = computed<SortMode>(() => {
@@ -247,8 +149,8 @@ const filteredGeojson = computed<PrimaryCareResponse | undefined>(() => {
 
 const filteredLocations = computed<PrimaryCareLocation[]>(() => {
   let result = filterLogicalValue.value.length
-    ? applyFilters(locationsWithDistance.value, filterLogicalValue.value)
-    : locationsWithDistance.value
+    ? applyFilters(locations.value, filterLogicalValue.value)
+    : locations.value
 
   if (keywordsForSearch.value) {
     const terms = keywordsForSearch.value
@@ -261,10 +163,8 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
       return terms.some((term) => {
         const keywordBits =
           keywordToFilterMap.value?.[term] &&
-          keywordToFilterMap.value[term][
-            Math.floor(locationsWithDistance.value.indexOf(loc) / 32)
-          ] &
-            (1 << Math.floor(locationsWithDistance.value.indexOf(loc) % 32))
+          keywordToFilterMap.value[term][Math.floor(locations.value.indexOf(loc) / 32)] &
+            (1 << Math.floor(locations.value.indexOf(loc) % 32))
         return haystack.includes(term) || keywordBits
       })
     })
@@ -273,63 +173,38 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
   return filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
 })
 
-function handleSearchSubmit(locationSearchString: string) {
-  switch (true) {
-    case PinboardUtilities.StreetAddress.test(locationSearchString):
-    case PinboardUtilities.StreetIntersection.test(locationSearchString): {
-      locationSearchMode.value = 'address'
-      addressForSearch.value = locationSearchString
-      zipcodeForSearch.value = ''
-      keywordsForSearch.value = ''
-      break
-    }
-    case PinboardUtilities.Zipcode.test(locationSearchString): {
-      locationSearchMode.value = 'zipcode'
-      zipcodeForSearch.value = locationSearchString
-      addressForSearch.value = ''
-      keywordsForSearch.value = ''
-      break
-    }
-    case locationSearchString !== '': {
-      locationSearchMode.value = 'keyword'
-      keywordsForSearch.value = locationSearchString
-      addressForSearch.value = ''
-      zipcodeForSearch.value = ''
-      break
-    }
-    default: {
-      locationSearchMode.value = undefined
-      addressForSearch.value = locationSearchString
-      zipcodeForSearch.value = locationSearchString
-      keywordsForSearch.value = locationSearchString
-    }
-  }
-}
-
-function handleGeolocate(locationData: { latitude: number; longitude: number; accuracy: number }) {
-  console.log('Geolocation Accuracy: ', locationData.accuracy)
-  userLocation.value = {
-    latitude: locationData.latitude,
-    longitude: locationData.longitude,
-  }
-}
-
-function handleGeolocateError(error: Error | GeolocationPositionError) {
-  console.error(error)
+function mapFilterTextToFilterLogic(
+  keywordMap: Record<string, Uint32Array>,
+  filterGroupFieldKey: keyof PrimaryCareFilterLogic['childFilters'],
+  filterLogic: FilterChoiceBitfieldGroup
+) {
+  Object.keys(filterLogic.childFilters).forEach((key) => {
+    t(`${filterGroupFieldKey}.${String(key)}`)
+      .toLocaleLowerCase()
+      .replace(/\W+/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .forEach((word) => (keywordMap[word] = filterLogic.childFilters[key].getBitfield()))
+  })
 }
 
 function handleApplyFilter(values: FilterValues) {
   filterState.value = values as PrimaryCareFilters
 }
 
-function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
-  return location as PrimaryCareLocation
+function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
+  return {
+    heading: String(location.properties.record ?? location.properties.address ?? ''),
+    subheader: location.distance,
+    body: String(location.properties.address ?? ''),
+  } satisfies MapCardProps
 }
 </script>
 
 <template>
   <PinboardBody
     :locations="filteredLocations"
+    :get-map-card-props="getMapCardProps"
     :search-or-user-location="searchOrUserLocation"
     :location-search-mode="locationSearchMode"
     :is-loading="isLoading"
@@ -352,15 +227,11 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
     </template>
 
     <template #location-card="{ location }">
-      <LocationCard :location="asPrimaryCareLocation(location)" />
+      <LocationCard :location="location" />
     </template>
 
     <template #location-detail="{ location, onClose, onPrint }">
-      <LocationDetail
-        :location="asPrimaryCareLocation(location)"
-        :on-close="onClose"
-        :on-print="onPrint"
-      />
+      <LocationDetail :location="location" :on-close="onClose" :on-print="onPrint" />
     </template>
 
     <template
@@ -382,6 +253,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
       <GeolocationButton
         :position="isMobile ? 'top-right' : 'bottom-right'"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
+        :show-location-marker="false"
         @located="handleGeolocate"
         @error="handleGeolocateError"
       />
@@ -416,7 +288,7 @@ function asPrimaryCareLocation(location: PinboardTypes.BasicLocation) {
           (e: any) => {
             const feature = e.features?.[0]
             if (!feature) return
-            const loc = locationsWithDistance.find((l) => l.id === feature.properties?.id)
+            const loc = locations.find((l) => l.id === feature.properties?.id)
             if (loc) onSelect(loc)
           }
         "

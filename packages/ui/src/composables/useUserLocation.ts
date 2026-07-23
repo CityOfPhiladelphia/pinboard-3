@@ -8,7 +8,7 @@ import type {
 } from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
-export function useUserLocation(promptOnPageLoad: boolean, watchLocation: boolean) {
+export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation: boolean = false) {
   const userLocation = ref<LatLon>({
     latitude: NaN,
     longitude: NaN,
@@ -137,7 +137,30 @@ export function useUserLocation(promptOnPageLoad: boolean, watchLocation: boolea
     clearUserLocation()
   }
 
-  return { userLocation, userLocationState, getUserLocation, endWatch }
+  function handleGeolocate(locationData: {
+    latitude: number
+    longitude: number
+    accuracy: number
+  }) {
+    console.log('Geolocation Accuracy: ', locationData.accuracy)
+    userLocation.value = {
+      latitude: locationData.latitude,
+      longitude: locationData.longitude,
+    }
+  }
+
+  function handleGeolocateError(error: Error | GeolocationPositionError) {
+    console.error(error)
+  }
+
+  return {
+    userLocation,
+    userLocationState,
+    getUserLocation,
+    endWatch,
+    handleGeolocate,
+    handleGeolocateError,
+  }
 }
 
 // verify location is in or near enough to Philadelphia

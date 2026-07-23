@@ -5,16 +5,18 @@ import type { BasicLocation } from '../types'
 // print-only container (see styles/print.css) and opening the browser print
 // dialog. Lives here rather than in a component so any finder rendering a
 // location detail can offer print without re-implementing the plumbing.
-export function usePrint(locations: Ref<BasicLocation[]>) {
+export function usePrint<PinboardLocation extends BasicLocation>(
+  locations: Ref<PinboardLocation[]>
+) {
   const printIds = ref<string[]>([])
 
   const printLocations = computed(() =>
     printIds.value
       .map((id) => locations.value.find((loc) => loc.id === id))
-      .filter((loc): loc is BasicLocation => loc !== undefined)
+      .filter((loc) => loc !== undefined)
   )
 
-  function print(location: BasicLocation) {
+  function print(location: PinboardLocation) {
     printIds.value = [location.id]
     // Wait for the print container to render the detail before opening the dialog.
     nextTick(() => window.print())

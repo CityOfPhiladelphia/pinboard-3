@@ -19,8 +19,8 @@ function mapsUrl(location: PrimaryCareLocation): string {
 <template>
   <div class="card-content">
     <span class="card-heading has-text-label-default">{{ location.name }}</span>
-    <span v-if="location.locationCardInfo.subheader" class="card-distance">
-      {{ location.locationCardInfo.subheader }}
+    <span v-if="location.distance" class="card-distance">
+      {{ location.distance }}
     </span>
     <LocationTags :location="location" class="card-tags" />
     <div class="card-links">

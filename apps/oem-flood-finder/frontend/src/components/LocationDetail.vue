@@ -15,11 +15,10 @@ const props = defineProps<{
 }>()
 
 const readingState = useLocationDetail(
-  () => props.location.deviceId,
+  () => props.location.id,
   () => props.location.deviceType,
 )
 
-// we could get gauge height out of location but this updates onWatch with graph
 const gaugeHeight = computed(() => {
   if (readingState.value.kind === 'Loaded' && readingState.value.data[0].gaugeHeight !== -9999.9) {
     return `${readingState.value.data[0].gaugeHeight} ${readingState.value.data[0].gaugeHeightUnit}`

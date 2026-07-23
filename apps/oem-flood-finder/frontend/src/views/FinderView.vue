@@ -1,9 +1,9 @@
 <script setup lang="ts">
 // vue imports
-import { computed, ref, watch } from 'vue'
+import { computed, markRaw, ref, watch } from 'vue'
 
 // 3rd party imports
-import { IconGauge, IconCamera, IconLocationDot } from '@phila/phila-ui-core/icons'
+import { IconGauge, IconCamera, IconLocationDot, IconWater } from '@phila/phila-ui-core/icons'
 
 // philly ui imports
 // pinboard imports
@@ -19,6 +19,7 @@ import {
   PinboardComposables,
   PinboardUtilities,
   type PinboardTypes,
+  type MapCardProps,
 } from '@pinboard/ui'
 import {
   filterLocations,
@@ -49,29 +50,22 @@ const sortLocationsOptions: PinboardTypes.SortLocationsOptions = {
 }
 
 // refs
-const addressForSearch = ref<string>('')
-const { addressCoordinates, finishedAddressFetch } =
-  PinboardComposables.useSearchAddress(addressForSearch)
-const zipcodeForSearch = ref<string>('')
-const { zipcodePolygon, finishedZipFetch } = PinboardComposables.useSearchZipcode(zipcodeForSearch)
-const keywordsForSearch = ref<string>('')
-const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
 const locationFilterMode = ref<Filters>('all')
 const visitedIds = ref(new Set<string>())
 const visibleFloodLayers = ref<FloodLayerId[]>([])
 const { oemLocations, isLoading, errorMessage } = useLocations()
-const { userLocation, userLocationState } = PinboardComposables.useUserLocation(true, true)
+const {
+  userLocationState,
+  keywordsForSearch,
+  locationSearchMode,
+  searchOrUserLocation,
+  handleSearchSubmit,
+  handleGeolocate,
+  handleGeolocateError,
+} = PinboardComposables.useUserAndSearchLocations(true, true)
 const locationSortMode = ref<SortMode>(
   ['located', 'watching'].includes(userLocationState.value) ? 'DistAsc' : '',
 )
-const { searchOrUserLocation } = PinboardComposables.useUserAndSearchLocations(
-  userLocation,
-  addressCoordinates,
-  finishedAddressFetch,
-  zipcodePolygon,
-  finishedZipFetch,
-)
-
 const isMobile = PinboardComposables.useIsMobile()
 
 // computed refs
@@ -120,39 +114,6 @@ function handleLocationSortChange(sortLocationsOption: string) {
   locationSortMode.value = sortLocationsOption as SortMode
 }
 
-function handleSearchSubmit(locationSearchString: string) {
-  switch (true) {
-    case PinboardUtilities.StreetAddress.test(locationSearchString):
-    case PinboardUtilities.StreetIntersection.test(locationSearchString): {
-      locationSearchMode.value = 'address'
-      addressForSearch.value = locationSearchString
-      zipcodeForSearch.value = ''
-      keywordsForSearch.value = ''
-      break
-    }
-    case PinboardUtilities.Zipcode.test(locationSearchString): {
-      locationSearchMode.value = 'zipcode'
-      zipcodeForSearch.value = locationSearchString
-      addressForSearch.value = ''
-      keywordsForSearch.value = ''
-      break
-    }
-    case locationSearchString !== '': {
-      locationSearchMode.value = 'keyword'
-      keywordsForSearch.value = locationSearchString
-      addressForSearch.value = ''
-      zipcodeForSearch.value = ''
-      break
-    }
-    default: {
-      locationSearchMode.value = undefined
-      addressForSearch.value = locationSearchString
-      zipcodeForSearch.value = locationSearchString
-      keywordsForSearch.value = locationSearchString
-    }
-  }
-}
-
 function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
   onSelect(loc)
 }
@@ -161,18 +122,31 @@ function handleDeselect(id: string) {
   visitedIds.value.add(id)
 }
 
-function handleGeolocate(data: { latitude: number; longitude: number; accuracy: number }) {
-  userLocation.value = { latitude: data.latitude, longitude: data.longitude }
+function getLocationTags(loc: OemLocation): NonNullable<MapCardProps['tags']> {
+  if (loc.deviceType === 'Camera') {
+    return [{ text: 'Camera', color: 'purple' as const, icon: markRaw(IconCamera) }]
+  }
+  const gaugeValue =
+    Number.isNaN(loc.gaugeHeight) || loc.gaugeHeight === -9999.9
+      ? 'No data'
+      : `${loc.gaugeHeight} ${loc.gaugeHeightUnit}`
+  return [{ text: 'Gauge', color: 'blue' as const, icon: markRaw(IconWater) }, { text: gaugeValue }]
 }
 
-function asOemLocation(location: PinboardTypes.BasicLocation) {
-  return location as OemLocation
+function getMapCardProps(location: OemLocation): MapCardProps {
+  return {
+    heading: location.name,
+    subheader: location.distance,
+    tags: getLocationTags(location),
+    src: location.thumbnailUrl,
+  } satisfies MapCardProps
 }
 </script>
 
 <template>
   <PinboardBody
     :locations="currentLocations"
+    :get-map-card-props="getMapCardProps"
     :search-or-user-location="searchOrUserLocation"
     :is-loading="isLoading"
     :error-message="errorMessage"
@@ -189,7 +163,7 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
     @deselect="handleDeselect"
   >
     <template #location-detail="{ location, onClose }">
-      <LocationDetail :on-close="onClose" :location="asOemLocation(location)" />
+      <LocationDetail :on-close="onClose" :location="location" />
     </template>
 
     <template
@@ -214,6 +188,7 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
         :show-location-marker="false"
         @located="handleGeolocate"
+        @error="handleGeolocateError"
       />
 
       <FillLayer
@@ -243,8 +218,8 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
             :zoom="zoom"
             :icon="isGauge(loc) ? IconGauge : IconCamera"
             :text="
-              loc.locationCardInfo.tags?.[1]?.text !== 'No data'
-                ? (loc.locationCardInfo.tags?.[1]?.text ?? '')
+              isGauge(loc) && !(Number.isNaN(loc.gaugeHeight) || loc.gaugeHeight === -9999.9)
+                ? String(loc.gaugeHeight)
                 : ''
             "
             :color-theme="isGauge(loc) ? 'light-primary' : 'light-purple'"
@@ -268,10 +243,4 @@ function asOemLocation(location: PinboardTypes.BasicLocation) {
   </PinboardBody>
 </template>
 
-<style scoped>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-</style>
+<style scoped></style>

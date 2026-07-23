@@ -62,10 +62,6 @@ export function useLocations(): {
         longitude: feature.geometry.coordinates[0],
         properties: feature.properties,
         geometry: feature.geometry,
-        locationCardInfo: {
-          heading: String(feature.properties.record ?? feature.properties.address ?? ''),
-          body: String(feature.properties.address ?? ''),
-        },
       }))
 
       geojson.value = {
