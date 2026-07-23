@@ -52,4 +52,12 @@ describe('useMyCasesStore', () => {
     localStorage.setItem('philly311:drafts', 'not json')
     expect(useMyCasesStore().drafts).toEqual([])
   })
+
+  it('tolerates valid JSON that is not an array', () => {
+    localStorage.setItem('philly311:drafts', '{}')
+    const store = useMyCasesStore()
+    expect(store.drafts).toEqual([])
+    const saved = store.saveDraft(draftInput)
+    expect(store.drafts).toEqual([saved])
+  })
 })

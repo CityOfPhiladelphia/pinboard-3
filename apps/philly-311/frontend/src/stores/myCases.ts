@@ -9,7 +9,9 @@ const STORAGE_KEY = 'philly311:drafts'
 function readDrafts(): ReportDraft[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as ReportDraft[]) : []
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? (parsed as ReportDraft[]) : []
   } catch {
     return []
   }

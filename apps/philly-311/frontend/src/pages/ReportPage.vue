@@ -1,21 +1,26 @@
 <!-- ABOUTME: Report-wizard shell. Renders a breadcrumb, the StepIndicator, the active
-     child step via <router-view>, and contextual Reset/Skip/Back/Next controls.
+     child step via <router-view>, and contextual Exit/Skip/Back/Next controls.
      Next always stays enabled; canAdvance and showErrors are provided so an
      invalid attempt surfaces the active step's error messages instead of
      blocking the click. A step can register nav handlers to intercept
-     Back/Next before the shell changes routes. -->
+     Back/Next before the shell changes routes. Exit opens ExitDialog, which
+     either saves the in-progress report as a draft or discards it. -->
 <script setup lang="ts">
 import { provide, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import StepIndicator from '@/components/wizard/StepIndicator.vue'
+import ExitDialog from '@/components/wizard/ExitDialog.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
+import { useMyCasesStore } from '@/stores/myCases'
 import { WIZARD_CAN_ADVANCE_KEY, WIZARD_SHOW_ERRORS_KEY } from '@/composables/useWizardValidity'
 import { WIZARD_NAV_KEY, type WizardNavHandlers } from '@/composables/useWizardNav'
 
 const router = useRouter()
 const route = useRoute()
 const store = useReportSubmissionStore()
+const myCases = useMyCasesStore()
+const exitOpen = ref(false)
 
 const STEPS = [
   { title: 'Image', path: '/report' },
@@ -54,9 +59,23 @@ function goNext() {
   }
   if (nextPath.value) router.push(nextPath.value)
 }
-function resetWizard() {
+function saveAndExit() {
+  const { category, customFields, location, description, contact, publicVisibility, photo } = store
+  myCases.saveDraft({
+    category,
+    customFields: { ...customFields },
+    location,
+    description,
+    contact: { ...contact },
+    publicVisibility,
+    ...(photo?.mediaUrl ? { mediaUrl: photo.mediaUrl } : {}),
+  })
   store.reset()
-  router.push('/report')
+  router.push('/')
+}
+function discardAndExit() {
+  store.reset()
+  router.push('/')
 }
 </script>
 
@@ -78,27 +97,21 @@ function resetWizard() {
     </section>
 
     <footer class="wizard__nav">
-      <button
-        v-if="isImageStep"
-        type="button"
-        class="wizard__reset"
-        data-test="wizard-reset"
-        @click="resetWizard"
-      >
-        Reset
+      <button type="button" class="wizard__exit" data-test="wizard-exit" @click="exitOpen = true">
+        Exit
       </button>
-      <PhilaButton
-        v-else
-        variant="secondary"
-        data-test="wizard-back"
-        :disabled="!prevPath"
-        @click="goPrev"
-        >Back</PhilaButton
-      >
 
       <div class="wizard__nav-right">
         <PhilaButton v-if="isImageStep" variant="secondary" data-test="wizard-skip" @click="goNext"
           >Skip</PhilaButton
+        >
+        <PhilaButton
+          v-if="!isImageStep"
+          variant="secondary"
+          data-test="wizard-back"
+          :disabled="!prevPath"
+          @click="goPrev"
+          >Back</PhilaButton
         >
         <PhilaButton
           v-if="!isLast"
@@ -110,6 +123,8 @@ function resetWizard() {
         >
       </div>
     </footer>
+
+    <ExitDialog v-model:open="exitOpen" @save="saveAndExit" @discard="discardAndExit" />
   </div>
 </template>
 
@@ -140,7 +155,7 @@ function resetWizard() {
   display: flex;
   gap: var(--spacing-s, 0.75rem);
 }
-.wizard__reset {
+.wizard__exit {
   background: none;
   border: none;
   color: var(--ui-color-primary, #0f4d90);

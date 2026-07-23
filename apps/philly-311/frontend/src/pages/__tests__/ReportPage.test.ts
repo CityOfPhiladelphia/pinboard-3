@@ -8,6 +8,9 @@ import { createRouter, createMemoryHistory } from 'vue-router'
 import { setActivePinia, createPinia } from 'pinia'
 import { defineComponent, inject, type Ref } from 'vue'
 import ReportPage from '../ReportPage.vue'
+import ExitDialog from '@/components/wizard/ExitDialog.vue'
+import { useReportSubmissionStore } from '@/stores/reportSubmission'
+import { useMyCasesStore } from '@/stores/myCases'
 import { WIZARD_CAN_ADVANCE_KEY, WIZARD_SHOW_ERRORS_KEY } from '@/composables/useWizardValidity'
 import { WIZARD_NAV_KEY, type WizardNavHandlers } from '@/composables/useWizardNav'
 
@@ -18,6 +21,7 @@ function makeRouter() {
   return createRouter({
     history: createMemoryHistory(),
     routes: [
+      { path: '/', component: Stub('landing') },
       {
         path: '/report',
         component: ReportPage,
@@ -34,7 +38,10 @@ function makeRouter() {
 }
 
 describe('ReportPage shell', () => {
-  beforeEach(() => setActivePinia(createPinia()))
+  beforeEach(() => {
+    localStorage.clear()
+    setActivePinia(createPinia())
+  })
 
   it('renders the stepper and the active step via router-view', async () => {
     const router = makeRouter()
@@ -54,9 +61,85 @@ describe('ReportPage shell', () => {
     const w = mount(ReportPage, { global: { plugins: [router] } })
     await flushPromises()
     expect(w.find('[data-test="wizard-skip"]').exists()).toBe(true)
+    expect(w.find('[data-test="wizard-back"]').exists()).toBe(false)
     router.push('/report/issue-type')
     await flushPromises()
     expect(w.find('[data-test="wizard-back"]').exists()).toBe(true)
+  })
+
+  it('shows the Exit link on every step and no longer shows Reset', async () => {
+    const router = makeRouter()
+    router.push('/report')
+    await router.isReady()
+    const w = mount(ReportPage, { global: { plugins: [router] } })
+    await flushPromises()
+    expect(w.find('[data-test="wizard-exit"]').exists()).toBe(true)
+    expect(w.find('[data-test="wizard-reset"]').exists()).toBe(false)
+
+    router.push('/report/review')
+    await flushPromises()
+    expect(w.find('[data-test="wizard-exit"]').exists()).toBe(true)
+  })
+
+  it('clicking Exit opens the ExitDialog', async () => {
+    const router = makeRouter()
+    router.push('/report')
+    await router.isReady()
+    const w = mount(ReportPage, { global: { plugins: [router] } })
+    await flushPromises()
+
+    expect(w.findComponent(ExitDialog).props('open')).toBe(false)
+    await w.find('[data-test="wizard-exit"]').trigger('click')
+    expect(w.findComponent(ExitDialog).props('open')).toBe(true)
+  })
+
+  it('saves a draft, resets the wizard, and navigates home when ExitDialog emits save', async () => {
+    const router = makeRouter()
+    router.push('/report')
+    await router.isReady()
+    const w = mount(ReportPage, { global: { plugins: [router] } })
+    await flushPromises()
+
+    const submission = useReportSubmissionStore()
+    submission.setCategory('Illegal Dumping')
+    submission.setQuestion('Q1', 'Yes')
+    submission.setDescription('Trash on the corner')
+    submission.setPrivacy(true)
+
+    await w.find('[data-test="wizard-exit"]').trigger('click')
+    await w.findComponent(ExitDialog).vm.$emit('save')
+    await flushPromises()
+
+    const myCases = useMyCasesStore()
+    expect(myCases.drafts[0]).toMatchObject({
+      category: 'Illegal Dumping',
+      customFields: { Q1: 'Yes' },
+      description: 'Trash on the corner',
+      publicVisibility: true,
+    })
+    expect(submission.category).toBeNull()
+    expect(submission.customFields).toEqual({})
+    expect(submission.description).toBe('')
+    expect(router.currentRoute.value.path).toBe('/')
+  })
+
+  it('resets the wizard and navigates home without saving when ExitDialog emits discard', async () => {
+    const router = makeRouter()
+    router.push('/report')
+    await router.isReady()
+    const w = mount(ReportPage, { global: { plugins: [router] } })
+    await flushPromises()
+
+    const submission = useReportSubmissionStore()
+    submission.setCategory('Illegal Dumping')
+
+    await w.find('[data-test="wizard-exit"]').trigger('click')
+    await w.findComponent(ExitDialog).vm.$emit('discard')
+    await flushPromises()
+
+    expect(useMyCasesStore().drafts).toHaveLength(0)
+    expect(submission.category).toBeNull()
+    expect(router.currentRoute.value.path).toBe('/')
   })
 
   it('Next advances to the next step', async () => {
