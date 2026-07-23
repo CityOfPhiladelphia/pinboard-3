@@ -10,7 +10,7 @@ import FeaturedArticles from '@/components/answers/FeaturedArticles.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
 import heroPhoto from '@/assets/answers-hero.jpg'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faMagnifyingGlass } from '@fortawesome/pro-solid-svg-icons'
+import { faMagnifyingGlass, faArrowDownArrowUp } from '@fortawesome/pro-solid-svg-icons'
 
 const k = useKnowledgeArticles()
 
@@ -19,12 +19,24 @@ const nextPageToken = ref<string | undefined>(undefined)
 const browseLoading = ref(false)
 const browseError = ref<string | null>(null)
 
+// 'sort:direction' for the API, or '' for the server's default order.
+const sortChoice = ref('')
+
+function sortParams(): { sort?: 'title' | 'lastPublishedAt'; direction?: 'asc' | 'desc' } {
+  if (!sortChoice.value) return {}
+  const [sort, direction] = sortChoice.value.split(':')
+  return { sort, direction } as ReturnType<typeof sortParams>
+}
+
 // With a token, appends the next page; without one, (re)loads the first page.
 async function loadPage(token?: string) {
   browseLoading.value = true
   browseError.value = null
   try {
-    const result = await k.loadArticles(token ? { nextPageToken: token } : {})
+    const result = await k.loadArticles({
+      ...sortParams(),
+      ...(token ? { nextPageToken: token } : {}),
+    })
     items.value = token ? [...items.value, ...result.items] : result.items
     nextPageToken.value = result.nextPageToken
   } catch (err) {
@@ -86,6 +98,29 @@ onMounted(loadPage)
         class="answers__search-icon"
         aria-hidden="true"
       />
+    </div>
+
+    <div v-if="!isSearching" class="answers__chips">
+      <label class="answers__chip">
+        <FontAwesomeIcon
+          :icon="faArrowDownArrowUp"
+          class="answers__chip-icon"
+          aria-hidden="true"
+        />
+        <select
+          v-model="sortChoice"
+          class="answers__chip-select"
+          aria-label="Sort articles"
+          data-test="answers-sort"
+          @change="loadPage()"
+        >
+          <option value="">Sort</option>
+          <option value="title:asc">Title A–Z</option>
+          <option value="title:desc">Title Z–A</option>
+          <option value="lastPublishedAt:desc">Newest first</option>
+          <option value="lastPublishedAt:asc">Oldest first</option>
+        </select>
+      </label>
     </div>
 
     <p v-if="isLoading" class="answers__status">Loading articles&hellip;</p>
@@ -192,6 +227,30 @@ onMounted(loadPage)
   transform: translateY(-50%);
   color: var(--ui-color-primary, #0f4d90);
   pointer-events: none;
+}
+.answers__chips {
+  display: flex;
+  gap: var(--spacing-s, 0.75rem);
+  margin-bottom: var(--spacing-l, 1.5rem);
+}
+.answers__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs, 0.25rem);
+  height: 32px;
+  padding: 0 var(--spacing-xs, 0.5rem);
+  background: #fff;
+  border: 1px solid var(--ui-color-grey-300, #d6d6d6);
+  border-radius: 16px;
+}
+.answers__chip-icon {
+  font-size: 0.875rem;
+}
+.answers__chip-select {
+  border: none;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
 }
 .answers__list {
   list-style: none;

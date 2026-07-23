@@ -110,6 +110,48 @@ describe('AnswersPage', () => {
     expect(w.text()).toContain('Article 2')
   })
 
+  it('choosing a sort order reloads the browse list with sort and direction', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [a('1')], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    loadArticles.mockResolvedValueOnce({ items: [a('2')], nextPageToken: undefined })
+    await w.find('[data-test="answers-sort"]').setValue('lastPublishedAt:desc')
+    await flushPromises()
+    expect(loadArticles).toHaveBeenLastCalledWith({
+      sort: 'lastPublishedAt',
+      direction: 'desc',
+    })
+  })
+
+  it('Load more keeps the chosen sort order', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [a('1')], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    loadArticles.mockResolvedValueOnce({ items: [a('2')], nextPageToken: '25' })
+    await w.find('[data-test="answers-sort"]').setValue('title:asc')
+    await flushPromises()
+    loadArticles.mockResolvedValueOnce({ items: [a('3')], nextPageToken: undefined })
+    await w.find('[data-test="answers-more"]').trigger('click')
+    await flushPromises()
+    expect(loadArticles).toHaveBeenLastCalledWith({
+      nextPageToken: '25',
+      sort: 'title',
+      direction: 'asc',
+    })
+  })
+
+  it('hides the sort control during an active search', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [a('1')], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    expect(w.find('[data-test="answers-sort"]').exists()).toBe(true)
+    loadArticles.mockResolvedValueOnce({ items: [a('9')], nextPageToken: undefined })
+    await w.find('input[type="search"]').setValue('pothole')
+    vi.advanceTimersByTime(250)
+    await flushPromises()
+    expect(w.find('[data-test="answers-sort"]').exists()).toBe(false)
+  })
+
   it('shows a search-specific empty state', async () => {
     loadArticles.mockResolvedValueOnce({ items: [a('1')], nextPageToken: undefined })
     const w = mountPage()
