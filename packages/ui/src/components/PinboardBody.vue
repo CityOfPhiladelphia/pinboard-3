@@ -56,6 +56,7 @@ const slots = defineSlots<{
     geojson: unknown
     map: unknown
     zoom: number
+    isMobile: boolean
     hoveredId: string | null
     selectedId: string | null
     mobileControlsTarget: HTMLDivElement | null

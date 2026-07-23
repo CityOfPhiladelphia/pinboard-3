@@ -2,7 +2,7 @@
 // ABOUTME: Mocks @pinboard/ui locally so the map library isn't loaded in vitest.
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, ref } from 'vue'
 import { mount, flushPromises, RouterLinkStub } from '@vue/test-utils'
 import { useOpenIssuesStore } from '@/stores/openIssues'
 import type { Report } from '@/composables/useNearbyReports'
@@ -82,6 +82,7 @@ vi.mock('@pinboard/ui', () => {
     MapNavigationControl: passthrough('MapNavigationControl'),
     GeolocationButton: passthrough('GeolocationButton'),
     BasemapToggle: passthrough('BasemapToggle'),
+    PinboardComposables: { useIsMobile: () => ref(false) },
   }
 })
 vi.mock('@/composables/useGeolocation', () => ({

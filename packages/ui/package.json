@@ -30,7 +30,7 @@
   "dependencies": {
     "@phila/phila-ui-app-footer": "1.2.3",
     "@phila/phila-ui-app-header": "1.0.0",
-    "@phila/phila-ui-bottom-sheet": "0.1.0",
+    "@phila/phila-ui-bottom-sheet": "0.1.1",
     "@phila/phila-ui-button": "2.3.0",
     "@phila/phila-ui-callout": "1.0.0-beta.10",
     "@phila/phila-ui-cards": "0.2.0",

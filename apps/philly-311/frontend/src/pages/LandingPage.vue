@@ -2,8 +2,14 @@
      service-type filter chips, geolocation-seeded load, and inline report detail. -->
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { Pinboard, MapNavigationControl, GeolocationButton, BasemapToggle } from '@pinboard/ui'
-import type { PinboardTypes } from '@pinboard/ui'
+import {
+  Pinboard,
+  MapNavigationControl,
+  GeolocationButton,
+  BasemapToggle,
+  PinboardComposables,
+} from '@pinboard/ui'
+import type { PinboardTypes, MapCardProps } from '@pinboard/ui'
 import { useReportFinder } from '@/composables/useReportFinder'
 import ReportDetail from '@/components/ReportDetail.vue'
 import { searchAddress } from '@/composables/useAis'
@@ -15,7 +21,16 @@ import ClusteredMarkers from '@/components/ClusteredMarkers.vue'
 import LocationAccuracyCircle from '@/components/LocationAccuracyCircle.vue'
 
 const finder = useReportFinder()
+const isMobile = PinboardComposables.useIsMobile()
 const searchPlaceholder = 'Search by address or ZIP'
+
+function getMapCardProps(location: PinboardTypes.BasicLocation): MapCardProps {
+  const report = finder.reportById(location.id)
+  return {
+    heading: location.name,
+    body: report?.address ?? '',
+  } satisfies MapCardProps
+}
 // 'address' after a successful geocode — Pinboard pans the map to
 // searchOrUserLocation only while an address/zipcode search mode is set.
 const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
@@ -43,8 +58,10 @@ async function onSearch(query: string) {
   <Pinboard
     :locations="finder.locations.value"
     :search-or-user-location="finder.searchOrUserLocation.value"
-    :is-loading="finder.isLoading.value"
+    :is-loading="finder.isLoading.value ? 'Loading reports…' : false"
     :error-message="finder.errorMessage.value"
+    :get-map-card-props="getMapCardProps"
+    :is-mobile="isMobile"
     :location-panel-search="searchPlaceholder"
     location-panel-count-noun="report"
     :location-search-mode="locationSearchMode"
