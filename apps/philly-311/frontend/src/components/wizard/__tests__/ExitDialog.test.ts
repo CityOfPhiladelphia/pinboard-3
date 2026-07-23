@@ -1,6 +1,7 @@
 // ABOUTME: Tests for ExitDialog — verifies save/discard/cancel emit the right
 // ABOUTME: events and that the native dialog close event also closes it.
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import ExitDialog from '../ExitDialog.vue'
 
@@ -33,5 +34,24 @@ describe('ExitDialog', () => {
     const w = mount(ExitDialog, { props: { open: true } })
     await w.find('dialog').trigger('close')
     expect(w.emitted('update:open')?.[0]).toEqual([false])
+  })
+
+  it('calls showModal when mounted already open', async () => {
+    // jsdom doesn't implement showModal, so stub it directly rather than spyOn
+    // (spyOn requires the method to already exist on the prototype).
+    const original = HTMLDialogElement.prototype.showModal
+    const showModal = vi.fn()
+    HTMLDialogElement.prototype.showModal = showModal
+    mount(ExitDialog, { props: { open: true } })
+    await nextTick()
+    expect(showModal).toHaveBeenCalled()
+    HTMLDialogElement.prototype.showModal = original
+  })
+
+  it('labels the dialog with the title for accessibility', () => {
+    const w = mount(ExitDialog, { props: { open: true } })
+    const title = w.find('#exit-dialog-title')
+    expect(title.exists()).toBe(true)
+    expect(w.find('dialog').attributes('aria-labelledby')).toBe('exit-dialog-title')
   })
 })

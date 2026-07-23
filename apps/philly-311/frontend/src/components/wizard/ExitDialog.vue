@@ -1,20 +1,23 @@
 <!-- ABOUTME: Wizard exit confirmation dialog — offers saving the in-progress
      report as a draft or discarding it; cancelling keeps the user in the wizard. -->
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { PhilaButton } from '@phila/phila-ui-button'
 
 const props = defineProps<{ open: boolean }>()
 const emit = defineEmits<{ 'update:open': [value: boolean]; save: []; discard: [] }>()
 const dialog = ref<HTMLDialogElement | null>(null)
 
-watch(
-  () => props.open,
-  (open) => {
-    if (open) dialog.value?.showModal?.()
-    else dialog.value?.close?.()
-  },
-)
+function syncOpen(open: boolean) {
+  if (open) dialog.value?.showModal?.()
+  else dialog.value?.close?.()
+}
+
+// The template ref isn't populated until after the first render, so an
+// `immediate` watch would run before `dialog.value` exists — sync once on
+// mount to cover being instantiated already-open, then watch for changes.
+onMounted(() => syncOpen(props.open))
+watch(() => props.open, syncOpen)
 
 function close() {
   emit('update:open', false)
@@ -30,8 +33,14 @@ function onDiscard() {
 </script>
 
 <template>
-  <dialog ref="dialog" class="exit-dialog" @close="close" @cancel="close">
-    <h2 class="exit-dialog__title">Exit this report?</h2>
+  <dialog
+    ref="dialog"
+    class="exit-dialog"
+    aria-labelledby="exit-dialog-title"
+    @close="close"
+    @cancel="close"
+  >
+    <h2 id="exit-dialog-title" class="exit-dialog__title">Exit this report?</h2>
     <p class="exit-dialog__body">Save your progress as a draft, or discard the report.</p>
     <div class="exit-dialog__actions">
       <button type="button" class="exit-dialog__cancel" data-test="exit-cancel" @click="close">
