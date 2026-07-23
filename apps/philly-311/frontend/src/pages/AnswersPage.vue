@@ -6,6 +6,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useKnowledgeArticles, type Article } from '@/composables/useKnowledgeArticles'
 import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
 import ArticleCard from '@/components/answers/ArticleCard.vue'
+import FeaturedArticles from '@/components/answers/FeaturedArticles.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
 import heroPhoto from '@/assets/answers-hero.jpg'
 
@@ -65,6 +66,8 @@ onMounted(loadPage)
         </p>
       </div>
     </header>
+
+    <FeaturedArticles class="answers__featured" />
 
     <div class="answers__content">
     <label class="sr-only" for="answers-search">Search articles</label>
@@ -141,6 +144,14 @@ onMounted(loadPage)
 .answers__hero h1 {
   color: #fff;
   margin: 0 0 var(--spacing-xs, 0.5rem);
+}
+.answers__featured {
+  /* Straddles the hero's bottom edge, per Figma. */
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  margin: -36px auto 0;
+  padding: 0 var(--spacing-m, 1rem);
 }
 .answers__content {
   max-width: 960px;

@@ -78,6 +78,17 @@ describe('useKnowledgeArticles.loadArticles', () => {
     await expect(loadArticles()).rejects.toMatchObject({ status: 500 })
   })
 
+  it('passes list, sort, direction, and limit as query params', async () => {
+    fetchMock.mockResolvedValueOnce(okResponse({ articles: [ARTICLE_A] }))
+    const { loadArticles } = useKnowledgeArticles()
+    await loadArticles({ list: 'featured', sort: 'lastPublishedAt', direction: 'desc', limit: 4 })
+    const calledUrl = new URL(fetchMock.mock.calls[0][0] as string)
+    expect(calledUrl.searchParams.get('list')).toBe('featured')
+    expect(calledUrl.searchParams.get('sort')).toBe('lastPublishedAt')
+    expect(calledUrl.searchParams.get('direction')).toBe('desc')
+    expect(calledUrl.searchParams.get('limit')).toBe('4')
+  })
+
   it('returns empty items array when articles list is empty', async () => {
     fetchMock.mockResolvedValueOnce(okResponse({ articles: [] }))
     const { loadArticles } = useKnowledgeArticles()

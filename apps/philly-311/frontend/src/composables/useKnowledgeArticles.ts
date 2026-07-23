@@ -49,6 +49,11 @@ export function useKnowledgeArticles() {
       nextPageToken?: string
       /** Server-side full-text search (Salesforce SOSL across all article fields). */
       search?: string
+      /** Curated Salesforce list view; mutually exclusive with search server-side. */
+      list?: 'featured'
+      sort?: 'title' | 'lastPublishedAt'
+      direction?: 'asc' | 'desc'
+      limit?: number
     } = {},
   ): Promise<{ items: Article[]; nextPageToken?: string }> {
     const response = await api311Fetch({
@@ -56,6 +61,10 @@ export function useKnowledgeArticles() {
       query: {
         offset: opts.nextPageToken,
         search: opts.search?.trim() || undefined,
+        list: opts.list,
+        sort: opts.sort,
+        direction: opts.direction,
+        limit: opts.limit,
       },
       auth,
     })

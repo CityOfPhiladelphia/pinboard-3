@@ -12,8 +12,12 @@ vi.mock('@/composables/useKnowledgeArticles', () => ({
 
 const a = (id: string) => ({ id, title: `Article ${id}` })
 
+// FeaturedArticles is stubbed so its own fetch doesn't consume the queued
+// loadArticles mocks; it has dedicated tests in components/answers/__tests__.
 function mountPage() {
-  return mount(AnswersPage, { global: { stubs: { RouterLink: RouterLinkStub } } })
+  return mount(AnswersPage, {
+    global: { stubs: { RouterLink: RouterLinkStub, FeaturedArticles: true } },
+  })
 }
 
 beforeEach(() => {
@@ -35,6 +39,13 @@ describe('AnswersPage', () => {
     expect(hero.find('img[alt=""]').exists()).toBe(true)
     expect(hero.find('h1').text()).toBe('Answers')
     expect(w.find('[aria-label="Breadcrumb"]').exists()).toBe(false)
+  })
+
+  it('mounts the featured-articles strip below the hero', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    expect(w.find('featured-articles-stub').exists()).toBe(true)
   })
 
   it('loads and renders the first page of articles', async () => {
