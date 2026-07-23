@@ -1,18 +1,97 @@
-<!-- ABOUTME: Wizard step 4 — details: required description (10-char floor gates Next),
-     optional contact info (stored; not included in the submit payload), and report visibility. -->
+<!-- ABOUTME: Wizard step 4 — details: walks the issue type's questions one per
+     screen (auto-advancing single-choice answers), ending with the required
+     description (10-char floor), contact info, and report visibility. -->
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
-import { useWizardValidity } from '@/composables/useWizardValidity'
+import { useServiceTypes } from '@/composables/useServiceTypes'
+import { useWizardNav } from '@/composables/useWizardNav'
+import { visibleQuestions } from '@/utils/conditional'
 import ContactInfo from '@/components/wizard/ContactInfo.vue'
+import QuestionField from '@/components/wizard/QuestionField.vue'
 
 const MIN_DESCRIPTION = 10
+const AUTO_ADVANCE_MS = 300
 
 const store = useReportSubmissionStore()
+const { list, load } = useServiceTypes()
+onMounted(() => {
+  void load()
+})
+
+const selected = computed(
+  () => (list.value ?? []).find((s) => s.serviceType === store.category) ?? null,
+)
+const questions = computed(() =>
+  selected.value
+    ? visibleQuestions(selected.value.questions, store.customFields, selected.value.serviceType)
+    : [],
+)
+const index = ref(0)
+const current = computed(() => questions.value[index.value] ?? null)
+const error = ref('')
+
+watch(questions, (qs) => {
+  if (index.value > qs.length) index.value = qs.length
+})
+
 const description = ref(store.description)
 watch(description, (v) => store.setDescription(v))
 
-useWizardValidity(computed(() => description.value.trim().length >= MIN_DESCRIPTION))
+function requiredMessage(type: string): string {
+  return type === 'picklist' || type === 'multipicklist'
+    ? 'Select an option to continue'
+    : 'Add an answer to continue'
+}
+
+let timer: ReturnType<typeof setTimeout> | null = null
+function cancelAutoAdvance() {
+  if (timer) {
+    clearTimeout(timer)
+    timer = null
+  }
+}
+onBeforeUnmount(cancelAutoAdvance)
+
+function answer(field: string, value: string, type: string) {
+  store.setQuestion(field, value)
+  error.value = ''
+  cancelAutoAdvance()
+  if (value && type === 'picklist') {
+    timer = setTimeout(next, AUTO_ADVANCE_MS)
+  }
+}
+
+function next(): boolean {
+  cancelAutoAdvance()
+  if (current.value) {
+    const q = current.value
+    if (q.required && !(store.customFields[q.field] ?? '')) {
+      error.value = requiredMessage(q.type)
+      return true
+    }
+    error.value = ''
+    index.value += 1
+    return true
+  }
+  if (description.value.trim().length < MIN_DESCRIPTION) {
+    error.value = 'Add a description to continue'
+    return true
+  }
+  return false
+}
+
+function back(): boolean {
+  cancelAutoAdvance()
+  error.value = ''
+  if (index.value > 0) {
+    index.value -= 1
+    return true
+  }
+  return false
+}
+
+useWizardNav({ next, back })
 
 function setPrivacy(e: Event) {
   store.setPrivacy((e.target as HTMLInputElement).checked)
@@ -21,39 +100,58 @@ function setPrivacy(e: Event) {
 
 <template>
   <div class="details-step">
-    <h1 class="details-step__title">Details</h1>
+    <template v-if="current">
+      <h1 class="details-step__title">
+        {{ current.label }}
+        <span v-if="current.required" class="details-step__required">* (required)</span>
+      </h1>
+      <QuestionField
+        :key="current.field"
+        :question="current"
+        hide-label
+        :error="error"
+        :model-value="store.customFields[current.field] ?? ''"
+        @update:model-value="(v: string) => answer(current!.field, v, current!.type)"
+      />
+    </template>
 
-    <label class="details-step__label" for="details-description">
-      Describe the issue <span class="details-step__required">* (required)</span>
-    </label>
-    <textarea
-      id="details-description"
-      v-model="description"
-      class="details-step__textarea"
-      rows="4"
-      aria-required="true"
-      aria-describedby="details-description-hint"
-    ></textarea>
-    <p id="details-description-hint" class="details-step__hint">At least 10 characters.</p>
+    <template v-else>
+      <h1 class="details-step__title">Details</h1>
 
-    <ContactInfo />
-
-    <fieldset class="details-step__privacy">
-      <legend class="details-step__privacy-legend">Visibility</legend>
-      <label class="details-step__privacy-toggle">
-        <input
-          type="checkbox"
-          :checked="store.publicVisibility"
-          aria-describedby="details-privacy-note"
-          @change="setPrivacy"
-        />
-        Make this report public
+      <label class="details-step__label" for="details-description">
+        Describe the issue <span class="details-step__required">* (required)</span>
       </label>
-      <p id="details-privacy-note" class="details-step__privacy-note">
-        Public reports show up on the map. Off by default; only you and 311 staff see your private
-        reports.
-      </p>
-    </fieldset>
+      <textarea
+        id="details-description"
+        v-model="description"
+        class="details-step__textarea"
+        :class="{ 'details-step__textarea--error': !!error }"
+        rows="4"
+        aria-required="true"
+        aria-describedby="details-description-hint"
+      ></textarea>
+      <p id="details-description-hint" class="details-step__hint">At least 10 characters.</p>
+      <p v-if="error" class="details-step__error" role="alert">{{ error }}</p>
+
+      <ContactInfo />
+
+      <fieldset class="details-step__privacy">
+        <legend class="details-step__privacy-legend">Visibility</legend>
+        <label class="details-step__privacy-toggle">
+          <input
+            type="checkbox"
+            :checked="store.publicVisibility"
+            aria-describedby="details-privacy-note"
+            @change="setPrivacy"
+          />
+          Make this report public
+        </label>
+        <p id="details-privacy-note" class="details-step__privacy-note">
+          Public reports show up on the map. Off by default; only you and 311 staff see your private
+          reports.
+        </p>
+      </fieldset>
+    </template>
   </div>
 </template>
 
@@ -89,6 +187,14 @@ function setPrivacy(e: Event) {
   margin: 4px 0 var(--spacing-l, 2rem);
   font-size: 0.875rem;
   color: var(--ui-color-grey-700, #4a4a4a);
+}
+.details-step__error {
+  margin: 4px 0 0;
+  color: #992100;
+  font-weight: 600;
+}
+.details-step__textarea--error {
+  border-color: #992100;
 }
 .details-step__privacy {
   border: 1px solid var(--ui-color-grey-200, #e3e3e3);
