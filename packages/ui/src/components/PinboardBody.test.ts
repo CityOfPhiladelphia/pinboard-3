@@ -118,6 +118,13 @@ describe('PinboardBody - locations-filters slot forwarding (mobile bottom sheet)
     // LocationsPanel itself teleported into the sheet, not just the raw slot.
     expect(sheet.findAll('.mapcard-stub')).toHaveLength(2)
   })
+
+  it('renders filters slot content exactly once on mobile', async () => {
+    const w = await mountPinboardBody({ isMobile: true })
+    // The Teleported LocationsPanel carries the forwarded #filters slot; a
+    // second raw <slot> in the sheet would double-render the app's filters UI.
+    expect(w.findAll('.my-filters')).toHaveLength(1)
+  })
 })
 
 describe('PinboardBody - locationPanelCountNoun forwarding', () => {

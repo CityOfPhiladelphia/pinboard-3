@@ -514,7 +514,6 @@ function selectedLocationValue() {
     <div class="bottom-sheet-stack">
       <div class="bottom-sheet-list-scroll" :class="{ 'is-hidden': selectedLocation }">
         <slot name="locations-header" />
-        <slot name="locations-filters" />
         <div class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
           <div id="bottom-sheet-sort"></div>
