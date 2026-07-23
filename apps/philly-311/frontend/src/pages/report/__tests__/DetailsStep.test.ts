@@ -462,6 +462,55 @@ describe('DetailsStep - final screen', () => {
   })
 })
 
+describe('DetailsStep - service-types loading (deep-link cold load)', () => {
+  it('shows a loading status while the catalog is still loading and blocks nav', async () => {
+    list.value = null
+    isLoading.value = true
+    useReportSubmissionStore().setCategory('Pothole Repair')
+    const { w, nav } = mountStep()
+    await flushPromises()
+
+    expect(w.text()).toContain('Loading questions')
+    expect(w.find('textarea').exists()).toBe(false)
+    expect(w.find('h1').exists()).toBe(false)
+    expect(nav.value?.next()).toBe(true)
+    expect(nav.value?.back()).toBe(false)
+  })
+
+  it('shows an error with a retry that re-calls load(), and blocks nav', async () => {
+    list.value = null
+    isLoading.value = false
+    error.value = { message: 'boom' }
+    useReportSubmissionStore().setCategory('Pothole Repair')
+    const { w, nav } = mountStep()
+    await flushPromises()
+
+    const alert = w.find('[role="alert"]')
+    expect(alert.exists()).toBe(true)
+    expect(alert.text()).toContain('boom')
+    expect(nav.value?.next()).toBe(true)
+    expect(nav.value?.back()).toBe(false)
+
+    await w.find('[data-test="retry-questions"]').trigger('click')
+    expect(load).toHaveBeenCalledTimes(2) // mount + retry
+  })
+
+  it('transitions from loading straight to question 0 once the catalog arrives', async () => {
+    list.value = null
+    isLoading.value = true
+    useReportSubmissionStore().setCategory('Pothole Repair')
+    const { w } = mountStep()
+    await flushPromises()
+    expect(w.text()).toContain('Loading questions')
+
+    list.value = CATALOG
+    isLoading.value = false
+    await flushPromises()
+
+    expect(w.find('h1').text()).toContain('Severity')
+  })
+})
+
 describe('DetailsStep - store sync', () => {
   it('typing writes store.description', async () => {
     const { w } = mountStep()

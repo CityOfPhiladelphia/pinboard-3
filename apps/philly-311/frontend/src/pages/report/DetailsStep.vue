@@ -7,6 +7,7 @@ import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useServiceTypes } from '@/composables/useServiceTypes'
 import { useWizardNav } from '@/composables/useWizardNav'
 import { visibleQuestions } from '@/utils/conditional'
+import { PhilaButton } from '@phila/phila-ui-button'
 import ContactInfo from '@/components/wizard/ContactInfo.vue'
 import QuestionField from '@/components/wizard/QuestionField.vue'
 
@@ -14,10 +15,16 @@ const MIN_DESCRIPTION = 10
 const AUTO_ADVANCE_MS = 300
 
 const store = useReportSubmissionStore()
-const { list, load } = useServiceTypes()
+const { list, load, isLoading, error: loadError } = useServiceTypes()
 onMounted(() => {
   void load()
 })
+
+// A deep link (?category=X) can land here before the catalog has loaded, or
+// after it's failed to load — in both cases the category's questions are
+// unknown, so question/final screens must stay hidden and Next must not
+// let the shell advance past them.
+const blocked = computed(() => !!store.category && !list.value)
 
 const selected = computed(
   () => (list.value ?? []).find((s) => s.serviceType === store.category) ?? null,
@@ -69,6 +76,7 @@ function answer(field: string, value: string, type: string) {
 
 function next(): boolean {
   cancelAutoAdvance()
+  if (blocked.value) return true
   if (current.value) {
     const q = current.value
     if (q.required && !(store.customFields[q.field] ?? '').trim()) {
@@ -89,6 +97,7 @@ function next(): boolean {
 function back(): boolean {
   cancelAutoAdvance()
   error.value = ''
+  if (blocked.value) return false
   if (index.value > 0) {
     index.value -= 1
     return true
@@ -105,7 +114,21 @@ function setPrivacy(e: Event) {
 
 <template>
   <div class="details-step">
-    <template v-if="current">
+    <template v-if="blocked">
+      <p v-if="isLoading" class="details-step__status">Loading questions…</p>
+      <p v-else-if="loadError" class="details-step__error" role="alert">
+        {{ loadError.message || 'Could not load questions.' }}
+        <PhilaButton
+          variant="secondary"
+          class="details-step__retry"
+          data-test="retry-questions"
+          @click="() => void load()"
+          >Retry</PhilaButton
+        >
+      </p>
+    </template>
+
+    <template v-else-if="current">
       <h1 class="details-step__title">
         {{ current.label }}
         <span v-if="current.required" class="details-step__required">* (required)</span>
@@ -200,6 +223,9 @@ function setPrivacy(e: Event) {
 }
 .details-step__textarea--error {
   border-color: #992100;
+}
+.details-step__retry {
+  margin-left: var(--spacing-s, 0.75rem);
 }
 .details-step__privacy {
   border: 1px solid var(--ui-color-grey-200, #e3e3e3);
