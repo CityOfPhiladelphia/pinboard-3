@@ -21,16 +21,16 @@
     "format:check": "prettier --check ."
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.5.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-vue": "^10.9.2",
-    "globals": "^17.7.0",
-    "prettier": "^3.8.4",
-    "turbo": "^2.10.0",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.62.0",
-    "vue-tsc": "^3.3.5"
+    "@eslint/js": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-plugin-vue": "catalog:",
+    "globals": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:",
+    "vue-tsc": "catalog:",
+    "turbo": "^2.10.0"
   },
   "pnpm": {
     "overrides": {

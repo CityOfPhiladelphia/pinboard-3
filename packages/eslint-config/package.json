@@ -8,12 +8,12 @@
     "access": "public"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.2.1",
-    "eslint-config-prettier": "^10.1.8",
+    "@eslint/js": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
     "eslint-plugin-turbo": "^2.9.6",
-    "eslint-plugin-vue": "^10.9",
-    "typescript-eslint": "^8.59.1",
-    "globals": "^17.5.0"
+    "eslint-plugin-vue": "catalog:",
+    "typescript-eslint": "catalog:",
+    "globals": "catalog:"
   }
 }
