@@ -8,6 +8,7 @@
     "access": "public"
   },
   "devDependencies": {
+    "typescript": "catalog:",
     "@eslint/js": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",

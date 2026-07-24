@@ -28,6 +28,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "vite": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "@types/geojson": "^7946.0.16"
   }
 }
