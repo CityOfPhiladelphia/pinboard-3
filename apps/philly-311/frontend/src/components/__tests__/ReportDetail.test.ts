@@ -1,6 +1,6 @@
 // ABOUTME: Tests for ReportDetail — the inline detail panel rendered in Pinboard's
 // ABOUTME: location-detail slot when a report marker is selected.
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { CloseButton } from '@phila/phila-ui-button'
 import ReportDetail from '../ReportDetail.vue'
@@ -36,10 +36,14 @@ describe('ReportDetail', () => {
 const caseReport = {
   id: '12345678', lat: 39.95, lng: -75.16, serviceType: 'Pothole', status: 'In Progress',
   address: '1515 Market St', createdAt: '2026-07-01T13:14:00Z',
-  description: 'Deep pothole', slaDate: '2026-08-01T00:00:00Z', department: 'Streets',
+  description: 'Deep pothole', slaDate: '2026-08-01', department: 'Streets',
 } as Report
 
 describe('case fields view', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   it('renders nothing case-specific by default (landing finder usage)', () => {
     const w = mount(ReportDetail, { props: { report: caseReport, onClose: () => {} } })
     expect(w.find('.report-detail__fields').exists()).toBe(false)
@@ -66,6 +70,11 @@ describe('case fields view', () => {
     expect(w2.find('.report-detail__sla').exists()).toBe(false)
   })
 
+  it('renders the SLA deadline as a date only, without shifting the day', () => {
+    const w = mount(ReportDetail, { props: { report: caseReport, onClose: () => {}, showCaseFields: true } })
+    expect(w.find('.report-detail__sla').text()).toContain('8/1/2026')
+  })
+
   it('Share copies the current URL to the clipboard and confirms', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     vi.stubGlobal('navigator', { clipboard: { writeText } })
@@ -74,6 +83,23 @@ describe('case fields view', () => {
     await flushPromises()
     expect(writeText).toHaveBeenCalledWith(window.location.href)
     expect(w.text()).toContain('Link copied')
-    vi.unstubAllGlobals()
+  })
+
+  it('announces the copy confirmation to assistive tech', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('navigator', { clipboard: { writeText } })
+    const w = mount(ReportDetail, { props: { report: caseReport, onClose: () => {}, showCaseFields: true } })
+    await w.find('.report-detail__share').trigger('click')
+    await flushPromises()
+    expect(w.find('[role="status"]').text()).toContain('Link copied')
+  })
+
+  it('stays on "Share" without an unhandled rejection when the clipboard write fails', async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error('denied'))
+    vi.stubGlobal('navigator', { clipboard: { writeText } })
+    const w = mount(ReportDetail, { props: { report: caseReport, onClose: () => {}, showCaseFields: true } })
+    await w.find('.report-detail__share').trigger('click')
+    await flushPromises()
+    expect(w.find('.report-detail__share').text()).toBe('Share')
   })
 })

@@ -16,16 +16,29 @@ function formatWhen(iso?: string): string {
     : d.toLocaleString('en-US', { timeZone: 'America/New_York' })
 }
 
+// slaDate is a date-only field ("YYYY-MM-DD", parsed as UTC midnight), so format
+// in UTC to avoid rendering the previous day in local time.
+function formatDeadline(iso: string): string {
+  const d = new Date(iso)
+  return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { timeZone: 'UTC' })
+}
+
 const copied = ref(false)
+let copiedTimer: ReturnType<typeof setTimeout> | undefined
 async function share() {
   const url = window.location.href
-  if (navigator.share) {
-    await navigator.share({ url }).catch(() => {})
+  try {
+    if (navigator.share) {
+      await navigator.share({ url })
+      return
+    }
+    await navigator.clipboard.writeText(url)
+  } catch {
     return
   }
-  await navigator.clipboard.writeText(url)
   copied.value = true
-  setTimeout(() => (copied.value = false), 2000)
+  clearTimeout(copiedTimer)
+  copiedTimer = setTimeout(() => (copied.value = false), 2000)
 }
 </script>
 
@@ -46,7 +59,7 @@ async function share() {
     <p v-if="report.description" class="report-detail__desc">{{ report.description }}</p>
     <div v-if="showCaseFields" class="report-detail__actions">
       <button type="button" class="report-detail__share" @click="share()">
-        {{ copied ? 'Link copied' : 'Share' }}
+        <span role="status">{{ copied ? 'Link copied' : 'Share' }}</span>
       </button>
     </div>
     <table v-if="showCaseFields" class="report-detail__fields">
@@ -59,7 +72,7 @@ async function share() {
     </table>
     <div v-if="showCaseFields && report.slaDate" class="report-detail__sla">
       <p class="report-detail__sla-title">Estimated update</p>
-      <p>Report will be reviewed by: {{ formatWhen(report.slaDate) }}</p>
+      <p>Report will be reviewed by: {{ formatDeadline(report.slaDate) }}</p>
     </div>
   </div>
 </template>
