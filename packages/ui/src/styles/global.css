@@ -4,27 +4,6 @@
   box-sizing: border-box;
 }
 
-/* Form controls don't inherit font-family by default, so raw buttons/inputs
-   (e.g. panel section toggles) would fall back to the browser default. */
-button,
-input,
-optgroup,
-select,
-textarea {
-  font-family: inherit;
-}
-
-/*
- * Shim for design-token rename: the locally-linked map-core bundles CSS that
- * references --dimension-core-600 (post-revamp name), but the published
- * phila-ui-core consumed by @pinboard/ui only defines --scale-600. Without
- * this shim, .phila-input .content's height collapses to auto and the search
- * bar squishes. Remove once phila-ui-core ships with the renamed token.
- */
-:root {
-  --dimension-core-600: 3rem;
-}
-
 #app {
   height: 100dvh;
 }

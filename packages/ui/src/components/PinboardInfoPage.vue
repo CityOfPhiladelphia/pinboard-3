@@ -39,7 +39,7 @@ function scrollToSection(id: string) {
       <nav
         v-if="sections.length"
         class="info-toc"
-        :class="{ mobile: isMobile }"
+        :style="{ display: isMobile ? 'none' : 'block' }"
         :aria-label="t('pinboard.infoPage.onThisPage')"
       >
         <h2 class="has-text-heading-6">{{ t('pinboard.infoPage.onThisPage') }}</h2>
@@ -130,12 +130,6 @@ function scrollToSection(id: string) {
   top: 1.5rem;
   align-self: flex-start;
   padding: 1.5rem 0;
-}
-
-.info-toc {
-  /* Hide the on-this-page table of contents on mobile so the /info content
-     fits on a phone (the sticky desktop TOC doesn't translate to small screens). */
-  display: none;
 }
 
 .info-toc ul {
