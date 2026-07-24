@@ -80,13 +80,13 @@ catalogs:
       version: 6.0.6
     eslint:
       specifier: ^10.7.0
-      version: 10.5.0
+      version: 10.7.0
     eslint-config-prettier:
       specifier: ^10.1.8
       version: 10.1.8
     eslint-plugin-vue:
       specifier: ^10.10.0
-      version: 10.9.2
+      version: 10.10.0
     globals:
       specifier: ^17.7.0
       version: 17.7.0
@@ -95,19 +95,16 @@ catalogs:
       version: 8.0.4
     prettier:
       specifier: ^3.9.6
-      version: 3.8.4
+      version: 3.9.6
     typescript:
       specifier: ^6.0.3
       version: 6.0.3
     typescript-eslint:
       specifier: ^8.65.0
-      version: 8.62.0
+      version: 8.65.0
     vite:
       specifier: ^7.3.1
       version: 7.3.5
-    vite-plugin-dts:
-      specifier: ^4.5.0
-      version: 4.5.4
     vite-plugin-vue-devtools:
       specifier: ^8.0.5
       version: 8.1.1
@@ -498,6 +495,9 @@ importers:
       vue:
         specifier: 'catalog:'
         version: 3.5.33(typescript@6.0.3)
+      vue-i18n:
+        specifier: 'catalog:'
+        version: 11.4.0(vue@3.5.33(typescript@6.0.3))
       vue-router:
         specifier: 5.0.6
         version: 5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
@@ -511,15 +511,18 @@ importers:
       '@vitejs/plugin-vue':
         specifier: 'catalog:'
         version: 6.0.6(vite@7.3.5(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))(vue@3.5.33(typescript@6.0.3))
+      npm-run-all2:
+        specifier: 'catalog:'
+        version: 8.0.4
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
       vite:
         specifier: 'catalog:'
         version: 7.3.5(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3)
-      vite-plugin-dts:
+      vite-plugin-vue-devtools:
         specifier: 'catalog:'
-        version: 4.5.4(@types/node@25.6.0)(rollup@4.60.1)(typescript@6.0.3)(vite@7.3.5(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))
-      vue-i18n:
-        specifier: 'catalog:'
-        version: 11.4.0(vue@3.5.33(typescript@6.0.3))
+        version: 8.1.1(vite@7.3.5(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))(vue@3.5.33(typescript@6.0.3))
 
 packages:
 
@@ -2924,7 +2927,7 @@ packages:
     resolution: {integrity: sha512-d4sOM8M/8z7vRXHHq/ebbblfaxENjogAAekcfcDCCwAyvGqnPrc7f4NZbvItS+g4WTgerW0xDwSz5qz11JT3vg==}
     peerDependencies:
       typescript: '*'
-      vite: '>=7.3.2'
+      vite: '>=6.4.2 <8'
     peerDependenciesMeta:
       vite:
         optional: true
