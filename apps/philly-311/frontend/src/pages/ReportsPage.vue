@@ -58,17 +58,20 @@ onMounted(() => {
     <template #page-header>
       <div class="reports-page-header">
         <h1>My Requests</h1>
-        <div class="reports-stats">
-          <StatTile label="Total" :value="cases.reports.value.length" tone="neutral" />
-          <StatTile label="Resolved" :value="counts.resolved" tone="success" />
-          <StatTile label="In Progress" :value="counts.inProgress" tone="info" />
-          <StatTile label="Closed" :value="counts.closed" tone="danger" />
-        </div>
+        <ul class="reports-stats">
+          <li><StatTile label="Total" :value="cases.reports.value.length" tone="neutral" /></li>
+          <li><StatTile label="Resolved" :value="counts.resolved" tone="success" /></li>
+          <li><StatTile label="In Progress" :value="counts.inProgress" tone="info" /></li>
+          <li><StatTile label="Closed" :value="counts.closed" tone="danger" /></li>
+        </ul>
       </div>
     </template>
 
     <template #locations-header>
-      <div v-if="!cases.isLoading.value && !cases.reports.value.length" class="reports-empty">
+      <div
+        v-if="!cases.isLoading.value && !cases.errorMessage.value && !cases.reports.value.length"
+        class="reports-empty"
+      >
         <p>You haven't submitted any requests yet.</p>
         <RouterLink to="/report">Report an issue</RouterLink>
       </div>
@@ -136,10 +139,29 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-m, 1rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.reports-stats .stat-tile {
+.reports-stats > li {
   flex: 1 1 10rem;
+  margin: 0;
+}
+
+/* Bounded 2x2 grid on narrow screens so the header leaves room for map + sheet. */
+@media (max-width: 768px) {
+  .reports-page-header {
+    padding: var(--spacing-s, 0.75rem) var(--spacing-m, 1rem);
+  }
+  .reports-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-s, 0.75rem);
+  }
+  .reports-stats :deep(.stat-tile__value) {
+    font-size: 1.75rem;
+  }
 }
 
 .reports-empty {

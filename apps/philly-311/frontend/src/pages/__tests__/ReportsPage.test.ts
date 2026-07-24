@@ -7,9 +7,10 @@ import ReportsPage from '../ReportsPage.vue'
 import type { Report } from '@/composables/useNearbyReports'
 
 const reports = ref<Report[]>([])
+const errorMessage = ref<string | null>(null)
 const load = vi.fn()
 vi.mock('@/composables/useMyCases', () => ({
-  useMyCases: () => ({ reports, isLoading: ref(false), errorMessage: ref(null), load }),
+  useMyCases: () => ({ reports, isLoading: ref(false), errorMessage, load }),
 }))
 vi.mock('@phila/sso-vue', () => ({ useAuth: () => ({ isAuthenticated: ref(true) }) }))
 vi.mock('@pinboard/ui', async () => ({
@@ -87,9 +88,18 @@ describe('ReportsPage', () => {
 
   it('shows the empty state with a link to /report when there are no cases', () => {
     reports.value = []
+    errorMessage.value = null
     const w = mountPage()
     expect(w.text()).toContain("You haven't submitted any requests yet")
     const link = w.findComponent(RouterLinkStub)
     expect(link.props('to')).toBe('/report')
+  })
+
+  it('does not show the empty state when the load failed', () => {
+    reports.value = []
+    errorMessage.value = 'Something went wrong'
+    const w = mountPage()
+    expect(w.text()).not.toContain("You haven't submitted any requests yet")
+    errorMessage.value = null
   })
 })
