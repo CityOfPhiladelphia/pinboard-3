@@ -511,9 +511,6 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
-      '@vitejs/plugin-vue':
-        specifier: 'catalog:'
-        version: 6.0.6(vite@7.3.5(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))(vue@3.5.33(typescript@6.0.3))
       npm-run-all2:
         specifier: 'catalog:'
         version: 8.0.4
@@ -526,9 +523,6 @@ importers:
       vite-plugin-dts:
         specifier: 'catalog:'
         version: 4.5.4(@types/node@25.6.0)(rollup@4.60.1)(typescript@6.0.3)(vite@7.3.5(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))
-      vite-plugin-vue-devtools:
-        specifier: 'catalog:'
-        version: 8.1.1(vite@7.3.5(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))(vue@3.5.33(typescript@6.0.3))
 
 packages:
 
@@ -2933,7 +2927,7 @@ packages:
     resolution: {integrity: sha512-d4sOM8M/8z7vRXHHq/ebbblfaxENjogAAekcfcDCCwAyvGqnPrc7f4NZbvItS+g4WTgerW0xDwSz5qz11JT3vg==}
     peerDependencies:
       typescript: '*'
-      vite: '>=6.4.2 <8'
+      vite: '>=7.3.2'
     peerDependenciesMeta:
       vite:
         optional: true
