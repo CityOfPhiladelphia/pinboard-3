@@ -14,6 +14,8 @@ export interface Report {
   mediaUrl?: string
   description?: string
   createdAt?: string
+  slaDate?: string
+  department?: string
 }
 
 export interface PageParams {
@@ -30,7 +32,7 @@ export interface PageResult {
   lastOffset: number | null
 }
 
-interface ApiNearbyIssue {
+export interface ApiNearbyIssue {
   id: string
   caseNumber: string
   serviceType: string | null
@@ -43,10 +45,11 @@ interface ApiNearbyIssue {
   longitude: number
   createdAt: string
   updatedAt: string
+  slaDate?: string | null
   childCount: number
 }
 
-function toReport(i: ApiNearbyIssue): Report {
+export function toReport(i: ApiNearbyIssue): Report {
   return {
     id: i.id,
     lat: i.latitude,
@@ -57,6 +60,8 @@ function toReport(i: ApiNearbyIssue): Report {
     mediaUrl: i.mediaUrl ?? undefined,
     description: i.description,
     createdAt: i.createdAt,
+    slaDate: i.slaDate ?? undefined,
+    department: i.department ?? undefined,
   }
 }
 
