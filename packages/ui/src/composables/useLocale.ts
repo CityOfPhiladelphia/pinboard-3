@@ -1,6 +1,6 @@
 import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute } from 'vue-router'
-import { languageCodes } from '@pinboard/ui'
+import { languageCodes } from '../i18n'
 
 const DEFAULT_LOCALE = 'en'
 
