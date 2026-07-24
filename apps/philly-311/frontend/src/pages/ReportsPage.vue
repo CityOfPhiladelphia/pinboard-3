@@ -1,8 +1,148 @@
-<!-- ABOUTME: Stub for the Reports page — not yet built. Exists so the header's
-     Reports nav link has a destination to route to. -->
+<!-- ABOUTME: My Requests — the signed-in user's 311 cases on the Pinboard chassis:
+     stat tiles in the page header, case cards + map pins, case detail panel. -->
+<script setup lang="ts">
+import { computed, onMounted } from 'vue'
+import { Pinboard, MapNavigationControl, BasemapToggle, PinboardComposables } from '@pinboard/ui'
+import type { PinboardTypes, MapCardProps } from '@pinboard/ui'
+import { useAuth } from '@phila/sso-vue'
+import { useMyCases } from '@/composables/useMyCases'
+import { reportToLocation, statusBucket } from '@/utils/reportCard'
+import { DEFAULT_CENTER } from '@/utils/geoDefaults'
+import StatTile from '@/components/StatTile.vue'
+import ReportListingCard from '@/components/ReportListingCard.vue'
+import ReportDetail from '@/components/ReportDetail.vue'
+import ClusteredMarkers from '@/components/ClusteredMarkers.vue'
+import MapConstraints from '@/components/MapConstraints.vue'
+
+const auth = useAuth()
+const cases = useMyCases(auth)
+const isMobile = PinboardComposables.useIsMobile()
+
+const locations = computed(() => cases.reports.value.map(reportToLocation))
+// Required by Pinboard; without a location-search-mode the map never pans to it.
+const searchOrUserLocation: PinboardTypes.LatLon = {
+  latitude: DEFAULT_CENTER.lat,
+  longitude: DEFAULT_CENTER.lng,
+}
+const reportById = (id: string) => cases.reports.value.find((r) => r.id === id)
+
+const counts = computed(() => {
+  const c = { resolved: 0, inProgress: 0, closed: 0 }
+  for (const r of cases.reports.value) c[statusBucket(r.status)]++
+  return c
+})
+
+function getMapCardProps(location: PinboardTypes.BasicLocation): MapCardProps {
+  const report = reportById(location.id)
+  return {
+    heading: location.name,
+    body: report?.address ?? '',
+  } satisfies MapCardProps
+}
+
+onMounted(() => {
+  void cases.load()
+})
+</script>
+
 <template>
-  <main>
-    <h1>Reports</h1>
-    <p>Reports are coming soon.</p>
-  </main>
+  <Pinboard
+    :locations="locations"
+    :search-or-user-location="searchOrUserLocation"
+    :is-loading="cases.isLoading.value ? 'Loading your requests…' : false"
+    :error-message="cases.errorMessage.value"
+    :get-map-card-props="getMapCardProps"
+    :is-mobile="isMobile"
+    location-panel-count-noun="request"
+  >
+    <template #page-header>
+      <div class="reports-page-header">
+        <h1>My Requests</h1>
+        <div class="reports-stats">
+          <StatTile label="Total" :value="cases.reports.value.length" tone="neutral" />
+          <StatTile label="Resolved" :value="counts.resolved" tone="success" />
+          <StatTile label="In Progress" :value="counts.inProgress" tone="info" />
+          <StatTile label="Closed" :value="counts.closed" tone="danger" />
+        </div>
+      </div>
+    </template>
+
+    <template #locations-header>
+      <div v-if="!cases.isLoading.value && !cases.reports.value.length" class="reports-empty">
+        <p>You haven't submitted any requests yet.</p>
+        <RouterLink to="/report">Report an issue</RouterLink>
+      </div>
+    </template>
+
+    <template #location-card="{ location }">
+      <ReportListingCard v-if="reportById(location.id)" :report="reportById(location.id)!" />
+      <p v-else>{{ location.name }}</p>
+    </template>
+
+    <template #location-detail="{ location, onClose }">
+      <ReportDetail
+        v-if="reportById(location.id)"
+        :report="reportById(location.id)!"
+        :on-close="onClose"
+        :show-case-fields="true"
+      />
+    </template>
+
+    <template
+      #map-content="{
+        map,
+        zoom,
+        isMobile,
+        hoveredId,
+        selectedId,
+        mobileControlsTarget,
+        onHover,
+        onHoverEnd,
+        onSelect,
+      }"
+    >
+      <MapConstraints v-if="map" :map="map" />
+      <MapNavigationControl v-if="!isMobile" position="bottom-right" />
+      <BasemapToggle
+        position="bottom-right"
+        :teleport-to="isMobile ? mobileControlsTarget : undefined"
+      />
+      <!-- Rounded zoom: clustering and pin sizing are integer-granular, and a
+           fractional zoom prop would re-render every marker per animation frame. -->
+      <ClusteredMarkers
+        :locations="locations"
+        :zoom="Math.round(zoom)"
+        :map="map"
+        :hovered-id="hoveredId"
+        :selected-id="selectedId"
+        @hover="onHover"
+        @hover-end="onHoverEnd"
+        @select="onSelect"
+      />
+    </template>
+  </Pinboard>
 </template>
+
+<style scoped>
+.reports-page-header {
+  padding: var(--spacing-m, 1rem) var(--spacing-l, 1.5rem);
+}
+
+.reports-page-header h1 {
+  margin: 0 0 var(--spacing-m, 1rem);
+}
+
+.reports-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-m, 1rem);
+}
+
+.reports-stats .stat-tile {
+  flex: 1 1 10rem;
+}
+
+.reports-empty {
+  padding: var(--spacing-m, 1rem);
+}
+</style>
