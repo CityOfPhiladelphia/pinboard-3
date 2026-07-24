@@ -8,7 +8,7 @@ export default defineConfig({
     vue(),
     dts({
       include: ['src'],
-      rollupTypes: true,
+      bundleTypes: true,
     }),
   ],
   build: {
