@@ -51,6 +51,8 @@ describe('statusBucket', () => {
     ['New', 'inProgress'],
     ['In Progress', 'inProgress'],
     ['Anything Else', 'inProgress'],
+    [null, 'inProgress'],
+    [undefined, 'inProgress'],
   ])('buckets %s as %s', (status, bucket) => {
     expect(statusBucket(status)).toBe(bucket)
   })

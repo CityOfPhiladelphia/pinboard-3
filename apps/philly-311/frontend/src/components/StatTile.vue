@@ -44,9 +44,11 @@ withDefaults(
 .stat-tile__label--neutral {
   color: #000;
 }
+/* Success-300, not Schemes-Success (500): the 500 green is ~2.6:1 on white and
+   fails WCAG AA for text; the 300 step reads ~6:1. */
 .stat-tile__value--success,
 .stat-tile__label--success {
-  color: var(--Schemes-Success, #1bb82a);
+  color: var(--Palettes-Success-Success-300, #0c7216);
 }
 .stat-tile__value--info,
 .stat-tile__label--info {
