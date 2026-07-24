@@ -62,6 +62,7 @@
     "npm-run-all2": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-vue-devtools": "catalog:"
+    "vite-plugin-vue-devtools": "catalog:",
+    "vite-plugin-dts": "catalog:"
   }
 }
