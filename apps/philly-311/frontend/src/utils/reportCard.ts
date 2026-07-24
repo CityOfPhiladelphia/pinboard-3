@@ -1,5 +1,5 @@
 // ABOUTME: Maps a 311 Report to a Pinboard BasicLocation for the finder's map and list;
-// ABOUTME: provides the status-icon treatment for report status display.
+// ABOUTME: provides the status-icon treatment and status bucketing for report status display.
 import type { PinboardTypes } from '@pinboard/ui'
 import type { Report } from '@/composables/useNearbyReports'
 
@@ -12,6 +12,14 @@ export function statusIconTreatment(
 ): StatusIconTreatment | null {
   if (!status) return null
   return RESOLVED_STATUSES.has(status) ? 'resolved' : 'open'
+}
+
+export type StatusBucket = 'resolved' | 'closed' | 'inProgress'
+
+export function statusBucket(status: string | undefined | null): StatusBucket {
+  if (status === 'Resolved') return 'resolved'
+  if (status === 'Closed') return 'closed'
+  return 'inProgress'
 }
 
 export function reportToLocation(report: Report): PinboardTypes.BasicLocation {

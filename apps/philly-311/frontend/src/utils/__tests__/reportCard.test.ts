@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { reportToLocation, statusIconTreatment } from '../reportCard'
+import { reportToLocation, statusIconTreatment, statusBucket } from '../reportCard'
 import type { Report } from '@/composables/useNearbyReports'
 
 const base: Report = {
@@ -41,5 +41,17 @@ describe('statusIconTreatment', () => {
     expect(statusIconTreatment('')).toBeNull()
     expect(statusIconTreatment(undefined)).toBeNull()
     expect(statusIconTreatment(null)).toBeNull()
+  })
+})
+
+describe('statusBucket', () => {
+  it.each([
+    ['Resolved', 'resolved'],
+    ['Closed', 'closed'],
+    ['New', 'inProgress'],
+    ['In Progress', 'inProgress'],
+    ['Anything Else', 'inProgress'],
+  ])('buckets %s as %s', (status, bucket) => {
+    expect(statusBucket(status)).toBe(bucket)
   })
 })
