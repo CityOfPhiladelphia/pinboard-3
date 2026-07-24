@@ -388,123 +388,125 @@ function selectedLocationValue() {
 
 <template>
   <div v-if="selectedLocation && !isMobile" id="detail-overlay-desktop"></div>
-  <div v-if="slots['page-header']" class="finder-page-header">
-    <slot name="page-header" />
-  </div>
-  <div class="finder-panel" :class="{ 'finder-panel--with-page-header': !!slots['page-header'] }">
-    <div class="finder-panel-locations">
-      <slot name="locations-header" />
+  <div class="finder-body">
+    <div v-if="slots['page-header']" class="finder-page-header">
+      <slot name="page-header" />
+    </div>
+    <div class="finder-panel" :class="{ 'finder-panel--with-page-header': !!slots['page-header'] }">
+      <div class="finder-panel-locations">
+        <slot name="locations-header" />
 
-      <div v-if="errorMessage" class="status-message status-message--error">
-        {{ errorMessage }}
-      </div>
+        <div v-if="errorMessage" class="status-message status-message--error">
+          {{ errorMessage }}
+        </div>
 
-      <!-- Skeleton cards only on desktop, where the list lives in this left panel.
+        <!-- Skeleton cards only on desktop, where the list lives in this left panel.
            On mobile the list is in the bottom sheet, so these would flash in the
            map area and then vanish — show nothing here and let the map's own
            loading state and the sheet's "Loading data…" label cover it. -->
-      <div v-if="isLoading && !isMobile" class="loading-list">
-        <MapCard v-for="n in 5" :key="n" :is-loading="true" />
+        <div v-if="isLoading && !isMobile" class="loading-list">
+          <MapCard v-for="n in 5" :key="n" :is-loading="true" />
+        </div>
+
+        <Teleport v-else-if="!isLoading" to="#locations-panel-mobile" :disabled="!isMobile">
+          <LocationsPanel
+            ref="locationsPanelRef"
+            :locations="locations"
+            :get-map-card-props="getMapCardProps"
+            :location-filter="locationPanelFilter"
+            :location-search="locationPanelSearch"
+            :location-sort="locationPanelSort"
+            :count-noun="!isMobile ? locationPanelCountNoun : undefined"
+            :user-location-state="userLocationState"
+            :wait-for-user-location="waitForUserLocation"
+            :hovered-id="hoveredLocationId"
+            :selected-id="selectedLocationId"
+            :is-mobile="isMobile"
+            @select="handleSelect"
+            @hover="handleHover"
+            @hover-end="handleHoverEnd"
+            @search-string="handleSearchChange"
+            @search="handleSearchSubmit"
+            @selected-filter="handleLocationFilterChange"
+            @sort-option="handleLocationSortChange"
+          >
+            <template v-if="filters" #below-search>
+              <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
+                <div class="filter-chip-bar">
+                  <FilterChipGroup
+                    :filters="orderedChipFilters"
+                    :model-value="filterValues"
+                    color="white"
+                    filter-button
+                    :filter-button-text="t('pinboard.filters')"
+                    :reset-text="t('pinboard.reset')"
+                    :elevated="isMobile && chipsOnMap"
+                    @update:model-value="handleApplyFilter"
+                    @open-filters="allFiltersOpen = true"
+                    @dropdown-close="recomputeChipOrder"
+                  />
+                </div>
+              </Teleport>
+            </template>
+            <template v-if="slots['locations-filters']" #filters>
+              <slot name="locations-filters" />
+            </template>
+            <template #list-header>
+              <div v-if="!isMobile && !locationPanelCountNoun" class="location-list-header">
+                <span>{{ locationCountLabel }}</span>
+              </div>
+            </template>
+            <template v-if="$slots['location-card']" #location-card="{ location }">
+              <slot name="location-card" :location="location" />
+            </template>
+          </LocationsPanel>
+        </Teleport>
       </div>
 
-      <Teleport v-else-if="!isLoading" to="#locations-panel-mobile" :disabled="!isMobile">
-        <LocationsPanel
-          ref="locationsPanelRef"
+      <div class="finder-panel-map">
+        <MapPanel
+          ref="mapPanelRef"
+          :config="effectiveMapConfig"
+          :is-loading="isLoading"
+          :is-mobile="isMobile"
           :locations="locations"
-          :get-map-card-props="getMapCardProps"
-          :location-filter="locationPanelFilter"
-          :location-search="locationPanelSearch"
-          :location-sort="locationPanelSort"
-          :count-noun="!isMobile ? locationPanelCountNoun : undefined"
-          :user-location-state="userLocationState"
-          :wait-for-user-location="waitForUserLocation"
+          :geojson="geojson"
           :hovered-id="hoveredLocationId"
           :selected-id="selectedLocationId"
-          :is-mobile="isMobile"
-          @select="handleSelect"
-          @hover="handleHover"
-          @hover-end="handleHoverEnd"
-          @search-string="handleSearchChange"
-          @search="handleSearchSubmit"
-          @selected-filter="handleLocationFilterChange"
-          @sort-option="handleLocationSortChange"
-        >
-          <template v-if="filters" #below-search>
-            <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
-              <div class="filter-chip-bar">
-                <FilterChipGroup
-                  :filters="orderedChipFilters"
-                  :model-value="filterValues"
-                  color="white"
-                  filter-button
-                  :filter-button-text="t('pinboard.filters')"
-                  :reset-text="t('pinboard.reset')"
-                  :elevated="isMobile && chipsOnMap"
-                  @update:model-value="handleApplyFilter"
-                  @open-filters="allFiltersOpen = true"
-                  @dropdown-close="recomputeChipOrder"
-                />
-              </div>
-            </Teleport>
-          </template>
-          <template v-if="slots['locations-filters']" #filters>
-            <slot name="locations-filters" />
-          </template>
-          <template #list-header>
-            <div v-if="!isMobile && !locationPanelCountNoun" class="location-list-header">
-              <span>{{ locationCountLabel }}</span>
-            </div>
-          </template>
-          <template v-if="$slots['location-card']" #location-card="{ location }">
-            <slot name="location-card" :location="location" />
-          </template>
-        </LocationsPanel>
-      </Teleport>
-    </div>
+          :mobile-controls-target="mobileControlsTarget"
+          :mobile-controls-target-left="mobileControlsTargetLeft"
+          :map-content-slot="slots['map-content']"
+          :on-hover="handleHover"
+          :on-hover-end="handleHoverEnd"
+          :on-select="handleMapSelect"
+        />
+        <div
+          v-if="isMobile"
+          ref="mobileControlsTarget"
+          class="mobile-controls-float"
+          :style="mobileControlsStyle"
+        />
+        <div
+          v-if="isMobile"
+          ref="mobileControlsTargetLeft"
+          class="mobile-controls-float-left"
+          :style="mobileControlsStyle"
+        />
+        <div id="mobile-map-search-filter" class="mobile-map-search-filter"></div>
+      </div>
 
-    <div class="finder-panel-map">
-      <MapPanel
-        ref="mapPanelRef"
-        :config="effectiveMapConfig"
-        :is-loading="isLoading"
-        :is-mobile="isMobile"
-        :locations="locations"
-        :geojson="geojson"
-        :hovered-id="hoveredLocationId"
-        :selected-id="selectedLocationId"
-        :mobile-controls-target="mobileControlsTarget"
-        :mobile-controls-target-left="mobileControlsTargetLeft"
-        :map-content-slot="slots['map-content']"
-        :on-hover="handleHover"
-        :on-hover-end="handleHoverEnd"
-        :on-select="handleMapSelect"
-      />
-      <div
-        v-if="isMobile"
-        ref="mobileControlsTarget"
-        class="mobile-controls-float"
-        :style="mobileControlsStyle"
-      />
-      <div
-        v-if="isMobile"
-        ref="mobileControlsTargetLeft"
-        class="mobile-controls-float-left"
-        :style="mobileControlsStyle"
-      />
-      <div id="mobile-map-search-filter" class="mobile-map-search-filter"></div>
-    </div>
-
-    <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
-      <FilterPanel
-        v-if="allFiltersOpen"
-        :filters="filters"
-        :model-value="filterValues"
-        :full-screen="isMobile"
-        :title="t('pinboard.allFilters')"
-        :reset-text="t('pinboard.reset')"
-        @update:model-value="handleApplyFilter"
-        @close="allFiltersOpen = false"
-      />
+      <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
+        <FilterPanel
+          v-if="allFiltersOpen"
+          :filters="filters"
+          :model-value="filterValues"
+          :full-screen="isMobile"
+          :title="t('pinboard.allFilters')"
+          :reset-text="t('pinboard.reset')"
+          @update:model-value="handleApplyFilter"
+          @close="allFiltersOpen = false"
+        />
+      </div>
     </div>
   </div>
   <BottomSheet
@@ -549,6 +551,12 @@ function selectedLocationValue() {
 </template>
 
 <style scoped>
+.finder-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .finder-panel {
   display: grid;
   grid-template-columns: 1fr 2fr;
