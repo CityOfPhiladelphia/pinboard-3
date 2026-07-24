@@ -27,10 +27,10 @@
     "eslint-plugin-vue": "catalog:",
     "globals": "catalog:",
     "prettier": "catalog:",
+    "turbo": "^2.10.6",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
-    "vue-tsc": "catalog:",
-    "turbo": "^2.10.0"
+    "vue-tsc": "catalog:"
   },
   "pnpm": {
     "overrides": {
