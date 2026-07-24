@@ -1,10 +1,12 @@
 <!-- ABOUTME: Inline detail for a selected 311 report in Pinboard's location-detail slot:
-     photo, status, service type, address, time, description. -->
+     photo, status, service type, address, time, description, and (when showCaseFields is
+     set) a fields table, SLA banner, and Share button for the My Requests case view. -->
 <script setup lang="ts">
+import { ref } from 'vue'
 import { CloseButton } from '@phila/phila-ui-button'
 import type { Report } from '@/composables/useNearbyReports'
 
-defineProps<{ report: Report; onClose: () => void }>()
+defineProps<{ report: Report; onClose: () => void; showCaseFields?: boolean }>()
 
 function formatWhen(iso?: string): string {
   if (!iso) return ''
@@ -12,6 +14,18 @@ function formatWhen(iso?: string): string {
   return Number.isNaN(d.getTime())
     ? ''
     : d.toLocaleString('en-US', { timeZone: 'America/New_York' })
+}
+
+const copied = ref(false)
+async function share() {
+  const url = window.location.href
+  if (navigator.share) {
+    await navigator.share({ url }).catch(() => {})
+    return
+  }
+  await navigator.clipboard.writeText(url)
+  copied.value = true
+  setTimeout(() => (copied.value = false), 2000)
 }
 </script>
 
@@ -30,6 +44,23 @@ function formatWhen(iso?: string): string {
     <p class="report-detail__address">{{ report.address }}</p>
     <p v-if="report.createdAt" class="report-detail__time">{{ formatWhen(report.createdAt) }}</p>
     <p v-if="report.description" class="report-detail__desc">{{ report.description }}</p>
+    <div v-if="showCaseFields" class="report-detail__actions">
+      <button type="button" class="report-detail__share" @click="share()">
+        {{ copied ? 'Link copied' : 'Share' }}
+      </button>
+    </div>
+    <table v-if="showCaseFields" class="report-detail__fields">
+      <tbody>
+        <tr><th scope="row">Issue type</th><td>{{ report.serviceType }}</td></tr>
+        <tr><th scope="row">Location</th><td>{{ report.address }}</td></tr>
+        <tr v-if="report.createdAt"><th scope="row">Submitted</th><td>{{ formatWhen(report.createdAt) }}</td></tr>
+        <tr><th scope="row">Request ID</th><td>{{ report.id }}</td></tr>
+      </tbody>
+    </table>
+    <div v-if="showCaseFields && report.slaDate" class="report-detail__sla">
+      <p class="report-detail__sla-title">Estimated update</p>
+      <p>Report will be reviewed by: {{ formatWhen(report.slaDate) }}</p>
+    </div>
   </div>
 </template>
 
@@ -54,5 +85,40 @@ function formatWhen(iso?: string): string {
 }
 .report-detail h2 {
   margin: var(--spacing-s, 0.5rem) 0;
+}
+.report-detail__actions {
+  margin: var(--spacing-s, 0.5rem) 0;
+}
+.report-detail__share {
+  border: 1px solid var(--ui-color-primary, #1034f4);
+  border-radius: 999px;
+  background: #fff;
+  padding: 0.375rem 1rem;
+  cursor: pointer;
+}
+.report-detail__fields {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--spacing-s, 0.5rem) 0;
+}
+.report-detail__fields tr {
+  border-bottom: 1px solid var(--Schemes-Border-low, #ccc);
+}
+.report-detail__fields th {
+  text-align: left;
+  font-weight: bold;
+  padding: 0.5rem 0.5rem 0.5rem 0;
+}
+.report-detail__fields td {
+  padding: 0.5rem 0;
+}
+.report-detail__sla {
+  background: #d4e6fb;
+  border-radius: 6px;
+  padding: var(--spacing-s, 0.5rem) 1rem;
+}
+.report-detail__sla-title {
+  font-weight: bold;
+  margin: 0 0 0.25rem;
 }
 </style>
