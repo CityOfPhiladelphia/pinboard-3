@@ -69,4 +69,34 @@ describe('useMyCases', () => {
     expect(cases.errorMessage.value).toBeTruthy()
     expect(cases.isLoading.value).toBe(false)
   })
+
+  it('leaves reports empty when a later page fails mid-pagination', async () => {
+    mockFetch
+      .mockResolvedValueOnce(respond([issue(1)], '<http://x/me/issues?offset=200>; rel="next"'))
+      .mockResolvedValueOnce({ ok: false, status: 500, headers: new Headers(), json: async () => ({}) } as Response)
+    const cases = useMyCases(auth)
+    await cases.load()
+    expect(cases.reports.value).toEqual([])
+    expect(cases.errorMessage.value).toBeTruthy()
+  })
+
+  it('stops paginating when the next offset does not advance', async () => {
+    mockFetch.mockResolvedValue(respond([issue(1)], '<http://x/me/issues?offset=0>; rel="next"'))
+    const cases = useMyCases(auth)
+    await cases.load()
+    expect(mockFetch).toHaveBeenCalledTimes(1)
+    expect(cases.reports.value).toHaveLength(1)
+  })
+
+  it('ignores a load() while one is already in flight', async () => {
+    let release!: (r: Response) => void
+    mockFetch.mockImplementationOnce(() => new Promise<Response>((resolve) => (release = resolve)))
+    const cases = useMyCases(auth)
+    const first = cases.load()
+    const second = cases.load()
+    release(respond([issue(1)], null))
+    await Promise.all([first, second])
+    expect(mockFetch).toHaveBeenCalledTimes(1)
+    expect(cases.reports.value).toHaveLength(1)
+  })
 })

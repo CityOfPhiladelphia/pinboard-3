@@ -3,7 +3,7 @@
 // ABOUTME: and the same-origin dev proxy ("/api") both round-trip cleanly.
 import type { useAuth } from '@phila/sso-vue'
 
-type Auth = ReturnType<typeof useAuth>
+export type Auth = ReturnType<typeof useAuth>
 
 export type QueryParams = Record<string, string | number | boolean | undefined>
 
