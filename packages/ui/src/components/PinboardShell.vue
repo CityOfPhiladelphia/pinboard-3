@@ -45,7 +45,7 @@ const {
   onSheetPointerDown,
   locale,
   setLocale,
-} = useInitPinboardApp()
+} = useInitPinboardApp(props.localeAppKey)
 
 const navbarInfo = useTemplateRef<InstanceType<typeof NavbarInfo>>('navbarInfo')
 const router = useRouter()
@@ -58,6 +58,14 @@ watch(
     infoSheetOpen.value = false
   }
 )
+
+watch(isMobile, (newVal) => {
+  if (newVal) {
+    navbarInfo.value?.hide()
+  } else {
+    infoSheetOpen.value = false
+  }
+})
 
 onMounted(async () => {
   await router.isReady()
@@ -114,6 +122,7 @@ onMounted(async () => {
       </template>
       <template v-else #navbar-end>
         <NavbarInfo
+          v-if="showHeaderTooltip"
           v-bind="isMobile ? { onClickCapture: openInfoSheet } : {}"
           ref="navbarInfo"
           :info-title="infoTitle"
@@ -124,6 +133,13 @@ onMounted(async () => {
             <RouterLink :to="`/${infoHref}`">{{ infoLinkText }}</RouterLink>
           </span>
         </NavbarInfo>
+        <RouterLink v-else :to="`/${infoHref}`">
+          <NavbarInfo
+          :info-title="infoTitle"
+          :label="infoLabel ?? infoTitle"
+          :style="{ pointerEvents: showHeaderTooltip ? 'auto' : 'none' }"
+        />
+        </RouterLink>
       </template>
     </AppHeader>
 

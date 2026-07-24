@@ -215,7 +215,7 @@ function focusSearchInput() {
     </Teleport>
 
     <Teleport to="#bottom-sheet-sort" :disabled="!isMobile">
-      <div v-if="sortOptions" class="location-sort">
+      <div v-if="sortOptions" class="location-sort content">
         <SortPanel
           :sort-options="sortOptions"
           :applied-sort="appliedSort"

@@ -60,10 +60,6 @@ export function useInitPinboardApp(localeAppKey?: string) {
   const isMobile = useIsMobile()
   provide(IS_MOBILE_KEY, isMobile)
 
-  watch(isMobile, (mobile) => {
-    if (!mobile) infoSheetOpen.value = false
-  })
-
   onBeforeUnmount(() => {
     document.removeEventListener('pointermove', onSheetPointerMove)
     document.removeEventListener('pointerup', onSheetPointerUp)

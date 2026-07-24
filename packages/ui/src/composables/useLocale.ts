@@ -33,7 +33,6 @@ function getBrowserLanguages(): readonly string[] {
 
 export function useLocale(appKey: string) {
   const STORAGE_KEY = `${appKey}.locale`
-
   const { locale } = useI18n()
   const router = useRouter()
   const route = useRoute()

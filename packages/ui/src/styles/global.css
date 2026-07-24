@@ -1,11 +1,7 @@
-/* Ambient base font. Components teleported to <body> (filter/sort panels,
-   bottom sheets) land outside the app wrapper, so they can't inherit a font
-   set on a wrapper element. Setting it on body covers teleported content too. */
-body {
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: var(--Body-Default-font-body-default-family, 'Montserrat', sans-serif);
 }
 
 /* Form controls don't inherit font-family by default, so raw buttons/inputs

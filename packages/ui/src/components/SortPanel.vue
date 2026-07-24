@@ -143,7 +143,7 @@ watch(panelOpen, (isOpen) => {
               :disabled="value === 'DistAsc' && !locationAvailable"
               @update:model-value="pendingSelection = $event as SortMode"
             />
-            <p v-if="value === 'DistAsc'" class="sort-panel-hint">
+            <p v-if="value === 'DistAsc'" class="sort-panel-hint content">
               {{ locationAvailable ? t('pinboard.sortClosest') : t('pinboard.sortShareLocation') }}
             </p>
           </li>
@@ -217,7 +217,7 @@ watch(panelOpen, (isOpen) => {
 }
 
 .sort-panel-hint {
-  margin: 0.25rem 0 0 calc(20px + var(--spacing-s, 0.75rem));
+  margin: 0 0 -0.25rem calc(1.25rem + var(--spacing-s, 0.75rem));
   font-size: 0.75rem;
   color: var(--Schemes-On-Surface-Variant, #888);
 }
