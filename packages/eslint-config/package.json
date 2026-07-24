@@ -11,7 +11,7 @@
     "@eslint/js": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "eslint-plugin-turbo": "^2.9.6",
+    "eslint-plugin-turbo": "^2.10.6",
     "eslint-plugin-vue": "catalog:",
     "typescript-eslint": "catalog:",
     "globals": "catalog:"
