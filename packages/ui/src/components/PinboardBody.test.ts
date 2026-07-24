@@ -1,15 +1,20 @@
 // ABOUTME: Tests for PinboardBody's slot-forwarding seam — the locations-filters
 // ABOUTME: slot and count-noun prop must actually reach LocationsPanel, per path.
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { mount, type VueWrapper } from '@vue/test-utils'
+import { config, mount, type VueWrapper } from '@vue/test-utils'
 import { nextTick } from 'vue'
+import type { Router } from 'vue-router'
 import PinboardBody from './PinboardBody.vue'
 import type { BasicLocation, MapCardPropsGetter } from '../types'
 
 // MapPanel pulls in the real @phila/phila-ui-map-core (maplibre) chain, which
 // isn't needed for these slot/prop-forwarding assertions and is noisy under jsdom.
 vi.mock('./MapPanel.vue', () => ({
-  default: { name: 'MapPanel', template: '<div class="map-panel-stub" />' },
+  default: {
+    name: 'MapPanel',
+    template: '<div class="map-panel-stub" />',
+    methods: { panTo: () => {} },
+  },
 }))
 
 const MapCardStub = {
@@ -153,6 +158,26 @@ describe('PinboardBody - locationPanelCountNoun forwarding', () => {
 
     const withoutNoun = await mountPinboardBody()
     expect(withoutNoun.find('.location-sheet-header').text()).toContain('2 items')
+  })
+})
+
+// The finder apps regenerate the locations array as pages stream in (computed
+// over a growing reports list), so a selection made mid-load must survive the
+// array being replaced with fresh objects that carry the same ids.
+describe('PinboardBody - selection survives locations array replacement', () => {
+  it('keeps rendering the location detail after locations are regenerated', async () => {
+    const w = await mountPinboardBody({
+      slots: { 'location-detail': '<div class="my-detail">{{ params.location.id }}</div>' },
+    })
+    const router = (config.global.plugins as [Router])[0]
+    await router.push({ query: { location: 'a1' } })
+    await nextTick()
+    expect(document.querySelector('.my-detail')?.textContent).toBe('a1')
+
+    // Same ids, brand-new array and objects — as when another page of data lands.
+    await w.setProps({ locations: locations() })
+    await nextTick()
+    expect(document.querySelector('.my-detail')?.textContent).toBe('a1')
   })
 })
 

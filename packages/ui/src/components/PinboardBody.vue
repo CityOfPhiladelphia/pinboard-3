@@ -266,13 +266,17 @@ watch(selectedLocationId, (id) => {
 // on initial mount (immediate), when the data finishes loading, and on Back/Forward. An absent or
 // unknown id clears the selection (graceful). Direct set (not selectLocation) so it doesn't re-push;
 // it also intentionally skips the deselect/visited-tracking emit — URL-driven nav doesn't mark visited.
+// Re-resolves by identity, not just id: apps regenerate the locations array as pages stream in, and
+// a selection held from an earlier array would otherwise go stale (selectedLocationValue relies on
+// the selected object being present in the current array). Only pan when the id actually changes.
 function resolveLocationFromRoute() {
   const param = route.query.location
   const id = typeof param === 'string' ? param : undefined
-  if (id === selectedLocationId.value) return
   const match = id ? props.locations.find((loc) => loc.id === id) : undefined
+  if (match === selectedLocation.value) return
+  const idChanged = id !== selectedLocationId.value
   selectedLocation.value = match ?? undefined
-  if (match) mapPanelRef.value?.panTo(match)
+  if (match && idChanged) mapPanelRef.value?.panTo(match)
 }
 watch([() => route.query.location, () => props.locations], resolveLocationFromRoute, {
   immediate: true,
@@ -381,13 +385,17 @@ const effectiveMapConfig = (() => {
   return base
 })()
 
-function selectedLocationValue() {
-  return props.locations[props.locations.indexOf(selectedLocation.value)]
-}
+// Resolved against the CURRENT locations array by id, because apps regenerate
+// the array (fresh objects) as pages stream in and a click can hand us an item
+// from a previous generation. Undefined while the id isn't in the array — the
+// route watcher then clears the stale selection on its next flush.
+const selectedLocationResolved = computed(() =>
+  props.locations.find((loc) => loc.id === selectedLocation.value?.id)
+)
 </script>
 
 <template>
-  <div v-if="selectedLocation && !isMobile" id="detail-overlay-desktop"></div>
+  <div v-if="selectedLocationResolved && !isMobile" id="detail-overlay-desktop"></div>
   <div class="finder-body">
     <div v-if="slots['page-header']" class="finder-page-header">
       <slot name="page-header" />
@@ -527,14 +535,14 @@ function selectedLocationValue() {
         <div id="locations-panel-mobile"></div>
       </div>
 
-      <div v-if="selectedLocation">
+      <div v-if="selectedLocationResolved">
         <Teleport to="#detail-overlay-desktop" :disabled="isMobile">
           <div :class="isMobile ? 'bottom-sheet-detail' : 'detail-overlay'">
             <slot
               name="location-detail"
-              :location="selectedLocationValue()"
+              :location="selectedLocationResolved"
               :on-close="handleCloseLocationDetail"
-              :on-print="isMobile ? undefined : () => print(selectedLocationValue())"
+              :on-print="isMobile ? undefined : () => print(selectedLocationResolved!)"
             />
           </div>
         </Teleport>
