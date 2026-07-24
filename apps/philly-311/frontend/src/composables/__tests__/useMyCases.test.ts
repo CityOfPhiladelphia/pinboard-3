@@ -19,7 +19,7 @@ const issue = (n: number, extra: Record<string, unknown> = {}) => ({
   longitude: -75.16,
   createdAt: '2026-07-01T00:00:00Z',
   updatedAt: '2026-07-01T00:00:00Z',
-  slaDate: '2026-08-01T00:00:00Z',
+  slaDate: '2026-08-01',
   slaDays: 30,
   childCount: 0,
   ...extra,
@@ -47,7 +47,7 @@ describe('useMyCases', () => {
     )
     expect(cases.reports.value).toHaveLength(1)
     expect(cases.reports.value[0]).toMatchObject({
-      id: '10000001', serviceType: 'Pothole', slaDate: '2026-08-01T00:00:00Z', department: 'Streets',
+      id: '10000001', serviceType: 'Pothole', slaDate: '2026-08-01', department: 'Streets',
     })
   })
 

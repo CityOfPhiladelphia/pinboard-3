@@ -1,5 +1,5 @@
-// ABOUTME: Tests for PinboardBody's slot-forwarding seam — the locations-filters
-// ABOUTME: slot and count-noun prop must actually reach LocationsPanel, per path.
+// ABOUTME: Tests for PinboardBody's slot seams (locations-filters forwarding, page-header,
+// ABOUTME: count-noun prop) and selection surviving locations-array regeneration.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { config, mount, type VueWrapper } from '@vue/test-utils'
 import { nextTick } from 'vue'
