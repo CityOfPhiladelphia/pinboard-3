@@ -9,6 +9,9 @@ catalogs:
     '@eslint/js':
       specifier: ^10.0.1
       version: 10.0.1
+    '@phila/constructs':
+      specifier: ^0.11.4
+      version: 0.11.4
     '@phila/phila-ui-app-footer':
       specifier: ^1.2.4
       version: 1.2.4
@@ -78,6 +81,18 @@ catalogs:
     '@vitejs/plugin-vue':
       specifier: ^6.0.3
       version: 6.0.6
+    aws-cdk:
+      specifier: ^2.1132.0
+      version: 2.1133.0
+    aws-cdk-lib:
+      specifier: ^2.261.0
+      version: 2.262.1
+    cdk-nag:
+      specifier: ^2.38.2
+      version: 2.38.2
+    constructs:
+      specifier: ^10.7.1
+      version: 10.7.1
     eslint:
       specifier: ^10.7.0
       version: 10.7.0
@@ -96,6 +111,12 @@ catalogs:
     prettier:
       specifier: ^3.9.6
       version: 3.9.6
+    source-map-support:
+      specifier: ^0.5.21
+      version: 0.5.21
+    ts-node:
+      specifier: ^10.9.0
+      version: 10.9.2
     typescript:
       specifier: ^6.0.3
       version: 6.0.3
@@ -192,19 +213,19 @@ importers:
   apps/oem-flood-finder/cdk:
     dependencies:
       '@phila/constructs':
-        specifier: ^0.8.0
-        version: 0.8.0(aws-cdk-lib@2.252.0(constructs@10.6.0))(cdk-nag@2.38.2(aws-cdk-lib@2.252.0(constructs@10.6.0))(constructs@10.6.0))(constructs@10.6.0)
+        specifier: 'catalog:'
+        version: 0.11.4(aws-cdk-lib@2.262.1(constructs@10.7.1))(cdk-nag@2.38.2(aws-cdk-lib@2.262.1(constructs@10.7.1))(constructs@10.7.1))(constructs@10.7.1)
       aws-cdk-lib:
-        specifier: ^2.252.0
-        version: 2.252.0(constructs@10.6.0)
+        specifier: 'catalog:'
+        version: 2.262.1(constructs@10.7.1)
       cdk-nag:
-        specifier: ^2.38.2
-        version: 2.38.2(aws-cdk-lib@2.252.0(constructs@10.6.0))(constructs@10.6.0)
+        specifier: 'catalog:'
+        version: 2.38.2(aws-cdk-lib@2.262.1(constructs@10.7.1))(constructs@10.7.1)
       constructs:
-        specifier: ^10.6.0
-        version: 10.6.0
+        specifier: 'catalog:'
+        version: 10.7.1
       source-map-support:
-        specifier: ^0.5.21
+        specifier: 'catalog:'
         version: 0.5.21
     devDependencies:
       '@repo/eslint-config':
@@ -214,13 +235,13 @@ importers:
         specifier: workspace:*
         version: link:../../../packages/typescript-config
       aws-cdk:
-        specifier: ^2.1120.0
-        version: 2.1120.0
+        specifier: 'catalog:'
+        version: 2.1133.0
       ts-node:
-        specifier: ^10.9.0
+        specifier: 'catalog:'
         version: 10.9.2(@types/node@25.6.0)(typescript@6.0.3)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
 
   apps/oem-flood-finder/frontend:
@@ -293,19 +314,19 @@ importers:
   apps/primary-care-finder/cdk:
     dependencies:
       '@phila/constructs':
-        specifier: ^0.8.0
-        version: 0.8.0(aws-cdk-lib@2.252.0(constructs@10.6.0))(cdk-nag@2.38.2(aws-cdk-lib@2.252.0(constructs@10.6.0))(constructs@10.6.0))(constructs@10.6.0)
+        specifier: 'catalog:'
+        version: 0.11.4(aws-cdk-lib@2.262.1(constructs@10.7.1))(cdk-nag@2.38.2(aws-cdk-lib@2.262.1(constructs@10.7.1))(constructs@10.7.1))(constructs@10.7.1)
       aws-cdk-lib:
-        specifier: ^2.252.0
-        version: 2.252.0(constructs@10.6.0)
+        specifier: 'catalog:'
+        version: 2.262.1(constructs@10.7.1)
       cdk-nag:
-        specifier: ^2.38.2
-        version: 2.38.2(aws-cdk-lib@2.252.0(constructs@10.6.0))(constructs@10.6.0)
+        specifier: 'catalog:'
+        version: 2.38.2(aws-cdk-lib@2.262.1(constructs@10.7.1))(constructs@10.7.1)
       constructs:
-        specifier: ^10.6.0
-        version: 10.6.0
+        specifier: 'catalog:'
+        version: 10.7.1
       source-map-support:
-        specifier: ^0.5.21
+        specifier: 'catalog:'
         version: 0.5.21
     devDependencies:
       '@repo/eslint-config':
@@ -315,13 +336,13 @@ importers:
         specifier: workspace:*
         version: link:../../../packages/typescript-config
       aws-cdk:
-        specifier: ^2.1120.0
-        version: 2.1120.0
+        specifier: 'catalog:'
+        version: 2.1133.0
       ts-node:
-        specifier: ^10.9.0
+        specifier: 'catalog:'
         version: 10.9.2(@types/node@25.6.0)(typescript@6.0.3)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
 
   apps/primary-care-finder/frontend:
@@ -529,14 +550,14 @@ importers:
 
 packages:
 
-  '@aws-cdk/asset-awscli-v1@2.2.273':
-    resolution: {integrity: sha512-X57HYUtHt9BQrlrzUNcMyRsDUCoakYNnY6qh5lNwRCHPtQoTfXmuISkfLk0AjLkcbS5lw1LLTQFiQhTDXfiTvg==}
+  '@aws-cdk/asset-awscli-v1@2.2.282':
+    resolution: {integrity: sha512-7hKMi5tTxDcKGIMIOq14PnY0GBcugW33Uh/2YHDZiEwSxLeFOCYBwhR+BFXONb/EJeVI3RETFgailNZbkcKF6g==}
 
-  '@aws-cdk/asset-node-proxy-agent-v6@2.1.1':
-    resolution: {integrity: sha512-We4bmHaowOPHr+IQR4/FyTGjRfjgBj4ICMjtqmJeBDWad3Q/6St12NT07leNtyuukv2qMhtSZJQorD8KpKTwRA==}
+  '@aws-cdk/asset-node-proxy-agent-v6@2.1.2':
+    resolution: {integrity: sha512-pDiuqH+qY3zM9lhhLjbKJ1tnKOHzQ2V4Wr/3qsxyKeKAkuPMI/BVGvZG1PbrikUw949cGVTfVEt4ETKKYnrj0Q==}
 
-  '@aws-cdk/cloud-assembly-schema@53.20.0':
-    resolution: {integrity: sha512-4kLAUO+I8b4nlk1Z2P4n3Ye8UtqCiXk0kJMLUThBnyHLbdz06rwAb+qlb9WZOie7NtPluemVS243ifcBh/NVsQ==}
+  '@aws-cdk/cloud-assembly-schema@54.14.0':
+    resolution: {integrity: sha512-JCZCzgp3SuXQVljaKqXnttHzcezEHt9Ag/YipK0XwUFD+Iz2T4jY7gUc3pA25Uq6pzY2n9DvO/nEU++dPXW4Rw==}
     engines: {node: '>= 18.0.0'}
     bundledDependencies:
       - jsonschema
@@ -1049,8 +1070,8 @@ packages:
   '@microsoft/tsdoc@0.16.0':
     resolution: {integrity: sha512-xgAyonlVVS+q7Vc7qLW0UrJU7rSFcETRWsqdXZtjzRU8dF+6CkozTK4V4y1LwOX7j8r/vHphjDeMeGI4tNGeGA==}
 
-  '@phila/constructs@0.8.0':
-    resolution: {integrity: sha512-tDwT6k1AFbbQIl7oAkMVPv+HgvIfqNg04/HZZ685TLEKf3k7McpEakbXvHEMNyKaGhU8cXEh38nxk8uHYaAHCw==}
+  '@phila/constructs@0.11.4':
+    resolution: {integrity: sha512-hKEoeJdm22hF1fs+/i7CXQezV9z1WvcfN6+6lvYnwaTu9MIraHXrKH7CTe1ykCnZ77CSAqSKb6oy26b8G2qlXw==}
     peerDependencies:
       aws-cdk-lib: ^2.236.0
       cdk-nag: ^2.28.0
@@ -1766,12 +1787,13 @@ packages:
     resolution: {integrity: sha512-cbdCP0PGOBq0ASG+sjnKIoYkWMKhhz+F/h9pRexUdX2Hd38+WOlBkRKlqkGOSm0YQpcFMQBJeK4WspUAkwsEdg==}
     engines: {node: '>=20.19.0'}
 
-  aws-cdk-lib@2.252.0:
-    resolution: {integrity: sha512-bRLyTtJxhVgsx2JrL2B/KYYWf+Rg0s68UgQp+VRZK0h5fXeaPqDVEJGPMr7FiOgrmYwEadjfbxsTsZKNAloAvg==}
+  aws-cdk-lib@2.262.1:
+    resolution: {integrity: sha512-B6YP4r6ojUZCDhl+qBu/CrWzcipR8sIgshcqYvgw013sghPXmVkYdJ3yuI9+DKML3YLSjQrHy1nGJs+Nqq7JCg==}
     engines: {node: '>= 20.0.0'}
     peerDependencies:
       constructs: ^10.5.0
     bundledDependencies:
+      - '@aws/cloudformation-validate'
       - '@balena/dockerignore'
       - '@aws-cdk/cloud-assembly-api'
       - case
@@ -1781,12 +1803,11 @@ packages:
       - minimatch
       - punycode
       - semver
-      - table
       - yaml
       - mime-types
 
-  aws-cdk@2.1120.0:
-    resolution: {integrity: sha512-vDVa0IX0FhizARdY/GLSParFglKbdHCIhM8IDmynrAv9w8uLLljzWMeLUOhC1XpMErDZ/npYEihAOjfKxTaMIw==}
+  aws-cdk@2.1133.0:
+    resolution: {integrity: sha512-DGlCBwqxSHTe1u/IoT5WV+Bbd2K3UhwFHsdMqb2nQa1fkJmaQgoNFu0It+p3HxyMWeW+gKsVzT5KcjQPQ6Kzuw==}
     engines: {node: '>= 18.0.0'}
     hasBin: true
 
@@ -1852,8 +1873,8 @@ packages:
   confbox@0.2.2:
     resolution: {integrity: sha512-1NB+BKqhtNipMsov4xI/NnhCKp9XG9NamYp5PVm9klAT0fsrNPjaFICsCFhNhwZJKNh7zB/3q8qXz0E9oaMNtQ==}
 
-  constructs@10.6.0:
-    resolution: {integrity: sha512-TxHOnBO5zMo/G76ykzGF/wMpEHu257TbWiIxP9K0Yv/+t70UzgBQiTqjkAsWOPC6jW91DzJI0+ehQV6xDRNBuQ==}
+  constructs@10.7.1:
+    resolution: {integrity: sha512-ulK25Sg2Nv1jW+A9VeV7fu9GFN9KdVTNWdXMoapNRwqkQzSdToro/Tttk3Ak5BGI80NRA/d2nSzKnoZ27LizLw==}
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
@@ -3103,11 +3124,11 @@ packages:
 
 snapshots:
 
-  '@aws-cdk/asset-awscli-v1@2.2.273': {}
+  '@aws-cdk/asset-awscli-v1@2.2.282': {}
 
-  '@aws-cdk/asset-node-proxy-agent-v6@2.1.1': {}
+  '@aws-cdk/asset-node-proxy-agent-v6@2.1.2': {}
 
-  '@aws-cdk/cloud-assembly-schema@53.20.0': {}
+  '@aws-cdk/cloud-assembly-schema@54.14.0': {}
 
   '@babel/code-frame@7.29.0':
     dependencies:
@@ -3619,11 +3640,11 @@ snapshots:
 
   '@microsoft/tsdoc@0.16.0': {}
 
-  '@phila/constructs@0.8.0(aws-cdk-lib@2.252.0(constructs@10.6.0))(cdk-nag@2.38.2(aws-cdk-lib@2.252.0(constructs@10.6.0))(constructs@10.6.0))(constructs@10.6.0)':
+  '@phila/constructs@0.11.4(aws-cdk-lib@2.262.1(constructs@10.7.1))(cdk-nag@2.38.2(aws-cdk-lib@2.262.1(constructs@10.7.1))(constructs@10.7.1))(constructs@10.7.1)':
     dependencies:
-      aws-cdk-lib: 2.252.0(constructs@10.6.0)
-      cdk-nag: 2.38.2(aws-cdk-lib@2.252.0(constructs@10.6.0))(constructs@10.6.0)
-      constructs: 10.6.0
+      aws-cdk-lib: 2.262.1(constructs@10.7.1)
+      cdk-nag: 2.38.2(aws-cdk-lib@2.262.1(constructs@10.7.1))(constructs@10.7.1)
+      constructs: 10.7.1
 
   '@phila/phila-ui-app-footer@1.2.4(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
     dependencies:
@@ -4464,14 +4485,14 @@ snapshots:
       '@babel/parser': 7.29.2
       ast-kit: 2.2.0
 
-  aws-cdk-lib@2.252.0(constructs@10.6.0):
+  aws-cdk-lib@2.262.1(constructs@10.7.1):
     dependencies:
-      '@aws-cdk/asset-awscli-v1': 2.2.273
-      '@aws-cdk/asset-node-proxy-agent-v6': 2.1.1
-      '@aws-cdk/cloud-assembly-schema': 53.20.0
-      constructs: 10.6.0
+      '@aws-cdk/asset-awscli-v1': 2.2.282
+      '@aws-cdk/asset-node-proxy-agent-v6': 2.1.2
+      '@aws-cdk/cloud-assembly-schema': 54.14.0
+      constructs: 10.7.1
 
-  aws-cdk@2.1120.0: {}
+  aws-cdk@2.1133.0: {}
 
   balanced-match@4.0.4: {}
 
@@ -4501,10 +4522,10 @@ snapshots:
 
   caniuse-lite@1.0.30001799: {}
 
-  cdk-nag@2.38.2(aws-cdk-lib@2.252.0(constructs@10.6.0))(constructs@10.6.0):
+  cdk-nag@2.38.2(aws-cdk-lib@2.262.1(constructs@10.7.1))(constructs@10.7.1):
     dependencies:
-      aws-cdk-lib: 2.252.0(constructs@10.6.0)
-      constructs: 10.6.0
+      aws-cdk-lib: 2.262.1(constructs@10.7.1)
+      constructs: 10.7.1
 
   chokidar@5.0.0:
     dependencies:
@@ -4520,7 +4541,7 @@ snapshots:
 
   confbox@0.2.2: {}
 
-  constructs@10.6.0: {}
+  constructs@10.7.1: {}
 
   convert-source-map@2.0.0: {}
 

@@ -4,7 +4,29 @@ packages:
   - 'packages/*'
 
 catalog:
+  eslint: '^10.7.0'
   '@eslint/js': '^10.0.1'
+  eslint-config-prettier: '^10.1.8'
+  eslint-plugin-vue: '^10.10.0'
+  globals: '^17.7.0'
+  npm-run-all2: '^8.0.4'
+  prettier: '^3.9.6'
+  typescript: '^6.0.3'
+  typescript-eslint: '^8.65.0'
+  vite: '^7.3.1'
+  vite-plugin-dts: '^4.5.0'
+  'vite-plugin-vue-devtools': '^8.0.5'
+  vue: ^3.5.0
+  vue-i18n: ^11.0.1
+  vue-router: ^5.0.6
+  vue-tsc: '^3.3.8'
+  'aws-cdk': '^2.1132.0'
+  'aws-cdk-lib': '^2.261.0'
+  'cdk-nag': '^2.38.2'
+  'constructs': '^10.7.1'
+  'ts-node': '^10.9.0'
+  'source-map-support': '^0.5.21'
+  '@phila/constructs': '^0.11.4'
   '@phila/phila-ui-app-footer': '^1.2.4'
   '@phila/phila-ui-app-header': '^1.0.1'
   '@phila/phila-ui-bottom-sheet': '^0.1.1'
@@ -28,18 +50,3 @@ catalog:
   '@phila/phila-ui-text-field': '^1.2.1'
   '@phila/phila-ui-tooltip': '^0.1.1'
   '@vitejs/plugin-vue': '^6.0.3'
-  eslint: '^10.7.0'
-  eslint-config-prettier: '^10.1.8'
-  eslint-plugin-vue: '^10.10.0'
-  globals: '^17.7.0'
-  npm-run-all2: '^8.0.4'
-  prettier: '^3.9.6'
-  typescript: '^6.0.3'
-  typescript-eslint: '^8.65.0'
-  vite: '^7.3.1'
-  vite-plugin-dts: '^4.5.0'
-  'vite-plugin-vue-devtools': '^8.0.5'
-  vue: ^3.5.0
-  vue-i18n: ^11.0.1
-  vue-router: ^5.0.6
-  vue-tsc: '^3.3.8'
