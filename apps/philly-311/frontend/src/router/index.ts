@@ -25,7 +25,11 @@ export const routes: RouteRecordRaw[] = [
     ],
   },
   { path: '/report/confirmation', component: () => import('@/pages/ReportConfirmationPage.vue') },
-  { path: '/reports', component: () => import('@/pages/ReportsPage.vue') },
+  {
+    path: '/reports',
+    component: () => import('@/pages/ReportsPage.vue'),
+    meta: { requiresAuth: true },
+  },
   { path: '/answers', component: () => import('@/pages/AnswersPage.vue') },
   { path: '/answers/:id', component: () => import('@/pages/AnswerDetailPage.vue') },
   { path: '/auth/redirect', component: () => import('@/pages/AuthRedirectPage.vue') },

@@ -1,8 +1,8 @@
-// ABOUTME: Tests for App — Map/Reports/Answers header nav links, the "Report an
-// ABOUTME: issue" CTA, the login trigger, the sub-footer links, and the phila
-// ABOUTME: .content wrapper.
+// ABOUTME: Tests for App — Map/My Requests/Answers header nav links, the "Report an
+// ABOUTME: issue" CTA, the login/signed-in states, the sub-footer links, and the
+// ABOUTME: phila .content wrapper.
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, ref, computed } from 'vue'
 import { mount, RouterLinkStub } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import App from '../App.vue'
@@ -24,8 +24,15 @@ vi.mock('@pinboard/ui', () => ({
 }))
 
 const signIn = vi.fn()
+const signOut = vi.fn()
+const isAuthenticated = ref(false)
 vi.mock('@phila/sso-vue', () => ({
-  useAuth: () => ({ signIn }),
+  useAuth: () => ({
+    signIn,
+    signOut,
+    isAuthenticated,
+    userName: computed(() => (isAuthenticated.value ? 'Ben Franklin' : null)),
+  }),
 }))
 
 function makeRouter() {
@@ -49,15 +56,17 @@ async function mountApp(initialPath = '/') {
 beforeEach(() => {
   sessionStorage.clear()
   signIn.mockClear()
+  signOut.mockClear()
+  isAuthenticated.value = false
 })
 
 describe('App', () => {
-  it('passes Map/Reports/Answers as the header nav links', async () => {
+  it('passes Map/My Requests/Answers as the header nav links', async () => {
     const w = await mountApp()
     const shell = w.findComponent({ name: 'PinboardShell' })
     expect(shell.props('links')).toEqual([
       { text: 'Map', href: '/' },
-      { text: 'Reports', href: '/reports' },
+      { text: 'My Requests', href: '/reports' },
       { text: 'Answers', href: '/answers' },
     ])
   })
@@ -117,5 +126,16 @@ describe('App', () => {
       'https://www.phila.gov/accessibility-policy/',
       'https://www.phila.gov/feedback/',
     ])
+  })
+
+  it('shows the user name and a Sign out button instead of Login when authenticated', async () => {
+    isAuthenticated.value = true
+    const w = await mountApp()
+    const navbarEnd = w.find('[data-test="navbar-end"]')
+    expect(navbarEnd.text()).toContain('Ben Franklin')
+    expect(navbarEnd.findAll('button').find((b) => b.text() === 'Login / Sign up')).toBeFalsy()
+    const signOutButton = navbarEnd.findAll('button').find((b) => b.text() === 'Sign out')
+    await signOutButton?.trigger('click')
+    expect(signOut).toHaveBeenCalledOnce()
   })
 })

@@ -40,4 +40,8 @@ describe('routes', () => {
     const r = makeRouter()
     expect(r.resolve('/reports').matched).toHaveLength(1)
   })
+  it('marks /reports as requiring auth', () => {
+    const r = makeRouter()
+    expect(r.resolve('/reports').meta.requiresAuth).toBe(true)
+  })
 })

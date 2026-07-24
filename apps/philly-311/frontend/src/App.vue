@@ -10,11 +10,11 @@ import { useRoute } from 'vue-router'
 import type { NavLink } from '@pinboard/ui'
 
 const route = useRoute()
-const { signIn } = useAuth()
+const { signIn, signOut, isAuthenticated, userName } = useAuth()
 
 const navLinks: NavLink[] = [
   { text: 'Map', href: '/' },
-  { text: 'Reports', href: '/reports' },
+  { text: 'My Requests', href: '/reports' },
   { text: 'Answers', href: '/answers' },
 ]
 
@@ -40,7 +40,11 @@ function login() {
   >
     <template #navbar-end>
       <PhilaButton variant="primary" to="/report">Report an issue</PhilaButton>
-      <button type="button" class="navbar-login" @click="login()">Login / Sign up</button>
+      <template v-if="isAuthenticated">
+        <span class="navbar-user">{{ userName }}</span>
+        <button type="button" class="navbar-login" @click="signOut()">Sign out</button>
+      </template>
+      <button v-else type="button" class="navbar-login" @click="login()">Login / Sign up</button>
     </template>
     <template #sub-footer>
       <a class="sub-footer-link" href="https://www.phila.gov/terms-of-use/">Terms of use</a>
@@ -79,5 +83,11 @@ function login() {
 }
 .navbar-login:hover {
   text-decoration: underline;
+}
+
+.navbar-user {
+  color: #fff;
+  font-weight: 600;
+  padding: 0 var(--spacing-s, 0.75rem);
 }
 </style>
