@@ -135,10 +135,10 @@ onMounted(async () => {
         </NavbarInfo>
         <RouterLink v-else :to="`/${infoHref}`">
           <NavbarInfo
-          :info-title="infoTitle"
-          :label="infoLabel ?? infoTitle"
-          :style="{ pointerEvents: showHeaderTooltip ? 'auto' : 'none' }"
-        />
+            :info-title="infoTitle"
+            :label="infoLabel ?? infoTitle"
+            :style="{ pointerEvents: showHeaderTooltip ? 'auto' : 'none' }"
+          />
         </RouterLink>
       </template>
     </AppHeader>

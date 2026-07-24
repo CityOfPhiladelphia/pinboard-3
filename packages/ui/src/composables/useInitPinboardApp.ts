@@ -1,4 +1,4 @@
-import { onBeforeUnmount, provide, ref, watch } from 'vue'
+import { onBeforeUnmount, provide, ref } from 'vue'
 import { useLocale } from './useLocale'
 import { useIsMobile } from './useIsMobile'
 import { IS_MOBILE_KEY } from '../keys'

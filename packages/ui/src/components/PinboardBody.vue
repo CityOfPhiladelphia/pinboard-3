@@ -547,7 +547,6 @@ function selectedLocationValue() {
   font-family: var(--Body-Default-font-body-default-family, 'Montserrat', sans-serif);
 }
 
-
 .finder-panel-desktop {
   display: grid;
   grid-template-columns: 1fr 2fr;
