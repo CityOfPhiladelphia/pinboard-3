@@ -43,6 +43,7 @@ import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 // slots
 const slots = defineSlots<{
   nav?(): unknown
+  'page-header'?: unknown
   'locations-header'?: unknown
   'locations-filters'?: unknown
   'location-card'?(props: { location: PinboardLocation }): unknown
@@ -387,7 +388,10 @@ function selectedLocationValue() {
 
 <template>
   <div v-if="selectedLocation && !isMobile" id="detail-overlay-desktop"></div>
-  <div class="finder-panel">
+  <div v-if="slots['page-header']" class="finder-page-header">
+    <slot name="page-header" />
+  </div>
+  <div class="finder-panel" :class="{ 'finder-panel--with-page-header': !!slots['page-header'] }">
     <div class="finder-panel-locations">
       <slot name="locations-header" />
 
@@ -551,6 +555,12 @@ function selectedLocationValue() {
   width: 100%;
   height: 100%;
   position: relative;
+}
+
+.finder-panel--with-page-header {
+  height: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .finder-panel-locations {

@@ -55,12 +55,15 @@ afterEach(() => {
 // that first patch and Teleport fails to find its target — so every mount here
 // replays the same isLoading true → false sequence.
 async function mountPinboardBody(
-  extraProps: Record<string, unknown> & { isLoading?: string | false } = {}
+  extraProps: Record<string, unknown> & {
+    isLoading?: string | false
+    slots?: Record<string, string>
+  } = {}
 ) {
   const container = document.createElement('div')
   document.body.appendChild(container)
 
-  const { isLoading = false, ...rest } = extraProps
+  const { isLoading = false, slots: extraSlots, ...rest } = extraProps
   const wrapper = mount(PinboardBody, {
     attachTo: container,
     props: {
@@ -76,6 +79,7 @@ async function mountPinboardBody(
     slots: {
       'locations-header': '<div class="my-header">Header</div>',
       'locations-filters': '<div class="my-filters">Chips</div>',
+      ...extraSlots,
     },
     global: {
       stubs: { MapCard: MapCardStub, BottomSheet: BottomSheetStub },
@@ -149,5 +153,26 @@ describe('PinboardBody - locationPanelCountNoun forwarding', () => {
 
     const withoutNoun = await mountPinboardBody()
     expect(withoutNoun.find('.location-sheet-header').text()).toContain('2 items')
+  })
+})
+
+describe('page-header slot', () => {
+  it('renders page-header content above the finder panel when the slot is filled', async () => {
+    const w = await mountPinboardBody({
+      slots: { 'page-header': '<h1 data-test="ph">My Requests</h1>' },
+    })
+    const header = w.find('.finder-page-header')
+    expect(header.exists()).toBe(true)
+    expect(header.find('[data-test="ph"]').text()).toBe('My Requests')
+    // header precedes the panel in the DOM
+    const el = header.element
+    expect(el.nextElementSibling?.classList.contains('finder-panel')).toBe(true)
+    expect(w.find('.finder-panel').classes()).toContain('finder-panel--with-page-header')
+  })
+
+  it('renders no header wrapper and no modifier class when the slot is absent', async () => {
+    const w = await mountPinboardBody()
+    expect(w.find('.finder-page-header').exists()).toBe(false)
+    expect(w.find('.finder-panel').classes()).not.toContain('finder-panel--with-page-header')
   })
 })
