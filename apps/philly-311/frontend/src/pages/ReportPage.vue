@@ -6,7 +6,7 @@
      Back/Next before the shell changes routes. Exit opens ExitDialog, which
      either saves the in-progress report as a draft or discards it. -->
 <script setup lang="ts">
-import { provide, ref, computed } from 'vue'
+import { provide, ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import StepIndicator from '@/components/wizard/StepIndicator.vue'
 import ExitDialog from '@/components/wizard/ExitDialog.vue'
@@ -29,6 +29,16 @@ const STEPS = [
   { title: 'Details', path: '/report/details' },
   { title: 'Review', path: '/report/review' },
 ]
+
+// The wizard is its own scroll container (the shell locks the viewport), so
+// the browser never resets scroll on navigation — do it on each step change.
+const wizardEl = ref<HTMLElement | null>(null)
+watch(
+  () => route.path,
+  () => {
+    if (wizardEl.value) wizardEl.value.scrollTop = 0
+  },
+)
 
 const canAdvance = ref(true)
 const showErrors = ref(false)
@@ -80,7 +90,7 @@ function discardAndExit() {
 </script>
 
 <template>
-  <div class="wizard">
+  <div ref="wizardEl" class="wizard">
     <nav class="wizard__crumb" aria-label="Breadcrumb">
       <RouterLink to="/">Home</RouterLink> / <span>Report an issue</span>
     </nav>
@@ -132,7 +142,9 @@ function discardAndExit() {
 .wizard {
   max-width: 980px;
   margin: 0 auto;
-  padding: var(--spacing-m, 1rem);
+  /* No bottom padding: the sticky nav pins to the scrollport's bottom edge and
+     content would otherwise show through a padding-sized gap beneath it. */
+  padding: var(--spacing-m, 1rem) var(--spacing-m, 1rem) 0;
   height: 100%;
   overflow-y: auto;
 }
@@ -144,11 +156,18 @@ function discardAndExit() {
   padding: var(--spacing-l, 2rem) 0;
   min-height: 320px;
 }
+/* Sticky so Exit/Back/Next stay reachable: the wizard scrolls internally
+   (the shell locks the viewport) and steps like Location put a wheel-capturing
+   map over most of the content, so controls at the end of the scroll run
+   can otherwise sit below the fold with no way to reach them. */
 .wizard__nav {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: var(--spacing-m, 1rem);
+  padding: var(--spacing-m, 1rem) 0;
   border-top: 1px solid var(--ui-color-grey-300, #d6d6d6);
 }
 .wizard__nav-right {
