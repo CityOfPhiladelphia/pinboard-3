@@ -3,6 +3,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { Pinboard, MapNavigationControl, BasemapToggle, PinboardComposables } from '@pinboard/ui'
+import { Callout } from '@phila/phila-ui-callout'
 import type { PinboardTypes, MapCardProps } from '@pinboard/ui'
 import { useAuth } from '@phila/sso-vue'
 import { useMyCases } from '@/composables/useMyCases'
@@ -68,13 +69,14 @@ onMounted(() => {
     </template>
 
     <template #locations-header>
-      <div
+      <Callout
         v-if="!cases.isLoading.value && !cases.errorMessage.value && !cases.reports.value.length"
         class="reports-empty"
+        type="info"
+        message="You haven't submitted any requests yet."
       >
-        <p>You haven't submitted any requests yet.</p>
         <RouterLink to="/report">Report an issue</RouterLink>
-      </div>
+      </Callout>
     </template>
 
     <template #location-card="{ location }">
@@ -164,6 +166,6 @@ onMounted(() => {
 }
 
 .reports-empty {
-  padding: var(--spacing-m, 1rem);
+  margin: var(--spacing-m, 1rem);
 }
 </style>

@@ -4,6 +4,7 @@
 import { onMounted, nextTick, ref } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { PhilaButton } from '@phila/phila-ui-button'
+import { Callout } from '@phila/phila-ui-callout'
 
 const store = useReportSubmissionStore()
 const heading = ref<HTMLElement | null>(null)
@@ -16,7 +17,7 @@ onMounted(async () => {
 
 <template>
   <div class="confirmation">
-    <div class="confirmation__status" role="status">
+    <Callout class="confirmation__status" type="success" role="status">
       <h1 ref="heading" tabindex="-1" class="confirmation__title">
         Thanks — your report was submitted.
       </h1>
@@ -24,7 +25,7 @@ onMounted(async () => {
         Reference number:
         <strong>{{ store.submitted.caseNumber || store.submitted.id }}</strong>
       </p>
-    </div>
+    </Callout>
     <div class="confirmation__actions">
       <PhilaButton variant="primary" to="/report">Report another issue</PhilaButton>
       <RouterLink class="confirmation__link" to="/">See reports near you</RouterLink>

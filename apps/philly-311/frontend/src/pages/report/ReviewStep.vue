@@ -7,6 +7,7 @@ import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useApi } from '@/composables/useApi'
 import ReviewSummary from '@/components/wizard/ReviewSummary.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
+import { Callout } from '@phila/phila-ui-callout'
 import type { SubmitResponse } from '@/types/wizard'
 
 const GENERIC_ERROR = 'Something went wrong submitting your report. Please try again.'
@@ -50,7 +51,13 @@ async function submit() {
 
     <ReviewSummary />
 
-    <p v-if="errorMessage" class="review-step__error" role="alert">{{ errorMessage }}</p>
+    <Callout
+      v-if="errorMessage"
+      class="review-step__error"
+      type="error"
+      role="alert"
+      :message="errorMessage"
+    />
 
     <PhilaButton
       type="button"
@@ -79,10 +86,6 @@ async function submit() {
 }
 .review-step__error {
   margin: var(--spacing-m, 1rem) 0;
-  padding: var(--spacing-s, 0.75rem) var(--spacing-m, 1rem);
-  border: 1px solid var(--ui-color-error, #c4122f);
-  border-radius: 8px;
-  color: var(--ui-color-error, #c4122f);
 }
 .review-step__submit {
   margin-top: var(--spacing-m, 1rem);

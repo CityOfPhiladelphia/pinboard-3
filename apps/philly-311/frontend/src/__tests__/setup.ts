@@ -85,6 +85,22 @@ vi.mock('@phila/phila-ui-button', () => ({
   }),
 }))
 
+vi.mock('@phila/phila-ui-callout', () => ({
+  Callout: defineComponent({
+    name: 'Callout',
+    props: ['title', 'message', 'type'],
+    setup(props: Record<string, unknown>, { slots }) {
+      return () =>
+        h('div', {}, [
+          (props.title as string) ?? '',
+          ' ',
+          (props.message as string) ?? '',
+          slots.default?.(),
+        ])
+    },
+  }),
+}))
+
 vi.mock('@phila/phila-ui-app-header', () => ({
   AppHeader: stub('AppHeader', 'nav'),
 }))

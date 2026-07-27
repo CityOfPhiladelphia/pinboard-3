@@ -1,10 +1,22 @@
 // ABOUTME: Tests for ReportDetail — the inline detail panel rendered in Pinboard's
 // ABOUTME: location-detail slot when a report marker is selected.
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { mount, flushPromises } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
+import { defineComponent, h } from 'vue'
 import { CloseButton } from '@phila/phila-ui-button'
 import ReportDetail from '../ReportDetail.vue'
 import type { Report } from '@/composables/useNearbyReports'
+
+// The chassis index pulls phila dist CSS vitest can't load; stub DetailActions.
+// Share behavior itself is covered by the chassis's DetailActions.test.ts.
+vi.mock('@pinboard/ui', () => ({
+  DetailActions: defineComponent({
+    name: 'DetailActions',
+    setup() {
+      return () => h('div')
+    },
+  }),
+}))
 
 const report: Report = {
   id: '1',
@@ -52,10 +64,12 @@ describe('case fields view', () => {
   })
 
   it('renders nothing case-specific by default (landing finder usage)', () => {
-    const w = mount(ReportDetail, { props: { report: caseReport, onClose: () => {} } })
+    const w = mount(ReportDetail, {
+      props: { report: caseReport, onClose: () => {} },
+    })
     expect(w.find('.report-detail__fields').exists()).toBe(false)
     expect(w.find('.report-detail__sla').exists()).toBe(false)
-    expect(w.find('.report-detail__share').exists()).toBe(false)
+    expect(w.findComponent({ name: 'DetailActions' }).exists()).toBe(false)
   })
 
   it('shows the fields table when showCaseFields is set', () => {
@@ -92,37 +106,12 @@ describe('case fields view', () => {
     expect(w.find('.report-detail__sla').text()).toContain('8/1/2026')
   })
 
-  it('Share copies the current URL to the clipboard and confirms', async () => {
-    const writeText = vi.fn().mockResolvedValue(undefined)
-    vi.stubGlobal('navigator', { clipboard: { writeText } })
+  // Share behavior (clipboard, announcement, failure) is covered by the chassis's
+  // DetailActions.test.ts; here we only assert the control is wired to showCaseFields.
+  it('renders DetailActions only in the case view', () => {
     const w = mount(ReportDetail, {
       props: { report: caseReport, onClose: () => {}, showCaseFields: true },
     })
-    await w.find('.report-detail__share').trigger('click')
-    await flushPromises()
-    expect(writeText).toHaveBeenCalledWith(window.location.href)
-    expect(w.text()).toContain('Link copied')
-  })
-
-  it('announces the copy confirmation to assistive tech', async () => {
-    const writeText = vi.fn().mockResolvedValue(undefined)
-    vi.stubGlobal('navigator', { clipboard: { writeText } })
-    const w = mount(ReportDetail, {
-      props: { report: caseReport, onClose: () => {}, showCaseFields: true },
-    })
-    await w.find('.report-detail__share').trigger('click')
-    await flushPromises()
-    expect(w.find('[role="status"]').text()).toContain('Link copied')
-  })
-
-  it('stays on "Share" without an unhandled rejection when the clipboard write fails', async () => {
-    const writeText = vi.fn().mockRejectedValue(new Error('denied'))
-    vi.stubGlobal('navigator', { clipboard: { writeText } })
-    const w = mount(ReportDetail, {
-      props: { report: caseReport, onClose: () => {}, showCaseFields: true },
-    })
-    await w.find('.report-detail__share').trigger('click')
-    await flushPromises()
-    expect(w.find('.report-detail__share').text()).toBe('Share')
+    expect(w.findComponent({ name: 'DetailActions' }).exists()).toBe(true)
   })
 })
