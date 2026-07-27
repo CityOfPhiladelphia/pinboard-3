@@ -8,6 +8,9 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   plugins: [vue(), vueDevTools()],
   resolve: {
+    // pnpm materializes vue-router twice (differing peer graphs); two copies mean
+    // two injection symbols and useRoute() returns undefined inside @pinboard/ui.
+    dedupe: ['vue', 'vue-router'],
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@pinboard/ui/style.css': fileURLToPath(
