@@ -2,4 +2,6 @@
    scheme variables so primary surfaces follow phila theming. */
 :root {
   --ui-color-primary: var(--Schemes-Primary, #1034f4);
+  --ui-color-error: var(--Schemes-Error, #c4122f);
+  --ui-color-red: var(--Schemes-Error, #c0392b);
 }

@@ -3,6 +3,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useAuth } from '@phila/sso-vue'
+import { TextField } from '@phila/phila-ui-text-field'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 
 const store = useReportSubmissionStore()
@@ -32,18 +33,30 @@ watch([name, email, phone], () => {
   <fieldset class="contact-info">
     <legend class="contact-info__legend">Contact info (optional)</legend>
     <p class="contact-info__note">If we have questions, we'll get in touch using these.</p>
-    <label class="contact-info__field">
-      Name
-      <input v-model="name" type="text" autocomplete="name" />
-    </label>
-    <label class="contact-info__field">
-      Email
-      <input v-model="email" type="email" autocomplete="email" />
-    </label>
-    <label class="contact-info__field">
-      Phone
-      <input v-model="phone" type="tel" autocomplete="tel" />
-    </label>
+    <TextField
+      id="contact-name"
+      v-model="name"
+      label="Name"
+      type="text"
+      autocomplete="name"
+      class="contact-info__field"
+    />
+    <TextField
+      id="contact-email"
+      v-model="email"
+      label="Email"
+      type="email"
+      autocomplete="email"
+      class="contact-info__field"
+    />
+    <TextField
+      id="contact-phone"
+      v-model="phone"
+      label="Phone"
+      type="tel"
+      autocomplete="tel"
+      class="contact-info__field"
+    />
   </fieldset>
 </template>
 
@@ -65,18 +78,6 @@ watch([name, email, phone], () => {
 }
 .contact-info__field {
   display: block;
-  font-weight: 600;
   margin-bottom: var(--spacing-s, 0.75rem);
-}
-.contact-info__field input {
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-  margin-top: 4px;
-  padding: 8px 12px;
-  border: 1px solid var(--ui-color-grey-400, #a1a1a1);
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 400;
 }
 </style>

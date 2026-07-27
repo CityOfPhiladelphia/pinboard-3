@@ -115,14 +115,30 @@ const GROUP_PROPS = [
   'disabled',
 ]
 
+// Mirrors the real TextField's contract: renders the label, an inner <input>
+// bound to modelValue, and forwards $attrs (autocomplete, type, …) to the input.
+const textFieldStub = (name: string) =>
+  defineComponent({
+    name,
+    inheritAttrs: false,
+    props: TEXT_FIELD_PROPS,
+    emits: ['update:modelValue'],
+    setup(props: Record<string, unknown>, { attrs, emit }) {
+      return () =>
+        h('div', {}, [
+          (props.label as string) ?? '',
+          h('input', {
+            ...attrs,
+            id: props.id,
+            value: props.modelValue,
+            onInput: (e: Event) => emit('update:modelValue', (e.target as HTMLInputElement).value),
+          }),
+        ])
+    },
+  })
+
 vi.mock('@phila/phila-ui-text-field', () => ({
-  TextField: formStub('TextField', TEXT_FIELD_PROPS, 'label'),
-}))
-vi.mock('@phila/phila-ui-textarea', () => ({
-  Textarea: formStub('Textarea', TEXT_FIELD_PROPS, 'label'),
-}))
-vi.mock('@phila/phila-ui-select-field', () => ({
-  SelectField: formStub('SelectField', TEXT_FIELD_PROPS, 'label'),
+  TextField: textFieldStub('TextField'),
 }))
 vi.mock('@phila/phila-ui-radio', () => ({
   RadioGroup: formStub('RadioGroup', GROUP_PROPS, 'groupLabel'),

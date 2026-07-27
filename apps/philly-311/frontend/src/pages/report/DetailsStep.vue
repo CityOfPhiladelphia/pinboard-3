@@ -218,11 +218,11 @@ function setPrivacy(e: Event) {
 }
 .details-step__error {
   margin: 4px 0 0;
-  color: #992100;
+  color: var(--Schemes-On-Error-Container, #992100);
   font-weight: 600;
 }
 .details-step__textarea--error {
-  border-color: #992100;
+  border-color: var(--Schemes-On-Error-Container, #992100);
 }
 .details-step__retry {
   margin-left: var(--spacing-s, 0.75rem);

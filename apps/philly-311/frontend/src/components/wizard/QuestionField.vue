@@ -194,17 +194,17 @@ function setCheckbox(record: Record<string, boolean>) {
 }
 
 .question-field--error {
-  background: #f8c9bd;
+  background: var(--Schemes-Error-Container, #f8c9bd);
   border-radius: 12px;
   padding: 16px;
 }
 .question-field--error textarea,
 .question-field--error select {
-  border-color: #992100;
+  border-color: var(--Schemes-On-Error-Container, #992100);
 }
 .question-field__error {
   margin: var(--spacing-s, 0.75rem) 0 0;
-  color: #992100;
+  color: var(--Schemes-On-Error-Container, #992100);
   font-weight: 600;
 }
 </style>
