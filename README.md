@@ -50,15 +50,6 @@ You also need to rebuild `packages/ui` whenever you change its source code:
 cd packages/ui && pnpm build
 ```
 
-### FontAwesome Pro
-
-Some dependencies require FontAwesome Pro icons. You need a `.npmrc` file (at the repo root or in your home directory) with your FA Pro auth token:
-
-```
-@fortawesome:registry=https://npm.fontawesome.com/
-//npm.fontawesome.com/:_authToken=YOUR_TOKEN_HERE
-```
-
 Do not commit this file — it is gitignored.
 
 ## Branch strategy
