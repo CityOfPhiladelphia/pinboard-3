@@ -11,11 +11,11 @@
     "@eslint/js": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "eslint-plugin-turbo": "^2.10.6",
     "eslint-plugin-vue": "catalog:",
-    "eslint-plugin-vue-scoped-css": "^3.1.1",
     "globals": "catalog:",
     "typescript": "catalog:",
-    "typescript-eslint": "catalog:"
+    "typescript-eslint": "catalog:",
+    "eslint-plugin-turbo": "^2.10.6",
+    "eslint-plugin-vue-scoped-css": "^3.1.1"
   }
 }

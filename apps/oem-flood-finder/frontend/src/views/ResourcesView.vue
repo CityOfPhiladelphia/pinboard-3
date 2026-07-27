@@ -6,7 +6,7 @@ import { IconChevronLeft } from '@phila/phila-ui-core/icons'
 import { IS_MOBILE_KEY } from '@pinboard/ui'
 import { inject, ref } from 'vue'
 
-const isMobile = inject(IS_MOBILE_KEY, ref(false))
+const isMobile = inject(IS_MOBILE_KEY, ref(true))
 const router = useRouter()
 </script>
 
