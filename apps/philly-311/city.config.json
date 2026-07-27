@@ -6,5 +6,21 @@
   "contact": "websupport@phila.gov",
   "compliance": [],
   "confidentiality": "medium",
-  "packageManager": "pnpm"
+  "cdkPath": "./cdk",
+  "packageManager": "pnpm",
+  "environments": {
+    "dev": {
+      "profile": "phila-oit-se-311-api",
+      "vpc": "TestVpc"
+    },
+    "test": {
+      "profile": "phila-oit-se-311-api",
+      "vpc": "TestVpc"
+    },
+    "prod": {
+      "profile": "phila-oit-se-311-api",
+      "vpc": "ProdVpc"
+    }
+  },
+  "frontendBuildCommand": "build-only"
 }

@@ -1,0 +1,26 @@
+{
+  "name": "cdk-philly-311",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "cdk": "cdk",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@phila/constructs": "^0.8.0",
+    "aws-cdk-lib": "^2.252.0",
+    "cdk-nag": "^2.38.2",
+    "constructs": "^10.6.0",
+    "source-map-support": "^0.5.21"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "aws-cdk": "^2.1120.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^6.0.3"
+  }
+}
