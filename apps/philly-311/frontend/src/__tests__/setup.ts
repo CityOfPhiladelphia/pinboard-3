@@ -85,6 +85,42 @@ vi.mock('@phila/phila-ui-button', () => ({
   }),
 }))
 
+// Mirrors the real Search/SearchSuggestions contract: an input bound to
+// modelValue, and a listbox of flat suggestion strings emitting select.
+vi.mock('@phila/phila-ui-search', () => ({
+  Search: defineComponent({
+    name: 'Search',
+    props: ['modelValue', 'placeholder'],
+    emits: ['update:modelValue', 'search'],
+    setup(props: Record<string, unknown>, { emit, expose }) {
+      expose({ focus: () => undefined })
+      return () =>
+        h('input', {
+          type: 'search',
+          placeholder: props.placeholder,
+          value: props.modelValue,
+          onInput: (e: Event) => emit('update:modelValue', (e.target as HTMLInputElement).value),
+        })
+    },
+  }),
+  SearchSuggestions: defineComponent({
+    name: 'SearchSuggestions',
+    props: ['suggestions'],
+    emits: ['select', 'dismiss'],
+    setup(props: Record<string, unknown>, { emit, expose }) {
+      expose({ focusFirst: () => undefined })
+      return () =>
+        h(
+          'ul',
+          { role: 'listbox' },
+          (props.suggestions as string[]).map((s) =>
+            h('li', { role: 'option', onClick: () => emit('select', s) }, s),
+          ),
+        )
+    },
+  }),
+}))
+
 vi.mock('@phila/phila-ui-callout', () => ({
   Callout: defineComponent({
     name: 'Callout',

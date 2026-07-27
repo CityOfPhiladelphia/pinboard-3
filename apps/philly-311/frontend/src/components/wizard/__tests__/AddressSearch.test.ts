@@ -1,5 +1,6 @@
-// ABOUTME: Tests for AddressSearch — debounced autocomplete, result rendering,
+// ABOUTME: Tests for AddressSearch — debounced autocomplete, suggestion rendering,
 // ABOUTME: pick-resolution + select emission, list-stays-closed after pick, errors.
+// Combobox keyboard/ARIA mechanics are owned by @phila/phila-ui-search.
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, type VueWrapper } from '@vue/test-utils'
 import AddressSearch from '../AddressSearch.vue'
@@ -36,7 +37,7 @@ afterEach(() => {
 })
 
 describe('AddressSearch - debounce + results', () => {
-  it('calls autocompleteAddresses after the debounce and renders results with city line', async () => {
+  it('calls autocompleteAddresses after the debounce and renders suggestions with the city', async () => {
     mockAutocompleteAddresses.mockResolvedValue([
       { address: '1234 MARKET ST', searchAddress: '1234 MARKET ST' },
     ])
@@ -59,6 +60,21 @@ describe('AddressSearch - debounce + results', () => {
     await wrapper.find('input').setValue('')
     await vi.advanceTimersByTimeAsync(260)
     expect(mockAutocompleteAddresses).not.toHaveBeenCalled()
+    expect(wrapper.find('[role="listbox"]').exists()).toBe(false)
+  })
+
+  it('Escape closes the suggestion list', async () => {
+    mockAutocompleteAddresses.mockResolvedValue([
+      { address: '1234 MARKET ST', searchAddress: '1234 MARKET ST' },
+    ])
+    const wrapper = mount(AddressSearch)
+    await typeAndSettle(wrapper, '1234')
+
+    expect(wrapper.find('[role="listbox"]').exists()).toBe(true)
+
+    await wrapper.find('input').trigger('keydown', { key: 'Escape' })
+    await wrapper.vm.$nextTick()
+
     expect(wrapper.find('[role="listbox"]').exists()).toBe(false)
   })
 })
@@ -169,109 +185,5 @@ describe('AddressSearch - error handling', () => {
     await typeAndSettle(wrapper, '1234')
 
     expect(wrapper.find('.address-search__error').text()).toContain('AIS autocomplete failed')
-  })
-})
-
-describe('AddressSearch - ARIA combobox contract', () => {
-  it('input has combobox role and aria attributes when closed', () => {
-    const wrapper = mount(AddressSearch)
-    const input = wrapper.find('input')
-    expect(input.attributes('role')).toBe('combobox')
-    expect(input.attributes('aria-autocomplete')).toBe('list')
-    expect(input.attributes('aria-controls')).toBe('address-search-listbox')
-    expect(input.attributes('aria-expanded')).toBe('false')
-  })
-
-  it('sets aria-expanded="true" when results are shown', async () => {
-    mockAutocompleteAddresses.mockResolvedValue([
-      { address: '1234 MARKET ST', searchAddress: '1234 MARKET ST' },
-    ])
-    const wrapper = mount(AddressSearch)
-    await typeAndSettle(wrapper, '1234')
-    expect(wrapper.find('input').attributes('aria-expanded')).toBe('true')
-  })
-
-  it('options are <li role="option"> with no inner button', async () => {
-    mockAutocompleteAddresses.mockResolvedValue([
-      { address: '1234 MARKET ST', searchAddress: '1234 MARKET ST' },
-    ])
-    const wrapper = mount(AddressSearch)
-    await typeAndSettle(wrapper, '1234')
-    const option = wrapper.find('[role="listbox"] [role="option"]')
-    expect(option.exists()).toBe(true)
-    expect(option.find('button').exists()).toBe(false)
-  })
-})
-
-describe('AddressSearch - keyboard navigation', () => {
-  it('ArrowDown sets aria-activedescendant to first option, second ArrowDown moves to second', async () => {
-    mockAutocompleteAddresses.mockResolvedValue([
-      { address: '1234 MARKET ST', searchAddress: '1234 MARKET ST' },
-      { address: '1234 MARKET ST UNIT 2', searchAddress: '1234 MARKET ST UNIT 2' },
-    ])
-    const wrapper = mount(AddressSearch)
-    await typeAndSettle(wrapper, '1234')
-    const input = wrapper.find('input')
-
-    expect(input.attributes('aria-activedescendant')).toBeFalsy()
-
-    await input.trigger('keydown', { key: 'ArrowDown' })
-    expect(input.attributes('aria-activedescendant')).toBe('address-option-0')
-
-    await input.trigger('keydown', { key: 'ArrowDown' })
-    expect(input.attributes('aria-activedescendant')).toBe('address-option-1')
-  })
-
-  it('ArrowUp moves focus back after ArrowDown', async () => {
-    mockAutocompleteAddresses.mockResolvedValue([
-      { address: '1234 MARKET ST', searchAddress: '1234 MARKET ST' },
-      { address: '1234 MARKET ST UNIT 2', searchAddress: '1234 MARKET ST UNIT 2' },
-    ])
-    const wrapper = mount(AddressSearch)
-    await typeAndSettle(wrapper, '1234')
-    const input = wrapper.find('input')
-
-    await input.trigger('keydown', { key: 'ArrowDown' })
-    await input.trigger('keydown', { key: 'ArrowDown' })
-    expect(input.attributes('aria-activedescendant')).toBe('address-option-1')
-
-    await input.trigger('keydown', { key: 'ArrowUp' })
-    expect(input.attributes('aria-activedescendant')).toBe('address-option-0')
-  })
-
-  it('Enter while an option is active selects it', async () => {
-    mockAutocompleteAddresses.mockResolvedValue([
-      { address: '1234 MARKET ST', searchAddress: '1234 MARKET ST' },
-    ])
-    mockSearchAddress.mockResolvedValue(FEATURE)
-
-    const wrapper = mount(AddressSearch)
-    await typeAndSettle(wrapper, '1234')
-    const input = wrapper.find('input')
-
-    await input.trigger('keydown', { key: 'ArrowDown' })
-    await input.trigger('keydown', { key: 'Enter' })
-    await vi.advanceTimersByTimeAsync(0)
-    await wrapper.vm.$nextTick()
-
-    expect(mockSearchAddress).toHaveBeenCalledWith('1234 MARKET ST')
-    expect(wrapper.emitted('select')?.[0]).toEqual([FEATURE])
-    expect(wrapper.find('[role="listbox"]').exists()).toBe(false)
-  })
-
-  it('Escape closes the list and sets aria-expanded to false', async () => {
-    mockAutocompleteAddresses.mockResolvedValue([
-      { address: '1234 MARKET ST', searchAddress: '1234 MARKET ST' },
-    ])
-    const wrapper = mount(AddressSearch)
-    await typeAndSettle(wrapper, '1234')
-
-    expect(wrapper.find('[role="listbox"]').exists()).toBe(true)
-
-    await wrapper.find('input').trigger('keydown', { key: 'Escape' })
-    await wrapper.vm.$nextTick()
-
-    expect(wrapper.find('[role="listbox"]').exists()).toBe(false)
-    expect(wrapper.find('input').attributes('aria-expanded')).toBe('false')
   })
 })

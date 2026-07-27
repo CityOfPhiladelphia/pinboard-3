@@ -10,6 +10,7 @@ export default [
       'vue/one-component-per-file': 'off',
       'vue/require-prop-types': 'off',
       'vue/multi-word-component-names': 'off',
+      'vue/no-reserved-component-names': 'off',
     },
   },
 ]

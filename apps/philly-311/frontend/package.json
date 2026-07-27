@@ -29,6 +29,7 @@
     "@phila/phila-ui-filter-panel": "1.0.0",
     "@phila/phila-ui-map-core": "1.1.1",
     "@phila/phila-ui-radio": "1.0.0",
+    "@phila/phila-ui-search": "1.2.0",
     "@phila/phila-ui-switch": "^0.0.5",
     "@phila/phila-ui-tags": "0.1.0",
     "@phila/phila-ui-text-field": "1.2.0",
