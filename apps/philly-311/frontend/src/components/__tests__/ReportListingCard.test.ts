@@ -71,10 +71,14 @@ describe('ReportListingCard', () => {
 
   it('also treats New and Open as the open/purple chip', () => {
     expect(
-      mountCard(report({ status: 'New' })).find('.listing-card__status-icon').classes(),
+      mountCard(report({ status: 'New' }))
+        .find('.listing-card__status-icon')
+        .classes(),
     ).toContain('listing-card__status-icon--open')
     expect(
-      mountCard(report({ status: 'Open' })).find('.listing-card__status-icon').classes(),
+      mountCard(report({ status: 'Open' }))
+        .find('.listing-card__status-icon')
+        .classes(),
     ).toContain('listing-card__status-icon--open')
   })
 

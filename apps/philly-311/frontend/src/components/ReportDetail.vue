@@ -64,10 +64,22 @@ async function share() {
     </div>
     <table v-if="showCaseFields" class="report-detail__fields">
       <tbody>
-        <tr><th scope="row">Issue type</th><td>{{ report.serviceType }}</td></tr>
-        <tr><th scope="row">Location</th><td>{{ report.address }}</td></tr>
-        <tr v-if="report.createdAt"><th scope="row">Submitted</th><td>{{ formatWhen(report.createdAt) }}</td></tr>
-        <tr><th scope="row">Request ID</th><td>{{ report.id }}</td></tr>
+        <tr>
+          <th scope="row">Issue type</th>
+          <td>{{ report.serviceType }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Location</th>
+          <td>{{ report.address }}</td>
+        </tr>
+        <tr v-if="report.createdAt">
+          <th scope="row">Submitted</th>
+          <td>{{ formatWhen(report.createdAt) }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Request ID</th>
+          <td>{{ report.id }}</td>
+        </tr>
       </tbody>
     </table>
     <div v-if="showCaseFields && report.slaDate" class="report-detail__sla">

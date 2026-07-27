@@ -32,7 +32,8 @@ export function useMyCases(auth: Auth) {
       } while (offset !== undefined)
       reports.value = all
     } catch (e) {
-      errorMessage.value = e instanceof Error ? e.message : 'Something went wrong loading your requests.'
+      errorMessage.value =
+        e instanceof Error ? e.message : 'Something went wrong loading your requests.'
     } finally {
       isLoading.value = false
     }

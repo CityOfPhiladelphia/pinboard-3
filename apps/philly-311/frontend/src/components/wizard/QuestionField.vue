@@ -28,9 +28,7 @@ const isLargePicklist = computed(
   () => props.question.type === 'picklist' && (props.question.options?.length ?? 0) > 4,
 )
 
-const choices = computed(() =>
-  (props.question.options ?? []).map((o) => ({ text: o, value: o })),
-)
+const choices = computed(() => (props.question.options ?? []).map((o) => ({ text: o, value: o })))
 // RadioGroup/CheckboxGroup model a Record<choice value, checked>; the wizard
 // stores answers as strings ('A' / 'A;B'), so translate at this boundary.
 const radioValue = computed<Record<string, boolean>>(() =>

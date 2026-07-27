@@ -34,9 +34,16 @@ describe('ReportDetail', () => {
 })
 
 const caseReport = {
-  id: '12345678', lat: 39.95, lng: -75.16, serviceType: 'Pothole', status: 'In Progress',
-  address: '1515 Market St', createdAt: '2026-07-01T13:14:00Z',
-  description: 'Deep pothole', slaDate: '2026-08-01', department: 'Streets',
+  id: '12345678',
+  lat: 39.95,
+  lng: -75.16,
+  serviceType: 'Pothole',
+  status: 'In Progress',
+  address: '1515 Market St',
+  createdAt: '2026-07-01T13:14:00Z',
+  description: 'Deep pothole',
+  slaDate: '2026-08-01',
+  department: 'Streets',
 } as Report
 
 describe('case fields view', () => {
@@ -52,7 +59,9 @@ describe('case fields view', () => {
   })
 
   it('shows the fields table when showCaseFields is set', () => {
-    const w = mount(ReportDetail, { props: { report: caseReport, onClose: () => {}, showCaseFields: true } })
+    const w = mount(ReportDetail, {
+      props: { report: caseReport, onClose: () => {}, showCaseFields: true },
+    })
     const rows = w.findAll('.report-detail__fields tr')
     const text = rows.map((r) => r.text())
     expect(text.some((t) => t.includes('Issue type') && t.includes('Pothole'))).toBe(true)
@@ -62,23 +71,33 @@ describe('case fields view', () => {
   })
 
   it('shows the estimated-update banner only when slaDate is present', () => {
-    const w = mount(ReportDetail, { props: { report: caseReport, onClose: () => {}, showCaseFields: true } })
+    const w = mount(ReportDetail, {
+      props: { report: caseReport, onClose: () => {}, showCaseFields: true },
+    })
     expect(w.find('.report-detail__sla').text()).toContain('Estimated update')
     const w2 = mount(ReportDetail, {
-      props: { report: { ...caseReport, slaDate: undefined }, onClose: () => {}, showCaseFields: true },
+      props: {
+        report: { ...caseReport, slaDate: undefined },
+        onClose: () => {},
+        showCaseFields: true,
+      },
     })
     expect(w2.find('.report-detail__sla').exists()).toBe(false)
   })
 
   it('renders the SLA deadline as a date only, without shifting the day', () => {
-    const w = mount(ReportDetail, { props: { report: caseReport, onClose: () => {}, showCaseFields: true } })
+    const w = mount(ReportDetail, {
+      props: { report: caseReport, onClose: () => {}, showCaseFields: true },
+    })
     expect(w.find('.report-detail__sla').text()).toContain('8/1/2026')
   })
 
   it('Share copies the current URL to the clipboard and confirms', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     vi.stubGlobal('navigator', { clipboard: { writeText } })
-    const w = mount(ReportDetail, { props: { report: caseReport, onClose: () => {}, showCaseFields: true } })
+    const w = mount(ReportDetail, {
+      props: { report: caseReport, onClose: () => {}, showCaseFields: true },
+    })
     await w.find('.report-detail__share').trigger('click')
     await flushPromises()
     expect(writeText).toHaveBeenCalledWith(window.location.href)
@@ -88,7 +107,9 @@ describe('case fields view', () => {
   it('announces the copy confirmation to assistive tech', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     vi.stubGlobal('navigator', { clipboard: { writeText } })
-    const w = mount(ReportDetail, { props: { report: caseReport, onClose: () => {}, showCaseFields: true } })
+    const w = mount(ReportDetail, {
+      props: { report: caseReport, onClose: () => {}, showCaseFields: true },
+    })
     await w.find('.report-detail__share').trigger('click')
     await flushPromises()
     expect(w.find('[role="status"]').text()).toContain('Link copied')
@@ -97,7 +118,9 @@ describe('case fields view', () => {
   it('stays on "Share" without an unhandled rejection when the clipboard write fails', async () => {
     const writeText = vi.fn().mockRejectedValue(new Error('denied'))
     vi.stubGlobal('navigator', { clipboard: { writeText } })
-    const w = mount(ReportDetail, { props: { report: caseReport, onClose: () => {}, showCaseFields: true } })
+    const w = mount(ReportDetail, {
+      props: { report: caseReport, onClose: () => {}, showCaseFields: true },
+    })
     await w.find('.report-detail__share').trigger('click')
     await flushPromises()
     expect(w.find('.report-detail__share').text()).toBe('Share')

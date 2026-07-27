@@ -21,8 +21,7 @@ function mountChips(modelValue = 'all') {
 describe('FilterChips', () => {
   it('renders a toggle FilterDefinition per option with the service-type icon color', () => {
     const filters = mountChips().findComponent(FilterChipGroup).props('filters') as
-      | FilterDefinition[]
-      | undefined
+      FilterDefinition[] | undefined
     expect(filters?.map((f) => f.key)).toEqual(['Pothole Repair', 'Graffiti Removal'])
     for (const f of filters ?? []) {
       expect(f.choices).toBeUndefined()

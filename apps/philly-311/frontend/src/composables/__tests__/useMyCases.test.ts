@@ -43,11 +43,18 @@ describe('useMyCases', () => {
     const cases = useMyCases(auth)
     await cases.load()
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.objectContaining({ path: '/private/key/me/issues', auth, query: expect.objectContaining({ limit: 200 }) }),
+      expect.objectContaining({
+        path: '/private/key/me/issues',
+        auth,
+        query: expect.objectContaining({ limit: 200 }),
+      }),
     )
     expect(cases.reports.value).toHaveLength(1)
     expect(cases.reports.value[0]).toMatchObject({
-      id: '10000001', serviceType: 'Pothole', slaDate: '2026-08-01', department: 'Streets',
+      id: '10000001',
+      serviceType: 'Pothole',
+      slaDate: '2026-08-01',
+      department: 'Streets',
     })
   })
 
@@ -63,7 +70,12 @@ describe('useMyCases', () => {
   })
 
   it('surfaces API errors via errorMessage and clears isLoading', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: false, status: 500, headers: new Headers(), json: async () => ({}) } as Response)
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      headers: new Headers(),
+      json: async () => ({}),
+    } as Response)
     const cases = useMyCases(auth)
     await cases.load()
     expect(cases.errorMessage.value).toBeTruthy()
@@ -73,7 +85,12 @@ describe('useMyCases', () => {
   it('leaves reports empty when a later page fails mid-pagination', async () => {
     mockFetch
       .mockResolvedValueOnce(respond([issue(1)], '<http://x/me/issues?offset=200>; rel="next"'))
-      .mockResolvedValueOnce({ ok: false, status: 500, headers: new Headers(), json: async () => ({}) } as Response)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        headers: new Headers(),
+        json: async () => ({}),
+      } as Response)
     const cases = useMyCases(auth)
     await cases.load()
     expect(cases.reports.value).toEqual([])

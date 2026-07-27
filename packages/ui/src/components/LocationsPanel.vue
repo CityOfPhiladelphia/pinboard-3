@@ -53,9 +53,7 @@ const pendingKeydown = ref(false)
 const listRef = ref<HTMLElement | null>(null)
 // computed refs
 const countLabel = computed(() =>
-  props.countNoun
-    ? locationCountLabel(props.locations.length, props.countNoun)
-    : null
+  props.countNoun ? locationCountLabel(props.locations.length, props.countNoun) : null
 )
 
 // watchers

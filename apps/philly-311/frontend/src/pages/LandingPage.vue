@@ -99,7 +99,6 @@ async function onSearch(query: string) {
       #map-content="{
         map,
         zoom,
-        isMobile,
         hoveredId,
         selectedId,
         mobileControlsTarget,

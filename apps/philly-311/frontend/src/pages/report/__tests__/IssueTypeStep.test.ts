@@ -55,7 +55,9 @@ import IssueTypeStep from '../IssueTypeStep.vue'
 
 function mountStep(canAdvance = ref(false), showErrors = ref(false)) {
   const w = mount(IssueTypeStep, {
-    global: { provide: { [WIZARD_CAN_ADVANCE_KEY]: canAdvance, [WIZARD_SHOW_ERRORS_KEY]: showErrors } },
+    global: {
+      provide: { [WIZARD_CAN_ADVANCE_KEY]: canAdvance, [WIZARD_SHOW_ERRORS_KEY]: showErrors },
+    },
   })
   return { w, canAdvance }
 }

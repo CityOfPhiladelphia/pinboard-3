@@ -13,7 +13,9 @@ import router from './router'
 const app = createApp(App)
 app.use(createPinia())
 // ponytail: English-only for now; per-locale app messages when philly-311 localizes
-app.use(createI18n({ legacy: false, locale: 'en', fallbackLocale: 'en', messages: pinboardMessages }))
+app.use(
+  createI18n({ legacy: false, locale: 'en', fallbackLocale: 'en', messages: pinboardMessages }),
+)
 app.use(createB2CPlugin({ env: import.meta.env }))
 app.use(router)
 app.use(

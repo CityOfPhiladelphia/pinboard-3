@@ -26,7 +26,9 @@ describe('buildUrl', () => {
   })
 
   it('encodes query params and skips undefined', () => {
-    const url = new URL(buildUrl('https://api.example.test', '/x', { lat: 39.95, lng: -75.16, foo: undefined }))
+    const url = new URL(
+      buildUrl('https://api.example.test', '/x', { lat: 39.95, lng: -75.16, foo: undefined }),
+    )
     expect(url.searchParams.get('lat')).toBe('39.95')
     expect(url.searchParams.get('lng')).toBe('-75.16')
     expect(url.searchParams.has('foo')).toBe(false)

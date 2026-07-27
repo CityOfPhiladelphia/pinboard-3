@@ -1,0 +1,9 @@
+#!/bin/sh
+# ABOUTME: Pre-commit hook: eslint across the workspace (turbo-cached) and
+# ABOUTME: prettier check on staged files. Wired via core.hooksPath by the prepare script.
+set -e
+
+pnpm lint
+
+git diff --cached --name-only --diff-filter=ACMR -z |
+  xargs -0 pnpm exec prettier --check --ignore-unknown

@@ -10,3 +10,4 @@ AGENTS.md
 .superpowers/
 .vscode/
 .playwright-mcp/
+.DS_Store

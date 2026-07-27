@@ -84,71 +84,71 @@ onMounted(loadPage)
     <FeaturedArticles class="answers__featured" />
 
     <div class="answers__content">
-    <label class="sr-only" for="answers-search">Search articles</label>
-    <div class="answers__search">
-      <input
-        id="answers-search"
-        v-model="query"
-        type="search"
-        class="answers__search-input"
-        placeholder="Search by topic or keyword"
-      />
-      <FontAwesomeIcon
-        :icon="faMagnifyingGlass"
-        class="answers__search-icon"
-        aria-hidden="true"
-      />
-    </div>
-
-    <div v-if="!isSearching" class="answers__chips">
-      <label class="answers__chip">
+      <label class="sr-only" for="answers-search">Search articles</label>
+      <div class="answers__search">
+        <input
+          id="answers-search"
+          v-model="query"
+          type="search"
+          class="answers__search-input"
+          placeholder="Search by topic or keyword"
+        />
         <FontAwesomeIcon
-          :icon="faArrowDownArrowUp"
-          class="answers__chip-icon"
+          :icon="faMagnifyingGlass"
+          class="answers__search-icon"
           aria-hidden="true"
         />
-        <select
-          v-model="sortChoice"
-          class="answers__chip-select"
-          aria-label="Sort articles"
-          data-test="answers-sort"
-          @change="loadPage()"
-        >
-          <option value="">Sort</option>
-          <option value="title:asc">Title A–Z</option>
-          <option value="title:desc">Title Z–A</option>
-          <option value="lastPublishedAt:desc">Newest first</option>
-          <option value="lastPublishedAt:asc">Oldest first</option>
-        </select>
-      </label>
-    </div>
+      </div>
 
-    <p v-if="isLoading" class="answers__status">Loading articles&hellip;</p>
-    <p v-else-if="errorMessage" role="alert" class="answers__status">
-      Couldn't load articles. {{ errorMessage }}
-    </p>
-    <p v-else-if="visible.length === 0 && isSearching" class="answers__status">
-      No articles match &ldquo;{{ query.trim() }}&rdquo;.
-    </p>
-    <p v-else-if="visible.length === 0" class="answers__status">No articles available.</p>
+      <div v-if="!isSearching" class="answers__chips">
+        <label class="answers__chip">
+          <FontAwesomeIcon
+            :icon="faArrowDownArrowUp"
+            class="answers__chip-icon"
+            aria-hidden="true"
+          />
+          <select
+            v-model="sortChoice"
+            class="answers__chip-select"
+            aria-label="Sort articles"
+            data-test="answers-sort"
+            @change="loadPage()"
+          >
+            <option value="">Sort</option>
+            <option value="title:asc">Title A–Z</option>
+            <option value="title:desc">Title Z–A</option>
+            <option value="lastPublishedAt:desc">Newest first</option>
+            <option value="lastPublishedAt:asc">Oldest first</option>
+          </select>
+        </label>
+      </div>
 
-    <ul v-else class="answers__list">
-      <li v-for="article in visible" :key="article.id">
-        <ArticleCard :article="article" />
-      </li>
-    </ul>
+      <p v-if="isLoading" class="answers__status">Loading articles&hellip;</p>
+      <p v-else-if="errorMessage" role="alert" class="answers__status">
+        Couldn't load articles. {{ errorMessage }}
+      </p>
+      <p v-else-if="visible.length === 0 && isSearching" class="answers__status">
+        No articles match &ldquo;{{ query.trim() }}&rdquo;.
+      </p>
+      <p v-else-if="visible.length === 0" class="answers__status">No articles available.</p>
 
-    <PhilaButton
-      v-if="nextPageToken && !isSearching"
-      variant="secondary"
-      type="button"
-      class="answers__more"
-      :disabled="isLoading"
-      data-test="answers-more"
-      @click="loadPage(nextPageToken)"
-    >
-      Load more
-    </PhilaButton>
+      <ul v-else class="answers__list">
+        <li v-for="article in visible" :key="article.id">
+          <ArticleCard :article="article" />
+        </li>
+      </ul>
+
+      <PhilaButton
+        v-if="nextPageToken && !isSearching"
+        variant="secondary"
+        type="button"
+        class="answers__more"
+        :disabled="isLoading"
+        data-test="answers-more"
+        @click="loadPage(nextPageToken)"
+      >
+        Load more
+      </PhilaButton>
     </div>
   </main>
 </template>

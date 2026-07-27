@@ -10,7 +10,11 @@ vi.mock('@/composables/useKnowledgeArticles', () => ({
   useKnowledgeArticles: () => ({ loadArticles, loadArticle: vi.fn() }),
 }))
 
-const a = (id: string, lastPublishedAt?: string) => ({ id, title: `Article ${id}`, lastPublishedAt })
+const a = (id: string, lastPublishedAt?: string) => ({
+  id,
+  title: `Article ${id}`,
+  lastPublishedAt,
+})
 
 function mountStrip() {
   return mount(FeaturedArticles, { global: { stubs: { RouterLink: RouterLinkStub } } })

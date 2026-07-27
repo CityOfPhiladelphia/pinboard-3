@@ -5,9 +5,7 @@ import type { Report } from '@/composables/useNearbyReports'
 
 export type StatusIconTreatment = 'resolved' | 'open'
 
-export function statusIconTreatment(
-  status: string | undefined | null,
-): StatusIconTreatment | null {
+export function statusIconTreatment(status: string | undefined | null): StatusIconTreatment | null {
   if (!status) return null
   return statusBucket(status) === 'inProgress' ? 'open' : 'resolved'
 }

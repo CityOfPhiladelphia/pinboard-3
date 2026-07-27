@@ -11,11 +11,7 @@ defineProps<{ article: Article }>()
   <article class="article-card">
     <RouterLink class="article-card__link" :to="`/answers/${article.id}`">
       <span class="article-card__title">{{ article.title }}</span>
-      <FontAwesomeIcon
-        :icon="faChevronRight"
-        class="article-card__chevron"
-        aria-hidden="true"
-      />
+      <FontAwesomeIcon :icon="faChevronRight" class="article-card__chevron" aria-hidden="true" />
     </RouterLink>
   </article>
 </template>

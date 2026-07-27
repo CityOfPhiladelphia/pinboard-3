@@ -95,7 +95,6 @@ onMounted(() => {
       #map-content="{
         map,
         zoom,
-        isMobile,
         hoveredId,
         selectedId,
         mobileControlsTarget,

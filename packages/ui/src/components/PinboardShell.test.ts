@@ -21,11 +21,7 @@ describe('PinboardShell', () => {
     })
     const navLinks = w.findAll('a.phila-navbar-link')
     expect(navLinks.map((a) => a.text())).toEqual(['Map', 'Reports', 'Answers'])
-    expect(navLinks.map((a) => a.attributes('href'))).toEqual([
-      '/',
-      '/reports',
-      '/answers',
-    ])
+    expect(navLinks.map((a) => a.attributes('href'))).toEqual(['/', '/reports', '/answers'])
   })
 
   it('renders no header nav links when links is omitted', () => {
