@@ -8,13 +8,14 @@
     "access": "public"
   },
   "devDependencies": {
-    "typescript": "catalog:",
     "@eslint/js": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "eslint-plugin-turbo": "^2.10.6",
     "eslint-plugin-vue": "catalog:",
-    "typescript-eslint": "catalog:",
-    "globals": "catalog:"
+    "eslint-plugin-vue-scoped-css": "^3.1.1",
+    "globals": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:"
   }
 }

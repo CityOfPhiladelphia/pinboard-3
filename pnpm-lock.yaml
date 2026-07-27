@@ -110,7 +110,7 @@ catalogs:
       version: 8.0.4
     prettier:
       specifier: ^3.9.6
-      version: 3.9.6
+      version: 3.8.4
     source-map-support:
       specifier: ^0.5.21
       version: 0.5.21
@@ -423,6 +423,9 @@ importers:
       eslint-plugin-vue:
         specifier: 'catalog:'
         version: 10.9.2(@typescript-eslint/parser@8.65.0(eslint@10.5.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.5.0(jiti@2.6.1))(vue-eslint-parser@10.4.0(eslint@10.5.0(jiti@2.6.1)))
+      eslint-plugin-vue-scoped-css:
+        specifier: ^3.1.1
+        version: 3.1.1(eslint@10.5.0(jiti@2.6.1))(vue-eslint-parser@10.4.0(eslint@10.5.0(jiti@2.6.1)))
       globals:
         specifier: 'catalog:'
         version: 17.7.0
@@ -1931,6 +1934,9 @@ packages:
   error-stack-parser-es@1.0.5:
     resolution: {integrity: sha512-5qucVt2XcuGMcEGgWI7i+yZpmpByQ8J1lHhcL7PwqCwu9FPP3VUXzT4ltHe5i2z9dePwEHcDVOAfSnHsOlCXRA==}
 
+  es-toolkit@1.50.0:
+    resolution: {integrity: sha512-OyZKhUVvEep9ITEiwHn8GKnMRQIVqoSIX7WnRbkWgJkllCujilqP2rD0u979tkl8wqyc8ICwlc1UBVv/Sl1G6w==}
+
   esbuild@0.28.1:
     resolution: {integrity: sha512-HrJrvZv5ayxBzPfwphOoNzkzOIIlifzk0KJrGK2c8R4+LKpMtpYLQeUdjnwjWv/LZlkH2laZk+4w78pi99D4Vw==}
     engines: {node: '>=18'}
@@ -1955,6 +1961,20 @@ packages:
     peerDependencies:
       eslint: '>6.6.0'
       turbo: '>=2.9.14'
+
+  eslint-plugin-vue-scoped-css@3.1.1:
+    resolution: {integrity: sha512-GIskMvLPnDtiu88rWXQHy2b2QZ4j959N5UgghML64jH0sg3Km+HRa9m7nkpcEBGLD4iA4vtMDbBIoLdFcbT8lQ==}
+    engines: {node: ^20.19.0 || ^22.13.0 || >=24}
+    peerDependencies:
+      eslint: '>=9.38.0'
+      postcss-scss: ^4.0.3
+      postcss-styl: ^0.12.0
+      vue-eslint-parser: '>=7.1.0'
+    peerDependenciesMeta:
+      postcss-scss:
+        optional: true
+      postcss-styl:
+        optional: true
 
   eslint-plugin-vue@10.10.0:
     resolution: {integrity: sha512-dL9x9rBHqqNcByWiLOHK6L0SB97V82/NC0cZRn9cXPjM7pCuWlpQQP9bFH4vjBv80ej1ZpzAkuD8zWH1o9bZbA==}
@@ -2461,6 +2481,12 @@ packages:
 
   pkg-types@2.3.0:
     resolution: {integrity: sha512-SIqCzDRg0s9npO5XQ3tNZioRY1uK06lA41ynBC1YmFTmnY6FjUjVt6s4LoADmwoig1qqD0oK8h1p/8mlMx8Oig==}
+
+  postcss-safe-parser@7.0.1:
+    resolution: {integrity: sha512-0AioNCJZ2DPYz5ABT6bddIqlhgwhpHZ/l65YAYo0BCIn0xiDpsnTHz0gnoTGk0OXZW0JRs+cDwL8u/teRdz+8A==}
+    engines: {node: '>=18.0'}
+    peerDependencies:
+      postcss: '>=8.5.10'
 
   postcss-selector-parser@7.1.4:
     resolution: {integrity: sha512-HeP7D2wyhkR+XaK6v4W8oRF62Dsz4flyuczALJp61GckGm42u1saSSJ/0auvcBqxs3jMRFEcPK34At/0JBKdOg==}
@@ -4299,6 +4325,8 @@ snapshots:
 
   error-stack-parser-es@1.0.5: {}
 
+  es-toolkit@1.50.0: {}
+
   esbuild@0.28.1:
     optionalDependencies:
       '@esbuild/aix-ppc64': 0.28.1
@@ -4345,6 +4373,16 @@ snapshots:
       dotenv: 16.0.3
       eslint: 10.5.0(jiti@2.6.1)
       turbo: 2.10.6
+
+  eslint-plugin-vue-scoped-css@3.1.1(eslint@10.5.0(jiti@2.6.1))(vue-eslint-parser@10.4.0(eslint@10.5.0(jiti@2.6.1))):
+    dependencies:
+      '@eslint-community/eslint-utils': 4.10.1(eslint@10.5.0(jiti@2.6.1))
+      es-toolkit: 1.50.0
+      eslint: 10.5.0(jiti@2.6.1)
+      postcss: 8.5.23
+      postcss-safe-parser: 7.0.1(postcss@8.5.23)
+      postcss-selector-parser: 7.1.4
+      vue-eslint-parser: 10.4.0(eslint@10.5.0(jiti@2.6.1))
 
   eslint-plugin-vue@10.10.0(@typescript-eslint/parser@8.65.0(eslint@10.7.0(jiti@2.6.1))(typescript@6.0.3))(eslint@10.7.0(jiti@2.6.1))(vue-eslint-parser@10.4.0(eslint@10.7.0(jiti@2.6.1))):
     dependencies:
@@ -4832,6 +4870,10 @@ snapshots:
       confbox: 0.2.2
       exsolve: 1.0.8
       pathe: 2.0.3
+
+  postcss-safe-parser@7.0.1(postcss@8.5.23):
+    dependencies:
+      postcss: 8.5.23
 
   postcss-selector-parser@7.1.4:
     dependencies:
