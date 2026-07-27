@@ -4,7 +4,8 @@ import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
-import { createB2CPlugin } from '@phila/sso-vue'
+import { createSSOPlugin } from '@phila/sso-vue'
+import { B2CProvider } from '@phila/sso-core'
 import { createPinboard, pinboardMessages } from '@pinboard/ui'
 import App from './App.vue'
 import router from './router'
@@ -15,7 +16,28 @@ app.use(createPinia())
 app.use(
   createI18n({ legacy: false, locale: 'en', fallbackLocale: 'en', messages: pinboardMessages }),
 )
-app.use(createB2CPlugin({ env: import.meta.env }))
+// createSSOPlugin + B2CProvider instead of createB2CPlugin: the shorthand can't
+// pass apiScopes, and without a scope sso-core's post-login acquireToken gets an
+// empty token, treats it as interaction-required, and redirect-loops through B2C.
+app.use(
+  createSSOPlugin({
+    clientConfig: {
+      provider: new B2CProvider({
+        clientId: import.meta.env.VITE_SSO_CLIENT_ID,
+        b2cEnvironment: import.meta.env.VITE_SSO_TENANT,
+        authorityDomain: import.meta.env.VITE_SSO_AUTHORITY_DOMAIN,
+        redirectUri: import.meta.env.VITE_SSO_REDIRECT_URI,
+        apiScopes: import.meta.env.VITE_SSO_API_SCOPE ? [import.meta.env.VITE_SSO_API_SCOPE] : [],
+        policies: {
+          signUpSignIn: 'B2C_1A_AD_SIGNIN_ONLY',
+          signInOnly: 'B2C_1A_AD_SIGNIN_ONLY',
+          resetPassword: 'B2C_1A_PASSWORDRESET',
+        },
+      }),
+      debug: Boolean(import.meta.env.DEV),
+    },
+  }),
+)
 app.use(router)
 app.use(
   createPinboard({
