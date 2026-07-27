@@ -263,6 +263,9 @@ importers:
       '@phila/phila-ui-switch':
         specifier: ^0.0.5
         version: 0.0.5(@fortawesome/fontawesome-svg-core@7.3.1)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.3.1)(vue@3.5.33(typescript@6.0.3)))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@2.3.1(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
+      '@phila/phila-ui-tags':
+        specifier: 0.1.0
+        version: 0.1.0(@fortawesome/fontawesome-svg-core@7.3.1)(@fortawesome/pro-solid-svg-icons@7.2.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.3.1)(vue@3.5.33(typescript@6.0.3)))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@2.3.1(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-text-field':
         specifier: 1.2.0
         version: 1.2.0(@fortawesome/fontawesome-svg-core@7.3.1)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.3.1)(vue@3.5.33(typescript@6.0.3)))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@2.3.1(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
@@ -5229,6 +5232,16 @@ snapshots:
       '@fortawesome/fontawesome-svg-core': 7.3.1
       '@phila/phila-ui-core': 3.0.0-beta.8(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       vue: 3.5.33(typescript@6.0.3)
+
+  '@phila/phila-ui-tags@0.1.0(@fortawesome/fontawesome-svg-core@7.3.1)(@fortawesome/pro-solid-svg-icons@7.2.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.3.1)(vue@3.5.33(typescript@6.0.3)))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@2.3.1(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
+    dependencies:
+      '@fortawesome/fontawesome-svg-core': 7.3.1
+      '@fortawesome/pro-solid-svg-icons': 7.2.0
+      '@phila/phila-ui-core': 2.4.0(@fortawesome/fontawesome-svg-core@7.3.1)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.3.1)(vue@3.5.33(typescript@6.0.3)))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@2.3.1(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
+      vue: 3.5.33(typescript@6.0.3)
+    transitivePeerDependencies:
+      - '@fortawesome/vue-fontawesome'
+      - vue-router
 
   '@phila/phila-ui-tags@0.1.0(@fortawesome/fontawesome-svg-core@7.3.1)(@fortawesome/pro-solid-svg-icons@7.2.0)(@fortawesome/vue-fontawesome@3.1.3(@fortawesome/fontawesome-svg-core@7.3.1)(vue@3.5.33(typescript@6.0.3)))(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
     dependencies:

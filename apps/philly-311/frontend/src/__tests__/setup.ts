@@ -51,7 +51,7 @@ vi.mock('@phila/phila-ui-map-core', () => ({
 }))
 
 vi.mock('@phila/phila-ui-tags', () => ({
-  Tags: stub('Tags', 'span'),
+  Tags: formStub('Tags', ['color', 'icon', 'text', 'variant', 'size'], 'text'),
 }))
 
 vi.mock('@phila/phila-ui-filter-chip', () => ({

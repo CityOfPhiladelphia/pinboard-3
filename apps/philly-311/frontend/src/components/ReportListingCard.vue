@@ -1,10 +1,9 @@
 <!-- ABOUTME: Report listing card for the finder's left panel (Figma ".311 Report listing"):
-     photo + service-type title with a status icon chip, address, timestamp. -->
+     photo + service-type title with a status tag, address, timestamp. -->
 <script setup lang="ts">
 import { computed } from 'vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faCircleCheck, faClock } from '@fortawesome/pro-solid-svg-icons'
-import { IconImage } from '@phila/phila-ui-core/icons'
+import { Tags } from '@phila/phila-ui-tags'
+import { IconImage, IconCircleCheck, IconClock } from '@phila/phila-ui-core/icons'
 import type { Report } from '@/composables/useNearbyReports'
 import { statusIconTreatment } from '@/utils/reportCard'
 import { formatCardTimestamp } from '@/utils/datetime'
@@ -13,7 +12,9 @@ const props = defineProps<{ report: Report }>()
 
 const timestamp = computed(() => formatCardTimestamp(props.report.createdAt))
 const statusTreatment = computed(() => statusIconTreatment(props.report.status))
-const statusIcon = computed(() => (statusTreatment.value === 'resolved' ? faCircleCheck : faClock))
+const statusIcon = computed(() =>
+  statusTreatment.value === 'resolved' ? IconCircleCheck : IconClock,
+)
 </script>
 
 <template>
@@ -27,15 +28,14 @@ const statusIcon = computed(() => (statusTreatment.value === 'resolved' ? faCirc
     <div class="listing-card__content">
       <p class="listing-card__title">
         <span class="listing-card__title-text">{{ report.serviceType }}</span>
-        <span
+        <Tags
           v-if="statusTreatment"
-          class="listing-card__status-icon"
-          :class="`listing-card__status-icon--${statusTreatment}`"
-          role="img"
-          :aria-label="report.status"
-        >
-          <FontAwesomeIcon :icon="statusIcon" aria-hidden="true" />
-        </span>
+          variant="readonly"
+          size="small"
+          :color="statusTreatment === 'resolved' ? 'green' : 'purple'"
+          :icon="statusIcon"
+          :text="report.status"
+        />
       </p>
       <p class="listing-card__address">{{ report.address }}</p>
       <p v-if="timestamp" class="listing-card__meta">{{ timestamp }}</p>
@@ -91,24 +91,6 @@ const statusIcon = computed(() => (statusTreatment.value === 'resolved' ? faCirc
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.listing-card__status-icon {
-  display: flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  font-size: 0.75rem;
-}
-.listing-card__status-icon--resolved {
-  background: var(--Schemes-Success-Container, #caecc8);
-  color: var(--Schemes-On-Success-Container, #07570f);
-}
-.listing-card__status-icon--open {
-  background: #e5cefa;
-  color: #030831;
 }
 .listing-card__address {
   margin: 0;

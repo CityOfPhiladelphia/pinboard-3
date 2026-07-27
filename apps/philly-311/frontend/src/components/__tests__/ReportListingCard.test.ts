@@ -1,11 +1,14 @@
 // ABOUTME: Tests for ReportListingCard — Figma report-listing card fidelity:
-// ABOUTME: photo/placeholder, title + status icon chip, address, timestamp, no distance.
+// ABOUTME: photo/placeholder, title + status tag, address, timestamp, no distance.
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faCircleCheck, faClock } from '@fortawesome/pro-solid-svg-icons'
+import { IconCircleCheck, IconClock } from '@phila/phila-ui-core/icons'
 import ReportListingCard from '../ReportListingCard.vue'
 import type { Report } from '@/composables/useNearbyReports'
+
+function statusTag(w: ReturnType<typeof mount>) {
+  return w.findComponent({ name: 'Tags' })
+}
 
 function report(overrides: Partial<Report> = {}): Report {
   return {
@@ -46,45 +49,34 @@ describe('ReportListingCard', () => {
     expect(w.find('.listing-card__photo--placeholder').exists()).toBe(true)
   })
 
-  it('shows a green circle-check chip for a resolved/closed status, labeled for screen readers', () => {
+  it('shows a green circle-check tag with the status text for a resolved/closed status', () => {
     const w = mountCard(report({ status: 'Closed' }))
-    const chip = w.find('.listing-card__status-icon')
-    expect(chip.classes()).toContain('listing-card__status-icon--resolved')
-    expect(chip.attributes('aria-label')).toBe('Closed')
-    expect(w.findComponent(FontAwesomeIcon).props('icon')).toBe(faCircleCheck)
+    const tag = statusTag(w)
+    expect(tag.props('color')).toBe('green')
+    expect(tag.props('icon')).toBe(IconCircleCheck)
+    expect(tag.props('text')).toBe('Closed')
   })
 
-  it('also treats Resolved as the resolved/green chip', () => {
-    const w = mountCard(report({ status: 'Resolved' }))
-    expect(w.find('.listing-card__status-icon').classes()).toContain(
-      'listing-card__status-icon--resolved',
-    )
+  it('also treats Resolved as the green tag', () => {
+    expect(statusTag(mountCard(report({ status: 'Resolved' }))).props('color')).toBe('green')
   })
 
-  it('shows a purple clock chip for an open/in-progress status, labeled for screen readers', () => {
+  it('shows a purple clock tag for an open/in-progress status', () => {
     const w = mountCard(report({ status: 'In Progress' }))
-    const chip = w.find('.listing-card__status-icon')
-    expect(chip.classes()).toContain('listing-card__status-icon--open')
-    expect(chip.attributes('aria-label')).toBe('In Progress')
-    expect(w.findComponent(FontAwesomeIcon).props('icon')).toBe(faClock)
+    const tag = statusTag(w)
+    expect(tag.props('color')).toBe('purple')
+    expect(tag.props('icon')).toBe(IconClock)
+    expect(tag.props('text')).toBe('In Progress')
   })
 
-  it('also treats New and Open as the open/purple chip', () => {
-    expect(
-      mountCard(report({ status: 'New' }))
-        .find('.listing-card__status-icon')
-        .classes(),
-    ).toContain('listing-card__status-icon--open')
-    expect(
-      mountCard(report({ status: 'Open' }))
-        .find('.listing-card__status-icon')
-        .classes(),
-    ).toContain('listing-card__status-icon--open')
+  it('also treats New and Open as the purple tag', () => {
+    expect(statusTag(mountCard(report({ status: 'New' }))).props('color')).toBe('purple')
+    expect(statusTag(mountCard(report({ status: 'Open' }))).props('color')).toBe('purple')
   })
 
-  it('omits the status chip when status is empty', () => {
+  it('omits the status tag when status is empty', () => {
     const w = mountCard(report({ status: '' }))
-    expect(w.find('.listing-card__status-icon').exists()).toBe(false)
+    expect(statusTag(w).exists()).toBe(false)
   })
 
   it('does not render a distance row', () => {
