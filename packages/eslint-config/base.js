@@ -34,7 +34,7 @@ export const viteJsConfig = defineConfig([
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'no-undef': 'off',
       'vue-scoped-css/no-unused-selector': 'error',
-      'vue-scoped-css/enforce-style-type': 'error'
+      'vue-scoped-css/enforce-style-type': 'error',
     },
   },
 ])
