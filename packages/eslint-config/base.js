@@ -3,7 +3,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import eslintConfigPrettier from 'eslint-config-prettier/flat'
 import tseslint from 'typescript-eslint'
 import eslintPluginVue from 'eslint-plugin-vue'
-import eslintPluginVueScopedCSS from 'eslint-plugin-vue-scoped-css';
+import eslintPluginVueScopedCSS from 'eslint-plugin-vue-scoped-css'
 import globals from 'globals'
 import turboPlugin from 'eslint-plugin-turbo'
 
@@ -33,7 +33,7 @@ export const viteJsConfig = defineConfig([
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'no-undef': 'off',
-      "vue-scoped-css/no-unused-selector": "error"
+      'vue-scoped-css/no-unused-selector': 'error',
     },
   },
 ])
