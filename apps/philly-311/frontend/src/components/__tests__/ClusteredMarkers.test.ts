@@ -45,7 +45,8 @@ describe('ClusteredMarkers', () => {
     expect(pinIcons).toContain(serviceTypeIconComponent('Pothole Repair'))
     expect(pinIcons).toContain(serviceTypeIconComponent('Graffiti Removal'))
     for (const icon of pinIcons) {
-      expect(typeof icon).toBe('function')
+      // A component (renderable), not a raw icon-definition data object.
+      expect('iconName' in icon).toBe(false)
     }
   })
 })

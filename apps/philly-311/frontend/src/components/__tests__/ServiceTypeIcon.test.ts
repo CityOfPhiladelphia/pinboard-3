@@ -2,10 +2,11 @@
 // ABOUTME: and aria-hidden decorative glyph.
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { h } from 'vue'
 
 vi.mock('@/utils/serviceTypeMeta', () => ({ serviceTypeColor: () => 'rgb(1, 2, 3)' }))
 vi.mock('@/utils/reportIcon', () => ({
-  serviceTypeIconDefinition: () => ({ iconName: 'x', prefix: 'fas' }),
+  serviceTypeIconComponent: () => (props: Record<string, unknown>) => h('svg', props),
 }))
 
 import ServiceTypeIcon from '../ServiceTypeIcon.vue'

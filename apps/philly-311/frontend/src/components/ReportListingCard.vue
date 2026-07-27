@@ -3,7 +3,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faImage, faCircleCheck, faClock } from '@fortawesome/pro-solid-svg-icons'
+import { faCircleCheck, faClock } from '@fortawesome/pro-solid-svg-icons'
+import { IconImage } from '@phila/phila-ui-core/icons'
 import type { Report } from '@/composables/useNearbyReports'
 import { statusIconTreatment } from '@/utils/reportCard'
 import { formatCardTimestamp } from '@/utils/datetime'
@@ -20,7 +21,7 @@ const statusIcon = computed(() => (statusTreatment.value === 'resolved' ? faCirc
     <div class="listing-card__media">
       <img v-if="report.mediaUrl" class="listing-card__photo" :src="report.mediaUrl" alt="" />
       <div v-else class="listing-card__photo listing-card__photo--placeholder">
-        <FontAwesomeIcon :icon="faImage" />
+        <IconImage aria-hidden="true" />
       </div>
     </div>
     <div class="listing-card__content">

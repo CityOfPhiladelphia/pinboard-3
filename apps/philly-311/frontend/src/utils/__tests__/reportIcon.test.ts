@@ -1,40 +1,34 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { faRoad, faDumpster, faLocationDot } from '@fortawesome/pro-solid-svg-icons'
-import { serviceTypeIconDefinition, serviceTypeIconComponent } from '../reportIcon'
-
-describe('serviceTypeIconDefinition', () => {
-  it('maps a known common-category service type to its FA icon', () => {
-    expect(serviceTypeIconDefinition('Pothole Repair')).toBe(faRoad)
-    expect(serviceTypeIconDefinition('Illegal Dumping')).toBe(faDumpster)
-  })
-  it('falls back to a neutral pin icon for unknown / missing types', () => {
-    expect(serviceTypeIconDefinition('Some Unmapped Type')).toBe(faLocationDot)
-    expect(serviceTypeIconDefinition(undefined)).toBe(faLocationDot)
-  })
-})
+import { IconRoad, IconBoxArchive, IconLocationDot } from '@phila/phila-ui-core/icons'
+import { serviceTypeIconComponent } from '../reportIcon'
 
 describe('serviceTypeIconComponent', () => {
+  it('maps a known common-category service type to its phila icon', () => {
+    expect(serviceTypeIconComponent('Pothole Repair')).toBe(IconRoad)
+    expect(serviceTypeIconComponent('Illegal Dumping')).toBe(IconBoxArchive)
+  })
+
+  it('falls back to a neutral pin icon for unknown / missing types', () => {
+    expect(serviceTypeIconComponent('Some Unmapped Type')).toBe(IconLocationDot)
+    expect(serviceTypeIconComponent(undefined)).toBe(IconLocationDot)
+  })
+
   it('returns a stable component identity per icon', () => {
     expect(serviceTypeIconComponent('Pothole Repair')).toBe(
       serviceTypeIconComponent('Pothole Repair'),
     )
-    // Types sharing the fallback definition share one component.
     expect(serviceTypeIconComponent('Some Unmapped Type')).toBe(serviceTypeIconComponent(undefined))
     expect(serviceTypeIconComponent('Pothole Repair')).not.toBe(
       serviceTypeIconComponent('Illegal Dumping'),
     )
   })
 
-  it('renders the FontAwesome svg for the mapped icon', () => {
-    const w = mount(serviceTypeIconComponent('Pothole Repair'))
-    expect(w.find('svg[data-icon="road"]').exists()).toBe(true)
-  })
-
-  it('passes through attrs such as class', () => {
+  it('renders an svg and passes through attrs such as class', () => {
     const w = mount(serviceTypeIconComponent('Pothole Repair'), {
       attrs: { class: 'pin-glyph' },
     })
+    expect(w.find('svg').exists()).toBe(true)
     expect(w.find('svg').classes()).toContain('pin-glyph')
   })
 })

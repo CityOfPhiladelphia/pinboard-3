@@ -2,8 +2,7 @@
      (Salesforce featured list view). Hides itself when the fetch fails or is empty. -->
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faArrowTrendUp } from '@fortawesome/pro-solid-svg-icons'
+import { IconStar } from '@phila/phila-ui-core/icons'
 import { useKnowledgeArticles, type Article } from '@/composables/useKnowledgeArticles'
 
 const k = useKnowledgeArticles()
@@ -33,7 +32,7 @@ onMounted(async () => {
   <ul v-if="articles.length > 0" class="featured" aria-label="Featured articles">
     <li v-for="article in articles" :key="article.id" class="featured__card">
       <RouterLink class="featured__link" :to="`/answers/${article.id}`">
-        <FontAwesomeIcon :icon="faArrowTrendUp" class="featured__icon" aria-hidden="true" />
+        <IconStar class="featured__icon" aria-hidden="true" />
         <span class="featured__title">{{ article.title }}</span>
       </RouterLink>
     </li>

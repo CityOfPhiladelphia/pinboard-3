@@ -1,7 +1,6 @@
 <!-- ABOUTME: List row for a knowledge article; whole row links to the detail page. -->
 <script setup lang="ts">
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faChevronRight } from '@fortawesome/pro-solid-svg-icons'
+import { IconChevronRight } from '@phila/phila-ui-core/icons'
 import type { Article } from '@/composables/useKnowledgeArticles'
 
 defineProps<{ article: Article }>()
@@ -11,7 +10,7 @@ defineProps<{ article: Article }>()
   <article class="article-card">
     <RouterLink class="article-card__link" :to="`/answers/${article.id}`">
       <span class="article-card__title">{{ article.title }}</span>
-      <FontAwesomeIcon :icon="faChevronRight" class="article-card__chevron" aria-hidden="true" />
+      <IconChevronRight class="article-card__chevron" aria-hidden="true" />
     </RouterLink>
   </article>
 </template>
