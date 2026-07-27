@@ -83,7 +83,7 @@ export default {
     section2Title: '保险和费用',
     p2: '这些健康中心接受多种形式的保险。 其中包括联邦医疗保险（Medicare）和联邦医疗补助（Medicaid）。 即使您没有医疗保险，也能获得医疗健康服务。 如果您没有医疗保险，您将需要根据自身收入和家庭人数的具体情况支付很少的费用。',
     section25Title: '需要帮助获得健康保险吗？',
-    p25: "费城的BenePhilly计划提供免费支持，帮助居民申请健康保险。要了解更多信息，请访问 <a href='https://www.phila.gov/programs/benephilly/' target='_blank'>https://www.phila.gov/programs/benephilly</a>。",
+    p25: '费城的BenePhilly计划提供免费支持，帮助居民申请健康保险。要了解更多信息，请访问',
     section3Title: '语言帮助',
     p3: '所有健康中心提供电话口译服务。 某些中心还提供现场口译。 查看每个地点的详细信息，以及工作人员使用的语言列表。 您还可搜索特定语言。',
     section4Title: '建立医患关系',
@@ -91,6 +91,7 @@ export default {
     section5Title: '查找器更新',
     p5: '我们每三个月为每个健康中心更新信息一次。 如果出现问题，您可以通过',
     feedbackForm: '反馈表联系我们',
+    period: '。',
   },
   cards: {
     table1Intro:

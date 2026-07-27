@@ -14,6 +14,7 @@ import type {
   LocationFilterOption,
   MapCardPropsGetter,
   SortLocationsOptions,
+  SortMode,
   UserLocationState,
 } from '../types'
 
@@ -37,7 +38,7 @@ const emit = defineEmits<{
   search: []
   searchString: [search: string]
   selectedFilter: [filter: string]
-  sortOption: [sort: string]
+  sortOption: [sort: SortMode]
   hover: [id: string]
   'hover-end': []
 }>()
@@ -67,7 +68,7 @@ function handleFilterChange(selectedFilter: string) {
   emit('selectedFilter', selectedFilter)
 }
 
-function handleSortChange(sortOption: string) {
+function handleSortChange(sortOption: SortMode) {
   emit('sortOption', sortOption)
 }
 
@@ -114,6 +115,7 @@ defineExpose({ scrollToCard })
     v-if="waitForUserLocation && userLocationState === 'acquiring'"
     ref="listRef"
     class="location-list"
+    :class="{ mobile: isMobile }"
   >
     <MapCard
       v-for="n in 5"
@@ -182,6 +184,11 @@ defineExpose({ scrollToCard })
   scrollbar-gutter: stable;
 }
 
+.location-list.mobile {
+  padding: 1rem;
+  scrollbar-width: none;
+}
+
 .location-card {
   cursor: pointer;
   flex-shrink: 0;
@@ -202,12 +209,5 @@ defineExpose({ scrollToCard })
 .location-card--selected {
   background-color: var(--Schemes-Surface-Container, #eee);
   outline: 2px solid var(--Schemes-Primary, #1976d2);
-}
-
-@media (max-width: 768px) {
-  .location-list {
-    padding: 1rem;
-    scrollbar-width: none;
-  }
 }
 </style>

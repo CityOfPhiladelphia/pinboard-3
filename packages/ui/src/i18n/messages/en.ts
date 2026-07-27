@@ -21,7 +21,7 @@ export default {
       onThisPage: 'On this page',
     },
     nav: {
-      learnMore: 'Learn more about the tool',
+      learnMore: 'About this tool',
     },
     footer: {
       termsOfUse: 'Terms of use',

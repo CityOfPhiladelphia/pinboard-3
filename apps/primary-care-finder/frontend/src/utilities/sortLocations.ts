@@ -10,25 +10,13 @@ export function sortLocations(
   locations = toValue(locations)
   currentLocation = toValue(currentLocation)
   sortMode = toValue(sortMode)
-  locations.forEach((location) => {
-    location.distance = PinboardUtilities.hasLocationData(currentLocation)
-      ? `${PinboardUtilities.getHaversineDistance(
-          { latitude: location.latitude, longitude: location.longitude },
-          {
-            latitude: currentLocation.latitude,
-            longitude: currentLocation.longitude,
-          },
-          1
-        )} mi`
-      : undefined
-  })
 
   switch (PinboardUtilities.hasLocationData(currentLocation) && !sortMode ? 'distance' : sortMode) {
     case 'name': {
       return sortAlpha(locations)
     }
     case 'distance': {
-      return sortDistance(locations, currentLocation)
+      return sortDistance(locations)
     }
     default: {
       return locations
@@ -47,20 +35,7 @@ function sortAlpha(locations: PrimaryCareLocation[]) {
   return locations
 }
 
-function sortDistance(locations: PrimaryCareLocation[], currentLocation: PinboardTypes.LatLon) {
-  currentLocation = toValue(currentLocation)
-  locations.forEach((location) => {
-    location.distance = PinboardUtilities.hasLocationData(currentLocation)
-      ? `${PinboardUtilities.getHaversineDistance(
-          { latitude: location.latitude, longitude: location.longitude },
-          {
-            latitude: currentLocation.latitude,
-            longitude: currentLocation.longitude,
-          },
-          1
-        )} mi`
-      : undefined
-  })
+function sortDistance(locations: PrimaryCareLocation[]) {
   locations.sort(
     (a, b) => Number(a.distance?.replace(' mi', '')) - Number(b.distance?.replace(' mi', ''))
   )

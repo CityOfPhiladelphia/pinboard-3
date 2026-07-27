@@ -84,7 +84,7 @@ export default {
     section2Title: 'Bảo hiểm và chi phí',
     p2: 'Những trung tâm y tế này sẽ tiếp nhận các loại hồ sơ bảo hiểm. Bao gồm Medicare và Medicaid. Kể cả khi không có bảo hiểm, bạn vẫn được chăm sóc sức khoẻ. Nếu bạn không có bảo hiểm, bạn sẽ phải chi trả một khoản phí nhỏ dựa trên thu nhập cá nhân và số lượng thành viên trong gia đình.',
     section25Title: 'Cần giúp đỡ để nhận bảo hiểm y tế?',
-    p25: "Chương trình BenePhilly của Philadelphia cung cấp hỗ trợ miễn phí để giúp cư dân đăng ký bảo hiểm y tế. Để tìm hiểu thêm, hãy truy cập <a href='https://www.phila.gov/programs/benephilly/' target='_blank'>https://www.phila.gov/programs/benephilly</a>.",
+    p25: 'Chương trình BenePhilly của Philadelphia cung cấp hỗ trợ miễn phí để giúp cư dân đăng ký bảo hiểm y tế. Để tìm hiểu thêm, hãy truy cập',
     section3Title: 'Truy cập ngôn ngữ',
     p3: 'Tất cả các trung tâm y tế đều cung cấp dịch vụ Phiên dịch qua điện thoại. Một vài trung tâm cũng có cung cấp phiên dịch viên trực tiếp. Xem chi tiết danh sách các ngôn ngữ mà nhân viên có thể sử dụng được ở mỗi nơi. Bạn cũng có thể tìm kiếm một ngôn ngữ cụ thể.',
     section4Title: 'Thiết lập dịch vụ chăm sóc sức khoẻ',
@@ -92,6 +92,7 @@ export default {
     section5Title: 'Cập nhật về công cụ tìm kiếm',
     p5: 'Chúng tôi cập nhật thông tin về từng trung tâm y tế mỗi ba tháng. Nếu có sai sót, hãy cho chúng tôi biết qua',
     feedbackForm: 'đơn phản hồi của chúng tôi',
+    period: '.',
   },
   cards: {
     table1Intro:

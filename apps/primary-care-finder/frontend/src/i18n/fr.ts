@@ -84,7 +84,7 @@ export default {
     section2Title: 'Assurance et coût',
     p2: "Ces centres de santé prennent en charge de nombreuses formes d'assurance. Notamment Medicare et Medicaid. Vous pouvez bénéficier de soins même si vous n'avez pas d'assurance. Si vous n'êtes pas assuré, vous devrez payer une petite participation en fonction de vos revenus et de la composition de votre famille.",
     section25Title: "Vous avez besoin d'aide pour souscrire une assurance maladie ?",
-    p25: "Le programme BenePhilly de Philadelphie offre une assistance gratuite pour aider les résidents à souscrire une assurance maladie. Pour en savoir plus, rendez-vous sur <a href='https://www.phila.gov/programs/benephilly/' target='_blank'>https://www.phila.gov/programs/benephilly</a>.",
+    p25: 'Le programme BenePhilly de Philadelphie offre une assistance gratuite pour aider les résidents à souscrire une assurance maladie. Pour en savoir plus, rendez-vous sur',
     section3Title: 'Accès linguistique',
     p3: "Tous les centres de santé proposent des services d'interprétation par téléphone. Certains proposent également des services d'interprétation en personne. Consultez les détails de chaque centre pour obtenir la liste de toutes les langues parlées par le personnel. Vous pouvez également rechercher une langue spécifique.",
     section4Title: 'Mise en place des soins',
@@ -92,6 +92,7 @@ export default {
     section5Title: "Mises à jour de l'outil de recherche",
     p5: 'Nous mettons à jour les informations pour chaque centre de santé tous les trois mois. Si vous rencontrez un problème, vous pouvez nous le faire savoir en remplissant notre',
     feedbackForm: 'formulaire de feedback',
+    period: '.',
   },
   cards: {
     table1Intro:

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // vue imports
-import { computed, markRaw, ref, watch } from 'vue'
+import { computed, inject, markRaw, ref, watch } from 'vue'
 
 // 3rd party imports
 import { IconGauge, IconCamera, IconLocationDot, IconWater } from '@phila/phila-ui-core/icons'
@@ -20,12 +20,12 @@ import {
   PinboardUtilities,
   type PinboardTypes,
   type MapCardProps,
+  IS_MOBILE_KEY,
 } from '@pinboard/ui'
 import {
   filterLocations,
   isGauge,
   searchLocations,
-  sortLocations,
   FLOOD_LAYER_IDS,
   FLOOD_LAYER_CONFIG,
   FLOOD_LEGEND_ITEMS,
@@ -35,7 +35,7 @@ import {
 // app imports
 import LocationDetail from '@/components/LocationDetail.vue'
 import { useLocations } from '@/composables/useLocations'
-import type { Filters, OemLocation, SortMode } from '@/types'
+import type { Filters, OemLocation } from '@/types'
 
 // app variables
 const searchPlaceholderText = 'Search by address, zipcode, or keyword...'
@@ -44,7 +44,7 @@ const filterOptions: PinboardTypes.LocationFilterOption[] = [
   { value: 'gauges' satisfies Filters, label: 'Gauge' },
   { value: 'cameras' satisfies Filters, label: 'Camera' },
 ]
-const sortLocationsOptions: PinboardTypes.SortLocationsOptions = {
+const sortLocationsOptions: Partial<PinboardTypes.SortLocationsOptions> = {
   DistAsc: 'Distance',
   AlphaAsc: 'Alphabetical',
 }
@@ -62,11 +62,11 @@ const {
   handleSearchSubmit,
   handleGeolocate,
   handleGeolocateError,
-} = PinboardComposables.useUserAndSearchLocations(true, true)
-const locationSortMode = ref<SortMode>(
+} = PinboardComposables.useUserAndSearchLocations(oemLocations, true, true)
+const locationSortMode = ref<PinboardTypes.SortMode>(
   ['located', 'watching'].includes(userLocationState.value) ? 'DistAsc' : '',
 )
-const isMobile = PinboardComposables.useIsMobile()
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 
 // computed refs
 const currentLocations = computed(() => {
@@ -80,7 +80,7 @@ const currentLocations = computed(() => {
   const gotSearchMatches = typeof searchedLocations !== 'string'
   if (!gotSearchMatches) console.log(searchedLocations)
   return gotSearchMatches
-    ? sortLocations(searchedLocations, searchOrUserLocation, locationSortMode)
+    ? PinboardUtilities.sortLocations(searchedLocations, searchOrUserLocation, locationSortMode)
     : []
 })
 
@@ -110,8 +110,8 @@ function handleLocationFilterChange(selectedFilter: string) {
   locationFilterMode.value = selectedFilter as Filters
 }
 
-function handleLocationSortChange(sortLocationsOption: string) {
-  locationSortMode.value = sortLocationsOption as SortMode
+function handleLocationSortChange(sortLocationsOption: PinboardTypes.SortMode) {
+  locationSortMode.value = sortLocationsOption
 }
 
 function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {

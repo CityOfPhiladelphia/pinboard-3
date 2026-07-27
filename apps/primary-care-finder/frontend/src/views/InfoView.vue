@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { PinboardInfoPage } from '@pinboard/ui'
+import { IS_MOBILE_KEY, PinboardInfoPage } from '@pinboard/ui'
 
 const { t } = useI18n()
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 
 const sections = computed(() => [
   { id: 'insurance', title: t('introPage.section2Title') },
@@ -15,45 +16,50 @@ const sections = computed(() => [
 </script>
 
 <template>
-  <PinboardInfoPage back-to="/" :sections="sections">
+  <PinboardInfoPage back-to="/" :sections="sections" :is-mobile="isMobile">
     <div class="intro-text-container">
-      <h1>{{ t('introPage.section1Title') }}</h1>
-      <p class="main-description" v-html="t('introPage.p0')" />
+      <h1 v-text="t('introPage.section1Title')" />
+      <p class="main-description" v-text="t('introPage.p0')" />
     </div>
     <div class="content-container">
-      <p v-html="t('introPage.p05')" />
-      <p v-html="t('introPage.p1')" />
+      <p v-text="t('introPage.p05')" />
+      <p v-text="t('introPage.p1')" />
       <ol>
-        <li>{{ t('introPage.ol1.li1') }}</li>
-        <li>{{ t('introPage.ol1.li2') }}</li>
-        <li>{{ t('introPage.ol1.li3') }}</li>
+        <li v-text="t('introPage.ol1.li1')" />
+        <li v-text="t('introPage.ol1.li2')" />
+        <li v-text="t('introPage.ol1.li3')" />
       </ol>
 
       <section id="insurance" class="subsection-container">
-        <h2 class="has-text-heading-5">{{ t('introPage.section2Title') }}</h2>
-        <p v-html="t('introPage.p2')" />
+        <h2 class="has-text-heading-5" v-text="t('introPage.section2Title')" />
+        <p v-text="t('introPage.p2')" />
       </section>
       <section id="insurance-help" class="subsection-container">
-        <h2 class="has-text-heading-5">{{ t('introPage.section25Title') }}</h2>
-        <p v-html="t('introPage.p25')" />
+        <h2 class="has-text-heading-5" v-text="t('introPage.section25Title')" />
+        <p>
+          {{ t('introPage.p25') }}
+          <a href="https://www.phila.gov/programs/benephilly/" target="_blank"
+            >https://www.phila.gov/programs/benephilly</a
+          >{{ t('introPage.period') }}
+        </p>
       </section>
       <section id="language" class="subsection-container">
-        <h2 class="has-text-heading-5">{{ t('introPage.section3Title') }}</h2>
-        <p>{{ t('introPage.p3') }}</p>
+        <h2 class="has-text-heading-5" v-text="t('introPage.section3Title')" />
+        <p v-text="t('introPage.p3')" />
       </section>
       <section id="establishing" class="subsection-container">
-        <h2 class="has-text-heading-5">{{ t('introPage.section4Title') }}</h2>
-        <p>{{ t('introPage.p4') }}</p>
+        <h2 class="has-text-heading-5" v-text="t('introPage.section4Title')" />
+        <p v-text="t('introPage.p4')" />
       </section>
       <section id="updates" class="subsection-container">
-        <h2 class="has-text-heading-5">{{ t('introPage.section5Title') }}</h2>
+        <h2 class="has-text-heading-5" v-text="t('introPage.section5Title')" />
         <p>
           {{ t('introPage.p5') }}
           <a
             target="_blank"
             href="https://www.phila.gov/departments/department-of-public-health/about-us/contact-us/#send-us-a-message"
             >{{ t('introPage.feedbackForm') }}</a
-          >.
+          >{{ t('introPage.period') }}
         </p>
       </section>
     </div>

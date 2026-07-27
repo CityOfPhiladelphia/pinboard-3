@@ -3,6 +3,7 @@ Central file to simplify importing functions into app projects.
 Contains references to exported functions and useful constants and regular expressions
 */
 
+import { sortLocations } from './sortLocations'
 import { getHaversineDistance } from './getHaversineDistance'
 import { hasLocationData } from './hasLocationData'
 import { slugify } from './slugify'
@@ -19,6 +20,7 @@ const StreetIntersection: Readonly<RegExp> =
 const Zipcode: Readonly<RegExp> = /^\d{5}(?:-\d{4})?$/
 
 export {
+  sortLocations,
   getHaversineDistance,
   hasLocationData,
   slugify,

@@ -84,7 +84,7 @@ export default {
     section2Title: 'Bima na gharama',
     p2: 'Vituo hivi vya afya huchukua aina nyingi za bima. Hii ni pamoja na Medicare na Medicaid.  Unaweza kupata huduma hata kama hauna bima. Ikiwa huna bima, utalipa ada ndogo kulingana na mapato yako na ukubwa wa familia.',
     section25Title: 'Unahitaji msaada wa kupata bima ya afya?',
-    p25: "Programu ya BenePhilly ya Philadelphia inatoa msaada wa bure kusaidia wakazi kuomba bima ya afya. Ili kujifunza zaidi, tembel ea <a href='https://www.phila.gov/programs/benephilly/' target='_blank'>https://www.phila.gov/programs/benephilly</a>.",
+    p25: 'Programu ya BenePhilly ya Philadelphia inatoa msaada wa bure kusaidia wakazi kuomba bima ya afya. Ili kujifunza zaidi, tembel ea',
     section3Title: 'Ufikiaji wa lugha',
     p3: 'Vituo vyote vya afya vinatoa huduma za ukalimani kwa njia ya simu. Baadhi yake pia hutoa tafsiri ya ana kwa ana. Tazama maelezo ya kila eneo kwa orodha ya lugha zote zinazozungumzwa na wafanyikazi. Unaweza pia kutafuta lugha hususa.',
     section4Title: 'Kuanzisha huduma',
@@ -92,6 +92,7 @@ export default {
     section5Title: 'Sasisho kwa kitafutaji',
     p5: 'Tunasasisha taarifa kwa kila kituo cha afya kila baada ya miezi mitatu. Ikiwa kuna kitu kibaya, unaweza kutujulisha kupitia ',
     feedbackForm: 'fomu yetu ya maoni',
+    period: '.',
   },
   cards: {
     table1Intro:

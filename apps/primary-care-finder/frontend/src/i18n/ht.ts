@@ -84,7 +84,7 @@ export default {
     section2Title: 'Asirans ak pri',
     p2: 'Sant sante sa yo pran plizyè fòm asirans. Sa gen ladann Medicare ak Medicaid. Ou ka jwenn swen menm si ou pa gen asirans. Si w pa gen asirans, w ap peye yon ti frè ki baze sou revni w ak kantite fanmi w.',
     section25Title: 'Bezwen èd pou jwenn asirans sante?',
-    p25: "Pwogram BenePhilly Philadelphia a ofri sipò gratis pou ede rezidan aplike pou asirans sante. Pou aprann plis, vizite <a href='https://www.phila.gov/programs/benephilly/' target='_blank'>https://www.phila.gov/programs/benephilly</a>.",
+    p25: 'Pwogram BenePhilly Philadelphia a ofri sipò gratis pou ede rezidan aplike pou asirans sante. Pou aprann plis, vizite',
     section3Title: 'Aksè nan lang',
     p3: 'Tout sant sante ofri sèvis entèpretasyon telefòn. Gen kèk ki ofri tou entèpretasyon an pèsòn. Gade detay chak kote pou jwenn yon lis tout lang anplwaye yo pale. Ou ka chèche yon lang espesifik tou.',
     section4Title: 'Etabli swen',
@@ -92,6 +92,7 @@ export default {
     section5Title: 'Aktyalizasyon rechèch la',
     p5: 'Nou aktyalize enfòmasyon pou chak sant sante chak twa mwa. Si gen yon bagay ki pa kòrèk, ou ka fè nou konn sa atravè',
     feedbackForm: 'Fòmilè fidbak nou an',
+    period: '.',
   },
   cards: {
     table1Intro:

@@ -93,7 +93,7 @@ export interface MenuOption {
   value: string
 }
 
-export type SortLocationsOptions = Record<string, string>
+export type SortLocationsOptions = Partial<Record<SortMode, string>>
 
 export type ProxyAutocompleteResult = string[]
 

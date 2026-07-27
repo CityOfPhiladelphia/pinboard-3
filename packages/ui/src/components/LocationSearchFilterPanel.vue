@@ -24,16 +24,21 @@ import { Search } from '@phila/phila-ui-search'
 
 // pinboard component imports
 import LocationFilter from './LocationFilter.vue'
-import SortPanel, { type SortPanelOption } from './SortPanel.vue'
+import SortPanel from './SortPanel.vue'
 import SearchSuggestions from './SearchSuggestions.vue'
 
 // pinboard composables imports
 import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 import { useRecentSearches } from '../composables/useRecentSearches'
-import { PINBOARD_CONFIG_KEY } from '../plugin'
+import { PINBOARD_CONFIG_KEY } from '../keys.ts'
 
 // type imports
-import type { LocationFilterOption, SortLocationsOptions, UserLocationState } from '../types'
+import type {
+  LocationFilterOption,
+  SortLocationsOptions,
+  SortMode,
+  UserLocationState,
+} from '../types'
 
 // props
 const props = defineProps<{
@@ -49,11 +54,11 @@ const emit = defineEmits<{
   search: []
   searchString: [search: string]
   selectedFilter: [filter: string]
-  sortOption: [sort: string]
+  sortOption: [sort: SortMode]
 }>()
 
 // refs
-const appliedSort = ref<string | null>(null)
+const appliedSort = ref<SortMode>('')
 const searchString = ref<string>('')
 const searchWrapperRef = ref<HTMLElement | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
@@ -80,19 +85,15 @@ const dropdownSuggestions = computed(() => {
 const showingRecents = computed(() => !searchString.value)
 
 // computed refs
-const sortChoices = computed<SortPanelOption[]>(() => {
-  const opts = props.sortOptions ?? {}
-  return Object.entries(opts).map(([value, label]) => ({ value, label }))
-})
 
 // event handlers
 function handleFilterChange(option: string) {
   emit('selectedFilter', option)
 }
 
-function handleSortChange(value: string | null) {
+function handleSortChange(value: SortMode) {
   appliedSort.value = value
-  emit('sortOption', value ?? '')
+  emit('sortOption', value)
 }
 
 function handleSearchChange(search: string) {
@@ -214,9 +215,9 @@ function focusSearchInput() {
     </Teleport>
 
     <Teleport to="#bottom-sheet-sort" :disabled="!isMobile">
-      <div v-if="sortOptions" class="location-sort">
+      <div v-if="sortOptions" class="location-sort content">
         <SortPanel
-          :sort-options="sortChoices"
+          :sort-options="sortOptions"
           :applied-sort="appliedSort"
           :user-location-state="props.userLocationState"
           :is-mobile="isMobile"
@@ -252,6 +253,15 @@ function focusSearchInput() {
   width: 100%;
 }
 
+.location-search.mobile :deep(.state-layer) {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.location-search.mobile :deep(.phila-text-field) {
+  padding: 0 var(--scale-small, 0.5rem);
+}
+
 .location-filters {
   grid-area: filters;
   padding: 0rem 0rem 0rem 1rem;
@@ -268,24 +278,5 @@ function focusSearchInput() {
   grid-area: sort;
   margin-left: auto;
   padding: 0rem 1rem 1.25rem 0rem;
-}
-
-@media (max-width: 768px) {
-  .location-search {
-    padding: 0.6rem 1.5rem 0.25rem 1.5rem;
-  }
-
-  .location-filters {
-    padding: 0rem 0rem 0rem 1.6rem;
-  }
-
-  .location-search :deep(.state-layer) {
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  .location-search :deep(.phila-text-field) {
-    padding: 0 var(--scale-small, 0.5rem);
-  }
 }
 </style>

@@ -15,7 +15,7 @@ import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { MapCard } from '@phila/phila-ui-cards'
 
 // import pinboard config
-import { PINBOARD_CONFIG_KEY } from '../plugin'
+import { PINBOARD_CONFIG_KEY } from '../keys'
 
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
@@ -35,6 +35,7 @@ import type {
   MapCardPropsGetter,
   SearchMode,
   SortLocationsOptions,
+  SortMode,
   UserLocationState,
 } from '../types'
 import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
@@ -100,7 +101,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   search: [search: string]
   selectedLocationsFilter: [filter: string]
-  sortLocationsOption: [sort: string]
+  sortLocationsOption: [sort: SortMode]
   deselect: [locationId: string]
   'update:filterValues': [value: FilterValues]
 }>()
@@ -312,7 +313,7 @@ function handleLocationFilterChange(selectedLocationsFilter: string) {
   emit('selectedLocationsFilter', selectedLocationsFilter)
 }
 
-function handleLocationSortChange(sortLocationsOption: string) {
+function handleLocationSortChange(sortLocationsOption: SortMode) {
   emit('sortLocationsOption', sortLocationsOption)
 }
 
@@ -372,8 +373,8 @@ function selectedLocationValue() {
 </script>
 
 <template>
-  <div v-if="selectedLocation && !isMobile" id="detail-overlay-desktop"></div>
-  <div class="finder-panel">
+  <div id="detail-overlay-desktop" />
+  <div class="finder-panel" :class="isMobile ? 'finder-panel-mobile' : 'finder-panel-desktop'">
     <div class="finder-panel-locations">
       <slot name="locations-header" />
 
@@ -440,7 +441,7 @@ function selectedLocationValue() {
       </Teleport>
     </div>
 
-    <div class="finder-panel-map">
+    <div :class="isMobile ? 'finder-panel-map' : ''">
       <MapPanel
         ref="mapPanelRef"
         :config="effectiveMapConfig"
@@ -469,10 +470,14 @@ function selectedLocationValue() {
         class="mobile-controls-float-left"
         :style="mobileControlsStyle"
       />
-      <div id="mobile-map-search-filter" class="mobile-map-search-filter"></div>
+      <div id="mobile-map-search-filter" class="mobile-map-search-filter" />
     </div>
 
-    <div v-if="filters" class="all-filters-overlay" :class="{ open: allFiltersOpen }">
+    <div
+      v-if="filters"
+      class="all-filters-overlay"
+      :style="{ display: allFiltersOpen && !isMobile ? 'block' : 'none' }"
+    >
       <FilterPanel
         v-if="allFiltersOpen"
         :filters="filters"
@@ -491,6 +496,7 @@ function selectedLocationValue() {
     :snap-points="snapPoints"
     :collapse-label="selectedLocation ? '' : t('pinboard.mapView')"
     :collapse-icon="selectedLocation ? undefined : IconMap"
+    :style="{ display: isMobile ? 'block' : 'none' }"
     class="mobile-bottom-sheet"
   >
     <div class="bottom-sheet-stack">
@@ -498,9 +504,9 @@ function selectedLocationValue() {
         <slot name="locations-header" />
         <div class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
-          <div id="bottom-sheet-sort"></div>
+          <div id="bottom-sheet-sort" />
         </div>
-        <div id="locations-panel-mobile"></div>
+        <div id="locations-panel-mobile" />
       </div>
 
       <div v-if="selectedLocation">
@@ -528,11 +534,26 @@ function selectedLocationValue() {
 
 <style scoped>
 .finder-panel {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
   width: 100%;
   height: 100%;
   position: relative;
+}
+
+.finder-panel :deep(.phila-filter-panel__title) {
+  font-family: var(--Body-Default-font-body-default-family, 'Montserrat', sans-serif);
+}
+
+.finder-panel :deep(.phila-filter-panel__section-toggle) {
+  font-family: var(--Body-Default-font-body-default-family, 'Montserrat', sans-serif);
+}
+
+.finder-panel-desktop {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+
+.finder-panel-mobile {
+  display: block;
 }
 
 .finder-panel-locations {
@@ -540,6 +561,11 @@ function selectedLocationValue() {
   flex-direction: column;
   border-right: 1px solid #ccc;
   overflow: hidden;
+}
+
+.finder-panel-map {
+  width: 100%;
+  height: 100%;
 }
 
 .status-message--error {
@@ -556,10 +582,6 @@ function selectedLocationValue() {
   scrollbar-width: none;
 }
 
-.finder-panel-map {
-  overflow: hidden;
-}
-
 .location-sheet-header {
   display: flex;
   align-items: center;
@@ -574,10 +596,6 @@ function selectedLocationValue() {
   padding: 0.75rem 1rem 0.5rem;
   font-family: var(--Body-Default-font-body-default-family);
   font-weight: 700;
-}
-
-.mobile-bottom-sheet {
-  display: none;
 }
 
 .detail-overlay {
@@ -655,74 +673,45 @@ function selectedLocationValue() {
   z-index: 12;
   background: var(--Schemes-Surface-Bright, #fff);
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
-  display: none;
 }
 
-.all-filters-overlay.open {
+.mobile-controls-float {
+  position: absolute;
+  right: 10px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.mobile-controls-float > :deep(*) {
+  pointer-events: auto;
+}
+
+.mobile-controls-float-left {
+  position: absolute;
+  left: 10px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.mobile-controls-float-left > :deep(*) {
+  pointer-events: auto;
+}
+
+.mobile-map-search-filter {
   display: block;
-}
-
-/* Keep in sync with the matchMedia query in useIsMobile.ts */
-@media (max-width: 768px), (max-width: 1064px) and (max-height: 600px) {
-  .finder-panel {
-    position: relative;
-    display: block;
-  }
-
-  .finder-panel-map {
-    width: 100%;
-    height: 100%;
-  }
-
-  .mobile-bottom-sheet {
-    display: block;
-  }
-
-  .mobile-controls-float {
-    position: absolute;
-    right: 10px;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 10px;
-    pointer-events: none;
-  }
-
-  .mobile-controls-float > :deep(*) {
-    pointer-events: auto;
-  }
-
-  .mobile-controls-float-left {
-    position: absolute;
-    left: 10px;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    pointer-events: none;
-  }
-
-  .mobile-controls-float-left > :deep(*) {
-    pointer-events: auto;
-  }
-
-  .mobile-map-search-filter {
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 2;
-    padding: 10px 0;
-  }
-
-  /* Mobile: FilterPanel renders its own full-screen takeover (teleported to
-     <body>, above the header). The desktop slide-over wrapper is inert here —
-     the v-if'd FilterPanel still mounts and teleports itself out. */
-  .all-filters-overlay.open {
-    display: none;
-  }
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding: 10px 0;
 }
 </style>
