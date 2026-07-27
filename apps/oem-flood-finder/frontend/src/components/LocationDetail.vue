@@ -137,7 +137,6 @@ const lastUpdatedDate = computed(() => {
   flex-shrink: 0;
 }
 
-.detail-header h2,
 .detail-header h4 {
   margin: 0;
   flex: 1;
@@ -160,29 +159,4 @@ const lastUpdatedDate = computed(() => {
   gap: 0.5rem;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1rem 0;
-}
-
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 0.75rem;
-  text-align: left;
-}
-
-th {
-  background-color: #f5f5f5;
-  font-weight: 600;
-}
-
-tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-tr:hover {
-  background-color: #f0f0f0;
-}
 </style>
