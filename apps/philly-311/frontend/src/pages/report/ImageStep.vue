@@ -107,7 +107,7 @@ async function onFile(e: Event) {
   margin: 0 0 var(--spacing-s, 0.5rem);
 }
 .image-step__note {
-  color: var(--ui-color-grey-700, #4a4a4a);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
   margin: 0 0 var(--spacing-s, 0.5rem);
 }
 .image-step__count {
@@ -120,7 +120,7 @@ async function onFile(e: Event) {
 .image-step__zone {
   flex: 1;
   min-height: 180px;
-  border: 1px dashed var(--ui-color-grey-400, #b3b3b3);
+  border: 1px dashed var(--Schemes-Border, #b3b3b3);
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -134,10 +134,10 @@ async function onFile(e: Event) {
   opacity: 0;
 }
 .image-step__zone:focus-within {
-  outline: 2px solid var(--ui-color-primary, #0f4d90);
+  outline: 2px solid var(--Schemes-Primary, #0f4d90);
   outline-offset: 2px;
 }
 .image-step__error {
-  color: var(--ui-color-red, #c0392b);
+  color: var(--Schemes-Error, #c0392b);
 }
 </style>

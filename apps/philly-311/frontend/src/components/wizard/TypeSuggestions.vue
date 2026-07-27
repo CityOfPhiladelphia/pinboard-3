@@ -40,10 +40,10 @@ const top = computed(() => {
 
 <style scoped>
 .type-suggestions {
-  border: 1px solid var(--ui-color-grey-300, #d6d6d6);
+  border: 1px solid var(--Schemes-Border-low, #d6d6d6);
   border-radius: 8px;
   padding: var(--spacing-m, 1rem);
-  background: var(--ui-color-grey-100, #f5f5f5);
+  background: var(--Schemes-Surface-Variant, #f5f5f5);
 }
 .type-suggestions__title {
   font-size: 1rem;
@@ -52,7 +52,7 @@ const top = computed(() => {
 }
 .type-suggestions__note {
   margin: 0 0 var(--spacing-s, 0.75rem);
-  color: var(--ui-color-grey-700, #4a4a4a);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
   font-size: 0.875rem;
 }
 .type-suggestions__list {
@@ -70,14 +70,14 @@ const top = computed(() => {
   width: 100%;
   text-align: left;
   background: #fff;
-  border: 1px solid var(--ui-color-primary, #0f4d90);
+  border: 1px solid var(--Schemes-Primary, #0f4d90);
   border-radius: 8px;
   padding: var(--spacing-s, 0.75rem);
   cursor: pointer;
 }
 .type-suggestions__card:hover,
 .type-suggestions__card:focus-visible {
-  outline: 2px solid var(--ui-color-primary, #0f4d90);
+  outline: 2px solid var(--Schemes-Primary, #0f4d90);
   outline-offset: 1px;
 }
 .type-suggestions__body {
@@ -89,6 +89,6 @@ const top = computed(() => {
 }
 .type-suggestions__desc {
   font-size: 0.875rem;
-  color: var(--ui-color-grey-700, #4a4a4a);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
 }
 </style>

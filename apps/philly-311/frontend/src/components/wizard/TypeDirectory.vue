@@ -80,7 +80,7 @@ const groups = computed(() => {
   width: 100%;
   max-width: 480px;
   padding: var(--spacing-s, 0.5rem);
-  border: 1px solid var(--ui-color-grey-400, #b3b3b3);
+  border: 1px solid var(--Schemes-Border, #b3b3b3);
   border-radius: 4px;
   margin-bottom: var(--spacing-m, 1rem);
 }
@@ -105,7 +105,7 @@ const groups = computed(() => {
   text-align: left;
   background: none;
   border: none;
-  border-bottom: 1px solid var(--ui-color-grey-300, #d6d6d6);
+  border-bottom: 1px solid var(--Schemes-Border-low, #d6d6d6);
   padding: var(--spacing-s, 0.75rem) 0;
   cursor: pointer;
 }
@@ -119,14 +119,14 @@ const groups = computed(() => {
 }
 .type-directory__name {
   font-weight: 700;
-  color: var(--ui-color-primary, #0f4d90);
+  color: var(--Schemes-Primary, #0f4d90);
 }
 .type-directory__desc {
   font-size: 0.875rem;
-  color: var(--ui-color-grey-700, #4a4a4a);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
 }
 .type-directory__empty {
-  color: var(--ui-color-grey-700, #4a4a4a);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
 }
 @media (max-width: 768px) {
   .type-directory__list {

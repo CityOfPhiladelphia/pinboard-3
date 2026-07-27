@@ -37,7 +37,7 @@ const diameterPx = computed(
 <style scoped>
 .location-accuracy-circle {
   border-radius: 50%;
-  background: color-mix(in srgb, var(--color-primary, #0f4d90) 20%, transparent);
-  border: 1px solid var(--color-primary, #0f4d90);
+  background: color-mix(in srgb, var(--Schemes-Primary, #0f4d90) 20%, transparent);
+  border: 1px solid var(--Schemes-Primary, #0f4d90);
 }
 </style>

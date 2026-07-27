@@ -109,6 +109,6 @@ async function onSelect(suggestion: string) {
   font-size: 0.875rem;
 }
 .address-search__error {
-  color: var(--ui-color-red, #c0392b);
+  color: var(--Schemes-Error, #c0392b);
 }
 </style>

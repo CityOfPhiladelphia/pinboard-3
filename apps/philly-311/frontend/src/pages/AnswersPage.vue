@@ -207,7 +207,7 @@ onMounted(loadPage)
   width: 100%;
   padding: var(--spacing-s, 0.75rem) 3rem var(--spacing-s, 0.75rem) var(--spacing-s, 0.75rem);
   background: #fff;
-  border: 1px solid var(--ui-color-grey-300, #d6d6d6);
+  border: 1px solid var(--Schemes-Border-low, #d6d6d6);
   border-radius: 8px;
   font-size: 1rem;
 }
@@ -216,7 +216,7 @@ onMounted(loadPage)
   right: var(--spacing-s, 0.75rem);
   top: 50%;
   transform: translateY(-50%);
-  color: var(--ui-color-primary, #0f4d90);
+  color: var(--Schemes-Primary, #0f4d90);
   pointer-events: none;
 }
 .answers__chips {
@@ -231,7 +231,7 @@ onMounted(loadPage)
   height: 32px;
   padding: 0 var(--spacing-xs, 0.5rem);
   background: #fff;
-  border: 1px solid var(--ui-color-grey-300, #d6d6d6);
+  border: 1px solid var(--Schemes-Border-low, #d6d6d6);
   border-radius: 16px;
 }
 .answers__chip-icon {

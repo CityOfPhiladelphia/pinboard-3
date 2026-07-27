@@ -36,10 +36,10 @@ import reportDocument from '@/assets/report-document.svg'
 }
 .report-callout__lede {
   margin: 0 0 var(--spacing-s, 0.75rem);
-  color: var(--ui-color-grey-700, #4a4a4a);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
 }
 .report-callout__about-link {
-  color: var(--ui-color-primary, #1034f4);
+  color: var(--Schemes-Primary, #1034f4);
   font-weight: 700;
   text-decoration: underline;
 }
@@ -54,7 +54,7 @@ import reportDocument from '@/assets/report-document.svg'
   justify-content: center;
   min-height: 48px;
   padding: 0 var(--spacing-l, 1.5rem);
-  background: var(--ui-color-primary, #1034f4);
+  background: var(--Schemes-Primary, #1034f4);
   color: #fff;
   border-radius: 9999px;
   font-weight: 600;

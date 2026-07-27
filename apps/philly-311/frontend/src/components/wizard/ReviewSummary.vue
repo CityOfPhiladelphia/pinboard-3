@@ -111,7 +111,7 @@ const locationText = computed(() => {
 
 <style scoped>
 .review-summary__section {
-  border: 1px solid var(--ui-color-grey-200, #e3e3e3);
+  border: 1px solid var(--Schemes-Border-low, #e3e3e3);
   border-radius: 8px;
   padding: var(--spacing-m, 1rem);
   margin-bottom: var(--spacing-m, 1rem);
@@ -128,7 +128,7 @@ const locationText = computed(() => {
 }
 .review-summary__edit {
   font-size: 0.875rem;
-  color: var(--ui-color-primary, #0f4d90);
+  color: var(--Schemes-Primary, #0f4d90);
 }
 .review-summary__photo {
   max-width: 200px;

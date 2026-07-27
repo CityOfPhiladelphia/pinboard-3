@@ -64,8 +64,8 @@ const statusIcon = computed(() =>
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ui-color-grey-200, #e3e3e3);
-  color: var(--ui-color-grey-400, #a1a1a1);
+  background: var(--Schemes-Border-low, #e3e3e3);
+  color: var(--Schemes-Border, #a1a1a1);
   font-size: 1.5rem;
 }
 .listing-card__content {

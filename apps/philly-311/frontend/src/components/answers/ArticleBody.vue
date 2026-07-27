@@ -28,6 +28,6 @@ const safe = computed(() => sanitize(props.html))
   margin-bottom: var(--spacing-s, 0.75rem);
 }
 .article-body :deep(a) {
-  color: var(--ui-color-primary, #0f4d90);
+  color: var(--Schemes-Primary, #0f4d90);
 }
 </style>

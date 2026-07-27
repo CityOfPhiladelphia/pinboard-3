@@ -64,12 +64,12 @@ const indexed = computed(() =>
   content: '';
   flex: 1;
   height: 2px;
-  background: var(--ui-color-grey-300, #ccc);
+  background: var(--Schemes-Border-low, #ccc);
   margin: 0 var(--spacing-xs, 0.5rem);
 }
 
 .step-indicator li[data-state='done']::after {
-  background: var(--ui-color-primary, #0f4d90);
+  background: var(--Schemes-Primary, #0f4d90);
 }
 
 /* Base style for both button and span step labels */
@@ -108,9 +108,9 @@ const indexed = computed(() =>
 /* Done: filled primary circle */
 .step-indicator li[data-state='done'] button::before {
   content: '✓';
-  background: var(--ui-color-primary, #0f4d90);
+  background: var(--Schemes-Primary, #0f4d90);
   color: #fff;
-  border: 2px solid var(--ui-color-primary, #0f4d90);
+  border: 2px solid var(--Schemes-Primary, #0f4d90);
 }
 
 /* Done: clickable button styling */
@@ -119,7 +119,7 @@ const indexed = computed(() =>
   border: none;
   padding: 0;
   cursor: pointer;
-  color: var(--ui-color-primary, #0f4d90);
+  color: var(--Schemes-Primary, #0f4d90);
   font-weight: 500;
 }
 
@@ -129,25 +129,25 @@ const indexed = computed(() =>
 
 /* Current: filled primary circle with number */
 .step-indicator li[data-state='current'] span:not(.sr-only)::before {
-  background: var(--ui-color-primary, #0f4d90);
+  background: var(--Schemes-Primary, #0f4d90);
   color: #fff;
-  border: 2px solid var(--ui-color-primary, #0f4d90);
+  border: 2px solid var(--Schemes-Primary, #0f4d90);
 }
 
 .step-indicator li[data-state='current'] span:not(.sr-only) {
-  color: var(--ui-color-primary, #0f4d90);
+  color: var(--Schemes-Primary, #0f4d90);
   font-weight: 700;
 }
 
 /* Upcoming: outlined circle with number */
 .step-indicator li[data-state='upcoming'] span:not(.sr-only)::before {
   background: transparent;
-  color: var(--ui-color-grey-700, #4a4a4a);
-  border: 2px solid var(--ui-color-grey-300, #ccc);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
+  border: 2px solid var(--Schemes-Border-low, #ccc);
 }
 
 .step-indicator li[data-state='upcoming'] span:not(.sr-only) {
-  color: var(--ui-color-grey-700, #4a4a4a);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
   font-weight: 400;
 }
 

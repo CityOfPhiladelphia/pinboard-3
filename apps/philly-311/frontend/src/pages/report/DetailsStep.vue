@@ -199,14 +199,14 @@ function setPrivacy(e: Event) {
 }
 .details-step__required {
   font-weight: 400;
-  color: var(--ui-color-grey-700, #4a4a4a);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
   font-size: 0.875rem;
 }
 .details-step__textarea {
   width: 100%;
   box-sizing: border-box;
   padding: 8px 12px;
-  border: 1px solid var(--ui-color-grey-400, #a1a1a1);
+  border: 1px solid var(--Schemes-Border, #a1a1a1);
   border-radius: 8px;
   font-size: 1rem;
   font-family: inherit;
@@ -214,7 +214,7 @@ function setPrivacy(e: Event) {
 .details-step__hint {
   margin: 4px 0 var(--spacing-l, 2rem);
   font-size: 0.875rem;
-  color: var(--ui-color-grey-700, #4a4a4a);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
 }
 .details-step__error {
   margin: 4px 0 0;
@@ -228,7 +228,7 @@ function setPrivacy(e: Event) {
   margin-left: var(--spacing-s, 0.75rem);
 }
 .details-step__privacy {
-  border: 1px solid var(--ui-color-grey-200, #e3e3e3);
+  border: 1px solid var(--Schemes-Border-low, #e3e3e3);
   border-radius: 8px;
   padding: var(--spacing-m, 1rem);
   margin: var(--spacing-l, 2rem) 0 0;
@@ -246,6 +246,6 @@ function setPrivacy(e: Event) {
 .details-step__privacy-note {
   margin: var(--spacing-s, 0.75rem) 0 0;
   font-size: 0.875rem;
-  color: var(--ui-color-grey-700, #4a4a4a);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
 }
 </style>

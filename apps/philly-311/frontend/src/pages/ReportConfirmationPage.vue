@@ -54,6 +54,6 @@ onMounted(async () => {
   margin-top: var(--spacing-l, 2rem);
 }
 .confirmation__link {
-  color: var(--ui-color-primary, #0f4d90);
+  color: var(--Schemes-Primary, #0f4d90);
 }
 </style>

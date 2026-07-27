@@ -88,7 +88,7 @@ function formatDeadline(iso: string): string {
   border-radius: 6px;
 }
 .report-detail__img--placeholder {
-  background: var(--ui-color-grey-200, #e5e5e5);
+  background: var(--Schemes-Border-low, #e5e5e5);
 }
 .report-detail h2 {
   margin: var(--spacing-s, 0.5rem) 0;

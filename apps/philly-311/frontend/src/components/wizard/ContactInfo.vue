@@ -62,7 +62,7 @@ watch([name, email, phone], () => {
 
 <style scoped>
 .contact-info {
-  border: 1px solid var(--ui-color-grey-200, #e3e3e3);
+  border: 1px solid var(--Schemes-Border-low, #e3e3e3);
   border-radius: 8px;
   padding: var(--spacing-m, 1rem);
   margin: 0;
@@ -74,7 +74,7 @@ watch([name, email, phone], () => {
 .contact-info__note {
   margin: 0 0 var(--spacing-s, 0.75rem);
   font-size: 0.875rem;
-  color: var(--ui-color-grey-700, #4a4a4a);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
 }
 .contact-info__field {
   display: block;

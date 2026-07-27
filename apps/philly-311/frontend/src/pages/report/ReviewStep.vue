@@ -82,7 +82,7 @@ async function submit() {
 }
 .review-step__intro {
   margin: 0 0 var(--spacing-m, 1rem);
-  color: var(--ui-color-grey-700, #4a4a4a);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
 }
 .review-step__error {
   margin: var(--spacing-m, 1rem) 0;

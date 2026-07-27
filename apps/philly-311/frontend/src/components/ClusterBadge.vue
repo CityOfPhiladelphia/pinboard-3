@@ -23,7 +23,7 @@ defineProps<{ count: number }>()
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: var(--color-primary, #0f4d90);
+  background: var(--Schemes-Primary, #0f4d90);
   color: #fff;
   font-weight: 700;
   cursor: pointer;

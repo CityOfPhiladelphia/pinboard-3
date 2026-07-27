@@ -71,7 +71,7 @@ function onDiscard() {
 }
 .exit-dialog__body {
   margin: 0 0 var(--spacing-l, 2rem);
-  color: var(--ui-color-grey-700, #4a4a4a);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
 }
 .exit-dialog__actions {
   display: flex;
@@ -83,7 +83,7 @@ function onDiscard() {
   margin-right: auto;
   background: none;
   border: none;
-  color: var(--ui-color-primary, #0f4d90);
+  color: var(--Schemes-Primary, #0f4d90);
   font-weight: 600;
   cursor: pointer;
 }

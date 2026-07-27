@@ -17,7 +17,7 @@ defineProps<{ article: Article }>()
 
 <style scoped>
 .article-card {
-  border-bottom: 1px solid var(--ui-color-grey-300, #d6d6d6);
+  border-bottom: 1px solid var(--Schemes-Border-low, #d6d6d6);
 }
 .article-card__link {
   display: flex;
@@ -25,7 +25,7 @@ defineProps<{ article: Article }>()
   justify-content: space-between;
   gap: var(--spacing-m, 1rem);
   padding: var(--spacing-m, 1rem) var(--spacing-xs, 0.5rem);
-  color: var(--ui-color-grey-700, #0f0f0f);
+  color: var(--Schemes-On-Surface-High, #0f0f0f);
   text-decoration: none;
 }
 .article-card__title {
@@ -37,6 +37,6 @@ defineProps<{ article: Article }>()
 }
 .article-card__chevron {
   flex-shrink: 0;
-  color: var(--ui-color-grey-500, #444);
+  color: var(--Schemes-On-Surface-Variant, #444);
 }
 </style>

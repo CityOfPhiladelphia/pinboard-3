@@ -125,7 +125,7 @@ async function useMyLocation() {
 }
 .location-step__required {
   font-weight: 400;
-  color: var(--ui-color-grey-700, #4a4a4a);
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
   font-size: 1rem;
 }
 .location-step__columns {
@@ -142,7 +142,7 @@ async function useMyLocation() {
 }
 .location-step__error {
   margin: var(--spacing-s, 0.75rem) 0 0;
-  color: var(--ui-color-red, #c0392b);
+  color: var(--Schemes-Error, #c0392b);
 }
 @media (max-width: 768px) {
   .location-step__columns {

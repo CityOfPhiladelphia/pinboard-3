@@ -168,7 +168,7 @@ function discardAndExit() {
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-m, 1rem) 0;
-  border-top: 1px solid var(--ui-color-grey-300, #d6d6d6);
+  border-top: 1px solid var(--Schemes-Border-low, #d6d6d6);
 }
 .wizard__nav-right {
   display: flex;
@@ -177,7 +177,7 @@ function discardAndExit() {
 .wizard__exit {
   background: none;
   border: none;
-  color: var(--ui-color-primary, #0f4d90);
+  color: var(--Schemes-Primary, #0f4d90);
   cursor: pointer;
 }
 </style>

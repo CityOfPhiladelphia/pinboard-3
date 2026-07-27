@@ -52,7 +52,7 @@ onMounted(async () => {
   flex: 1 0 220px;
   max-width: 256px;
   background: #fff;
-  border: 1px solid var(--ui-color-grey-300, #d6d6d6);
+  border: 1px solid var(--Schemes-Border-low, #d6d6d6);
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
@@ -62,7 +62,7 @@ onMounted(async () => {
   gap: var(--spacing-s, 0.75rem);
   height: 100%;
   padding: var(--spacing-s, 0.75rem);
-  color: var(--ui-color-grey-700, #0f0f0f);
+  color: var(--Schemes-On-Surface-High, #0f0f0f);
   text-decoration: none;
 }
 .featured__link:hover .featured__title {
