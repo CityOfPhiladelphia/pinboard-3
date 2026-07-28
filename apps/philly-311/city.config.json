@@ -1,0 +1,26 @@
+{
+  "appName": "philly-311",
+  "applicationType": "static-site",
+  "department": "4-oit",
+  "team": "Software Engineering",
+  "contact": "websupport@phila.gov",
+  "compliance": [],
+  "confidentiality": "medium",
+  "cdkPath": "./cdk",
+  "packageManager": "pnpm",
+  "environments": {
+    "dev": {
+      "profile": "phila-oit-se-311-api",
+      "vpc": "TestVpc"
+    },
+    "test": {
+      "profile": "phila-oit-se-311-api",
+      "vpc": "TestVpc"
+    },
+    "prod": {
+      "profile": "phila-oit-se-311-api",
+      "vpc": "ProdVpc"
+    }
+  },
+  "frontendBuildCommand": "build-only"
+}

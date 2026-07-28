@@ -19,6 +19,8 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
@@ -58,6 +60,10 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@vue/test-utils": "^2.4.9",
+    "jsdom": "^29.1.0",
+    "vite-plugin-dts": "^4.5.0",
+    "vitest": "^4.1.5",
     "vite": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "typescript": "catalog:"

@@ -1,5 +1,8 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "concurrency": "1",
+  "globalDependencies": ["packages/**"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -9,14 +12,27 @@
       "cache": false,
       "persistent": true
     },
-    "lint": {},
-    "type-check": {
-      "dependsOn": ["^build"]
+    "lint": {
+      "dependsOn": ["^lint"]
     },
-    "format": {
+    "lint:fix": {
+      "dependsOn": ["^lint:fix"]
+    },
+    "type-check": {
+      "dependsOn": ["^type-check"]
+    },
+    "clean": {
       "cache": false
     },
-    "format:check": {}
+    "format": {
+      "dependsOn": ["^format"]
+    },
+    "format:check": {
+      "dependsOn": ["^format:check"]
+    },
+    "test": {
+      "dependsOn": ["^test"]
+    }
   },
   "globalPassThroughEnv": [
     "CDK_DEFAULT_ACCOUNT",

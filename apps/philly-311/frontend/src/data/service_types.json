@@ -1,0 +1,335 @@
+{
+  "ADA Curb Ramp": {
+    "description": "Missing, damaged, or non-compliant wheelchair curb ramp at intersection",
+    "keywords": [
+      "wheelchair",
+      "handicap",
+      "disability",
+      "accessible",
+      "curb cut",
+      "mobility",
+      "ada"
+    ]
+  },
+  "Abandoned Bike": {
+    "description": "Bicycle left unattended, often locked to pole or rack for extended period",
+    "keywords": ["bicycle", "cycle", "scooter", "e-bike", "locked", "left"]
+  },
+  "Abandoned Vehicle": {
+    "description": "Car, truck, or motorcycle left unattended on street for extended period",
+    "keywords": ["car", "automobile", "truck", "van", "junked", "derelict", "parked"]
+  },
+  "Alley Light Outage": {
+    "description": "Light in alleyway not working or damaged",
+    "keywords": ["dark", "lamp", "bulb", "alleyway", "back street", "broken light"]
+  },
+  "Building Structurally Dangerous (Occupied)": {
+    "description": "Occupied building with visible structural damage like leaning walls or cracked foundation",
+    "keywords": [
+      "unsafe",
+      "structural",
+      "collapse",
+      "crumbling",
+      "hazard",
+      "inhabited",
+      "leaning",
+      "condemned"
+    ]
+  },
+  "Building Structurally Dangerous (Vacant)": {
+    "description": "Vacant building with visible structural damage, potential collapse risk",
+    "keywords": [
+      "unsafe",
+      "structural",
+      "collapse",
+      "crumbling",
+      "hazard",
+      "empty",
+      "abandoned",
+      "condemned"
+    ]
+  },
+  "Cave-In Repair": {
+    "description": "Street surface collapsed inward, often near utility infrastructure",
+    "keywords": ["sinkhole", "collapse", "hole", "ground", "caved", "subsidence"]
+  },
+  "Complaint (Streets)": {
+    "description": "General streets department complaint not fitting other categories",
+    "keywords": ["worker", "employee", "crew", "department", "service", "staff", "rude"]
+  },
+  "Dangerous Sidewalk": {
+    "description": "Cracked, raised, or broken sidewalk creating trip hazard",
+    "keywords": [
+      "walkway",
+      "pavement",
+      "tripping",
+      "cracked",
+      "uneven",
+      "hazard",
+      "footpath",
+      "lifted"
+    ]
+  },
+  "Dead Animal in Street": {
+    "description": "Dead animal carcass on street, sidewalk, or public area",
+    "keywords": [
+      "roadkill",
+      "carcass",
+      "deceased",
+      "wildlife",
+      "dog",
+      "cat",
+      "deer",
+      "raccoon",
+      "rat"
+    ]
+  },
+  "Demolition Complaint": {
+    "description": "Complaint about demolition work or improper demolition practices",
+    "keywords": ["tearing down", "wrecking", "destruction", "building removal", "debris"]
+  },
+  "Depression": {
+    "description": "Sunken area in street surface causing pooling water or uneven driving",
+    "keywords": ["sinking", "dip", "low spot", "sunken", "uneven road", "settling"]
+  },
+  "Ditch Repair": {
+    "description": "Damaged or clogged roadside drainage ditch needing repair",
+    "keywords": ["drainage", "channel", "gutter", "trench", "culvert", "eroded"]
+  },
+  "Dumpster Violation": {
+    "description": "Overflowing dumpster, dumpster blocking sidewalk, or improperly placed dumpster",
+    "keywords": ["trash", "garbage", "waste", "container", "overflowing", "bin", "commercial waste"]
+  },
+  "Exterior High Weeds": {
+    "description": "Overgrown weeds or vegetation on property exterior",
+    "keywords": ["overgrown", "lawn", "yard", "vegetation", "grass", "unkempt", "unmowed"]
+  },
+  "Graffiti Removal": {
+    "description": "Spray paint, markers, or other vandalism on buildings, signs, or infrastructure",
+    "keywords": ["tagging", "vandalism", "spray paint", "mural", "defacing", "wall", "writing"]
+  },
+  "Homeless Encampment": {
+    "description": "Homeless camp with tents, belongings, or debris in public area",
+    "keywords": ["tent", "camp", "shelter", "unhoused", "transient", "sleeping"]
+  },
+  "Hydrant Knocked Down": {
+    "description": "Fire hydrant damaged, leaking, or knocked over by vehicle",
+    "keywords": ["fire plug", "hit", "damaged", "broken", "bent", "water"]
+  },
+  "Icy Road Surface": {
+    "description": "Ice on road surface needing treatment",
+    "keywords": ["frozen", "slippery", "black ice", "winter", "frost", "dangerous road", "salt"]
+  },
+  "Illegal Dumping": {
+    "description": "Trash, furniture, or debris illegally dumped on sidewalk, vacant lot, or street",
+    "keywords": ["fly tipping", "littering", "garbage", "waste", "junk", "mattress", "furniture"]
+  },
+  "Inlet Cleaning": {
+    "description": "Storm drain or street inlet clogged with debris causing flooding",
+    "keywords": [
+      "storm drain",
+      "sewer drain",
+      "clogged",
+      "blocked",
+      "flooding",
+      "grate",
+      "puddle",
+      "standing water"
+    ]
+  },
+  "Line Striping": {
+    "description": "Faded or missing road markings including crosswalks, lane lines, or parking lines",
+    "keywords": [
+      "road markings",
+      "paint",
+      "lanes",
+      "crosswalk",
+      "pedestrian crossing",
+      "faded",
+      "lines"
+    ]
+  },
+  "Manhole Cover Missing": {
+    "description": "Open manhole in street or sidewalk creating safety hazard",
+    "keywords": ["sewer cover", "utility hole", "lid", "grate", "open hole", "rattling", "loose"]
+  },
+  "Manhole Other Problem": {
+    "description": "Manhole issue other than missing cover — raised, sunken, or damaged",
+    "keywords": [
+      "manhole",
+      "sewer cover",
+      "utility hole",
+      "raised",
+      "sunken",
+      "damaged",
+      "rattling"
+    ]
+  },
+  "Needle Collection": {
+    "description": "Used needles or syringes found in public area needing safe disposal",
+    "keywords": ["syringe", "sharps", "drug", "hazardous", "biohazard", "injection"]
+  },
+  "Other (Streets)": {
+    "description": "Miscellaneous streets issue not covered by specific categories",
+    "keywords": ["street", "road", "miscellaneous", "other", "noise", "trash hauler"]
+  },
+  "Parks and Rec Safety and Maintenance": {
+    "description": "Damaged playground equipment, broken benches, or park safety hazards",
+    "keywords": ["park", "playground", "bench", "recreation", "equipment", "safety", "maintenance"]
+  },
+  "Plastic Bag Complaint": {
+    "description": "Business distributing prohibited plastic bags",
+    "keywords": ["bags", "banned", "store", "retailer", "single-use", "shopping bag"]
+  },
+  "Pothole Repair": {
+    "description": "Hole or depression in street surface from pavement deterioration",
+    "keywords": ["hole", "crack", "road damage", "pavement", "asphalt", "bump"]
+  },
+  "Property Maintenance Exterior": {
+    "description": "Building exterior issues: peeling paint, broken windows, damaged facade",
+    "keywords": ["facade", "siding", "windows", "paint", "building exterior", "boarded", "shutters"]
+  },
+  "Property Maintenance Interior": {
+    "description": "Building interior issues visible from outside or reported by occupant",
+    "keywords": [
+      "housing",
+      "living conditions",
+      "rental",
+      "apartment",
+      "tenant",
+      "mold",
+      "pests",
+      "cockroach",
+      "rodent"
+    ]
+  },
+  "Push-Up": {
+    "description": "Buckling or heaving pavement pushed up from underneath",
+    "keywords": ["bump", "mound", "raised", "asphalt", "uneven", "heaving", "buckle"]
+  },
+  "Recyclables Collection": {
+    "description": "Missed recycling pickup or recycling container issues",
+    "keywords": ["recycling", "missed pickup", "bins", "curbside", "collection", "blue bin"]
+  },
+  "Residential Fire Safety Complaint": {
+    "description": "Fire hazard or safety violation in residential building",
+    "keywords": [
+      "alarm",
+      "smoke detector",
+      "exit",
+      "blocked",
+      "overcrowding",
+      "fire escape",
+      "extinguisher"
+    ]
+  },
+  "Rubbish Collection": {
+    "description": "Missed trash pickup or overflowing trash containers",
+    "keywords": ["trash", "garbage", "missed pickup", "waste", "refuse", "bin", "collection day"]
+  },
+  "Salting": {
+    "description": "Icy road surface needing salt treatment",
+    "keywords": ["frozen", "slippery", "black ice", "winter", "frost", "dangerous road", "salt"]
+  },
+  "Sanitation Violation": {
+    "description": "Property with excessive trash, debris, or unsanitary conditions",
+    "keywords": ["littering", "garbage", "waste", "dirty", "unsanitary", "dumping", "bags"]
+  },
+  "Short Term Rental Complaint": {
+    "description": "Short-term rental property operating without proper licensing",
+    "keywords": ["airbnb", "vrbo", "vacation rental", "tourist", "lodging", "party house"]
+  },
+  "Shoveling": {
+    "description": "Unshoveled sidewalk creating pedestrian hazard after snowfall",
+    "keywords": ["snow removal", "unshoveled", "icy sidewalk", "winter", "walkway", "slippery"]
+  },
+  "Smoke Detector": {
+    "description": "Request for smoke detector installation or battery replacement",
+    "keywords": ["detector", "fire alarm", "safety", "installation", "battery", "carbon monoxide"]
+  },
+  "Snow Removal": {
+    "description": "Snow-covered street or sidewalk needing plowing or clearing",
+    "keywords": ["plowing", "plow", "clearing", "blizzard", "winter", "salt", "ice"]
+  },
+  "Stop Sign Repair": {
+    "description": "Stop sign damaged, missing, knocked down, or obscured",
+    "keywords": ["sign", "traffic", "missing", "damaged", "bent", "knocked down", "intersection"]
+  },
+  "Street Light Outage": {
+    "description": "Street light not working, flickering, or staying on during day",
+    "keywords": ["lamp", "dark", "bulb", "pole", "lighting", "not working", "burned out"]
+  },
+  "Street Light(Other)": {
+    "description": "Street light issue not covered by standard outage report",
+    "keywords": ["lamp", "flickering", "dim", "buzzing", "pole", "lighting", "broken"]
+  },
+  "Street Trees": {
+    "description": "Issues with city-owned trees along streets or sidewalks",
+    "keywords": [
+      "branches",
+      "limbs",
+      "roots",
+      "overgrown",
+      "trimming",
+      "canopy",
+      "fallen",
+      "blocking"
+    ]
+  },
+  "Traffic Signal Emergency": {
+    "description": "Traffic light malfunctioning, knocked down, or completely out",
+    "keywords": [
+      "stoplight",
+      "traffic light",
+      "signal",
+      "intersection",
+      "red light",
+      "green light",
+      "blinking"
+    ]
+  },
+  "Tree Maintenance": {
+    "description": "Street tree needing pruning, trimming, or general maintenance",
+    "keywords": ["pruning", "trimming", "removal", "branches", "limbs", "dead tree", "stump"]
+  },
+  "Unlicensed Business Complaint": {
+    "description": "Business operating without required licenses or permits",
+    "keywords": ["permit", "illegal", "unregistered", "operating", "rental", "unlawful"]
+  },
+  "Vacant Lot": {
+    "description": "Empty lot with overgrown weeds, debris, or illegal dumping",
+    "keywords": ["empty lot", "overgrown", "weeds", "trash", "abandoned", "land", "eyesore"]
+  },
+  "Vacant Property": {
+    "description": "Abandoned property with maintenance issues or safety hazards",
+    "keywords": ["abandoned building", "empty", "boarded up", "neglected", "derelict", "squatters"]
+  },
+  "Vendor Complaint": {
+    "description": "Street vendor operating illegally or causing obstruction",
+    "keywords": [
+      "merchant",
+      "seller",
+      "hawker",
+      "cart",
+      "stand",
+      "peddler",
+      "food truck",
+      "sidewalk sale"
+    ]
+  },
+  "Work Underway in violation of permit requirements": {
+    "description": "Construction work not following approved permit specifications",
+    "keywords": [
+      "construction",
+      "permit violation",
+      "building",
+      "contractor",
+      "code violation",
+      "non-compliant"
+    ]
+  },
+  "Work Underway without Permits": {
+    "description": "Construction or renovation work being done without required permits",
+    "keywords": ["construction", "unpermitted", "building", "contractor", "illegal", "renovation"]
+  }
+}

@@ -8,7 +8,7 @@ import PinboardSubFooter from './PinboardSubFooter.vue'
 import { onMounted, useTemplateRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { VNode } from 'vue'
-import type { NavbarBrandProps } from '@phila/phila-ui-app-header'
+import type { NavbarBrandProps, NavLink } from '@phila/phila-ui-app-header'
 import { useInitPinboardApp } from '../composables/_index.ts'
 import { languages } from '../i18n/languages.ts'
 
@@ -19,13 +19,14 @@ const props = defineProps<{
   bannerTitle?: string
   bannerMessage?: string
   feedbackHref?: string
-  infoTitle: string
+  infoTitle?: string
   infoLabel?: string
-  infoMessage: string
-  infoLinkText: string
-  infoHref: string
+  infoMessage?: string
+  infoLinkText?: string
+  infoHref?: string
   localeAppKey?: string
   showHeaderTooltip: boolean
+  links?: NavLink[]
 }>()
 
 defineSlots<{
@@ -86,6 +87,7 @@ onMounted(async () => {
       id="pinboard-nav"
       :compact-mobile="true"
       :show-trusted-site="true"
+      :links="links"
       :navbar-brand="{
         brandingImage: { src: '', href: '/', altText: title },
         brandingLink: logo ? undefined : { text: title, href: '/' },

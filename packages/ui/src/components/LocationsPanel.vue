@@ -1,12 +1,15 @@
 <script setup lang="ts" generic="PinboardLocation extends BasicLocation">
 // vue imports
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 // philly ui imports
 import { MapCard } from '@phila/phila-ui-cards'
 
 // pinboard component imports
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
+
+// pinboard utilities imports
+import { locationCountLabel } from '../utilities/locationCountLabel'
 
 // type imports
 import type {
@@ -30,6 +33,7 @@ const props = defineProps<{
   locationSearch: string | undefined
   locationFilter: LocationFilterOption[] | undefined
   locationSort: SortLocationsOptions | undefined
+  countNoun?: string
 }>()
 
 // emits
@@ -49,6 +53,9 @@ const emit = defineEmits<{
 const pendingKeydown = ref(false)
 const listRef = ref<HTMLElement | null>(null)
 // computed refs
+const countLabel = computed(() =>
+  props.countNoun ? locationCountLabel(props.locations.length, props.countNoun) : null
+)
 
 // watchers
 watch(
@@ -108,6 +115,10 @@ defineExpose({ scrollToCard })
   />
 
   <slot name="below-search" />
+
+  <slot name="filters" />
+
+  <div v-if="countLabel" class="location-count">{{ countLabel }}</div>
 
   <slot name="list-header" />
 
@@ -170,6 +181,13 @@ defineExpose({ scrollToCard })
 </template>
 
 <style scoped>
+.location-count {
+  padding: 0 1rem;
+  font-family: var(--Body-Default-font-body-default-family);
+  font-size: var(--Body-Default-font-body-default-size, 1rem);
+  color: var(--Schemes-On-Surface-Variant, #888);
+}
+
 .location-list {
   display: flex;
   flex-direction: column;

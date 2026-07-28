@@ -1,0 +1,192 @@
+// ABOUTME: Tests for AnswersPage — initial browse list, Load more pagination,
+// ABOUTME: debounced server-side search, clear-query reload, error/empty states.
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { mount, flushPromises, RouterLinkStub } from '@vue/test-utils'
+import AnswersPage from '../AnswersPage.vue'
+
+const { loadArticles } = vi.hoisted(() => ({ loadArticles: vi.fn() }))
+
+vi.mock('@/composables/useKnowledgeArticles', () => ({
+  useKnowledgeArticles: () => ({ loadArticles, loadArticle: vi.fn() }),
+}))
+
+const a = (id: string) => ({ id, title: `Article ${id}` })
+
+// FeaturedArticles is stubbed so its own fetch doesn't consume the queued
+// loadArticles mocks; it has dedicated tests in components/answers/__tests__.
+function mountPage() {
+  return mount(AnswersPage, {
+    global: { stubs: { RouterLink: RouterLinkStub, FeaturedArticles: true } },
+  })
+}
+
+beforeEach(() => {
+  vi.useFakeTimers()
+  loadArticles.mockReset()
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
+
+describe('AnswersPage', () => {
+  it('renders the hero banner with a decorative photo and no breadcrumb', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    const hero = w.find('.answers__hero')
+    expect(hero.exists()).toBe(true)
+    expect(hero.find('img[alt=""]').exists()).toBe(true)
+    expect(hero.find('h1').text()).toBe('Answers')
+    expect(w.find('[aria-label="Breadcrumb"]').exists()).toBe(false)
+  })
+
+  it('search field has the Figma placeholder and a decorative search icon', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    expect(w.find('input[type="search"]').attributes('placeholder')).toBe(
+      'Search by topic or keyword',
+    )
+    expect(w.find('.answers__search svg[aria-hidden="true"]').exists()).toBe(true)
+  })
+
+  it('mounts the featured-articles strip below the hero', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    expect(w.find('featured-articles-stub').exists()).toBe(true)
+  })
+
+  it('loads and renders the first page of articles', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [a('1'), a('2')], nextPageToken: '25' })
+    const w = mountPage()
+    await flushPromises()
+    expect(loadArticles).toHaveBeenCalledWith({})
+    expect(w.text()).toContain('Article 1')
+    expect(w.text()).toContain('Article 2')
+    expect(w.find('[data-test="answers-more"]').exists()).toBe(true)
+  })
+
+  it('Load more appends the next page and hides at the end', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [a('1')], nextPageToken: '25' })
+    const w = mountPage()
+    await flushPromises()
+    loadArticles.mockResolvedValueOnce({ items: [a('2')], nextPageToken: undefined })
+    await w.find('[data-test="answers-more"]').trigger('click')
+    await flushPromises()
+    expect(loadArticles).toHaveBeenLastCalledWith({ nextPageToken: '25' })
+    expect(w.text()).toContain('Article 1')
+    expect(w.text()).toContain('Article 2')
+    expect(w.find('[data-test="answers-more"]').exists()).toBe(false)
+  })
+
+  it('a typed query runs a server-side search that replaces the list', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [a('1')], nextPageToken: '25' })
+    const w = mountPage()
+    await flushPromises()
+    loadArticles.mockResolvedValueOnce({ items: [a('9')], nextPageToken: undefined })
+    await w.find('input[type="search"]').setValue('pothole')
+    vi.advanceTimersByTime(250)
+    await flushPromises()
+    expect(loadArticles).toHaveBeenLastCalledWith({ search: 'pothole' })
+    expect(w.text()).toContain('Article 9')
+    expect(w.text()).not.toContain('Article 1')
+    expect(w.find('[data-test="answers-more"]').exists()).toBe(false)
+  })
+
+  it('clearing the query reloads the first browse page', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [a('1')], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    loadArticles.mockResolvedValueOnce({ items: [a('9')], nextPageToken: undefined })
+    await w.find('input[type="search"]').setValue('pothole')
+    vi.advanceTimersByTime(250)
+    await flushPromises()
+    loadArticles.mockResolvedValueOnce({ items: [a('1'), a('2')], nextPageToken: undefined })
+    await w.find('input[type="search"]').setValue('')
+    await flushPromises()
+    expect(loadArticles).toHaveBeenLastCalledWith({})
+    expect(w.text()).toContain('Article 2')
+  })
+
+  it('choosing a sort order reloads the browse list with sort and direction', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [a('1')], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    loadArticles.mockResolvedValueOnce({ items: [a('2')], nextPageToken: undefined })
+    await w.find('[data-test="answers-sort"]').setValue('lastPublishedAt:desc')
+    await flushPromises()
+    expect(loadArticles).toHaveBeenLastCalledWith({
+      sort: 'lastPublishedAt',
+      direction: 'desc',
+    })
+  })
+
+  it('Load more keeps the chosen sort order', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [a('1')], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    loadArticles.mockResolvedValueOnce({ items: [a('2')], nextPageToken: '25' })
+    await w.find('[data-test="answers-sort"]').setValue('title:asc')
+    await flushPromises()
+    loadArticles.mockResolvedValueOnce({ items: [a('3')], nextPageToken: undefined })
+    await w.find('[data-test="answers-more"]').trigger('click')
+    await flushPromises()
+    expect(loadArticles).toHaveBeenLastCalledWith({
+      nextPageToken: '25',
+      sort: 'title',
+      direction: 'asc',
+    })
+  })
+
+  it('hides the sort control during an active search', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [a('1')], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    expect(w.find('[data-test="answers-sort"]').exists()).toBe(true)
+    loadArticles.mockResolvedValueOnce({ items: [a('9')], nextPageToken: undefined })
+    await w.find('input[type="search"]').setValue('pothole')
+    vi.advanceTimersByTime(250)
+    await flushPromises()
+    expect(w.find('[data-test="answers-sort"]').exists()).toBe(false)
+  })
+
+  it('shows a search-specific empty state', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [a('1')], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    loadArticles.mockResolvedValueOnce({ items: [], nextPageToken: undefined })
+    await w.find('input[type="search"]').setValue('zebra')
+    vi.advanceTimersByTime(250)
+    await flushPromises()
+    expect(w.text()).toContain('No articles match')
+  })
+
+  it('shows the generic empty state when the list is empty', async () => {
+    loadArticles.mockResolvedValueOnce({ items: [], nextPageToken: undefined })
+    const w = mountPage()
+    await flushPromises()
+    expect(w.text()).toContain('No articles available.')
+  })
+
+  it('surfaces load errors via role=alert', async () => {
+    loadArticles.mockRejectedValueOnce(new Error('boom'))
+    const w = mountPage()
+    await flushPromises()
+    expect(w.find('[role="alert"]').text()).toContain('boom')
+  })
+
+  it('a successful search renders results even after the initial browse failed', async () => {
+    loadArticles.mockRejectedValueOnce(new Error('boom'))
+    const w = mountPage()
+    await flushPromises()
+    expect(w.find('[role="alert"]').exists()).toBe(true)
+    loadArticles.mockResolvedValueOnce({ items: [a('9')], nextPageToken: undefined })
+    await w.find('input[type="search"]').setValue('pothole')
+    vi.advanceTimersByTime(250)
+    await flushPromises()
+    expect(w.find('[role="alert"]').exists()).toBe(false)
+    expect(w.text()).toContain('Article 9')
+  })
+})

@@ -7,3 +7,7 @@ cdk.out
 AGENTS.md
 docs/superpowers/
 AGENTS.md
+.superpowers/
+.vscode/
+.playwright-mcp/
+.DS_Store
