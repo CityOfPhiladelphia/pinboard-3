@@ -66,7 +66,7 @@ const {
 const locationSortMode = ref<PinboardTypes.SortMode>(
   ['located', 'watching'].includes(userLocationState.value) ? 'DistAsc' : '',
 )
-const isMobile = inject(IS_MOBILE_KEY, ref(false))
+const isMobile = inject(IS_MOBILE_KEY, ref(true))
 
 // computed refs
 const currentLocations = computed(() => {

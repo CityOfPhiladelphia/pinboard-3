@@ -4,12 +4,28 @@ import { useIsMobile } from './useIsMobile'
 import { IS_MOBILE_KEY } from '../keys'
 
 export function useInitPinboardApp(localeAppKey?: string) {
-  const { locale, init, setLocale } = localeAppKey ? useLocale(localeAppKey) : {}
-  if (init) init()
-
   const infoSheetOpen = ref(false)
   const isDraggingSheet = ref(false)
   const dragY = ref(0)
+  const isMobile = useIsMobile()
+  const { locale, init, setLocale } = localeAppKey ? useLocale(localeAppKey) : {}
+
+  if (init) init()
+  provide(IS_MOBILE_KEY, isMobile)
+
+  /* Drag-down-to-dismiss. BottomSheet's built-in drag is snap-point based
+   * and a single snap point ([60]) clamps it to no movement, so we layer
+   * our own pointer tracking on top: translate the sheet to follow the
+   * pointer, dismiss past DRAG_DISMISS_THRESHOLD on release, otherwise
+   * spring back. Clicks (zero delta) pass through. */
+  const DRAG_DISMISS_THRESHOLD = 160
+  let dragStartY = 0
+
+  onBeforeUnmount(() => {
+    document.removeEventListener('pointermove', onSheetPointerMove)
+    document.removeEventListener('pointerup', onSheetPointerUp)
+    document.removeEventListener('pointercancel', onSheetPointerUp)
+  })
 
   function openInfoSheet(event: Event) {
     event.preventDefault()
@@ -21,14 +37,6 @@ export function useInitPinboardApp(localeAppKey?: string) {
     infoSheetOpen.value = false
     dragY.value = 0
   }
-
-  /* Drag-down-to-dismiss. BottomSheet's built-in drag is snap-point based
-   * and a single snap point ([60]) clamps it to no movement, so we layer
-   * our own pointer tracking on top: translate the sheet to follow the
-   * pointer, dismiss past DRAG_DISMISS_THRESHOLD on release, otherwise
-   * spring back. Clicks (zero delta) pass through. */
-  const DRAG_DISMISS_THRESHOLD = 160
-  let dragStartY = 0
 
   function onSheetPointerDown(e: PointerEvent) {
     dragStartY = e.clientY
@@ -56,15 +64,6 @@ export function useInitPinboardApp(localeAppKey?: string) {
       dragY.value = 0
     }
   }
-
-  const isMobile = useIsMobile()
-  provide(IS_MOBILE_KEY, isMobile)
-
-  onBeforeUnmount(() => {
-    document.removeEventListener('pointermove', onSheetPointerMove)
-    document.removeEventListener('pointerup', onSheetPointerUp)
-    document.removeEventListener('pointercancel', onSheetPointerUp)
-  })
 
   return {
     isMobile,

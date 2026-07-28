@@ -24,8 +24,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        env:
-          NPM_FONTAWESOME_SECRET: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
 
       - name: Lint
         run: pnpm turbo lint
@@ -98,8 +96,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        env:
-          NPM_FONTAWESOME_SECRET: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
 
       - name: Install city CLI
         run: npm install -g @phila/cli
@@ -144,8 +140,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        env:
-          NPM_FONTAWESOME_SECRET: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
 
       - name: Install city CLI
         run: npm install -g @phila/cli
@@ -224,8 +218,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        env:
-          NPM_FONTAWESOME_SECRET: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
 
       - name: Install city CLI
         run: npm install -g @phila/cli
@@ -270,8 +262,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        env:
-          NPM_FONTAWESOME_SECRET: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
 
       - name: Install city CLI
         run: npm install -g @phila/cli

@@ -7,8 +7,8 @@
     "access": "public"
   },
   "devDependencies": {
+    "typescript": "catalog:",
     "@tsconfig/node24": "^24.0.4",
-    "@types/node": "^26.1.1",
     "@vue/tsconfig": "^0.9.1"
   }
 }

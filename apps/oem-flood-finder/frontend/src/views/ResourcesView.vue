@@ -6,7 +6,7 @@ import { IconChevronLeft } from '@phila/phila-ui-core/icons'
 import { IS_MOBILE_KEY } from '@pinboard/ui'
 import { inject, ref } from 'vue'
 
-const isMobile = inject(IS_MOBILE_KEY, ref(false))
+const isMobile = inject(IS_MOBILE_KEY, ref(true))
 const router = useRouter()
 </script>
 
@@ -144,7 +144,7 @@ const router = useRouter()
   </div>
 </template>
 
-<style>
+<style scoped>
 .layout {
   display: flex;
   justify-content: center;
@@ -167,10 +167,6 @@ const router = useRouter()
   align-items: center;
 }
 
-.content-area.mobile {
-  padding: 1.5rem 1rem 0 1rem;
-}
-
 .section {
   display: flex;
   width: 100%;
@@ -179,11 +175,6 @@ const router = useRouter()
   flex-direction: column;
   align-items: flex-start;
   gap: var(--spacing-4xl, 4rem);
-}
-
-.section.mobile {
-  gap: var(--spacing-2xl, 2rem);
-  padding-bottom: var(--spacing-2xl, 2rem);
 }
 
 .intro-text-container {
