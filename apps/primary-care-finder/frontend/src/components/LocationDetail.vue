@@ -18,6 +18,7 @@ import {
 
 const props = defineProps<{
   location: PrimaryCareLocation
+  isMobile: boolean
   onClose: () => void
   onPrint?: () => void
 }>()
@@ -213,7 +214,7 @@ function translateTransitList(raw: string | null, category: string): string {
       <span class="has-text-label-large">{{ t('locationDetails') }}</span>
 
       <!-- Contact: phone, website, address — icon + value, no headers -->
-      <div class="detail-columns detail-columns--contact detail-zone">
+      <div class="detail-columns detail-columns--contact detail-zone" :class="{ mobile: isMobile }">
         <div class="detail-col-left">
           <div v-if="location.properties.med_phone_num" class="icon-row">
             <Icon :icon="IconPhone" inline decorative class="row-icon" />
@@ -421,10 +422,8 @@ function translateTransitList(raw: string | null, category: string): string {
   gap: 1rem;
 }
 
-@media (max-width: 768px), (max-width: 1064px) and (max-height: 600px) {
-  .detail-columns {
-    grid-template-columns: 1fr;
-  }
+.detail-columns.mobile {
+  grid-template-columns: 1fr;
 }
 
 @container (max-width: 500px) {

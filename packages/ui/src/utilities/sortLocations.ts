@@ -1,15 +1,17 @@
 import { toValue, type Ref } from 'vue'
-import type { BasicLocation, CustomSort, SortMode } from '../types'
+import type { BasicLocation, CustomSort, LatLon, SortMode } from '../types'
+import { hasLocationData } from './_index'
 
 export function sortLocations<PinboardLocation extends BasicLocation>(
   locations: Ref<PinboardLocation[]> | PinboardLocation[],
+  currentLocation: Ref<LatLon> | LatLon,
   sortMode: Ref<SortMode> | SortMode,
   customSort?: CustomSort<PinboardLocation>
 ) {
   locations = toValue(locations)
   sortMode = toValue(sortMode)
 
-  switch (sortMode) {
+  switch (hasLocationData(currentLocation) && !sortMode ? 'DistAsc' : sortMode) {
     case 'AlphaAsc': {
       return customSort?.AlphaAsc
         ? customSort.AlphaAsc(locations)

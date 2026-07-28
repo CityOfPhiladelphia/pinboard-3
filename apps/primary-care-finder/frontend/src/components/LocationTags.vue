@@ -110,7 +110,7 @@ const detailTags = computed<TagConfig[]>(() => {
         }
       : null,
   ]
-  return candidates.filter((t): t is TagConfig => t !== null)
+  return candidates.filter((t) => t !== null)
 })
 
 const todaysException = computed<string | undefined>(() => {
@@ -160,7 +160,7 @@ const cardTags = computed<TagConfig[]>(() => {
   ]
 
   const max = props.max ?? 3
-  return candidates.filter((t): t is TagConfig => t !== null).slice(0, max)
+  return candidates.filter((t) => t !== null).slice(0, max)
 })
 
 const visibleTags = computed(() => (props.detail ? detailTags.value : cardTags.value))

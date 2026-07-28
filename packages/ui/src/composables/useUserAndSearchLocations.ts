@@ -1,10 +1,16 @@
-import { ref, watch } from 'vue'
+import { ref, toValue, watch, type Ref } from 'vue'
 import { hasLocationData } from '../utilities/hasLocationData'
-import type { LatLon, SearchMode } from '../types'
+import type { BasicLocation, LatLon, SearchMode } from '../types'
 import { useSearchAddress, useSearchZipcode, useUserLocation } from './_index'
-import { StreetAddress, StreetIntersection, Zipcode } from '../utilities/_index'
+import {
+  getHaversineDistance,
+  StreetAddress,
+  StreetIntersection,
+  Zipcode,
+} from '../utilities/_index'
 
-export function useUserAndSearchLocations(
+export function useUserAndSearchLocations<PinboardLocation extends BasicLocation>(
+  locations: Ref<PinboardLocation[]>,
   promptLocationOnPageLoad: boolean = false,
   watchLocation: boolean = false
 ) {
@@ -62,6 +68,40 @@ export function useUserAndSearchLocations(
       }
     }
   )
+
+  watch(
+    () => searchOrUserLocation.value,
+    () => {
+      if (hasLocationData(searchOrUserLocation.value)) {
+        findLocationDistances()
+      }
+    },
+    { deep: 1 }
+  )
+
+  watch(
+    () => locations.value.length,
+    (newLength) => {
+      if (newLength && hasLocationData(searchOrUserLocation.value)) {
+        findLocationDistances()
+      }
+    }
+  )
+
+  function findLocationDistances() {
+    const locsWithDistance = toValue(locations)
+    locsWithDistance.forEach((location) => {
+      location.distance = `${getHaversineDistance(
+        { latitude: location.latitude, longitude: location.longitude },
+        {
+          latitude: searchOrUserLocation.value.latitude,
+          longitude: searchOrUserLocation.value.longitude,
+        },
+        1
+      )} mi`
+    })
+    locations.value = locsWithDistance
+  }
 
   function handleSearchSubmit(locationSearchString: string) {
     switch (true) {

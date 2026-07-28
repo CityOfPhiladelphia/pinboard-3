@@ -64,7 +64,7 @@ export default {
     section2Title: 'Insurance and cost',
     p2: "These health centers take many forms of insurance. This includes Medicare and Medicaid. You can get care even if you don't have insurance. If you're uninsured, you'll pay a small fee based on your income and family size.",
     section25Title: 'Need help getting health insurance?',
-    p25: "Philadelphia's BenePhilly program offers free support to help residents apply for health insurance. To learn more, visit <a href='https://www.phila.gov/programs/benephilly/' target='_blank'>https://www.phila.gov/programs/benephilly</a>.",
+    p25: "Philadelphia's BenePhilly program offers free support to help residents apply for health insurance. To learn more, visit",
     section3Title: 'Language access',
     p3: "All health centers offer phone interpretation services. Some also offer in-person interpretation. View each location's details for a list of all languages spoken by staff. You can also search for a specific language.",
     section4Title: 'Establishing care',
@@ -72,6 +72,7 @@ export default {
     section5Title: 'Updates to the finder',
     p5: 'We update the information for each health center every three months. If something is wrong, you can let us know through our',
     feedbackForm: 'feedback form',
+    period: '.',
   },
   cards: {
     table1Intro:

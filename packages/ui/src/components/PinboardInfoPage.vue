@@ -8,6 +8,7 @@ withDefaults(
   defineProps<{
     backTo?: string
     sections: { id: string; title: string }[]
+    isMobile: boolean
   }>(),
   { backTo: '/' }
 )
@@ -22,9 +23,9 @@ function scrollToSection(id: string) {
 
 <template>
   <div class="pinboard-info-page layout content">
-    <div class="inner-container">
-      <div class="content-area">
-        <div class="section">
+    <div class="inner-container" :class="{ mobile: isMobile }">
+      <div class="content-area" :class="{ mobile: isMobile }">
+        <div class="section" :class="{ mobile: isMobile }">
           <PhilaLink
             :href="backTo"
             :text="t('pinboard.infoPage.backToMap')"
@@ -35,7 +36,12 @@ function scrollToSection(id: string) {
           <slot />
         </div>
       </div>
-      <nav v-if="sections.length" class="info-toc" :aria-label="t('pinboard.infoPage.onThisPage')">
+      <nav
+        v-if="sections.length"
+        class="info-toc"
+        :style="{ display: isMobile ? 'none' : 'block' }"
+        :aria-label="t('pinboard.infoPage.onThisPage')"
+      >
         <h2 class="has-text-heading-6">{{ t('pinboard.infoPage.onThisPage') }}</h2>
         <ul>
           <li v-for="s in sections" :key="s.id">
@@ -64,10 +70,23 @@ function scrollToSection(id: string) {
   align-self: stretch;
 }
 
+.inner-container.mobile {
+  /* Fill the viewport and allow the flex chain to shrink, so the content wraps
+     to the phone width instead of resolving to the 45rem max and overflowing. */
+  width: 100%;
+  min-width: 0;
+}
+
 .content-area {
   padding: 1.5rem 2rem 0 2rem;
   justify-content: center;
   align-items: center;
+}
+
+.content-area.mobile {
+  flex: 1;
+  min-width: 0;
+  padding: 1.5rem 1rem 0 1rem;
 }
 
 .section {
@@ -81,6 +100,12 @@ function scrollToSection(id: string) {
   /* Break long unbreakable tokens (e.g. URLs) so they wrap instead of forcing
      the column wider than the viewport on narrow screens. */
   overflow-wrap: anywhere;
+}
+
+.section.mobile {
+  gap: 0.75rem;
+  padding-bottom: 1.5rem;
+  max-width: 100%;
 }
 
 /* Links are injected via v-html (no scope attribute) and may inherit a global
@@ -125,32 +150,5 @@ function scrollToSection(id: string) {
 .info-toc li,
 .info-toc a {
   margin: 0;
-}
-
-@media (max-width: 768px) {
-  /* Fill the viewport and allow the flex chain to shrink, so the content wraps
-     to the phone width instead of resolving to the 45rem max and overflowing. */
-  .inner-container {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .content-area {
-    flex: 1;
-    min-width: 0;
-    padding: 1.5rem 1rem 0 1rem;
-  }
-
-  .section {
-    gap: 0.75rem;
-    padding-bottom: 1.5rem;
-    max-width: 100%;
-  }
-
-  /* Hide the on-this-page table of contents on mobile so the /info content
-     fits on a phone (the sticky desktop TOC doesn't translate to small screens). */
-  .info-toc {
-    display: none;
-  }
 }
 </style>

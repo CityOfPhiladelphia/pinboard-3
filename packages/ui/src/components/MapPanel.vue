@@ -87,7 +87,7 @@ const SlotRenderer = defineComponent({
 
     <div v-if="isLoading" class="map-loading-overlay">
       <div class="map-loading-spinner" />
-      <span class="map-loading-text" v-text="isLoading"></span>
+      <span class="map-loading-text" v-text="isLoading" />
     </div>
   </div>
 </template>

@@ -3,11 +3,11 @@ import { useRouter } from 'vue-router'
 import { Logo } from '@phila/phila-ui-logo'
 import { PhilaLink } from '@phila/phila-ui-link'
 import { IconChevronLeft } from '@phila/phila-ui-core/icons'
-import { PinboardComposables } from '@pinboard/ui'
+import { IS_MOBILE_KEY } from '@pinboard/ui'
+import { inject, ref } from 'vue'
 
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 const router = useRouter()
-
-const isMobile = PinboardComposables.useIsMobile()
 </script>
 
 <template>
@@ -115,7 +115,7 @@ const isMobile = PinboardComposables.useIsMobile()
               </ul>
             </div>
 
-            <div class="subsection-container mobile-footer-links">
+            <div class="subsection-container" :style="{ display: isMobile ? 'flex' : 'none' }">
               <div class="mobile-footer-heading">
                 <Logo bell-only />
                 <component :is="isMobile ? 'h6' : 'h5'">About phila.gov</component>
@@ -167,6 +167,10 @@ const isMobile = PinboardComposables.useIsMobile()
   align-items: center;
 }
 
+.content-area.mobile {
+  padding: 1.5rem 1rem 0 1rem;
+}
+
 .section {
   display: flex;
   width: 100%;
@@ -175,6 +179,11 @@ const isMobile = PinboardComposables.useIsMobile()
   flex-direction: column;
   align-items: flex-start;
   gap: var(--spacing-4xl, 4rem);
+}
+
+.section.mobile {
+  gap: var(--spacing-2xl, 2rem);
+  padding-bottom: var(--spacing-2xl, 2rem);
 }
 
 .intro-text-container {
@@ -210,29 +219,10 @@ const isMobile = PinboardComposables.useIsMobile()
   width: 100%;
 }
 
-.mobile-footer-links {
-  display: none;
-}
-
 .mobile-footer-heading {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   font-size: 1.25rem;
-}
-
-@media (max-width: 768px) {
-  .content-area {
-    padding: 1.5rem 1rem 0 1rem;
-  }
-
-  .section {
-    gap: var(--spacing-2xl, 2rem);
-    padding-bottom: var(--spacing-2xl, 2rem);
-  }
-
-  .mobile-footer-links {
-    display: flex;
-  }
 }
 </style>
