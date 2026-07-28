@@ -116,14 +116,6 @@ function scrollToSection(id: string) {
   word-break: break-word;
 }
 
-.subsection-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--spacing-xs, 0.5rem);
-  align-self: stretch;
-}
-
 .info-toc {
   flex: 0 0 14rem;
   position: sticky;

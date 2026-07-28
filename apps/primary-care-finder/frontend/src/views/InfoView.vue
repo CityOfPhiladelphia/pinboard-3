@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { IS_MOBILE_KEY, PinboardInfoPage } from '@pinboard/ui'
 
 const { t } = useI18n()
-const isMobile = inject(IS_MOBILE_KEY, ref(false))
+const isMobile = inject(IS_MOBILE_KEY, ref(true))
 
 const sections = computed(() => [
   { id: 'insurance', title: t('introPage.section2Title') },

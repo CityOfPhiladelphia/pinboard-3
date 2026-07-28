@@ -198,6 +198,13 @@ onMounted(async () => {
   padding-left: var(--spacing-l);
 }
 
+.pinboard-shell-info-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.25);
+}
+
 /* Sheet sizes to its content; snap-points value is ignored visually.
  * --drag-y is set inline by the drag handler; transform-only transition
  * springs the sheet back when the user releases under threshold, while
@@ -209,14 +216,20 @@ onMounted(async () => {
   max-height: 90dvh;
   padding: 0 var(--spacing-m) 50px;
   transform: translateY(var(--drag-y, 0px));
-  transition: transform 0.25s ease-out;
+  transition: transform 0.25s ease-out !important;
 }
 
-.pinboard-shell-info-scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: rgba(0, 0, 0, 0.25);
+.pinboard-shell-info-sheet.pinboard-shell-info-sheet--dragging .bottom-sheet {
+  transition: none !important;
+}
+
+.pinboard-shell-scrim-fade-leave-active {
+  transition: opacity 0.25s ease-out;
+  pointer-events: none;
+}
+
+.pinboard-shell-scrim-fade-leave-to {
+  opacity: 0;
 }
 
 .pinboard-shell-info-close {

@@ -64,10 +64,6 @@ function login() {
   display: contents;
 }
 
-.sub-footer-link {
-  font-weight: 400;
-}
-
 .navbar-login {
   background: none;
   border: none;
@@ -77,6 +73,7 @@ function login() {
   cursor: pointer;
   padding: 0 var(--spacing-s, 0.75rem);
 }
+
 .navbar-login:hover {
   text-decoration: underline;
 }

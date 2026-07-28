@@ -10,7 +10,7 @@ const feedbackHref =
 <template>
   <PinboardShell
     :title="t('app.name')"
-    info-title="About this tool"
+    :info-title="t('app.aboutTitle')"
     :info-label="t('app.aboutTitle')"
     :info-message="t('callout.message')"
     :info-link-text="t('callout.linkText')"

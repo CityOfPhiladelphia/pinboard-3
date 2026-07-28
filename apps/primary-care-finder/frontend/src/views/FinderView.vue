@@ -73,7 +73,7 @@ const defaultFilterState: PrimaryCareFilters = {
   },
 }
 
-const isMobile = inject(IS_MOBILE_KEY, ref(false))
+const isMobile = inject(IS_MOBILE_KEY, ref(true))
 const { t } = useI18n()
 const { locations, languages, isLoading, errorMessage, geojson } = useLocations()
 const { filterChipDefinitions } = useFilterChipDefinitions(languages)
@@ -316,6 +316,7 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
 }
 
 .locations-callout :deep(.callout-title) {
+  font-family: var(--Body-Default-font-body-default-family);
   font-size: var(--scale-200);
   text-align: left;
 }
