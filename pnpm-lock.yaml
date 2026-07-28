@@ -107,7 +107,7 @@ catalogs:
       version: 10.1.8
     eslint-plugin-vue:
       specifier: ^10.10.0
-      version: 10.10.0
+      version: 10.9.2
     globals:
       specifier: ^17.8.0
       version: 17.8.0
@@ -372,7 +372,7 @@ importers:
         specifier: ^8.0.1
         version: 8.0.1
       vue:
-        specifier: ^3.5.33
+        specifier: 'catalog:'
         version: 3.5.33(typescript@6.0.3)
       vue-i18n:
         specifier: 'catalog:'
