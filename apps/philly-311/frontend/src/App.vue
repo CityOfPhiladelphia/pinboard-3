@@ -1,7 +1,7 @@
 <!-- ABOUTME: Root component. Wraps every route in PinboardShell chrome inside a
      phila .content region and supplies the header's nav links and CTAs. -->
 <script setup lang="ts">
-import { PinboardShell } from '@pinboard/ui'
+import { PinboardShell, PhilaLink } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import '@/assets/a11y.css'
 import { PhilaButton } from '@phila/phila-ui-button'
@@ -43,13 +43,17 @@ function login() {
     :show-header-tooltip="false"
     :feedback-href="feedbackHref"
   >
+    <template #navbar-left-end>
+      <PhilaButton variant="primary" to="/report" class="navbar-cta">Report an issue</PhilaButton>
+    </template>
     <template #navbar-end>
-      <PhilaButton variant="primary" to="/report">Report an issue</PhilaButton>
       <template v-if="isAuthenticated">
-        <span class="navbar-user">{{ userName }}</span>
-        <button type="button" class="navbar-login" @click="signOut()">Sign out</button>
+        <span class="navbar-user has-text-label-default">{{ userName }}</span>
+        <PhilaLink href="#" variant="on-primary" @click.prevent="signOut()"> Sign out </PhilaLink>
       </template>
-      <button v-else type="button" class="navbar-login" @click="login()">Login / Sign up</button>
+      <PhilaLink v-else href="#" variant="on-primary" @click.prevent="login()">
+        Login / Sign up
+      </PhilaLink>
     </template>
     <div class="content app-content">
       <RouterView />
@@ -64,23 +68,12 @@ function login() {
   display: contents;
 }
 
-.navbar-login {
-  background: none;
-  border: none;
-  color: #fff;
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0 var(--spacing-s, 0.75rem);
-}
-
-.navbar-login:hover {
-  text-decoration: underline;
+.navbar-cta {
+  align-self: center;
 }
 
 .navbar-user {
-  color: #fff;
-  font-weight: 600;
-  padding: 0 var(--spacing-s, 0.75rem);
+  color: var(--Schemes-On-Inverse-Surface-Bright, #fff);
+  padding-right: var(--spacing-3xl);
 }
 </style>

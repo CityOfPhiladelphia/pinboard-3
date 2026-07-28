@@ -14,11 +14,21 @@ vi.mock('@pinboard/ui', () => ({
     setup(_, { slots }) {
       return () =>
         h('div', [
+          h('div', { 'data-test': 'navbar-left-end' }, slots['navbar-left-end']?.()),
           h('div', { 'data-test': 'navbar-end' }, slots['navbar-end']?.()),
           h('div', { 'data-test': 'mobile-nav' }, slots['mobile-nav']?.()),
           h('div', { 'data-test': 'sub-footer' }, slots['sub-footer']?.()),
           slots.default?.(),
         ])
+    },
+  }),
+  // Minimal stand-in: renders as a plain <a>, same as the real component's non-router
+  // path (App.vue only ever passes href, never `to`), so href/text/click assertions hold.
+  PhilaLink: defineComponent({
+    name: 'PhilaLink',
+    props: { href: { type: String, default: undefined } },
+    setup(props, { slots }) {
+      return () => h('a', { href: props.href }, slots.default?.())
     },
   }),
 }))
@@ -71,10 +81,10 @@ describe('App', () => {
     ])
   })
 
-  it('puts a "Report an issue" button routing to /report in the navbar-end slot', async () => {
+  it('puts a "Report an issue" button routing to /report in the navbar-left-end slot', async () => {
     const w = await mountApp()
-    const navbarEnd = w.find('[data-test="navbar-end"]')
-    const link = navbarEnd.find('a')
+    const navbarLeftEnd = w.find('[data-test="navbar-left-end"]')
+    const link = navbarLeftEnd.find('a')
     expect(link.exists()).toBe(true)
     expect(link.attributes('href')).toBe('/report')
     expect(link.text()).toBe('Report an issue')
@@ -83,17 +93,17 @@ describe('App', () => {
   it('puts a Login / Sign up trigger in the navbar-end slot that starts the sso-vue login flow', async () => {
     const w = await mountApp()
     const navbarEnd = w.find('[data-test="navbar-end"]')
-    const loginButton = navbarEnd.findAll('button').find((b) => b.text() === 'Login / Sign up')
-    expect(loginButton).toBeTruthy()
-    await loginButton?.trigger('click')
+    const loginLink = navbarEnd.findAll('a').find((a) => a.text() === 'Login / Sign up')
+    expect(loginLink).toBeTruthy()
+    await loginLink?.trigger('click')
     expect(signIn).toHaveBeenCalledOnce()
   })
 
   it('records the current route as the post-login redirect before starting sign-in', async () => {
     const w = await mountApp('/report/location')
     const navbarEnd = w.find('[data-test="navbar-end"]')
-    const loginButton = navbarEnd.findAll('button').find((b) => b.text() === 'Login / Sign up')
-    await loginButton?.trigger('click')
+    const loginLink = navbarEnd.findAll('a').find((a) => a.text() === 'Login / Sign up')
+    await loginLink?.trigger('click')
     expect(sessionStorage.getItem('auth:redirectTo')).toBe('/report/location')
   })
 
@@ -133,9 +143,9 @@ describe('App', () => {
     const w = await mountApp()
     const navbarEnd = w.find('[data-test="navbar-end"]')
     expect(navbarEnd.text()).toContain('Ben Franklin')
-    expect(navbarEnd.findAll('button').find((b) => b.text() === 'Login / Sign up')).toBeFalsy()
-    const signOutButton = navbarEnd.findAll('button').find((b) => b.text() === 'Sign out')
-    await signOutButton?.trigger('click')
+    expect(navbarEnd.findAll('a').find((a) => a.text() === 'Login / Sign up')).toBeFalsy()
+    const signOutLink = navbarEnd.findAll('a').find((a) => a.text() === 'Sign out')
+    await signOutLink?.trigger('click')
     expect(signOut).toHaveBeenCalledOnce()
   })
 })
