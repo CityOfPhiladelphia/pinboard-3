@@ -45,6 +45,7 @@ const slots = defineSlots<{
   nav?(): unknown
   'page-header'?: unknown
   'locations-header'?: unknown
+  'locations-filters'?: unknown
   'location-card'?(props: { location: PinboardLocation }): unknown
   'location-detail'?(props: {
     location: PinboardLocation
@@ -84,6 +85,7 @@ const props = withDefaults(
     geojson?: unknown
     filters?: FilterDefinition[]
     filterValues?: FilterValues
+    locationPanelCountNoun?: string
   }>(),
   {
     waitForUserLocation: false,
@@ -95,6 +97,7 @@ const props = withDefaults(
     geojson: undefined,
     filters: undefined,
     filterValues: undefined,
+    locationPanelCountNoun: undefined,
   }
 )
 
@@ -433,6 +436,9 @@ function selectedLocationValue() {
                   />
                 </div>
               </Teleport>
+            </template>
+            <template v-if="slots['locations-filters']" #filters>
+              <slot name="locations-filters" />
             </template>
             <template #list-header>
               <div v-if="!isMobile" class="location-list-header">
