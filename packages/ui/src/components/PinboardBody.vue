@@ -25,7 +25,6 @@ import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
 // pinboard composables and utilities imports
 import { hasLocationData } from '../utilities/hasLocationData'
-import { locationCountLabel as formatLocationCount } from '../utilities/locationCountLabel'
 import { usePrint } from '../composables/usePrint'
 
 // type imports
@@ -46,7 +45,6 @@ const slots = defineSlots<{
   nav?(): unknown
   'page-header'?: unknown
   'locations-header'?: unknown
-  'locations-filters'?: unknown
   'location-card'?(props: { location: PinboardLocation }): unknown
   'location-detail'?(props: {
     location: PinboardLocation
@@ -58,7 +56,6 @@ const slots = defineSlots<{
     geojson: unknown
     map: unknown
     zoom: number
-    isMobile: boolean
     hoveredId: string | null
     selectedId: string | null
     mobileControlsTarget: HTMLDivElement | null
@@ -84,7 +81,6 @@ const props = withDefaults(
     locationPanelSearch?: string
     locationPanelSort?: SortLocationsOptions
     locationSearchMode?: SearchMode
-    locationPanelCountNoun?: string
     geojson?: unknown
     filters?: FilterDefinition[]
     filterValues?: FilterValues
@@ -96,7 +92,6 @@ const props = withDefaults(
     locationPanelSearch: undefined,
     locationPanelSort: undefined,
     locationSearchMode: undefined,
-    locationPanelCountNoun: undefined,
     geojson: undefined,
     filters: undefined,
     filterValues: undefined,
@@ -164,21 +159,12 @@ const selectedLocationId = computed(() =>
   selectedLocation.value === undefined ? undefined : selectedLocation.value.id
 )
 
-// Falls back to the i18n-driven generic label; apps that need a custom noun
-// (e.g. "report" instead of "item") pass locationPanelCountNoun and lose i18n
-// pluralization in exchange for that word, same tradeoff LocationsPanel makes.
-const defaultLocationCountLabel = computed(() => {
+const locationCountLabel = computed(() => {
   const message = props.locations.length
     ? t('pinboard.itemCount', { count: props.locations.length }, props.locations.length)
     : t('pinboard.noLocations')
   return props.isLoading || message
 })
-
-const locationCountLabel = computed(() =>
-  props.locationPanelCountNoun
-    ? formatLocationCount(props.locations.length, props.locationPanelCountNoun)
-    : defaultLocationCountLabel.value
-)
 
 // Filter chips in use bubble up to sit right after the (pinned) Sort chip. The
 // order is a snapshot recomputed only at safe moments — initial load, a chip's
@@ -267,17 +253,13 @@ watch(selectedLocationId, (id) => {
 // on initial mount (immediate), when the data finishes loading, and on Back/Forward. An absent or
 // unknown id clears the selection (graceful). Direct set (not selectLocation) so it doesn't re-push;
 // it also intentionally skips the deselect/visited-tracking emit — URL-driven nav doesn't mark visited.
-// Re-resolves by identity, not just id: apps regenerate the locations array as pages stream in, and
-// a selection held from an earlier array would otherwise go stale (selectedLocationValue relies on
-// the selected object being present in the current array). Only pan when the id actually changes.
 function resolveLocationFromRoute() {
   const param = route.query.location
   const id = typeof param === 'string' ? param : undefined
+  if (id === selectedLocationId.value) return
   const match = id ? props.locations.find((loc) => loc.id === id) : undefined
-  if (match === selectedLocation.value) return
-  const idChanged = id !== selectedLocationId.value
   selectedLocation.value = match ?? undefined
-  if (match && idChanged) mapPanelRef.value?.panTo(match)
+  if (match) mapPanelRef.value?.panTo(match)
 }
 watch([() => route.query.location, () => props.locations], resolveLocationFromRoute, {
   immediate: true,
@@ -386,22 +368,18 @@ const effectiveMapConfig = (() => {
   return base
 })()
 
-// Resolved against the CURRENT locations array by id, because apps regenerate
-// the array (fresh objects) as pages stream in and a click can hand us an item
-// from a previous generation. Undefined while the id isn't in the array — the
-// route watcher then clears the stale selection on its next flush.
-const selectedLocationResolved = computed(() =>
-  props.locations.find((loc) => loc.id === selectedLocation.value?.id)
-)
+function selectedLocationValue() {
+  return props.locations[props.locations.indexOf(selectedLocation.value)]
+}
 </script>
 
 <template>
-  <div v-if="selectedLocationResolved && !isMobile" id="detail-overlay-desktop"></div>
+  <div id="detail-overlay-desktop" />
   <div class="finder-body">
     <div v-if="slots['page-header']" class="finder-page-header">
       <slot name="page-header" />
     </div>
-    <div class="finder-panel" :class="{ 'finder-panel--with-page-header': !!slots['page-header'], 'finder-panel-mobile': isMobile, 'finder-panel-desktop': !isMobile }">
+    <div class="finder-panel" :class="isMobile ? 'finder-panel-mobile' : 'finder-panel-desktop'">
       <div class="finder-panel-locations">
         <slot name="locations-header" />
 
@@ -425,7 +403,6 @@ const selectedLocationResolved = computed(() =>
             :location-filter="locationPanelFilter"
             :location-search="locationPanelSearch"
             :location-sort="locationPanelSort"
-            :count-noun="!isMobile ? locationPanelCountNoun : undefined"
             :user-location-state="userLocationState"
             :wait-for-user-location="waitForUserLocation"
             :hovered-id="hoveredLocationId"
@@ -457,11 +434,8 @@ const selectedLocationResolved = computed(() =>
                 </div>
               </Teleport>
             </template>
-            <template v-if="slots['locations-filters']" #filters>
-              <slot name="locations-filters" />
-            </template>
             <template #list-header>
-              <div v-if="!isMobile && !locationPanelCountNoun" class="location-list-header">
+              <div v-if="!isMobile" class="location-list-header">
                 <span>{{ locationCountLabel }}</span>
               </div>
             </template>
@@ -472,7 +446,7 @@ const selectedLocationResolved = computed(() =>
         </Teleport>
       </div>
 
-      <div class="finder-panel-map">
+      <div :class="isMobile ? 'finder-panel-map' : ''">
         <MapPanel
           ref="mapPanelRef"
           :config="effectiveMapConfig"
@@ -482,92 +456,44 @@ const selectedLocationResolved = computed(() =>
           :geojson="geojson"
           :hovered-id="hoveredLocationId"
           :selected-id="selectedLocationId"
-          :is-mobile="isMobile"
-          @select="handleSelect"
-          @hover="handleHover"
-          @hover-end="handleHoverEnd"
-          @search-string="handleSearchChange"
-          @search="handleSearchSubmit"
-          @selected-filter="handleLocationFilterChange"
-          @sort-option="handleLocationSortChange"
-        >
-          <template v-if="filters" #below-search>
-            <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
-              <div class="filter-chip-bar">
-                <FilterChipGroup
-                  :filters="orderedChipFilters"
-                  :model-value="filterValues"
-                  color="white"
-                  filter-button
-                  :filter-button-text="t('pinboard.filters')"
-                  :reset-text="t('pinboard.reset')"
-                  :elevated="isMobile && chipsOnMap"
-                  @update:model-value="handleApplyFilter"
-                  @open-filters="allFiltersOpen = true"
-                  @dropdown-close="recomputeChipOrder"
-                />
-              </div>
-            </Teleport>
-          </template>
-          <template #list-header>
-            <div v-if="!isMobile" class="location-list-header">
-              <span>{{ locationCountLabel }}</span>
-            </div>
-          </template>
-          <template v-if="$slots['location-card']" #location-card="{ location }">
-            <slot name="location-card" :location="location" />
-          </template>
-        </LocationsPanel>
-      </Teleport>
-    </div>
+          :mobile-controls-target="mobileControlsTarget"
+          :mobile-controls-target-left="mobileControlsTargetLeft"
+          :map-content-slot="slots['map-content']"
+          :on-hover="handleHover"
+          :on-hover-end="handleHoverEnd"
+          :on-select="handleMapSelect"
+        />
+        <div
+          v-if="isMobile"
+          ref="mobileControlsTarget"
+          class="mobile-controls-float"
+          :style="mobileControlsStyle"
+        />
+        <div
+          v-if="isMobile"
+          ref="mobileControlsTargetLeft"
+          class="mobile-controls-float-left"
+          :style="mobileControlsStyle"
+        />
+        <div id="mobile-map-search-filter" class="mobile-map-search-filter" />
+      </div>
 
-    <div :class="isMobile ? 'finder-panel-map' : ''">
-      <MapPanel
-        ref="mapPanelRef"
-        :config="effectiveMapConfig"
-        :is-loading="isLoading"
-        :is-mobile="isMobile"
-        :locations="locations"
-        :geojson="geojson"
-        :hovered-id="hoveredLocationId"
-        :selected-id="selectedLocationId"
-        :mobile-controls-target="mobileControlsTarget"
-        :mobile-controls-target-left="mobileControlsTargetLeft"
-        :map-content-slot="slots['map-content']"
-        :on-hover="handleHover"
-        :on-hover-end="handleHoverEnd"
-        :on-select="handleMapSelect"
-      />
       <div
-        v-if="isMobile"
-        ref="mobileControlsTarget"
-        class="mobile-controls-float"
-        :style="mobileControlsStyle"
-      />
-      <div
-        v-if="isMobile"
-        ref="mobileControlsTargetLeft"
-        class="mobile-controls-float-left"
-        :style="mobileControlsStyle"
-      />
-      <div id="mobile-map-search-filter" class="mobile-map-search-filter" />
-    </div>
-
-    <div
-      v-if="filters"
-      class="all-filters-overlay"
-      :style="{ display: allFiltersOpen && !isMobile ? 'block' : 'none' }"
-    >
-      <FilterPanel
-        v-if="allFiltersOpen"
-        :filters="filters"
-        :model-value="filterValues"
-        :full-screen="isMobile"
-        :title="t('pinboard.allFilters')"
-        :reset-text="t('pinboard.reset')"
-        @update:model-value="handleApplyFilter"
-        @close="allFiltersOpen = false"
-      />
+        v-if="filters"
+        class="all-filters-overlay"
+        :style="{ display: allFiltersOpen && !isMobile ? 'block' : 'none' }"
+      >
+        <FilterPanel
+          v-if="allFiltersOpen"
+          :filters="filters"
+          :model-value="filterValues"
+          :full-screen="isMobile"
+          :title="t('pinboard.allFilters')"
+          :reset-text="t('pinboard.reset')"
+          @update:model-value="handleApplyFilter"
+          @close="allFiltersOpen = false"
+        />
+      </div>
     </div>
   </div>
   <BottomSheet
@@ -589,14 +515,14 @@ const selectedLocationResolved = computed(() =>
         <div id="locations-panel-mobile" />
       </div>
 
-      <div v-if="selectedLocationResolved">
+      <div v-if="selectedLocation">
         <Teleport to="#detail-overlay-desktop" :disabled="isMobile">
           <div :class="isMobile ? 'bottom-sheet-detail' : 'detail-overlay'">
             <slot
               name="location-detail"
-              :location="selectedLocationResolved"
+              :location="selectedLocationValue()"
               :on-close="handleCloseLocationDetail"
-              :on-print="isMobile ? undefined : () => print(selectedLocationResolved!)"
+              :on-print="isMobile ? undefined : () => print(selectedLocationValue())"
             />
           </div>
         </Teleport>
@@ -625,10 +551,6 @@ const selectedLocationResolved = computed(() =>
   position: relative;
 }
 
-.finder-panel--with-page-header {
-  height: auto;
-  flex: 1;
-  min-height: 0;
 .finder-panel :deep(.phila-filter-panel__title) {
   font-family: var(--Body-Default-font-body-default-family, 'Montserrat', sans-serif);
 }

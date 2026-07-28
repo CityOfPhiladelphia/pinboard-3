@@ -18,6 +18,8 @@ const navLinks: NavLink[] = [
   { text: 'Answers', href: '/answers' },
 ]
 
+const feedbackHref = 'https://www.phila.gov/feedback/'
+
 // Mirrors authGuard's redirect mechanism (router/index.ts) so a header-initiated
 // login returns the user to where they clicked from, not '/' or a stale guard redirect.
 function login() {
@@ -37,6 +39,9 @@ function login() {
       href: '/',
     }"
     :links="navLinks"
+    :translations="false"
+    :show-header-tooltip="false"
+    :feedback-href="feedbackHref"
   >
     <template #navbar-end>
       <PhilaButton variant="primary" to="/report">Report an issue</PhilaButton>
@@ -45,15 +50,6 @@ function login() {
         <button type="button" class="navbar-login" @click="signOut()">Sign out</button>
       </template>
       <button v-else type="button" class="navbar-login" @click="login()">Login / Sign up</button>
-    </template>
-    <template #sub-footer>
-      <a class="sub-footer-link" href="https://www.phila.gov/terms-of-use/">Terms of use</a>
-      <a class="sub-footer-link" href="https://www.phila.gov/open-records-policy/">Right to know</a>
-      <a class="sub-footer-link" href="https://www.phila.gov/privacypolicy/">Privacy Policy</a>
-      <a class="sub-footer-link" href="https://www.phila.gov/accessibility-policy/"
-        >Accessibility</a
-      >
-      <a class="sub-footer-link" href="https://www.phila.gov/feedback/">Feedback</a>
     </template>
     <div class="content app-content">
       <RouterView />
