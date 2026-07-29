@@ -1,5 +1,6 @@
 <!-- ABOUTME: List row for a knowledge article; whole row links to the detail page. -->
 <script setup lang="ts">
+import { Icon } from '@phila/phila-ui-core'
 import { IconChevronRight } from '@phila/phila-ui-core/icons'
 import type { Article } from '@/composables/useKnowledgeArticles'
 
@@ -10,7 +11,7 @@ defineProps<{ article: Article }>()
   <article class="article-card">
     <RouterLink class="article-card__link" :to="`/answers/${article.id}`">
       <span class="article-card__title">{{ article.title }}</span>
-      <IconChevronRight class="article-card__chevron" aria-hidden="true" />
+      <Icon :icon="IconChevronRight" decorative class="article-card__chevron" />
     </RouterLink>
   </article>
 </template>
