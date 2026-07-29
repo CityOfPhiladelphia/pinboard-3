@@ -48,7 +48,7 @@ describe('AnswersPage', () => {
     expect(w.find('input[type="search"]').attributes('placeholder')).toBe(
       'Search by topic or keyword',
     )
-    expect(w.find('.answers__search svg[aria-hidden="true"]').exists()).toBe(true)
+    expect(w.find('.answers__search .answers__search-icon[aria-hidden="true"]').exists()).toBe(true)
   })
 
   it('mounts the featured-articles strip below the hero', async () => {

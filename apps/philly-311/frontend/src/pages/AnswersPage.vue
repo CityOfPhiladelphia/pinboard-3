@@ -9,6 +9,7 @@ import ArticleCard from '@/components/answers/ArticleCard.vue'
 import FeaturedArticles from '@/components/answers/FeaturedArticles.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
 import heroPhoto from '@/assets/answers-hero.jpg'
+import { Icon } from '@phila/phila-ui-core'
 import { IconMagnifyingGlass, IconSort } from '@phila/phila-ui-core/icons'
 
 const k = useKnowledgeArticles()
@@ -92,12 +93,12 @@ onMounted(loadPage)
           class="answers__search-input"
           placeholder="Search by topic or keyword"
         />
-        <IconMagnifyingGlass class="answers__search-icon" aria-hidden="true" />
+        <Icon :icon="IconMagnifyingGlass" decorative class="answers__search-icon" />
       </div>
 
       <div v-if="!isSearching" class="answers__chips">
         <label class="answers__chip">
-          <IconSort class="answers__chip-icon" aria-hidden="true" />
+          <Icon :icon="IconSort" decorative size="extra-small" />
           <select
             v-model="sortChoice"
             class="answers__chip-select"
@@ -233,9 +234,6 @@ onMounted(loadPage)
   background: #fff;
   border: 1px solid var(--Schemes-Border-low, #d6d6d6);
   border-radius: 16px;
-}
-.answers__chip-icon {
-  font-size: 0.875rem;
 }
 .answers__chip-select {
   border: none;

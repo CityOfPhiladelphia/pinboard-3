@@ -27,6 +27,6 @@ describe('ArticleCard', () => {
       props: { article },
       global: { stubs: { RouterLink: RouterLinkStub } },
     })
-    expect(w.find('svg[aria-hidden="true"].article-card__chevron').exists()).toBe(true)
+    expect(w.find('.article-card__chevron[aria-hidden="true"]').exists()).toBe(true)
   })
 })

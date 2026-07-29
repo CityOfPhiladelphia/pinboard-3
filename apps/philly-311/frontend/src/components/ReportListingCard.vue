@@ -3,6 +3,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Tags } from '@phila/phila-ui-tags'
+import { Icon } from '@phila/phila-ui-core'
 import { IconImage, IconCircleCheck, IconClock } from '@phila/phila-ui-core/icons'
 import type { Report } from '@/composables/useNearbyReports'
 import { statusIconTreatment } from '@/utils/reportCard'
@@ -22,7 +23,7 @@ const statusIcon = computed(() =>
     <div class="listing-card__media">
       <img v-if="report.mediaUrl" class="listing-card__photo" :src="report.mediaUrl" alt="" />
       <div v-else class="listing-card__photo listing-card__photo--placeholder">
-        <IconImage aria-hidden="true" />
+        <Icon :icon="IconImage" decorative size="extra-small" />
       </div>
     </div>
     <div class="listing-card__content">
@@ -66,7 +67,6 @@ const statusIcon = computed(() =>
   justify-content: center;
   background: var(--Schemes-Border-low, #e3e3e3);
   color: var(--Schemes-Border, #a1a1a1);
-  font-size: 1.5rem;
 }
 .listing-card__content {
   display: flex;
