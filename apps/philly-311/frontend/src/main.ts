@@ -39,6 +39,7 @@ app.use(
   }),
 )
 app.use(router)
+app.provide('router', router)
 app.use(
   createPinboard({
     title: 'Philly 311',

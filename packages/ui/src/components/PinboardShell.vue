@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { AppFooter } from '@phila/phila-ui-app-footer'
-import { AppHeader, NavbarInfo } from '@phila/phila-ui-app-header'
+import { AppHeader, NavbarBrand, NavbarInfo } from '@phila/phila-ui-app-header'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { CloseButton } from '@phila/phila-ui-button'
 import MobileNavPanel from './MobileNavPanel.vue'
 import PinboardSubFooter from './PinboardSubFooter.vue'
-import { onMounted, useTemplateRef, watch } from 'vue'
+import { computed, onMounted, useTemplateRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { VNode } from 'vue'
 import type { NavbarBrandProps, NavLink } from '@phila/phila-ui-app-header'
@@ -32,10 +32,17 @@ const props = defineProps<{
 defineSlots<{
   default(): VNode[]
   'mobile-nav'(): VNode[]
+  'navbar-left-end'(): VNode[]
   'navbar-end'(): VNode[]
   'info-body'(): VNode[]
   'sub-footer'(): VNode[]
 }>()
+
+const navbarBrandProps = computed(() => ({
+  brandingImage: { src: '', href: '/', altText: props.title },
+  brandingLink: props.logo ? undefined : { text: props.title, href: '/' },
+  logo: props.logo,
+}))
 
 const {
   isMobile,
@@ -88,17 +95,20 @@ onMounted(async () => {
       :compact-mobile="true"
       :show-trusted-site="true"
       :links="links"
-      :navbar-brand="{
-        brandingImage: { src: '', href: '/', altText: title },
-        brandingLink: logo ? undefined : { text: title, href: '/' },
-        logo: logo,
-      }"
       :banner-title="bannerTitle"
       :banner-message="bannerMessage"
       :languages="translations ? languages : undefined"
       :locale="locale"
       @update:locale="setLocale"
     >
+      <!-- Reproduces AppHeader's own navbar-left fallback (brand/logo) so we can add
+           app-provided content (e.g. a CTA) between the brand and the nav links, which
+           AppHeader has no dedicated slot for. -->
+      <template #navbar-left>
+        <NavbarBrand v-bind="navbarBrandProps" />
+        <slot name="navbar-left-end" />
+      </template>
+
       <!-- Suppress AppHeader's default search button: it renders by default but opens an
            empty panel since we don't wire up search. Temporary until the upstream fix
            (phila-ui-4 bead map-core-k8c) gates the default on a search-panel slot.
