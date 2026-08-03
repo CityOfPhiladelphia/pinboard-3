@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "build": "turbo run build",
+    "build:no-concur": "pnpm build --concurrency=1",
     "dev": "turbo run dev",
     "dev:oem": "pnpm --filter @pinboard/oem-flood-finder dev",
     "dev:oem:fresh": "pnpm --filter @pinboard/oem-flood-finder dev:fresh",

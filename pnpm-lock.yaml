@@ -107,7 +107,7 @@ catalogs:
       version: 10.1.8
     eslint-plugin-vue:
       specifier: ^10.10.0
-      version: 10.9.2
+      version: 10.10.0
     globals:
       specifier: ^17.8.0
       version: 17.8.0
