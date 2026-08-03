@@ -27,7 +27,7 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
   const byId = ref(new Map<string, Report>())
   const total = ref<number | null>(null)
   const fetchedAt = ref<number | null>(null)
-  const isLoading = ref(false)
+  const isLoading = ref(true)
   const error = ref<Error | null>(null)
 
   // Not part of exposed state — tracks the in-flight Promise to prevent concurrent loads.
@@ -57,6 +57,7 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
     // For a reload, keep prior data in place until page 1 succeeds to avoid a blank state
     // if page 1 fails mid-reload.
     const isReload = fetchedAt.value !== null
+    const newReports: Report[] = []
     if (!isReload) {
       reports.value = []
       byId.value = new Map()
@@ -64,6 +65,14 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
     }
     error.value = null
     isLoading.value = true
+
+    // Probe for total after page 1 is painted
+    try {
+      total.value = await _probeTotal(fetch, anchor)
+    } catch (e) {
+      error.value = e as Error
+      return
+    }
 
     let page1: PageResult
     try {
@@ -76,26 +85,16 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
       })
       // Page 1 landed — atomically replace the dataset (clears stale data on reload path).
       const newById = new Map<string, Report>()
-      const newReports: Report[] = []
+
       for (const r of page1.reports) {
         if (!newById.has(r.id)) {
           newReports.push(r)
           newById.set(r.id, r)
         }
       }
-      reports.value = newReports
+
       byId.value = newById
       fetchedAt.value = now()
-    } catch (e) {
-      error.value = e as Error
-      return
-    } finally {
-      isLoading.value = false
-    }
-
-    // Probe for total after page 1 is painted
-    try {
-      total.value = await _probeTotal(fetch, anchor)
     } catch (e) {
       error.value = e as Error
       return
@@ -114,7 +113,7 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
         })
         for (const r of page.reports) {
           if (!byId.value.has(r.id)) {
-            reports.value.push(r)
+            newReports.push(r)
             byId.value.set(r.id, r)
           }
         }
@@ -125,6 +124,8 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
         return
       }
     }
+    reports.value = newReports
+    isLoading.value = false
   }
 
   async function _run(
