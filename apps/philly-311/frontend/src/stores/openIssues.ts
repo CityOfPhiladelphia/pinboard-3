@@ -66,7 +66,6 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
     error.value = null
     isLoading.value = true
 
-    // Probe for total after page 1 is painted
     try {
       total.value = await _probeTotal(fetch, anchor)
     } catch (e) {
