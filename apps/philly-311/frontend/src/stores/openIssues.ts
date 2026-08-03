@@ -66,13 +66,6 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
     error.value = null
     isLoading.value = true
 
-    try {
-      total.value = await _probeTotal(fetch, anchor)
-    } catch (e) {
-      error.value = e as Error
-      return
-    }
-
     let page1: PageResult
     try {
       page1 = await fetch({
@@ -124,6 +117,7 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
       }
     }
     reports.value = newReports
+    total.value = newReports.length
     isLoading.value = false
   }
 
