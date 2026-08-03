@@ -45,6 +45,17 @@ vi.mock('@phila/sso-vue', () => ({
   }),
 }))
 
+const accountStatus = ref<'idle' | 'pending' | 'ready' | 'error'>('idle')
+const accountError = ref<string | null>(null)
+const retryAccountProvisioning = vi.fn()
+vi.mock('@/composables/useAccountProvisioning', () => ({
+  useAccountProvisioning: () => ({
+    status: accountStatus,
+    errorMessage: accountError,
+    retry: retryAccountProvisioning,
+  }),
+}))
+
 function makeRouter() {
   return createRouter({
     history: createMemoryHistory(),
@@ -68,6 +79,9 @@ beforeEach(() => {
   signIn.mockClear()
   signOut.mockClear()
   isAuthenticated.value = false
+  accountStatus.value = 'idle'
+  accountError.value = null
+  retryAccountProvisioning.mockClear()
 })
 
 describe('App', () => {
@@ -147,5 +161,30 @@ describe('App', () => {
     const signOutLink = navbarEnd.findAll('a').find((a) => a.text() === 'Sign out')
     await signOutLink?.trigger('click')
     expect(signOut).toHaveBeenCalledOnce()
+  })
+})
+
+describe('App — account-provisioning gate', () => {
+  it('renders the routed page when provisioning is idle', async () => {
+    const w = await mountApp()
+    expect(w.find('.content.app-content').find('div').exists()).toBe(true)
+    expect(w.text()).not.toContain('Logging in')
+  })
+
+  it('blocks the routed page and shows a status message while provisioning is pending', async () => {
+    accountStatus.value = 'pending'
+    const w = await mountApp()
+    expect(w.text()).toContain('Logging in')
+  })
+
+  it('blocks the routed page and shows a retry action when provisioning fails', async () => {
+    accountStatus.value = 'error'
+    accountError.value = 'No contact for a@b.com'
+    const w = await mountApp()
+    expect(w.text()).toContain("Couldn't log you in")
+    expect(w.text()).toContain('No contact for a@b.com')
+    const retryButton = w.findAll('button').find((b) => b.text() === 'Try again')
+    await retryButton?.trigger('click')
+    expect(retryAccountProvisioning).toHaveBeenCalledOnce()
   })
 })

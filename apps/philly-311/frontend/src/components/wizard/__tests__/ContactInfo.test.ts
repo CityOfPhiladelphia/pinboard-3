@@ -7,11 +7,12 @@ import { createPinia, setActivePinia } from 'pinia'
 import ContactInfo from '../ContactInfo.vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 
-// Per-test controllable auth state (overrides the global setup mock)
+// Per-test controllable auth state (overrides the global setup mock).
+const user = ref<{ name?: string; idTokenClaims?: { email?: string } } | null>(null)
 const authState = {
   isAuthenticated: ref(false),
-  user: ref<{ name?: string; username?: string } | null>(null),
-  userName: computed(() => authState.user.value?.name ?? null),
+  user,
+  userName: computed(() => user.value?.name ?? null),
 }
 
 vi.mock('@phila/sso-vue', () => ({
@@ -43,7 +44,7 @@ describe('ContactInfo', () => {
 
   it('prefills name and email when authenticated', async () => {
     authState.isAuthenticated.value = true
-    authState.user.value = { name: 'Jane', username: 'jane@phila.gov' }
+    authState.user.value = { name: 'Jane', idTokenClaims: { email: 'jane@phila.gov' } }
     const w = mount(ContactInfo)
     await flushPromises()
     expect(inputValue(w, 'input[autocomplete="name"]')).toBe('Jane')
@@ -59,7 +60,7 @@ describe('ContactInfo', () => {
     const store = useReportSubmissionStore()
     store.setContact({ name: 'Stored Name', email: 'stored@example.com' })
     authState.isAuthenticated.value = true
-    authState.user.value = { name: 'Jane', username: 'jane@phila.gov' }
+    authState.user.value = { name: 'Jane', idTokenClaims: { email: 'jane@phila.gov' } }
     const w = mount(ContactInfo)
     await flushPromises()
     expect(inputValue(w, 'input[autocomplete="name"]')).toBe('Stored Name')
@@ -81,7 +82,7 @@ describe('ContactInfo', () => {
     await flushPromises()
 
     authState.isAuthenticated.value = true
-    authState.user.value = { name: 'Jane', username: 'jane@phila.gov' }
+    authState.user.value = { name: 'Jane', idTokenClaims: { email: 'jane@phila.gov' } }
     await flushPromises()
 
     expect(inputValue(w, 'input[autocomplete="name"]')).toBe('My Own Name')
@@ -90,7 +91,7 @@ describe('ContactInfo', () => {
 
   it('handles sign-out gracefully — no throw, values retained', async () => {
     authState.isAuthenticated.value = true
-    authState.user.value = { name: 'Jane', username: 'jane@phila.gov' }
+    authState.user.value = { name: 'Jane', idTokenClaims: { email: 'jane@phila.gov' } }
     const w = mount(ContactInfo)
     await flushPromises()
 
