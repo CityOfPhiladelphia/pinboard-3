@@ -18,7 +18,9 @@ function prefillFromAuth() {
   if (prefilled) return
   if (!isAuthenticated.value) return
   if (!name.value && userName.value) name.value = userName.value
-  if (!email.value && user.value?.username) email.value = user.value.username
+  const claims = user.value?.idTokenClaims as Record<string, unknown> | undefined
+  const claimEmail = claims?.email as string | undefined
+  if (!email.value && claimEmail) email.value = claimEmail
   prefilled = true
 }
 

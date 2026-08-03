@@ -29,7 +29,7 @@ app.use(
         redirectUri: import.meta.env.VITE_SSO_REDIRECT_URI,
         apiScopes: import.meta.env.VITE_SSO_API_SCOPE ? [import.meta.env.VITE_SSO_API_SCOPE] : [],
         policies: {
-          signUpSignIn: 'B2C_1A_AD_SIGNIN_ONLY',
+          signUpSignIn: 'B2C_1A_SIGNUP_SIGNIN',
           signInOnly: 'B2C_1A_AD_SIGNIN_ONLY',
           resetPassword: 'B2C_1A_PASSWORDRESET',
         },
