@@ -5,12 +5,19 @@ import { PinboardShell, PhilaLink } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import '@/assets/a11y.css'
 import { PhilaButton } from '@phila/phila-ui-button'
+import { Callout } from '@phila/phila-ui-callout'
 import { useAuth } from '@phila/sso-vue'
 import { useRoute } from 'vue-router'
 import type { NavLink } from '@pinboard/ui'
+import { useAccountProvisioning } from '@/composables/useAccountProvisioning'
 
 const route = useRoute()
 const { signIn, signOut, isAuthenticated, userName } = useAuth()
+const {
+  status: accountStatus,
+  errorMessage: accountError,
+  retry: retryAccountProvisioning,
+} = useAccountProvisioning()
 
 const navLinks: NavLink[] = [
   { text: 'Map', href: '/' },
@@ -56,7 +63,22 @@ function login() {
       </PhilaLink>
     </template>
     <div class="content app-content">
-      <RouterView />
+      <div v-if="accountStatus === 'pending'" class="account-provisioning-gate" role="status">
+        <span class="spinner" aria-hidden="true" />
+        <span class="sr-only">Logging in…</span>
+      </div>
+      <Callout
+        v-else-if="accountStatus === 'error'"
+        class="account-provisioning-gate"
+        type="error"
+        role="alert"
+        :message="`Couldn't log you in: ${accountError}`"
+      >
+        <PhilaButton variant="secondary" type="button" @click="retryAccountProvisioning()">
+          Try again
+        </PhilaButton>
+      </Callout>
+      <RouterView v-else />
     </div>
   </PinboardShell>
 </template>
@@ -75,5 +97,29 @@ function login() {
 .navbar-user {
   color: var(--Schemes-On-Inverse-Surface-Bright, #fff);
   padding-right: var(--spacing-3xl);
+}
+
+.account-provisioning-gate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--spacing-m, 1rem);
+  box-sizing: border-box;
+}
+
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid var(--Schemes-Border-low, #e3e3e3);
+  border-top-color: var(--Schemes-Primary, #002855);
+  border-radius: 50%;
+  animation: spinner-rotate 0.8s linear infinite;
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
