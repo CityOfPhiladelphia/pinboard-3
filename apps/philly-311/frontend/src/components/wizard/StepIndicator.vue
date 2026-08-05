@@ -2,6 +2,8 @@
      Marks the current step with aria-current="step" and labels via SR-only text. -->
 <script setup lang="ts">
 import { computed } from 'vue'
+import { Icon } from '@phila/phila-ui-core'
+import { IconCheck } from '@phila/phila-ui-core/icons'
 
 interface Step {
   title: string
@@ -29,14 +31,17 @@ const indexed = computed(() =>
   <nav aria-label="Report progress" class="step-indicator">
     <ol>
       <li v-for="step in indexed" :key="step.n" :data-state="step.state">
-        <button v-if="step.clickable" type="button" @click="emit('navigate', step.path)">
-          <span class="sr-only">Step {{ step.n }} of {{ steps.length }}: </span>
-          {{ step.title }}
-        </button>
-        <span v-else :aria-current="step.state === 'current' ? 'step' : undefined">
-          <span class="sr-only">Step {{ step.n }} of {{ steps.length }}: </span>
-          {{ step.title }}
-        </span>
+        <span class="sr-only" :v-text="`Step ${step.n} of ${steps.length}`" />
+        <div
+          :type="step.clickable ? 'button' : ''"
+          class="step-status"
+          @click="step.clickable ? emit('navigate', step.path) : null"
+        >
+          <span v-if="step.n >= currentStep" class="step-number" v-text="step.n" />
+          <Icon v-else :icon="IconCheck" size="extra-small" class="step-number" />
+          <span class="step-label" v-text="step.title" />
+        </div>
+        <div v-if="step.n < steps.length" class="step-dash" />
       </li>
     </ol>
   </nav>
@@ -44,36 +49,35 @@ const indexed = computed(() =>
 
 <style scoped>
 .step-indicator ol {
-  display: flex;
-  align-items: center;
+  counter-reset: step-counter;
+  display: grid;
+  place-content: center;
   list-style: none;
-  padding: var(--spacing-m, 1rem) 0;
+  padding: 0;
   margin: 0;
-  gap: 0;
+  max-width: 512px;
+  grid-template-columns: 2fr 2fr 2fr 2fr 1fr;
 }
 
 .step-indicator li {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  position: relative;
+  counter-increment: step-counter;
+  display: grid;
+  grid-template-areas:
+    'number dash'
+    'label empty';
 }
 
 /* Connecting line between steps */
-.step-indicator li:not(:last-child)::after {
+.step-dash {
+  grid-area: dash;
   content: '';
-  flex: 1;
-  height: 2px;
-  background: var(--Schemes-Border-low, #ccc);
-  margin: 0 var(--spacing-xs, 0.5rem);
-}
-
-.step-indicator li[data-state='done']::after {
-  background: var(--Schemes-Primary, #0f4d90);
+  height: 0px;
+  border: var(--border-width-s, 1px) solid var(--Schemes-Border-low, #ccc);
+  margin: var(--spacing-m, 0.5rem) 0;
+  width: 72px;
 }
 
 /* Base style for both button and span step labels */
-.step-indicator li button,
 .step-indicator li span:not(.sr-only) {
   display: flex;
   align-items: center;
@@ -82,73 +86,81 @@ const indexed = computed(() =>
   white-space: nowrap;
 }
 
-/* Numbered circle indicator via ::before — counter-reset on ol, counter-increment on li */
-.step-indicator ol {
-  counter-reset: step-counter;
+.step-number {
+  grid-area: number;
+  display: grid;
+  place-content: center;
+  margin: 0 auto var(--spacing-xs, 8px) auto;
+  width: 32px;
+  height: 32px;
+  aspect-ratio: 1/1;
+  background: transparent;
+  border-radius: var(--border-radius-2xl, 32px);
+  font-family: var(--Label-Small-font-label-small-family, Montserrat);
+  font-size: var(--Label-Small-font-label-small-size, 14px);
+  font-style: normal;
+  line-height: var(--Label-Small-font-label-small-lineheight, 20px); /* 142.857% */
+  font-weight: 600;
 }
 
-.step-indicator li {
-  counter-increment: step-counter;
+.step-indicator li:first-child .step-number {
+  margin-left: 0;
 }
 
-.step-indicator li button::before,
-.step-indicator li span:not(.sr-only)::before {
-  content: counter(step-counter);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  flex-shrink: 0;
+.step-indicator li:last-child .step-number {
+  margin-right: 0;
 }
 
-/* Done: filled primary circle */
-.step-indicator li[data-state='done'] button::before {
-  content: '✓';
-  background: var(--Schemes-Primary, #0f4d90);
-  color: #fff;
-  border: 2px solid var(--Schemes-Primary, #0f4d90);
+.step-label {
+  grid-area: label;
+  font-family: var(--Body-ExtraSmall-font-body-xs-family, Montserrat);
+  font-size: var(--Body-ExtraSmall-font-body-xs-size, 12px);
+  font-style: normal;
+  line-height: var(--Body-ExtraSmall-font-body-xs-lineheight, 16px); /* 133.333% */
+  font-weight: 400;
+  text-align: center;
 }
 
 /* Done: clickable button styling */
-.step-indicator li[data-state='done'] button {
-  background: none;
-  border: none;
-  padding: 0;
+.step-indicator li[data-state='done'] .step-status {
   cursor: pointer;
-  color: var(--Schemes-Primary, #0f4d90);
-  font-weight: 500;
 }
 
-.step-indicator li[data-state='done'] button:hover {
+.step-indicator li[data-state='done'] .step-number {
+  width: 28px;
+  height: 28px;
+  border: var(--border-width-m, 2px) solid var(--Schemes-Primary, #1034f4);
+  color: var(--Schemes-Primary, #1034f4);
+}
+
+.step-indicator li[data-state='done']:hover {
   text-decoration: underline;
 }
 
-/* Current: filled primary circle with number */
-.step-indicator li[data-state='current'] span:not(.sr-only)::before {
-  background: var(--Schemes-Primary, #0f4d90);
-  color: #fff;
-  border: 2px solid var(--Schemes-Primary, #0f4d90);
+.step-indicator li[data-state='done']::after {
+  pointer-events: unset;
+  cursor: default;
 }
 
-.step-indicator li[data-state='current'] span:not(.sr-only) {
-  color: var(--Schemes-Primary, #0f4d90);
-  font-weight: 700;
+/* Current: filled primary circle with number */
+.step-indicator li[data-state='current'] .step-number {
+  background: var(--Schemes-Primary, #0f4d90);
+  color: var(--Schemes-On-Primary, #fff);
+}
+
+.step-indicator li[data-state='current'] .step-label {
+  color: var(--Schemes-On-Background, #000);
+  font-weight: 600;
 }
 
 /* Upcoming: outlined circle with number */
-.step-indicator li[data-state='upcoming'] span:not(.sr-only)::before {
-  background: transparent;
-  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
-  border: 2px solid var(--Schemes-Border-low, #ccc);
+.step-indicator li[data-state='upcoming'] .step-number {
+  border: var(--border-width-m, 2px) dashed var(--Schemes-Border-low, #ccc);
+  color: var(--Schemes-Border-high, #9b9b9b);
 }
 
-.step-indicator li[data-state='upcoming'] span:not(.sr-only) {
-  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
-  font-weight: 400;
+.step-indicator li[data-state='upcoming'] .step-label {
+  color: var(--Schemes-On-Background, #000);
 }
 
 /* Responsive: stack vertically on small screens */

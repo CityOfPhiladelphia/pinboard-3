@@ -21,6 +21,9 @@ catalogs:
     '@phila/phila-ui-bottom-sheet':
       specifier: ^0.1.1
       version: 0.1.1
+    '@phila/phila-ui-breadcrumbs':
+      specifier: ^0.2.4
+      version: 0.2.4
     '@phila/phila-ui-button':
       specifier: ^2.3.1
       version: 2.3.1
@@ -107,7 +110,7 @@ catalogs:
       version: 10.1.8
     eslint-plugin-vue:
       specifier: ^10.10.0
-      version: 10.9.2
+      version: 10.10.0
     globals:
       specifier: ^17.8.0
       version: 17.8.0
@@ -311,6 +314,9 @@ importers:
 
   apps/philly-311/frontend:
     dependencies:
+      '@phila/phila-ui-breadcrumbs':
+        specifier: 'catalog:'
+        version: 0.2.4(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-button':
         specifier: 'catalog:'
         version: 2.3.1(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
@@ -1284,6 +1290,11 @@ packages:
 
   '@phila/phila-ui-bottom-sheet@0.1.1':
     resolution: {integrity: sha512-dJhtGgXaZFUPv7mYigDOMkt2llxf7tG1WmOQats77F20vnx7+WML4rdweQ4L+c2y4pbbNHRaZobNViGB8WaeKw==}
+    peerDependencies:
+      vue: ^3.0.0
+
+  '@phila/phila-ui-breadcrumbs@0.2.4':
+    resolution: {integrity: sha512-O5/cEcJZ5l7lql70120cQZrZYNLPV4xQf4FRyzhqODQc6FvHLMolNTQx7lxcP0at+Zlbip9OmoqgTRFAIR74Zg==}
     peerDependencies:
       vue: ^3.0.0
 
@@ -4227,6 +4238,14 @@ snapshots:
   '@phila/phila-ui-bottom-sheet@0.1.1(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
     dependencies:
       '@phila/phila-ui-core': 3.0.1(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
+      vue: 3.5.33(typescript@6.0.3)
+    transitivePeerDependencies:
+      - vue-router
+
+  '@phila/phila-ui-breadcrumbs@0.2.4(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
+    dependencies:
+      '@phila/phila-ui-core': 3.0.1(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
+      '@phila/phila-ui-link': 1.1.1(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       vue: 3.5.33(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
