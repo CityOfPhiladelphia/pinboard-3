@@ -11,7 +11,6 @@ import { useRouter, useRoute } from 'vue-router'
 import StepIndicator from '@/components/wizard/StepIndicator.vue'
 import ExitDialog from '@/components/wizard/ExitDialog.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
-import { Breadcrumbs } from '@phila/phila-ui-breadcrumbs'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useMyCasesStore } from '@/stores/myCases'
 import { WIZARD_CAN_ADVANCE_KEY, WIZARD_SHOW_ERRORS_KEY } from '@/composables/useWizardValidity'
@@ -92,17 +91,16 @@ function discardAndExit() {
 
 <template>
   <div ref="wizardEl" class="wizard">
-    <div class="wizard__header">
-      <Breadcrumbs :items="[{ label: 'Report an issue' }]" class="wizard__bradcrumbs" />
+    <nav class="wizard__crumb" aria-label="Breadcrumb">
+      <RouterLink to="/">Home</RouterLink> / <span>Report an issue</span>
+    </nav>
 
-      <StepIndicator
-        :steps="STEPS"
-        :current-step="currentStep"
-        :completed-through="completedThrough"
-        class="wizard__steps"
-        @navigate="(path: string) => router.push(path)"
-      />
-    </div>
+    <StepIndicator
+      :steps="STEPS"
+      :current-step="currentStep"
+      :completed-through="completedThrough"
+      @navigate="(path: string) => router.push(path)"
+    />
 
     <section class="wizard__content">
       <RouterView />
@@ -142,42 +140,19 @@ function discardAndExit() {
 
 <style scoped>
 .wizard {
-  display: grid;
-  grid-template-areas:
-    'w_header'
-    'w_content'
-    'w_footer';
-  grid-template-rows: min-content auto min-content;
+  max-width: 980px;
+  margin: 0 auto;
+  /* No bottom padding: the sticky nav pins to the scrollport's bottom edge and
+     content would otherwise show through a padding-sized gap beneath it. */
+  padding: var(--spacing-m, 1rem) var(--spacing-m, 1rem) 0;
+  height: 100%;
+  overflow-y: auto;
 }
-
-.wizard__header {
-  grid-area: w_header;
-  grid-template-areas:
-    'w_breadcrumbs'
-    'w_stepindicator';
-  grid-template-rows: min-content min-content;
-  width: 100%;
-  max-width: 1440px;
-  padding: var(--spacing-l, 24px) var(--spacing-xl, 32px);
+.wizard__crumb {
+  font-size: 0.875rem;
+  margin-bottom: var(--spacing-s, 0.75rem);
 }
-
-.wizard__header :deep(li) {
-  margin-bottom: 0;
-  padding-left: 0;
-}
-
-.wizard__bradcrumbs {
-  grid-area: w_breadcrumbs;
-  padding: var(--spacing-xs, 8px);
-}
-
-.wizard__steps {
-  grid-area: w_stepindicator;
-  place-items: center;
-}
-
 .wizard__content {
-  grid-area: w_content;
   padding: var(--spacing-l, 2rem) 0;
   min-height: 320px;
 }
@@ -186,7 +161,6 @@ function discardAndExit() {
    map over most of the content, so controls at the end of the scroll run
    can otherwise sit below the fold with no way to reach them. */
 .wizard__nav {
-  grid-area: w_footer;
   position: sticky;
   bottom: 0;
   background: #fff;

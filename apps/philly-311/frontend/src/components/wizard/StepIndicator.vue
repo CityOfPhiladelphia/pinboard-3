@@ -68,12 +68,14 @@ const indexed = computed(() => {
   list-style: none;
   padding: 0;
   margin: 0;
-  max-width: 512px;
+  max-width: 32rem;
   grid-template-columns: 14fr 15fr 15fr 15fr 5fr;
 }
 
 .step-indicator li {
   counter-increment: step-counter;
+  margin-bottom: 0;
+  padding-left: 0;
   display: grid;
   grid-template-areas:
     'dash_l pad_l number pad_r dash_r'
@@ -82,12 +84,12 @@ const indexed = computed(() => {
 
 .step-pad-right {
   grid-area: pad_r;
-  width: var(--spacing-xs, 8px);
+  width: var(--spacing-xs, 0.5rem);
 }
 
 .step-pad-left {
   grid-area: pad_l;
-  width: var(--spacing-xs, 8px);
+  width: var(--spacing-xs, 0.5rem);
 }
 
 /* Connecting line between steps */
@@ -95,34 +97,34 @@ const indexed = computed(() => {
   grid-area: dash_r;
   content: '';
   height: 0px;
-  border: var(--border-width-s, 1px) solid var(--Schemes-Border-low, #ccc);
-  margin: var(--spacing-m, 0.5rem) 0;
-  width: 36px;
+  border: var(--border-width-s, 0.0625rem) solid var(--Schemes-Border-low, rgb(204, 204, 204));
+  margin: var(--spacing-m, 1rem) 0;
+  width: 2.25rem;
 }
 
 .step-dash-left {
   grid-area: dash_l;
   content: '';
   height: 0px;
-  border: var(--border-width-s, 1px) solid var(--Schemes-Border-low, #ccc);
-  margin: var(--spacing-m, 0.5rem) 0;
-  width: 36px;
+  border: var(--border-width-s, 0.0625rem) solid var(--Schemes-Border-low, rgb(204, 204, 204));
+  margin: var(--spacing-m, 1rem) 0;
+  width: 2.25rem;
 }
 
 .step-number {
   grid-area: number;
   display: grid;
   place-content: center;
-  margin: 0 0 var(--spacing-xs, 8px) 0;
-  width: 32px;
-  height: 32px;
+  margin: 0 0 var(--spacing-xs, 0.5rem) 0;
+  width: 2rem;
+  height: 2rem;
   aspect-ratio: 1/1;
   background: transparent;
-  border-radius: var(--border-radius-2xl, 32px);
+  border-radius: var(--border-radius-2xl, 2rem);
   font-family: var(--Label-Small-font-label-small-family, Montserrat);
-  font-size: var(--Label-Small-font-label-small-size, 14px);
+  font-size: var(--Label-Small-font-label-small-size, 1rem);
   font-style: normal;
-  line-height: var(--Label-Small-font-label-small-lineheight, 20px); /* 142.857% */
+  line-height: var(--Label-Small-font-label-small-lineheight, 1.25rem); /* 142.857% */
   font-weight: 600;
 }
 
@@ -138,9 +140,9 @@ const indexed = computed(() => {
   grid-area: label;
   margin: 0 auto;
   font-family: var(--Body-ExtraSmall-font-body-xs-family, Montserrat);
-  font-size: var(--Body-ExtraSmall-font-body-xs-size, 12px);
+  font-size: var(--Body-ExtraSmall-font-body-xs-size, 0.75rem);
   font-style: normal;
-  line-height: var(--Body-ExtraSmall-font-body-xs-lineheight, 16px); /* 133.333% */
+  line-height: var(--Body-ExtraSmall-font-body-xs-lineheight, 1rem); /* 133.333% */
   font-weight: 400;
 }
 
@@ -158,14 +160,14 @@ const indexed = computed(() => {
 }
 
 .step-indicator li[data-state='done'] .step-number {
-  width: 28px;
-  height: 28px;
-  border: var(--border-width-m, 2px) solid var(--Schemes-Primary, #1034f4);
-  color: var(--Schemes-Primary, #1034f4);
+  width: 1.7rem;
+  height: 1.7rem;
+  border: var(--border-width-m, 0.125rem) solid var(--Schemes-Primary, rgb(16, 52, 244));
+  color: var(--Schemes-Primary, rgb(16, 52, 244));
 }
 
 .step-indicator li[data-state='done'] .step-dash-right {
-  border: var(--border-width-s, 1px) solid var(--Schemes-Primary, #1034f4);
+  border: var(--border-width-s, 0.0625rem) solid var(--Schemes-Primary, rgb(16, 52, 244));
 }
 
 .step-indicator li[data-state='done']:hover {
@@ -179,7 +181,7 @@ const indexed = computed(() => {
 
 /* Current: filled primary circle with number */
 .step-indicator li[data-state='current'] .step-number {
-  background: var(--Schemes-Primary, #0f4d90);
+  background: var(--Schemes-Primary, rgb(16, 52, 244));
   color: var(--Schemes-On-Primary, #fff);
 }
 
@@ -189,27 +191,16 @@ const indexed = computed(() => {
 }
 
 .step-indicator li[data-state='current'] .step-dash-left {
-  border: var(--border-width-s, 1px) solid var(--Schemes-Primary, #1034f4);
+  border: var(--border-width-s, 0.0625rem) solid var(--Schemes-Primary, rgb(16, 52, 244));
 }
 
 /* Upcoming: outlined circle with number */
 .step-indicator li[data-state='upcoming'] .step-number {
-  border: var(--border-width-m, 2px) dashed var(--Schemes-Border-low, #ccc);
-  color: var(--Schemes-Border-high, #9b9b9b);
+  border: var(--border-width-m, 0.125rem) dashed var(--Schemes-Border-low, rgb(204, 204, 204));
+  color: var(--Schemes-Border-high, rgb(155, 155, 155));
 }
 
 .step-indicator li[data-state='upcoming'] .step-label {
   color: var(--Schemes-On-Background, #000);
-}
-
-/* Responsive: stack vertically on small screens */
-@media (max-width: 600px) {
-  .step-dash-left {
-    width: 18px;
-  }
-
-  .step-dash-right {
-    width: 18px;
-  }
 }
 </style>
