@@ -1,7 +1,7 @@
 <!-- ABOUTME: Wizard step indicator with click-to-jump on completed steps.
      Marks the current step with aria-current="step" and labels via SR-only text. -->
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { Icon } from '@phila/phila-ui-core'
 import { IconCheck } from '@phila/phila-ui-core/icons'
 
@@ -15,18 +15,30 @@ const props = defineProps<{
   completedThrough: number
 }>()
 const emit = defineEmits<{ navigate: [path: string] }>()
+const hovered = ref<Record<string, 'underline' | ''>>(
+  Object.fromEntries(props.steps.map((step) => [step.title, ''])),
+)
 
 const indexed = computed(() => {
-  const a = props.steps.map((s, i) => ({
+  return props.steps.map((s, i) => ({
     ...s,
     n: i + 1,
     state:
       i + 1 < props.currentStep ? 'done' : i + 1 === props.currentStep ? 'current' : 'upcoming',
     clickable: i + 1 <= props.completedThrough && i + 1 !== props.currentStep,
   }))
-  console.log(a)
-  return a
 })
+
+function handleMouseEnter(ev: MouseEvent) {
+  const target = ev.target as HTMLElement
+  const buttonId = target.id
+  hovered.value[buttonId] = 'underline'
+}
+function handleMouseLeave(ev: MouseEvent) {
+  const target = ev.target as HTMLElement
+  const buttonId = target.id
+  hovered.value[buttonId] = ''
+}
 </script>
 
 <template>
@@ -39,8 +51,11 @@ const indexed = computed(() => {
         <span v-if="step.n >= currentStep" class="step-number" v-text="step.n" />
         <div
           v-else
+          :id="step.title"
           :type="step.clickable ? 'button' : ''"
           class="step-button"
+          @mouseenter="handleMouseEnter"
+          @mouseleave="handleMouseLeave"
           @click="step.clickable ? emit('navigate', step.path) : null"
         >
           <Icon :icon="IconCheck" size="extra-small" class="step-number" />
@@ -50,6 +65,7 @@ const indexed = computed(() => {
         <span
           :type="step.clickable ? 'button' : ''"
           class="step-label"
+          :style="{ 'text-decoration': hovered[step.title] }"
           @click="step.clickable ? emit('navigate', step.path) : null"
           v-text="step.title"
         />
@@ -111,7 +127,7 @@ const indexed = computed(() => {
   height: 0px;
   border: var(--border-width-s, 0.0625rem) solid var(--Schemes-Border-low, rgb(204, 204, 204));
   margin: var(--spacing-m, 1rem) 0;
-  width: 2.25rem;
+  width: 2.26rem;
 }
 
 .step-number {
@@ -152,12 +168,6 @@ const indexed = computed(() => {
 }
 
 /* Done: clickable button styling */
-.step-indicator li[data-state='done'] .step-button:hover,
-.step-indicator li[data-state='done'] .step-label:hover {
-  cursor: pointer;
-  text-decoration: underline;
-}
-
 .step-indicator li[data-state='done'] .step-number {
   width: 1.7rem;
   height: 1.7rem;
@@ -165,7 +175,14 @@ const indexed = computed(() => {
   color: var(--Schemes-Primary, rgb(16, 52, 244));
 }
 
+.step-indicator li[data-state='done'] .step-label:hover,
+.step-indicator li[data-state='done'] .step-button:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .step-indicator li[data-state='done'] .step-dash-right,
+.step-indicator li[data-state='done'] .step-dash-left,
 .step-indicator li[data-state='current'] .step-dash-left {
   border: var(--border-width-s, 0.0625rem) solid var(--Schemes-Primary, rgb(16, 52, 244));
 }
