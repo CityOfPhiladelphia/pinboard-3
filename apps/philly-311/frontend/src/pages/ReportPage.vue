@@ -150,7 +150,7 @@ function discardAndExit() {
     'w_header'
     'w_content'
     'w_footer';
-  grid-template-rows: 144px auto 112px;
+  grid-template-rows: 9rem auto 7rem;
   height: 100%;
   width: 100%;
   margin: 0 auto;
@@ -163,12 +163,12 @@ function discardAndExit() {
     'w_stepindicator';
   grid-template-rows: 3fr 5fr;
   width: 100%;
-  padding: var(--spacing-l, 24px) var(--spacing-xl, 32px);
+  padding: var(--spacing-l, 1.5rem) var(--spacing-xl, 2rem);
 }
 
 .wizard__bradcrumbs {
   grid-area: w_breadcrumbs;
-  padding: var(--spacing-xs, 8px);
+  padding: var(--spacing-xs, 0.5rem);
 }
 
 .wizard__bradcrumbs :deep(li) {
@@ -185,7 +185,7 @@ function discardAndExit() {
 .wizard__content {
   grid-area: w_content;
   padding: var(--spacing-l, 2rem) 0;
-  margin: 0 80px;
+  margin: 0 var(--scale-1000, 5rem);
   overflow-y: auto;
   overflow-x: auto;
 }
@@ -196,24 +196,22 @@ function discardAndExit() {
    can otherwise sit below the fold with no way to reach them. */
 .wizard__nav {
   grid-area: w_footer;
-  position: sticky;
-  bottom: 0;
-  background: #fff;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-m, 1rem) 0;
   border-top: 1px solid var(--Schemes-Border-low, #d6d6d6);
+  background: var(--Schemes-Background, #fff);
 }
 
 .wizard__nav-right {
   display: flex;
   gap: var(--spacing-s, 0.75rem);
-  margin-right: 80px;
+  margin-right: var(--scale-1000, 5rem);
 }
 
 .wizard__exit {
-  margin-left: 80px;
+  margin-left: var(--scale-1000, 5rem);
   text-decoration: underline;
 }
 </style>
