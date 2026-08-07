@@ -63,6 +63,9 @@ export const authGuard: NavigationGuard = async (to) => {
 export function wizardGuard(to: RouteLocationNormalized): true | string {
   if (to.path === '/report' || !to.path.startsWith('/report/')) return true
   const store = useReportSubmissionStore()
+  if (Object.entries(to.query).length) {
+    store.urlQueryParamsToState(to.query)
+  }
 
   // Confirmation is post-wizard: requires a recorded submission, skips the category gate.
   if (to.path === '/report/confirmation') return store.submitted ? true : '/report'
