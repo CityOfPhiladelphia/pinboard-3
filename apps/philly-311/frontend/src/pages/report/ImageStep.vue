@@ -64,75 +64,98 @@ async function onFile(e: Event) {
 </script>
 
 <template>
-  <div class="image-step">
-    <h1 class="image-step__title">Images (optional)</h1>
-    <p class="image-step__note">
-      This app uses machine learning to pull location data from your photo and suggest the issue
-      type to report. Do not upload any images with personal or sensitive information.
-    </p>
-    <p class="image-step__count">{{ store.photo ? '1/1' : '0/1' }}</p>
-    <div class="image-step__zones">
-      <label class="image-step__zone">
-        <span v-if="waitingImageUpload" class="image-step__zone-label">Upload</span>
-        <img :id="imageId" alt="Upload" style="display: none" onload="this.style.display = ''" />
-        <input type="file" accept="image/*" @change="onFile" />
-      </label>
-    </div>
+  <h1 class="image-step__title">Images (optional)</h1>
+  <div
+    class="image-step__note"
+    v-text="
+      `This app uses machine learning to pull location data from your photo and suggest the issue type
+    to report. Do not upload any images with personal or sensitive information.`
+    "
+  />
 
-    <div role="status">
-      <p v-if="classifying" class="image-step__status">Analyzing your photo…</p>
-      <p v-else-if="store.photo" class="image-step__status">Photo added.</p>
-      <p v-else-if="errorMessage" role="alert" class="image-step__error">{{ errorMessage }}</p>
-    </div>
+  <div class="image-step__count">{{ store.photo ? '1/1' : '0/1' }}</div>
+  <div class="image-step__upload-container">
+    <label class="image-step__upload">
+      <span v-if="waitingImageUpload" class="image-step__upload-label">Upload</span>
+      <img :id="imageId" alt="Upload" style="display: none" onload="this.style.display = ''" />
+      <input type="file" accept="image/*" @change="onFile" />
+    </label>
+  </div>
+
+  <div role="status">
+    <div v-if="classifying" class="image-step__status">Analyzing your photo…</div>
+    <div v-else-if="store.photo" class="image-step__status">Photo added.</div>
+    <div v-else-if="errorMessage" role="alert" class="image-step__error">{{ errorMessage }}</div>
   </div>
 </template>
 
 <style scoped>
-.image-step {
-  max-width: 640px;
-}
-
 .image-step__title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 var(--spacing-s, 0.5rem);
+  align-self: stretch;
+  /* Heading/H5 */
+  color: #374151;
+  font-family: var(--Heading-H5-font-heading-5-family, Montserrat);
+  font-size: var(--Heading-H5-font-heading-5-size, 1.25rem);
+  font-style: normal;
+  font-weight: 600;
+  line-height: var(--Heading-H5-font-heading-5-lineheight, 1.75rem); /* 140% */
 }
 
 .image-step__note {
+  max-width: 39rem;
+  align-self: stretch;
+  margin: var(--spacing-xs, 0.5rem) 0;
   color: var(--Schemes-On-Surface-Variant, #4a4a4a);
-  margin: 0 0 var(--spacing-s, 0.5rem);
+  color: #374151;
+
+  /* Body/Default */
+  font-family: var(--Body-Default-font-body-default-family, Montserrat);
+  font-size: var(--Body-Default-font-body-default-size, 1rem);
+  font-style: normal;
+  font-weight: 400;
+  line-height: var(--Body-Default-font-body-default-lineheight, 2rem); /* 150% */
 }
 
 .image-step__count {
-  margin: 0 0 var(--spacing-s, 0.5rem);
+  margin-bottom: var(--spacing-l, 2rem);
 }
 
-.image-step__zones {
-  display: flex;
-  gap: var(--spacing-m, 1rem);
+.image-step__upload-container {
+  margin: 0 0.25rem;
+  display: grid;
+  height: 15rem;
+  row-gap: var(--spacing-m, 1rem);
+  column-gap: var(--spacing-m, 1rem);
+  align-self: stretch;
+  grid-template-rows: repeat(1, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
-.image-step__zone {
-  flex: 1;
-  min-height: 180px;
-  border: 1px dashed var(--Schemes-Border, #b3b3b3);
-  border-radius: 6px;
+.image-step__upload {
   display: flex;
-  align-items: center;
+  padding: var(--spacing-xs, 0.5rem);
+  flex-direction: column;
   justify-content: center;
-  cursor: pointer;
+  align-items: center;
+  gap: var(--spacing-2xs, 0.25rem);
+  align-self: stretch;
+  grid-row: 1 / span 1;
+  grid-column: 1 / span 1;
+  justify-self: stretch;
+  border-radius: 0.75rem;
+  border: var(--border-width-s, 1px) dashed var(--Schemes-Border-high, #9b9b9b);
 }
 
-.image-step__zone input {
+.image-step__upload input {
   position: absolute;
   width: 1px;
   height: 1px;
   opacity: 0;
 }
 
-.image-step__zone:focus-within {
-  outline: 2px solid var(--Schemes-Primary, #0f4d90);
-  outline-offset: 2px;
+.image-step__upload:focus-within {
+  outline: var(--border-width-m, 0.125rem) solid var(--Schemes-Primary, rgb(16, 52, 244));
+  outline-offset: 0.125rem;
 }
 
 .image-step__error {

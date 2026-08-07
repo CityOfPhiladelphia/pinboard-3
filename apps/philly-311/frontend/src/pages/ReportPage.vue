@@ -214,5 +214,6 @@ function discardAndExit() {
 
 .wizard__exit {
   margin-left: 80px;
+  text-decoration: underline;
 }
 </style>
