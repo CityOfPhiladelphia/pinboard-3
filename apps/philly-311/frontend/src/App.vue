@@ -1,15 +1,16 @@
 <!-- ABOUTME: Root component. Wraps every route in PinboardShell chrome inside a
      phila .content region and supplies the header's nav links and CTAs. -->
 <script setup lang="ts">
-import { PinboardShell, PhilaLink } from '@pinboard/ui'
+import { PinboardShell } from '@pinboard/ui'
 import '@pinboard/ui/style.css'
 import '@/assets/a11y.css'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { Callout } from '@phila/phila-ui-callout'
 import { useAuth } from '@phila/sso-vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import type { NavLink } from '@pinboard/ui'
 import { useAccountProvisioning } from '@/composables/useAccountProvisioning'
+import ReportDocumentIcon from '@/components/ReportDocumentIcon.vue'
 
 const route = useRoute()
 const { signIn, signOut, isAuthenticated, userName } = useAuth()
@@ -19,11 +20,23 @@ const {
   retry: retryAccountProvisioning,
 } = useAccountProvisioning()
 
-const navLinks: NavLink[] = [
-  { text: 'Map', href: '/' },
-  { text: 'My Requests', href: '/reports' },
-  { text: 'Answers', href: '/answers' },
-]
+// Marks a nav link selected when its href matches the current route, exactly
+// or as a path prefix (so e.g. "/answers" stays selected on "/answers/123").
+// "/" is exempt from prefix matching or it would match every route.
+const isSelectedHref = (href?: string) =>
+  href !== undefined && (href === route.path || (href !== '/' && route.path.startsWith(`${href}/`)))
+
+const navLinks = computed(() =>
+  [
+    { text: 'Report an issue', href: '/report', icon: ReportDocumentIcon, iconSize: 'large' },
+    { text: 'Map', href: '/' },
+    { text: 'My Requests', href: '/reports' },
+    { text: 'Answers', href: '/answers' },
+    ...(isAuthenticated.value
+      ? [{ text: userName.value }, { text: 'Sign out', href: '#', onClick: () => signOut() }]
+      : [{ text: 'Login / Sign up', href: '#', onClick: () => login() }]),
+  ].map((link) => ({ ...link, selected: isSelectedHref(link.href) })),
+)
 
 const feedbackHref = 'https://www.phila.gov/feedback/'
 
@@ -50,18 +63,6 @@ function login() {
     :show-header-tooltip="false"
     :feedback-href="feedbackHref"
   >
-    <template #navbar-left-end>
-      <PhilaButton variant="primary" to="/report" class="navbar-cta">Report an issue</PhilaButton>
-    </template>
-    <template #navbar-end>
-      <template v-if="isAuthenticated">
-        <span class="navbar-user has-text-label-default">{{ userName }}</span>
-        <PhilaLink href="#" variant="on-primary" @click.prevent="signOut()"> Sign out </PhilaLink>
-      </template>
-      <PhilaLink v-else href="#" variant="on-primary" @click.prevent="login()">
-        Login / Sign up
-      </PhilaLink>
-    </template>
     <div class="content app-content">
       <div v-if="accountStatus === 'pending'" class="account-provisioning-gate" role="status">
         <span class="spinner" aria-hidden="true" />
@@ -88,15 +89,6 @@ function login() {
    without introducing a layout box that would break the full-height map. */
 .app-content {
   display: contents;
-}
-
-.navbar-cta {
-  align-self: center;
-}
-
-.navbar-user {
-  color: var(--Schemes-On-Inverse-Surface-Bright, #fff);
-  padding-right: var(--spacing-3xl);
 }
 
 .account-provisioning-gate {
