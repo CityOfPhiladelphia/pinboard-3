@@ -109,30 +109,33 @@ function discardAndExit() {
     </section>
 
     <footer class="wizard__nav">
-      <button type="button" class="wizard__exit" data-test="wizard-exit" @click="exitOpen = true">
+      <PhilaButton
+        size="extra-small"
+        class="wizard__exit"
+        data-test="wizard-exit"
+        @click="exitOpen = true"
+      >
         Exit
-      </button>
+      </PhilaButton>
 
       <div class="wizard__nav-right">
-        <PhilaButton v-if="isImageStep" variant="secondary" data-test="wizard-skip" @click="goNext"
-          >Skip</PhilaButton
-        >
         <PhilaButton
           v-if="!isImageStep"
           variant="secondary"
           data-test="wizard-back"
           :disabled="!prevPath"
           @click="goPrev"
-          >Back</PhilaButton
         >
+          Back
+        </PhilaButton>
         <PhilaButton
           v-if="!isLast"
           variant="primary"
           data-test="wizard-next"
           :disabled="!nextPath"
           @click="goNext"
-          >Next</PhilaButton
-        >
+          >{{ isImageStep ? 'Skip' : 'Next' }}
+        </PhilaButton>
       </div>
     </footer>
 
@@ -147,7 +150,10 @@ function discardAndExit() {
     'w_header'
     'w_content'
     'w_footer';
-  grid-template-rows: min-content auto min-content;
+  grid-template-rows: 144px auto 112px;
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .wizard__header {
@@ -155,15 +161,9 @@ function discardAndExit() {
   grid-template-areas:
     'w_breadcrumbs'
     'w_stepindicator';
-  grid-template-rows: min-content min-content;
+  grid-template-rows: 3fr 5fr;
   width: 100%;
-  max-width: 1440px;
   padding: var(--spacing-l, 24px) var(--spacing-xl, 32px);
-}
-
-.wizard__header :deep(li) {
-  margin-bottom: 0;
-  padding-left: 0;
 }
 
 .wizard__bradcrumbs {
@@ -171,16 +171,25 @@ function discardAndExit() {
   padding: var(--spacing-xs, 8px);
 }
 
+.wizard__bradcrumbs :deep(li) {
+  margin-bottom: 0;
+  padding-left: 0;
+}
+
 .wizard__steps {
   grid-area: w_stepindicator;
-  place-items: center;
+  display: grid;
+  place-content: center;
 }
 
 .wizard__content {
   grid-area: w_content;
   padding: var(--spacing-l, 2rem) 0;
-  min-height: 320px;
+  margin: 0 80px;
+  overflow-y: auto;
+  overflow-x: auto;
 }
+
 /* Sticky so Exit/Back/Next stay reachable: the wizard scrolls internally
    (the shell locks the viewport) and steps like Location put a wheel-capturing
    map over most of the content, so controls at the end of the scroll run
@@ -196,14 +205,14 @@ function discardAndExit() {
   padding: var(--spacing-m, 1rem) 0;
   border-top: 1px solid var(--Schemes-Border-low, #d6d6d6);
 }
+
 .wizard__nav-right {
   display: flex;
   gap: var(--spacing-s, 0.75rem);
+  margin-right: 80px;
 }
+
 .wizard__exit {
-  background: none;
-  border: none;
-  color: var(--Schemes-Primary, #0f4d90);
-  cursor: pointer;
+  margin-left: 80px;
 }
 </style>
