@@ -86,7 +86,7 @@ function handleMouseLeave(ev: MouseEvent) {
   padding: 0;
   margin: 0;
   max-width: 32rem;
-  grid-template-columns: 14fr 15fr 15fr 15fr 5fr;
+  grid-template-columns: auto auto auto auto auto;
 }
 
 .step-indicator li {
