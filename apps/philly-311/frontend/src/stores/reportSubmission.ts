@@ -10,6 +10,8 @@ import type {
   SubmittedReport,
   WizardLocation,
 } from '@/types/wizard'
+import { charCodeToString, stringToCharCode } from '@pinboard/core'
+import type { LocationQuery } from 'vue-router'
 
 interface State {
   category: string | null
@@ -23,6 +25,19 @@ interface State {
   photoSuggestions: PhotoSuggestion[]
   submitted: SubmittedReport | null
 }
+
+interface T extends LocationQuery {
+  c: string
+  cf: string
+  l: string
+  d: string
+  p: string
+  co: string
+  pv: string
+  ps: string
+}
+
+type QueryParams = Pick<T, 'c' | 'cf' | 'l' | 'd' | 'p' | 'co' | 'pv' | 'ps'>
 
 const initial = (): State => ({
   category: null,
@@ -111,6 +126,89 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
         body.customFields = { ...this.customFields }
       }
       return body
+    },
+    stateToUrlQueryParams(): string {
+      const stateUrl: (string | null)[] = Array.from(
+        Object.entries(this.$state),
+        ([storeKey, storeValue]) => {
+          switch (storeKey as keyof State) {
+            case 'category': {
+              return storeValue ? `c=${encodeURIComponent(storeValue)}` : null
+            }
+            case 'customFields': {
+              return Object.keys(storeValue).length
+                ? `cf=${stringToCharCode(JSON.stringify(storeValue))}`
+                : null
+            }
+            case 'location': {
+              return storeValue ? `l=${stringToCharCode(JSON.stringify(storeValue))}` : null
+            }
+            case 'description': {
+              return Object.keys(storeValue).length
+                ? `d=${stringToCharCode(JSON.stringify(storeValue))}`
+                : null
+            }
+            case 'photo': {
+              return storeValue ? `p=${stringToCharCode(storeValue.mediaUrl)}` : null
+            }
+            case 'contact': {
+              return Object.keys(storeValue).length
+                ? `co=${stringToCharCode(JSON.stringify(storeValue))}`
+                : null
+            }
+            case 'publicVisibility': {
+              return storeValue ? 'pv=t' : null
+            }
+            case 'photoSuggestions': {
+              return Object.keys(storeValue).length
+                ? `ps=${stringToCharCode(JSON.stringify(storeValue))}`
+                : null
+            }
+            case 'submitted': {
+              return null
+            }
+          }
+        },
+      )
+      return stateUrl.filter(Boolean).join('&')
+    },
+    urlQueryParamsToState(params: LocationQuery) {
+      Object.entries(params as QueryParams).forEach(([queryKey, queryValue]) => {
+        switch (queryKey as keyof QueryParams) {
+          case 'c': {
+            this.category = decodeURIComponent(queryValue)
+            break
+          }
+          case 'cf': {
+            this.customFields = JSON.parse(charCodeToString(queryValue))
+            break
+          }
+          case 'l': {
+            this.location = JSON.parse(charCodeToString(queryValue))
+            break
+          }
+          case 'd': {
+            this.description = JSON.parse(charCodeToString(queryValue))
+            break
+          }
+          case 'p': {
+            this.photo = { mediaUrl: JSON.parse(charCodeToString(queryValue)) }
+            break
+          }
+          case 'co': {
+            this.contact = JSON.parse(charCodeToString(queryValue))
+            break
+          }
+          case 'pv': {
+            this.publicVisibility = true
+            break
+          }
+          case 'ps': {
+            this.photoSuggestions = JSON.parse(charCodeToString(queryValue))
+            break
+          }
+        }
+      })
     },
   },
 })
