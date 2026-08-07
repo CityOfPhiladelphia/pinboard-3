@@ -21,21 +21,7 @@ const router = useRouter()
 const route = useRoute()
 const store = useReportSubmissionStore()
 const myCases = useMyCasesStore()
-
 const exitOpen = ref(false)
-watch(
-  exitOpen,
-  (isOpen, wasOpen) => {
-    if (isOpen) {
-      router.push(`?${store.stateToUrlQueryParams()}`)
-    } else if (!isOpen && wasOpen) {
-      router.back()
-    } else {
-      router.replace({ query: {} })
-    }
-  },
-  { immediate: true },
-)
 
 const STEPS = [
   { title: 'Image', path: '/report' },
@@ -134,7 +120,7 @@ function discardAndExit() {
 
       <div class="wizard__nav-right">
         <PhilaButton
-          v-else
+          v-if="!isImageStep"
           variant="secondary"
           data-test="wizard-back"
           :disabled="!prevPath"
@@ -228,5 +214,6 @@ function discardAndExit() {
 
 .wizard__exit {
   margin-left: 80px;
+  text-decoration: underline;
 }
 </style>
