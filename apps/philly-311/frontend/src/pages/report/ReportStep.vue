@@ -1,6 +1,4 @@
-<!-- ABOUTME: Wizard step 1 — optional photo. Upload/Camera -> processForClassify -> /classify,
-     which stores the report (mediaUrl) and returns issue-type suggestions for step 2. Optional;
-     Skip/Next both advance. -->
+<!-- ABOUTME: Template for report pages. Standardizes step headings -->
 <script setup lang="ts">
 // props
 defineProps<{
@@ -39,7 +37,6 @@ defineSlots<{
 .report-step__title {
   grid-area: title;
   display: grid;
-  /* Heading/H5 */
   color: #374151;
 }
 
