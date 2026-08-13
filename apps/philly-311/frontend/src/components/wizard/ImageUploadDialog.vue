@@ -124,13 +124,14 @@ function getImageDimensions(dataURL: string): Promise<Dimensions> {
 }
 
 function setScales(image: Dimensions, container: Dimensions) {
-  const asprLtOne = image.height < image.width
-  canvasHeight.value = asprLtOne
-    ? container.height
-    : Math.floor(container.width * (image.height / image.width))
-  canvasWidth.value = asprLtOne
-    ? Math.floor(container.height * (image.width / image.height))
-    : container.width
+  const widthLtHeight = container.width <= container.height
+  canvasHeight.value =
+    (widthLtHeight ? Math.floor(image.height * container.width) / image.width : container.height) *
+    0.99
+  canvasWidth.value =
+    (widthLtHeight
+      ? container.width
+      : Math.floor((image.width * container.height) / image.height)) * 0.99
   h_scale.value = image.height / canvasHeight.value
   w_scale.value = image.width / canvasWidth.value
 }
@@ -206,8 +207,8 @@ function setScales(image: Dimensions, container: Dimensions) {
   grid-template-rows:
     auto auto var(--spacing-l, 1.5rem) auto var(--spacing-m, 1rem) 1fr var(--spacing-s, 0.75rem)
     auto var(--spacing-3xl, 3rem) auto;
-  width: clamp(10vw, 50rem, 90vw);
-  height: clamp(10vh, 45rem, 80vh);
+  width: clamp(10vw, 65rem, 90vw);
+  height: clamp(10vh, 65rem, 95vh);
   padding: var(--spacing-xl, 2rem);
   border: none;
   border-radius: var(--border-radius-xl, 1.5rem);
