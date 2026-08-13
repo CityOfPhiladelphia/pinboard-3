@@ -2,7 +2,7 @@
      which stores the image (mediaUrl) and returns issue-type suggestions for step 2. Optional;
      Skip/Next both advance. -->
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { Icon } from '@phila/phila-ui-core'
 import { IconAdd, IconArrowUp } from '@phila/phila-ui-core/icons'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
@@ -17,21 +17,22 @@ const fileUploadUrl = ref<string>('')
 const errorMessage = ref('')
 const markupComplete = ref(false)
 
-useWizardValidity(computed(() => markupComplete.value))
-
-watch(
-  () => markupComplete.value,
-  () => {
-    console.log('NEW: ', fileUploadUrl.value)
-  },
-)
-
 const stepTitle = 'Image (optional)'
 const stepDescription = `This app uses machine learning to pull location data from your photo and suggest the issue type
     to report. Do not upload any images with personal or sensitive information.`
 
 const imageCount = computed(() => {
-  return store.photo ? '1/1' : '0/1'
+  return store.photo.previewUrl ? '1/1' : '0/1'
+})
+
+useWizardValidity(computed(() => markupComplete.value))
+
+watch(markupComplete, (nowComplete) => {
+  if (nowComplete && !store.$state.photo.previewUrl) store.setPhotoPreview(fileUploadUrl.value)
+})
+
+onMounted(() => {
+  if (store.$state.photo.previewUrl) markupComplete.value = true
 })
 
 function preventDefault(e: Event) {
@@ -48,6 +49,13 @@ function handleInput(e: Event) {
   const target = e.target as HTMLInputElement
   fileUploadUrl.value = validateFileType(target.files?.[0]) ?? ''
   uploadDialogOpen.value = !!fileUploadUrl.value
+}
+
+function removeImage() {
+  URL.revokeObjectURL(fileUploadUrl.value)
+  store.setPhotoPreview(undefined)
+  fileUploadUrl.value = ''
+  markupComplete.value = false
 }
 
 function validateFileType(maybeFile: File | undefined) {
@@ -81,9 +89,11 @@ function validateFileType(maybeFile: File | undefined) {
         <div
           v-else
           class="image-step__upload image-step__preview"
-          :style="{ 'background-image': `url(${fileUploadUrl})` }"
+          :style="{ 'background-image': `url(${store.$state.photo.previewUrl})` }"
         >
-          <Icon :icon="IconAdd" size="extra-small" class="image-step__preview-delete" />
+          <button @click="removeImage">
+            <Icon :icon="IconAdd" size="extra-small" class="image-step__preview-delete" />
+          </button>
         </div>
       </div>
     </template>
@@ -103,8 +113,7 @@ function validateFileType(maybeFile: File | undefined) {
     'imageCount'
     'gap-image'
     'imageUpload';
-  grid-template-rows: auto var(--spacing-xs, 0.5rem) 1fr;
-  row-gap: var(--spacing-xs, 0.5rem);
+  grid-template-rows: auto var(--spacing-m, 1.5rem) 1fr;
 }
 
 .image-step__count {
@@ -156,19 +165,9 @@ function validateFileType(maybeFile: File | undefined) {
   );
 }
 
-.image-step__preview::after {
-  content: '';
-  position: absolute;
-  position-anchor: --preview;
-  position-area: top right;
-  translate: -50% 50%;
-  height: 2rem;
-  width: 2rem;
-  background: transparent;
-}
-
 .image-step__upload input {
-  display: none;
+  height: 0;
+  width: 0;
 }
 
 .image-step__upload:focus-within {

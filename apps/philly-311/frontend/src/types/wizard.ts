@@ -3,7 +3,7 @@
 
 export interface PhotoAsset {
   /** CloudFront URL returned by /classify (which doubles as the upload endpoint). */
-  mediaUrl: string
+  mediaUrl?: string
   /** Local preview URL (object URL) for the thumbnail before submit. */
   previewUrl?: string
 }

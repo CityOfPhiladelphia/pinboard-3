@@ -49,17 +49,17 @@ function handleMouseLeave(ev: MouseEvent) {
         <div v-if="step.n > 1" class="step-pad-left" />
 
         <span v-if="step.n >= currentStep" class="step-number" v-text="step.n" />
-        <div
+        <button
           v-else
           :id="step.title"
-          :type="step.clickable ? 'button' : ''"
+          :type="step.clickable ? 'button' : undefined"
           class="step-button"
           @mouseenter="handleMouseEnter"
           @mouseleave="handleMouseLeave"
           @click="step.clickable ? emit('navigate', step.path) : null"
         >
           <Icon :icon="IconCheck" size="extra-small" class="step-number" />
-        </div>
+        </button>
 
         <span class="sr-only" :v-text="`Step ${step.n} of ${steps.length}`" />
         <span
@@ -127,6 +127,11 @@ function handleMouseLeave(ev: MouseEvent) {
   border: var(--border-width-s, 0.0625rem) solid var(--Schemes-Border-low, rgb(204, 204, 204));
   margin: var(--spacing-m, 1rem) 0;
   width: var(--scale-450, 2.25rem);
+}
+
+.step-button {
+  background: transparent;
+  border: none;
 }
 
 .step-number {
