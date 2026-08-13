@@ -2,21 +2,29 @@
      which stores the image (mediaUrl) and returns issue-type suggestions for step 2. Optional;
      Skip/Next both advance. -->
 <script setup lang="ts">
-import { computed, ref, useId } from 'vue'
-
+import { computed, ref, watch } from 'vue'
+import { Icon } from '@phila/phila-ui-core'
+import { IconAdd, IconArrowUp } from '@phila/phila-ui-core/icons'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useWizardValidity } from '@/composables/useWizardValidity'
 import ReportStep from './ReportStep.vue'
 import ImageUploadDialog from '@/components/wizard/ImageUploadDialog.vue'
 
 const store = useReportSubmissionStore()
-useWizardValidity(computed(() => true)) // the step is optional
 
-const imageId = useId()
 const uploadDialogOpen = ref(false)
-const fileUpload = ref<File | undefined>(undefined)
+const fileUploadUrl = ref<string>('')
 const errorMessage = ref('')
-const classifying = ref(false)
+const markupComplete = ref(false)
+
+useWizardValidity(computed(() => markupComplete.value))
+
+watch(
+  () => markupComplete.value,
+  () => {
+    console.log('NEW: ', fileUploadUrl.value)
+  },
+)
 
 const stepTitle = 'Image (optional)'
 const stepDescription = `This app uses machine learning to pull location data from your photo and suggest the issue type
@@ -26,37 +34,29 @@ const imageCount = computed(() => {
   return store.photo ? '1/1' : '0/1'
 })
 
-const statusMessage = computed(() => {
-  return classifying.value
-    ? 'Analyzing your photo…'
-    : store.photo
-      ? 'Photo added.'
-      : errorMessage.value
-})
-
 function preventDefault(e: Event) {
   e.preventDefault()
 }
 
 function handleDrop(e: DragEvent) {
   e.preventDefault()
-  fileUpload.value = validateFileType(e.dataTransfer?.files[0])
-  uploadDialogOpen.value = !!fileUpload.value
+  fileUploadUrl.value = validateFileType(e.dataTransfer?.files[0]) ?? ''
+  uploadDialogOpen.value = !!fileUploadUrl.value
 }
 
 function handleInput(e: Event) {
   const target = e.target as HTMLInputElement
-  fileUpload.value = validateFileType(target.files?.[0])
-  uploadDialogOpen.value = !!fileUpload.value
+  fileUploadUrl.value = validateFileType(target.files?.[0]) ?? ''
+  uploadDialogOpen.value = !!fileUploadUrl.value
 }
 
 function validateFileType(maybeFile: File | undefined) {
   if (maybeFile && /image\/(?:jpe?g|png)/.test(maybeFile?.type)) {
-    return maybeFile
+    return URL.createObjectURL(maybeFile)
   } else {
     errorMessage.value = `Invalid file type: ${maybeFile?.type}. Must be jpeg or png.`
     console.error(errorMessage.value)
-    return undefined
+    return ''
   }
 }
 </script>
@@ -67,22 +67,33 @@ function validateFileType(maybeFile: File | undefined) {
       <div class="image__step">
         <p class="image-step__count has-text-body-default" v-text="imageCount" />
         <div />
-        <div class="image-step__upload-container">
-          <label class="image-step__upload" @dragover="preventDefault" @drop="handleDrop"
-            >Upload
-            <img :id="imageId" alt="" />
-            <input type="file" accept="image/png, image/jpeg" @change="handleInput" />
-          </label>
+
+        <label
+          v-if="!markupComplete"
+          class="image-step__upload"
+          @dragover="preventDefault"
+          @drop="handleDrop"
+        >
+          <Icon :icon="IconArrowUp" size="extra-small" style="margin: auto" />
+          Upload
+          <input type="file" accept="image/png, image/jpeg" @change="handleInput" />
+        </label>
+        <div
+          v-else
+          class="image-step__upload image-step__preview"
+          :style="{ 'background-image': `url(${fileUploadUrl})` }"
+        >
+          <Icon :icon="IconAdd" size="extra-small" class="image-step__preview-delete" />
         </div>
-        <p
-          :role="errorMessage ? 'alert' : 'status'"
-          :class="[{ ['image-step__error']: errorMessage }, 'image-step__status']"
-          v-text="statusMessage"
-        />
       </div>
     </template>
   </ReportStep>
-  <ImageUploadDialog v-model:open="uploadDialogOpen" v-model:file="fileUpload" />
+  <ImageUploadDialog
+    v-if="uploadDialogOpen"
+    v-model:open="uploadDialogOpen"
+    v-model:complete="markupComplete"
+    v-model:file="fileUploadUrl"
+  />
 </template>
 
 <style scoped>
@@ -91,9 +102,8 @@ function validateFileType(maybeFile: File | undefined) {
   grid-template-areas:
     'imageCount'
     'gap-image'
-    'imageUpload'
-    'status';
-  grid-template-rows: auto var(--spacing-xs, 0.5rem) auto auto;
+    'imageUpload';
+  grid-template-rows: auto var(--spacing-xs, 0.5rem) 1fr;
   row-gap: var(--spacing-xs, 0.5rem);
 }
 
@@ -102,25 +112,59 @@ function validateFileType(maybeFile: File | undefined) {
   margin-bottom: 0 !important;
 }
 
-.image-step__upload-container {
+.image-step__upload {
   grid-area: imageUpload;
   display: grid;
   height: 15rem;
-  row-gap: var(--spacing-m, 1rem);
-  column-gap: var(--spacing-m, 1rem);
-  grid-template-rows: repeat(1, minmax(0, 1fr));
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-
-.image-step__upload {
-  display: grid;
+  width: 15rem;
   padding: var(--spacing-xs, 0.5rem);
   place-content: center;
-  gap: var(--spacing-2xs, 0.25rem);
-  grid-row: 1 / span 1;
-  grid-column: 1 / span 1;
   border-radius: 0.75rem;
   border: var(--border-width-s, 1px) dashed var(--Schemes-Border-high, #9b9b9b);
+}
+
+.image-step__preview {
+  grid-area: imageUpload;
+  anchor-name: --preview;
+  corner-top-right-shape: scoop;
+  border-top-right-radius: 1.25em;
+  background-repeat: 'no-repeat';
+  background-position: 'center center';
+  background-size: 'contain';
+}
+
+.image-step__preview-delete {
+  cursor: pointer;
+  position: absolute;
+  position-anchor: --preview;
+  position-area: top right;
+  translate: -50% 50%;
+  transform: rotate(45deg);
+  width: var(--scale-400, 2rem);
+  height: var(--scale-400, 2rem);
+  display: grid;
+  place-items: center;
+  border-radius: var(--border-radius-full, 624.9375rem);
+  background: var(--Schemes-Error, #cc3000);
+  color: var(--Schemes-On-Error, #fff);
+  text-align: center;
+  /* Elevation/Elevation Light/1 */
+  box-shadow: var(
+    --elevation-light-1,
+    0 1px 2px 0 rgba(0, 0, 0, 0.3),
+    0 1px 3px 1px rgba(0, 0, 0, 0.15)
+  );
+}
+
+.image-step__preview::after {
+  content: '';
+  position: absolute;
+  position-anchor: --preview;
+  position-area: top right;
+  translate: -50% 50%;
+  height: 2rem;
+  width: 2rem;
+  background: transparent;
 }
 
 .image-step__upload input {

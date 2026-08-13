@@ -64,7 +64,7 @@ function goPrev() {
 }
 function goNext() {
   if (navHandlers.value?.next()) return
-  if (!canAdvance.value) {
+  if (!canAdvance.value && !isImageStep.value) {
     showErrors.value = true
     return
   }
@@ -134,7 +134,7 @@ function discardAndExit() {
           data-test="wizard-next"
           :disabled="!nextPath"
           @click="goNext"
-          >{{ isImageStep ? 'Skip' : 'Next' }}
+          >{{ isImageStep && !canAdvance ? 'Skip' : 'Next' }}
         </PhilaButton>
       </div>
     </footer>

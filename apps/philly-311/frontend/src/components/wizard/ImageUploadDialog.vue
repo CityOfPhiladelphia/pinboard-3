@@ -1,7 +1,7 @@
 <!-- ABOUTME: Wizard exit confirmation dialog — offers saving the in-progress
      report as a draft or discarding it; cancelling keeps the user in the wizard. -->
 <script setup lang="ts">
-import { ref, watch, onMounted, useTemplateRef } from 'vue'
+import { ref, onMounted, useTemplateRef } from 'vue'
 
 import { PhilaButton, CloseButton } from '@phila/phila-ui-button'
 import { Tags } from '@phila/phila-ui-tags'
@@ -9,43 +9,130 @@ import { Icon } from '@phila/phila-ui-core'
 import { IconPencil, IconBackwardStep, IconForwardStep } from '@phila/phila-ui-core/icons'
 import { DrawingCanvas } from '@pinboard/ui'
 
-const props = defineProps<{ open: boolean }>()
-const emit = defineEmits<{ 'update:open': [value: boolean]; save: []; discard: [] }>()
+interface Dimensions {
+  height: number
+  width: number
+}
+
+const open = defineModel<boolean>('open')
+const file = defineModel<string>('file', { default: '' })
+defineModel<boolean>('complete')
+const emit = defineEmits<{
+  'update:open': [value: boolean]
+  'update:complete': [value: boolean]
+  'update:file': [value: string]
+}>()
 
 const title = 'Show us where the issue appears in your photo'
 const note = `Draw a circle around where the issue appears, or skip ahead to the next step.`
+const inkColor =
+  getComputedStyle(document.documentElement)
+    .getPropertyValue('--phillies-red-500-phillies-red')
+    .trim() || '#CC3000'
 
 const dialog = ref<HTMLDialogElement | null>(null)
+const canvasContainerRef = useTemplateRef('canvasContainerRef')
 const canvasRef = useTemplateRef('canvasRef')
-const drawingComplete = ref<boolean>(false)
-const canvasHeight = ref(0)
-const canvasWidth = ref(0)
+const canvasHeight = ref(NaN)
+const canvasWidth = ref(NaN)
+const h_scale = ref(NaN)
+const w_scale = ref(NaN)
+const uploadedImage = ref<HTMLImageElement | undefined>(undefined)
+const imageDim = ref<Dimensions>({
+  height: NaN,
+  width: NaN,
+})
 
-// The template ref isn't populated until after the first render, so an
-// `immediate` watch would run before `dialog.value` exists — sync once on
-// mount to cover being instantiated already-open, then watch for changes.
-onMounted(() => syncOpen(props.open))
-
-watch(() => props.open, syncOpen)
-
-function syncOpen(open: boolean) {
-  if (open) {
-    dialog.value?.showModal()
-    canvasHeight.value = canvasRef.value?.clientHeight ?? 0
-    canvasWidth.value = canvasRef.value?.clientWidth ?? 0
-  } else dialog.value?.close()
+const canvasBackground = {
+  'background-image': `url(${file.value})`,
+  'background-repeat': 'no-repeat',
+  'background-position': 'center center',
+  'background-size': 'contain',
 }
 
-function close() {
+onMounted(() => {
+  dialog.value?.showModal()
+  if (!canvasContainerRef.value) {
+    throw new Error('Drawing canvas container failed to mount')
+  }
+  const containerDim: Dimensions = {
+    height: canvasContainerRef.value.clientHeight,
+    width: canvasContainerRef.value.clientWidth,
+  }
+  getImageDimensions(file.value).then((imageDimensions) => {
+    imageDim.value = imageDimensions
+    setScales(imageDimensions, containerDim)
+  })
+})
+
+function handleClose() {
   emit('update:open', false)
 }
-function onSave() {
-  close()
-  emit('save')
+
+function handleSkip() {
+  emit('update:complete', true)
+  emit('update:open', false)
 }
-function onDiscard() {
-  close()
-  emit('discard')
+
+function handleNext() {
+  const offCanvas = new OffscreenCanvas(imageDim.value.width, imageDim.value.height)
+  if (!canvasRef.value?.drawingCanvas) {
+    throw new Error('Ref for drawing canvas was undefined')
+  }
+
+  const context = offCanvas.getContext('2d')
+  if (!context) {
+    throw new Error('Failed to get context from OffscreenCanvas')
+  }
+  createImageBitmap(canvasRef.value.drawingCanvas, {
+    resizeWidth: imageDim.value.width,
+    resizeHeight: imageDim.value.height,
+    resizeQuality: 'high',
+  }).then((markupImage) => {
+    if (!uploadedImage.value) {
+      throw new Error('Could not locate uploaded image')
+    }
+    context.drawImage(uploadedImage.value, 0, 0)
+    context.drawImage(markupImage, 0, 0)
+    URL.revokeObjectURL(file.value)
+    offCanvas.convertToBlob({ type: 'image/png', quality: 1 }).then((markupBlob) => {
+      emit('update:file', URL.createObjectURL(markupBlob))
+      handleSkip()
+    })
+  })
+}
+
+function handleUndo() {
+  canvasRef.value?.undoLine()
+}
+
+function handleRedo() {
+  canvasRef.value?.redoLine()
+}
+
+function getImageDimensions(dataURL: string): Promise<Dimensions> {
+  return new Promise((resolve) => {
+    uploadedImage.value = new Image()
+    uploadedImage.value.onload = () => {
+      resolve({
+        height: uploadedImage.value?.height ?? NaN,
+        width: uploadedImage.value?.width ?? NaN,
+      })
+    }
+    uploadedImage.value.src = dataURL
+  })
+}
+
+function setScales(image: Dimensions, container: Dimensions) {
+  const asprLtOne = image.height < image.width
+  canvasHeight.value = asprLtOne
+    ? container.height
+    : Math.floor(container.width * (image.height / image.width))
+  canvasWidth.value = asprLtOne
+    ? Math.floor(container.height * (image.width / image.height))
+    : container.width
+  h_scale.value = image.height / canvasHeight.value
+  w_scale.value = image.width / canvasWidth.value
 }
 </script>
 
@@ -54,11 +141,11 @@ function onDiscard() {
     ref="dialog"
     class="image-dialog"
     aria-labelledby="image-dialog-title"
-    @close="close"
-    @cancel="close"
+    @close="handleClose"
+    @cancel="handleClose"
   >
     <div class="image-dialog-close">
-      <CloseButton aria-label="Close image upload dialog" @click="close" />
+      <CloseButton aria-label="Close image upload dialog" @click="handleClose" />
     </div>
 
     <div id="image-dialog-title" class="image-dialog-title" v-text="title" />
@@ -67,27 +154,32 @@ function onDiscard() {
       <Icon :icon="IconPencil" size="extra-small" /> {{ note }}
     </div>
     <div />
-    <div ref="canvasRef" class="image-dialog-canvas">
+    <div ref="canvasContainerRef" class="image-dialog-canvas">
       <DrawingCanvas
-        v-if="canvasHeight && canvasWidth"
+        v-if="open && canvasHeight && canvasWidth"
+        ref="canvasRef"
         :height="canvasHeight"
         :width="canvasWidth"
+        :options="{ strokeStyle: inkColor }"
+        :style="canvasBackground"
       ></DrawingCanvas>
     </div>
 
     <div />
     <div class="image-dialog-actions">
-      <Tags text="Redo" :icon="IconForwardStep" color="white" @click="onSave" />
-      <Tags text="Undo" :icon="IconBackwardStep" color="white" @click="onDiscard" />
+      <Tags text="Redo" :icon="IconForwardStep" color="white" @click="handleRedo" />
+      <Tags text="Undo" :icon="IconBackwardStep" color="white" @click="handleUndo" />
     </div>
     <div />
     <div class="image-dialog-footer">
-      <PhilaButton variant="secondary" data-test="image-discard" @click="close">Cancel</PhilaButton>
+      <PhilaButton variant="secondary" data-test="image-discard" @click="handleClose"
+        >Cancel</PhilaButton
+      >
       <PhilaButton
-        :variant="drawingComplete ? 'primary' : 'secondary'"
+        :variant="canvasRef?.drawingComplete ? 'primary' : 'secondary'"
         data-test="image-save"
-        @click="close"
-        >{{ drawingComplete ? 'Next' : 'Skip' }}</PhilaButton
+        @click="canvasRef?.drawingComplete ? handleNext() : handleSkip()"
+        >{{ canvasRef?.drawingComplete ? 'Next' : 'Skip' }}</PhilaButton
       >
     </div>
   </dialog>
@@ -115,8 +207,9 @@ function onDiscard() {
     auto auto var(--spacing-l, 1.5rem) auto var(--spacing-m, 1rem) 1fr var(--spacing-s, 0.75rem)
     auto var(--spacing-3xl, 3rem) auto;
   width: clamp(10vw, 50rem, 90vw);
-  height: clamp(10vh, 45rem, 90vh);
+  height: clamp(10vh, 45rem, 80vh);
   padding: var(--spacing-xl, 2rem);
+  border: none;
   border-radius: var(--border-radius-xl, 1.5rem);
   background: var(--Schemes-Background, #fff);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
@@ -170,8 +263,11 @@ dialog:not([open]) {
 
 .image-dialog-canvas {
   grid-area: canvas;
-  height: 100%;
-  width: 100%;
+  overflow: auto;
+  display: grid;
+  place-content: center;
+  height: 1fr;
+  width: 1fr;
 }
 
 .image-dialog-actions {

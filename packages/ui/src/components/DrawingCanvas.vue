@@ -1,55 +1,59 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 
-const props = withDefaults(
-  defineProps<{
-    height: number
-    width: number
+const props = defineProps<{
+  height: number
+  width: number
+  options?: {
     lineWidth?: number
     lineCap?: 'butt' | 'round' | 'square'
     strokeStyle?: CanvasGradient | CanvasPattern | string
-  }>(),
-  {
-    lineWidth: 5,
-    lineCap: 'butt',
-    strokeStyle: 'red',
   }
-)
+}>()
 
-const canvas = useTemplateRef('canvasRef')
+const drawingCanvas = useTemplateRef('canvasRef')
 const context = ref<CanvasRenderingContext2D | undefined>(undefined)
+const drawingComplete = ref(false)
+
+defineExpose({
+  undoLine,
+  redoLine,
+  drawingCanvas,
+  drawingComplete,
+})
+
 let pointerLoc = { x: 0, y: 0 }
 let isDrawing = false
 
 onMounted(() => {
-  if (!canvas.value) {
+  if (!drawingCanvas.value) {
     throw new Error(`Failed to locate canvas element`)
   }
-  canvas.value.addEventListener('mousedown', startDrawing)
-  canvas.value.addEventListener('mouseup', stopDrawing)
-  canvas.value.addEventListener('mousemove', sketch)
+  drawingCanvas.value.addEventListener('mousedown', startDrawing)
+  drawingCanvas.value.addEventListener('mouseup', stopDrawing)
+  drawingCanvas.value.addEventListener('mousemove', drawLine)
 
-  context.value = canvas.value.getContext('2d') ?? undefined
+  context.value = drawingCanvas.value.getContext('2d') ?? undefined
   if (!context.value) {
     throw new Error('Failed to locate get context from canvas element')
   }
-  context.value.lineWidth = props.lineWidth
-  context.value.lineCap = props.lineCap
-  context.value.strokeStyle = props.strokeStyle
+  context.value.lineWidth = props.options?.lineWidth || 4
+  context.value.lineCap = props.options?.lineCap || 'butt'
+  context.value.strokeStyle = props.options?.strokeStyle || 'red'
   context.value.lineJoin = 'round'
 })
 
 onBeforeUnmount(() => {
-  canvas.value?.removeEventListener('mousedown', startDrawing)
-  canvas.value?.removeEventListener('mouseup', stopDrawing)
-  canvas.value?.removeEventListener('mousemove', sketch)
+  drawingCanvas.value?.removeEventListener('mousedown', startDrawing)
+  drawingCanvas.value?.removeEventListener('mouseup', stopDrawing)
+  drawingCanvas.value?.removeEventListener('mousemove', drawLine)
 })
 
 function getPosition(event: MouseEvent) {
-  if (!canvas.value) {
+  if (!drawingCanvas.value) {
     throw new Error(`getPosition failed on canvas element`)
   }
-  const rect = canvas.value.getBoundingClientRect()
+  const rect = drawingCanvas.value.getBoundingClientRect()
   pointerLoc = {
     x: event.clientX - rect.left,
     y: event.clientY - rect.top,
@@ -57,7 +61,7 @@ function getPosition(event: MouseEvent) {
 }
 
 function startDrawing(event: MouseEvent) {
-  if (!context.value) return
+  if (drawingComplete.value || !context.value) return
   isDrawing = true
   getPosition(event)
   context.value.beginPath()
@@ -65,18 +69,33 @@ function startDrawing(event: MouseEvent) {
 }
 
 function stopDrawing() {
-  if (!isDrawing || !context.value) return
+  if (!isDrawing || !drawingCanvas.value || !context.value) return
   isDrawing = false
   context.value.lineTo(pointerLoc.x, pointerLoc.y)
   context.value.closePath()
   context.value.stroke()
+  drawingComplete.value = true
 }
 
-function sketch(event: MouseEvent) {
+function drawLine(event: MouseEvent) {
   if (!isDrawing || !context.value) return
   getPosition(event)
   context.value.lineTo(pointerLoc.x, pointerLoc.y)
   context.value.stroke()
+}
+
+function undoLine() {
+  if (!drawingCanvas.value || !context.value) return
+  context.value.save()
+  context.value.clearRect(0, 0, drawingCanvas.value.width, drawingCanvas.value.height)
+  drawingComplete.value = false
+}
+
+function redoLine() {
+  if (!drawingCanvas.value || !context.value) return
+  context.value.restore()
+  context.value.stroke()
+  drawingComplete.value = true
 }
 </script>
 
@@ -92,6 +111,8 @@ function sketch(event: MouseEvent) {
 
 <style scoped>
 .drawing-canvas {
-  background-color: aqua;
+  cursor:
+    url('../assets/pencil.svg') 0 30,
+    crosshair;
 }
 </style>
