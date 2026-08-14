@@ -66,3 +66,8 @@ export interface ReportDraft {
   /** Uploaded photo URL only — blob preview URLs don't survive reload. */
   mediaUrl?: string
 }
+
+export interface Dimensions {
+  height: number
+  width: number
+}

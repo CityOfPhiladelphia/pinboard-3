@@ -9,6 +9,7 @@ import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useWizardValidity } from '@/composables/useWizardValidity'
 import ReportStep from './ReportStep.vue'
 import ImageUploadDialog from '@/components/wizard/ImageUploadDialog.vue'
+import type { Dimensions } from '@/types/wizard.ts'
 
 const store = useReportSubmissionStore()
 
@@ -16,6 +17,10 @@ const uploadDialogOpen = ref(false)
 const fileUploadUrl = ref<string>('')
 const errorMessage = ref('')
 const markupComplete = ref(false)
+const imageScale = ref<Dimensions>({
+  height: 1,
+  width: 1,
+})
 
 const stepTitle = 'Image (optional)'
 const stepDescription = `This app uses machine learning to pull location data from your photo and suggest the issue type
@@ -26,6 +31,23 @@ const imageCount = computed(() => {
 })
 
 useWizardValidity(computed(() => markupComplete.value))
+
+const imageScaleStyle = computed(() => {
+  return {
+    height: `${18 * imageScale.value.height}rem`,
+    width: `${18 * imageScale.value.width}rem`,
+  }
+})
+
+const imagePreviewStyle = computed(() => {
+  return {
+    ...imageScaleStyle.value,
+    'background-image': `url(${store.$state.photo.previewUrl})`,
+    'background-repeat': 'no-repeat',
+    'background-position': 'center center',
+    'background-size': 'contain',
+  }
+})
 
 watch(markupComplete, (nowComplete) => {
   if (nowComplete && !store.$state.photo.previewUrl) store.setPhotoPreview(fileUploadUrl.value)
@@ -56,6 +78,10 @@ function removeImage() {
   store.setPhotoPreview(undefined)
   fileUploadUrl.value = ''
   markupComplete.value = false
+  imageScale.value = {
+    height: 1,
+    width: 1,
+  }
 }
 
 function validateFileType(maybeFile: File | undefined) {
@@ -79,6 +105,7 @@ function validateFileType(maybeFile: File | undefined) {
         <label
           v-if="!markupComplete"
           class="image-step__upload"
+          :style="imageScaleStyle"
           @dragover="preventDefault"
           @drop="handleDrop"
         >
@@ -86,11 +113,7 @@ function validateFileType(maybeFile: File | undefined) {
           Upload
           <input type="file" accept="image/png, image/jpeg" @change="handleInput" />
         </label>
-        <div
-          v-else
-          class="image-step__upload image-step__preview"
-          :style="{ 'background-image': `url(${store.$state.photo.previewUrl})` }"
-        >
+        <div v-else class="image-step__preview" :style="imagePreviewStyle">
           <button @click="removeImage">
             <Icon :icon="IconAdd" size="extra-small" class="image-step__preview-delete" />
           </button>
@@ -103,6 +126,7 @@ function validateFileType(maybeFile: File | undefined) {
     v-model:open="uploadDialogOpen"
     v-model:complete="markupComplete"
     v-model:file="fileUploadUrl"
+    v-model:scale="imageScale"
   />
 </template>
 
@@ -124,8 +148,6 @@ function validateFileType(maybeFile: File | undefined) {
 .image-step__upload {
   grid-area: imageUpload;
   display: grid;
-  height: 15rem;
-  width: 15rem;
   padding: var(--spacing-xs, 0.5rem);
   place-content: center;
   border-radius: 0.75rem;
@@ -137,9 +159,6 @@ function validateFileType(maybeFile: File | undefined) {
   anchor-name: --preview;
   corner-top-right-shape: scoop;
   border-top-right-radius: 1.25em;
-  background-repeat: 'no-repeat';
-  background-position: 'center center';
-  background-size: 'contain';
 }
 
 .image-step__preview-delete {

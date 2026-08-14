@@ -8,20 +8,12 @@ import { Tags } from '@phila/phila-ui-tags'
 import { Icon } from '@phila/phila-ui-core'
 import { IconPencil, IconBackwardStep, IconForwardStep } from '@phila/phila-ui-core/icons'
 import { DrawingCanvas } from '@pinboard/ui'
-
-interface Dimensions {
-  height: number
-  width: number
-}
+import type { Dimensions } from '@/types/wizard'
 
 const open = defineModel<boolean>('open')
+const complete = defineModel<boolean>('complete')
 const file = defineModel<string>('file', { default: '' })
-defineModel<boolean>('complete')
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-  'update:complete': [value: boolean]
-  'update:file': [value: string]
-}>()
+const scale = defineModel<Dimensions>('scale')
 
 const title = 'Show us where the issue appears in your photo'
 const note = `Draw a circle around where the issue appears, or skip ahead to the next step.`
@@ -35,8 +27,6 @@ const canvasContainerRef = useTemplateRef('canvasContainerRef')
 const canvasRef = useTemplateRef('canvasRef')
 const canvasHeight = ref(NaN)
 const canvasWidth = ref(NaN)
-const h_scale = ref(NaN)
-const w_scale = ref(NaN)
 const uploadedImage = ref<HTMLImageElement | undefined>(undefined)
 const imageDim = ref<Dimensions>({
   height: NaN,
@@ -61,17 +51,18 @@ onMounted(() => {
   }
   getImageDimensions(file.value).then((imageDimensions) => {
     imageDim.value = imageDimensions
-    setScales(imageDimensions, containerDim)
+    setCanvasScale(imageDimensions, containerDim)
   })
 })
 
 function handleClose() {
-  emit('update:open', false)
+  open.value = false
 }
 
 function handleSkip() {
-  emit('update:complete', true)
-  emit('update:open', false)
+  setImageScale()
+  complete.value = true
+  open.value = false
 }
 
 function handleNext() {
@@ -96,7 +87,7 @@ function handleNext() {
     context.drawImage(markupImage, 0, 0)
     URL.revokeObjectURL(file.value)
     offCanvas.convertToBlob({ type: 'image/png', quality: 1 }).then((markupBlob) => {
-      emit('update:file', URL.createObjectURL(markupBlob))
+      file.value = URL.createObjectURL(markupBlob)
       handleSkip()
     })
   })
@@ -123,7 +114,7 @@ function getImageDimensions(dataURL: string): Promise<Dimensions> {
   })
 }
 
-function setScales(image: Dimensions, container: Dimensions) {
+function setCanvasScale(image: Dimensions, container: Dimensions) {
   const widthLtHeight = container.width <= container.height
   canvasHeight.value =
     (widthLtHeight ? Math.floor(image.height * container.width) / image.width : container.height) *
@@ -132,8 +123,28 @@ function setScales(image: Dimensions, container: Dimensions) {
     (widthLtHeight
       ? container.width
       : Math.floor((image.width * container.height) / image.height)) * 0.99
-  h_scale.value = image.height / canvasHeight.value
-  w_scale.value = image.width / canvasWidth.value
+  scale.value = widthLtHeight
+    ? {
+        height: image.height / image.width,
+        width: 1,
+      }
+    : {
+        height: 1,
+        width: image.width / image.height,
+      }
+}
+
+function setImageScale() {
+  const widthLtHeight = imageDim.value.width <= imageDim.value.height
+  scale.value = widthLtHeight
+    ? {
+        height: imageDim.value.height / imageDim.value.width,
+        width: 1,
+      }
+    : {
+        height: 1,
+        width: imageDim.value.width / imageDim.value.height,
+      }
 }
 </script>
 
