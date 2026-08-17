@@ -40,15 +40,6 @@ const groups = computed(() => {
 
 <template>
   <div class="type-directory">
-    <label class="type-directory__search-label" for="type-search">Search issue types</label>
-    <input
-      id="type-search"
-      v-model="query"
-      type="search"
-      class="type-directory__search"
-      placeholder="Search"
-    />
-
     <p class="type-directory__empty" role="status">
       {{ groups.length ? '' : 'No issue types match your search.' }}
     </p>
@@ -71,6 +62,9 @@ const groups = computed(() => {
 </template>
 
 <style scoped>
+.type-directory {
+  overflow: auto;
+}
 .type-directory__search-label {
   display: block;
   font-weight: 600;

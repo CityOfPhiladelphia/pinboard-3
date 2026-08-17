@@ -2,17 +2,27 @@
      caseType-grouped directory). View derives from store.category; Next is gated on
      a category being chosen via useWizardValidity. -->
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useServiceTypes } from '@/composables/useServiceTypes'
 import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { PhilaButton } from '@phila/phila-ui-button'
+import { Search } from '@phila/phila-ui-search'
 import ServiceTypeIcon from '@/components/ServiceTypeIcon.vue'
 import TypeSuggestions from '@/components/wizard/TypeSuggestions.vue'
 import TypeDirectory from '@/components/wizard/TypeDirectory.vue'
+import ImageAnalysis from '@/components/wizard/ImageAnalysis.vue'
+import ReportStep from './ReportStep.vue'
 
 const store = useReportSubmissionStore()
 const { list, isLoading, error, load } = useServiceTypes()
+
+const classifying = ref(false)
+const errorMessage = ref('')
+
+const stepTitle = `Select an issue type * (required)`
+const searchPlaceholder = `Search by issue type`
+
 onMounted(() => {
   void load()
 })
@@ -35,123 +45,120 @@ function change() {
 </script>
 
 <template>
-  <div class="issue-step">
-    <h1 class="issue-step__title">
-      Issue type <span class="issue-step__required">* (required)</span>
-    </h1>
-    <p v-if="showErrors && !store.category" class="issue-step__error" role="alert">
-      Select an issue type to continue
-    </p>
-
-    <p v-if="isLoading && !catalog.length" class="issue-step__status">Loading issue types…</p>
-    <p v-else-if="error" class="issue-step__error" role="alert">
-      {{ error.message || 'Could not load issue types.' }}
-      <PhilaButton
-        variant="secondary"
-        class="issue-step__retry"
-        data-test="retry-types"
-        @click="() => void load()"
-        >Retry</PhilaButton
-      >
-    </p>
-
-    <template v-else-if="!store.category">
-      <div v-if="store.photo && hasSurvivingSuggestions" class="issue-step__photo-band">
-        <img
-          class="issue-step__photo"
-          :src="store.photo.previewUrl ?? store.photo.mediaUrl"
-          alt="Your uploaded photo"
+  <ReportStep :step-title="stepTitle">
+    <template #step-content>
+      <div class="issue-step">
+        <ImageAnalysis
+          v-if="store.photo.previewUrl && !store.photoSuggestions.length"
+          v-model:classifying="classifying"
+          v-model:error="errorMessage"
+          class="issue-step__analysis"
         />
-        <TypeSuggestions :suggestions="store.photoSuggestions" :catalog="catalog" @select="pick" />
-      </div>
+        <img
+          v-else-if="store.photo.previewUrl && store.photoSuggestions.length"
+          :src="store.photo.previewUrl"
+          class="issue-step__photo"
+        />
+        <Search :placeholder="searchPlaceholder" class="issue-step__search"></Search>
+        <div class="issue-step__issue-types">
+          <p v-if="showErrors && !store.category" class="issue-step__error" role="alert">
+            Select an issue type to continue
+          </p>
 
-      <h2 class="issue-step__subhead">All issue types</h2>
-      <TypeDirectory :catalog="catalog" @select="pick" />
-    </template>
+          <p v-if="classifying || (isLoading && !catalog.length)" class="issue-step__status">
+            Loading issue types…
+          </p>
+          <p v-else-if="error" class="issue-step__error" role="alert">
+            {{ error.message || 'Could not load issue types.' }}
+            <PhilaButton
+              variant="secondary"
+              class="issue-step__retry"
+              data-test="retry-types"
+              @click="() => void load()"
+              >Retry</PhilaButton
+            >
+          </p>
 
-    <template v-else>
-      <div class="issue-step__selected">
-        <ServiceTypeIcon :service-type="store.category" :size="36" />
-        <span class="issue-step__selected-body">
-          <span class="issue-step__selected-name">{{ store.category }}</span>
-          <span v-if="selected" class="issue-step__selected-desc">{{ selected.description }}</span>
-        </span>
-        <button type="button" data-test="change-type" class="issue-step__change" @click="change">
-          Change
-        </button>
+          <template v-else-if="!store.category">
+            <div v-if="store.photo && hasSurvivingSuggestions" class="issue-step__photo-band">
+              <TypeSuggestions
+                :suggestions="store.photoSuggestions"
+                :catalog="catalog"
+                @select="pick"
+              />
+            </div>
+
+            <h5 class="issue-step__subhead">All issue types</h5>
+            <TypeDirectory :catalog="catalog" @select="pick" />
+          </template>
+
+          <template v-else>
+            <div class="issue-step__selected">
+              <ServiceTypeIcon :service-type="store.category" :size="36" />
+              <span class="issue-step__selected-body">
+                <span class="issue-step__selected-name">{{ store.category }}</span>
+                <span v-if="selected" class="issue-step__selected-desc">{{
+                  selected.description
+                }}</span>
+              </span>
+              <button
+                type="button"
+                data-test="change-type"
+                class="issue-step__change"
+                @click="change"
+              >
+                Change
+              </button>
+            </div>
+          </template>
+        </div>
       </div>
     </template>
-  </div>
+  </ReportStep>
 </template>
 
 <style scoped>
-.issue-step__title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 var(--spacing-m, 1rem);
-}
-.issue-step__required {
-  font-weight: 400;
-  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
-  font-size: 1rem;
-}
-.issue-step__retry {
-  margin-left: var(--spacing-s, 0.75rem);
-}
-.issue-step__photo-band {
+.issue-step {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: var(--spacing-m, 1rem);
-  margin-bottom: var(--spacing-l, 2rem);
-}
-.issue-step__photo {
+  height: 100%;
   width: 100%;
-  max-height: 360px;
-  object-fit: cover;
-  border-radius: 8px;
+  grid-template-areas:
+    'uploadedImage search'
+    'uploadedImage issueTypes';
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  column-gap: var(--spacing-xl, 2rem);
+  row-gap: var(--spacing-m, 1rem);
 }
-.issue-step__subhead {
-  font-size: 1.125rem;
-  font-weight: 700;
-  margin: 0 0 var(--spacing-s, 0.75rem);
+
+.issue-step__analysis {
+  grid-area: uploadedImage;
+  display: grid;
+  place-items: center;
+  height: 100%;
+  width: 100%;
 }
-.issue-step__selected {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-s, 0.75rem);
-  border: 1px solid var(--Schemes-Primary, #0f4d90);
-  border-radius: 8px;
-  padding: var(--spacing-s, 0.75rem);
-  margin-bottom: var(--spacing-m, 1rem);
+
+.issue-step__photo {
+  grid-area: uploadedImage;
+  display: grid;
+  align-self: center;
+  height: auto;
+  width: 100%;
+  border-radius: 0.75rem;
+
+  /* Elevation/Elevation Light/2 */
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.3),
+    0 2px 6px 2px rgba(0, 0, 0, 0.15);
 }
-.issue-step__selected-body {
-  display: flex;
-  flex-direction: column;
+
+.issue-step__search {
+  grid-area: search;
 }
-.issue-step__selected-name {
-  font-weight: 700;
-}
-.issue-step__selected-desc {
-  font-size: 0.875rem;
-  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
-}
-.issue-step__change {
-  margin-left: auto;
-  background: none;
-  border: none;
-  color: var(--Schemes-Primary, #0f4d90);
-  font-weight: 600;
-  cursor: pointer;
-}
-.issue-step__error {
-  color: var(--Schemes-Error, #c0392b);
-}
-.issue-step__photo-band :deep(.type-suggestions) {
-  align-self: start;
-}
-@media (max-width: 768px) {
-  .issue-step__photo-band {
-    grid-template-columns: 1fr;
-  }
+
+.issue-step__issue-types {
+  grid-area: issueTypes;
+  overflow: auto;
 }
 </style>
