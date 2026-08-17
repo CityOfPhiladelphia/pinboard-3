@@ -374,8 +374,11 @@ const effectiveMapConfig = (() => {
   return base
 })()
 
-function selectedLocationValue() {
-  return props.locations.find((loc) => loc.id === selectedLocationId.value)
+function selectedLocationValue(): PinboardLocation {
+  const byId = props.locations.find((loc) => loc.id === selectedLocationId.value)
+  if (byId) return byId
+  if (selectedLocation.value) return selectedLocation.value
+  throw new Error('selectedLocationValue() called without a selection')
 }
 </script>
 
