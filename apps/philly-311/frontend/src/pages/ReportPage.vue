@@ -11,6 +11,7 @@ import { useRouter, useRoute } from 'vue-router'
 import StepIndicator from '@/components/wizard/StepIndicator.vue'
 import ExitDialog from '@/components/wizard/ExitDialog.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
+import { Breadcrumbs } from '@phila/phila-ui-breadcrumbs'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useMyCasesStore } from '@/stores/myCases'
 import { WIZARD_CAN_ADVANCE_KEY, WIZARD_SHOW_ERRORS_KEY } from '@/composables/useWizardValidity'
@@ -20,21 +21,7 @@ const router = useRouter()
 const route = useRoute()
 const store = useReportSubmissionStore()
 const myCases = useMyCasesStore()
-
 const exitOpen = ref(false)
-watch(
-  exitOpen,
-  (isOpen, wasOpen) => {
-    if (isOpen) {
-      router.push(`?${store.stateToUrlQueryParams()}`)
-    } else if (!isOpen && wasOpen) {
-      router.back()
-    } else {
-      router.replace({ query: {} })
-    }
-  },
-  { immediate: true },
-)
 
 const STEPS = [
   { title: 'Image', path: '/report' },
@@ -105,46 +92,50 @@ function discardAndExit() {
 
 <template>
   <div ref="wizardEl" class="wizard">
-    <nav class="wizard__crumb" aria-label="Breadcrumb">
-      <RouterLink to="/">Home</RouterLink> / <span>Report an issue</span>
-    </nav>
+    <div class="wizard__header">
+      <Breadcrumbs :items="[{ label: 'Report an issue' }]" class="wizard__bradcrumbs" />
 
-    <StepIndicator
-      :steps="STEPS"
-      :current-step="currentStep"
-      :completed-through="completedThrough"
-      @navigate="(path: string) => router.push(path)"
-    />
+      <StepIndicator
+        :steps="STEPS"
+        :current-step="currentStep"
+        :completed-through="completedThrough"
+        class="wizard__steps"
+        @navigate="(path: string) => router.push(path)"
+      />
+    </div>
 
     <section class="wizard__content">
       <RouterView />
     </section>
 
     <footer class="wizard__nav">
-      <button type="button" class="wizard__exit" data-test="wizard-exit" @click="exitOpen = true">
+      <PhilaButton
+        size="extra-small"
+        class="wizard__exit"
+        data-test="wizard-exit"
+        @click="exitOpen = true"
+      >
         Exit
-      </button>
+      </PhilaButton>
 
       <div class="wizard__nav-right">
-        <PhilaButton v-if="isImageStep" variant="secondary" data-test="wizard-skip" @click="goNext"
-          >Skip</PhilaButton
-        >
         <PhilaButton
-          v-else
+          v-if="!isImageStep"
           variant="secondary"
           data-test="wizard-back"
           :disabled="!prevPath"
           @click="goPrev"
-          >Back</PhilaButton
         >
+          Back
+        </PhilaButton>
         <PhilaButton
           v-if="!isLast"
           variant="primary"
           data-test="wizard-next"
           :disabled="!nextPath"
           @click="goNext"
-          >Next</PhilaButton
-        >
+          >{{ isImageStep ? 'Skip' : 'Next' }}
+        </PhilaButton>
       </div>
     </footer>
 
@@ -154,44 +145,73 @@ function discardAndExit() {
 
 <style scoped>
 .wizard {
-  max-width: 980px;
-  margin: 0 auto;
-  /* No bottom padding: the sticky nav pins to the scrollport's bottom edge and
-     content would otherwise show through a padding-sized gap beneath it. */
-  padding: var(--spacing-m, 1rem) var(--spacing-m, 1rem) 0;
+  display: grid;
+  grid-template-areas:
+    'w_header'
+    'w_content'
+    'w_footer';
+  grid-template-rows: 9rem auto 7rem;
   height: 100%;
-  overflow-y: auto;
+  width: 100%;
+  margin: 0 auto;
 }
-.wizard__crumb {
-  font-size: 0.875rem;
-  margin-bottom: var(--spacing-s, 0.75rem);
+
+.wizard__header {
+  grid-area: w_header;
+  grid-template-areas:
+    'w_breadcrumbs'
+    'w_stepindicator';
+  grid-template-rows: 3fr 5fr;
+  width: 100%;
+  padding: var(--spacing-l, 1.5rem) var(--spacing-xl, 2rem);
 }
+
+.wizard__bradcrumbs {
+  grid-area: w_breadcrumbs;
+  padding: var(--spacing-xs, 0.5rem);
+}
+
+.wizard__bradcrumbs :deep(li) {
+  margin-bottom: 0;
+  padding-left: 0;
+}
+
+.wizard__steps {
+  grid-area: w_stepindicator;
+  display: grid;
+  place-content: center;
+}
+
 .wizard__content {
+  grid-area: w_content;
   padding: var(--spacing-l, 2rem) 0;
-  min-height: 320px;
+  margin: 0 var(--scale-1000, 5rem);
+  overflow-y: auto;
+  overflow-x: auto;
 }
+
 /* Sticky so Exit/Back/Next stay reachable: the wizard scrolls internally
    (the shell locks the viewport) and steps like Location put a wheel-capturing
    map over most of the content, so controls at the end of the scroll run
    can otherwise sit below the fold with no way to reach them. */
 .wizard__nav {
-  position: sticky;
-  bottom: 0;
-  background: #fff;
+  grid-area: w_footer;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-m, 1rem) 0;
   border-top: 1px solid var(--Schemes-Border-low, #d6d6d6);
+  background: var(--Schemes-Background, #fff);
 }
+
 .wizard__nav-right {
   display: flex;
   gap: var(--spacing-s, 0.75rem);
+  margin-right: var(--scale-1000, 5rem);
 }
+
 .wizard__exit {
-  background: none;
-  border: none;
-  color: var(--Schemes-Primary, #0f4d90);
-  cursor: pointer;
+  margin-left: var(--scale-1000, 5rem);
+  text-decoration: underline;
 }
 </style>
