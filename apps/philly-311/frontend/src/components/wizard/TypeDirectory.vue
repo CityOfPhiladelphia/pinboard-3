@@ -5,11 +5,11 @@ import { computed, ref } from 'vue'
 import type { ServiceType } from '@/types/api'
 import { fuzzyScore } from '@/utils/fuzzy'
 import serviceTypeInfo from '@/data/service_types.json'
-import ServiceTypeIcon from '@/components/ServiceTypeIcon.vue'
+import CaseTypeCard from './CaseTypeCard.vue'
+import ServiceTypeCard from './ServiceTypeCard.vue'
 
 const props = defineProps<{ catalog: ServiceType[] }>()
-const emit = defineEmits<{ select: [serviceType: string] }>()
-
+const selected = defineModel<string>('selected')
 const query = ref('')
 
 const INFO = serviceTypeInfo as Record<string, { description: string; keywords: string[] }>
@@ -44,20 +44,20 @@ const groups = computed(() => {
       {{ groups.length ? '' : 'No issue types match your search.' }}
     </p>
 
-    <section v-for="group in groups" :key="group.caseType" class="type-directory__group">
-      <h3 class="type-directory__heading">{{ group.caseType }}</h3>
-      <ul class="type-directory__list">
-        <li v-for="s in group.items" :key="s.serviceType">
-          <button type="button" class="type-directory__row" @click="emit('select', s.serviceType)">
-            <ServiceTypeIcon :service-type="s.serviceType" :size="32" />
-            <span class="type-directory__body">
-              <span class="type-directory__name">{{ s.serviceType }}</span>
-              <span class="type-directory__desc">{{ s.description }}</span>
-            </span>
-          </button>
-        </li>
-      </ul>
-    </section>
+    <div v-for="caseType in groups" :key="caseType.caseType">
+      <CaseTypeCard
+        v-if="caseType.items.length > 1"
+        v-model:selected="selected"
+        :case-type="caseType.caseType"
+        :service-types="caseType.items"
+      />
+      <ServiceTypeCard
+        v-else
+        v-model:selected="selected"
+        :service-type="caseType.items[0].serviceType"
+        :description="caseType.items[0].description"
+      />
+    </div>
   </div>
 </template>
 

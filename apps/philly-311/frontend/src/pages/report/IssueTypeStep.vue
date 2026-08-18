@@ -2,7 +2,7 @@
      caseType-grouped directory). View derives from store.category; Next is gated on
      a category being chosen via useWizardValidity. -->
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useServiceTypes } from '@/composables/useServiceTypes'
 import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
@@ -19,13 +19,10 @@ const { list, isLoading, error, load } = useServiceTypes()
 
 const classifying = ref(false)
 const errorMessage = ref('')
+const selectedServiceType = ref<string>('')
 
 const stepTitle = `Select an issue type * (required)`
 const searchPlaceholder = `Search by issue type`
-
-onMounted(() => {
-  void load()
-})
 
 const catalog = computed(() => list.value ?? [])
 const selected = computed(() => catalog.value.find((s) => s.serviceType === store.category) ?? null)
@@ -36,9 +33,12 @@ const hasSurvivingSuggestions = computed(() =>
 useWizardValidity(computed(() => !!store.category && !error.value))
 const showErrors = useWizardErrors()
 
-function pick(serviceType: string) {
-  store.setCategory(serviceType)
-}
+onMounted(() => {
+  void load()
+})
+
+watch(selectedServiceType, (selectedService) => store.setCategory(selectedService))
+
 function change() {
   store.setCategory(null)
 }
@@ -82,14 +82,14 @@ function change() {
           <template v-else-if="!store.category">
             <div v-if="store.photo && hasSurvivingSuggestions" class="issue-step__photo-band">
               <TypeSuggestions
+                v-model:selected="selectedServiceType"
                 :suggestions="store.photoSuggestions"
                 :catalog="catalog"
-                @select="pick"
               />
             </div>
 
             <h5 class="issue-step__subhead">All issue types</h5>
-            <TypeDirectory :catalog="catalog" @select="pick" />
+            <TypeDirectory v-model:selected="selectedServiceType" :catalog="catalog" />
           </template>
 
           <template v-else>
