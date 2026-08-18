@@ -25,6 +25,7 @@ import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
 // pinboard composables and utilities imports
 import { hasLocationData } from '../utilities/hasLocationData'
+import { locationCountLabel as formatLocationCountLabel } from '../utilities/locationCountLabel'
 import { usePrint } from '../composables/usePrint'
 
 // type imports
@@ -163,9 +164,11 @@ const selectedLocationId = computed(() =>
 )
 
 const locationCountLabel = computed(() => {
-  const message = props.locations.length
-    ? t('pinboard.itemCount', { count: props.locations.length }, props.locations.length)
-    : t('pinboard.noLocations')
+  const message = props.locationPanelCountNoun
+    ? formatLocationCountLabel(props.locations.length, props.locationPanelCountNoun)
+    : props.locations.length
+      ? t('pinboard.itemCount', { count: props.locations.length }, props.locations.length)
+      : t('pinboard.noLocations')
   return props.isLoading || message
 })
 
@@ -371,8 +374,11 @@ const effectiveMapConfig = (() => {
   return base
 })()
 
-function selectedLocationValue() {
-  return props.locations[props.locations.indexOf(selectedLocation.value)]
+function selectedLocationValue(): PinboardLocation {
+  const byId = props.locations.find((loc) => loc.id === selectedLocationId.value)
+  if (byId) return byId
+  if (selectedLocation.value) return selectedLocation.value
+  throw new Error('selectedLocationValue() called without a selection')
 }
 </script>
 
@@ -382,7 +388,13 @@ function selectedLocationValue() {
     <div v-if="slots['page-header']" class="finder-page-header">
       <slot name="page-header" />
     </div>
-    <div class="finder-panel" :class="isMobile ? 'finder-panel-mobile' : 'finder-panel-desktop'">
+    <div
+      class="finder-panel"
+      :class="[
+        isMobile ? 'finder-panel-mobile' : 'finder-panel-desktop',
+        { 'finder-panel--with-page-header': !!slots['page-header'] },
+      ]"
+    >
       <div class="finder-panel-locations">
         <slot name="locations-header" />
 
@@ -411,6 +423,7 @@ function selectedLocationValue() {
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"
             :is-mobile="isMobile"
+            :count-noun="isMobile ? undefined : locationPanelCountNoun"
             @select="handleSelect"
             @hover="handleHover"
             @hover-end="handleHoverEnd"
@@ -441,7 +454,7 @@ function selectedLocationValue() {
               <slot name="locations-filters" />
             </template>
             <template #list-header>
-              <div v-if="!isMobile" class="location-list-header">
+              <div v-if="!isMobile && !locationPanelCountNoun" class="location-list-header">
                 <span>{{ locationCountLabel }}</span>
               </div>
             </template>
@@ -555,6 +568,12 @@ function selectedLocationValue() {
   width: 100%;
   height: 100%;
   position: relative;
+}
+
+.finder-panel--with-page-header {
+  height: auto;
+  min-height: 0;
+  flex: 1 1 auto;
 }
 
 .finder-panel :deep(.phila-filter-panel__title) {
