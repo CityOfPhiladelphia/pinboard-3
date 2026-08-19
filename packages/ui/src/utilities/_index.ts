@@ -7,7 +7,7 @@ import { sortLocations } from './sortLocations'
 import { getHaversineDistance } from './getHaversineDistance'
 import { hasLocationData } from './hasLocationData'
 import { slugify } from './slugify'
-import { scaleImageAndContainer, getImageScale } from './scaleImagesContainers'
+export * from './scaleImagesContainers'
 
 // A house number (optional range and unit-letter suffix) followed by at least
 // one more token. Liberal on purpose: shorthand like "943 sigel" should reach
@@ -25,8 +25,6 @@ export {
   getHaversineDistance,
   hasLocationData,
   slugify,
-  scaleImageAndContainer,
-  getImageScale,
   StreetAddress,
   StreetIntersection,
   Zipcode,

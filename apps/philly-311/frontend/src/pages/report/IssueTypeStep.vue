@@ -8,6 +8,7 @@ import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValid
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { Search } from '@phila/phila-ui-search'
+import { LoadingCards } from '@pinboard/ui'
 import ServiceTypeIcon from '@/components/ServiceTypeIcon.vue'
 import TypeSuggestions from '@/components/wizard/TypeSuggestions.vue'
 import TypeDirectory from '@/components/wizard/TypeDirectory.vue'
@@ -24,10 +25,9 @@ const selectedServiceType = ref<string>('')
 const stepTitle = `Select an issue type * (required)`
 const searchPlaceholder = `Search by issue type`
 
-const catalog = computed(() => list.value ?? [])
-const selected = computed(() => catalog.value.find((s) => s.serviceType === store.category) ?? null)
+const selected = computed(() => list.value.find((s) => s.serviceType === store.category) ?? null)
 const hasSurvivingSuggestions = computed(() =>
-  store.photoSuggestions.some((s) => catalog.value.some((c) => c.serviceType === s.serviceType)),
+  store.photoSuggestions.some((s) => list.value.some((c) => c.serviceType === s.serviceType)),
 )
 
 useWizardValidity(computed(() => !!store.category && !error.value))
@@ -59,15 +59,15 @@ function change() {
           :src="store.photo.previewUrl"
           class="issue-step__photo"
         />
-        <Search :placeholder="searchPlaceholder" class="issue-step__search"></Search>
+        <Search :placeholder="searchPlaceholder" class="issue-step__search" />
         <div class="issue-step__issue-types">
-          <p v-if="showErrors && !store.category" class="issue-step__error" role="alert">
-            Select an issue type to continue
-          </p>
-
-          <p v-if="classifying || (isLoading && !catalog.length)" class="issue-step__status">
-            Loading issue types…
-          </p>
+          <p
+            v-if="showErrors && !store.category"
+            class="issue-step__error"
+            role="alert"
+            v-text="'Select an issue type to continue'"
+          />
+          <LoadingCards v-if="classifying || (isLoading && !list.length)" :card-scale="60" />
           <p v-else-if="error" class="issue-step__error" role="alert">
             {{ error.message || 'Could not load issue types.' }}
             <PhilaButton
@@ -80,26 +80,26 @@ function change() {
           </p>
 
           <template v-else-if="!store.category">
-            <div v-if="store.photo && hasSurvivingSuggestions" class="issue-step__photo-band">
-              <TypeSuggestions
-                v-model:selected="selectedServiceType"
-                :suggestions="store.photoSuggestions"
-                :catalog="catalog"
-              />
-            </div>
+            <TypeSuggestions
+              v-if="store.photo && hasSurvivingSuggestions"
+              v-model:selected="selectedServiceType"
+              :suggestions="store.photoSuggestions"
+              :catalog="list"
+            />
 
-            <h5 class="issue-step__subhead">All issue types</h5>
-            <TypeDirectory v-model:selected="selectedServiceType" :catalog="catalog" />
+            <TypeDirectory v-model:selected="selectedServiceType" :catalog="list" />
           </template>
 
           <template v-else>
             <div class="issue-step__selected">
               <ServiceTypeIcon :service-type="store.category" :size="36" />
               <span class="issue-step__selected-body">
-                <span class="issue-step__selected-name">{{ store.category }}</span>
-                <span v-if="selected" class="issue-step__selected-desc">{{
-                  selected.description
-                }}</span>
+                <span class="issue-step__selected-name" v-text="store.category" />
+                <span
+                  v-if="selected"
+                  class="issue-step__selected-desc"
+                  v-text="selected.description"
+                />
               </span>
               <button
                 type="button"
@@ -126,7 +126,7 @@ function change() {
     'uploadedImage search'
     'uploadedImage issueTypes';
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto 1fr;
   column-gap: var(--spacing-xl, 2rem);
   row-gap: var(--spacing-m, 1rem);
 }
@@ -135,16 +135,14 @@ function change() {
   grid-area: uploadedImage;
   display: grid;
   place-items: center;
-  height: 100%;
-  width: 100%;
 }
 
 .issue-step__photo {
   grid-area: uploadedImage;
   display: grid;
-  align-self: center;
-  height: auto;
-  width: 100%;
+  height: 100%;
+  width: auto;
+  margin: 0 auto;
   border-radius: 0.75rem;
 
   /* Elevation/Elevation Light/2 */

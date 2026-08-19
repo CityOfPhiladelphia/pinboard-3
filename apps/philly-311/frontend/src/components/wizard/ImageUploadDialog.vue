@@ -46,16 +46,10 @@ const canvasBackground = {
 
 onMounted(() => {
   dialog.value?.showModal()
-  if (!canvasContainerRef.value) {
-    throw new Error('Drawing canvas container failed to mount')
-  }
-  const containerDim: PinboardTypes.Dimensions = {
-    height: canvasContainerRef.value.clientHeight,
-    width: canvasContainerRef.value.clientWidth,
-  }
+
   getImageDimensions(file.value).then((imageDimensions) => {
     imageDim.value = resizeImageToMax(imageDimensions)
-    const scales = PinboardUtilities.scaleImageAndContainer(imageDimensions, containerDim)
+    const scales = PinboardUtilities.scaleImageAndContainer(imageDimensions, canvasContainerRef)
     canvasDimentions.value = scales.container
     store.setPhotoDimensions(scales.image)
   })
@@ -269,11 +263,9 @@ dialog:not([open]) {
 
 .image-dialog-canvas {
   grid-area: canvas;
-  overflow: auto;
+  overflow: clip;
   display: grid;
   place-content: center;
-  height: 1fr;
-  width: 1fr;
 }
 
 .image-dialog-actions {

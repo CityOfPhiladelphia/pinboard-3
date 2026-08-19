@@ -4,7 +4,8 @@ import { useApi } from '@/composables/useApi'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { Icon } from '@phila/phila-ui-core'
 import { IconStar } from '@phila/phila-ui-core/icons'
-import { onMounted, onUnmounted } from 'vue'
+import { PinboardUtilities, type PinboardTypes } from '@pinboard/ui'
+import { computed, onMounted, onUnmounted, useTemplateRef } from 'vue'
 
 interface ClassifyResponse {
   classifications: { serviceType: string; confidence: number; caseType: string }[]
@@ -15,6 +16,17 @@ const store = useReportSubmissionStore()
 
 const classifying = defineModel<boolean>('classifying')
 const error = defineModel<string>('error')
+const imageContainerRef = useTemplateRef('imageContainerRef')
+
+const imageContainerDim = computed(() => {
+  const dimensions: PinboardTypes.Dimensions = imageContainerRef.value
+    ? PinboardUtilities.resizeContainerToImageAspectRatio(store.photo.dimensions, imageContainerRef)
+    : {
+        height: 100,
+        width: 100,
+      }
+  return dimensions
+})
 
 // classifyBody.imgB64 is mutated before each fetchData() call; useApi reads
 // opts.body lazily so the latest value is always sent.
@@ -67,8 +79,17 @@ async function classifyImage() {
   <div class="image-analysis">
     <Icon class="image-analysis-icon" :icon="IconStar" />
     <label class="image-analysis-title" v-text="title" />
-    <p class="image-analysis-subhead" v-text="subHead" />
-    <img class="image-analysis-body" :src="store.$state.photo.previewUrl" />
+    <span class="image-analysis-subhead" v-text="subHead" />
+    <div ref="imageContainerRef" class="image-analysis-image-container">
+      <img
+        v-if="imageContainerRef"
+        :src="store.photo.previewUrl || store.photo.mediaUrl"
+        alt="Image analysis preview image"
+        class="image-analysis-image"
+        :height="imageContainerDim.height"
+        :width="imageContainerDim.width"
+      />
+    </div>
   </div>
 </template>
 
@@ -76,20 +97,20 @@ async function classifyImage() {
 .image-analysis {
   display: grid;
   grid-template-areas:
-    'h-icon'
-    'h-title'
-    'h-subhead'
+    'ia-icon'
+    'ia-title'
+    'ia-subhead'
     'ia-body';
   place-items: center;
   grid-template-rows: auto auto auto 1fr;
   grid-template-columns: 1fr;
   height: 100%;
   width: 100%;
-  padding: var(--spacing-xl, 2rem);
+  padding: var(--spacing-2xl, 2.5rem);
 }
 
 .image-analysis-icon {
-  grid-area: h-icon;
+  grid-area: ia-icon;
   color: #000;
 
   /* Icons/Solid/Default */
@@ -101,7 +122,7 @@ async function classifyImage() {
 }
 
 .image-analysis-title {
-  grid-area: h-title;
+  grid-area: ia-title;
   color: #000;
 
   /* Label/ExtraLarge */
@@ -113,7 +134,7 @@ async function classifyImage() {
 }
 
 .image-analysis-subhead {
-  grid-area: h-subhead;
+  grid-area: ia-subhead;
   color: #000;
 
   /* Body/Default */
@@ -122,15 +143,19 @@ async function classifyImage() {
   font-style: normal;
   font-weight: 400;
   line-height: var(--Body-Default-font-body-default-lineheight, 1.5rem); /* 150% */
+  margin-bottom: var(--spacing-m, 1rem);
 }
 
-.image-analysis-body {
-  display: grid;
+.image-analysis-image-container {
   grid-area: ia-body;
-  height: clamp(5rem, 25svh + 1rem, 15.9375rem);
-  width: auto;
-  border-radius: 0.75rem;
+  display: grid;
+  height: 100%;
+  width: 100%;
+  place-content: center;
+}
 
+.image-analysis-image {
+  border-radius: 0.75rem;
   /* Elevation/Elevation Light/2 */
   box-shadow:
     0 1px 2px 0 rgba(0, 0, 0, 0.3),

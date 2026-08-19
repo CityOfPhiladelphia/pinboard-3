@@ -159,7 +159,7 @@ function discardAndExit() {
 }
 
 .spacer {
-  height: var(--spacing-l, 2rem);
+  height: var(--spacing-s, 0.75rem);
 }
 
 .wizard__header {

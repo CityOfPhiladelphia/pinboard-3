@@ -12,7 +12,6 @@ import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
 import '../styles/print.css'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
-import { MapCard } from '@phila/phila-ui-cards'
 
 // import pinboard config
 import { PINBOARD_CONFIG_KEY } from '../keys'
@@ -40,6 +39,7 @@ import type {
   UserLocationState,
 } from '../types'
 import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
+import LoadingCards from './LoadingCards.vue'
 
 // slots
 const slots = defineSlots<{
@@ -407,7 +407,7 @@ function selectedLocationValue(): PinboardLocation {
            map area and then vanish — show nothing here and let the map's own
            loading state and the sheet's "Loading data…" label cover it. -->
         <div v-if="isLoading && !isMobile" class="loading-list">
-          <MapCard v-for="n in 5" :key="n" :is-loading="true" />
+          <LoadingCards />
         </div>
 
         <Teleport v-else-if="!isLoading" to="#locations-panel-mobile" :disabled="!isMobile">

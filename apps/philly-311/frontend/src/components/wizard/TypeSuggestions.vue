@@ -38,57 +38,7 @@ const top = computed(() => {
 
 <style scoped>
 .type-suggestions {
-  border: 1px solid var(--Schemes-Border-low, #d6d6d6);
-  border-radius: 8px;
-  padding: var(--spacing-m, 1rem);
-  background: var(--Schemes-Surface-Variant, #f5f5f5);
-}
-
-.type-suggestions__title {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0;
-}
-
-.type-suggestions__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-s, 0.75rem);
-}
-
-.type-suggestions__card {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-s, 0.75rem);
-  width: 100%;
-  text-align: left;
-  background: #fff;
-  border: 1px solid var(--Schemes-Primary, #0f4d90);
-  border-radius: 8px;
-  padding: var(--spacing-s, 0.75rem);
-  cursor: pointer;
-}
-
-.type-suggestions__card:hover,
-.type-suggestions__card:focus-visible {
-  outline: 2px solid var(--Schemes-Primary, #0f4d90);
-  outline-offset: 1px;
-}
-
-.type-suggestions__body {
-  display: flex;
-  flex-direction: column;
-}
-
-.type-suggestions__name {
-  font-weight: 700;
-}
-
-.type-suggestions__desc {
-  font-size: 0.875rem;
-  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
+  display: grid;
+  row-gap: var(--spacing-m, 1rem);
 }
 </style>
