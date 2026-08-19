@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { AppFooter } from '@phila/phila-ui-app-footer'
 import { AppHeader, NavbarBrand, NavbarInfo } from '@phila/phila-ui-app-header'
+import { Callout } from '@phila/phila-ui-callout'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { CloseButton } from '@phila/phila-ui-button'
 import MobileNavPanel from './MobileNavPanel.vue'
@@ -95,12 +96,17 @@ onMounted(async () => {
       :compact-mobile="true"
       :show-trusted-site="true"
       :links="links"
-      :banner-title="bannerTitle"
-      :banner-message="bannerMessage"
       :languages="translations ? languages : undefined"
       :locale="locale"
       @update:locale="setLocale"
     >
+      <!-- AppHeader renders whatever the alerts slot provides; the banner markup itself
+           belongs to the consumer. Shown when either half is set, since an app may supply
+           only a title or only a message. -->
+      <template v-if="bannerTitle || bannerMessage" #alerts>
+        <Callout type="warning" :title="bannerTitle" :message="bannerMessage" :open="true" />
+      </template>
+
       <!-- Reproduces AppHeader's own navbar-left fallback (brand/logo) so we can add
            app-provided content (e.g. a CTA) between the brand and the nav links, which
            AppHeader has no dedicated slot for. -->
