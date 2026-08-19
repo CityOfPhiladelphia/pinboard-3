@@ -70,7 +70,6 @@ const groups = computed(() => {
 .type-directory__header {
   color: #374151;
   padding: var(--spacing-s, 0.75rem) 0;
-  margin-top: var(--spacing-m, 1rem);
 
   /* Heading/H5 */
   font-family: var(--Heading-H5-font-heading-5-family, Montserrat);

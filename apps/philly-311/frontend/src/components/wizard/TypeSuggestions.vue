@@ -40,5 +40,6 @@ const top = computed(() => {
 .type-suggestions {
   display: grid;
   row-gap: var(--spacing-m, 1rem);
+  margin-bottom: var(--spacing-m, 1rem);
 }
 </style>

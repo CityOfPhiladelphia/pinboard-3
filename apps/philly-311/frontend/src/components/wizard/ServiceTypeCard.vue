@@ -2,9 +2,16 @@
 <script setup lang="ts">
 import { serviceTypeIcons } from '@/data/serviceTypeIconMap'
 import { Icon } from '@phila/phila-ui-core'
+import { IconCheck } from '@phila/phila-ui-core/icons'
+import { useReportSubmissionStore } from '@/stores/reportSubmission'
+import { computed } from 'vue'
 
 const props = defineProps<{ serviceType: string; description: string }>()
 const selected = defineModel<string>('selected')
+
+const store = useReportSubmissionStore()
+
+const currentlySelected = computed(() => store.category === props.serviceType)
 
 function select() {
   selected.value = props.serviceType
@@ -12,13 +19,14 @@ function select() {
 </script>
 
 <template>
-  <details :open="false" @click="select">
+  <details :open="false" :class="{ selected: currentlySelected }" @click="select">
     <summary>
       <Icon
         :icon="serviceTypeIcons?.[serviceType] ?? serviceTypeIcons.default"
         class="summary-icon"
       />
       {{ serviceType }}
+      <Icon v-if="currentlySelected" :icon="IconCheck" class="summary-icon selected-check" />
     </summary>
     {{ description }}
   </details>
@@ -33,6 +41,7 @@ details {
 }
 
 summary {
+  display: flex;
   color: var(--Schemes-On-Surface-High, #000);
 
   /* Label/Default */
@@ -57,5 +66,14 @@ summary {
 
 summary::marker {
   content: '';
+}
+
+.selected {
+  border-radius: var(--border-radius-s, 0.5rem);
+  border: var(--border-width-s, 1px) solid var(--sixers-blue-550-sixers-blue, #1f50f7);
+}
+
+.selected-check {
+  margin-left: auto;
 }
 </style>
