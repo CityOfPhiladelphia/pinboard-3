@@ -77,6 +77,10 @@ function onDiscard() {
 
 <style scoped>
 .exit-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   max-width: 28rem;
   width: 100%;
   padding: var(--spacing-l, 2rem);

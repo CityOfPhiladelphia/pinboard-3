@@ -3,7 +3,7 @@
 
 export interface PhotoAsset {
   /** CloudFront URL returned by /classify (which doubles as the upload endpoint). */
-  mediaUrl: string
+  mediaUrl?: string
   /** Local preview URL (object URL) for the thumbnail before submit. */
   previewUrl?: string
 }
@@ -65,4 +65,9 @@ export interface ReportDraft {
   publicVisibility: boolean
   /** Uploaded photo URL only — blob preview URLs don't survive reload. */
   mediaUrl?: string
+}
+
+export interface Dimensions {
+  height: number
+  width: number
 }

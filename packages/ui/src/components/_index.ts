@@ -9,6 +9,7 @@ import MapPanel from './MapPanel.vue'
 import MobileNavPanel from './MobileNavPanel.vue'
 import SearchSuggestions from './SearchSuggestions.vue'
 import SortPanel from './SortPanel.vue'
+import DrawingCanvas from './DrawingCanvas.vue'
 
 export {
   PinboardBody,
@@ -22,4 +23,5 @@ export {
   MobileNavPanel,
   SearchSuggestions,
   SortPanel,
+  DrawingCanvas,
 }

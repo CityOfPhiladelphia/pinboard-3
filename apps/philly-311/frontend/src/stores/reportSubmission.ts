@@ -18,7 +18,7 @@ interface State {
   customFields: Record<string, string>
   location: WizardLocation | null
   description: string
-  photo: PhotoAsset | null
+  photo: PhotoAsset
   contact: ContactInfo
   /** When true, the report is publicly visible. Default false (matches mobile). */
   publicVisibility: boolean
@@ -44,7 +44,7 @@ const initial = (): State => ({
   customFields: {},
   location: null,
   description: '',
-  photo: null,
+  photo: {},
   contact: {},
   publicVisibility: false,
   photoSuggestions: [],
@@ -74,14 +74,17 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     setPhotoSuggestions(suggestions: PhotoSuggestion[]) {
       this.photoSuggestions = suggestions
     },
-    setPhoto(photo: PhotoAsset | null) {
+    setPhoto(photo: string | undefined) {
+      this.photo.mediaUrl = photo
+    },
+    setPhotoPreview(photo: string | undefined) {
       // Revoke the previous blob URL so the underlying File can be GC'd.
       // Browsers hold the blob alive until revoke or page unload.
-      const prev = this.photo?.previewUrl
+      const prev = this.photo.previewUrl
       if (prev && prev.startsWith('blob:') && typeof URL.revokeObjectURL === 'function') {
         URL.revokeObjectURL(prev)
       }
-      this.photo = photo
+      this.photo.previewUrl = photo
     },
     setDescription(description: string) {
       this.description = description
@@ -93,7 +96,8 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
       this.publicVisibility = publicVisibility
     },
     reset() {
-      this.setPhoto(null)
+      this.setPhoto(undefined)
+      this.setPhotoPreview(undefined)
       // Function form: the object form deep-merges plain objects, which would
       // leave customFields/contact entries behind.
       this.$patch((state) => {
@@ -102,7 +106,8 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     },
     /** Record a successful submit and clear the wizard for a fresh report. */
     recordSubmission(result: SubmittedReport) {
-      this.setPhoto(null)
+      this.setPhoto(undefined)
+      this.setPhotoPreview(undefined)
       this.$patch((state) => {
         Object.assign(state, initial(), { submitted: result })
       })

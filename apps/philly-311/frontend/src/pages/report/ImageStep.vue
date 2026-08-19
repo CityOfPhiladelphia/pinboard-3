@@ -2,137 +2,201 @@
      which stores the image (mediaUrl) and returns issue-type suggestions for step 2. Optional;
      Skip/Next both advance. -->
 <script setup lang="ts">
-import { computed, ref, useId } from 'vue'
-import { processForClassify } from '@/utils/photo'
-import { useApi } from '@/composables/useApi'
+import { computed, onMounted, ref, watch } from 'vue'
+import { Icon } from '@phila/phila-ui-core'
+import { IconAdd, IconArrowUp } from '@phila/phila-ui-core/icons'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useWizardValidity } from '@/composables/useWizardValidity'
-
-interface ClassifyResponse {
-  classifications: { serviceType: string; confidence: number; caseType: string }[]
-  imageUrl: string
-}
+import ReportStep from './ReportStep.vue'
+import ImageUploadDialog from '@/components/wizard/ImageUploadDialog.vue'
+import type { Dimensions } from '@/types/wizard.ts'
 
 const store = useReportSubmissionStore()
-useWizardValidity(computed(() => true)) // the step is optional
 
-const waitingImageUpload = ref(true)
-const classifying = ref(false)
+const uploadDialogOpen = ref(false)
+const fileUploadUrl = ref<string>('')
 const errorMessage = ref('')
-const imageId = useId()
-
-// classifyBody.imgB64 is mutated before each fetchData() call; useApi reads
-// opts.body lazily so the latest value is always sent.
-const classifyBody = { imgB64: '' }
-const classify = useApi<ClassifyResponse>({
-  url: '/private/key/classify',
-  method: 'POST',
-  body: classifyBody,
+const markupComplete = ref(false)
+const imageScale = ref<Dimensions>({
+  height: 1,
+  width: 1,
 })
 
-async function onFile(e: Event) {
-  if (classifying.value) return
+const stepTitle = 'Image (optional)'
+const stepDescription = `This app uses machine learning to pull location data from your photo and suggest the issue type
+    to report. Do not upload any images with personal or sensitive information.`
+
+const imageCount = computed(() => {
+  return store.photo.previewUrl ? '1/1' : '0/1'
+})
+
+useWizardValidity(computed(() => markupComplete.value))
+
+const imageScaleStyle = computed(() => {
+  return {
+    height: `${18 * imageScale.value.height}rem`,
+    width: `${18 * imageScale.value.width}rem`,
+  }
+})
+
+const imagePreviewStyle = computed(() => {
+  return {
+    ...imageScaleStyle.value,
+    'background-image': `url(${store.$state.photo.previewUrl})`,
+    'background-repeat': 'no-repeat',
+    'background-position': 'center center',
+    'background-size': 'contain',
+  }
+})
+
+watch(markupComplete, (nowComplete) => {
+  if (nowComplete && !store.$state.photo.previewUrl) store.setPhotoPreview(fileUploadUrl.value)
+})
+
+onMounted(() => {
+  if (store.$state.photo.previewUrl) markupComplete.value = true
+})
+
+function preventDefault(e: Event) {
+  e.preventDefault()
+}
+
+function handleDrop(e: DragEvent) {
+  e.preventDefault()
+  fileUploadUrl.value = validateFileType(e.dataTransfer?.files[0]) ?? ''
+  uploadDialogOpen.value = !!fileUploadUrl.value
+}
+
+function handleInput(e: Event) {
   const target = e.target as HTMLInputElement
-  const file = target.files?.[0]
-  if (!file) return
-  waitingImageUpload.value = false
-  classifying.value = true
-  errorMessage.value = ''
-  const previewUrl = URL.createObjectURL(file)
-  const imgElement = document.getElementById(imageId) as HTMLImageElement
-  imgElement.src = previewUrl
-  try {
-    classifyBody.imgB64 = await processForClassify(file)
-    const result = await classify.fetchData()
-    if (!result || classify.error.value) {
-      errorMessage.value = classify.error.value?.message || 'Classification failed.'
-      if (previewUrl) URL.revokeObjectURL(previewUrl)
-      return
-    }
-    store.setPhoto({ mediaUrl: result.imageUrl, previewUrl })
-    store.setPhotoSuggestions(
-      result.classifications.map((c) => ({ serviceType: c.serviceType, confidence: c.confidence })),
-    )
-  } catch (err) {
-    errorMessage.value = (err as Error).message || 'Photo processing failed.'
-    if (previewUrl) URL.revokeObjectURL(previewUrl)
-  } finally {
-    classifying.value = false
-    target.value = ''
+  fileUploadUrl.value = validateFileType(target.files?.[0]) ?? ''
+  uploadDialogOpen.value = !!fileUploadUrl.value
+}
+
+function removeImage() {
+  URL.revokeObjectURL(fileUploadUrl.value)
+  store.setPhotoPreview(undefined)
+  fileUploadUrl.value = ''
+  markupComplete.value = false
+  imageScale.value = {
+    height: 1,
+    width: 1,
+  }
+}
+
+function validateFileType(maybeFile: File | undefined) {
+  if (maybeFile && /image\/(?:jpe?g|png)/.test(maybeFile?.type)) {
+    return URL.createObjectURL(maybeFile)
+  } else {
+    errorMessage.value = `Invalid file type: ${maybeFile?.type}. Must be jpeg or png.`
+    console.error(errorMessage.value)
+    return ''
   }
 }
 </script>
 
 <template>
-  <div class="image-step">
-    <h1 class="image-step__title">Images (optional)</h1>
-    <p class="image-step__note">
-      This app uses machine learning to pull location data from your photo and suggest the issue
-      type to report. Do not upload any images with personal or sensitive information.
-    </p>
-    <p class="image-step__count">{{ store.photo ? '1/1' : '0/1' }}</p>
-    <div class="image-step__zones">
-      <label class="image-step__zone">
-        <span v-if="waitingImageUpload" class="image-step__zone-label">Upload</span>
-        <img :id="imageId" alt="Upload" style="display: none" onload="this.style.display = ''" />
-        <input type="file" accept="image/*" @change="onFile" />
-      </label>
-    </div>
+  <ReportStep :step-title="stepTitle" :step-note="stepDescription">
+    <template #step-content>
+      <div class="image__step">
+        <p class="image-step__count has-text-body-default" v-text="imageCount" />
+        <div />
 
-    <div role="status">
-      <p v-if="classifying" class="image-step__status">Analyzing your photo…</p>
-      <p v-else-if="store.photo" class="image-step__status">Photo added.</p>
-      <p v-else-if="errorMessage" role="alert" class="image-step__error">{{ errorMessage }}</p>
-    </div>
-  </div>
+        <label
+          v-if="!markupComplete"
+          class="image-step__upload"
+          :style="imageScaleStyle"
+          @dragover="preventDefault"
+          @drop="handleDrop"
+        >
+          <Icon :icon="IconArrowUp" size="extra-small" style="margin: auto" />
+          Upload
+          <input type="file" accept="image/png, image/jpeg" @change="handleInput" />
+        </label>
+        <div v-else class="image-step__preview" :style="imagePreviewStyle">
+          <button @click="removeImage">
+            <Icon :icon="IconAdd" size="extra-small" class="image-step__preview-delete" />
+          </button>
+        </div>
+      </div>
+    </template>
+  </ReportStep>
+  <ImageUploadDialog
+    v-if="uploadDialogOpen"
+    v-model:open="uploadDialogOpen"
+    v-model:complete="markupComplete"
+    v-model:file="fileUploadUrl"
+    v-model:scale="imageScale"
+  />
 </template>
 
 <style scoped>
-.image-step {
-  max-width: 640px;
-}
-
-.image-step__title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 var(--spacing-s, 0.5rem);
-}
-
-.image-step__note {
-  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
-  margin: 0 0 var(--spacing-s, 0.5rem);
+.image__step {
+  display: grid;
+  grid-template-areas:
+    'imageCount'
+    'gap-image'
+    'imageUpload';
+  grid-template-rows: auto var(--spacing-m, 1.5rem) 1fr;
 }
 
 .image-step__count {
-  margin: 0 0 var(--spacing-s, 0.5rem);
+  grid-area: imageCount;
+  margin-bottom: 0 !important;
 }
 
-.image-step__zones {
-  display: flex;
-  gap: var(--spacing-m, 1rem);
+.image-step__upload {
+  grid-area: imageUpload;
+  display: grid;
+  padding: var(--spacing-xs, 0.5rem);
+  place-content: center;
+  border-radius: 0.75rem;
+  border: var(--border-width-s, 1px) dashed var(--Schemes-Border-high, #9b9b9b);
 }
 
-.image-step__zone {
-  flex: 1;
-  min-height: 180px;
-  border: 1px dashed var(--Schemes-Border, #b3b3b3);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.image-step__preview {
+  grid-area: imageUpload;
+  anchor-name: --preview;
+  corner-top-right-shape: scoop;
+  border-top-right-radius: 1.25em;
+}
+
+.image-step__preview-delete {
   cursor: pointer;
-}
-
-.image-step__zone input {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
+  position-anchor: --preview;
+  position-area: top right;
+  translate: -50% 50%;
+  transform: rotate(45deg);
+  width: var(--scale-400, 2rem);
+  height: var(--scale-400, 2rem);
+  display: grid;
+  place-items: center;
+  border-radius: var(--border-radius-full, 624.9375rem);
+  background: var(--Schemes-Error, #cc3000);
+  color: var(--Schemes-On-Error, #fff);
+  text-align: center;
+  /* Elevation/Elevation Light/1 */
+  box-shadow: var(
+    --elevation-light-1,
+    0 1px 2px 0 rgba(0, 0, 0, 0.3),
+    0 1px 3px 1px rgba(0, 0, 0, 0.15)
+  );
 }
 
-.image-step__zone:focus-within {
-  outline: 2px solid var(--Schemes-Primary, #0f4d90);
-  outline-offset: 2px;
+.image-step__upload input {
+  height: 0;
+  width: 0;
+}
+
+.image-step__upload:focus-within {
+  outline: var(--border-width-m, 0.125rem) solid var(--Schemes-Primary, rgb(16, 52, 244));
+  outline-offset: 0.125rem;
+}
+
+.image-step__status {
+  grid-area: status;
+  margin-bottom: 0 !important;
 }
 
 .image-step__error {
