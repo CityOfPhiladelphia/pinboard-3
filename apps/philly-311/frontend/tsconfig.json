@@ -5,6 +5,7 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"],
+      "@pinboard/core": ["../../../packages/core/src/index.ts"],
       "@pinboard/ui": ["../../../packages/ui/src/index.ts"]
     }
   }

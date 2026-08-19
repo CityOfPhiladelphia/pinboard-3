@@ -1,5 +1,4 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
@@ -15,6 +14,9 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@pinboard/ui/style.css': fileURLToPath(
         new URL('../../../packages/ui/dist/ui.css', import.meta.url),
+      ),
+      '@pinboard/core': fileURLToPath(
+        new URL('../../../packages/core/src/index.ts', import.meta.url),
       ),
       '@pinboard/ui': fileURLToPath(new URL('../../../packages/ui/src/index.ts', import.meta.url)),
     },

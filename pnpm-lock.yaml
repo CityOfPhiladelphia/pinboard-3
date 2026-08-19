@@ -502,6 +502,10 @@ importers:
         version: 8.1.5(vite@7.3.6(@types/node@26.1.1)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))(vue@3.5.33(typescript@6.0.3))
 
   packages/core:
+    dependencies:
+      vue:
+        specifier: 'catalog:'
+        version: 3.5.33(typescript@6.0.3)
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -865,8 +869,8 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
-  '@babel/runtime-corejs3@7.29.7':
-    resolution: {integrity: sha512-ppj9ouYku+RX0ljtgZd+KMO5mkM2bCqg8H2PYAFWnLsHEIKIdRojqbJ2i3eVHrisuxy7nOFCmngTDdWtUCdXUQ==}
+  '@babel/runtime-corejs3@7.29.2':
+    resolution: {integrity: sha512-Lc94FOD5+0aXhdb0Tdg3RUtqT6yWbI/BbFWvlaSJ3gAb9Ks+99nHRDKADVqC37er4eCB0fHyWT+y+K3QOvJKbw==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.28.6':
@@ -1659,8 +1663,8 @@ packages:
     cpu: [arm64]
     os: [win32]
 
-  '@turf/helpers@7.4.0':
-    resolution: {integrity: sha512-7PAwLZqOdRzTI5g9bHvUwlloAXPDH/mlajtryk0tw4ZwGMtmXsAyF4QundsAMfy4u48Fyd3AUqMXY0SMxqJGWg==}
+  '@turf/helpers@7.3.5':
+    resolution: {integrity: sha512-E/NMGV5MwbjjP7AJXBtsanC3yY8N2MQ87IGdIgkB2ji5AtBpwnH4L3gEqpYN4RlCJJWbLbzO91BbKv2waUd0eg==}
 
   '@types/arcgis-rest-api@10.4.8':
     resolution: {integrity: sha512-MapiW0nP/5X0BUHmtRNEjbK0xrxS6n0syZWQk25H4ObFFwuK1+pGl7LQfOLgpsVM849WQ1b2sKIvWqEAvPwzCA==}
@@ -2148,8 +2152,8 @@ packages:
     resolution: {integrity: sha512-7Vv6asjS4gMOuILabD3l739tsaxFQmC+a7pLZm02zyvs8p977bL3zEgq3yDk5rn9B0PbYgIv++jmHcuUab4RhA==}
     engines: {node: '>=18'}
 
-  core-js-pure@3.50.0:
-    resolution: {integrity: sha512-6GP3Pxz4IKyWjAfa747vIu/jilB5z29JWROLqH/b+pXVcpgh6tM06ZIBwSuglgVqzDYURhOK6oEzTrG0bCHitA==}
+  core-js-pure@3.49.0:
+    resolution: {integrity: sha512-XM4RFka59xATyJv/cS3O3Kml72hQXUeGRuuTmMYFxwzc9/7C8OYTaIR/Ji+Yt8DXzsFLNhat15cE/JP15HrCgw==}
 
   create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
@@ -2304,8 +2308,8 @@ packages:
   date-fns@4.1.0:
     resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
 
-  dayjs@1.11.23:
-    resolution: {integrity: sha512-QDTCU0M0MxR3hQfnlDJfwekQiaanm1ubOD231u73WBckQ/fsamwRLiE2GBz6D3a/xF1NgfiDLJjXBa1hYOYTtQ==}
+  dayjs@1.11.21:
+    resolution: {integrity: sha512-98IT+HOahAisibz/yjKbzuOBwYcjJ7BCLPzARyHiyEBmRz4fatF+KPJszEHXsGYjUG234aH/cOjW1wwTbKUZlA==}
 
   de-indent@1.0.2:
     resolution: {integrity: sha512-e/1zu3xH5MQryN2zdVaF0OrdNLUbvWxzMbi+iNA6Bky7l1RoP8a2fIbRocyHclXt/arDrrR6lL3TqFD9pMQTsg==}
@@ -3851,9 +3855,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/runtime-corejs3@7.29.7':
+  '@babel/runtime-corejs3@7.29.2':
     dependencies:
-      core-js-pure: 3.50.0
+      core-js-pure: 3.49.0
 
   '@babel/template@7.28.6':
     dependencies:
@@ -4313,7 +4317,7 @@ snapshots:
       '@phila/phila-ui-collapse-panel': 0.2.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-core': 3.1.0-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-text-field': 1.2.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
-      dayjs: 1.11.23
+      dayjs: 1.11.21
       vue: 3.5.33(typescript@6.0.3)
     transitivePeerDependencies:
       - '@vue/composition-api'
@@ -4362,7 +4366,7 @@ snapshots:
       '@phila/phila-ui-core': 3.1.0-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-search': 1.2.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-tooltip': 0.1.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
-      '@turf/helpers': 7.4.0
+      '@turf/helpers': 7.3.5
       clsx: 2.1.1
       maplibre-gl: 5.24.0
       pepjs: 0.5.3
@@ -4615,7 +4619,7 @@ snapshots:
   '@turbo/windows-arm64@2.10.7':
     optional: true
 
-  '@turf/helpers@7.4.0':
+  '@turf/helpers@7.3.5':
     dependencies:
       '@types/geojson': 7946.0.16
       tslib: 2.8.1
@@ -5170,7 +5174,7 @@ snapshots:
     dependencies:
       is-what: 5.5.0
 
-  core-js-pure@3.50.0: {}
+  core-js-pure@3.49.0: {}
 
   create-require@1.1.1: {}
 
@@ -5350,7 +5354,7 @@ snapshots:
 
   date-fns@4.1.0: {}
 
-  dayjs@1.11.23: {}
+  dayjs@1.11.21: {}
 
   de-indent@1.0.2: {}
 
@@ -5665,7 +5669,7 @@ snapshots:
 
   imask@7.6.1:
     dependencies:
-      '@babel/runtime-corejs3': 7.29.7
+      '@babel/runtime-corejs3': 7.29.2
 
   import-lazy@4.0.0: {}
 

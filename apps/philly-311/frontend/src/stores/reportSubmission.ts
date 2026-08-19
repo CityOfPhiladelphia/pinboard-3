@@ -10,13 +10,15 @@ import type {
   SubmittedReport,
   WizardLocation,
 } from '@/types/wizard'
+import { charCodeToString, stringToCharCode } from '@pinboard/core'
+import type { LocationQuery } from 'vue-router'
 
 interface State {
   category: string | null
   customFields: Record<string, string>
   location: WizardLocation | null
   description: string
-  photo: PhotoAsset | null
+  photo: PhotoAsset
   contact: ContactInfo
   /** When true, the report is publicly visible. Default false (matches mobile). */
   publicVisibility: boolean
@@ -24,12 +26,25 @@ interface State {
   submitted: SubmittedReport | null
 }
 
+interface T extends LocationQuery {
+  c: string
+  cf: string
+  l: string
+  d: string
+  p: string
+  co: string
+  pv: string
+  ps: string
+}
+
+type QueryParams = Pick<T, 'c' | 'cf' | 'l' | 'd' | 'p' | 'co' | 'pv' | 'ps'>
+
 const initial = (): State => ({
   category: null,
   customFields: {},
   location: null,
   description: '',
-  photo: null,
+  photo: {},
   contact: {},
   publicVisibility: false,
   photoSuggestions: [],
@@ -59,14 +74,17 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     setPhotoSuggestions(suggestions: PhotoSuggestion[]) {
       this.photoSuggestions = suggestions
     },
-    setPhoto(photo: PhotoAsset | null) {
+    setPhoto(photo: string | undefined) {
+      this.photo.mediaUrl = photo
+    },
+    setPhotoPreview(photo: string | undefined) {
       // Revoke the previous blob URL so the underlying File can be GC'd.
       // Browsers hold the blob alive until revoke or page unload.
-      const prev = this.photo?.previewUrl
+      const prev = this.photo.previewUrl
       if (prev && prev.startsWith('blob:') && typeof URL.revokeObjectURL === 'function') {
         URL.revokeObjectURL(prev)
       }
-      this.photo = photo
+      this.photo.previewUrl = photo
     },
     setDescription(description: string) {
       this.description = description
@@ -78,7 +96,8 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
       this.publicVisibility = publicVisibility
     },
     reset() {
-      this.setPhoto(null)
+      this.setPhoto(undefined)
+      this.setPhotoPreview(undefined)
       // Function form: the object form deep-merges plain objects, which would
       // leave customFields/contact entries behind.
       this.$patch((state) => {
@@ -87,7 +106,8 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     },
     /** Record a successful submit and clear the wizard for a fresh report. */
     recordSubmission(result: SubmittedReport) {
-      this.setPhoto(null)
+      this.setPhoto(undefined)
+      this.setPhotoPreview(undefined)
       this.$patch((state) => {
         Object.assign(state, initial(), { submitted: result })
       })
@@ -111,6 +131,89 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
         body.customFields = { ...this.customFields }
       }
       return body
+    },
+    stateToUrlQueryParams(): string {
+      const stateUrl: (string | null)[] = Array.from(
+        Object.entries(this.$state),
+        ([storeKey, storeValue]) => {
+          switch (storeKey as keyof State) {
+            case 'category': {
+              return storeValue ? `c=${encodeURIComponent(storeValue)}` : null
+            }
+            case 'customFields': {
+              return Object.keys(storeValue).length
+                ? `cf=${stringToCharCode(JSON.stringify(storeValue))}`
+                : null
+            }
+            case 'location': {
+              return storeValue ? `l=${stringToCharCode(JSON.stringify(storeValue))}` : null
+            }
+            case 'description': {
+              return Object.keys(storeValue).length
+                ? `d=${stringToCharCode(JSON.stringify(storeValue))}`
+                : null
+            }
+            case 'photo': {
+              return storeValue ? `p=${stringToCharCode(storeValue.mediaUrl)}` : null
+            }
+            case 'contact': {
+              return Object.keys(storeValue).length
+                ? `co=${stringToCharCode(JSON.stringify(storeValue))}`
+                : null
+            }
+            case 'publicVisibility': {
+              return storeValue ? 'pv=t' : null
+            }
+            case 'photoSuggestions': {
+              return Object.keys(storeValue).length
+                ? `ps=${stringToCharCode(JSON.stringify(storeValue))}`
+                : null
+            }
+            case 'submitted': {
+              return null
+            }
+          }
+        },
+      )
+      return stateUrl.filter(Boolean).join('&')
+    },
+    urlQueryParamsToState(params: LocationQuery) {
+      Object.entries(params as QueryParams).forEach(([queryKey, queryValue]) => {
+        switch (queryKey as keyof QueryParams) {
+          case 'c': {
+            this.category = decodeURIComponent(queryValue)
+            break
+          }
+          case 'cf': {
+            this.customFields = JSON.parse(charCodeToString(queryValue))
+            break
+          }
+          case 'l': {
+            this.location = JSON.parse(charCodeToString(queryValue))
+            break
+          }
+          case 'd': {
+            this.description = JSON.parse(charCodeToString(queryValue))
+            break
+          }
+          case 'p': {
+            this.photo = { mediaUrl: JSON.parse(charCodeToString(queryValue)) }
+            break
+          }
+          case 'co': {
+            this.contact = JSON.parse(charCodeToString(queryValue))
+            break
+          }
+          case 'pv': {
+            this.publicVisibility = true
+            break
+          }
+          case 'ps': {
+            this.photoSuggestions = JSON.parse(charCodeToString(queryValue))
+            break
+          }
+        }
+      })
     },
   },
 })

@@ -34,7 +34,9 @@ const questions = computed(() =>
     ? visibleQuestions(selected.value.questions, store.customFields, selected.value.serviceType)
     : [],
 )
-const index = ref(0)
+const index = ref(
+  Object.keys(store.customFields).length ? Object.keys(store.customFields).length - 1 : 0,
+)
 const current = computed(() => questions.value[index.value] ?? null)
 const error = ref('')
 

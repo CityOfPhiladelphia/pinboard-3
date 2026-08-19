@@ -6,6 +6,10 @@ packages:
 catalog:
   '@eslint/js': '^10.0.1'
   '@phila/constructs': '^0.11.4'
+  # Every @phila/phila-ui-* package depends on an exact @phila/phila-ui-core version,
+  # so the whole set moves together: a mixed set resolves two copies of core, and the
+  # module-scoped registries inside it (useVisibility) stop seeing each other.
+  # Pinned exactly for the same reason - a range could drift one package off the set.
   '@phila/phila-ui-app-footer': '1.2.5-beta.0'
   '@phila/phila-ui-app-header': '2.0.0-beta.1'
   '@phila/phila-ui-bottom-sheet': '0.1.2-beta.0'

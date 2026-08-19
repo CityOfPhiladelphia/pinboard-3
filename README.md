@@ -80,3 +80,7 @@ Deployments use AWS OIDC — no long-lived credentials. Each app/environment pai
 - **pnpm** — package manager and workspace management
 - **Turbo** — task orchestration (build, lint, type-check)
 - **city CLI** — AWS infrastructure deployment (`city deploy`, `city ship`)
+
+### Icons
+
+The Phila UI design system uses bundled SVG icons sourced from [Font Awesome Free](https://fontawesome.com) (CC BY 4.0). All icons are embedded directly in the package — no external icon font or auth token required.

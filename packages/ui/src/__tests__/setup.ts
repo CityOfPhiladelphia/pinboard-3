@@ -6,6 +6,7 @@ import { config } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import { createI18n } from 'vue-i18n'
 import { pinboardMessages } from '../i18n'
+import { createPinboard } from '../plugin'
 
 window.matchMedia =
   window.matchMedia ??
@@ -23,6 +24,11 @@ const i18n = createI18n({
   messages: pinboardMessages,
 })
 
+// Components inject PINBOARD_CONFIG_KEY, which apps supply by installing this
+// plugin. Install it here too so mounts see the same config channel they do in
+// an app rather than injecting undefined and quietly dropping config-gated UI.
+const pinboard = createPinboard({ appId: 'test', mobileFilterPlacement: 'sheet' })
+
 // Fresh router per test: components that watch the route (PinboardBody,
 // PinboardShell) keep their watcher alive if a test never unmounts its
 // wrapper, and a router instance shared across tests lets one test's
@@ -34,5 +40,5 @@ beforeEach(() => {
     history: createMemoryHistory(),
     routes: [{ path: '/:pathMatch(.*)*', component: { template: '<div />' } }],
   })
-  config.global.plugins = [router, i18n]
+  config.global.plugins = [router, i18n, pinboard]
 })

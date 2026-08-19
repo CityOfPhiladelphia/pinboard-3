@@ -126,6 +126,12 @@ export interface GeoJSONFeatureCollectionResponse {
   features: ArcgisFeature[] | GeoJsonFeature[]
 }
 
+export interface DrawingOptions {
+  lineWidth?: number
+  lineCap?: 'butt' | 'round' | 'square'
+  strokeStyle?: CanvasGradient | CanvasPattern | string
+}
+
 // type GeoJsonGeometryType =
 //   | 'Point'
 //   | 'MultiPoint'

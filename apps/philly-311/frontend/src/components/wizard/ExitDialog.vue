@@ -1,23 +1,35 @@
 <!-- ABOUTME: Wizard exit confirmation dialog — offers saving the in-progress
      report as a draft or discarding it; cancelling keeps the user in the wizard. -->
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { PhilaButton } from '@phila/phila-ui-button'
+import { useAuth } from '@phila/sso-vue'
+import { useRoute } from 'vue-router'
 
 const props = defineProps<{ open: boolean }>()
 const emit = defineEmits<{ 'update:open': [value: boolean]; save: []; discard: [] }>()
-const dialog = ref<HTMLDialogElement | null>(null)
 
-function syncOpen(open: boolean) {
-  if (open) dialog.value?.showModal?.()
-  else dialog.value?.close?.()
-}
+const loggedInMessage = 'Save your progress as a draft, or discard the report.'
+const loggedOutMessage = `Press ${navigator.platform.toLowerCase().includes('mac') ? 'Cmd' : 'Ctrl'} + D to bookmark this page, or drag this link to your bookmarks`
+
+const dialog = ref<HTMLDialogElement | null>(null)
+const { isAuthenticated } = useAuth()
+const route = useRoute()
+
+const bookmarkTitle = computed(() => {
+  return `Philly 311 Report: ${route.query.c}`
+})
 
 // The template ref isn't populated until after the first render, so an
 // `immediate` watch would run before `dialog.value` exists — sync once on
 // mount to cover being instantiated already-open, then watch for changes.
 onMounted(() => syncOpen(props.open))
 watch(() => props.open, syncOpen)
+
+function syncOpen(open: boolean) {
+  if (open) dialog.value?.showModal?.()
+  else dialog.value?.close?.()
+}
 
 function close() {
   emit('update:open', false)
@@ -41,7 +53,16 @@ function onDiscard() {
     @cancel="close"
   >
     <h2 id="exit-dialog-title" class="exit-dialog__title">Exit this report?</h2>
-    <p class="exit-dialog__body">Save your progress as a draft, or discard the report.</p>
+    <p class="exit-dialog__body">
+      {{ isAuthenticated ? loggedInMessage : loggedOutMessage }}
+      <a
+        v-if="!isAuthenticated"
+        :href="route.fullPath"
+        :title="bookmarkTitle"
+        draggable="true"
+        v-text="bookmarkTitle"
+      />
+    </p>
     <div class="exit-dialog__actions">
       <button type="button" class="exit-dialog__cancel" data-test="exit-cancel" @click="close">
         Cancel
@@ -56,6 +77,10 @@ function onDiscard() {
 
 <style scoped>
 .exit-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   max-width: 28rem;
   width: 100%;
   padding: var(--spacing-l, 2rem);
