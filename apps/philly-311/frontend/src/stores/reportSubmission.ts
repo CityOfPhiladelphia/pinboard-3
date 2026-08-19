@@ -13,6 +13,7 @@ import type {
 import { charCodeToString, stringToCharCode } from '@pinboard/core'
 import type { LocationQuery } from 'vue-router'
 import type { PinboardTypes } from '@pinboard/ui'
+import { decodePhotoInfo, encodePhotoInfo } from '@/utils/encodeDecodePhoto'
 
 interface State {
   category: string | null
@@ -169,7 +170,7 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
                 : null
             }
             case 'photo': {
-              return storeValue ? `p=${stringToCharCode(storeValue.mediaUrl)}` : null
+              return storeValue ? `p=${stringToCharCode(encodePhotoInfo(storeValue))}` : null
             }
             case 'contact': {
               return Object.keys(storeValue).length
@@ -212,7 +213,7 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
             break
           }
           case 'p': {
-            this.photo = JSON.parse(charCodeToString(queryValue))
+            this.photo = decodePhotoInfo(charCodeToString(queryValue))
             break
           }
           case 'co': {
