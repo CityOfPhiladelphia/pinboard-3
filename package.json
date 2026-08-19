@@ -30,13 +30,23 @@
     "eslint-plugin-vue": "catalog:",
     "globals": "catalog:",
     "prettier": "catalog:",
-    "turbo": "^2.10.7",
+    "turbo": "^2.10.11",
     "typescript": "catalog:",
     "vue-tsc": "catalog:"
   },
   "pnpm": {
     "overrides": {
-      "vue-router": "5.0.6"
+      "vue-router": "5.0.6",
+      "brace-expansion@>=3.0.0 <5.0.7": ">=5.0.7",
+      "brace-expansion@>=4.0.0 <5.0.8": ">=5.0.8",
+      "postcss@<=8.5.22": ">=8.5.23",
+      "fast-uri@>=3.0.0 <3.1.5": ">=3.1.5",
+      "brace-expansion@>=4.0.0 <5.0.9": ">=5.0.9",
+      "brace-expansion@>=2.0.0 <2.1.4": ">=2.1.4",
+      "dompurify@<=3.4.12": ">=3.4.13",
+      "nanoid@<3.3.16": ">=3.3.16",
+      "nanoid@<3.3.18": ">=3.3.18",
+      "postcss@<=8.5.17": ">=8.5.18"
     }
   }
 }
