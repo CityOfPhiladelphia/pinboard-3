@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
-import type { Dimensions } from '@/types'
+import type { Dimensions } from '../types'
 
 const props = defineProps<{
   dimensions: Dimensions

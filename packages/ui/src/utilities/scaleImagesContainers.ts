@@ -1,5 +1,5 @@
 import { toValue, type Ref } from 'vue'
-import type { Dimensions } from '@/types'
+import type { Dimensions } from '../types'
 
 function getScale(dimA: Dimensions, dimB: Dimensions, widthLessThanHeight: boolean): Dimensions {
   return widthLessThanHeight
