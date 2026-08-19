@@ -1,7 +1,8 @@
 <!-- ABOUTME: Landing-header callout: heading + lede + the primary "Submit request" CTA
-     (filled pill with an overlapping document illustration) routing to /report. -->
+     routing to /report. The CTA used to carry its own document illustration, but that
+     glyph now lives on the header's "Report an issue" link, so it's dropped here. -->
 <script setup lang="ts">
-import reportDocument from '@/assets/report-document.svg'
+import { PhilaButton } from '@phila/phila-ui-button'
 </script>
 
 <template>
@@ -18,10 +19,9 @@ import reportDocument from '@/assets/report-document.svg'
         >About Philly311.</a
       >
     </p>
-    <div class="report-callout__cta-row">
-      <RouterLink to="/report" class="report-callout__cta">Submit request</RouterLink>
-      <img class="report-callout__cta-icon" :src="reportDocument" alt="" aria-hidden="true" />
-    </div>
+    <PhilaButton variant="primary" size="large" to="/report" class="report-callout__cta">
+      Submit request
+    </PhilaButton>
   </section>
 </template>
 
@@ -43,35 +43,8 @@ import reportDocument from '@/assets/report-document.svg'
   font-weight: 700;
   text-decoration: underline;
 }
-.report-callout__cta-row {
-  position: relative;
-  display: flex;
-}
 .report-callout__cta {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  padding: 0 var(--spacing-l, 1.5rem);
-  background: var(--Schemes-Primary, #1034f4);
-  color: #fff;
-  border-radius: 9999px;
-  font-weight: 600;
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-  text-decoration: none;
-  box-shadow:
-    0 1px 3px 1px rgba(0, 0, 0, 0.15),
-    0 1px 2px 0 rgba(0, 0, 0, 0.3);
-}
-.report-callout__cta-icon {
-  position: absolute;
-  left: -4px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 60px;
-  height: 60px;
-  pointer-events: none;
+  width: 100%;
+  max-width: none;
 }
 </style>

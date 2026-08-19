@@ -35,31 +35,7 @@
   },
   "pnpm": {
     "overrides": {
-      "vue-router": "5.0.6",
-      "@phila/phila-ui-app-footer": "link:../phila-ui-4/packages/app-footer",
-      "@phila/phila-ui-app-header": "link:../phila-ui-4/packages/app-header",
-      "@phila/phila-ui-bottom-sheet": "link:../phila-ui-4/packages/bottom-sheet",
-      "@phila/phila-ui-button": "link:../phila-ui-4/packages/button",
-      "@phila/phila-ui-callout": "link:../phila-ui-4/packages/callout",
-      "@phila/phila-ui-cards": "link:../phila-ui-4/packages/cards",
-      "@phila/phila-ui-charts": "link:../phila-ui-4/packages/charts",
-      "@phila/phila-ui-checkbox": "link:../phila-ui-4/packages/checkbox",
-      "@phila/phila-ui-core": "link:../phila-ui-4/packages/core",
-      "@phila/phila-ui-date-field": "link:../phila-ui-4/packages/date-field",
-      "@phila/phila-ui-filter-chip": "link:../phila-ui-4/packages/filter-chip",
-      "@phila/phila-ui-filter-panel": "link:../phila-ui-4/packages/filter-panel",
-      "@phila/phila-ui-link": "link:../phila-ui-4/packages/link",
-      "@phila/phila-ui-logo": "link:../phila-ui-4/packages/logo",
-      "@phila/phila-ui-map-core": "link:../phila-ui-4/packages/map-core",
-      "@phila/phila-ui-menu": "link:../phila-ui-4/packages/menu",
-      "@phila/phila-ui-radio": "link:../phila-ui-4/packages/radio",
-      "@phila/phila-ui-search": "link:../phila-ui-4/packages/search",
-      "@phila/phila-ui-switch": "link:../phila-ui-4/packages/switch",
-      "@phila/phila-ui-table": "link:../phila-ui-4/packages/table",
-      "@phila/phila-ui-tabs": "link:../phila-ui-4/packages/tabs",
-      "@phila/phila-ui-tags": "link:../phila-ui-4/packages/tags",
-      "@phila/phila-ui-text-field": "link:../phila-ui-4/packages/text-field",
-      "@phila/phila-ui-tooltip": "link:../phila-ui-4/packages/tooltip"
+      "vue-router": "5.0.6"
     }
   }
 }

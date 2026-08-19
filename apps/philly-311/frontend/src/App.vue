@@ -10,7 +10,7 @@ import { useAuth } from '@phila/sso-vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAccountProvisioning } from '@/composables/useAccountProvisioning'
-import ReportDocumentIcon from '@/components/ReportDocumentIcon.vue'
+import ReportDocumentIcon from '@/components/ReportDocumentIcon'
 
 const route = useRoute()
 const { signIn, signOut, isAuthenticated, userName } = useAuth()
@@ -28,12 +28,17 @@ const isSelectedHref = (href?: string) =>
 
 const navLinks = computed(() =>
   [
-    { text: 'Report an issue', href: '/report', icon: ReportDocumentIcon, iconSize: 'large' },
+    {
+      text: 'Report an issue',
+      href: '/report',
+      icon: ReportDocumentIcon,
+      iconSize: 'large' as const,
+    },
     { text: 'Map', href: '/' },
     { text: 'My Requests', href: '/reports' },
     { text: 'Answers', href: '/answers' },
     ...(isAuthenticated.value
-      ? [{ text: userName.value }, { text: 'Sign out', href: '#', onClick: () => signOut() }]
+      ? [{ text: userName.value ?? '' }, { text: 'Sign out', href: '#', onClick: () => signOut() }]
       : [{ text: 'Login / Sign up', href: '#', onClick: () => login() }]),
   ].map((link) => ({ ...link, selected: isSelectedHref(link.href) })),
 )
