@@ -46,11 +46,11 @@ catalogs:
       specifier: 0.1.2-beta.0
       version: 0.1.2-beta.0
     '@phila/phila-ui-filter-chip':
-      specifier: 1.1.2-beta.0
-      version: 1.1.2-beta.0
+      specifier: 1.1.2-beta.1
+      version: 1.1.2-beta.1
     '@phila/phila-ui-filter-panel':
-      specifier: 1.0.2-beta.0
-      version: 1.0.2-beta.0
+      specifier: 1.0.2-beta.1
+      version: 1.0.2-beta.1
     '@phila/phila-ui-link':
       specifier: 1.1.2-beta.0
       version: 1.1.2-beta.0
@@ -334,10 +334,10 @@ importers:
         version: 0.1.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-filter-chip':
         specifier: 'catalog:'
-        version: 1.1.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
+        version: 1.1.2-beta.1(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-filter-panel':
         specifier: 'catalog:'
-        version: 1.0.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
+        version: 1.0.2-beta.1(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-map-core':
         specifier: 'catalog:'
         version: 1.3.0-beta.1(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
@@ -592,10 +592,10 @@ importers:
         version: 3.1.0-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-filter-chip':
         specifier: 'catalog:'
-        version: 1.1.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
+        version: 1.1.2-beta.1(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-filter-panel':
         specifier: 'catalog:'
-        version: 1.0.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
+        version: 1.0.2-beta.1(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-link':
         specifier: 'catalog:'
         version: 1.1.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
@@ -1342,13 +1342,13 @@ packages:
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-filter-chip@1.1.2-beta.0':
-    resolution: {integrity: sha512-TfUJCbEH6E+7LCFPaLTpinCLhELOMjeGby/N0KIHEDELfb8EWb/f/Q8uJxQ7kohGD+n80OqwiP24SsRvhvpucg==}
+  '@phila/phila-ui-filter-chip@1.1.2-beta.1':
+    resolution: {integrity: sha512-7cktuebwsHUReuUNJ/7vTc1w/AtvKf+YSQ6qtuz/pmYKwtsYKQ5bOM2LJV9L7BHdAhjcbPHPlwbr6Ae1t0QWlQ==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-filter-panel@1.0.2-beta.0':
-    resolution: {integrity: sha512-LGC+IRdGRoIHe5sdAKL+GDGH0grb05f+Rd+0iK9BOKrj7lJ3Dh5sTSS/GCRfsRV3s+FnS+XFV1L5OISyx4XKVA==}
+  '@phila/phila-ui-filter-panel@1.0.2-beta.1':
+    resolution: {integrity: sha512-M4l0XKRAHU92AXoXY7YQs/ZhX9NLxXAlHvlQwt3eLPnYIwOkz9JMEQT9lbbqHbPzGYl9LNr5MCKOuKvuQLpXSw==}
     peerDependencies:
       vue: ^3.0.0
 
@@ -4319,7 +4319,7 @@ snapshots:
       - '@vue/composition-api'
       - vue-router
 
-  '@phila/phila-ui-filter-chip@1.1.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
+  '@phila/phila-ui-filter-chip@1.1.2-beta.1(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
     dependencies:
       '@phila/phila-ui-button': 2.3.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-checkbox': 1.0.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
@@ -4329,7 +4329,7 @@ snapshots:
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-filter-panel@1.0.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
+  '@phila/phila-ui-filter-panel@1.0.2-beta.1(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
     dependencies:
       '@phila/phila-ui-button': 2.3.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-checkbox': 1.0.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
