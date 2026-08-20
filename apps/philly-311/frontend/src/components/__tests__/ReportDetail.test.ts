@@ -1,117 +1,100 @@
-// ABOUTME: Tests for ReportDetail — the inline detail panel rendered in Pinboard's
-// ABOUTME: location-detail slot when a report marker is selected.
-import { describe, it, expect, vi, afterEach } from 'vitest'
+// ABOUTME: Tests for ReportDetail — the location-detail panel wrapper that renders
+// ABOUTME: instantly from the lightweight Report, then loads the full issue by id.
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
-import { CloseButton } from '@phila/phila-ui-button'
+import { ref } from 'vue'
 import ReportDetail from '../ReportDetail.vue'
+import ReportDetailContent from '../ReportDetailContent.vue'
 import type { Report } from '@/composables/useNearbyReports'
 
-// The chassis index pulls phila dist CSS vitest can't load; stub DetailActions.
-// Share behavior itself is covered by the chassis's DetailActions.test.ts.
-vi.mock('@pinboard/ui', () => ({
-  DetailActions: defineComponent({
-    name: 'DetailActions',
-    setup() {
-      return () => h('div')
-    },
-  }),
+const issue = ref<unknown>(null)
+const isUpvoting = ref(false)
+const upvoteError = ref<string | null>(null)
+const load = vi.fn()
+const upvote = vi.fn()
+vi.mock('@/composables/useIssue', () => ({
+  useIssue: () => ({ issue, isUpvoting, upvoteError, load, upvote }),
+}))
+
+vi.mock('../ReportDetailContent.vue', () => ({
+  default: {
+    name: 'ReportDetailContent',
+    props: ['report', 'onClose', 'showUpvote', 'upvoting', 'upvoteError', 'onUpvote'],
+    template: '<div />',
+  },
 }))
 
 const report: Report = {
-  id: '1',
-  caseNumber: '1',
+  id: '12345678',
   lat: 39.95,
   lng: -75.16,
   serviceType: 'Pothole Repair',
   status: 'In Progress',
   address: '1234 Market St',
   description: 'big hole',
+  createdAt: '2026-07-01T13:14:00Z',
+  slaDate: '2026-08-01',
 }
 
-describe('ReportDetail', () => {
-  it('renders the report fields', () => {
-    const w = mount(ReportDetail, { props: { report, onClose: vi.fn() } })
-    expect(w.text()).toContain('Pothole Repair')
-    expect(w.text()).toContain('1234 Market St')
-    expect(w.text()).toContain('In Progress')
-    expect(w.text()).toContain('big hole')
-  })
-  it('calls onClose when the close button is clicked', async () => {
-    const onClose = vi.fn()
-    const w = mount(ReportDetail, { props: { report, onClose } })
-    await w.findComponent(CloseButton).trigger('click')
-    expect(onClose).toHaveBeenCalled()
-  })
+beforeEach(() => {
+  issue.value = null
+  isUpvoting.value = false
+  upvoteError.value = null
+  load.mockReset()
+  upvote.mockReset()
 })
 
-const caseReport = {
-  id: '12345678',
-  lat: 39.95,
-  lng: -75.16,
-  serviceType: 'Pothole',
-  status: 'In Progress',
-  address: '1515 Market St',
-  createdAt: '2026-07-01T13:14:00Z',
-  description: 'Deep pothole',
-  slaDate: '2026-08-01',
-  department: 'Streets',
-} as Report
-
-describe('case fields view', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals()
+describe('ReportDetail', () => {
+  it('loads the full issue by id on mount', () => {
+    mount(ReportDetail, { props: { report, onClose: vi.fn() } })
+    expect(load).toHaveBeenCalledWith('12345678')
   })
 
-  it('renders nothing case-specific by default (landing finder usage)', () => {
-    const w = mount(ReportDetail, {
-      props: { report: caseReport, onClose: () => {} },
-    })
-    expect(w.find('.report-detail__fields').exists()).toBe(false)
-    expect(w.find('.report-detail__sla').exists()).toBe(false)
-    expect(w.findComponent({ name: 'DetailActions' }).exists()).toBe(false)
+  it('reloads when the selected report id changes', async () => {
+    const w = mount(ReportDetail, { props: { report, onClose: vi.fn() } })
+    await w.setProps({ report: { ...report, id: '87654321' } })
+    expect(load).toHaveBeenCalledWith('87654321')
   })
 
-  it('shows the fields table when showCaseFields is set', () => {
-    const w = mount(ReportDetail, {
-      props: { report: caseReport, onClose: () => {}, showCaseFields: true },
+  it('renders a placeholder Issue built from the lightweight Report before the fetch resolves', () => {
+    const w = mount(ReportDetail, { props: { report, onClose: vi.fn() } })
+    const content = w.findComponent(ReportDetailContent)
+    expect(content.props('report')).toMatchObject({
+      id: '12345678',
+      serviceType: 'Pothole Repair',
+      status: 'In Progress',
+      address: '1234 Market St',
+      description: 'big hole',
+      slaDate: '2026-08-01',
     })
-    const rows = w.findAll('.report-detail__fields tr')
-    const text = rows.map((r) => r.text())
-    expect(text.some((t) => t.includes('Issue type') && t.includes('Pothole'))).toBe(true)
-    expect(text.some((t) => t.includes('Location') && t.includes('1515 Market St'))).toBe(true)
-    expect(text.some((t) => t.includes('Submitted'))).toBe(true)
-    expect(text.some((t) => t.includes('Request ID') && t.includes('12345678'))).toBe(true)
   })
 
-  it('shows the estimated-update banner only when slaDate is present', () => {
-    const w = mount(ReportDetail, {
-      props: { report: caseReport, onClose: () => {}, showCaseFields: true },
-    })
-    expect(w.find('.report-detail__sla').text()).toContain('Estimated update')
-    const w2 = mount(ReportDetail, {
-      props: {
-        report: { ...caseReport, slaDate: undefined },
-        onClose: () => {},
-        showCaseFields: true,
-      },
-    })
-    expect(w2.find('.report-detail__sla').exists()).toBe(false)
+  it('swaps in the full issue once the fetch resolves', () => {
+    issue.value = { id: '12345678', serviceType: 'Pothole Repair', private: true, customFields: [] }
+    const w = mount(ReportDetail, { props: { report, onClose: vi.fn() } })
+    expect(w.findComponent(ReportDetailContent).props('report')).toEqual(issue.value)
   })
 
-  it('renders the SLA deadline as a date only, without shifting the day', () => {
-    const w = mount(ReportDetail, {
-      props: { report: caseReport, onClose: () => {}, showCaseFields: true },
-    })
-    expect(w.find('.report-detail__sla').text()).toContain('8/1/2026')
+  it('wires onUpvote to upvote() with the selected report id', () => {
+    const w = mount(ReportDetail, { props: { report, onClose: vi.fn() } })
+    const onUpvote = w.findComponent(ReportDetailContent).props('onUpvote') as (
+      description: string,
+    ) => void
+    onUpvote('Still there today.')
+    expect(upvote).toHaveBeenCalledWith('12345678', 'Still there today.')
   })
 
-  // Share behavior (clipboard, announcement, failure) is covered by the chassis's
-  // DetailActions.test.ts; here we only assert the control is wired to showCaseFields.
-  it('renders DetailActions only in the case view', () => {
+  it('passes onClose, showUpvote, and upvote state through to ReportDetailContent', () => {
+    const onClose = vi.fn()
+    isUpvoting.value = true
+    upvoteError.value = 'boom'
     const w = mount(ReportDetail, {
-      props: { report: caseReport, onClose: () => {}, showCaseFields: true },
+      props: { report, onClose, showUpvote: false },
     })
-    expect(w.findComponent({ name: 'DetailActions' }).exists()).toBe(true)
+    const content = w.findComponent(ReportDetailContent)
+    expect(content.props('onClose')).toBe(onClose)
+    expect(content.props('showUpvote')).toBe(false)
+    expect(content.props('upvoting')).toBe(true)
+    expect(content.props('upvoteError')).toBe('boom')
   })
 })
