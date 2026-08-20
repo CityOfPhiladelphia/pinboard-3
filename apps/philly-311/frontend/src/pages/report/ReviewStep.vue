@@ -40,7 +40,7 @@ async function submit() {
     errorMessage.value = submitError.value?.message || GENERIC_ERROR
     return
   }
-  store.recordSubmission({ id: result.id, caseNumber: result.caseNumber })
+  store.recordSubmission(result)
   router.push('/report/confirmation')
 }
 </script>

@@ -89,7 +89,7 @@ onMounted(() => {
         v-if="reportById(location.id)"
         :report="reportById(location.id)!"
         :on-close="onClose"
-        :show-case-fields="true"
+        :show-upvote="false"
       />
     </template>
 

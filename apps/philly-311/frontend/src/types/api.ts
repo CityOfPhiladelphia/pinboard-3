@@ -20,19 +20,34 @@ export interface ServiceType {
   questions: QuestionField[]
 }
 
+/** An answer to one of a service type's follow-up questions, as returned on an Issue. */
+export interface CustomFieldValue {
+  field: string
+  label: string
+  type: string
+  value: string | null
+  options?: string[]
+}
+
+/** Mirrors the API's Issue shape (GET /issues/:id, POST /submit, POST /issues/:id/upvote).
+ *  Fields are optional here because callers may build a partial Issue from lighter-weight
+ *  data (e.g. a nearby-issues Report) before the full record has loaded. */
 export interface Issue {
   id: string
   caseNumber?: string
-  status: string
+  status?: string
   serviceType?: string
-  agency?: string
-  subject?: string
-  description?: string
+  department?: string
+  private?: boolean
   address?: string
-  zipCode?: string
+  description?: string
+  mediaUrl?: string
   latitude?: number
   longitude?: number
-  mediaUrl?: string
   createdAt?: string
   updatedAt?: string
+  slaDate?: string
+  slaDays?: number
+  childCount?: number
+  customFields?: CustomFieldValue[]
 }

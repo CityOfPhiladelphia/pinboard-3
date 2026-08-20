@@ -1,118 +1,58 @@
-<!-- ABOUTME: Inline detail for a selected 311 report in Pinboard's location-detail slot:
-     photo, status, service type, address, time, description, and (when showCaseFields is
-     set) a fields table, SLA banner, and Share button for the My Requests case view. -->
+<!-- ABOUTME: Inline detail for a selected 311 report in Pinboard's location-detail slot.
+     Renders instantly from the lightweight Report the map/list already has, then fetches
+     the full issue (customFields, private) by id and swaps it in via ReportDetailContent. -->
 <script setup lang="ts">
-import { CloseButton } from '@phila/phila-ui-button'
-import { Callout } from '@phila/phila-ui-callout'
-import { DetailActions } from '@pinboard/ui'
+import { computed, watch } from 'vue'
+import ReportDetailContent from './ReportDetailContent.vue'
+import { useIssue } from '@/composables/useIssue'
 import type { Report } from '@/composables/useNearbyReports'
+import type { Issue } from '@/types/api'
 
-defineProps<{ report: Report; onClose: () => void; showCaseFields?: boolean }>()
+const props = withDefaults(
+  defineProps<{ report: Report; onClose: () => void; showUpvote?: boolean }>(),
+  // An absent optional boolean prop is cast to false by Vue, not undefined —
+  // default it to true so Upvote shows unless a caller explicitly opts out.
+  { showUpvote: true },
+)
 
-function formatWhen(iso?: string): string {
-  if (!iso) return ''
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime())
-    ? ''
-    : d.toLocaleString('en-US', { timeZone: 'America/New_York' })
+const { issue, isUpvoting, upvoteError, load, upvote } = useIssue()
+
+/** Placeholder Issue built from the lightweight Report, shown until the full fetch resolves. */
+function reportToIssue(r: Report): Issue {
+  return {
+    id: r.id,
+    caseNumber: r.id,
+    status: r.status,
+    serviceType: r.serviceType,
+    department: r.department,
+    address: r.address,
+    description: r.description,
+    mediaUrl: r.mediaUrl,
+    createdAt: r.createdAt,
+    slaDate: r.slaDate,
+  }
 }
 
-// slaDate is a date-only field ("YYYY-MM-DD", parsed as UTC midnight), so format
-// in UTC to avoid rendering the previous day in local time.
-function formatDeadline(iso: string): string {
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { timeZone: 'UTC' })
+const displayIssue = computed(() => issue.value ?? reportToIssue(props.report))
+
+watch(
+  () => props.report.id,
+  (id) => void load(id),
+  { immediate: true },
+)
+
+function handleUpvote(description: string): Promise<boolean> {
+  return upvote(props.report.id, description)
 }
 </script>
 
 <template>
-  <div class="report-detail">
-    <CloseButton class="report-detail__close" @click="onClose" />
-    <img
-      v-if="report.mediaUrl"
-      :src="report.mediaUrl"
-      :alt="report.serviceType"
-      class="report-detail__img"
-    />
-    <div v-else class="report-detail__img report-detail__img--placeholder" aria-hidden="true" />
-    <h2 class="has-text-heading-5">{{ report.serviceType }}</h2>
-    <p class="report-detail__status">{{ report.status }}</p>
-    <p class="report-detail__address">{{ report.address }}</p>
-    <p v-if="report.createdAt" class="report-detail__time">{{ formatWhen(report.createdAt) }}</p>
-    <p v-if="report.description" class="report-detail__desc">{{ report.description }}</p>
-    <DetailActions v-if="showCaseFields" class="report-detail__actions" />
-    <table v-if="showCaseFields" class="report-detail__fields">
-      <tbody>
-        <tr>
-          <th scope="row">Issue type</th>
-          <td>{{ report.serviceType }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Location</th>
-          <td>{{ report.address }}</td>
-        </tr>
-        <tr v-if="report.createdAt">
-          <th scope="row">Submitted</th>
-          <td>{{ formatWhen(report.createdAt) }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Request ID</th>
-          <td>{{ report.id }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <Callout
-      v-if="showCaseFields && report.slaDate"
-      class="report-detail__sla"
-      type="info"
-      title="Estimated update"
-      :message="`Report will be reviewed by: ${formatDeadline(report.slaDate)}`"
-    />
-  </div>
+  <ReportDetailContent
+    :report="displayIssue"
+    :on-close="onClose"
+    :show-upvote="showUpvote"
+    :upvoting="isUpvoting"
+    :upvote-error="upvoteError"
+    :on-upvote="handleUpvote"
+  />
 </template>
-
-<style scoped>
-.report-detail {
-  position: relative;
-  padding: var(--spacing-m, 1rem);
-}
-.report-detail__close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-}
-.report-detail__img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 6px;
-}
-.report-detail__img--placeholder {
-  background: var(--Schemes-Border-low, #e5e5e5);
-}
-.report-detail h2 {
-  margin: var(--spacing-s, 0.5rem) 0;
-}
-.report-detail__actions {
-  margin: var(--spacing-s, 0.5rem) 0;
-}
-.report-detail__fields {
-  width: 100%;
-  border-collapse: collapse;
-  margin: var(--spacing-s, 0.5rem) 0;
-}
-.report-detail__fields tr {
-  border-bottom: 1px solid var(--Schemes-Border-low, #ccc);
-}
-.report-detail__fields th {
-  text-align: left;
-  font-weight: bold;
-  padding: 0.5rem 0.5rem 0.5rem 0;
-}
-.report-detail__fields td {
-  padding: 0.5rem 0;
-}
-.report-detail__sla {
-  margin: var(--spacing-s, 0.5rem) 0;
-}
-</style>

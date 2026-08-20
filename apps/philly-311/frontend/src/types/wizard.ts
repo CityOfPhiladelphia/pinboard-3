@@ -2,6 +2,7 @@
 // ABOUTME: Mirrors the API submit payload shape and the per-step form data.
 
 import type { PinboardTypes } from '@pinboard/ui'
+import type { Issue } from './api'
 
 export interface PhotoAsset {
   /** CloudFront URL returned by /classify (which doubles as the upload endpoint). */
@@ -44,17 +45,12 @@ export interface SubmitPayload {
   customFields?: Record<string, string>
 }
 
-/** Fields of the POST /private/key/submit success response the app uses. */
-export interface SubmitResponse {
-  id: string
-  caseNumber?: string
-}
+/** The POST /private/key/submit success response — the full created Issue. */
+export type SubmitResponse = Issue
 
-/** The slice of a successful submit kept for the confirmation page. */
-export interface SubmittedReport {
-  id: string
-  caseNumber?: string
-}
+/** The submitted report kept for the confirmation page, which renders it via
+ *  ReportDetailContent alongside the map/my-requests detail panel. */
+export type SubmittedReport = Issue
 
 /** A locally saved, resumable snapshot of an in-progress report. */
 export interface ReportDraft {
