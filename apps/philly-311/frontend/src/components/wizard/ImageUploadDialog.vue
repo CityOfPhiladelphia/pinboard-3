@@ -2,18 +2,20 @@
      report as a draft or discarding it; cancelling keeps the user in the wizard. -->
 <script setup lang="ts">
 import { ref, onMounted, useTemplateRef } from 'vue'
-
 import { PhilaButton, CloseButton } from '@phila/phila-ui-button'
 import { Tags } from '@phila/phila-ui-tags'
 import { Icon } from '@phila/phila-ui-core'
 import { IconPencil, IconBackwardStep, IconForwardStep } from '@phila/phila-ui-core/icons'
-import { DrawingCanvas } from '@pinboard/ui'
-import type { Dimensions } from '@/types/wizard'
+import { DrawingCanvas, PinboardUtilities } from '@pinboard/ui'
+import type { PinboardTypes } from '@pinboard/ui'
+import { blobToDataURL, JPEG_QUALITY, resizeImageToMax } from '@/utils/photo'
+import { useReportSubmissionStore } from '@/stores/reportSubmission'
+
+const store = useReportSubmissionStore()
 
 const open = defineModel<boolean>('open')
 const complete = defineModel<boolean>('complete')
 const file = defineModel<string>('file', { default: '' })
-const scale = defineModel<Dimensions>('scale')
 
 const title = 'Show us where the issue appears in your photo'
 const note = `Draw a circle around where the issue appears, or skip ahead to the next step.`
@@ -25,10 +27,12 @@ const inkColor =
 const dialog = ref<HTMLDialogElement | null>(null)
 const canvasContainerRef = useTemplateRef('canvasContainerRef')
 const canvasRef = useTemplateRef('canvasRef')
-const canvasHeight = ref(NaN)
-const canvasWidth = ref(NaN)
+const canvasDimentions = ref<PinboardTypes.Dimensions>({
+  height: NaN,
+  width: NaN,
+})
 const uploadedImage = ref<HTMLImageElement | undefined>(undefined)
-const imageDim = ref<Dimensions>({
+const imageDim = ref<PinboardTypes.Dimensions>({
   height: NaN,
   width: NaN,
 })
@@ -42,16 +46,12 @@ const canvasBackground = {
 
 onMounted(() => {
   dialog.value?.showModal()
-  if (!canvasContainerRef.value) {
-    throw new Error('Drawing canvas container failed to mount')
-  }
-  const containerDim: Dimensions = {
-    height: canvasContainerRef.value.clientHeight,
-    width: canvasContainerRef.value.clientWidth,
-  }
+
   getImageDimensions(file.value).then((imageDimensions) => {
-    imageDim.value = imageDimensions
-    setCanvasScale(imageDimensions, containerDim)
+    imageDim.value = resizeImageToMax(imageDimensions)
+    const scales = PinboardUtilities.scaleImageAndContainer(imageDimensions, canvasContainerRef)
+    canvasDimentions.value = scales.container
+    store.setPhotoDimensions(scales.image)
   })
 })
 
@@ -60,9 +60,29 @@ function handleClose() {
 }
 
 function handleSkip() {
-  setImageScale()
-  complete.value = true
-  open.value = false
+  const offCanvas = new OffscreenCanvas(imageDim.value.width, imageDim.value.height)
+  if (!canvasRef.value?.drawingCanvas) {
+    throw new Error('Ref for drawing canvas was undefined')
+  }
+
+  const context = offCanvas.getContext('2d')
+  if (!context) {
+    throw new Error('Failed to get context from OffscreenCanvas')
+  }
+
+  if (!uploadedImage.value) {
+    throw new Error('Could not locate uploaded image')
+  }
+
+  context.drawImage(uploadedImage.value, 0, 0)
+  URL.revokeObjectURL(file.value)
+  offCanvas
+    .convertToBlob({ type: 'image/jpeg', quality: JPEG_QUALITY })
+    .then(async (markupBlob) => {
+      file.value = await blobToDataURL(markupBlob)
+      complete.value = true
+      open.value = false
+    })
 }
 
 function handleNext() {
@@ -86,10 +106,13 @@ function handleNext() {
     context.drawImage(uploadedImage.value, 0, 0)
     context.drawImage(markupImage, 0, 0)
     URL.revokeObjectURL(file.value)
-    offCanvas.convertToBlob({ type: 'image/png', quality: 1 }).then((markupBlob) => {
-      file.value = URL.createObjectURL(markupBlob)
-      handleSkip()
-    })
+    offCanvas
+      .convertToBlob({ type: 'image/jpeg', quality: JPEG_QUALITY })
+      .then(async (markupBlob) => {
+        file.value = await blobToDataURL(markupBlob)
+        complete.value = true
+        open.value = false
+      })
   })
 }
 
@@ -101,7 +124,7 @@ function handleRedo() {
   canvasRef.value?.redoLine()
 }
 
-function getImageDimensions(dataURL: string): Promise<Dimensions> {
+function getImageDimensions(dataURL: string): Promise<PinboardTypes.Dimensions> {
   return new Promise((resolve) => {
     uploadedImage.value = new Image()
     uploadedImage.value.onload = () => {
@@ -112,39 +135,6 @@ function getImageDimensions(dataURL: string): Promise<Dimensions> {
     }
     uploadedImage.value.src = dataURL
   })
-}
-
-function setCanvasScale(image: Dimensions, container: Dimensions) {
-  const widthLtHeight = container.width <= container.height
-  canvasHeight.value =
-    (widthLtHeight ? Math.floor(image.height * container.width) / image.width : container.height) *
-    0.99
-  canvasWidth.value =
-    (widthLtHeight
-      ? container.width
-      : Math.floor((image.width * container.height) / image.height)) * 0.99
-  scale.value = widthLtHeight
-    ? {
-        height: image.height / image.width,
-        width: 1,
-      }
-    : {
-        height: 1,
-        width: image.width / image.height,
-      }
-}
-
-function setImageScale() {
-  const widthLtHeight = imageDim.value.width <= imageDim.value.height
-  scale.value = widthLtHeight
-    ? {
-        height: imageDim.value.height / imageDim.value.width,
-        width: 1,
-      }
-    : {
-        height: 1,
-        width: imageDim.value.width / imageDim.value.height,
-      }
 }
 </script>
 
@@ -168,15 +158,13 @@ function setImageScale() {
     <div />
     <div ref="canvasContainerRef" class="image-dialog-canvas">
       <DrawingCanvas
-        v-if="open && canvasHeight && canvasWidth"
+        v-if="open && canvasDimentions.height && canvasDimentions.width"
         ref="canvasRef"
-        :height="canvasHeight"
-        :width="canvasWidth"
+        :dimensions="canvasDimentions"
         :options="{ strokeStyle: inkColor }"
         :style="canvasBackground"
-      ></DrawingCanvas>
+      />
     </div>
-
     <div />
     <div class="image-dialog-actions">
       <Tags text="Redo" :icon="IconForwardStep" color="white" @click="handleRedo" />
@@ -218,8 +206,8 @@ function setImageScale() {
   grid-template-rows:
     auto auto var(--spacing-l, 1.5rem) auto var(--spacing-m, 1rem) 1fr var(--spacing-s, 0.75rem)
     auto var(--spacing-3xl, 3rem) auto;
-  width: clamp(10vw, 65rem, 90vw);
-  height: clamp(10vh, 65rem, 95vh);
+  width: clamp(15rem, 50svh + 20rem, 90svh);
+  height: clamp(15rem, 50svh + 20rem, 80svh);
   padding: var(--spacing-xl, 2rem);
   border: none;
   border-radius: var(--border-radius-xl, 1.5rem);
@@ -240,7 +228,7 @@ dialog:not([open]) {
 }
 
 .image-dialog-close > .phila-button {
-  color: var(--Schemes-On-Surface-High, #000) !important;
+  color: var(--Schemes-On-Surface-High, #000);
 }
 
 .image-dialog-title {
@@ -275,11 +263,9 @@ dialog:not([open]) {
 
 .image-dialog-canvas {
   grid-area: canvas;
-  overflow: auto;
+  overflow: clip;
   display: grid;
   place-content: center;
-  height: 1fr;
-  width: 1fr;
 }
 
 .image-dialog-actions {

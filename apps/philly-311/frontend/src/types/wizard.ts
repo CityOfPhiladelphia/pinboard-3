@@ -1,11 +1,14 @@
 // ABOUTME: Shared types for the report submission wizard.
 // ABOUTME: Mirrors the API submit payload shape and the per-step form data.
 
+import type { PinboardTypes } from '@pinboard/ui'
+
 export interface PhotoAsset {
   /** CloudFront URL returned by /classify (which doubles as the upload endpoint). */
   mediaUrl?: string
   /** Local preview URL (object URL) for the thumbnail before submit. */
   previewUrl?: string
+  dimensions: PinboardTypes.Dimensions
 }
 
 export interface ContactInfo {
@@ -65,9 +68,4 @@ export interface ReportDraft {
   publicVisibility: boolean
   /** Uploaded photo URL only — blob preview URLs don't survive reload. */
   mediaUrl?: string
-}
-
-export interface Dimensions {
-  height: number
-  width: number
 }

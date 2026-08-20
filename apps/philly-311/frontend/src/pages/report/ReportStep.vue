@@ -36,7 +36,6 @@ defineSlots<{
 
 .report-step__title {
   grid-area: title;
-  display: grid;
   color: #374151;
 }
 
