@@ -100,7 +100,6 @@ function validateFileType(maybeFile: File | undefined) {
     <template #step-content>
       <div class="image__step">
         <p class="image-step__count has-text-body-default" v-text="imageCount" />
-        <div />
 
         <label
           v-if="!markupComplete"
@@ -133,11 +132,13 @@ function validateFileType(maybeFile: File | undefined) {
 <style scoped>
 .image__step {
   display: grid;
+  height: 100%;
   grid-template-areas:
     'imageCount'
-    'gap-image'
     'imageUpload';
-  grid-template-rows: auto var(--spacing-m, 1.5rem) 1fr;
+  grid-template-rows: auto 1fr;
+  row-gap: var(--spacing-m, 1.5rem);
+  overflow: auto;
 }
 
 .image-step__count {
@@ -159,6 +160,7 @@ function validateFileType(maybeFile: File | undefined) {
   anchor-name: --preview;
   corner-top-right-shape: scoop;
   border-top-right-radius: 1.25em;
+  overflow: auto;
 }
 
 .image-step__preview-delete {
@@ -192,14 +194,5 @@ function validateFileType(maybeFile: File | undefined) {
 .image-step__upload:focus-within {
   outline: var(--border-width-m, 0.125rem) solid var(--Schemes-Primary, rgb(16, 52, 244));
   outline-offset: 0.125rem;
-}
-
-.image-step__status {
-  grid-area: status;
-  margin-bottom: 0 !important;
-}
-
-.image-step__error {
-  color: var(--Schemes-Error, #c0392b);
 }
 </style>
