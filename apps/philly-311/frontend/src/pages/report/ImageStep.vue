@@ -2,25 +2,20 @@
      which stores the image (mediaUrl) and returns issue-type suggestions for step 2. Optional;
      Skip/Next both advance. -->
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Icon } from '@phila/phila-ui-core'
-import { IconAdd, IconArrowUp } from '@phila/phila-ui-core/icons'
+import { IconClose, IconArrowUp } from '@phila/phila-ui-core/icons'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useWizardValidity } from '@/composables/useWizardValidity'
 import ReportStep from './ReportStep.vue'
 import ImageUploadDialog from '@/components/wizard/ImageUploadDialog.vue'
-import type { Dimensions } from '@/types/wizard.ts'
 
 const store = useReportSubmissionStore()
 
 const uploadDialogOpen = ref(false)
-const fileUploadUrl = ref<string>('')
+const fileUploadUrl = ref<string>(store.photo.previewUrl || store.photo.mediaUrl || '')
 const errorMessage = ref('')
-const markupComplete = ref(false)
-const imageScale = ref<Dimensions>({
-  height: 1,
-  width: 1,
-})
+const markupComplete = ref(!!fileUploadUrl.value)
 
 const stepTitle = 'Image (optional)'
 const stepDescription = `This app uses machine learning to pull location data from your photo and suggest the issue type
@@ -34,15 +29,15 @@ useWizardValidity(computed(() => markupComplete.value))
 
 const imageScaleStyle = computed(() => {
   return {
-    height: `${18 * imageScale.value.height}rem`,
-    width: `${18 * imageScale.value.width}rem`,
+    height: `${18 * store.photo.dimensions.height}rem`,
+    width: `${18 * store.photo.dimensions.width}rem`,
   }
 })
 
 const imagePreviewStyle = computed(() => {
   return {
     ...imageScaleStyle.value,
-    'background-image': `url(${store.$state.photo.previewUrl})`,
+    'background-image': `url(${fileUploadUrl.value})`,
     'background-repeat': 'no-repeat',
     'background-position': 'center center',
     'background-size': 'contain',
@@ -50,11 +45,7 @@ const imagePreviewStyle = computed(() => {
 })
 
 watch(markupComplete, (nowComplete) => {
-  if (nowComplete && !store.$state.photo.previewUrl) store.setPhotoPreview(fileUploadUrl.value)
-})
-
-onMounted(() => {
-  if (store.$state.photo.previewUrl) markupComplete.value = true
+  if (nowComplete) store.setPhotoPreview(fileUploadUrl.value)
 })
 
 function preventDefault(e: Event) {
@@ -75,13 +66,9 @@ function handleInput(e: Event) {
 
 function removeImage() {
   URL.revokeObjectURL(fileUploadUrl.value)
-  store.setPhotoPreview(undefined)
+  store.resetPhoto()
   fileUploadUrl.value = ''
   markupComplete.value = false
-  imageScale.value = {
-    height: 1,
-    width: 1,
-  }
 }
 
 function validateFileType(maybeFile: File | undefined) {
@@ -101,7 +88,6 @@ function validateFileType(maybeFile: File | undefined) {
       <div class="image__step">
         <p class="image-step__count has-text-body-default" v-text="imageCount" />
         <div />
-
         <label
           v-if="!markupComplete"
           class="image-step__upload"
@@ -114,8 +100,8 @@ function validateFileType(maybeFile: File | undefined) {
           <input type="file" accept="image/png, image/jpeg" @change="handleInput" />
         </label>
         <div v-else class="image-step__preview" :style="imagePreviewStyle">
-          <button @click="removeImage">
-            <Icon :icon="IconAdd" size="extra-small" class="image-step__preview-delete" />
+          <button class="image-step__preview-delete" @click="removeImage">
+            <Icon :icon="IconClose" size="extra-small" class="image-step__preview-delete-icon" />
           </button>
         </div>
       </div>
@@ -126,7 +112,6 @@ function validateFileType(maybeFile: File | undefined) {
     v-model:open="uploadDialogOpen"
     v-model:complete="markupComplete"
     v-model:file="fileUploadUrl"
-    v-model:scale="imageScale"
   />
 </template>
 
@@ -156,22 +141,24 @@ function validateFileType(maybeFile: File | undefined) {
 
 .image-step__preview {
   grid-area: imageUpload;
-  anchor-name: --preview;
   corner-top-right-shape: scoop;
   border-top-right-radius: 1.25em;
+  position: relative;
 }
 
 .image-step__preview-delete {
   cursor: pointer;
   position: absolute;
-  position-anchor: --preview;
-  position-area: top right;
-  translate: -50% 50%;
-  transform: rotate(45deg);
+  top: 0;
+  right: 0;
+  translate: 50% -50%;
+  background: transparent;
+  border: none;
+}
+
+.image-step__preview-delete-icon {
   width: var(--scale-400, 2rem);
   height: var(--scale-400, 2rem);
-  display: grid;
-  place-items: center;
   border-radius: var(--border-radius-full, 624.9375rem);
   background: var(--Schemes-Error, #cc3000);
   color: var(--Schemes-On-Error, #fff);

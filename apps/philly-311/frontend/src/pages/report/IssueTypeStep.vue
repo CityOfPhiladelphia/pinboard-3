@@ -2,156 +2,190 @@
      caseType-grouped directory). View derives from store.category; Next is gated on
      a category being chosen via useWizardValidity. -->
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useServiceTypes } from '@/composables/useServiceTypes'
 import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
-import { PhilaButton } from '@phila/phila-ui-button'
-import ServiceTypeIcon from '@/components/ServiceTypeIcon.vue'
+import { Search } from '@phila/phila-ui-search'
+import { LoadingCards } from '@pinboard/ui'
+import { Callout } from '@phila/phila-ui-callout'
 import TypeSuggestions from '@/components/wizard/TypeSuggestions.vue'
 import TypeDirectory from '@/components/wizard/TypeDirectory.vue'
+import ImageAnalysis from '@/components/wizard/ImageAnalysis.vue'
+import ReportStep from './ReportStep.vue'
+import IssueLoadError from '@/components/wizard/IssueLoadError.vue'
+import type { ServiceType } from '@/types/api.ts'
 
 const store = useReportSubmissionStore()
 const { list, isLoading, error, load } = useServiceTypes()
-onMounted(() => {
-  void load()
-})
 
-const catalog = computed(() => list.value ?? [])
-const selected = computed(() => catalog.value.find((s) => s.serviceType === store.category) ?? null)
+const searchMatchedIssueTypes = ref<ServiceType[]>([])
+const classifying = ref(false)
+const errorMessage = ref('')
+const selectedServiceType = ref<string>('')
+const searchTerms = ref('')
+
+const stepTitle = `Select an issue type * (required)`
+const searchPlaceholder = `Search by issue type`
+
 const hasSurvivingSuggestions = computed(() =>
-  store.photoSuggestions.some((s) => catalog.value.some((c) => c.serviceType === s.serviceType)),
+  store.photoSuggestions.some((s) => list.value.some((c) => c.serviceType === s.serviceType)),
 )
+const imageHeightWidthStyle = computed(() => {
+  return store.photo.dimensions.height > store.photo.dimensions.width
+    ? {
+        height: '100%',
+        width: 'auto',
+      }
+    : {
+        height: 'auto',
+        width: '100%',
+      }
+})
 
 useWizardValidity(computed(() => !!store.category && !error.value))
 const showErrors = useWizardErrors()
 
-function pick(serviceType: string) {
-  store.setCategory(serviceType)
+onBeforeMount(() => {
+  if (!list.value.length) {
+    load()
+  } else {
+    searchMatchedIssueTypes.value = [...list.value]
+  }
+})
+
+watch(selectedServiceType, (selectedService) => store.setCategory(selectedService))
+
+function handleSearchChange(search: string) {
+  if (!search) searchMatchedIssueTypes.value = [...list.value]
+  searchTerms.value = search
 }
-function change() {
-  store.setCategory(null)
+
+function handleSearchSubmit() {
+  const uniqueTerms = searchTerms.value
+    ? new Set(searchTerms.value.toLocaleLowerCase().split(' '))
+    : null
+  if (!uniqueTerms) {
+    searchMatchedIssueTypes.value = [...list.value]
+    return
+  }
+  searchMatchedIssueTypes.value = [...list.value].filter((serviceType) => {
+    const terms = new Set(
+      [
+        serviceType.serviceType.toLocaleLowerCase().split(' '),
+        serviceType.caseType.toLocaleLowerCase().split(' '),
+        serviceType.department.toLocaleLowerCase().split(' '),
+        serviceType.description.toLocaleLowerCase().split(' '),
+      ].flat(),
+    )
+    return terms.intersection(uniqueTerms).size
+  })
 }
 </script>
 
 <template>
-  <div class="issue-step">
-    <h1 class="issue-step__title">
-      Issue type <span class="issue-step__required">* (required)</span>
-    </h1>
-    <p v-if="showErrors && !store.category" class="issue-step__error" role="alert">
-      Select an issue type to continue
-    </p>
+  <ReportStep :step-title="stepTitle">
+    <template #step-content>
+      <div class="issue-step">
+        <template v-if="store.photo.previewUrl || store.photo.mediaUrl">
+          <ImageAnalysis
+            v-if="!store.photoSuggestions.length"
+            v-model:classifying="classifying"
+            v-model:error="errorMessage"
+            class="issue-step__analysis"
+          />
+          <img
+            v-else-if="store.photoSuggestions.length"
+            :src="store.photo.previewUrl || store.photo.mediaUrl"
+            class="issue-step__photo"
+            :style="imageHeightWidthStyle"
+          />
+        </template>
 
-    <p v-if="isLoading && !catalog.length" class="issue-step__status">Loading issue types…</p>
-    <p v-else-if="error" class="issue-step__error" role="alert">
-      {{ error.message || 'Could not load issue types.' }}
-      <PhilaButton
-        variant="secondary"
-        class="issue-step__retry"
-        data-test="retry-types"
-        @click="() => void load()"
-        >Retry</PhilaButton
-      >
-    </p>
-
-    <template v-else-if="!store.category">
-      <div v-if="store.photo && hasSurvivingSuggestions" class="issue-step__photo-band">
-        <img
-          class="issue-step__photo"
-          :src="store.photo.previewUrl ?? store.photo.mediaUrl"
-          alt="Your uploaded photo"
+        <Search
+          :placeholder="searchPlaceholder"
+          class="issue-step__search"
+          @update:model-value="handleSearchChange"
+          @search="handleSearchSubmit"
         />
-        <TypeSuggestions :suggestions="store.photoSuggestions" :catalog="catalog" @select="pick" />
-      </div>
+        <div class="issue-step__issue-types">
+          <Callout
+            v-if="showErrors && !store.category"
+            :title="'Select an issue type to continue'"
+            :type="'error'"
+          />
+          <LoadingCards v-if="classifying || (isLoading && !list.length)" :card-scale="60" />
+          <IssueLoadError v-else-if="error" />
 
-      <h2 class="issue-step__subhead">All issue types</h2>
-      <TypeDirectory :catalog="catalog" @select="pick" />
-    </template>
-
-    <template v-else>
-      <div class="issue-step__selected">
-        <ServiceTypeIcon :service-type="store.category" :size="36" />
-        <span class="issue-step__selected-body">
-          <span class="issue-step__selected-name">{{ store.category }}</span>
-          <span v-if="selected" class="issue-step__selected-desc">{{ selected.description }}</span>
-        </span>
-        <button type="button" data-test="change-type" class="issue-step__change" @click="change">
-          Change
-        </button>
+          <template v-else>
+            <TypeSuggestions
+              v-if="store.photo && hasSurvivingSuggestions"
+              v-model:selected="selectedServiceType"
+              :suggestions="store.photoSuggestions"
+              :catalog="searchMatchedIssueTypes.length ? searchMatchedIssueTypes : list"
+            />
+            <TypeDirectory
+              v-model:selected="selectedServiceType"
+              :catalog="searchMatchedIssueTypes.length ? searchMatchedIssueTypes : list"
+            />
+          </template>
+        </div>
       </div>
     </template>
-  </div>
+  </ReportStep>
 </template>
 
 <style scoped>
-.issue-step__title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 var(--spacing-m, 1rem);
-}
-.issue-step__required {
-  font-weight: 400;
-  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
-  font-size: 1rem;
-}
-.issue-step__retry {
-  margin-left: var(--spacing-s, 0.75rem);
-}
-.issue-step__photo-band {
+.issue-step {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: var(--spacing-m, 1rem);
-  margin-bottom: var(--spacing-l, 2rem);
-}
-.issue-step__photo {
+  height: 100%;
   width: 100%;
-  max-height: 360px;
-  object-fit: cover;
-  border-radius: 8px;
+  grid-template-areas:
+    'uploadedImage search'
+    'uploadedImage issueTypes';
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  column-gap: var(--spacing-xl, 2rem);
+  row-gap: var(--spacing-m, 1rem);
 }
-.issue-step__subhead {
-  font-size: 1.125rem;
-  font-weight: 700;
-  margin: 0 0 var(--spacing-s, 0.75rem);
+
+.issue-step__analysis {
+  grid-area: uploadedImage;
+  display: grid;
+  place-items: center;
 }
-.issue-step__selected {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-s, 0.75rem);
-  border: 1px solid var(--Schemes-Primary, #0f4d90);
-  border-radius: 8px;
-  padding: var(--spacing-s, 0.75rem);
-  margin-bottom: var(--spacing-m, 1rem);
+
+.issue-step__photo {
+  grid-area: uploadedImage;
+  display: grid;
+  margin: auto auto;
+  border-radius: 0.75rem;
+
+  /* Elevation/Elevation Light/2 */
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.3),
+    0 2px 6px 2px rgba(0, 0, 0, 0.15);
 }
-.issue-step__selected-body {
-  display: flex;
-  flex-direction: column;
+
+.issue-step__search {
+  grid-area: search;
 }
-.issue-step__selected-name {
-  font-weight: 700;
+
+.issue-step__issue-types {
+  grid-area: issueTypes;
+  overflow: auto;
 }
-.issue-step__selected-desc {
-  font-size: 0.875rem;
-  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
-}
-.issue-step__change {
-  margin-left: auto;
-  background: none;
-  border: none;
-  color: var(--Schemes-Primary, #0f4d90);
-  font-weight: 600;
-  cursor: pointer;
-}
+
 .issue-step__error {
-  color: var(--Schemes-Error, #c0392b);
-}
-.issue-step__photo-band :deep(.type-suggestions) {
-  align-self: start;
-}
-@media (max-width: 768px) {
-  .issue-step__photo-band {
-    grid-template-columns: 1fr;
-  }
+  color: var(--Schemes-On-Error-Container, #992100);
+  border-radius: 0.75rem;
+  background: var(--Schemes-Error-Container, #f8c9bd);
+
+  /* Label/Default */
+  font-family: var(--Label-Default-font-label-default-family, Montserrat);
+  font-size: var(--Label-Default-font-label-default-size, 1rem);
+  font-style: normal;
+  font-weight: 600;
+  line-height: var(--Label-Default-font-label-default-lineheight, 1.5rem); /* 150% */
 }
 </style>

@@ -21,7 +21,21 @@ const router = useRouter()
 const route = useRoute()
 const store = useReportSubmissionStore()
 const myCases = useMyCasesStore()
+
 const exitOpen = ref(false)
+watch(
+  exitOpen,
+  (isOpen, wasOpen) => {
+    if (isOpen) {
+      router.push(`?${store.stateToUrlQueryParams()}`)
+    } else if (!isOpen && wasOpen) {
+      router.back()
+    } else {
+      router.replace({ query: {} })
+    }
+  },
+  { immediate: true },
+)
 
 const STEPS = [
   { title: 'Image', path: '/report' },
@@ -103,11 +117,11 @@ function discardAndExit() {
         @navigate="(path: string) => router.push(path)"
       />
     </div>
-
-    <section class="wizard__content">
+    <div class="spacer" />
+    <div class="wizard__content">
       <RouterView />
-    </section>
-
+    </div>
+    <div class="spacer" />
     <footer class="wizard__nav">
       <PhilaButton
         size="extra-small"
@@ -148,12 +162,18 @@ function discardAndExit() {
   display: grid;
   grid-template-areas:
     'w_header'
+    'h-spacer'
     'w_content'
+    'f-spacer'
     'w_footer';
-  grid-template-rows: 9rem auto 7rem;
+  grid-template-rows: 9rem auto 1fr auto 7rem;
   height: 100%;
   width: 100%;
   margin: 0 auto;
+}
+
+.spacer {
+  height: var(--spacing-s, 0.75rem);
 }
 
 .wizard__header {
@@ -184,10 +204,8 @@ function discardAndExit() {
 
 .wizard__content {
   grid-area: w_content;
-  padding: var(--spacing-l, 2rem) 0;
   margin: 0 var(--scale-1000, 5rem);
-  overflow-y: auto;
-  overflow-x: auto;
+  overflow: hidden;
 }
 
 /* Sticky so Exit/Back/Next stay reachable: the wizard scrolls internally

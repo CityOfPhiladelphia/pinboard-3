@@ -2,6 +2,11 @@
 import type { MapCardProps } from '@phila/phila-ui-cards'
 import type { Ref } from 'vue'
 
+export interface Dimensions {
+  height: number
+  width: number
+}
+
 export type Latitude = number
 export type Longitude = number
 

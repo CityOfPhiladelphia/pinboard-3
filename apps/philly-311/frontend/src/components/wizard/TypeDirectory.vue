@@ -5,11 +5,11 @@ import { computed, ref } from 'vue'
 import type { ServiceType } from '@/types/api'
 import { fuzzyScore } from '@/utils/fuzzy'
 import serviceTypeInfo from '@/data/service_types.json'
-import ServiceTypeIcon from '@/components/ServiceTypeIcon.vue'
+import CaseTypeCard from './CaseTypeCard.vue'
+import ServiceTypeCard from './ServiceTypeCard.vue'
 
 const props = defineProps<{ catalog: ServiceType[] }>()
-const emit = defineEmits<{ select: [serviceType: string] }>()
-
+const selected = defineModel<string>('selected')
 const query = ref('')
 
 const INFO = serviceTypeInfo as Record<string, { description: string; keywords: string[] }>
@@ -40,97 +40,46 @@ const groups = computed(() => {
 
 <template>
   <div class="type-directory">
-    <label class="type-directory__search-label" for="type-search">Search issue types</label>
-    <input
-      id="type-search"
-      v-model="query"
-      type="search"
-      class="type-directory__search"
-      placeholder="Search"
-    />
-
-    <p class="type-directory__empty" role="status">
-      {{ groups.length ? '' : 'No issue types match your search.' }}
+    <h5 class="type-directory__header" v-text="'All issue types'" />
+    <p v-if="!groups.length" class="type-directory__empty" role="status">
+      {{ 'No issue types match your search.' }}
     </p>
 
-    <section v-for="group in groups" :key="group.caseType" class="type-directory__group">
-      <h3 class="type-directory__heading">{{ group.caseType }}</h3>
-      <ul class="type-directory__list">
-        <li v-for="s in group.items" :key="s.serviceType">
-          <button type="button" class="type-directory__row" @click="emit('select', s.serviceType)">
-            <ServiceTypeIcon :service-type="s.serviceType" :size="32" />
-            <span class="type-directory__body">
-              <span class="type-directory__name">{{ s.serviceType }}</span>
-              <span class="type-directory__desc">{{ s.description }}</span>
-            </span>
-          </button>
-        </li>
-      </ul>
-    </section>
+    <div v-for="caseType in groups" :key="caseType.caseType" class="type-directory__cards">
+      <CaseTypeCard
+        v-if="caseType.items.length > 1"
+        v-model:selected="selected"
+        :case-type="caseType.caseType"
+        :service-types="caseType.items"
+      />
+      <ServiceTypeCard
+        v-else
+        v-model:selected="selected"
+        :service-type="caseType.items[0].serviceType"
+        :description="caseType.items[0].description"
+      />
+    </div>
   </div>
 </template>
 
 <style scoped>
-.type-directory__search-label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: var(--spacing-xs, 0.25rem);
+.type-directory {
+  overflow: auto;
 }
-.type-directory__search {
-  width: 100%;
-  max-width: 480px;
-  padding: var(--spacing-s, 0.5rem);
-  border: 1px solid var(--Schemes-Border, #b3b3b3);
-  border-radius: 4px;
-  margin-bottom: var(--spacing-m, 1rem);
-}
-.type-directory__heading {
-  font-size: 1.125rem;
-  font-weight: 700;
-  margin: var(--spacing-m, 1rem) 0 var(--spacing-xs, 0.25rem);
-}
-.type-directory__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: var(--spacing-l, 2rem);
-}
-.type-directory__row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-s, 0.75rem);
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  border-bottom: 1px solid var(--Schemes-Border-low, #d6d6d6);
+
+.type-directory__header {
+  color: #374151;
   padding: var(--spacing-s, 0.75rem) 0;
-  cursor: pointer;
+
+  /* Heading/H5 */
+  font-family: var(--Heading-H5-font-heading-5-family, Montserrat);
+  font-size: var(--Heading-H5-font-heading-5-size, 1.25rem);
+  font-style: normal;
+  font-weight: 600;
+  line-height: var(--Heading-H5-font-heading-5-lineheight, 1.75rem); /* 140% */
 }
-.type-directory__row:hover .type-directory__name,
-.type-directory__row:focus-visible .type-directory__name {
-  text-decoration: underline;
-}
-.type-directory__body {
-  display: flex;
-  flex-direction: column;
-}
-.type-directory__name {
-  font-weight: 700;
-  color: var(--Schemes-Primary, #0f4d90);
-}
-.type-directory__desc {
-  font-size: 0.875rem;
-  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
-}
-.type-directory__empty {
-  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
-}
-@media (max-width: 768px) {
-  .type-directory__list {
-    grid-template-columns: 1fr;
-  }
+
+.type-directory__cards:not(:last-child) {
+  margin-bottom: var(--spacing-s, 0.75rem);
 }
 </style>
