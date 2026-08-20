@@ -1,6 +1,7 @@
-// ABOUTME: Tests for App — Map/My Requests/Answers header nav links, the "Report an
-// ABOUTME: issue" CTA, the login/signed-in states, the sub-footer links, and the
-// ABOUTME: phila .content wrapper.
+// ABOUTME: Tests for App — the header's Report-an-issue/Map/My Requests/Answers/
+// ABOUTME: login nav links (now all passed through PinboardShell's `links` prop
+// ABOUTME: rather than app-provided slots), the sub-footer links, and the phila
+// ABOUTME: .content wrapper.
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { defineComponent, h, ref, computed } from 'vue'
 import { mount, RouterLinkStub } from '@vue/test-utils'
@@ -14,21 +15,10 @@ vi.mock('@pinboard/ui', () => ({
     setup(_, { slots }) {
       return () =>
         h('div', [
-          h('div', { 'data-test': 'navbar-left-end' }, slots['navbar-left-end']?.()),
-          h('div', { 'data-test': 'navbar-end' }, slots['navbar-end']?.()),
           h('div', { 'data-test': 'mobile-nav' }, slots['mobile-nav']?.()),
           h('div', { 'data-test': 'sub-footer' }, slots['sub-footer']?.()),
           slots.default?.(),
         ])
-    },
-  }),
-  // Minimal stand-in: renders as a plain <a>, same as the real component's non-router
-  // path (App.vue only ever passes href, never `to`), so href/text/click assertions hold.
-  PhilaLink: defineComponent({
-    name: 'PhilaLink',
-    props: { href: { type: String, default: undefined } },
-    setup(props, { slots }) {
-      return () => h('a', { href: props.href }, slots.default?.())
     },
   }),
 }))
@@ -84,40 +74,47 @@ beforeEach(() => {
   retryAccountProvisioning.mockClear()
 })
 
+// Shape of the objects App.vue passes as PinboardShell's `links` prop; `icon` is
+// omitted from most assertions below since it's a component reference, not data.
+type TestNavLink = { text: string; href?: string; selected?: boolean; onClick?: () => void }
+
 describe('App', () => {
-  it('passes Map/My Requests/Answers as the header nav links', async () => {
+  it('passes Report an issue, Map, My Requests, Answers, and Login / Sign up as the header nav links', async () => {
     const w = await mountApp()
     const shell = w.findComponent({ name: 'PinboardShell' })
-    expect(shell.props('links')).toEqual([
+    const links = shell.props('links') as TestNavLink[]
+    expect(links.map(({ text, href }) => ({ text, href }))).toEqual([
+      { text: 'Report an issue', href: '/report' },
       { text: 'Map', href: '/' },
       { text: 'My Requests', href: '/reports' },
       { text: 'Answers', href: '/answers' },
+      { text: 'Login / Sign up', href: '#' },
     ])
   })
 
-  it('puts a "Report an issue" button routing to /report in the navbar-left-end slot', async () => {
+  it('gives the "Report an issue" link a large icon', async () => {
     const w = await mountApp()
-    const navbarLeftEnd = w.find('[data-test="navbar-left-end"]')
-    const link = navbarLeftEnd.find('a')
-    expect(link.exists()).toBe(true)
-    expect(link.attributes('href')).toBe('/report')
-    expect(link.text()).toBe('Report an issue')
+    const shell = w.findComponent({ name: 'PinboardShell' })
+    const links = shell.props('links') as (TestNavLink & { icon?: unknown; iconSize?: string })[]
+    const reportLink = links.find((link) => link.text === 'Report an issue')
+    expect(reportLink?.icon).toBeTruthy()
+    expect(reportLink?.iconSize).toBe('large')
   })
 
-  it('puts a Login / Sign up trigger in the navbar-end slot that starts the sso-vue login flow', async () => {
-    const w = await mountApp()
-    const navbarEnd = w.find('[data-test="navbar-end"]')
-    const loginLink = navbarEnd.findAll('a').find((a) => a.text() === 'Login / Sign up')
-    expect(loginLink).toBeTruthy()
-    await loginLink?.trigger('click')
-    expect(signIn).toHaveBeenCalledOnce()
+  it('marks the nav link matching the current route as selected', async () => {
+    const w = await mountApp('/answers')
+    const shell = w.findComponent({ name: 'PinboardShell' })
+    const links = shell.props('links') as TestNavLink[]
+    expect(links.find((link) => link.text === 'Answers')?.selected).toBe(true)
+    expect(links.find((link) => link.text === 'Map')?.selected).toBe(false)
   })
 
-  it('records the current route as the post-login redirect before starting sign-in', async () => {
+  it('starts the sso-vue login flow and records the current route as the post-login redirect when Login / Sign up is triggered', async () => {
     const w = await mountApp('/report/location')
-    const navbarEnd = w.find('[data-test="navbar-end"]')
-    const loginLink = navbarEnd.findAll('a').find((a) => a.text() === 'Login / Sign up')
-    await loginLink?.trigger('click')
+    const shell = w.findComponent({ name: 'PinboardShell' })
+    const links = shell.props('links') as TestNavLink[]
+    links.find((link) => link.text === 'Login / Sign up')?.onClick?.()
+    expect(signIn).toHaveBeenCalledOnce()
     expect(sessionStorage.getItem('auth:redirectTo')).toBe('/report/location')
   })
 
@@ -152,14 +149,15 @@ describe('App', () => {
     ])
   })
 
-  it('shows the user name and a Sign out button instead of Login when authenticated', async () => {
+  it('shows the user name and a Sign out link instead of Login when authenticated', async () => {
     isAuthenticated.value = true
     const w = await mountApp()
-    const navbarEnd = w.find('[data-test="navbar-end"]')
-    expect(navbarEnd.text()).toContain('Ben Franklin')
-    expect(navbarEnd.findAll('a').find((a) => a.text() === 'Login / Sign up')).toBeFalsy()
-    const signOutLink = navbarEnd.findAll('a').find((a) => a.text() === 'Sign out')
-    await signOutLink?.trigger('click')
+    const shell = w.findComponent({ name: 'PinboardShell' })
+    const links = shell.props('links') as TestNavLink[]
+    expect(links.find((link) => link.text === 'Ben Franklin')).toBeTruthy()
+    expect(links.find((link) => link.text === 'Login / Sign up')).toBeFalsy()
+    const signOutLink = links.find((link) => link.text === 'Sign out')
+    signOutLink?.onClick?.()
     expect(signOut).toHaveBeenCalledOnce()
   })
 })

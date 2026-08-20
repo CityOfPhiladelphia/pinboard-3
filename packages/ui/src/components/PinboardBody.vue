@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="PinboardLocation extends BasicLocation">
 // vue imports
-import { inject, ref, computed, watch, toRef } from 'vue'
+import { inject, ref, computed, watch, toRef, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -216,8 +216,57 @@ watch(
   { immediate: true }
 )
 
+// --- detail panel focus management ---
+// The panel opens over the card that triggered it, so keyboard focus has to be
+// moved into it on open and handed back to the card on close. On desktop it is
+// also trapped inside while open. Content comes from the location-detail slot,
+// so the panel finds its heading and controls by query rather than by ref.
+const detailPanelRef = ref<HTMLElement | null>(null)
+let detailOpener: HTMLElement | null = null
+
+const DETAIL_FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+// Prefer the site-name heading so a screen reader announces which location this
+// is; fall back to the first control. The heading is not otherwise focusable, so
+// it takes tabindex=-1, and its id labels the dialog.
+function focusDetailPanel() {
+  nextTick(() => {
+    const root = detailPanelRef.value
+    if (!root) return
+    const heading = root.querySelector<HTMLElement>('h1, h2, h3')
+    if (heading) {
+      heading.id = 'pinboard-detail-heading'
+      heading.setAttribute('tabindex', '-1')
+      heading.focus()
+    } else {
+      root.querySelector<HTMLElement>(DETAIL_FOCUSABLE)?.focus()
+    }
+  })
+}
+
+// Desktop trap: a guard brackets each end of the panel. Focusing one means Tab or
+// Shift+Tab is on its way out, so send focus to the far end instead. The guards
+// are themselves tabbable and must be excluded here, or wrapping to "the last
+// focusable" would land on the other guard and bounce between the two.
+function detailFocusables(): HTMLElement[] {
+  const root = detailPanelRef.value
+  if (!root) return []
+  return Array.from(root.querySelectorAll<HTMLElement>(DETAIL_FOCUSABLE)).filter(
+    (el) => !el.classList.contains('detail-focus-guard')
+  )
+}
+function onDetailGuardStart() {
+  const els = detailFocusables()
+  els[els.length - 1]?.focus()
+}
+function onDetailGuardEnd() {
+  const els = detailFocusables()
+  els[0]?.focus()
+}
+
 // watchers
-watch(selectedLocation, (loc) => {
+watch(selectedLocation, (loc, prev) => {
   if (loc) {
     // Mutual exclusion: the detail panel and the filter panel share the left
     // slot, so selecting a location closes the filter panel. Covers every
@@ -226,6 +275,13 @@ watch(selectedLocation, (loc) => {
     if (props.isMobile) {
       bottomSheetRef.value?.snapTo(snapPoints.length - 1)
     }
+    // Capture the card that opened the panel on first open only, so swapping
+    // straight to another location still returns focus to where it started.
+    if (!prev) detailOpener = document.activeElement as HTMLElement | null
+    focusDetailPanel()
+  } else if (prev) {
+    if (detailOpener && document.body.contains(detailOpener)) detailOpener.focus()
+    detailOpener = null
   }
 })
 
@@ -536,12 +592,31 @@ function selectedLocationValue(): PinboardLocation {
 
       <div v-if="selectedLocation">
         <Teleport to="#detail-overlay-desktop" :disabled="isMobile">
-          <div :class="isMobile ? 'bottom-sheet-detail' : 'detail-overlay'">
+          <div
+            ref="detailPanelRef"
+            :class="isMobile ? 'bottom-sheet-detail' : 'detail-overlay'"
+            role="dialog"
+            :aria-modal="isMobile ? undefined : 'true'"
+            aria-labelledby="pinboard-detail-heading"
+            @keydown.esc="handleCloseLocationDetail"
+          >
+            <span
+              v-if="!isMobile"
+              class="detail-focus-guard"
+              tabindex="0"
+              @focus="onDetailGuardStart"
+            />
             <slot
               name="location-detail"
               :location="selectedLocationValue()"
               :on-close="handleCloseLocationDetail"
               :on-print="isMobile ? undefined : () => print(selectedLocationValue())"
+            />
+            <span
+              v-if="!isMobile"
+              class="detail-focus-guard"
+              tabindex="0"
+              @focus="onDetailGuardEnd"
             />
           </div>
         </Teleport>
@@ -689,6 +764,16 @@ function selectedLocationValue(): PinboardLocation {
 
 .bottom-sheet-detail > * {
   max-width: 100%;
+}
+
+/* Bracketing tab stops for the desktop focus trap: reachable by Tab but visually
+   absent. Focusing one wraps focus back into the panel (see onDetailGuard*). */
+.detail-focus-guard {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
 }
 
 .bottom-sheet-detail :deep(img) {
