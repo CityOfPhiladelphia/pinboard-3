@@ -48,6 +48,6 @@ defineSlots<{
 
 .report-step__content {
   grid-area: content-slot;
-  overflow: hidden;
+  overflow: auto;
 }
 </style>

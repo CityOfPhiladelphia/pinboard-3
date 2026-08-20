@@ -5,25 +5,22 @@
 import { computed, ref } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { reverseGeocode, type AisFeature } from '@/composables/useAis'
-// import { getCurrentPosition } from '@/composables/useGeolocation'
-import { useWizardValidity } from '@/composables/useWizardValidity'
+import { getCurrentPosition } from '@/composables/useGeolocation'
+import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { isInPhilly } from '@/utils/bounds'
-// import { PhilaButton } from '@phila/phila-ui-button'
-// import AddressSearch from '@/components/wizard/AddressSearch.vue'
+import { PhilaButton } from '@phila/phila-ui-button'
+import AddressSearch from '@/components/wizard/AddressSearch.vue'
 import LocationMap from '@/components/wizard/LocationMap.vue'
-import ReportStep from './ReportStep.vue'
 
 const store = useReportSubmissionStore()
 const error = ref<string | null>(null)
-// const lookingUp = ref(false)
-
-const stepTitle = 'Confirm location * (required)'
+const lookingUp = ref(false)
 
 const isValidLocation = computed(
   () => !!store.location && isInPhilly(store.location.lat, store.location.lng),
 )
 useWizardValidity(isValidLocation)
-// const showErrors = useWizardErrors()
+const showErrors = useWizardErrors()
 
 // Each location intent increments this counter so that stale async resolutions
 // (slow geocodes, late geolocation callbacks) never clobber a newer selection.
@@ -62,43 +59,94 @@ async function onMove({ lat, lng }: { lat: number; lng: number }) {
   }
 }
 
-// async function useMyLocation() {
-//   const my = ++intent
-//   lookingUp.value = true
-//   error.value = null
-//   try {
-//     const pos = await getCurrentPosition()
-//     if (my !== intent) return
-//     if (!pos) {
-//       error.value = "We couldn't access your location. Type an address instead."
-//       return
-//     }
-//     const feature = await reverseGeocode(pos.lat, pos.lng)
-//     if (my !== intent) return
-//     if (feature) onSelect(feature)
-//     else error.value = "We couldn't resolve your location to an address."
-//   } catch {
-//     if (my !== intent) return
-//     error.value = "We couldn't resolve your location to an address."
-//   } finally {
-//     lookingUp.value = false
-//   }
-// }
+async function useMyLocation() {
+  const my = ++intent
+  lookingUp.value = true
+  error.value = null
+  try {
+    const pos = await getCurrentPosition()
+    if (my !== intent) return
+    if (!pos) {
+      error.value = "We couldn't access your location. Type an address instead."
+      return
+    }
+    const feature = await reverseGeocode(pos.lat, pos.lng)
+    if (my !== intent) return
+    if (feature) onSelect(feature)
+    else error.value = "We couldn't resolve your location to an address."
+  } catch {
+    if (my !== intent) return
+    error.value = "We couldn't resolve your location to an address."
+  } finally {
+    lookingUp.value = false
+  }
+}
 </script>
 
 <template>
-  <ReportStep :step-title="stepTitle">
-    <template #step-content>
-      <div class="location-step">
-        <LocationMap :location="mapLocation" @move="onMove" @out-of-bounds="onOutOfBounds" />
+  <div class="location-step">
+    <h1 class="location-step__title">
+      Location <span class="location-step__required">* (required)</span>
+    </h1>
+    <p v-if="showErrors && !isValidLocation" class="location-step__error" role="alert">
+      Choose a location to continue
+    </p>
+
+    <div class="location-step__columns">
+      <div class="location-step__form">
+        <AddressSearch @select="onSelect" />
+        <PhilaButton
+          variant="secondary"
+          class="location-step__geolocate"
+          data-test="use-my-location"
+          :disabled="lookingUp"
+          @click="useMyLocation"
+        >
+          {{ lookingUp ? 'Locating…' : 'Use my current location' }}
+        </PhilaButton>
+        <p v-if="store.location" class="location-step__chosen" data-test="chosen-address">
+          <strong>{{
+            store.location.address || `${store.location.lat}, ${store.location.lng}`
+          }}</strong>
+        </p>
+        <p v-if="error" class="location-step__error" role="alert">{{ error }}</p>
       </div>
-    </template>
-  </ReportStep>
+
+      <LocationMap :location="mapLocation" @move="onMove" @out-of-bounds="onOutOfBounds" />
+    </div>
+  </div>
 </template>
 
 <style scoped>
-.location-step {
+.location-step__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-m, 1rem);
+}
+.location-step__required {
+  font-weight: 400;
+  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
+  font-size: 1rem;
+}
+.location-step__columns {
   display: grid;
-  height: 100%;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: var(--spacing-m, 1rem);
+  align-items: start;
+}
+.location-step__geolocate {
+  margin-top: var(--spacing-s, 0.75rem);
+}
+.location-step__chosen {
+  margin: var(--spacing-s, 0.75rem) 0 0;
+}
+.location-step__error {
+  margin: var(--spacing-s, 0.75rem) 0 0;
+  color: var(--Schemes-Error, #c0392b);
+}
+@media (max-width: 768px) {
+  .location-step__columns {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

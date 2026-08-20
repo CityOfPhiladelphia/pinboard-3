@@ -142,9 +142,15 @@ function validateFileType(maybeFile: File | undefined) {
 
 .image-step__preview {
   grid-area: imageUpload;
+  position: relative;
+  border-radius: 0.75rem;
+
+  /* Elevation/Elevation Light/2 */
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.3),
+    0 2px 6px 2px rgba(0, 0, 0, 0.15);
   corner-top-right-shape: scoop;
   border-top-right-radius: 1.25em;
-  overflow: auto;
 }
 
 .image-step__preview-delete {
