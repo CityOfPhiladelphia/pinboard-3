@@ -117,11 +117,9 @@ function discardAndExit() {
         @navigate="(path: string) => router.push(path)"
       />
     </div>
-    <div class="spacer" />
     <div class="wizard__content">
       <RouterView />
     </div>
-    <div class="spacer" />
     <footer class="wizard__nav">
       <PhilaButton
         size="extra-small"
@@ -162,18 +160,13 @@ function discardAndExit() {
   display: grid;
   grid-template-areas:
     'w_header'
-    'h-spacer'
     'w_content'
-    'f-spacer'
     'w_footer';
-  grid-template-rows: 9rem auto 1fr auto 7rem;
+  grid-template-rows: 9rem 1fr 7rem;
+  row-gap: var(--spacing-s, 0.75rem);
   height: 100%;
   width: 100%;
   margin: 0 auto;
-}
-
-.spacer {
-  height: var(--spacing-s, 0.75rem);
 }
 
 .wizard__header {

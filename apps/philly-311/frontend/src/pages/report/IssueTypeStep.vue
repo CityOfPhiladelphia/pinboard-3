@@ -147,6 +147,7 @@ function handleSearchSubmit() {
   grid-template-rows: auto 1fr;
   column-gap: var(--spacing-xl, 2rem);
   row-gap: var(--spacing-m, 1rem);
+  overflow: auto;
 }
 
 .issue-step__analysis {

@@ -15,11 +15,7 @@ defineSlots<{
 <template>
   <div class="report__step">
     <h5 class="report-step__title" v-text="stepTitle" />
-    <div class="report-step__note">
-      <p v-if="stepNote" v-text="stepNote" />
-      <div v-if="stepNote" />
-    </div>
-
+    <p class="report-step__note" v-text="stepNote" />
     <div class="report-step__content">
       <slot name="step-content" />
     </div>
@@ -33,8 +29,8 @@ defineSlots<{
   grid-template-areas:
     'title'
     'note'
-    'step-content';
-  grid-template-rows: auto auto 1fr;
+    'content-slot';
+  grid-auto-rows: auto auto 1fr;
   row-gap: var(--spacing-xs, 0.5rem);
 }
 
@@ -51,7 +47,7 @@ defineSlots<{
 }
 
 .report-step__content {
-  grid-area: step-content;
+  grid-area: content-slot;
   overflow: auto;
 }
 </style>
