@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { AppFooter } from '@phila/phila-ui-app-footer'
-import { AppHeader, NavbarBrand, NavbarInfo } from '@phila/phila-ui-app-header'
-import { Callout } from '@phila/phila-ui-callout'
+import { AppHeader, NavbarInfo } from '@phila/phila-ui-app-header'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { CloseButton } from '@phila/phila-ui-button'
+import { Callout } from '@phila/phila-ui-callout'
 import MobileNavPanel from './MobileNavPanel.vue'
 import PinboardSubFooter from './PinboardSubFooter.vue'
 import { computed, onMounted, useTemplateRef, watch } from 'vue'
@@ -33,7 +33,6 @@ const props = defineProps<{
 defineSlots<{
   default(): VNode[]
   'mobile-nav'(): VNode[]
-  'navbar-left-end'(): VNode[]
   'navbar-end'(): VNode[]
   'info-body'(): VNode[]
   'sub-footer'(): VNode[]
@@ -91,54 +90,42 @@ onMounted(async () => {
 
 <template>
   <div class="pinboard">
+    <!-- showNavbarToggle/showSearch are left unset: AppHeader shows each
+         button only when its slot (mobile-nav / search-panel) actually has
+         content. We never provide search-panel, and mobile-nav below is only
+         forwarded when the caller provides it, so both do the right thing
+         automatically. -->
     <AppHeader
       id="pinboard-nav"
       :compact-mobile="true"
       :show-trusted-site="true"
+      :navbar-brand="navbarBrandProps"
       :links="links"
       :languages="translations ? languages : undefined"
       :locale="locale"
       @update:locale="setLocale"
     >
-      <!-- AppHeader renders whatever the alerts slot provides; the banner markup itself
-           belongs to the consumer. Shown when either half is set, since an app may supply
-           only a title or only a message. -->
-      <template v-if="bannerTitle || bannerMessage" #alerts>
-        <Callout type="warning" :title="bannerTitle" :message="bannerMessage" :open="true" />
-      </template>
-
-      <!-- Reproduces AppHeader's own navbar-left fallback (brand/logo) so we can add
-           app-provided content (e.g. a CTA) between the brand and the nav links, which
-           AppHeader has no dedicated slot for. -->
-      <template #navbar-left>
-        <NavbarBrand v-bind="navbarBrandProps" />
-        <slot name="navbar-left-end" />
-      </template>
-
-      <!-- Suppress AppHeader's default search button: it renders by default but opens an
-           empty panel since we don't wire up search. Temporary until the upstream fix
-           (phila-ui-4 bead map-core-k8c) gates the default on a search-panel slot.
-           Must contain a real (non-comment) node: Vue renders the slot's default content
-           when an overriding slot is empty, so a hidden span is what actually suppresses it. -->
-      <template #navbar-search><span hidden /></template>
-
-      <!-- Only show the hamburger when the app provides a mobile nav. AppHeader renders
-           the burger by default; suppress it otherwise so apps without a mobile nav (e.g.
-           oem-flood-finder) don't get a stray hamburger. Restores the pre-slot-refactor
-           "burger only if mobile-nav" behavior; same root cause as bead map-core-k8c.
-           Hidden span (not empty) because Vue renders a slot's default content when the
-           overriding slot is empty. -->
-      <template v-if="!$slots['mobile-nav']" #navbar-toggle><span hidden /></template>
-      <template v-else #mobile-nav>
+      <template v-if="$slots['mobile-nav']" #mobile-nav>
         <MobileNavPanel>
           <slot name="mobile-nav" />
         </MobileNavPanel>
       </template>
 
+      <!-- AppHeader's site-wide alert moved from a single-banner prop pair to an #alerts
+           slot that accepts any number of Callouts. PinboardShell still exposes the old
+           bannerTitle/bannerMessage prop pair to its own consumers (unchanged external API)
+           and adapts internally by wrapping them in one Callout. -->
+      <template v-if="bannerTitle || bannerMessage" #alerts>
+        <Callout type="warning" :title="bannerTitle" :message="bannerMessage" :open="true" />
+      </template>
+
       <template v-if="$slots['navbar-end']" #navbar-end>
         <slot name="navbar-end" />
       </template>
-      <template v-else #navbar-end>
+      <!-- Nothing configured (no tooltip, no info page to link to) -> render
+           nothing, rather than the RouterLink fallback below with an
+           undefined infoHref (`/${infoHref}` -> "/undefined"). -->
+      <template v-else-if="showHeaderTooltip || infoHref" #navbar-end>
         <NavbarInfo
           v-if="showHeaderTooltip"
           v-bind="isMobile ? { onClickCapture: openInfoSheet } : {}"
@@ -208,10 +195,6 @@ onMounted(async () => {
   position: relative;
   flex: 1;
   overflow: hidden;
-}
-
-.pinboard :deep(.phila-navbar-brand) {
-  padding-left: var(--spacing-l);
 }
 
 .pinboard-shell-info-scrim {

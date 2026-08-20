@@ -11,11 +11,11 @@ catalog:
   # module-scoped registries inside it (useVisibility) stop seeing each other.
   # Pinned exactly for the same reason - a range could drift one package off the set.
   '@phila/phila-ui-app-footer': '1.2.5-beta.0'
-  '@phila/phila-ui-app-header': '2.0.0-beta.0'
+  '@phila/phila-ui-app-header': '2.0.0-beta.1'
   '@phila/phila-ui-bottom-sheet': '0.1.2-beta.0'
   '@phila/phila-ui-breadcrumbs': '0.2.5-beta.0'
   '@phila/phila-ui-button': '2.3.2-beta.0'
-  '@phila/phila-ui-callout': '1.0.2-beta.0'
+  '@phila/phila-ui-callout': '1.1.0-beta.1'
   '@phila/phila-ui-cards': '0.2.2-beta.0'
   '@phila/phila-ui-charts': '0.1.2-beta.0'
   '@phila/phila-ui-checkbox': '1.0.2-beta.0'
@@ -40,10 +40,10 @@ catalog:
   'aws-cdk-lib': '^2.261.0'
   'cdk-nag': '^2.38.2'
   'constructs': '^10.7.1'
-  eslint: '^10.8.0'
+  eslint: '^10.8.1'
   eslint-config-prettier: '^10.1.8'
   eslint-plugin-vue: '^10.10.0'
-  globals: '^17.8.0'
+  globals: '^17.11.0'
   prettier: '^3.9.6'
   'source-map-support': '^0.5.21'
   'ts-node': '^10.9.0'
@@ -54,4 +54,4 @@ catalog:
   vue: ^3.5.0
   vue-i18n: ^11.0.1
   vue-router: ^5.0.6
-  vue-tsc: '^3.3.8'
+  vue-tsc: '^3.3.10'
