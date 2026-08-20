@@ -2,7 +2,7 @@
      caseType-grouped directory). View derives from store.category; Next is gated on
      a category being chosen via useWizardValidity. -->
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useServiceTypes } from '@/composables/useServiceTypes'
 import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
@@ -14,13 +14,16 @@ import TypeDirectory from '@/components/wizard/TypeDirectory.vue'
 import ImageAnalysis from '@/components/wizard/ImageAnalysis.vue'
 import ReportStep from './ReportStep.vue'
 import IssueLoadError from '@/components/wizard/IssueLoadError.vue'
+import type { ServiceType } from '@/types/api.ts'
 
 const store = useReportSubmissionStore()
 const { list, isLoading, error, load } = useServiceTypes()
 
+const searchMatchedIssueTypes = ref<ServiceType[]>([])
 const classifying = ref(false)
 const errorMessage = ref('')
 const selectedServiceType = ref<string>('')
+const searchTerms = ref('')
 
 const stepTitle = `Select an issue type * (required)`
 const searchPlaceholder = `Search by issue type`
@@ -43,11 +46,41 @@ const imageHeightWidthStyle = computed(() => {
 useWizardValidity(computed(() => !!store.category && !error.value))
 const showErrors = useWizardErrors()
 
-onMounted(() => {
-  load()
+onBeforeMount(() => {
+  if (!list.value.length) {
+    load()
+  } else {
+    searchMatchedIssueTypes.value = [...list.value]
+  }
 })
 
 watch(selectedServiceType, (selectedService) => store.setCategory(selectedService))
+
+function handleSearchChange(search: string) {
+  if (!search) searchMatchedIssueTypes.value = [...list.value]
+  searchTerms.value = search
+}
+
+function handleSearchSubmit() {
+  const uniqueTerms = searchTerms.value
+    ? new Set(searchTerms.value.toLocaleLowerCase().split(' '))
+    : null
+  if (!uniqueTerms) {
+    searchMatchedIssueTypes.value = [...list.value]
+    return
+  }
+  searchMatchedIssueTypes.value = [...list.value].filter((serviceType) => {
+    const terms = new Set(
+      [
+        serviceType.serviceType.toLocaleLowerCase().split(' '),
+        serviceType.caseType.toLocaleLowerCase().split(' '),
+        serviceType.department.toLocaleLowerCase().split(' '),
+        serviceType.description.toLocaleLowerCase().split(' '),
+      ].flat(),
+    )
+    return terms.intersection(uniqueTerms).size
+  })
+}
 </script>
 
 <template>
@@ -69,7 +102,12 @@ watch(selectedServiceType, (selectedService) => store.setCategory(selectedServic
           />
         </template>
 
-        <Search :placeholder="searchPlaceholder" class="issue-step__search" />
+        <Search
+          :placeholder="searchPlaceholder"
+          class="issue-step__search"
+          @update:model-value="handleSearchChange"
+          @search="handleSearchSubmit"
+        />
         <div class="issue-step__issue-types">
           <Callout
             v-if="showErrors && !store.category"
@@ -84,9 +122,12 @@ watch(selectedServiceType, (selectedService) => store.setCategory(selectedServic
               v-if="store.photo && hasSurvivingSuggestions"
               v-model:selected="selectedServiceType"
               :suggestions="store.photoSuggestions"
-              :catalog="list"
+              :catalog="searchMatchedIssueTypes.length ? searchMatchedIssueTypes : list"
             />
-            <TypeDirectory v-model:selected="selectedServiceType" :catalog="list" />
+            <TypeDirectory
+              v-model:selected="selectedServiceType"
+              :catalog="searchMatchedIssueTypes.length ? searchMatchedIssueTypes : list"
+            />
           </template>
         </div>
       </div>
@@ -105,7 +146,7 @@ watch(selectedServiceType, (selectedService) => store.setCategory(selectedServic
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto 1fr;
   column-gap: var(--spacing-xl, 2rem);
-  row-gap: var(--spacing-s, 0.5rem);
+  row-gap: var(--spacing-m, 1rem);
 }
 
 .issue-step__analysis {
