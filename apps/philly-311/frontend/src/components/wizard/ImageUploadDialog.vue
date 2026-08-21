@@ -227,10 +227,6 @@ dialog:not([open]) {
   margin-left: auto;
 }
 
-.image-dialog-close > .phila-button {
-  color: var(--Schemes-On-Surface-High, #000);
-}
-
 .image-dialog-title {
   grid-area: title;
   color: var(--Schemes-On-Surface-High, #000);

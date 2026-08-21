@@ -1,7 +1,7 @@
 <!-- ABOUTME: Wizard step 5 — review the report and submit it to the API.
      Owns the Submit button; the shell hides Next on the last step. -->
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, useId } from 'vue'
 import { useRouter } from 'vue-router'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useApi } from '@/composables/useApi'
@@ -13,6 +13,7 @@ import ReportStep from '@/components/wizard/ReportStep.vue'
 
 const GENERIC_ERROR = 'Something went wrong submitting your report. Please try again.'
 
+const reviewStepId = useId()
 const router = useRouter()
 const store = useReportSubmissionStore()
 
@@ -46,7 +47,7 @@ async function submit() {
 </script>
 
 <template>
-  <ReportStep :step-title="'Review'">
+  <ReportStep :id="reviewStepId" :required="true" :hide-required="true" :step-title="'Review'">
     <template #step-content>
       <div class="review-step">
         <p class="review-step__intro">Check your report before submitting.</p>
@@ -80,18 +81,16 @@ async function submit() {
   max-width: 640px;
   overflow: auto;
 }
-.review-step__title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 var(--spacing-s, 0.75rem);
-}
+
 .review-step__intro {
   margin: 0 0 var(--spacing-m, 1rem);
   color: var(--Schemes-On-Surface-Variant, #4a4a4a);
 }
+
 .review-step__error {
   margin: var(--spacing-m, 1rem) 0;
 }
+
 .review-step__submit {
   margin-top: var(--spacing-m, 1rem);
 }

@@ -77,18 +77,6 @@ function setCheckbox(record: Record<string, boolean>) {
       @update:model-value="setCheckbox"
     />
 
-    <!-- textarea: native -->
-    <template v-else-if="question.type === 'textarea'">
-      <label :for="fieldId" class="question-field__label" v-text="labelText" />
-      <textarea
-        :id="fieldId"
-        :value="modelValue"
-        rows="3"
-        :aria-required="question.required || undefined"
-        @input="set(($event.target as HTMLTextAreaElement).value)"
-      />
-    </template>
-
     <!-- date: DateField — forwards $attrs through its inner TextField to the native <input>.
          label always renders the real text (TextField's aria-label fallback only applies when
          label is empty, and mergeProps in its dist build clobbers an explicit aria-label attr
@@ -134,39 +122,10 @@ function setCheckbox(record: Record<string, boolean>) {
 </template>
 
 <style scoped>
-.question-field__label {
-  display: block;
-  margin-bottom: var(--spacing-xs, 4px);
-  font-weight: 600;
-}
-
-/* RadioGroup/CheckboxGroup have no accessible-name prop of their own, and TextField/DateField's
-   dist build clobbers an explicit aria-label attr, so hideLabel can't empty these labels
-   without losing the accessible name entirely. Instead the real text stays in the DOM for
-   screen readers and is only visually hidden here, matching src/assets/a11y.css's .sr-only
-   technique. */
-.question-field--bare-label :deep(.labels-container > span:first-child),
-.question-field--bare-label :deep(.phila-label) {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
 .question-field--error {
   background: var(--Schemes-Error-Container, #f8c9bd);
   border-radius: 12px;
   padding: 16px;
-}
-
-.question-field--error textarea,
-.question-field--error select {
-  border-color: var(--Schemes-On-Error-Container, #992100);
 }
 
 .question-field__error {

@@ -83,7 +83,7 @@ function validateFileType(maybeFile: File | undefined) {
 </script>
 
 <template>
-  <ReportStep :step-title="stepTitle" :step-note="stepDescription">
+  <ReportStep :step-title="stepTitle" :step-note="stepDescription" :required="false">
     <template #step-content>
       <div class="image__step">
         <p class="image-step__count has-text-body-default" v-text="imageCount" />
