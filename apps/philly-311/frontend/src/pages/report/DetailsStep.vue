@@ -7,7 +7,7 @@ import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useServiceTypes } from '@/composables/useServiceTypes'
 import { useWizardNav } from '@/composables/useWizardNav'
 import { visibleQuestions } from '@/utils/conditional'
-import { PhilaButton } from '@phila/phila-ui-button'
+import WizardLoadError from '@/components/wizard/WizardLoadError.vue'
 import DetailsStepQuestion from '@/components/wizard/DetailsStepQuestion.vue'
 import DetailsStepFinal from '@/components/wizard/DetailsStepFinal.vue'
 
@@ -28,7 +28,7 @@ const questionResponse = ref('')
 // after it's failed to load — in both cases the category's questions are
 // unknown, so question/final screens must stay hidden and Next must not
 // let the shell advance past them.
-const blocked = computed(() => !!store.category && !list.value)
+const blocked = computed(() => !!store.category && isLoading.value)
 
 const selected = computed(() => {
   return (list.value ?? []).find((s) => s.serviceType === store.category) ?? null
@@ -59,7 +59,6 @@ watch(description, (v) => {
 
 onBeforeMount(async () => {
   await load()
-  console.log(list.value)
   questionResponse.value = store.customFields[current.value.field] ?? ''
 })
 
@@ -130,9 +129,7 @@ useWizardNav({ next, back })
 </script>
 
 <template>
-  <template v-if="isLoading">
-    <p class="details-step__status">Loading questions…</p>
-  </template>
+  <p v-if="isLoading" class="details-step__status" v-text="'Loading questions…'" />
 
   <DetailsStepQuestion
     v-else-if="current"
@@ -145,30 +142,9 @@ useWizardNav({ next, back })
     v-else-if="questions.length == index"
     v-model:description="description"
     v-model:error="error"
-  ></DetailsStepFinal>
+  />
 
-  <template v-else>
-    <p class="details-step__error" role="alert">
-      {{ loadError?.message || 'Could not load questions.' }}
-      <PhilaButton
-        variant="secondary"
-        class="details-step__retry"
-        data-test="retry-questions"
-        @click="() => void load()"
-        >Retry</PhilaButton
-      >
-    </p>
-  </template>
+  <WizardLoadError v-else :error-message="loadError?.message || 'Could not load questions.'" />
 </template>
 
-<style scoped>
-.details-step__error {
-  margin: 4px 0 0;
-  color: var(--Schemes-On-Error-Container, #992100);
-  font-weight: 600;
-}
-
-.details-step__retry {
-  margin-left: var(--spacing-s, 0.75rem);
-}
-</style>
+<style scoped></style>

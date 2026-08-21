@@ -2,22 +2,19 @@
      screen (auto-advancing single-choice answers), ending with the required
      description (10-char floor), contact info, and report visibility. -->
 <script setup lang="ts">
-import { useId } from 'vue'
 import ReportStep from './ReportStep.vue'
 
 const isRequired = true
 
 const description = defineModel<string>('description')
 const error = defineModel<string>('error')
-const questionId = useId()
 </script>
 
 <template>
-  <ReportStep :id="questionId" :step-title="'Describe the issue'" :required="isRequired">
+  <ReportStep :step-title="'Describe the issue'" :error-active="false" :required="isRequired">
     <template #step-content>
       <div class="details-step">
         <textarea
-          :id="questionId"
           v-model="description"
           class="details-step__textarea"
           :class="{ 'details-step__textarea--error': !!error }"

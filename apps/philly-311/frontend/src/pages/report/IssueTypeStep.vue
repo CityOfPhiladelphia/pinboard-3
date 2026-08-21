@@ -13,7 +13,7 @@ import TypeSuggestions from '@/components/wizard/TypeSuggestions.vue'
 import TypeDirectory from '@/components/wizard/TypeDirectory.vue'
 import ImageAnalysis from '@/components/wizard/ImageAnalysis.vue'
 import ReportStep from '@/components/wizard/ReportStep.vue'
-import IssueLoadError from '@/components/wizard/IssueLoadError.vue'
+import WizardLoadError from '@/components/wizard/WizardLoadError.vue'
 import type { ServiceType } from '@/types/api.ts'
 
 const issueStepId = useId()
@@ -85,9 +85,9 @@ function handleSearchSubmit() {
 </script>
 
 <template>
-  <ReportStep :id="issueStepId" :step-title="stepTitle" :required="true">
+  <ReportStep :id="issueStepId" :error-active="false" :step-title="stepTitle" :required="true">
     <template #step-content>
-      <div class="issue-step">
+      <div :id="issueStepId" class="issue-step">
         <template v-if="store.photo.previewUrl || store.photo.mediaUrl">
           <ImageAnalysis
             v-if="!store.photoSuggestions.length"
@@ -116,7 +116,7 @@ function handleSearchSubmit() {
             :type="'error'"
           />
           <LoadingCards v-if="classifying || (isLoading && !list.length)" :card-scale="60" />
-          <IssueLoadError v-else-if="error" />
+          <WizardLoadError v-else-if="error" :error-message="error.message" />
 
           <template v-else>
             <TypeSuggestions

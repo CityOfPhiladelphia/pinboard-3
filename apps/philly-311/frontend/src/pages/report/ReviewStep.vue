@@ -1,7 +1,7 @@
 <!-- ABOUTME: Wizard step 5 — review the report and submit it to the API.
      Owns the Submit button; the shell hides Next on the last step. -->
 <script setup lang="ts">
-import { computed, ref, useId } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useApi } from '@/composables/useApi'
@@ -12,8 +12,6 @@ import type { SubmitResponse } from '@/types/wizard'
 import ReportStep from '@/components/wizard/ReportStep.vue'
 
 const GENERIC_ERROR = 'Something went wrong submitting your report. Please try again.'
-
-const reviewStepId = useId()
 const router = useRouter()
 const store = useReportSubmissionStore()
 
@@ -47,7 +45,7 @@ async function submit() {
 </script>
 
 <template>
-  <ReportStep :id="reviewStepId" :required="true" :hide-required="true" :step-title="'Review'">
+  <ReportStep :required="true" :error-active="false" :hide-required="true" :step-title="'Review'">
     <template #step-content>
       <div class="review-step">
         <p class="review-step__intro">Check your report before submitting.</p>

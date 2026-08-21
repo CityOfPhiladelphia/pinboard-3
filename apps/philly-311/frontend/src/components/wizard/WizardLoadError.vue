@@ -1,20 +1,18 @@
 <!-- ABOUTME: Component to allow retry of fetching issues types if initial load fails -->
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useServiceTypes } from '@/composables/useServiceTypes'
-import { useWizardValidity } from '@/composables/useWizardValidity'
-import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { PhilaButton } from '@phila/phila-ui-button'
 
-const store = useReportSubmissionStore()
-const { error, load } = useServiceTypes()
+defineProps<{
+  errorMessage: string
+}>()
 
-useWizardValidity(computed(() => !!store.category && !error.value))
+const { load } = useServiceTypes()
 </script>
 
 <template>
-  <div class="issue-step__error" role="alert">
-    <span v-text="error?.message || 'Could not load issue types.'" />
+  <div class="wizard__error" role="alert">
+    <span v-text="errorMessage" />
     <PhilaButton
       variant="secondary"
       class="issue-step__retry"
@@ -26,7 +24,7 @@ useWizardValidity(computed(() => !!store.category && !error.value))
 </template>
 
 <style scoped>
-.issue-step__error {
+.wizard__error {
   display: grid;
   place-content: center;
   width: fit-content;

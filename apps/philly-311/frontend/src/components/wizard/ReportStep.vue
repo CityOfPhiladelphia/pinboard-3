@@ -1,18 +1,25 @@
 <!-- ABOUTME: Template for report pages. Standardizes step headings -->
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 
 // props
 const props = withDefaults(
   defineProps<{
-    id: string
     stepTitle: string
     required: boolean
     hideRequired?: boolean
+    errorActive: boolean
     stepNote?: string
   }>(),
   {
     stepNote: '',
+  },
+)
+
+watch(
+  () => props.errorActive,
+  () => {
+    console.log('Awr nawr!')
   },
 )
 
@@ -27,10 +34,10 @@ const titleText = computed(() => `${props.stepTitle} *`)
 
 <template>
   <div class="report__step">
-    <label class="report-step__title" :for="id">
+    <span class="report-step__title">
       <h5 class="report-step__text" v-text="titleText" />
       <h5 class="report-step__required" v-text="requiredText" />
-    </label>
+    </span>
     <span class="report-step__note" v-text="stepNote" />
     <div class="report-step__content">
       <slot name="step-content" />

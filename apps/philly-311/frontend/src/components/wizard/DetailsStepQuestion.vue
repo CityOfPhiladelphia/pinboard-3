@@ -12,16 +12,12 @@ const error = defineModel<string>('error')
 <template>
   <ReportStep
     :step-title="props.current.label"
+    :error-active="!!error"
     :step-note="current.description"
     :required="props.current.required"
   >
     <template #step-content>
-      <QuestionField
-        :key="current.field"
-        v-model:model-value="response"
-        v-model:error="error"
-        :question="current"
-      />
+      <QuestionField v-model:model-value="response" v-model:error="error" :question="current" />
     </template>
   </ReportStep>
 </template>

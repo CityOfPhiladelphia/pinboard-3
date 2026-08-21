@@ -84,6 +84,9 @@ catalogs:
     '@phila/phila-ui-text-field':
       specifier: 1.2.2-beta.0
       version: 1.2.2-beta.0
+    '@phila/phila-ui-textarea':
+      specifier: 0.0.19-beta.0
+      version: 0.0.19-beta.0
     '@phila/phila-ui-tooltip':
       specifier: 0.1.2-beta.0
       version: 0.1.2-beta.0
@@ -104,16 +107,16 @@ catalogs:
       version: 10.7.1
     eslint:
       specifier: ^10.8.1
-      version: 10.8.0
+      version: 10.8.1
     eslint-config-prettier:
       specifier: ^10.1.8
       version: 10.1.8
     eslint-plugin-vue:
       specifier: ^10.10.0
-      version: 10.9.2
+      version: 10.10.0
     globals:
       specifier: ^17.11.0
-      version: 17.8.0
+      version: 17.11.0
     prettier:
       specifier: ^3.9.6
       version: 3.9.6
@@ -366,6 +369,9 @@ importers:
       '@phila/phila-ui-text-field':
         specifier: 'catalog:'
         version: 1.2.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
+      '@phila/phila-ui-textarea':
+        specifier: 'catalog:'
+        version: 0.0.19-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/sso-core':
         specifier: ^0.2.0
         version: 0.2.0
@@ -1430,6 +1436,11 @@ packages:
 
   '@phila/phila-ui-text-field@1.2.2-beta.0':
     resolution: {integrity: sha512-OzdIJ2HNLDxEt0TJRjWRDtbZZT5oxMZkscVzAhbOSER0hBxYTNM4kCFbOLscXz7PzcufT4f6sz9VLWUxHUObDA==}
+    peerDependencies:
+      vue: ^3.0.0
+
+  '@phila/phila-ui-textarea@0.0.19-beta.0':
+    resolution: {integrity: sha512-IBInwgbk4jKuheAtFOpxT75upab79/OddxTDFKEN/8c9qJDAKBrRnIQM6Dp5d0ZgtC6L1ACOCPsb4hrmNxsqbQ==}
     peerDependencies:
       vue: ^3.0.0
 
@@ -4493,6 +4504,13 @@ snapshots:
       vue-imask: 7.6.1(vue@3.5.33(typescript@6.0.3))
     transitivePeerDependencies:
       - '@vue/composition-api'
+      - vue-router
+
+  '@phila/phila-ui-textarea@0.0.19-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
+    dependencies:
+      '@phila/phila-ui-core': 3.1.0-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
+      vue: 3.5.33(typescript@6.0.3)
+    transitivePeerDependencies:
       - vue-router
 
   '@phila/phila-ui-tooltip@0.1.2-beta.0(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':

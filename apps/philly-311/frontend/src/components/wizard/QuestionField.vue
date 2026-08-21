@@ -61,7 +61,7 @@ function setCheckbox(record: Record<string, boolean>) {
          own); hideLabel visually hides it via the :deep() rule below instead of emptying it. -->
     <RadioGroup
       v-if="question.type === 'picklist'"
-      :group-label="labelText"
+      :group-label="''"
       :choices="choices"
       :model-value="radioValue"
       @update:model-value="setRadio"
@@ -71,7 +71,7 @@ function setCheckbox(record: Record<string, boolean>) {
     <!-- phila-ui gap: CheckboxGroup has no required prop and doesn't forward $attrs to its <input type="checkbox"> elements -->
     <CheckboxGroup
       v-else-if="question.type === 'multipicklist'"
-      :group-label="labelText"
+      :group-label="''"
       :choices="choices"
       :model-value="checkboxValue"
       @update:model-value="setCheckbox"
@@ -109,7 +109,6 @@ function setCheckbox(record: Record<string, boolean>) {
     <TextField
       v-else
       :id="fieldId"
-      :label="labelText"
       :model-value="modelValue"
       :imask-props="
         ['number', 'currency', 'double'].includes(question.type) ? { mask: Number } : undefined
@@ -117,12 +116,19 @@ function setCheckbox(record: Record<string, boolean>) {
       :aria-required="question.required || undefined"
       @update:model-value="set"
     />
-    <p v-if="error" class="question-field__error" role="alert">{{ error }}</p>
+    <p
+      v-if="true || error"
+      class="question-field__error"
+      role="alert"
+      v-text="error || 'Aur nawr!'"
+    />
   </div>
 </template>
 
 <style scoped>
 .question-field--error {
+  height: 100%;
+  width: 100%;
   background: var(--Schemes-Error-Container, #f8c9bd);
   border-radius: 12px;
   padding: 16px;
