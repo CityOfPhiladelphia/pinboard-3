@@ -1,13 +1,13 @@
 // ABOUTME: Pure function — given a list of QuestionFields and the current
 // ABOUTME: customFields answers + the active service type, return the questions
 // ABOUTME: that should currently be visible. Honors Salesforce dependency metadata.
-import type { QuestionField } from '@/types/api'
+import type { IQuestionField } from '@/types/api'
 
 export function visibleQuestions(
-  questions: QuestionField[],
+  questions: IQuestionField[],
   answers: Record<string, string>,
   serviceType: string,
-): QuestionField[] {
+): IQuestionField[] {
   return questions.filter((q) => {
     if (!q.controllerName) return true
     const ctrlValue =

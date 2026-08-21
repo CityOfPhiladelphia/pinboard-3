@@ -7,7 +7,7 @@ import { Icon } from '@phila/phila-ui-core'
 import { IconClose, IconArrowUp } from '@phila/phila-ui-core/icons'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useWizardValidity } from '@/composables/useWizardValidity'
-import ReportStep from './ReportStep.vue'
+import ReportStep from '@/components/wizard/ReportStep.vue'
 import ImageUploadDialog from '@/components/wizard/ImageUploadDialog.vue'
 
 const store = useReportSubmissionStore()

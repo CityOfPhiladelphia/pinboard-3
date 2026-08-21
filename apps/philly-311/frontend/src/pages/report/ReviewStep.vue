@@ -9,7 +9,7 @@ import ReviewSummary from '@/components/wizard/ReviewSummary.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { Callout } from '@phila/phila-ui-callout'
 import type { SubmitResponse } from '@/types/wizard'
-import ReportStep from './ReportStep.vue'
+import ReportStep from '@/components/wizard/ReportStep.vue'
 
 const GENERIC_ERROR = 'Something went wrong submitting your report. Please try again.'
 

@@ -2,60 +2,79 @@
      screen (auto-advancing single-choice answers), ending with the required
      description (10-char floor), contact info, and report visibility. -->
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeMount, onBeforeUnmount, ref, watch } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useServiceTypes } from '@/composables/useServiceTypes'
 import { useWizardNav } from '@/composables/useWizardNav'
 import { visibleQuestions } from '@/utils/conditional'
 import { PhilaButton } from '@phila/phila-ui-button'
-import ContactInfo from '@/components/wizard/ContactInfo.vue'
-import QuestionField from '@/components/wizard/QuestionField.vue'
-import ReportStep from './ReportStep.vue'
+import DetailsStepQuestion from '@/components/wizard/DetailsStepQuestion.vue'
+import DetailsStepFinal from '@/components/wizard/DetailsStepFinal.vue'
 
 const MIN_DESCRIPTION = 10
 const AUTO_ADVANCE_MS = 300
 
 const store = useReportSubmissionStore()
 const { list, load, isLoading, error: loadError } = useServiceTypes()
-onMounted(() => {
-  void load()
-})
 
+const restoringState = ref(true)
+const error = ref('')
+const description = ref(store.description)
+const index = ref(
+  Object.keys(store.customFields).length ? Object.keys(store.customFields).length - 1 : 0,
+)
+const questionResponse = ref('')
 // A deep link (?category=X) can land here before the catalog has loaded, or
 // after it's failed to load — in both cases the category's questions are
 // unknown, so question/final screens must stay hidden and Next must not
 // let the shell advance past them.
 const blocked = computed(() => !!store.category && !list.value)
 
-const selected = computed(
-  () => (list.value ?? []).find((s) => s.serviceType === store.category) ?? null,
-)
-const questions = computed(() =>
-  selected.value
+const selected = computed(() => {
+  return (list.value ?? []).find((s) => s.serviceType === store.category) ?? null
+})
+
+const questions = computed(() => {
+  return selected.value
     ? visibleQuestions(selected.value.questions, store.customFields, selected.value.serviceType)
-    : [],
+    : []
+})
+
+const current = computed(() => {
+  return questions.value?.[index.value] ?? null
+})
+
+// watch(current, () => console.log(current.value.type))
+
+watch(questionResponse, () =>
+  answer(current.value.field, questionResponse.value, current.value.type),
 )
-const index = ref(
-  Object.keys(store.customFields).length ? Object.keys(store.customFields).length - 1 : 0,
-)
-const current = computed(() => questions.value[index.value] ?? null)
-const error = ref('')
 
 watch(questions, (qs) => {
   if (index.value > qs.length) index.value = qs.length
 })
 
-const description = ref(store.description)
 watch(description, (v) => {
   store.setDescription(v)
   error.value = ''
 })
 
-function requiredMessage(type: string): string {
-  return type === 'picklist' || type === 'multipicklist'
-    ? 'Select an option to continue'
-    : 'Add an answer to continue'
-}
+onBeforeMount(async () => {
+  await load()
+  console.log(
+    list.value.filter((item) => item.questions.some((question) => question.type === 'textarea')),
+  )
+  console.log(
+    new Set(
+      Array.from(list.value, (item) =>
+        Array.from(item.questions, (question) => question.type),
+      ).flat(),
+    ),
+  )
+  questionResponse.value = store.customFields[current.value.field] ?? ''
+})
+
+onBeforeUnmount(cancelAutoAdvance)
 
 let timer: ReturnType<typeof setTimeout> | null = null
 function cancelAutoAdvance() {
@@ -64,9 +83,19 @@ function cancelAutoAdvance() {
     timer = null
   }
 }
-onBeforeUnmount(cancelAutoAdvance)
+
+function requiredMessage(type: string): string {
+  return type === 'picklist' || type === 'multipicklist'
+    ? 'Select an option to continue'
+    : 'Add an answer to continue'
+}
 
 function answer(field: string, value: string, type: string) {
+  if (restoringState.value) {
+    // ensure that if an in-progress report is being restored, the page remains on the last question with a response
+    restoringState.value = false
+    return
+  }
   store.setQuestion(field, value)
   error.value = ''
   cancelAutoAdvance()
@@ -109,85 +138,38 @@ function back(): boolean {
 }
 
 useWizardNav({ next, back })
-
-function setPrivacy(e: Event) {
-  store.setPrivacy((e.target as HTMLInputElement).checked)
-}
 </script>
 
 <template>
-  <ReportStep :step-title="''">
-    <template #step-content>
-      <div class="details-step">
-        <template v-if="blocked">
-          <p v-if="isLoading" class="details-step__status">Loading questions…</p>
-          <p v-else-if="loadError" class="details-step__error" role="alert">
-            {{ loadError.message || 'Could not load questions.' }}
-            <PhilaButton
-              variant="secondary"
-              class="details-step__retry"
-              data-test="retry-questions"
-              @click="() => void load()"
-              >Retry</PhilaButton
-            >
-          </p>
-        </template>
+  <template v-if="isLoading">
+    <p class="details-step__status">Loading questions…</p>
+  </template>
 
-        <template v-else-if="current">
-          <h1 class="details-step__title">
-            {{ current.label }}
-            <span v-if="current.required" class="details-step__required">* (required)</span>
-          </h1>
-          <QuestionField
-            :key="current.field"
-            :question="current"
-            hide-label
-            :error="error"
-            :model-value="store.customFields[current.field] ?? ''"
-            @update:model-value="(v: string) => answer(current!.field, v, current!.type)"
-          />
-        </template>
+  <DetailsStepQuestion
+    v-else-if="current"
+    v-model:response="questionResponse"
+    v-model:error="error"
+    :current="current"
+  />
 
-        <template v-else>
-          <h1 class="details-step__title">Details</h1>
+  <DetailsStepFinal
+    v-else-if="questions.length == index"
+    v-model:description="description"
+    v-model:error="error"
+  ></DetailsStepFinal>
 
-          <label class="details-step__label" for="details-description">
-            Describe the issue <span class="details-step__required">* (required)</span>
-          </label>
-          <textarea
-            id="details-description"
-            v-model="description"
-            class="details-step__textarea"
-            :class="{ 'details-step__textarea--error': !!error }"
-            rows="4"
-            aria-required="true"
-            aria-describedby="details-description-hint"
-          ></textarea>
-          <p id="details-description-hint" class="details-step__hint">At least 10 characters.</p>
-          <p v-if="error" class="details-step__error" role="alert">{{ error }}</p>
-
-          <ContactInfo />
-
-          <fieldset class="details-step__privacy">
-            <legend class="details-step__privacy-legend">Visibility</legend>
-            <label class="details-step__privacy-toggle">
-              <input
-                type="checkbox"
-                :checked="store.publicVisibility"
-                aria-describedby="details-privacy-note"
-                @change="setPrivacy"
-              />
-              Make this report public
-            </label>
-            <p id="details-privacy-note" class="details-step__privacy-note">
-              Public reports show up on the map. Off by default; only you and 311 staff see your
-              private reports.
-            </p>
-          </fieldset>
-        </template>
-      </div>
-    </template>
-  </ReportStep>
+  <template v-else>
+    <p class="details-step__error" role="alert">
+      {{ loadError?.message || 'Could not load questions.' }}
+      <PhilaButton
+        variant="secondary"
+        class="details-step__retry"
+        data-test="retry-questions"
+        @click="() => void load()"
+        >Retry</PhilaButton
+      >
+    </p>
+  </template>
 </template>
 
 <style scoped>

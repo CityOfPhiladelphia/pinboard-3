@@ -1,46 +1,41 @@
 <!-- ABOUTME: Renders a single wizard question's input field by question.type using phila-ui components.
      SelectField (large picklist) and textarea remain native HTML; all other types use phila-ui packages. -->
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useId } from 'vue'
 import { TextField } from '@phila/phila-ui-text-field'
 import { RadioGroup } from '@phila/phila-ui-radio'
 import { CheckboxGroup } from '@phila/phila-ui-checkbox'
 import { Switch } from '@phila/phila-ui-switch'
 import { DateField } from '@phila/phila-ui-date-field'
-import type { QuestionField } from '@/types/api'
+import type { IQuestionField } from '@/types/api'
 
 const props = defineProps<{
-  question: QuestionField
-  modelValue: string
-  hideLabel?: boolean
-  error?: string
+  question: IQuestionField
 }>()
-const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
-const fieldId = computed(() => `q-${props.question.field}`)
+const modelValue = defineModel<string>('model-value', { default: '' })
+const error = defineModel<string>('error')
+
+const fieldId = useId()
+
 const labelText = computed(() =>
   props.question.required ? `${props.question.label} *` : props.question.label,
-)
-const useRadioGroup = computed(
-  () => props.question.type === 'picklist' && (props.question.options?.length ?? 0) <= 4,
-)
-const isLargePicklist = computed(
-  () => props.question.type === 'picklist' && (props.question.options?.length ?? 0) > 4,
 )
 
 const choices = computed(() => (props.question.options ?? []).map((o) => ({ text: o, value: o })))
 // RadioGroup/CheckboxGroup model a Record<choice value, checked>; the wizard
-// stores answers as strings ('A' / 'A;B'), so translate at this boundary.
+// stores answers as strings ('A' / 'A;B'), so translate at this boundary.l
 const radioValue = computed<Record<string, boolean>>(() =>
-  Object.fromEntries((props.question.options ?? []).map((o) => [o, o === props.modelValue])),
+  Object.fromEntries((props.question.options ?? []).map((o) => [o, o === modelValue.value])),
 )
+
 const checkboxValue = computed<Record<string, boolean>>(() => {
-  const checked = new Set(props.modelValue ? props.modelValue.split(';').filter(Boolean) : [])
+  const checked = new Set(modelValue.value ? modelValue.value.split(';').filter(Boolean) : [])
   return Object.fromEntries((props.question.options ?? []).map((o) => [o, checked.has(o)]))
 })
 
 function set(value: string) {
-  emit('update:modelValue', value)
+  modelValue.value = value
 }
 function setRadio(record: Record<string, boolean>) {
   set(Object.keys(record).find((k) => record[k]) ?? '')
@@ -57,7 +52,7 @@ function setCheckbox(record: Record<string, boolean>) {
 <template>
   <div
     class="question-field"
-    :class="{ 'question-field--error': !!error, 'question-field--bare-label': hideLabel }"
+    :class="{ 'question-field--error': !!error }"
     :data-type="question.type"
   >
     <!-- picklist (≤4): RadioGroup -->
@@ -65,28 +60,12 @@ function setCheckbox(record: Record<string, boolean>) {
     <!-- group-label always renders the real text (RadioGroup has no accessible-name prop of its
          own); hideLabel visually hides it via the :deep() rule below instead of emptying it. -->
     <RadioGroup
-      v-if="useRadioGroup"
+      v-if="question.type === 'picklist'"
       :group-label="labelText"
       :choices="choices"
       :model-value="radioValue"
       @update:model-value="setRadio"
     />
-
-    <!-- picklist (>4): native select -->
-    <template v-else-if="isLargePicklist">
-      <label :for="fieldId" class="question-field__label" :class="{ 'sr-only': hideLabel }">{{
-        labelText
-      }}</label>
-      <select
-        :id="fieldId"
-        :value="modelValue"
-        :aria-required="question.required || undefined"
-        @change="set(($event.target as HTMLSelectElement).value)"
-      >
-        <option value="" disabled>Select…</option>
-        <option v-for="opt in question.options" :key="opt" :value="opt">{{ opt }}</option>
-      </select>
-    </template>
 
     <!-- multipicklist: CheckboxGroup -->
     <!-- phila-ui gap: CheckboxGroup has no required prop and doesn't forward $attrs to its <input type="checkbox"> elements -->
@@ -100,16 +79,14 @@ function setCheckbox(record: Record<string, boolean>) {
 
     <!-- textarea: native -->
     <template v-else-if="question.type === 'textarea'">
-      <label :for="fieldId" class="question-field__label" :class="{ 'sr-only': hideLabel }">{{
-        labelText
-      }}</label>
+      <label :for="fieldId" class="question-field__label" v-text="labelText" />
       <textarea
         :id="fieldId"
         :value="modelValue"
         rows="3"
         :aria-required="question.required || undefined"
         @input="set(($event.target as HTMLTextAreaElement).value)"
-      ></textarea>
+      />
     </template>
 
     <!-- date: DateField — forwards $attrs through its inner TextField to the native <input>.
@@ -142,28 +119,16 @@ function setCheckbox(record: Record<string, boolean>) {
          aria-label attr with its own, empty-when-labeled fallback); hideLabel visually hides
          the rendered <label> via the :deep() rule below instead. -->
     <TextField
-      v-else-if="['number', 'currency', 'double'].includes(question.type)"
-      :id="fieldId"
-      :label="labelText"
-      :model-value="modelValue"
-      :imask-props="{ mask: Number }"
-      :aria-required="question.required || undefined"
-      @update:model-value="set"
-    />
-
-    <!-- string / fallback: TextField — forwards $attrs to the native <input>.
-         label always renders the real text (TextField's dist build clobbers an explicit
-         aria-label attr with its own, empty-when-labeled fallback); hideLabel visually hides
-         the rendered <label> via the :deep() rule below instead. -->
-    <TextField
       v-else
       :id="fieldId"
       :label="labelText"
       :model-value="modelValue"
+      :imask-props="
+        ['number', 'currency', 'double'].includes(question.type) ? { mask: Number } : undefined
+      "
       :aria-required="question.required || undefined"
       @update:model-value="set"
     />
-
     <p v-if="error" class="question-field__error" role="alert">{{ error }}</p>
   </div>
 </template>
@@ -198,10 +163,12 @@ function setCheckbox(record: Record<string, boolean>) {
   border-radius: 12px;
   padding: 16px;
 }
+
 .question-field--error textarea,
 .question-field--error select {
   border-color: var(--Schemes-On-Error-Container, #992100);
 }
+
 .question-field__error {
   margin: var(--spacing-s, 0.75rem) 0 0;
   color: var(--Schemes-On-Error-Container, #992100);

@@ -12,7 +12,7 @@ import { Callout } from '@phila/phila-ui-callout'
 import TypeSuggestions from '@/components/wizard/TypeSuggestions.vue'
 import TypeDirectory from '@/components/wizard/TypeDirectory.vue'
 import ImageAnalysis from '@/components/wizard/ImageAnalysis.vue'
-import ReportStep from './ReportStep.vue'
+import ReportStep from '@/components/wizard/ReportStep.vue'
 import IssueLoadError from '@/components/wizard/IssueLoadError.vue'
 import type { ServiceType } from '@/types/api.ts'
 
