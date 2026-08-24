@@ -9,17 +9,21 @@ import { Switch } from '@phila/phila-ui-switch'
 import { DateField } from '@phila/phila-ui-date-field'
 import type { IQuestionField } from '@/types/api'
 
+const fieldId = useId()
+
 const props = defineProps<{
   question: IQuestionField
 }>()
 
-const modelValue = defineModel<string>('model-value', { default: '' })
+const modelValue = defineModel<string>('model-value')
 const error = defineModel<string>('error')
-
-const fieldId = useId()
 
 const labelText = computed(() =>
   props.question.required ? `${props.question.label} *` : props.question.label,
+)
+
+const textFieldImask = computed(() =>
+  ['number', 'currency', 'double'].includes(props.question.type) ? { mask: Number } : undefined,
 )
 
 const choices = computed(() => (props.question.options ?? []).map((o) => ({ text: o, value: o })))
@@ -37,9 +41,12 @@ const checkboxValue = computed<Record<string, boolean>>(() => {
 function set(value: string) {
   modelValue.value = value
 }
+
 function setRadio(record: Record<string, boolean>) {
+  console.log(record)
   set(Object.keys(record).find((k) => record[k]) ?? '')
 }
+
 function setCheckbox(record: Record<string, boolean>) {
   set(
     Object.keys(record)
@@ -47,12 +54,24 @@ function setCheckbox(record: Record<string, boolean>) {
       .join(';'),
   )
 }
+
+function validateDate(inputDate: string) {
+  if (Date.now() >= Date.parse(inputDate)) {
+    set(inputDate)
+  } else {
+    error.value = 'Date cannot be in the future'
+  }
+}
+
+function clearError() {
+  if (error.value) error.value = ''
+}
 </script>
 
 <template>
   <div
     class="question-field"
-    :class="{ 'question-field--error': !!error }"
+    :class="{ 'question-field__error': !!error }"
     :data-type="question.type"
   >
     <!-- picklist (≤4): RadioGroup -->
@@ -62,8 +81,10 @@ function setCheckbox(record: Record<string, boolean>) {
     <RadioGroup
       v-if="question.type === 'picklist'"
       :group-label="''"
+      :hide-title="{ hideFromScreenReader: true }"
       :choices="choices"
       :model-value="radioValue"
+      :aria-required="question.required || undefined"
       @update:model-value="setRadio"
     />
 
@@ -72,8 +93,10 @@ function setCheckbox(record: Record<string, boolean>) {
     <CheckboxGroup
       v-else-if="question.type === 'multipicklist'"
       :group-label="''"
+      :hide-title="{ hideFromScreenReader: true }"
       :choices="choices"
       :model-value="checkboxValue"
+      :aria-required="question.required || undefined"
       @update:model-value="setCheckbox"
     />
 
@@ -86,8 +109,10 @@ function setCheckbox(record: Record<string, boolean>) {
       :id="fieldId"
       :label="labelText"
       :model-value="modelValue"
+      :max="Date.now()"
       :aria-required="question.required || undefined"
-      @update:model-value="set"
+      @complete="validateDate"
+      @update:model-value="clearError"
     />
 
     <!-- boolean: Switch -->
@@ -110,33 +135,25 @@ function setCheckbox(record: Record<string, boolean>) {
       v-else
       :id="fieldId"
       :model-value="modelValue"
-      :imask-props="
-        ['number', 'currency', 'double'].includes(question.type) ? { mask: Number } : undefined
-      "
+      :imask-props="textFieldImask"
       :aria-required="question.required || undefined"
-      @update:model-value="set"
-    />
-    <p
-      v-if="true || error"
-      class="question-field__error"
-      role="alert"
-      v-text="error || 'Aur nawr!'"
+      @update:model-value="textFieldImask ? clearError : set"
+      @complete="textFieldImask ? set : ''"
     />
   </div>
 </template>
 
 <style scoped>
-.question-field--error {
-  height: 100%;
-  width: 100%;
-  background: var(--Schemes-Error-Container, #f8c9bd);
-  border-radius: 12px;
-  padding: 16px;
+.question-field {
+  width: fit-content;
 }
 
 .question-field__error {
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 16px;
   margin: var(--spacing-s, 0.75rem) 0 0;
   color: var(--Schemes-On-Error-Container, #992100);
-  font-weight: 600;
+  background: var(--Schemes-Error-Container, #f8c9bd);
 }
 </style>

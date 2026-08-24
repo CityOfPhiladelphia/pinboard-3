@@ -82,13 +82,6 @@ const titleText = computed(() => `${props.stepTitle} *`)
   grid-area: note;
   max-width: 39rem;
   color: var(--Schemes-On-Background, #000);
-
-  /* Body/Default */
-  font-family: var(--Body-Default-font-body-default-family, Montserrat);
-  font-size: var(--Body-Default-font-body-default-size, 1rem);
-  font-style: normal;
-  font-weight: 400;
-  line-height: var(--Body-Default-font-body-default-lineheight, 1.5rem); /* 150% */
 }
 
 .report-step__content {

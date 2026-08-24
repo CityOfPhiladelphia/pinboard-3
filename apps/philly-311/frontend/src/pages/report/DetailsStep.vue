@@ -17,7 +17,6 @@ const AUTO_ADVANCE_MS = 300
 const store = useReportSubmissionStore()
 const { list, load, isLoading, error: loadError } = useServiceTypes()
 
-const restoringState = ref(true)
 const error = ref('')
 const description = ref(store.description)
 const index = ref(
@@ -40,13 +39,12 @@ const questions = computed(() =>
     : [],
 )
 
-const current = computed(() => {
-  return questions.value?.[index.value] ?? null
-})
+const current = computed(() => questions.value?.[index.value] ?? null)
 
-watch(questionResponse, () =>
-  answer(current.value.field, questionResponse.value, current.value.type),
-)
+watch(questionResponse, () => {
+  if (store.customFields[current.value.field] !== questionResponse.value)
+    answer(current.value.field, questionResponse.value, current.value.type)
+})
 
 watch(questions, (qs) => {
   if (index.value > qs.length) index.value = qs.length
@@ -79,11 +77,6 @@ function requiredMessage(type: string): string {
 }
 
 function answer(field: string, value: string, type: string) {
-  if (restoringState.value) {
-    // ensure that if an in-progress report is being restored, the page remains on the last question with a response
-    restoringState.value = false
-    return
-  }
   store.setQuestion(field, value)
   error.value = ''
   cancelAutoAdvance()

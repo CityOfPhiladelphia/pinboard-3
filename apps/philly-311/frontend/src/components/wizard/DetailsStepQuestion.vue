@@ -4,17 +4,17 @@ import QuestionField from '@/components/wizard/QuestionField.vue'
 import ReportStep from './ReportStep.vue'
 import type { IQuestionField } from '@/types/api.ts'
 
-const props = defineProps<{ current: IQuestionField }>()
-const response = defineModel<string>('response', { default: '' })
+defineProps<{ current: IQuestionField }>()
+const response = defineModel<string>('response')
 const error = defineModel<string>('error')
 </script>
 
 <template>
   <ReportStep
-    :step-title="props.current.label"
+    :step-title="current.label"
     :error-active="!!error"
     :step-note="current.description"
-    :required="props.current.required"
+    :required="current.required"
   >
     <template #step-content>
       <QuestionField v-model:model-value="response" v-model:error="error" :question="current" />
