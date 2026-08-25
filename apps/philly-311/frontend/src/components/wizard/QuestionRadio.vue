@@ -22,10 +22,9 @@ const choices = computed(() => {
 // RadioGroup/CheckboxGroup model a Record<choice value, checked>; the wizard
 // stores answers as strings ('A' / 'A;B'), so translate at this boundary.l
 const radioValue = computed<Record<string, boolean>>(() => {
-  let a
-  a = Object.fromEntries((props.question.options ?? []).map((o) => [o, o === props.initialValue]))
-  console.log(a)
-  return a
+  return Object.fromEntries(
+    (props.question.options ?? []).map((o) => [o, o === props.initialValue]),
+  )
 })
 
 function setRadio(record: Record<string, boolean>) {

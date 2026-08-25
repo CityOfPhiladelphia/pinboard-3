@@ -15,9 +15,9 @@ const props = defineProps<{
 const modelValue = defineModel<string>('model-value')
 const error = defineModel<string>('error')
 
-// const labelText = computed(() =>
-//   props.question.required ? `${props.question.label} *` : props.question.label,
-// )
+const labelText = computed(() =>
+  props.question.required ? `${props.question.label} *` : props.question.label,
+)
 
 const textFieldImask = computed(() =>
   ['number', 'currency', 'double'].includes(props.question.type) ? { mask: Number } : undefined,
@@ -35,6 +35,7 @@ function set(value: string) {
          the rendered <label> via the :deep() rule below instead. -->
   <TextField
     :id="fieldId"
+    :label="labelText"
     :model-value="initialValue"
     :imask-props="textFieldImask"
     :aria-required="question.required || false"

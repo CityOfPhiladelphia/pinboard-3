@@ -29,41 +29,60 @@ const initialValue = computed(() => {
     :required="current.required"
   >
     <template #step-content>
-      <QuestionBoolean
-        v-if="current.type === 'boolean'"
-        v-model:model-value="response"
-        v-model:error="error"
-        :question="current"
-        :initial-value="initialValue"
-      />
-      <QuestionRadio
-        v-else-if="current.type === 'picklist'"
-        v-model:model-value="response"
-        v-model:error="error"
-        :question="current"
-        :initial-value="initialValue"
-      />
-      <QuestionCheckbox
-        v-else-if="current.type === 'multipicklist'"
-        v-model:model-value="response"
-        v-model:error="error"
-        :question="current"
-        :initial-value="initialValue"
-      />
-      <QuestionDate
-        v-else-if="current.type === 'date'"
-        v-model:model-value="response"
-        v-model:error="error"
-        :question="current"
-        :initial-value="initialValue"
-      />
-      <QuestionTextfield
-        v-else
-        v-model:model-value="response"
-        v-model:error="error"
-        :question="current"
-        :initial-value="initialValue"
-      />
+      <div
+        class="question-field"
+        :class="{ 'question-field__error': !!error }"
+        :data-type="current.type"
+      >
+        <QuestionBoolean
+          v-if="current.type === 'boolean'"
+          v-model:model-value="response"
+          v-model:error="error"
+          :question="current"
+          :initial-value="initialValue"
+        />
+        <QuestionRadio
+          v-else-if="current.type === 'picklist'"
+          v-model:model-value="response"
+          v-model:error="error"
+          :question="current"
+          :initial-value="initialValue"
+        />
+        <QuestionCheckbox
+          v-else-if="current.type === 'multipicklist'"
+          v-model:model-value="response"
+          v-model:error="error"
+          :question="current"
+          :initial-value="initialValue"
+        />
+        <QuestionDate
+          v-else-if="current.type === 'date'"
+          v-model:model-value="response"
+          v-model:error="error"
+          :question="current"
+          :initial-value="initialValue"
+        />
+        <QuestionTextfield
+          v-else
+          v-model:model-value="response"
+          v-model:error="error"
+          :question="current"
+          :initial-value="initialValue"
+        />
+      </div>
     </template>
   </ReportStep>
 </template>
+
+<style scoped>
+.question-field {
+  width: fit-content;
+}
+
+.question-field__error {
+  font-weight: 600;
+  border-radius: 12px;
+  color: var(--Schemes-On-Error-Container, #992100);
+  background: var(--Schemes-Error-Container, #f8c9bd);
+}
+</style>
