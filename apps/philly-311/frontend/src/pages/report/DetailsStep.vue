@@ -23,6 +23,7 @@ const index = ref(
   Object.keys(store.customFields).length ? Object.keys(store.customFields).length - 1 : 0,
 )
 const questionResponse = ref('')
+
 // A deep link (?category=X) can land here before the catalog has loaded, or
 // after it's failed to load — in both cases the category's questions are
 // unknown, so question/final screens must stay hidden and Next must not
@@ -33,11 +34,11 @@ const selected = computed(() => {
   return (list.value ?? []).find((s) => s.serviceType === store.category) ?? null
 })
 
-const questions = computed(() =>
-  selected.value
+const questions = computed(() => {
+  return selected.value
     ? visibleQuestions(selected.value.questions, store.customFields, selected.value.serviceType)
-    : [],
-)
+    : []
+})
 
 const current = computed(() => questions.value?.[index.value] ?? null)
 
@@ -57,7 +58,6 @@ watch(description, (v) => {
 
 onBeforeMount(async () => {
   await load()
-  questionResponse.value = store.customFields[current.value.field] ?? ''
 })
 
 onBeforeUnmount(cancelAutoAdvance)
@@ -80,7 +80,7 @@ function answer(field: string, value: string, type: string) {
   store.setQuestion(field, value)
   error.value = ''
   cancelAutoAdvance()
-  if (value && type === 'picklist') {
+  if (value && ['boolean', 'picklist'].includes(type)) {
     timer = setTimeout(() => {
       if (current.value) next()
     }, AUTO_ADVANCE_MS)

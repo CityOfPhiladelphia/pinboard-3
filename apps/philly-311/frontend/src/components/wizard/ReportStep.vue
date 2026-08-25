@@ -1,6 +1,6 @@
 <!-- ABOUTME: Template for report pages. Standardizes step headings -->
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 
 // props
 const props = withDefaults(
@@ -16,13 +16,6 @@ const props = withDefaults(
   },
 )
 
-watch(
-  () => props.errorActive,
-  () => {
-    console.log('Awr nawr!')
-  },
-)
-
 // slots
 defineSlots<{
   'step-content': unknown
@@ -35,8 +28,8 @@ const titleText = computed(() => `${props.stepTitle} *`)
 <template>
   <div class="report__step">
     <span class="report-step__title">
-      <h5 class="report-step__text" v-text="titleText" />
-      <h5 class="report-step__required" v-text="requiredText" />
+      <h5 :class="['report-step__text', errorActive ? 'error' : '']" v-text="titleText" />
+      <h5 :class="['report-step__required', errorActive ? 'error' : '']" v-text="requiredText" />
     </span>
     <span class="report-step__note" v-text="stepNote" />
     <div class="report-step__content">
@@ -87,5 +80,9 @@ const titleText = computed(() => `${props.stepTitle} *`)
 .report-step__content {
   grid-area: content-slot;
   overflow: auto;
+}
+
+.error {
+  color: var(--Schemes-Error, #cc3000);
 }
 </style>
