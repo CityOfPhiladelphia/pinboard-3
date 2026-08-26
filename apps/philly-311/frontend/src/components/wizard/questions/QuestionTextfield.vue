@@ -1,5 +1,4 @@
-<!-- ABOUTME: Renders a single wizard question's input field by question.type using phila-ui components.
-     SelectField (large picklist) and textarea remain native HTML; all other types use phila-ui packages. -->
+<!-- ABOUTME: Renders a single wizard question's input field for questions of type 'textarea', 'number', 'currency', 'double'  -->
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 import { TextField } from '@phila/phila-ui-text-field'

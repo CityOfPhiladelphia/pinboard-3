@@ -1,10 +1,10 @@
 <!-- ABOUTME: Wizard step 4 — details: question subcomponent. Uses ReportStep to standardize formatting for QuestionFields -->
 <script setup lang="ts">
-import QuestionBoolean from '@/components/wizard/QuestionBoolean.vue'
-import QuestionRadio from '@/components/wizard/QuestionRadio.vue'
-import QuestionCheckbox from '@/components/wizard/QuestionCheckbox.vue'
-import QuestionDate from '@/components/wizard/QuestionDate.vue'
-import QuestionTextfield from '@/components/wizard/QuestionTextfield.vue'
+import QuestionBoolean from '@/components/wizard/questions/QuestionBoolean.vue'
+import QuestionRadio from '@/components/wizard/questions/QuestionRadio.vue'
+import QuestionCheckbox from '@/components/wizard/questions/QuestionCheckbox.vue'
+import QuestionDate from '@/components/wizard/questions/QuestionDate.vue'
+import QuestionTextfield from '@/components/wizard/questions/QuestionTextfield.vue'
 import ReportStep from './ReportStep.vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import type { IQuestionField } from '@/types/api.ts'

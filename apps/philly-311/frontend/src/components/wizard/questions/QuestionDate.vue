@@ -1,5 +1,4 @@
-<!-- ABOUTME: Renders a single wizard question's input field by question.type using phila-ui components.
-     SelectField (large picklist) and textarea remain native HTML; all other types use phila-ui packages. -->
+<!-- ABOUTME: Renders a single wizard question's input field for questions of type 'date'  -->
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 import { DateField } from '@phila/phila-ui-date-field'
@@ -32,7 +31,6 @@ function validateDate(inputDate: string) {
 }
 
 function clearError() {
-  console.log('clearError')
   if (error.value) error.value = ''
 }
 </script>
