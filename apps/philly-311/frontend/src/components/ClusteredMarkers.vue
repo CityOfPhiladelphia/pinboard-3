@@ -6,6 +6,7 @@ import { MapMarker, MapIconTextPin } from '@pinboard/ui'
 import type { PinboardTypes } from '@pinboard/ui'
 import { useClusters } from '@/composables/useClusters'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
+import { serviceTypeColor } from '@/utils/serviceTypeMeta'
 import ClusterBadge from '@/components/ClusterBadge.vue'
 
 const props = defineProps<{
@@ -48,7 +49,7 @@ function onClusterClick(item: { id: number; lng: number; lat: number }) {
       <MapIconTextPin
         :zoom="zoom"
         :icon="serviceTypeIconComponent(locationById.get(item.id)!.name)"
-        color-theme="light-primary"
+        :color="serviceTypeColor(locationById.get(item.id)!.name)"
         :hovered="hoveredId === item.id"
         :selected="selectedId === item.id"
         @mouseenter="emit('hover', item.id)"

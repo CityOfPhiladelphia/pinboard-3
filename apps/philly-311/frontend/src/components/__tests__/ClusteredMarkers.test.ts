@@ -5,6 +5,7 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
 import ClusteredMarkers from '../ClusteredMarkers.vue'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
+import { serviceTypeColor } from '@/utils/serviceTypeMeta'
 
 vi.mock('@pinboard/ui', () => {
   const passthrough = (name: string) =>
@@ -48,5 +49,13 @@ describe('ClusteredMarkers', () => {
       // A component (renderable), not a raw icon-definition data object.
       expect('iconName' in icon).toBe(false)
     }
+  })
+
+  it('colors each pin by its own service type', () => {
+    const w = mountMarkers()
+    const pins = w.findAllComponents({ name: 'MapIconTextPin' })
+    const pinColors = pins.map((p) => p.vm.$attrs.color)
+    expect(pinColors).toContain(serviceTypeColor('Pothole Repair'))
+    expect(pinColors).toContain(serviceTypeColor('Graffiti Removal'))
   })
 })

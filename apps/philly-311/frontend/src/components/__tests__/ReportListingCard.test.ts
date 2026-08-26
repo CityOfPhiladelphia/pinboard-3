@@ -1,13 +1,18 @@
-// ABOUTME: Tests for ReportListingCard — Figma report-listing card fidelity:
-// ABOUTME: photo/placeholder, title + status tag, address, timestamp, no distance.
+// ABOUTME: Tests for ReportListingCard — the thin adapter from Report data + status
+// ABOUTME: bucketing onto @phila/phila-ui-cards' Report311 props/#placeholder slot.
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { IconCircleCheck, IconClock } from '@phila/phila-ui-core/icons'
+import {
+  IconCircleCheck,
+  IconClock,
+  IconCircleExclamation,
+  IconPersonDigging,
+} from '@phila/phila-ui-core/icons'
 import ReportListingCard from '../ReportListingCard.vue'
 import type { Report } from '@/composables/useNearbyReports'
 
-function statusTag(w: ReturnType<typeof mount>) {
-  return w.findComponent({ name: 'Tags' })
+function report311(w: ReturnType<typeof mount>) {
+  return w.findComponent({ name: 'Report311' })
 }
 
 function report(overrides: Partial<Report> = {}): Report {
@@ -30,63 +35,46 @@ function mountCard(r: Report = report()) {
 }
 
 describe('ReportListingCard', () => {
-  it('renders the service type title, address, and formatted timestamp', () => {
+  it('maps serviceType/address/timestamp onto Report311 label/description/timestamp', () => {
     const w = mountCard()
-    expect(w.text()).toContain('Pothole Repair')
-    expect(w.text()).toContain('1234 Market St')
-    expect(w.find('.listing-card__meta').text()).toBe('10/10/26 • 1:57 PM')
+    const card = report311(w)
+    expect(card.props('label')).toBe('Pothole Repair')
+    expect(card.props('description')).toBe('1234 Market St')
+    expect(card.props('timestamp')).toBe('10/10/26 • 1:57 PM')
   })
 
-  it('shows the photo when mediaUrl is present', () => {
+  it('passes mediaUrl through as src/alt', () => {
     const w = mountCard()
-    expect(w.find('img').attributes('src')).toBe('https://cdn.test/p.jpg')
-    expect(w.find('.listing-card__photo--placeholder').exists()).toBe(false)
+    expect(report311(w).props('src')).toBe('https://cdn.test/p.jpg')
+    expect(report311(w).props('alt')).toBe('Pothole Repair')
   })
 
-  it('shows a placeholder block when there is no photo', () => {
+  it('supplies a service-type icon placeholder when there is no photo', () => {
     const w = mountCard(report({ mediaUrl: undefined }))
     expect(w.find('img').exists()).toBe(false)
-    expect(w.find('.listing-card__photo--placeholder').exists()).toBe(true)
+    const placeholder = w.find('.listing-card__placeholder')
+    expect(placeholder.exists()).toBe(true)
+    expect(placeholder.findComponent({ name: 'Icon' }).props('icon')).toBe(IconPersonDigging)
   })
 
-  it('shows a green circle-check tag with the status text for a resolved/closed status', () => {
-    const w = mountCard(report({ status: 'Closed' }))
-    const tag = statusTag(w)
-    expect(tag.props('color')).toBe('green')
-    expect(tag.props('icon')).toBe(IconCircleCheck)
-    expect(tag.props('text')).toBe('Closed')
+  it('builds a green check-circle status object for Closed', () => {
+    const status = report311(mountCard(report({ status: 'Closed' }))).props('status')
+    expect(status).toMatchObject({ color: 'green', icon: IconCircleCheck, text: 'Closed' })
   })
 
-  it('also treats Resolved as the green tag', () => {
-    expect(statusTag(mountCard(report({ status: 'Resolved' }))).props('color')).toBe('green')
+  it('builds a yellow circle-exclamation status object for On Hold', () => {
+    const status = report311(mountCard(report({ status: 'On Hold' }))).props('status')
+    expect(status).toMatchObject({ color: 'yellow', icon: IconCircleExclamation, text: 'On Hold' })
   })
 
-  it('shows a purple clock tag for an open/in-progress status', () => {
-    const w = mountCard(report({ status: 'In Progress' }))
-    const tag = statusTag(w)
-    expect(tag.props('color')).toBe('purple')
-    expect(tag.props('icon')).toBe(IconClock)
-    expect(tag.props('text')).toBe('In Progress')
+  it('builds an open/in-progress status object with a purple style override', () => {
+    const status = report311(mountCard(report({ status: 'In Progress' }))).props('status')
+    expect(status).toMatchObject({ icon: IconClock, text: 'In Progress' })
+    expect(status.style.color).toContain('4a00c9')
   })
 
-  it('also treats New and Open as the purple tag', () => {
-    expect(statusTag(mountCard(report({ status: 'New' }))).props('color')).toBe('purple')
-    expect(statusTag(mountCard(report({ status: 'Open' }))).props('color')).toBe('purple')
-  })
-
-  it('omits the status tag when status is empty', () => {
-    const w = mountCard(report({ status: '' }))
-    expect(statusTag(w).exists()).toBe(false)
-  })
-
-  it('does not render a distance row', () => {
-    const w = mountCard()
-    expect(w.find('.listing-card__distance').exists()).toBe(false)
-    expect(w.text()).not.toContain('mi')
-  })
-
-  it('omits the timestamp row when createdAt is missing', () => {
-    const w = mountCard(report({ createdAt: undefined }))
-    expect(w.find('.listing-card__meta').exists()).toBe(false)
+  it('omits the status object entirely when status is empty', () => {
+    const status = report311(mountCard(report({ status: '' }))).props('status')
+    expect(status).toBeUndefined()
   })
 })

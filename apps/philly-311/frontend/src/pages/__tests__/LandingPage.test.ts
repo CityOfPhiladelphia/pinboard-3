@@ -178,10 +178,10 @@ describe('LandingPage', () => {
     const w = mount(LandingPage, { global: { stubs: globalStubs } })
     await flushPromises()
     const knownCard = w.find('.card-known')
-    expect(knownCard.find('.listing-card').exists()).toBe(true)
+    expect(knownCard.findComponent({ name: 'Report311' }).exists()).toBe(true)
     expect(knownCard.text()).toContain('Pothole Repair')
     const unknownCard = w.find('.card-unknown')
-    expect(unknownCard.find('.listing-card').exists()).toBe(false)
+    expect(unknownCard.findComponent({ name: 'Report311' }).exists()).toBe(false)
     expect(unknownCard.text()).toContain('Unknown Name')
   })
 

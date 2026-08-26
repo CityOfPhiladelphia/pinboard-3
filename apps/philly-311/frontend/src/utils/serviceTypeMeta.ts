@@ -36,7 +36,7 @@ const COLORS: Record<string, string> = {
   'Street Trees': '#40bf4d',
   'Graffiti Removal': '#a61abf',
   'Dead Animal in Street': '#804d26',
-  'Residential Fire Safety Complaint': '#f24010',
+  'Residential Fire Safety Complaint': '#f2400d',
   'Smoke Detector': '#e6660d',
   'Inlet Cleaning': '#1a8ce6',
   'Hydrant Knocked Down': '#e61a26',
@@ -65,4 +65,12 @@ const FALLBACK_COLOR = '#666673'
 export function serviceTypeColor(serviceType: string | undefined | null): string {
   if (!serviceType) return FALLBACK_COLOR
   return COLORS[serviceType] ?? FALLBACK_COLOR
+}
+
+export function serviceTypeTintStyle(serviceType: string | undefined | null): {
+  backgroundColor: string
+  color: string
+} {
+  const color = serviceTypeColor(serviceType)
+  return { backgroundColor: `color-mix(in srgb, ${color} 15%, white)`, color }
 }
