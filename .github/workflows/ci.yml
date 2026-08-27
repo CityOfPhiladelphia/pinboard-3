@@ -66,8 +66,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+
+      - name: Testing
         run: |
-          echo ${needs.detect-changes-test.outputs.phil311}
+          echo ${needs.detect-changes-test.outputs}
 
       - name: Ship to test with ctl
         uses: ./.github/actions/ship-app
