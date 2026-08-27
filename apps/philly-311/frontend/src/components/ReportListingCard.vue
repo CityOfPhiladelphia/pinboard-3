@@ -1,107 +1,72 @@
-<!-- ABOUTME: Report listing card for the finder's left panel (Figma ".311 Report listing"):
-     photo + service-type title with a status tag, address, timestamp. -->
+<!-- ABOUTME: Report listing card for the finder's left panel — a thin adapter from our
+     Report data + status bucketing onto @phila/phila-ui-cards' Report311 component. -->
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Tags } from '@phila/phila-ui-tags'
+import { Report311 } from '@phila/phila-ui-cards'
+import type { Report311Props } from '@phila/phila-ui-cards'
 import { Icon } from '@phila/phila-ui-core'
-import { IconImage, IconCircleCheck, IconClock } from '@phila/phila-ui-core/icons'
 import type { Report } from '@/composables/useNearbyReports'
-import { statusIconTreatment } from '@/utils/reportCard'
+import {
+  statusBucket,
+  statusTagColor,
+  statusTagIcon,
+  statusTagStyle,
+} from '@/composables/useReportStatus'
+import { serviceTypeTintStyle } from '@/utils/serviceTypeMeta'
+import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import { formatCardTimestamp } from '@/utils/datetime'
 
 const props = defineProps<{ report: Report }>()
 
-const timestamp = computed(() => formatCardTimestamp(props.report.createdAt))
-const statusTreatment = computed(() => statusIconTreatment(props.report.status))
-const statusIcon = computed(() =>
-  statusTreatment.value === 'resolved' ? IconCircleCheck : IconClock,
-)
+const timestamp = computed(() => formatCardTimestamp(props.report.createdAt) ?? undefined)
+const bucket = computed(() => statusBucket(props.report.status))
+
+const status = computed<Report311Props['status']>(() => {
+  if (!bucket.value) return undefined
+  return {
+    text: props.report.status,
+    color: statusTagColor(bucket.value),
+    icon: statusTagIcon(bucket.value),
+    style: statusTagStyle(bucket.value),
+  }
+})
+
+const placeholderStyle = computed(() => serviceTypeTintStyle(props.report.serviceType))
+const placeholderIcon = computed(() => serviceTypeIconComponent(props.report.serviceType))
+
+// No-op: BaseCard only applies its own hover/focus styling when it considers
+// itself "clickable" (isClickable = !!href || !!onClick — see Storybook's Report311
+// story, which passes href="#" for the same reason). We don't want real anchor
+// navigation here, so a listener is the lighter way to opt in. The actual card
+// selection is handled by the wrapping .location-card div in LocationsPanel.vue;
+// this click still bubbles up to it unchanged.
+function onClick() {}
 </script>
 
 <template>
-  <article class="listing-card">
-    <div class="listing-card__media">
-      <img v-if="report.mediaUrl" class="listing-card__photo" :src="report.mediaUrl" alt="" />
-      <div v-else class="listing-card__photo listing-card__photo--placeholder">
-        <Icon :icon="IconImage" decorative size="extra-small" />
+  <Report311
+    :label="report.serviceType"
+    :description="report.address"
+    :timestamp="timestamp"
+    :src="report.mediaUrl"
+    :alt="report.serviceType"
+    :status="status"
+    @click="onClick"
+  >
+    <template #placeholder>
+      <div class="listing-card__placeholder" :style="placeholderStyle">
+        <Icon :icon="placeholderIcon" decorative size="medium" />
       </div>
-    </div>
-    <div class="listing-card__content">
-      <p class="listing-card__title">
-        <span class="listing-card__title-text">{{ report.serviceType }}</span>
-        <Tags
-          v-if="statusTreatment"
-          variant="readonly"
-          size="small"
-          :color="statusTreatment === 'resolved' ? 'green' : 'purple'"
-          :icon="statusIcon"
-          :text="report.status"
-        />
-      </p>
-      <p class="listing-card__address">{{ report.address }}</p>
-      <p v-if="timestamp" class="listing-card__meta">{{ timestamp }}</p>
-    </div>
-  </article>
+    </template>
+  </Report311>
 </template>
 
 <style scoped>
-.listing-card {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-s, 0.75rem);
-  background: #fff;
-  border-bottom: 1px solid var(--Schemes-Border-low, #ccc);
-}
-.listing-card__media {
-  flex: none;
-}
-.listing-card__photo {
-  width: 72px;
-  height: 72px;
-  border-radius: 8px;
-  object-fit: cover;
-}
-.listing-card__photo--placeholder {
+.listing-card__placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--Schemes-Border-low, #e3e3e3);
-  color: var(--Schemes-Border, #a1a1a1);
-}
-.listing-card__content {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0;
-  gap: 4px;
-  padding: 1rem 0;
-}
-.listing-card__title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin: 0;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  font-weight: 600;
-  color: #000;
-}
-.listing-card__title-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.listing-card__address {
-  margin: 0;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: #000;
-}
-.listing-card__meta {
-  margin: 0;
-  font-size: 0.75rem;
-  line-height: 1rem;
-  color: #636363;
+  width: 100%;
+  height: 100%;
 }
 </style>

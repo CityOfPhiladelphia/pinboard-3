@@ -63,18 +63,18 @@ function mountPage() {
 describe('ReportsPage', () => {
   it('loads cases on mount and buckets them into the four stat tiles', () => {
     reports.value = [
-      rpt('1', 'Resolved'),
+      rpt('1', 'On Hold'),
       rpt('2', 'Closed'),
       rpt('3', 'New'),
-      rpt('4', 'In Progress'),
+      rpt('4', 'In-Progress'),
     ]
     const w = mountPage()
     expect(load).toHaveBeenCalled()
     const tiles = w.findAllComponents({ name: 'StatTile' })
     expect(tiles.map((t) => [t.props('label'), t.props('value')])).toEqual([
       ['Total', 4],
-      ['Resolved', 1],
       ['In Progress', 2],
+      ['On Hold', 1],
       ['Closed', 1],
     ])
   })

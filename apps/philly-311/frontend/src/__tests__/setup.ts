@@ -59,6 +59,25 @@ vi.mock('@phila/phila-ui-filter-chip', () => ({
     ['filters', 'modelValue', 'filterButton', 'filterButtonText', 'elevated'],
     'filterButtonText',
   ),
+  FilterChip: formStub('FilterChip', ['color', 'icon', 'text', 'size'], 'text'),
+}))
+
+// Mirrors Report311's own contract: renders an <img> when src is present, else the
+// #placeholder slot (matching CardImage's own <img v-if="source" /><slot v-else />).
+vi.mock('@phila/phila-ui-cards', () => ({
+  Report311: defineComponent({
+    name: 'Report311',
+    props: ['label', 'description', 'timestamp', 'src', 'alt', 'status'],
+    setup(props: Record<string, unknown>, { slots }) {
+      return () =>
+        h('div', {}, [
+          props.src ? h('img', { src: props.src as string }) : slots.placeholder?.(),
+          (props.label as string) ?? '',
+          (props.description as string) ?? '',
+          (props.timestamp as string) ?? '',
+        ])
+    },
+  }),
 }))
 
 vi.mock('@phila/phila-ui-filter-panel', () => ({
