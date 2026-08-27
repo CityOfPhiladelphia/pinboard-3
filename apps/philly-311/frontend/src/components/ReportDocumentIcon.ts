@@ -1,5 +1,5 @@
 import { h } from 'vue'
-import type { IconComponent } from '@phila/phila-ui-core'
+import type { IconComponent } from '@phila/phila-ui-core/icons'
 import rawSvg from '@/assets/report-document.svg?raw'
 
 const sourceSvg = new DOMParser().parseFromString(rawSvg, 'image/svg+xml').documentElement

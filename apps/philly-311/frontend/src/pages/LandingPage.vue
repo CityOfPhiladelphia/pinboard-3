@@ -140,3 +140,18 @@ async function onSearch(query: string) {
     </template>
   </Pinboard>
 </template>
+
+<style>
+.location-card--custom:not(.location-card--selected) {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+.location-card--custom.location-card--hovered:not(.location-card--selected) {
+  outline: none;
+}
+
+.location-list {
+  gap: 0;
+}
+</style>

@@ -7,7 +7,8 @@ import { Callout } from '@phila/phila-ui-callout'
 import type { PinboardTypes, MapCardProps } from '@pinboard/ui'
 import { useAuth } from '@phila/sso-vue'
 import { useMyCases } from '@/composables/useMyCases'
-import { reportToLocation, statusBucket } from '@/utils/reportCard'
+import { reportToLocation } from '@/utils/reportCard'
+import { statusBucket } from '@/composables/useReportStatus'
 import { DEFAULT_CENTER } from '@/utils/geoDefaults'
 import StatTile from '@/components/StatTile.vue'
 import ReportListingCard from '@/components/ReportListingCard.vue'
@@ -28,8 +29,11 @@ const searchOrUserLocation: PinboardTypes.LatLon = {
 const reportById = (id: string) => cases.reports.value.find((r) => r.id === id)
 
 const counts = computed(() => {
-  const c = { resolved: 0, inProgress: 0, closed: 0 }
-  for (const r of cases.reports.value) c[statusBucket(r.status)]++
+  const c = { open: 0, onHold: 0, closed: 0 }
+  for (const r of cases.reports.value) {
+    const bucket = statusBucket(r.status)
+    if (bucket) c[bucket]++
+  }
   return c
 })
 
@@ -61,9 +65,9 @@ onMounted(() => {
         <h1>My Requests</h1>
         <ul class="reports-stats">
           <li><StatTile label="Total" :value="cases.reports.value.length" tone="neutral" /></li>
-          <li><StatTile label="Resolved" :value="counts.resolved" tone="success" /></li>
-          <li><StatTile label="In Progress" :value="counts.inProgress" tone="info" /></li>
-          <li><StatTile label="Closed" :value="counts.closed" tone="danger" /></li>
+          <li><StatTile label="In Progress" :value="counts.open" tone="info" /></li>
+          <li><StatTile label="On Hold" :value="counts.onHold" tone="danger" /></li>
+          <li><StatTile label="Closed" :value="counts.closed" tone="success" /></li>
         </ul>
       </div>
     </template>
@@ -167,5 +171,20 @@ onMounted(() => {
 
 .reports-empty {
   margin: var(--spacing-m, 1rem);
+}
+</style>
+
+<style>
+.location-card--custom:not(.location-card--selected) {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+.location-card--custom.location-card--hovered:not(.location-card--selected) {
+  outline: none;
+}
+
+.location-list {
+  gap: 0;
 }
 </style>

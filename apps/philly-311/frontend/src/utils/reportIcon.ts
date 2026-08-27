@@ -1,46 +1,118 @@
-// ABOUTME: Resolve a 311 service type to a phila-ui pin icon via common_categories;
-// ABOUTME: neutral location-dot fallback for any unmapped or missing service type.
-import type { FunctionalComponent, SVGAttributes } from 'vue'
+// ABOUTME: Resolve a 311 service type to a phila-ui icon, kept in parity with the iOS
+// ABOUTME: (ServiceType.swift) and Android (ServiceTypeIcon.kt) icon choices where an
+// ABOUTME: equivalent phila-ui-core icon exists; neutral pin fallback otherwise.
 import {
-  IconRoad,
-  IconBoxArchive,
-  IconLightbulb,
-  IconSprayCan,
+  IconArrowDown,
+  IconBagShopping,
+  IconBicycle,
+  IconBriefcase,
+  IconBuilding,
+  IconBuildingUser,
   IconCar,
-  IconTrashCan,
-  IconRecycle,
-  IconTree,
-  IconPersonWalking,
-  IconWater,
+  IconCartShopping,
+  IconCircleChevronDown,
+  IconCircleDot,
+  IconCircleExclamation,
+  IconCircleUp,
+  IconCircleXmark,
+  IconClose,
+  IconComments,
+  IconDroplet,
+  IconDumpster,
+  IconEllipsis,
+  IconFire,
+  IconHammer,
+  IconHotel,
+  IconHouse,
+  IconHouseCrack,
+  IconLeaf,
+  IconLightbulb,
   IconLocationDot,
+  IconMap,
+  IconMinus,
+  IconMoon,
+  IconOctagon,
+  IconPaintbrush,
+  IconPaw,
+  IconPersonDigging,
+  IconPersonWalking,
+  IconRecycle,
+  IconSmog,
+  IconSnowflake,
+  IconSnowplow,
+  IconSoccerBall,
+  IconSuitcaseMedical,
+  IconTemperatureFull,
+  IconTent,
+  IconTrafficLight,
+  IconTrashCan,
+  IconTree,
+  IconTriangleExclamation,
+  IconWater,
+  IconWheelchair,
 } from '@phila/phila-ui-core/icons'
-import commonCategories from '@/data/common_categories.json'
-
-type IconComponent = FunctionalComponent<SVGAttributes>
+import type { IconComponent } from '@phila/phila-ui-core/icons'
 
 const ICONS: Record<string, IconComponent> = {
-  road: IconRoad,
-  // phila-icons has no dumpster glyph; BoxArchive is the closest bin shape.
-  dumpster: IconBoxArchive,
-  lightbulb: IconLightbulb,
-  'spray-can': IconSprayCan,
-  car: IconCar,
-  trash: IconTrashCan,
-  recycle: IconRecycle,
-  tree: IconTree,
-  'person-walking': IconPersonWalking,
-  water: IconWater,
+  'Abandoned Vehicle': IconCar,
+  'Abandoned Bike': IconBicycle,
+  'Illegal Dumping': IconTrashCan,
+  'Rubbish Collection': IconTrashCan,
+  'Recyclables Collection': IconRecycle,
+  'Sanitation Violation': IconTriangleExclamation,
+  'Dumpster Violation': IconDumpster,
+  'Pothole Repair': IconPersonDigging,
+  'Cave-In Repair': IconArrowDown,
+  Depression: IconCircleChevronDown,
+  'Ditch Repair': IconMinus,
+  'Push-Up': IconCircleUp,
+  'Dangerous Sidewalk': IconPersonWalking,
+  'ADA Curb Ramp': IconWheelchair,
+  'Line Striping': IconTrafficLight,
+  'Street Light Outage': IconLightbulb,
+  'Alley Light Outage': IconMoon,
+  'Street Light (Other)': IconLightbulb,
+  'Street Light(Other)': IconLightbulb,
+  'Traffic Signal Emergency': IconCircleExclamation,
+  'Stop Sign Repair': IconOctagon,
+  'Property Maintenance Exterior': IconBuilding,
+  'Property Maintenance Interior': IconBuildingUser,
+  'Exterior High Weeds': IconLeaf,
+  'Building Structurally Dangerous (Occupied)': IconHouseCrack,
+  'Building Structurally Dangerous (Vacant)': IconHouseCrack,
+  'Vacant Lot': IconMap,
+  'Vacant Property': IconHouse,
+  'Tree Maintenance': IconTree,
+  'Street Trees': IconTree,
+  'Graffiti Removal': IconPaintbrush,
+  'Dead Animal in Street': IconPaw,
+  'Residential Fire Safety Complaint': IconFire,
+  'Smoke Detector': IconSmog,
+  'Inlet Cleaning': IconWater,
+  'Hydrant Knocked Down': IconDroplet,
+  'Manhole Cover Missing': IconCircleDot,
+  'Manhole Other Problem': IconCircleXmark,
+  'Homeless Encampment': IconTent,
+  'Parks and Rec Safety and Maintenance': IconSoccerBall,
+  'Demolition Complaint': IconHammer,
+  'Work Underway without Permits': IconTriangleExclamation,
+  'Work Underway in violation of permit requirements': IconClose,
+  Salting: IconSnowflake,
+  Shoveling: IconSnowflake,
+  'Icy Road Surface': IconTemperatureFull,
+  'Snow Removal': IconSnowplow,
+  'Complaint (Streets)': IconComments,
+  'Other (Streets)': IconEllipsis,
+  'Vendor Complaint': IconCartShopping,
+  'Unlicensed Business Complaint': IconBriefcase,
+  'Short Term Rental Complaint': IconHotel,
+  'Plastic Bag Complaint': IconBagShopping,
+  'Needle Collection': IconSuitcaseMedical,
 }
-
-const BY_TITLE: Record<string, IconComponent> = Object.fromEntries(
-  commonCategories
-    .map((c) => [c.title, ICONS[c.iconName]] as const)
-    .filter((e): e is [string, IconComponent] => e[1] !== undefined),
-)
 
 // Icon components are imported constants, so identity is stable by construction —
 // consumers can key v-for/props off the returned reference safely.
 export function serviceTypeIconComponent(serviceType: string | undefined | null): IconComponent {
   if (!serviceType) return IconLocationDot
-  return BY_TITLE[serviceType] ?? IconLocationDot
+  return ICONS[serviceType] ?? IconLocationDot
 }

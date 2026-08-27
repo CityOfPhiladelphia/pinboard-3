@@ -36,6 +36,7 @@
   },
   "pnpm": {
     "overrides": {
+      "@cyclomedia/streetsmart-api": "25.7.0",
       "vue-router": "5.0.6",
       "brace-expansion@>=3.0.0 <5.0.7": ">=5.0.7",
       "brace-expansion@>=4.0.0 <5.0.8": ">=5.0.8",

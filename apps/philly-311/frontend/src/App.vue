@@ -2,6 +2,7 @@
      phila .content region and supplies the header's nav links and CTAs. -->
 <script setup lang="ts">
 import { PinboardShell } from '@pinboard/ui'
+import type { NavLink } from '@phila/phila-ui-app-header'
 import '@pinboard/ui/style.css'
 import '@/assets/a11y.css'
 import { PhilaButton } from '@phila/phila-ui-button'
@@ -26,21 +27,25 @@ const {
 const isSelectedHref = (href?: string) =>
   href !== undefined && (href === route.path || (href !== '/' && route.path.startsWith(`${href}/`)))
 
-const navLinks = computed(() =>
-  [
-    {
-      text: 'Report an issue',
-      href: '/report',
-      icon: ReportDocumentIcon,
-      iconSize: 'large' as const,
-    },
-    { text: 'Map', href: '/' },
-    { text: 'My Requests', href: '/reports' },
-    { text: 'Answers', href: '/answers' },
-    ...(isAuthenticated.value
-      ? [{ text: userName.value ?? '' }, { text: 'Sign out', href: '#', onClick: () => signOut() }]
-      : [{ text: 'Login / Sign up', href: '#', onClick: () => login() }]),
-  ].map((link) => ({ ...link, selected: isSelectedHref(link.href) })),
+const navLinks = computed(
+  () =>
+    [
+      {
+        text: 'Report an issue',
+        href: '/report',
+        icon: ReportDocumentIcon,
+        iconSize: 'large' as const,
+      },
+      { text: 'Map', href: '/' },
+      { text: 'My Requests', href: '/reports' },
+      { text: 'Answers', href: '/answers' },
+      ...(isAuthenticated.value
+        ? [
+            { text: userName.value ?? '' },
+            { text: 'Sign out', href: '#', onClick: () => signOut() },
+          ]
+        : [{ text: 'Login / Sign up', href: '#', onClick: () => login() }]),
+    ].map((link) => ({ ...link, selected: isSelectedHref(link.href) })) as NavLink[],
 )
 
 const feedbackHref = 'https://www.phila.gov/feedback/'

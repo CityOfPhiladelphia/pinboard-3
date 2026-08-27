@@ -4,6 +4,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
 import { CloseButton } from '@phila/phila-ui-button'
+import { IconCar, IconLocationDot } from '@phila/phila-ui-core/icons'
 import ReportDetailContent from '../ReportDetailContent.vue'
 import type { Issue } from '@/types/api'
 
@@ -38,15 +39,28 @@ describe('ReportDetailContent', () => {
     expect(w.text()).toContain('A blue van has been parked here for weeks.')
   })
 
-  it('shows the photo when mediaUrl is present, and hides it entirely otherwise', () => {
+  it('shows the photo when mediaUrl is present', () => {
     const w = mount(ReportDetailContent, {
       props: { report: { ...baseIssue, mediaUrl: 'https://cdn.test/p.jpg' } },
     })
     expect(w.find('img').attributes('src')).toBe('https://cdn.test/p.jpg')
+    expect(w.find('.report-detail__img--placeholder').exists()).toBe(false)
+  })
 
-    const w2 = mount(ReportDetailContent, { props: { report: baseIssue } })
-    expect(w2.find('img').exists()).toBe(false)
-    expect(w2.find('.report-detail__img').exists()).toBe(false)
+  it('shows a service-type icon placeholder when there is no photo', () => {
+    const w = mount(ReportDetailContent, { props: { report: baseIssue } })
+    expect(w.find('img').exists()).toBe(false)
+    const placeholder = w.find('.report-detail__img--placeholder')
+    expect(placeholder.exists()).toBe(true)
+    expect(placeholder.findComponent({ name: 'Icon' }).props('icon')).toBe(IconCar)
+  })
+
+  it('falls back to the generic location icon for an unmapped service type', () => {
+    const w = mount(ReportDetailContent, {
+      props: { report: { ...baseIssue, serviceType: 'Something Unmapped' } },
+    })
+    const placeholder = w.find('.report-detail__img--placeholder')
+    expect(placeholder.findComponent({ name: 'Icon' }).props('icon')).toBe(IconLocationDot)
   })
 
   it('shows the fields table with issue type, location, submitted, and request id', () => {
@@ -80,7 +94,7 @@ describe('ReportDetailContent', () => {
 
   it('omits the public/private tag while privacy is unknown', () => {
     const w = mount(ReportDetailContent, { props: { report: baseIssue } })
-    expect(w.findComponent({ name: 'Tags' }).exists()).toBe(true) // status tag still shows
+    expect(w.findComponent({ name: 'FilterChip' }).exists()).toBe(true) // status chip still shows
     expect(w.text()).not.toContain('Private')
     expect(w.text()).not.toContain('Public')
   })
