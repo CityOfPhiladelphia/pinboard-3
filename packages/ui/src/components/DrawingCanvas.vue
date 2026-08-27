@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
+import type { Dimensions } from '../types'
 
 const props = defineProps<{
-  height: number
-  width: number
+  dimensions: Dimensions
   options?: {
     lineWidth?: number
     lineCap?: 'butt' | 'round' | 'square'
@@ -102,8 +102,8 @@ function redoLine() {
 <template>
   <canvas
     ref="canvasRef"
-    :height="height"
-    :width="width"
+    :height="dimensions.height"
+    :width="dimensions.width"
     class="drawing-canvas"
     @mouseleave="stopDrawing"
   ></canvas>

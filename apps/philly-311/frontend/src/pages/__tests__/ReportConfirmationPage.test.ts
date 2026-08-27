@@ -1,10 +1,22 @@
-// ABOUTME: Tests for ReportConfirmationPage — reference number from store.submitted
-// ABOUTME: and the report-another / finder links.
-import { describe, it, expect, beforeEach } from 'vitest'
+// ABOUTME: Tests for ReportConfirmationPage — the success banner, the submitted
+// ABOUTME: report detail, and the report-another / finder links.
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
+import { defineComponent, h } from 'vue'
 import { setActivePinia, createPinia } from 'pinia'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import ReportConfirmationPage from '../ReportConfirmationPage.vue'
+
+// The chassis index pulls phila dist CSS vitest can't load; stub DetailActions.
+// Share behavior itself is covered by the chassis's DetailActions.test.ts.
+vi.mock('@pinboard/ui', () => ({
+  DetailActions: defineComponent({
+    name: 'DetailActions',
+    setup() {
+      return () => h('div')
+    },
+  }),
+}))
 
 const RouterLinkStub = {
   template: '<a :href="String(to)" class="router-link-stub"><slot /></a>',
@@ -20,17 +32,30 @@ function mountPage() {
 beforeEach(() => setActivePinia(createPinia()))
 
 describe('ReportConfirmationPage', () => {
-  it('announces success and shows the case number in a status region', () => {
+  it('announces success in a status region', () => {
     useReportSubmissionStore().recordSubmission({ id: 'a1', caseNumber: '311-0042' })
     const w = mountPage()
     const status = w.find('[role="status"]')
-    expect(status.text()).toContain('your report was submitted')
-    expect(status.text()).toContain('311-0042')
+    expect(status.text()).toContain('Success!')
+    expect(status.text()).toContain('Your report was submitted')
   })
 
-  it('falls back to the id when there is no caseNumber', () => {
-    useReportSubmissionStore().recordSubmission({ id: 'a1' })
-    expect(mountPage().find('[role="status"]').text()).toContain('a1')
+  it('renders the submitted report, including its request id, via ReportDetailContent', () => {
+    useReportSubmissionStore().recordSubmission({
+      id: 'a1',
+      caseNumber: '311-0042',
+      serviceType: 'Pothole Repair',
+      address: '1234 Market St',
+    })
+    const w = mountPage()
+    expect(w.find('.confirmation__detail').text()).toContain('Pothole Repair')
+    expect(w.find('.confirmation__detail').text()).toContain('1234 Market St')
+    expect(w.find('.confirmation__detail').text()).toContain('311-0042')
+  })
+
+  it('renders without a detail panel when nothing was submitted', () => {
+    const w = mountPage()
+    expect(w.find('.confirmation__detail').exists()).toBe(false)
   })
 
   it('links to a new report and to the finder', () => {

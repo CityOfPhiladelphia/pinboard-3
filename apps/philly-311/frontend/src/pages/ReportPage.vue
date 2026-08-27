@@ -21,7 +21,21 @@ const router = useRouter()
 const route = useRoute()
 const store = useReportSubmissionStore()
 const myCases = useMyCasesStore()
+
 const exitOpen = ref(false)
+watch(
+  exitOpen,
+  (isOpen, wasOpen) => {
+    if (isOpen) {
+      router.push(`?${store.stateToUrlQueryParams()}`)
+    } else if (!isOpen && wasOpen) {
+      router.back()
+    } else {
+      router.replace({ query: {} })
+    }
+  },
+  { immediate: true },
+)
 
 const STEPS = [
   { title: 'Image', path: '/report' },
@@ -103,11 +117,9 @@ function discardAndExit() {
         @navigate="(path: string) => router.push(path)"
       />
     </div>
-
-    <section class="wizard__content">
+    <div class="wizard__content">
       <RouterView />
-    </section>
-
+    </div>
     <footer class="wizard__nav">
       <PhilaButton
         size="extra-small"
@@ -150,7 +162,8 @@ function discardAndExit() {
     'w_header'
     'w_content'
     'w_footer';
-  grid-template-rows: 9rem auto 7rem;
+  grid-template-rows: 9rem 1fr 7rem;
+  row-gap: var(--spacing-s, 0.75rem);
   height: 100%;
   width: 100%;
   margin: 0 auto;
@@ -184,10 +197,8 @@ function discardAndExit() {
 
 .wizard__content {
   grid-area: w_content;
-  padding: var(--spacing-l, 2rem) 0;
   margin: 0 var(--scale-1000, 5rem);
-  overflow-y: auto;
-  overflow-x: auto;
+  overflow: hidden;
 }
 
 /* Sticky so Exit/Back/Next stay reachable: the wizard scrolls internally

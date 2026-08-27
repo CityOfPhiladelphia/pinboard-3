@@ -12,6 +12,8 @@ import type {
 } from '@/types/wizard'
 import { charCodeToString, stringToCharCode } from '@pinboard/core'
 import type { LocationQuery } from 'vue-router'
+import type { PinboardTypes } from '@pinboard/ui'
+import { decodePhotoInfo, encodePhotoInfo } from '@/utils/encodeDecodePhoto'
 
 interface State {
   category: string | null
@@ -44,7 +46,12 @@ const initial = (): State => ({
   customFields: {},
   location: null,
   description: '',
-  photo: {},
+  photo: {
+    dimensions: {
+      height: 1,
+      width: 1,
+    },
+  },
   contact: {},
   publicVisibility: false,
   photoSuggestions: [],
@@ -86,6 +93,9 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
       }
       this.photo.previewUrl = photo
     },
+    setPhotoDimensions(dimensions: PinboardTypes.Dimensions) {
+      this.photo.dimensions = dimensions
+    },
     setDescription(description: string) {
       this.description = description
     },
@@ -95,9 +105,16 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     setPrivacy(publicVisibility: boolean) {
       this.publicVisibility = publicVisibility
     },
-    reset() {
+    resetPhoto() {
       this.setPhoto(undefined)
       this.setPhotoPreview(undefined)
+      this.setPhotoDimensions({
+        height: 1,
+        width: 1,
+      })
+    },
+    reset() {
+      this.resetPhoto()
       // Function form: the object form deep-merges plain objects, which would
       // leave customFields/contact entries behind.
       this.$patch((state) => {
@@ -106,8 +123,7 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     },
     /** Record a successful submit and clear the wizard for a fresh report. */
     recordSubmission(result: SubmittedReport) {
-      this.setPhoto(undefined)
-      this.setPhotoPreview(undefined)
+      this.resetPhoto()
       this.$patch((state) => {
         Object.assign(state, initial(), { submitted: result })
       })
@@ -154,7 +170,7 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
                 : null
             }
             case 'photo': {
-              return storeValue ? `p=${stringToCharCode(storeValue.mediaUrl)}` : null
+              return storeValue ? `p=${stringToCharCode(encodePhotoInfo(storeValue))}` : null
             }
             case 'contact': {
               return Object.keys(storeValue).length
@@ -197,7 +213,7 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
             break
           }
           case 'p': {
-            this.photo = { mediaUrl: JSON.parse(charCodeToString(queryValue)) }
+            this.photo = decodePhotoInfo(charCodeToString(queryValue))
             break
           }
           case 'co': {

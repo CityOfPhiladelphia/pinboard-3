@@ -9,6 +9,7 @@ import ReviewSummary from '@/components/wizard/ReviewSummary.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { Callout } from '@phila/phila-ui-callout'
 import type { SubmitResponse } from '@/types/wizard'
+import ReportStep from './ReportStep.vue'
 
 const GENERIC_ERROR = 'Something went wrong submitting your report. Please try again.'
 
@@ -39,41 +40,45 @@ async function submit() {
     errorMessage.value = submitError.value?.message || GENERIC_ERROR
     return
   }
-  store.recordSubmission({ id: result.id, caseNumber: result.caseNumber })
+  store.recordSubmission(result)
   router.push('/report/confirmation')
 }
 </script>
 
 <template>
-  <div class="review-step">
-    <h1 class="review-step__title">Review</h1>
-    <p class="review-step__intro">Check your report before submitting.</p>
+  <ReportStep :step-title="'Review'">
+    <template #step-content>
+      <div class="review-step">
+        <p class="review-step__intro">Check your report before submitting.</p>
 
-    <ReviewSummary />
+        <ReviewSummary />
 
-    <Callout
-      v-if="errorMessage"
-      class="review-step__error"
-      type="error"
-      role="alert"
-      :message="errorMessage"
-    />
+        <Callout
+          v-if="errorMessage"
+          class="review-step__error"
+          type="error"
+          role="alert"
+          :message="errorMessage"
+        />
 
-    <PhilaButton
-      type="button"
-      class="review-step__submit"
-      data-test="review-submit"
-      :disabled="!canSubmit"
-      @click="submit"
-    >
-      {{ submitting ? 'Submitting…' : 'Submit report' }}
-    </PhilaButton>
-  </div>
+        <PhilaButton
+          type="button"
+          class="review-step__submit"
+          data-test="review-submit"
+          :disabled="!canSubmit"
+          @click="submit"
+        >
+          {{ submitting ? 'Submitting…' : 'Submit report' }}
+        </PhilaButton>
+      </div>
+    </template>
+  </ReportStep>
 </template>
 
 <style scoped>
 .review-step {
   max-width: 640px;
+  overflow: auto;
 }
 .review-step__title {
   font-size: 1.25rem;
