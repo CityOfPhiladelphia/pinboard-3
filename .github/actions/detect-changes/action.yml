@@ -1,9 +1,5 @@
 name: Detect changed apps
 description: 'Check which apps have changes that need to be shipped'
-inputs:
-  branch-name:
-    required: true
-    description: 'Branch to check for changes'
 outputs:
   oem:
     description: 'OEM Finder has changes'
@@ -16,13 +12,10 @@ outputs:
     value: ${{ steps.changes.outputs.phil311 }}
 runs-on: ubuntu-latest
 
-if: endsWith(github.ref, inputs.branch-name) && github.event_name == 'push'
-
 runs:
   using: 'composite'
   steps:
     - name: Check changed files
-      id: changes
       shell: bash
       run: |
         CHANGED=$(git diff --name-only HEAD^1 HEAD)
@@ -33,19 +26,19 @@ runs:
         ci_changed() { echo "$CHANGED" | grep -q "^\.github/workflows/ci\.yml$"; }
 
         if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
-          echo "::set-output name=oem::$(echo true)"
+          echo "oem=true" >> $GITHUB_OUTPUT
         else
-          echo "::set-output name=oem::$(echo false)"
+          echo "oem=false" >> $GITHUB_OUTPUT
         fi
 
         if packages_changed || app_changed "primary-care-finder" || ci_changed; then
-          echo "::set-output name=pcf::$(echo true)"
+          echo "pcf=true" >> $GITHUB_OUTPUT
         else
-          echo "::set-output name=pcf::$(echo false)"
+          echo "pcf=false" >> $GITHUB_OUTPUT
         fi
 
         if packages_changed || app_changed "philly-311" || ci_changed; then
-          echo "::set-output name=phil311::$(echo true)"
+          echo "phil311=true" >> $GITHUB_OUTPUT
         else
-          echo "::set-output name=phil311::$(echo false)"
+          echo "phil311=false" >> $GITHUB_OUTPUT
         fi
