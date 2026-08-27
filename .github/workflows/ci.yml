@@ -64,7 +64,7 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout code ${{ needs.detect-changes-test.outputs }}
+      - name: Checkout code ${{ needs.detect-changes-test.outputs.phil311 }}
         uses: actions/checkout@v6
 
       - name: Ship to test with ctl
