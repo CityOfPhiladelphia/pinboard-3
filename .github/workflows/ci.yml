@@ -69,7 +69,7 @@ jobs:
 
       - name: Print outputs
         run: |
-          echo ${{ needs.detect-changes-test.outputs }}
+          echo ${{ needs.detect-changes-test.outputs.phil311 }}
 
       - name: Ship to test with ctl
         uses: ./.github/actions/ship-app
