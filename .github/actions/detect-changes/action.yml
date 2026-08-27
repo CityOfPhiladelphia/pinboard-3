@@ -33,19 +33,19 @@ runs:
         ci_changed() { echo "$CHANGED" | grep -q "^\.github/workflows/ci\.yml$"; }
 
         if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
-          echo "oem=true" >> $GITHUB_OUTPUT
+          echo "::set-output name=oem::$(echo true)"
         else
-          echo "oem=false" >> $GITHUB_OUTPUT
+          echo "::set-output name=oem::$(echo false)"
         fi
 
         if packages_changed || app_changed "primary-care-finder" || ci_changed; then
-          echo "pcf=true" >> $GITHUB_OUTPUT
+          echo "::set-output name=pcf::$(echo true)"
         else
-          echo "pcf=false" >> $GITHUB_OUTPUT
+          echo "::set-output name=pcf::$(echo false)"
         fi
 
         if packages_changed || app_changed "philly-311" || ci_changed; then
-          echo "phil311=true" >> $GITHUB_OUTPUT
+          echo "::set-output name=phil311::$(echo true)"
         else
-          echo "phil311=false" >> $GITHUB_OUTPUT
+          echo "::set-output name=phil311::$(echo false)"
         fi
