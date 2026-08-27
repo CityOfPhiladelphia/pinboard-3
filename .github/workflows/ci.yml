@@ -65,11 +65,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Print outputs
-        run: |
-          echo ${{ needs.detect-changes-test.outputs.phil311 }}
-
-      - name: Ship to test with ctl
+      - name: Ship to ${{ github.ref == 'refs/heads/main' && 'main' || 'test' }} with ctl
         uses: ./.github/actions/ship-app
         with:
           app-name: 'philly-311'
