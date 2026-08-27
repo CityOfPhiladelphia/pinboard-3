@@ -47,7 +47,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: (Action) detect changes
-        uses: ..github/actions/detect-changes
+        uses: ./.github/actions/detect-changes
         with:
           branch-name: 'test'
 
