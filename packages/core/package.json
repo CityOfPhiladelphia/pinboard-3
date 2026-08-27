@@ -32,6 +32,7 @@
     "@repo/typescript-config": "workspace:*",
     "vite": "catalog:",
     "typescript": "catalog:",
-    "@types/geojson": "^7946.0.16"
+    "@types/geojson": "^7946.0.16",
+    "@types/node": "catalog:"
   }
 }

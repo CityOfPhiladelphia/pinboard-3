@@ -37,6 +37,7 @@
     "prettier": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-vue-devtools": "catalog:"
+    "vite-plugin-vue-devtools": "catalog:",
+    "@types/node": "catalog:"
   }
 }
