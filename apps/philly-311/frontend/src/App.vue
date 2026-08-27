@@ -111,8 +111,8 @@ function login() {
 }
 
 .spinner {
-  width: 3rem;
-  height: 3rem;
+  width: 2rem;
+  height: 2rem;
   border: 3px solid var(--Schemes-Border-low, #e3e3e3);
   border-top-color: var(--Schemes-Primary, #002855);
   border-radius: 50%;
