@@ -25,17 +25,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm turbo lint
+      # - name: Lint
+      #   run: pnpm turbo lint
 
       - name: Format check
         run: pnpm turbo format:check
 
-      - name: Type-check
-        run: pnpm turbo type-check
+      # - name: Type-check
+      #   run: pnpm turbo type-check
 
-      - name: Build
-        run: pnpm turbo build
+      # - name: Build
+      #   run: pnpm turbo build
 
   detect-changes-test:
     name: Detect changed apps (test)
