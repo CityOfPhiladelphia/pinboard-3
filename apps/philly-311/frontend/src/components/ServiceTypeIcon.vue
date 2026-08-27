@@ -29,4 +29,10 @@ const style = computed(() => ({
   justify-content: center;
   color: #fff;
 }
+
+.service-type-icon :deep(svg) {
+  display: block;
+  width: 60%;
+  height: 60%;
+}
 </style>

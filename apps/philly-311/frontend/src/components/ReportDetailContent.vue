@@ -3,15 +3,22 @@
      the service type's custom-field answers. Shared by the location-detail panel
      (map pin / my-requests selection) and the post-submit confirmation page. -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { CloseButton, PhilaButton } from '@phila/phila-ui-button'
 import { Callout } from '@phila/phila-ui-callout'
-import { Tags } from '@phila/phila-ui-tags'
+import { FilterChip } from '@phila/phila-ui-filter-chip'
 import { Icon } from '@phila/phila-ui-core'
 import { IconArrowUp, IconLock, IconGlobe, IconBars } from '@phila/phila-ui-core/icons'
 import { DetailActions } from '@pinboard/ui'
 import type { Issue } from '@/types/api'
-import { statusTagColor, statusTagIcon } from '@/utils/reportCard'
+import {
+  statusBucket,
+  statusTagColor,
+  statusTagIcon,
+  statusTagStyle,
+} from '@/composables/useReportStatus'
+import { serviceTypeTintStyle } from '@/utils/serviceTypeMeta'
+import { serviceTypeIconComponent } from '@/utils/reportIcon'
 
 const props = withDefaults(
   defineProps<{
@@ -33,6 +40,11 @@ const props = withDefaults(
     onUpvote: undefined,
   },
 )
+
+const bucket = computed(() => statusBucket(props.report.status))
+
+const placeholderStyle = computed(() => serviceTypeTintStyle(props.report.serviceType))
+const placeholderIcon = computed(() => serviceTypeIconComponent(props.report.serviceType))
 
 function formatWhen(iso?: string): string {
   if (!iso) return ''
@@ -83,20 +95,22 @@ async function confirmUpvote() {
 
     <div class="report-detail__body">
       <div class="report-detail__body-inner">
-        <div v-if="report.status || report.private !== undefined" class="report-detail__badges">
-          <Tags
-            v-if="report.status"
-            variant="readonly"
+        <div v-if="bucket || report.private !== undefined" class="report-detail__badges">
+          <FilterChip
+            v-if="bucket"
+            tabindex="-1"
             size="small"
-            :color="statusTagColor(report.status)"
-            :icon="statusTagIcon(report.status)"
+            :color="statusTagColor(bucket)"
+            :icon="statusTagIcon(bucket)"
+            :style="statusTagStyle(bucket)"
             :text="report.status"
           />
-          <Tags
+          <FilterChip
             v-if="report.private !== undefined"
-            variant="readonly"
+            tabindex="-1"
             size="small"
             color="white"
+            style="cursor: default"
             :icon="report.private ? IconLock : IconGlobe"
             :text="report.private ? 'Private' : 'Public'"
           />
@@ -107,6 +121,14 @@ async function confirmUpvote() {
           :alt="report.serviceType"
           class="report-detail__img"
         />
+        <div
+          v-else
+          class="report-detail__img report-detail__img--placeholder"
+          :style="placeholderStyle"
+          aria-hidden="true"
+        >
+          <Icon :icon="placeholderIcon" decorative size="extra-large" />
+        </div>
         <p v-if="report.description" class="report-detail__desc">{{ report.description }}</p>
         <div v-if="SHOW_ACTIONS" class="report-detail__actions">
           <PhilaButton
@@ -250,6 +272,11 @@ async function confirmUpvote() {
   height: 200px;
   object-fit: cover;
   border-radius: 8px;
+}
+.report-detail__img--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .report-detail__badges {
   display: flex;

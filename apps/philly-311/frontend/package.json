@@ -17,9 +17,11 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@phila/phila-ui-app-header": "catalog:",
     "@phila/phila-ui-breadcrumbs": "catalog:",
     "@phila/phila-ui-button": "catalog:",
     "@phila/phila-ui-callout": "catalog:",
+    "@phila/phila-ui-cards": "catalog:",
     "@phila/phila-ui-checkbox": "catalog:",
     "@phila/phila-ui-core": "catalog:",
     "@phila/phila-ui-date-field": "catalog:",
