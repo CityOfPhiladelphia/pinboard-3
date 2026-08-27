@@ -8,11 +8,6 @@ runs-on: ubuntu-latest
 
 if: github.ref == 'refs/heads/${{ inputs.branch-name }}' && github.event_name == 'push'
 
-outputs:
-  oem: ${{ steps.changes.outputs.oem }}
-  pcf: ${{ steps.changes.outputs.pcf }}
-  phil311: ${{ steps.changes.outputs.phil311 }}
-
 steps:
   - uses: actions/checkout@v5
     with:
@@ -29,19 +24,19 @@ steps:
       ci_changed() { echo "$CHANGED" | grep -q "^\.github/workflows/ci\.yml$"; }
 
       if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
-        echo "oem=true" >> $GITHUB_OUTPUT
+        echo "oem=true" >> $GITHUB_ENV
       else
-        echo "oem=false" >> $GITHUB_OUTPUT
+        echo "oem=false" >> $GITHUB_ENV
       fi
 
       if packages_changed || app_changed "primary-care-finder" || ci_changed; then
-        echo "pcf=true" >> $GITHUB_OUTPUT
+        echo "pcf=true" >> $GITHUB_ENV
       else
-        echo "pcf=false" >> $GITHUB_OUTPUT
+        echo "pcf=false" >> $GITHUB_ENV
       fi
 
       if packages_changed || app_changed "philly-311" || ci_changed; then
-        echo "phil311=true" >> $GITHUB_OUTPUT
+        echo "phil311=true" >> $GITHUB_ENV
       else
-        echo "phil311=false" >> $GITHUB_OUTPUT
+        echo "phil311=false" >> $GITHUB_ENV
       fi
