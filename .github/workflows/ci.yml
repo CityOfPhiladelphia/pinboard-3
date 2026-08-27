@@ -57,14 +57,14 @@ jobs:
     name: Ship Philly 311 to test
     runs-on: ubuntu-latest
     needs: detect-changes-test
-    # if: needs.detect-changes-test.outputs.phil311 == 'true'
+    if: needs.detect-changes-test.outputs.phil311 == 'true'
 
     permissions:
       id-token: write
       contents: read
 
     steps:
-      - name: Checkout code ${{ needs.detect-changes-test.outputs.phil311 }}
+      - name: Checkout code
         uses: actions/checkout@v6
 
       - name: Ship to test with ctl
