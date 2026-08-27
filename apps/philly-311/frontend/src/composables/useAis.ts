@@ -24,7 +24,7 @@ export async function autocompleteAddresses(
   signal?: AbortSignal,
 ): Promise<AisAutocompleteResult[]> {
   if (!q.trim()) return []
-  const url = buildUrl(autocompleteBase(), '/autocomplete', { q, gatekeeperKey: gatekeeperKey() })
+  const url = buildUrl(autocompleteBase(), '/autocomplete', { q, client_id: gatekeeperKey() })
   const res = await fetch(url, { signal })
   if (!res.ok) throw new Error(`AIS autocomplete failed: ${res.status}`)
   const data = await res.json()
@@ -37,7 +37,7 @@ export async function autocompleteAddresses(
 
 async function searchByPath(path: string, signal?: AbortSignal): Promise<AisFeature | null> {
   const url = buildUrl(searchBase(), `/search/${encodeURIComponent(path)}`, {
-    gatekeeperKey: gatekeeperKey(),
+    client_id: gatekeeperKey(),
   })
   const res = await fetch(url, { signal })
   if (!res.ok) return null

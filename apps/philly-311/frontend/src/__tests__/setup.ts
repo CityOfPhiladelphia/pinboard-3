@@ -16,7 +16,6 @@ vi.stubGlobal(
 )
 
 vi.stubEnv('VITE_API_BASE_URL', 'https://api.example.test')
-vi.stubEnv('VITE_API_KEY', 'test-api-key')
 vi.stubEnv('VITE_SSO_CLIENT_ID', 'test-client')
 vi.stubEnv('VITE_SSO_TENANT', 'test')
 vi.stubEnv('VITE_SSO_AUTHORITY_DOMAIN', 'test.b2clogin.com')
