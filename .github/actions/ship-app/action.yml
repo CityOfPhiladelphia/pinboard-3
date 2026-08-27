@@ -24,9 +24,11 @@ runs:
         cache: pnpm
 
     - name: Install dependencies
+      shell: bash
       run: pnpm install --frozen-lockfile
 
     - name: Install city CLI
+      shell: bash
       run: npm install -g @phila/cli
 
     - name: Configure AWS credentials
@@ -36,8 +38,10 @@ runs:
         aws-region: us-east-1
 
     - name: Build workspace dependencies
+      shell: bash
       run: pnpm turbo build --filter=@pinboard/${ inputs.app-name }^...
 
-    - name: Ship to ${ inputs.environment-name }
+    - name: Ship to ${{ inputs.environment-name }}
       working-directory: apps/${{ inputs.app-name }}
+      shell: bash
       run: city ship ${ inputs.environment-name } --web

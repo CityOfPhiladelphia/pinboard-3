@@ -1,0 +1,37 @@
+name: 'Ship all apps with ctl'
+description: 'Uses cloud template library to ship all apps to AWS'
+inputs:
+  environment-name:
+    required: true
+    description: 'Environment to ship to'
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v5
+
+    - uses: pnpm/action-setup@v5
+
+    - uses: actions/setup-node@v5
+      with:
+        node-version: 24
+        cache: pnpm
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    - name: Install city CLI
+      run: npm install -g @phila/cli
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ inputs.role-arn }}
+        aws-region: us-east-1
+
+    - name: Build workspace dependencies
+      run: pnpm turbo build --filter=@pinboard/${ inputs.app-name }^...
+
+    - name: Ship to ${ inputs.environment-name }
+      working-directory: apps/${{ inputs.app-name }}
+      run: city ship ${ inputs.environment-name } --web
