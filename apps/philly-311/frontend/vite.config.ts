@@ -24,9 +24,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://wdw5s1yfxg.execute-api.us-east-1.amazonaws.com',
+        target: process.env.VITE_311_API_URL,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/dev'),
+        rewrite: (path) => path.replace(/^\/api/, `${process.env.VITE_API_PROXY}`),
       },
     },
   },

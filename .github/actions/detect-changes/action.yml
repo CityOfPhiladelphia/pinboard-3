@@ -1,0 +1,47 @@
+name: Detect changed apps
+description: 'Check which apps have changes that need to be shipped'
+inputs:
+  branch-name:
+    required: true
+    description: 'Branch to check for changes'
+runs-on: ubuntu-latest
+
+if: github.ref == 'refs/heads/${{ inputs.branch-name }}' && github.event_name == 'push'
+
+outputs:
+  oem: ${{ steps.changes.outputs.oem }}
+  pcf: ${{ steps.changes.outputs.pcf }}
+  phil311: ${{ steps.changes.outputs.phil311 }}
+
+steps:
+  - uses: actions/checkout@v5
+    with:
+    fetch-depth: 2
+
+  - name: Check changed files
+    id: changes
+    run: |
+      CHANGED=$(git diff --name-only HEAD^1 HEAD)
+      echo "$CHANGED"
+
+      packages_changed() { echo "$CHANGED" | grep -q "^packages/"; }
+      app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
+      ci_changed() { echo "$CHANGED" | grep -q "^\.github/workflows/ci\.yml$"; }
+
+      if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
+        echo "oem=true" >> $GITHUB_OUTPUT
+      else
+        echo "oem=false" >> $GITHUB_OUTPUT
+      fi
+
+      if packages_changed || app_changed "primary-care-finder" || ci_changed; then
+        echo "pcf=true" >> $GITHUB_OUTPUT
+      else
+        echo "pcf=false" >> $GITHUB_OUTPUT
+      fi
+
+      if packages_changed || app_changed "philly-311" || ci_changed; then
+        echo "phil311=true" >> $GITHUB_OUTPUT
+      else
+        echo "phil311=false" >> $GITHUB_OUTPUT
+      fi

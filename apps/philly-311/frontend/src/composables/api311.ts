@@ -2,23 +2,27 @@
 // ABOUTME: path onto VITE_API_BASE_URL so stage paths (".../test", ".../dev")
 // ABOUTME: and the same-origin dev proxy ("/api") both round-trip cleanly.
 import type { useAuth } from '@phila/sso-vue'
+import { ref } from 'vue'
 
 export type Auth = ReturnType<typeof useAuth>
 
 export type QueryParams = Record<string, string | number | boolean | undefined>
 
+const key = ref('')
+
 async function apiKey(): Promise<string> {
-  const url = 'https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/get311Info'
+  if (key.value) return key.value
   const params = new URLSearchParams({
     apiUrl: 'wdw5s1yfxg',
   })
+  const url = `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/get311Info?${params.toString()}`
   try {
-    const response = await fetch(`${url}?${params.toString()}`)
+    const response = await fetch(url)
     if (!response.ok) {
       return ''
     }
-    const res = (await response.text()) as string
-    return res
+    key.value = (await response.text()) as string
+    return key.value
   } catch (e) {
     console.error(e)
     return ''

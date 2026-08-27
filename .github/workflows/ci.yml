@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, test]
+    branches: [main, test, task/make-usable-on-test-site]
 
 jobs:
   check:
@@ -41,242 +41,241 @@ jobs:
     name: Detect changed apps (test)
     runs-on: ubuntu-latest
     needs: check
-    if: github.ref == 'refs/heads/test' && github.event_name == 'push'
+    uses: ./.github/actions/detect-changes
+    with:
+      branch-name: 'test'
 
-    outputs:
-      oem: ${{ steps.changes.outputs.oem }}
-      pcf: ${{ steps.changes.outputs.pcf }}
-
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 2
-
-      - name: Check changed files
-        id: changes
-        run: |
-          CHANGED=$(git diff --name-only HEAD^1 HEAD)
-          echo "$CHANGED"
-
-          packages_changed() { echo "$CHANGED" | grep -q "^packages/"; }
-          app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
-          ci_changed() { echo "$CHANGED" | grep -q "^\.github/workflows/ci\.yml$"; }
-
-          if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
-            echo "oem=true" >> $GITHUB_OUTPUT
-          else
-            echo "oem=false" >> $GITHUB_OUTPUT
-          fi
-
-          if packages_changed || app_changed "primary-care-finder" || ci_changed; then
-            echo "pcf=true" >> $GITHUB_OUTPUT
-          else
-            echo "pcf=false" >> $GITHUB_OUTPUT
-          fi
-
-  deploy-test-oem-flood-finder:
-    name: Deploy oem-flood-finder to test
+  ship-test-philly-311:
+    name: Ship Philly 311 to test
     runs-on: ubuntu-latest
     needs: detect-changes-test
-    if: needs.detect-changes-test.outputs.oem == 'true'
+    if: needs.detect-changes-test.outputs.phil311 == 'true'
 
     permissions:
       id-token: write
       contents: read
 
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v5
-
-      - uses: actions/setup-node@v5
+      - name: Ship to test with ctl
+        uses: ./.github/actions/ship-app
         with:
-          node-version: 24
-          cache: pnpm
+          app-name: 'philly-311'
+          environment-name: 'test'
+          role-arn: ${{ secrets.AWS_DEPLOY_ROLE_ARN_311 }}
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  # deploy-test-oem-flood-finder:
+  #   name: Deploy oem-flood-finder to test
+  #   runs-on: ubuntu-latest
+  #   needs: detect-changes-test
+  #   if: needs.detect-changes-test.outputs.oem == 'true'
 
-      - name: Install city CLI
-        run: npm install -g @phila/cli
+  #   permissions:
+  #     id-token: write
+  #     contents: read
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN_TEST_OEM }}
-          aws-region: us-east-1
+  #   steps:
+  #     - uses: actions/checkout@v5
 
-      - name: Build workspace dependencies
-        run: pnpm turbo build --filter=@pinboard/oem-flood-finder^...
+  #     - uses: pnpm/action-setup@v5
 
-      - name: Deploy to test
-        working-directory: apps/oem-flood-finder
-        env:
-          CI: 'true'
-          VITE_FLOOD_API_KEY: ${{ secrets.FLOOD_API_KEY_TEST }}
-          VITE_FLOOD_API_BASE_URL: ${{ secrets.FLOOD_API_BASE_URL_TEST }}
-          VITE_AIS_URL: ${{ secrets.AIS_URL }}
-        run: city ship test --web
+  #     - uses: actions/setup-node@v5
+  #       with:
+  #         node-version: 24
+  #         cache: pnpm
 
-  deploy-test-primary-care-finder:
-    name: Deploy primary-care-finder to test
-    runs-on: ubuntu-latest
-    needs: detect-changes-test
-    if: needs.detect-changes-test.outputs.pcf == 'true'
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
 
-    permissions:
-      id-token: write
-      contents: read
+  #     - name: Install city CLI
+  #       run: npm install -g @phila/cli
 
-    steps:
-      - uses: actions/checkout@v5
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN_TEST_OEM }}
+  #         aws-region: us-east-1
 
-      - uses: pnpm/action-setup@v5
+  #     - name: Build workspace dependencies
+  #       run: pnpm turbo build --filter=@pinboard/oem-flood-finder^...
 
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: pnpm
+  #     - name: Deploy to test
+  #       working-directory: apps/oem-flood-finder
+  #       env:
+  #         CI: 'true'
+  #         VITE_FLOOD_API_KEY: ${{ secrets.FLOOD_API_KEY_TEST }}
+  #         VITE_FLOOD_API_BASE_URL: ${{ secrets.FLOOD_API_BASE_URL_TEST }}
+  #         VITE_AIS_URL: ${{ secrets.AIS_URL }}
+  #       run: city ship test --web
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  # deploy-test-primary-care-finder:
+  #   name: Deploy primary-care-finder to test
+  #   runs-on: ubuntu-latest
+  #   needs: detect-changes-test
+  #   if: needs.detect-changes-test.outputs.pcf == 'true'
 
-      - name: Install city CLI
-        run: npm install -g @phila/cli
+  #   permissions:
+  #     id-token: write
+  #     contents: read
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN_TEST_PCF }}
-          aws-region: us-east-1
+  #   steps:
+  #     - uses: actions/checkout@v5
 
-      - name: Build workspace dependencies
-        run: pnpm turbo build --filter=@pinboard/primary-care-finder^...
+  #     - uses: pnpm/action-setup@v5
 
-      - name: Deploy to test
-        working-directory: apps/primary-care-finder
-        env:
-          CI: 'true'
-        run: city ship test --web
+  #     - uses: actions/setup-node@v5
+  #       with:
+  #         node-version: 24
+  #         cache: pnpm
 
-  detect-changes-prod:
-    name: Detect changed apps (prod)
-    runs-on: ubuntu-latest
-    needs: check
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
 
-    outputs:
-      oem: ${{ steps.changes.outputs.oem }}
-      pcf: ${{ steps.changes.outputs.pcf }}
+  #     - name: Install city CLI
+  #       run: npm install -g @phila/cli
 
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 2
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN_TEST_PCF }}
+  #         aws-region: us-east-1
 
-      - name: Check changed files
-        id: changes
-        run: |
-          CHANGED=$(git diff --name-only HEAD^1 HEAD)
-          echo "$CHANGED"
+  #     - name: Build workspace dependencies
+  #       run: pnpm turbo build --filter=@pinboard/primary-care-finder^...
 
-          packages_changed() { echo "$CHANGED" | grep -q "^packages/"; }
-          app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
-          ci_changed() { echo "$CHANGED" | grep -q "^\.github/workflows/ci\.yml$"; }
+  #     - name: Deploy to test
+  #       working-directory: apps/primary-care-finder
+  #       env:
+  #         CI: 'true'
+  #       run: city ship test --web
 
-          if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
-            echo "oem=true" >> $GITHUB_OUTPUT
-          else
-            echo "oem=false" >> $GITHUB_OUTPUT
-          fi
+  # detect-changes-prod:
+  #   name: Detect changed apps (prod)
+  #   runs-on: ubuntu-latest
+  #   needs: check
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
-          if packages_changed || app_changed "primary-care-finder" || ci_changed; then
-            echo "pcf=true" >> $GITHUB_OUTPUT
-          else
-            echo "pcf=false" >> $GITHUB_OUTPUT
-          fi
+  #   outputs:
+  #     oem: ${{ steps.changes.outputs.oem }}
+  #     pcf: ${{ steps.changes.outputs.pcf }}
+  #     phil311: ${{ steps.changes.outputs.phil311 }}
 
-  deploy-prod-oem-flood-finder:
-    name: Deploy oem-flood-finder to prod
-    runs-on: ubuntu-latest
-    needs: detect-changes-prod
-    if: needs.detect-changes-prod.outputs.oem == 'true'
+  #   steps:
+  #     - uses: actions/checkout@v5
+  #       with:
+  #         fetch-depth: 2
 
-    permissions:
-      id-token: write
-      contents: read
+  #     - name: Check changed files
+  #       id: changes
+  #       run: |
+  #         CHANGED=$(git diff --name-only HEAD^1 HEAD)
+  #         echo "$CHANGED"
 
-    steps:
-      - uses: actions/checkout@v5
+  #         packages_changed() { echo "$CHANGED" | grep -q "^packages/"; }
+  #         app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
+  #         ci_changed() { echo "$CHANGED" | grep -q "^\.github/workflows/ci\.yml$"; }
 
-      - uses: pnpm/action-setup@v5
+  #         if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
+  #           echo "oem=true" >> $GITHUB_OUTPUT
+  #         else
+  #           echo "oem=false" >> $GITHUB_OUTPUT
+  #         fi
 
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: pnpm
+  #         if packages_changed || app_changed "primary-care-finder" || ci_changed; then
+  #           echo "pcf=true" >> $GITHUB_OUTPUT
+  #         else
+  #           echo "pcf=false" >> $GITHUB_OUTPUT
+  #         fi
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  #         if packages_changed || app_changed "philly-311" || ci_changed; then
+  #           echo "phil311=true" >> $GITHUB_OUTPUT
+  #         else
+  #           echo "phil311=false" >> $GITHUB_OUTPUT
+  #         fi
 
-      - name: Install city CLI
-        run: npm install -g @phila/cli
+  # deploy-prod-oem-flood-finder:
+  #   name: Deploy oem-flood-finder to prod
+  #   runs-on: ubuntu-latest
+  #   needs: detect-changes-prod
+  #   if: needs.detect-changes-prod.outputs.oem == 'true'
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD_OEM }}
-          aws-region: us-east-1
+  #   permissions:
+  #     id-token: write
+  #     contents: read
 
-      - name: Build workspace dependencies
-        run: pnpm turbo build --filter=@pinboard/oem-flood-finder^...
+  #   steps:
+  #     - uses: actions/checkout@v5
 
-      - name: Deploy to prod
-        working-directory: apps/oem-flood-finder
-        env:
-          CI: 'true'
-          VITE_FLOOD_API_KEY: ${{ secrets.FLOOD_API_KEY_PROD }}
-          VITE_FLOOD_API_BASE_URL: ${{ secrets.FLOOD_API_BASE_URL_PROD }}
-          VITE_AIS_URL: ${{ secrets.AIS_URL }}
-        run: city ship prod --web
+  #     - uses: pnpm/action-setup@v5
 
-  deploy-prod-primary-care-finder:
-    name: Deploy primary-care-finder to prod
-    runs-on: ubuntu-latest
-    needs: detect-changes-prod
-    if: needs.detect-changes-prod.outputs.pcf == 'true'
+  #     - uses: actions/setup-node@v5
+  #       with:
+  #         node-version: 24
+  #         cache: pnpm
 
-    permissions:
-      id-token: write
-      contents: read
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
 
-    steps:
-      - uses: actions/checkout@v5
+  #     - name: Install city CLI
+  #       run: npm install -g @phila/cli
 
-      - uses: pnpm/action-setup@v5
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD_OEM }}
+  #         aws-region: us-east-1
 
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: pnpm
+  #     - name: Build workspace dependencies
+  #       run: pnpm turbo build --filter=@pinboard/oem-flood-finder^...
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  #     - name: Deploy to prod
+  #       working-directory: apps/oem-flood-finder
+  #       env:
+  #         CI: 'true'
+  #         VITE_FLOOD_API_KEY: ${{ secrets.FLOOD_API_KEY_PROD }}
+  #         VITE_FLOOD_API_BASE_URL: ${{ secrets.FLOOD_API_BASE_URL_PROD }}
+  #         VITE_AIS_URL: ${{ secrets.AIS_URL }}
+  #       run: city ship prod --web
 
-      - name: Install city CLI
-        run: npm install -g @phila/cli
+  # deploy-prod-primary-care-finder:
+  #   name: Deploy primary-care-finder to prod
+  #   runs-on: ubuntu-latest
+  #   needs: detect-changes-prod
+  #   if: needs.detect-changes-prod.outputs.pcf == 'true'
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD_PCF }}
-          aws-region: us-east-1
+  #   permissions:
+  #     id-token: write
+  #     contents: read
 
-      - name: Build workspace dependencies
-        run: pnpm turbo build --filter=@pinboard/primary-care-finder^...
+  #   steps:
+  #     - uses: actions/checkout@v5
 
-      - name: Deploy to prod
-        working-directory: apps/primary-care-finder
-        env:
-          CI: 'true'
-        run: city ship prod --web
+  #     - uses: pnpm/action-setup@v5
+
+  #     - uses: actions/setup-node@v5
+  #       with:
+  #         node-version: 24
+  #         cache: pnpm
+
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
+
+  #     - name: Install city CLI
+  #       run: npm install -g @phila/cli
+
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD_PCF }}
+  #         aws-region: us-east-1
+
+  #     - name: Build workspace dependencies
+  #       run: pnpm turbo build --filter=@pinboard/primary-care-finder^...
+
+  #     - name: Deploy to prod
+  #       working-directory: apps/primary-care-finder
+  #       env:
+  #         CI: 'true'
+  #       run: city ship prod --web

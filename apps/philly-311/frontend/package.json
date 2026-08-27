@@ -42,7 +42,8 @@
     "supercluster": "^8.0.1",
     "vue": "catalog:",
     "vue-i18n": "catalog:",
-    "vue-router": "catalog:"
+    "vue-router": "catalog:",
+    "@types/node": "catalog:"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
