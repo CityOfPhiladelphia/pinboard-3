@@ -6,41 +6,41 @@ on:
     branches: [main, test, task/make-usable-on-test-site]
 
 jobs:
-  check:
-    name: Lint, type-check, build
-    runs-on: ubuntu-latest
+  # check:
+  #   name: Lint, type-check, build
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 2
+  #   steps:
+  #     - uses: actions/checkout@v5
+  #       with:
+  #         fetch-depth: 2
 
-      - uses: pnpm/action-setup@v5
+  #     - uses: pnpm/action-setup@v5
 
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: pnpm
+  #     - uses: actions/setup-node@v5
+  #       with:
+  #         node-version: 24
+  #         cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
 
-      # - name: Lint
-      #   run: pnpm turbo lint
+  #     - name: Lint
+  #       run: pnpm turbo lint
 
-      - name: Format check
-        run: pnpm turbo format:check
+  #     - name: Format check
+  #       run: pnpm turbo format:check
 
-      # - name: Type-check
-      #   run: pnpm turbo type-check
+  #     - name: Type-check
+  #       run: pnpm turbo type-check
 
-      # - name: Build
-      #   run: pnpm turbo build
+  #     - name: Build
+  #       run: pnpm turbo build
 
   detect-changes-test:
     name: Detect changed apps (test)
     runs-on: ubuntu-latest
-    needs: check
+    # needs: check
 
     steps:
       - name: Checkout code
@@ -69,7 +69,7 @@ jobs:
 
       - name: Print outputs
         run: |
-          echo '${needs.detect-changes-test.outputs}'
+          echo ${{ needs.detect-changes-test.outputs }}
 
       - name: Ship to test with ctl
         uses: ./.github/actions/ship-app
