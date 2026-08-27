@@ -41,9 +41,12 @@ jobs:
     name: Detect changed apps (test)
     runs-on: ubuntu-latest
     needs: check
-    uses: ./.github/actions/detect-changes
-    with:
-      branch-name: 'test'
+
+    steps:
+      - name: (Action) detect changes
+        uses: ./.github/actions/detect-changes
+        with:
+          branch-name: 'test'
 
   ship-test-philly-311:
     name: Ship Philly 311 to test
