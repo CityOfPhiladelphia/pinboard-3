@@ -16,7 +16,7 @@ outputs:
     value: ${{ steps.changes.outputs.phil311 }}
 runs-on: ubuntu-latest
 
-if: github.ref == 'refs/heads/${{ inputs.branch-name }}' && github.event_name == 'push'
+if: endsWith(github.ref, inputs.branch-name) && github.event_name == 'push'
 
 steps:
   - uses: actions/checkout@v5
