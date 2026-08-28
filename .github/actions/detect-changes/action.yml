@@ -42,3 +42,10 @@ runs:
         else
           echo "phl311=false" >> "$GITHUB_OUTPUT"
         fi
+
+    - name: Print Action changes
+      run: |
+        echo "OEM changed ${{ steps.detect-changes.outputs.oem }}"
+        echo "PCF changed ${{ steps.detect-changes.outputs.pcf }}"
+        echo "311 changed ${{ steps.detect-changes.outputs.phl311 }}"
+      shell: bash
