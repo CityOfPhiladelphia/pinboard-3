@@ -1,17 +1,8 @@
 name: Detect changed apps
 description: 'Check which apps have changes that need to be shipped'
 outputs:
-  oem:
-    description: 'OEM Flood Monitoring has changes'
-    value: ${{ steps.detect-changes.outputs.oem }}
-  pcf:
-    description: 'Primary Care Finder has changes'
-    value: ${{ steps.detect-changes.outputs.pcf }}
-  phl311:
-    description: 'Philly 311 has changes'
-    value: ${{ steps.detect-changes.outputs.phl311 }}
   updated:
-    description: 'Updated Apps'
+    description: 'Objects with app name and deploy role ARN'
     value: ${{ steps.detect-changes.outputs.updated }}
 
 runs:
@@ -21,34 +12,25 @@ runs:
       id: detect-changes
       shell: bash
       run: |
+        UPDATED_APPS=""
+        DEPLOY_ARNS=""
         CHANGED=$(git diff --name-only HEAD^1 HEAD)
         echo "$CHANGED"
-
-        UPDATEDAPPS=""
 
         packages_changed() { echo "$CHANGED" | grep -q "^packages/"; }
         app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
         ci_changed() { echo "$CHANGED" | grep -q "^\.github/"; }
 
         if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
-          echo "oem=true" >> "$GITHUB_OUTPUT"
-          UPDATEDAPPS+=",\"oem-flood-finder\""
-        else
-          echo "oem=false" >> "$GITHUB_OUTPUT"
+          UPDATED_APPS+=",{\"name\":\"oem-flood-finder\",\"role\":\"${secrets.AWS_DEPLOY_ROLE_ARN_311}\"}"
         fi
 
         if packages_changed || app_changed "primary-care-finder" || ci_changed; then
-          echo "pcf=true" >> "$GITHUB_OUTPUT"
-          UPDATEDAPPS+=",\"primary-care-finder\""
-        else
-          echo "pcf=false" >> "$GITHUB_OUTPUT"
+          UPDATED_APPS+=",{\"name\":\"primary-care-finder\",\"role\":\"${secrets.AWS_DEPLOY_ROLE_ARN_311}\"}"
         fi
 
         if packages_changed || app_changed "philly-311" || ci_changed; then
-          echo "phl311=true" >> "$GITHUB_OUTPUT"
-          UPDATEDAPPS+=",\"philly-311\""
-        else
-          echo "phl311=false" >> "$GITHUB_OUTPUT"
+          UPDATED_APPS+=",{\"name\":\"philly-311\",\"role\":\"${secrets.AWS_DEPLOY_ROLE_ARN_311}\"}"
         fi
 
-        echo "updated=[${UPDATEDAPPS:1}]" >> "$GITHUB_OUTPUT"
+        echo "updated=[${UPDATED_APPS:1}]" >> "$GITHUB_OUTPUT"
