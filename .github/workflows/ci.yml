@@ -57,13 +57,6 @@ jobs:
         id: changes
         uses: ./.github/actions/detect-changes
 
-      - name: Print changes
-        run: |
-          echo "OEM changed ${{ needs.changes.outputs.oem }}"
-          echo "PCF changed ${{ needs.changes.outputs.pcf }}"
-          echo "311 changed ${{ needs.changes.outputs.phl311 }}"
-          echo "updated app ${{ needs.changes.outputs.updated }}"
-
   ship-philly-311:
     name: Ship Philly 311
     runs-on: ubuntu-latest
