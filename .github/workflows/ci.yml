@@ -79,9 +79,9 @@ jobs:
 
       - name: Print changes
         run: |
-          echo "OEM changed ${{ needs.changes.outputs.oem }}"
-          echo "PCF changed ${{ needs.changes.outputs.pcf }}"
-          echo "311 changed ${{ needs.changes.outputs.phl311 }}"
+          echo "OEM changed ${{ needs.outputs.oem }}"
+          echo "PCF changed ${{ needs.outputs.pcf }}"
+          echo "311 changed ${{ needs.outputs.phl311 }}"
         shell: bash
 
       - name: Ship to ${{ (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/test' && 'test') || 'dev' }} with ctl
