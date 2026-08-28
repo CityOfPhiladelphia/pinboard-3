@@ -4,10 +4,10 @@ on:
   pull_request:
   push:
     branches: [main, test, task/make-usable-on-test-site]
-  env:
-    branch: ${{ (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/test' && 'test') || 'dev' }}
 
 jobs:
+  env:
+    branch: ${{ (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/test' && 'test') || 'dev' }}
   # check:
   #   name: Lint, type-check, build
   #   runs-on: ubuntu-latest
