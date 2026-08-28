@@ -51,4 +51,4 @@ runs:
           echo "phl311=false" >> "$GITHUB_OUTPUT"
         fi
 
-        echo "updated=${UPDATEDAPPS:2}" >> "$GITHUB_OUTPUT"
+        echo "updated=${UPDATEDAPPS:2:5}" >> "$GITHUB_OUTPUT"
