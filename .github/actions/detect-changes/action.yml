@@ -28,7 +28,7 @@ runs:
 
         packages_changed() { echo "$CHANGED" | grep -q "^packages/"; }
         app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
-        ci_changed() { echo "$CHANGED" | grep -q "^\.github/workflows/"; }
+        ci_changed() { echo "$CHANGED" | grep -q "^\.github/"; }
 
         if packages_changed || app_changed "oem-flood-finder" || ci_changed || true; then
           echo "oem=true" >> "$GITHUB_OUTPUT"
