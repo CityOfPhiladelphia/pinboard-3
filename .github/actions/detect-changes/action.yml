@@ -1,6 +1,15 @@
 name: Detect changed apps
 description: 'Check which apps have changes that need to be shipped'
-runs-on: ubuntu-latest
+outputs:
+  oem:
+    description: 'OEM Flood Monitoring has changes'
+    value: ${{ steps.detect-changes.outputs.oem }}
+  pcf:
+    description: 'Primary Care Finder has changes'
+    value: ${{ steps.detect-changes.outputs.oem }}
+  phl311:
+    description: 'Philly 311 has changes'
+    value: ${{ steps.detect-changes.outputs.oem }}
 
 runs:
   using: 'composite'
