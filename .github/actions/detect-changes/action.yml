@@ -28,7 +28,7 @@ runs:
         if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
           echo "oem=true" >> "$GITHUB_OUTPUT"
         else
-          echo "oem=false" >> "$GITHUB_OUTPUT"
+          echo "oem=true" >> "$GITHUB_OUTPUT"
         fi
 
         if packages_changed || app_changed "primary-care-finder" || ci_changed; then
