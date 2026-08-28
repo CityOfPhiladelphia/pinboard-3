@@ -61,10 +61,10 @@ jobs:
     name: Ship Pinboard Apps
     runs-on: ubuntu-latest
     needs: detect-changes
-    strategy:
-      max-parallel: 2
-      matrix:
-        app: ${{ fromJSON(needs.detect-changes.outputs.updated) }}
+    # strategy:
+    #   max-parallel: 2
+    #   matrix:
+    #     app: ${{ fromJSON(needs.detect-changes.outputs.updated) }}
     # if: needs.detect-changes.outputs.phl311 == 'true'
 
     permissions:
@@ -80,7 +80,7 @@ jobs:
           echo "OEM changed ${{ needs.detect-changes.outputs.oem }}"
           echo "PCF changed ${{ needs.detect-changes.outputs.pcf }}"
           echo "311 changed ${{ needs.detect-changes.outputs.phl311 }}"
-          echo "updated ${{ fromJSON(needs.detect-changes.outputs.updated) }}"
+          echo "updated ${{ needs.detect-changes.outputs.updated }}"
 
       - name: Set env
         env:
