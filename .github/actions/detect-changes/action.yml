@@ -31,25 +31,25 @@ runs:
         ci_changed() { echo "$CHANGED" | grep -q "^\.github/workflows/"; }
 
         if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
+          updated+=("oem-flood-finder");
           echo "oem=true" >> "$GITHUB_OUTPUT"
-          updated+=("oem-flood-finder")
         else
           echo "oem=false" >> "$GITHUB_OUTPUT"
         fi
 
         if packages_changed || app_changed "primary-care-finder" || ci_changed; then
+          updated+=("primary-care-finder");
           echo "pcf=true" >> "$GITHUB_OUTPUT"
-          updated+=("primary-care-finder")
         else
           echo "pcf=false" >> "$GITHUB_OUTPUT"
         fi
 
         if packages_changed || app_changed "philly-311" || ci_changed; then
+          updated+=("philly-311");
           echo "phl311=true" >> "$GITHUB_OUTPUT"
-          updated+=("philly-311")
         else
           echo "phl311=false" >> "$GITHUB_OUTPUT"
         fi
 
-        updatedStr=`printf -v joined '%s,' '${updated[@]}'`
+        updatedStr=$(printf -v joined '%s,' '${updated[@]}');
         echo "updated=[${updatedStr}]" >> "$GITHUB_OUTPUT"
