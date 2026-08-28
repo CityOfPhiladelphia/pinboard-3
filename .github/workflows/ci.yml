@@ -25,6 +25,11 @@ jobs:
       updated: ${{ steps.changes.outputs.updated }}
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
       - name: (Action) detect changes
         id: changes
         uses: ./.github/actions/detect-changes
@@ -43,6 +48,11 @@ jobs:
       contents: read
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
       - name: Ship to ${{ env.branch }} with ctl
         uses: ./.github/actions/ship-app
         with:
