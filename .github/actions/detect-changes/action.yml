@@ -52,4 +52,5 @@ runs:
         fi
 
         updatedStr=`printf -v joined '%s,' '${updated[@]}'`
+        echo $updatedStr
         echo "updated=[$updatedStr"] >> "$GITHUB_OUTPUT"
