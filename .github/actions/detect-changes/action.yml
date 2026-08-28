@@ -6,10 +6,10 @@ outputs:
     value: ${{ steps.detect-changes.outputs.oem }}
   pcf:
     description: 'Primary Care Finder has changes'
-    value: ${{ steps.detect-changes.outputs.oem }}
+    value: ${{ steps.detect-changes.outputs.pcf }}
   phl311:
     description: 'Philly 311 has changes'
-    value: ${{ steps.detect-changes.outputs.oem }}
+    value: ${{ steps.detect-changes.outputs.phl311 }}
 
 runs:
   using: 'composite'
@@ -38,7 +38,7 @@ runs:
         fi
 
         if packages_changed || app_changed "philly-311" || ci_changed; then
-          echo "phil311=true" >> "$GITHUB_OUTPUT"
+          echo "phl311=true" >> "$GITHUB_OUTPUT"
         else
-          echo "phil311=false" >> "$GITHUB_OUTPUT"
+          echo "phl311=false" >> "$GITHUB_OUTPUT"
         fi
