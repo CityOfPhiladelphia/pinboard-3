@@ -27,7 +27,7 @@ runs:
 
         REPO_CHANGED=$(packages_changed || ci_changed)
 
-        if $REPO_CHANGED || $(app_changed "oem-flood-finder"); then
+        if [[ $REPO_CHANGED || $(app_changed "oem-flood-finder") ]]; then
           ROLE=$secrets.AWS_ROLE_ARN_TEST_OEM
           if [ $inputs.branch == "prod" ]; then
             ROLE=$secrets.AWS_ROLE_ARN_PROD_OEM
@@ -35,7 +35,7 @@ runs:
           UPDATED_APPS+=",{\"name\":\"oem-flood-finder\",\"role\":\"$ROLE\"}"
         fi
 
-        if $REPO_CHANGED || $(app_changed "primary-care-finder"); then
+        if [[ $REPO_CHANGED || $(app_changed "primary-care-finder") ]]; then
           ROLE=$secrets.AWS_ROLE_ARN_TEST_PCF
           if [ $inputs.branch == "prod" ]; then
             ROLE=$secrets.AWS_ROLE_ARN_PROD_PCF
@@ -43,7 +43,7 @@ runs:
           UPDATED_APPS+=",{\"name\":\"primary-care-finder\",\"role\":\"$ROLE\"}"
         fi
 
-        if $REPO_CHANGED || $(app_changed "philly-311"); then
+        if [[ $REPO_CHANGED || $(app_changed "philly-311") ]]; then
           UPDATED_APPS+=",{\"name\":\"philly-311\",\"role\":\"$secrets.AWS_DEPLOY_ROLE_ARN_311\"}"
         fi
 
