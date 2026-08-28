@@ -24,24 +24,22 @@ runs:
         CHANGED=$(git diff --name-only HEAD^1 HEAD)
         echo "$CHANGED"
 
-        UPDATED_APPS=()
+        UPDATED_APPS=""
 
         packages_changed() { echo "$CHANGED" | grep -q "^packages/"; }
         app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
         ci_changed() { echo "$CHANGED" | grep -q "^\.github/workflows/"; }
 
         if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
-          UPDATED_APPS+=("oem-flood-finder")
+          UPDATED_APPS+=", oem-flood-finder"
         fi
 
         if packages_changed || app_changed "primary-care-finder" || ci_changed; then
-          UPDATED_APPS+=("primary-care-finder")
+          UPDATED_APPS+=", primary-care-finder"
         fi
 
         if packages_changed || app_changed "philly-311" || ci_changed; then
-          UPDATED_APPS+=("philly-311")
+          UPDATED_APPS+=", philly-311"
         fi
 
-        echo "${UPDATED_APPS[@]}"
-        UPDATED_STR=$(printf -v joined "%s," "${UPDATED_APPS[@]}");
-        echo "$UPDATED_STR"
+        echo "updated=$UPDATED_APPS" >> "$GITHUB_OUTPUT"
