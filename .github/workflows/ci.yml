@@ -75,16 +75,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Print changes
+        run: |
+          echo "OEM changed ${{ needs.detect-changes.outputs.oem }}"
+          echo "PCF changed ${{ needs.detect-changes.outputs.pcf }}"
+          echo "311 changed ${{ needs.detect-changes.outputs.phl311 }}"
+          echo "updated ${{ fromJSON(needs.detect-changes.outputs.updated) }}"
+
       - name: Set env
         env:
-          branch: ${{ (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/test' && 'test') || 'dev' }}
           app: ${{ matrix.app }}
+        run: |
+          echo "$app"
 
-      - name: Ship ${{ env.app }} to ${{ env.branch }} with ctl
+      - name: Ship to ${{ (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/test' && 'test') || 'dev' }} with ctl
         uses: ./.github/actions/ship-app
         with:
-          app-name: ${{ env.app }}
-          environment-name: ${{ env.branch }}
+          app-name: ${{ matrix.app }}
+          environment-name: ${{ (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/test' && 'test') || 'test' }}
           role-arn: ${{ secrets.AWS_DEPLOY_ROLE_ARN_311 }}
 
   # deploy-test-oem-flood-finder:
