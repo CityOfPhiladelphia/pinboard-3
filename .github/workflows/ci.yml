@@ -42,12 +42,9 @@ jobs:
     runs-on: ubuntu-latest
     # needs: check
     outputs:
-      oem:
-        value: ${{ steps.changes.outputs.oem }}
-      pfc:
-        value: ${{ steps.changes.outputs.pfc }}
-      phl311:
-        value: ${{ steps.changes.outputs.phl311 }}
+      oem: ${{ steps.changes.outputs.oem }}
+      pfc: ${{ steps.changes.outputs.pfc }}
+      phl311: ${{ steps.changes.outputs.phl311 }}
 
     steps:
       - name: Checkout code
@@ -57,14 +54,31 @@ jobs:
 
       - name: (Action) detect changes
         id: changes
-        uses: ./.github/actions/detect-changes
-
-      - name: Print changes
         run: |
-          echo "OEM changed ${{ steps.changes.outputs.oem }}"
-          echo "PCF changed ${{ steps.changes.outputs.pcf }}"
-          echo "311 changed ${{ steps.changes.outputs.phl311 }}"
-        shell: bash
+          CHANGED=$(git diff --name-only HEAD^1 HEAD)
+          echo "$CHANGED"
+
+          packages_changed() { echo "$CHANGED" | grep -q "^packages/"; }
+          app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
+          ci_changed() { echo "$CHANGED" | grep -q "^\.github/workflows/"; }
+
+          if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
+            echo "oem=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "oem=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if packages_changed || app_changed "primary-care-finder" || ci_changed; then
+            echo "pcf=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "pcf=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if packages_changed || app_changed "philly-311" || ci_changed; then
+            echo "phl311=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "phl311=false" >> "$GITHUB_OUTPUT"
+          fi
 
   ship-philly-311:
     name: Ship Philly 311
@@ -82,9 +96,9 @@ jobs:
 
       - name: Print changes
         run: |
-          echo "OEM changed ${{ needs.outputs.oem }}"
-          echo "PCF changed ${{ needs.outputs.pcf }}"
-          echo "311 changed ${{ needs.outputs.phl311 }}"
+          echo "OEM changed ${{ needs.changes.outputs.oem }}"
+          echo "PCF changed ${{ needs.changes.outputs.pcf }}"
+          echo "311 changed ${{ needs.changes.outputs.phl311 }}"
         shell: bash
 
       - name: Ship to ${{ (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/test' && 'test') || 'dev' }} with ctl
