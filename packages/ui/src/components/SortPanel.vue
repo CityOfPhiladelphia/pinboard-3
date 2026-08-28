@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { Radio } from '@phila/phila-ui-radio'
@@ -36,10 +36,36 @@ const locationAvailable = computed(() => {
 function openPanel() {
   pendingSelection.value = props.appliedSort
   panelOpen.value = true
+  // The panel is teleported to <body>, so it's outside the trigger's tab order.
+  // Move focus into the options (the selected one, else the first enabled) so a
+  // keyboard user lands inside the panel instead of being stranded on the trigger.
+  nextTick(() => {
+    const root = formEl.value
+    const target =
+      root?.querySelector<HTMLElement>('input:checked:not(:disabled)') ??
+      root?.querySelector<HTMLElement>('input:not(:disabled)')
+    target?.focus()
+  })
 }
 
 function closePanel() {
   panelOpen.value = false
+  // When the panel closes via keyboard (Esc/Apply/guard) the focused element is
+  // removed and focus falls to <body>. Return it to the trigger in that case. If
+  // the user clicked another control to dismiss, activeElement is that control —
+  // leave focus where the user put it.
+  nextTick(() => {
+    if (!document.activeElement || document.activeElement === document.body) {
+      triggerEl.value?.focus()
+    }
+  })
+}
+
+// A focus guard (the first/last tab stop, bracketing the content) received focus,
+// which means Tab/Shift+Tab is carrying focus out of the panel. Close it — the
+// non-modal counterpart to a focus trap.
+function onFocusGuard() {
+  closePanel()
 }
 
 function applySort() {
@@ -100,7 +126,14 @@ watch(panelOpen, (isOpen) => {
 
 <template>
   <div class="sort-panel-root">
-    <button ref="triggerEl" type="button" class="sort-panel-trigger" @click="openPanel">
+    <button
+      ref="triggerEl"
+      type="button"
+      class="sort-panel-trigger"
+      aria-haspopup="dialog"
+      :aria-expanded="panelOpen"
+      @click="openPanel"
+    >
       <IconSort class="sort-panel-trigger-icon" />
       <span>{{ triggerLabel }}</span>
     </button>
@@ -127,7 +160,10 @@ watch(panelOpen, (isOpen) => {
         :style="!isMobile ? anchorStyle : ''"
         class="sort-panel-form"
         :class="{ 'sort-panel-form-mobile': isMobile }"
+        role="dialog"
+        :aria-label="t('pinboard.sort')"
       >
+        <span class="sort-panel-focus-guard" tabindex="0" @focus="onFocusGuard" />
         <CloseButton v-if="isMobile" class="sort-panel-close" @click="closePanel" />
         <ul class="sort-panel-options">
           <li
@@ -156,6 +192,7 @@ watch(panelOpen, (isOpen) => {
             t('pinboard.apply')
           }}</PhilaButton>
         </div>
+        <span class="sort-panel-focus-guard" tabindex="0" @focus="onFocusGuard" />
       </div>
     </Teleport>
   </Teleport>
@@ -185,6 +222,21 @@ watch(panelOpen, (isOpen) => {
 .sort-panel-trigger:hover {
   background: #f5f5f5;
   color: #000;
+}
+
+.sort-panel-trigger:focus-visible {
+  outline: 2px solid var(--Focus-Ring-Color);
+  outline-offset: 2px;
+}
+
+/* Bracketing tab stops: focusable but visually absent. Tabbing onto one means
+   focus is leaving the panel, which closes it (see onFocusGuard). */
+.sort-panel-focus-guard {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
 }
 
 .sort-panel-trigger-icon {

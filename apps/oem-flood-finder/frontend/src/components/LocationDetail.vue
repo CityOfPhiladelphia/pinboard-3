@@ -51,10 +51,13 @@ const lastUpdatedDate = computed(() => {
   <div class="location-detail content">
     <div class="detail-header">
       <div style="display: flex; align-items: center; gap: var(--spacing-m)">
-        <h4 v-if="location.deviceType === 'Aware' || location.deviceType === 'Usgs'">
+        <!-- h2 (not h4) so PinboardBody's detail-panel focus/labelling hook
+             (querySelector('h1, h2, h3')) finds it; styled with the H4 tokens
+             so the visual size is unchanged. -->
+        <h2 v-if="location.deviceType === 'Aware' || location.deviceType === 'Usgs'">
           {{ location.name }}
-        </h4>
-        <h4 v-else-if="location.deviceType === 'Camera'">{{ location.name }}</h4>
+        </h2>
+        <h2 v-else-if="location.deviceType === 'Camera'">{{ location.name }}</h2>
         <Tags v-if="gaugeHeight" size="large" color="blue" variant="readonly" :text="gaugeHeight" />
       </div>
 
@@ -137,9 +140,12 @@ const lastUpdatedDate = computed(() => {
   flex-shrink: 0;
 }
 
-.detail-header h4 {
+.detail-header h2 {
   margin: 0;
   flex: 1;
+  font-family: var(--Heading-H4-font-heading-4-family);
+  font-size: var(--Heading-H4-font-heading-4-size);
+  line-height: var(--Heading-H4-font-heading-4-lineheight);
 }
 
 .detail-close-btn {

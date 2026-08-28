@@ -146,6 +146,7 @@ catalogs:
       version: 3.3.10
 
 overrides:
+  '@cyclomedia/streetsmart-api': 25.7.0
   vue-router: 5.0.6
   brace-expansion@>=3.0.0 <5.0.7: '>=5.0.7'
   brace-expansion@>=4.0.0 <5.0.8: '>=5.0.8'
@@ -966,8 +967,8 @@ packages:
     resolution: {integrity: sha512-QxULHAm7cNu72w97JUNCBFODFaXpbDg+dP8b/oWFAZ2MTRppA3U00Y2L1HqaS4J6yBqxwa/Y3nMBaxVKbB/NsA==}
     engines: {node: '>=20.19.0'}
 
-  '@cyclomedia/streetsmart-api@25.7.1':
-    resolution: {integrity: sha512-TmBsV1fr94EyRRJDU6A9B2Cbh7REQ6exIcZlv/kQyzbiFk9/rpSF1UU8SdxUE+ONpC1NvAGGEQaHX85VVle12w==}
+  '@cyclomedia/streetsmart-api@25.7.0':
+    resolution: {integrity: sha512-mQr1IEcecgWbY84gsFIdASChfKlki+LY4uur+U2AQdzwikhzEHgBtKxnX2R6jv6T6MOiXxnuTM4yMDjeHohtLg==}
     peerDependencies:
       react: 18.3.1
       react-dom: 18.3.1
@@ -3990,7 +3991,7 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.0': {}
 
-  '@cyclomedia/streetsmart-api@25.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@cyclomedia/streetsmart-api@25.7.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@types/gl-matrix': 2.4.5
       '@types/ol': 6.5.3
@@ -4425,7 +4426,7 @@ snapshots:
 
   '@phila/phila-ui-map-core@1.3.0-beta.6(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))':
     dependencies:
-      '@cyclomedia/streetsmart-api': 25.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@cyclomedia/streetsmart-api': 25.7.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@phila/phila-ui-checkbox': 1.1.0-beta.2(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
       '@phila/phila-ui-search': 1.2.2-beta.2(vue-router@5.0.6(@vue/compiler-sfc@3.5.33)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3)))(vue@3.5.33(typescript@6.0.3))
