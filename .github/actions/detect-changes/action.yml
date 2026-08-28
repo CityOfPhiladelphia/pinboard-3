@@ -8,6 +8,11 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+      with:
+        fetch-depth: 2
+
     - name: Check changed files
       id: detect-changes
       shell: bash
