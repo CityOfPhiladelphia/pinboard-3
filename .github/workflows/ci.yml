@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, test, task/make-usable-on-test-site]
+    branches: [main, test]
 
 jobs:
   check:
