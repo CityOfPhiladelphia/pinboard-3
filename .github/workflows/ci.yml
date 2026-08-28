@@ -6,21 +6,21 @@ on:
     branches: [main, test, task/make-usable-on-test-site]
 
 jobs:
-  # check:
-  #   name: Lint, type-check, build
-  #   runs-on: ubuntu-latest
+  check:
+    name: Lint, type-check, build
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/checkout@v7
-  #       with:
-  #         fetch-depth: 2
-  #     - name: (Action) Check code
-  #       uses: ./.github/actions/check-code
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+      - name: (Action) Check code
+        uses: ./.github/actions/check-code
 
   detect-changes:
     name: Detect changed apps
     runs-on: ubuntu-latest
-    # needs: check
+    needs: check
     outputs:
       updated: ${{ steps.changes.outputs.updated }}
 
