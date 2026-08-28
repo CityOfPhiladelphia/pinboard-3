@@ -4,10 +4,6 @@ description: 'Check code compliance and testing'
 runs:
   using: 'composite'
   steps:
-    - uses: actions/checkout@v7
-      with:
-        fetch-depth: 2
-
     - uses: pnpm/setup@v2
 
     - uses: actions/setup-node@v7
