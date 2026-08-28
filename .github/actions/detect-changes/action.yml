@@ -25,19 +25,19 @@ runs:
         app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
         ci_changed() { echo "$CHANGED" | grep -q "^\.github/workflows/"; }
 
-        if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
+        if [packages_changed || app_changed "oem-flood-finder" || ci_changed]; then
           echo "oem=true" >> "$GITHUB_OUTPUT"
         else
-          echo "oem=true" >> "$GITHUB_OUTPUT"
+          echo "oem=false" >> "$GITHUB_OUTPUT"
         fi
 
-        if packages_changed || app_changed "primary-care-finder" || ci_changed; then
+        if [packages_changed || app_changed "primary-care-finder" || ci_changed]; then
           echo "pcf=true" >> "$GITHUB_OUTPUT"
         else
           echo "pcf=false" >> "$GITHUB_OUTPUT"
         fi
 
-        if packages_changed || app_changed "philly-311" || ci_changed; then
+        if [packages_changed || app_changed "philly-311" || ci_changed]; then
           echo "phl311=true" >> "$GITHUB_OUTPUT"
         else
           echo "phl311=false" >> "$GITHUB_OUTPUT"
