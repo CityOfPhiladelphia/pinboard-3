@@ -41,6 +41,10 @@ jobs:
     name: Detect changed apps
     runs-on: ubuntu-latest
     # needs: check
+    outputs:
+      oem: ${{ steps.changes.outputs.oem }}
+      pfc: ${{ steps.changes.outputs.pfc }}
+      phl311: ${{ steps.changes.outputs.phl311 }}
 
     steps:
       - name: Checkout code
