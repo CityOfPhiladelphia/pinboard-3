@@ -27,6 +27,8 @@ runs:
 
         REPO_CHANGED=$(packages_changed || ci_changed)
 
+        echo $REPO_CHANGED
+
         if [[ $REPO_CHANGED || $(app_changed "oem-flood-finder") ]]; then
           ROLE=$secrets.AWS_ROLE_ARN_TEST_OEM
           if [ $inputs.branch == "prod" ]; then
