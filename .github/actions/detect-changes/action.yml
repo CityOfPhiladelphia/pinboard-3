@@ -26,7 +26,7 @@ runs:
         app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
 
 
-        if [ $packages_changed || $ci_changed || app_changed "philly-311" ]; then
+        if [[ $packages_changed || $ci_changed || `app_changed "philly-311"` ]]; then
           UPDATED_APPS+=",{\"name\":\"philly-311\",\"role\":\"$secrets.AWS_DEPLOY_ROLE_ARN_311\"}"
         fi
 
