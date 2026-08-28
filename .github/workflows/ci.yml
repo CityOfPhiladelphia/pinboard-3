@@ -83,7 +83,7 @@ jobs:
           echo "OEM changed ${{ needs.detect-changes.outputs.oem }}"
           echo "PCF changed ${{ needs.detect-changes.outputs.pcf }}"
           echo "311 changed ${{ needs.detect-changes.outputs.phl311 }}"
-          echo "updated ${{ fromJSON(needs.detect-changes.outputs.updated) }}
+          echo "updated ${{ needs.detect-changes.outputs.updated }}"
         shell: bash
 
       - name: Ship to ${{ (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/test' && 'test') || 'dev' }} with ctl
