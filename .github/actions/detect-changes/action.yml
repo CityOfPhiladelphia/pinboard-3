@@ -51,5 +51,5 @@ runs:
           echo "phl311=false" >> "$GITHUB_OUTPUT"
         fi
 
-        updatedStr = `printf -v joined '%s,' '${updated[@]}'`
+        updatedStr=`printf -v joined '%s,' '${updated[@]}'`
         echo "updated=[$updatedStr"] >> "$GITHUB_OUTPUT"
