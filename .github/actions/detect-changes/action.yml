@@ -46,7 +46,7 @@ runs:
 
         if packages_changed || app_changed "philly-311" || ci_changed; then
           echo "phl311=true" >> "$GITHUB_OUTPUT"
-          UPDATEDAPPS+=", \\\"philly-311\\\""
+          UPDATEDAPPS+=", \\\"philly-311"
         else
           echo "phl311=false" >> "$GITHUB_OUTPUT"
         fi
