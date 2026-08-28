@@ -32,21 +32,21 @@ runs:
 
         if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
           echo "oem=true" >> "$GITHUB_OUTPUT"
-          UPDATEDAPPS+=", \\\"oem-flood-finder"
+          UPDATEDAPPS+=", oem-flood-finder"
         else
           echo "oem=false" >> "$GITHUB_OUTPUT"
         fi
 
         if packages_changed || app_changed "primary-care-finder" || ci_changed; then
           echo "pcf=true" >> "$GITHUB_OUTPUT"
-          UPDATEDAPPS+=", \\\"primary-care-finder"
+          UPDATEDAPPS+=", primary-care-finder"
         else
           echo "pcf=false" >> "$GITHUB_OUTPUT"
         fi
 
         if packages_changed || app_changed "philly-311" || ci_changed; then
           echo "phl311=true" >> "$GITHUB_OUTPUT"
-          UPDATEDAPPS+=", \\\"philly-311"
+          UPDATEDAPPS+=", \\\"philly-311\\\""
         else
           echo "phl311=false" >> "$GITHUB_OUTPUT"
         fi
