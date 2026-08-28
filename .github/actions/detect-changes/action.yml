@@ -1,5 +1,9 @@
 name: Detect changed apps
 description: 'Check which apps have changes that need to be shipped'
+inputs:
+  branch:
+    required: true
+    description: 'Branch param to chose deployment role when role is tied to branch'
 outputs:
   updated:
     description: 'Objects with app name and deploy role ARN'
@@ -17,19 +21,12 @@ runs:
         CHANGED=$(git diff --name-only HEAD^1 HEAD)
         echo "$CHANGED"
 
-        packages_changed() { echo "$CHANGED" | grep -q "^packages/"; }
+        packages_changed=`echo "$CHANGED" | grep -q "^packages/"`
+        ci_changed=`echo "$CHANGED" | grep -q "^\.github/"`
         app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
-        ci_changed() { echo "$CHANGED" | grep -q "^\.github/"; }
 
-        if packages_changed || app_changed "oem-flood-finder" || ci_changed; then
-          UPDATED_APPS+=",{\"name\":\"oem-flood-finder\",\"role\":\"$secrets.AWS_DEPLOY_ROLE_ARN_311\"}"
-        fi
 
-        if packages_changed || app_changed "primary-care-finder" || ci_changed; then
-          UPDATED_APPS+=",{\"name\":\"primary-care-finder\",\"role\":\"$secrets.AWS_DEPLOY_ROLE_ARN_311\"}"
-        fi
-
-        if packages_changed || app_changed "philly-311" || ci_changed; then
+        if  [ $packages_changed || $ci_changed] || app_changed "philly-311"; then
           UPDATED_APPS+=",{\"name\":\"philly-311\",\"role\":\"$secrets.AWS_DEPLOY_ROLE_ARN_311\"}"
         fi
 

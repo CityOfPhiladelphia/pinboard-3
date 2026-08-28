@@ -33,6 +33,8 @@ jobs:
       - name: (Action) detect changes
         id: changes
         uses: ./.github/actions/detect-changes
+        with:
+          branch: ${{ (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/test' && 'test') || 'dev' }}
 
   ship-apps:
     name: Ship updated Pinboard apps
