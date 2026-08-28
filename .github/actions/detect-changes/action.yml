@@ -24,7 +24,7 @@ runs:
         CHANGED=$(git diff --name-only HEAD^1 HEAD)
         echo "$CHANGED"
 
-        declare -a UPDATED_APPS
+        UPDATED_APPS=()
 
         packages_changed() { echo "$CHANGED" | grep -q "^packages/"; }
         app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
@@ -42,5 +42,6 @@ runs:
           UPDATED_APPS+=("philly-311")
         fi
 
-        UPDATED_STR=$(printf -v joined '%s,' '${UPDATED_APPS[@]}');
+        echo "${UPDATED_APPS[@]}"
+        UPDATED_STR=$(printf -v joined "%s," "${UPDATED_APPS[@]}");
         echo "$UPDATED_STR"
