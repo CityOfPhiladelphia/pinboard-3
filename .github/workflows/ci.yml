@@ -6,8 +6,6 @@ on:
     branches: [main, test, task/make-usable-on-test-site]
 
 jobs:
-  env:
-    branch: ${{ (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/test' && 'test') || 'dev' }}
   # check:
   #   name: Lint, type-check, build
   #   runs-on: ubuntu-latest
@@ -70,6 +68,8 @@ jobs:
     name: Ship Philly 311
     runs-on: ubuntu-latest
     needs: detect-changes
+    env:
+      branch: ${{ (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/test' && 'test') || 'dev' }}
     # if: needs.detect-changes.outputs.phl311 == 'true'
 
     permissions:
