@@ -17,12 +17,37 @@ import { useMyCasesStore } from '@/stores/myCases'
 import { WIZARD_CAN_ADVANCE_KEY, WIZARD_SHOW_ERRORS_KEY } from '@/composables/useWizardValidity'
 import { WIZARD_NAV_KEY, type WizardNavHandlers } from '@/composables/useWizardNav'
 
+const STEPS = [
+  { title: 'Image', path: '/report' },
+  { title: 'Issue type', path: '/report/issue-type' },
+  { title: 'Location', path: '/report/location' },
+  { title: 'Details', path: '/report/details' },
+  { title: 'Review', path: '/report/review' },
+]
+
 const router = useRouter()
 const route = useRoute()
 const store = useReportSubmissionStore()
 const myCases = useMyCasesStore()
-
 const exitOpen = ref(false)
+const wizardEl = ref<HTMLElement | null>(null)
+const canAdvance = ref(true)
+const showErrors = ref(false)
+const navHandlers = ref<WizardNavHandlers | null>(null)
+
+provide(WIZARD_CAN_ADVANCE_KEY, canAdvance)
+provide(WIZARD_SHOW_ERRORS_KEY, showErrors)
+provide(WIZARD_NAV_KEY, navHandlers)
+
+watch(
+  // The wizard is its own scroll container (the shell locks the viewport), so
+  // the browser never resets scroll on navigation — do it on each step change.
+  () => route.path,
+  () => {
+    if (wizardEl.value) wizardEl.value.scrollTop = 0
+  },
+)
+
 watch(
   exitOpen,
   (isOpen, wasOpen) => {
@@ -37,36 +62,11 @@ watch(
   { immediate: true },
 )
 
-const STEPS = [
-  { title: 'Image', path: '/report' },
-  { title: 'Issue type', path: '/report/issue-type' },
-  { title: 'Location', path: '/report/location' },
-  { title: 'Details', path: '/report/details' },
-  { title: 'Review', path: '/report/review' },
-]
-
-// The wizard is its own scroll container (the shell locks the viewport), so
-// the browser never resets scroll on navigation — do it on each step change.
-const wizardEl = ref<HTMLElement | null>(null)
-watch(
-  () => route.path,
-  () => {
-    if (wizardEl.value) wizardEl.value.scrollTop = 0
-  },
-)
-
-const canAdvance = ref(true)
-const showErrors = ref(false)
-const navHandlers = ref<WizardNavHandlers | null>(null)
-provide(WIZARD_CAN_ADVANCE_KEY, canAdvance)
-provide(WIZARD_SHOW_ERRORS_KEY, showErrors)
-provide(WIZARD_NAV_KEY, navHandlers)
-
 const currentStep = computed(() => {
   const idx = STEPS.findIndex((s) => s.path === route.path)
   return idx === -1 ? 1 : idx + 1
 })
-const completedThrough = computed(() => Math.max(0, currentStep.value - 1))
+const completedThrough = computed(() => currentStep.value - 1)
 const isImageStep = computed(() => currentStep.value === 1)
 const isLast = computed(() => currentStep.value === STEPS.length)
 const prevPath = computed(() => STEPS[currentStep.value - 2]?.path ?? null)
@@ -76,6 +76,7 @@ function goPrev() {
   if (navHandlers.value?.back()) return
   if (prevPath.value) router.push(prevPath.value)
 }
+
 function goNext() {
   if (navHandlers.value?.next()) return
   if (!canAdvance.value && !isImageStep.value) {
@@ -84,6 +85,7 @@ function goNext() {
   }
   if (nextPath.value) router.push(nextPath.value)
 }
+
 function saveAndExit() {
   const { category, customFields, location, description, contact, publicVisibility, photo } = store
   myCases.saveDraft({
@@ -98,6 +100,7 @@ function saveAndExit() {
   store.reset()
   router.push('/')
 }
+
 function discardAndExit() {
   store.reset()
   router.push('/')

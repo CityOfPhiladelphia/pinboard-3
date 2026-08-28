@@ -1,7 +1,7 @@
 // ABOUTME: API response types for the 311 service request API.
 // ABOUTME: These mirror the shapes returned by /private/key/service-types and related endpoints.
 
-export interface QuestionField {
+export interface IQuestionField {
   field: string
   label: string
   type: string
@@ -9,6 +9,7 @@ export interface QuestionField {
   options?: string[]
   controllerName?: string
   dependentValues?: Record<string, string[]>
+  description: string
 }
 
 export interface ServiceType {
@@ -17,7 +18,7 @@ export interface ServiceType {
   description: string
   recordTypeID: string
   department: string
-  questions: QuestionField[]
+  questions: IQuestionField[]
 }
 
 /** An answer to one of a service type's follow-up questions, as returned on an Issue. */

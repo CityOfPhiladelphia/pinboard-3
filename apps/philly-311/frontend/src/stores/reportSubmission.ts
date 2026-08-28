@@ -67,13 +67,7 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
       this.category = category
     },
     setQuestion(field: string, value: string) {
-      if (!value) {
-        this.customFields = Object.fromEntries(
-          Object.entries(this.customFields).filter(([key]) => key !== field),
-        )
-      } else {
-        this.customFields = { ...this.customFields, [field]: value }
-      }
+      this.customFields[field] = value
     },
     setLocation(location: WizardLocation | null) {
       this.location = location

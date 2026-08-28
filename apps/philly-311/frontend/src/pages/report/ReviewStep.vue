@@ -9,10 +9,9 @@ import ReviewSummary from '@/components/wizard/ReviewSummary.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { Callout } from '@phila/phila-ui-callout'
 import type { SubmitResponse } from '@/types/wizard'
-import ReportStep from './ReportStep.vue'
+import ReportStep from '@/components/wizard/ReportStep.vue'
 
 const GENERIC_ERROR = 'Something went wrong submitting your report. Please try again.'
-
 const router = useRouter()
 const store = useReportSubmissionStore()
 
@@ -46,7 +45,7 @@ async function submit() {
 </script>
 
 <template>
-  <ReportStep :step-title="'Review'">
+  <ReportStep :required="true" :error-active="false" :hide-required="true" :step-title="'Review'">
     <template #step-content>
       <div class="review-step">
         <p class="review-step__intro">Check your report before submitting.</p>
@@ -80,18 +79,16 @@ async function submit() {
   max-width: 640px;
   overflow: auto;
 }
-.review-step__title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 var(--spacing-s, 0.75rem);
-}
+
 .review-step__intro {
   margin: 0 0 var(--spacing-m, 1rem);
   color: var(--Schemes-On-Surface-Variant, #4a4a4a);
 }
+
 .review-step__error {
   margin: var(--spacing-m, 1rem) 0;
 }
+
 .review-step__submit {
   margin-top: var(--spacing-m, 1rem);
 }

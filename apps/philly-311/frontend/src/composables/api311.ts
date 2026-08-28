@@ -7,8 +7,22 @@ export type Auth = ReturnType<typeof useAuth>
 
 export type QueryParams = Record<string, string | number | boolean | undefined>
 
-function apiKey(): string {
-  return import.meta.env.VITE_API_KEY ?? ''
+async function apiKey(): Promise<string> {
+  const url = 'https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/get311Info'
+  const params = new URLSearchParams({
+    apiUrl: 'wdw5s1yfxg',
+  })
+  try {
+    const response = await fetch(`${url}?${params.toString()}`)
+    if (!response.ok) {
+      return ''
+    }
+    const res = (await response.text()) as string
+    return res
+  } catch (e) {
+    console.error(e)
+    return ''
+  }
 }
 
 /**
@@ -43,7 +57,7 @@ interface Api311HeaderOptions {
 }
 
 async function api311Headers(opts: Api311HeaderOptions = {}): Promise<Record<string, string>> {
-  const headers: Record<string, string> = { 'x-api-key': apiKey() }
+  const headers: Record<string, string> = { 'x-api-key': await apiKey() }
   if (opts.contentType) headers['content-type'] = opts.contentType
   if (opts.auth?.isAuthenticated.value) {
     const token = await opts.auth.acquireToken({ forceRefresh: opts.forceRefreshToken ?? false })
@@ -82,7 +96,8 @@ export async function api311Fetch(opts: Api311FetchOptions): Promise<Response> {
       contentType: opts.body !== undefined ? 'application/json' : undefined,
     })
     const sentBearer = 'Authorization' in headers
-    const response = await fetch(api311Url(opts.path, opts.query), {
+    const url = api311Url(opts.path, opts.query)
+    const response = await fetch(url, {
       method: opts.method ?? 'GET',
       headers,
       body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,

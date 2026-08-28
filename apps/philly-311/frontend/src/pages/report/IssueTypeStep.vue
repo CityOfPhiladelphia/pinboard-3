@@ -2,7 +2,7 @@
      caseType-grouped directory). View derives from store.category; Next is gated on
      a category being chosen via useWizardValidity. -->
 <script setup lang="ts">
-import { computed, onBeforeMount, ref, watch } from 'vue'
+import { computed, onBeforeMount, ref, useId, watch } from 'vue'
 import { useServiceTypes } from '@/composables/useServiceTypes'
 import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
@@ -12,10 +12,11 @@ import { Callout } from '@phila/phila-ui-callout'
 import TypeSuggestions from '@/components/wizard/TypeSuggestions.vue'
 import TypeDirectory from '@/components/wizard/TypeDirectory.vue'
 import ImageAnalysis from '@/components/wizard/ImageAnalysis.vue'
-import ReportStep from './ReportStep.vue'
-import IssueLoadError from '@/components/wizard/IssueLoadError.vue'
+import ReportStep from '@/components/wizard/ReportStep.vue'
+import WizardLoadError from '@/components/wizard/WizardLoadError.vue'
 import type { ServiceType } from '@/types/api.ts'
 
+const issueStepId = useId()
 const store = useReportSubmissionStore()
 const { list, isLoading, error, load } = useServiceTypes()
 
@@ -84,9 +85,9 @@ function handleSearchSubmit() {
 </script>
 
 <template>
-  <ReportStep :step-title="stepTitle">
+  <ReportStep :id="issueStepId" :error-active="false" :step-title="stepTitle" :required="true">
     <template #step-content>
-      <div class="issue-step">
+      <div :id="issueStepId" class="issue-step">
         <template v-if="store.photo.previewUrl || store.photo.mediaUrl">
           <ImageAnalysis
             v-if="!store.photoSuggestions.length"
@@ -115,7 +116,7 @@ function handleSearchSubmit() {
             :type="'error'"
           />
           <LoadingCards v-if="classifying || (isLoading && !list.length)" :card-scale="60" />
-          <IssueLoadError v-else-if="error" />
+          <WizardLoadError v-else-if="error" :error-message="error.message" />
 
           <template v-else>
             <TypeSuggestions
@@ -175,18 +176,5 @@ function handleSearchSubmit() {
 .issue-step__issue-types {
   grid-area: issueTypes;
   overflow: auto;
-}
-
-.issue-step__error {
-  color: var(--Schemes-On-Error-Container, #992100);
-  border-radius: 0.75rem;
-  background: var(--Schemes-Error-Container, #f8c9bd);
-
-  /* Label/Default */
-  font-family: var(--Label-Default-font-label-default-family, Montserrat);
-  font-size: var(--Label-Default-font-label-default-size, 1rem);
-  font-style: normal;
-  font-weight: 600;
-  line-height: var(--Label-Default-font-label-default-lineheight, 1.5rem); /* 150% */
 }
 </style>

@@ -7,7 +7,7 @@ import { Icon } from '@phila/phila-ui-core'
 import { IconClose, IconArrowUp } from '@phila/phila-ui-core/icons'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useWizardValidity } from '@/composables/useWizardValidity'
-import ReportStep from './ReportStep.vue'
+import ReportStep from '@/components/wizard/ReportStep.vue'
 import ImageUploadDialog from '@/components/wizard/ImageUploadDialog.vue'
 
 const store = useReportSubmissionStore()
@@ -83,10 +83,15 @@ function validateFileType(maybeFile: File | undefined) {
 </script>
 
 <template>
-  <ReportStep :step-title="stepTitle" :step-note="stepDescription">
+  <ReportStep
+    :step-title="stepTitle"
+    :error-active="false"
+    :step-note="stepDescription"
+    :required="false"
+  >
     <template #step-content>
-      <div class="image__step">
-        <p class="image-step__count has-text-body-default" v-text="imageCount" />
+      <div id="imageStepId" class="image__step">
+        <span class="image-step__count has-text-body-default" v-text="imageCount" />
         <label
           v-if="!markupComplete"
           class="image-step__upload"
@@ -128,7 +133,6 @@ function validateFileType(maybeFile: File | undefined) {
 
 .image-step__count {
   grid-area: imageCount;
-  margin-bottom: 0 !important;
 }
 
 .image-step__upload {
