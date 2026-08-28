@@ -51,5 +51,4 @@ runs:
           echo "phl311=false" >> "$GITHUB_OUTPUT"
         fi
 
-        TRIMMED=${UPDATEDAPPS:2}
-        echo "updated=${TRIMMED}" >> "$GITHUB_OUTPUT"
+        echo "updated=${UPDATEDAPPS:2}" >> "$GITHUB_OUTPUT"
