@@ -42,7 +42,7 @@ runs:
         fi
 
         if packages_changed || ci_changed || app_changed "philly-311"; then
-          UPDATED_APPS+=",{\"name\":\"philly-311\",\"role\":\"$secrets.AWS_DEPLOY_ROLE_ARN_311\"}"
+          UPDATED_APPS+=",{\"name\":\"philly-311\",\"role\":\"$secrets.AWS_ROLE_ARN_311\"}"
         fi
 
         echo "updated=[${UPDATED_APPS:1}]" >> "$GITHUB_OUTPUT"
