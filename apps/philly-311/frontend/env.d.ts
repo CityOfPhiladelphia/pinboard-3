@@ -9,7 +9,6 @@ interface ImportMetaEnv {
   readonly VITE_311_SSO_REDIRECT_URI: string
   readonly VITE_311_SSO_API_SCOPE: string
   readonly VITE_311_API_URL: string
-  readonly VITE_311_API_BASE_URL: string
   readonly VITE_311_API_PROXY: string
   readonly VITE_311_AIS_BASE_URL: string
   readonly VITE_311_AIS_GATEKEEPER_KEY: string
