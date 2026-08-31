@@ -12,6 +12,7 @@ import { useIsMobile } from './useIsMobile'
 import { useNow } from './useNow'
 import { usePrint } from './usePrint'
 import { useLocale } from './useLocale'
+import { useMapBoundsFilter } from './useMapBoundsFilter'
 
 export {
   useInitPinboardApp,
@@ -24,4 +25,5 @@ export {
   useNow,
   usePrint,
   useLocale,
+  useMapBoundsFilter,
 }

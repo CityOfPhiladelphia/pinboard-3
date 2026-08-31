@@ -1,7 +1,8 @@
 <!-- ABOUTME: The 311 reports finder — Pinboard map + list of nearby reports with
      service-type filter chips, geolocation-seeded load, and inline report detail. -->
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import {
   Pinboard,
   MapNavigationControl,
@@ -23,6 +24,15 @@ import LocationAccuracyCircle from '@/components/LocationAccuracyCircle.vue'
 const finder = useReportFinder()
 const isMobile = PinboardComposables.useIsMobile()
 const searchPlaceholder = 'Search by address or ZIP'
+
+const route = useRoute()
+const selectedReportId = computed(() =>
+  typeof route.query.location === 'string' ? route.query.location : undefined,
+)
+const { visibleLocations, setMapBounds } = PinboardComposables.useMapBoundsFilter(
+  finder.locations,
+  { alwaysInclude: selectedReportId },
+)
 
 function getMapCardProps(location: PinboardTypes.BasicLocation): MapCardProps {
   const report = finder.reportById(location.id)
@@ -56,7 +66,7 @@ async function onSearch(query: string) {
 
 <template>
   <Pinboard
-    :locations="finder.locations.value"
+    :locations="visibleLocations"
     :search-or-user-location="finder.searchOrUserLocation.value"
     :is-loading="finder.isLoading.value ? 'Loading reports…' : false"
     :error-message="finder.errorMessage.value"
@@ -66,6 +76,7 @@ async function onSearch(query: string) {
     location-panel-count-noun="report"
     :location-search-mode="locationSearchMode"
     @search="onSearch"
+    @bounds-change="setMapBounds"
   >
     <template #locations-header>
       <ReportCallout />

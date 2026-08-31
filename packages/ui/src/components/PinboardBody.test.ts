@@ -12,6 +12,7 @@ import type { BasicLocation, MapCardPropsGetter } from '../types'
 vi.mock('./MapPanel.vue', () => ({
   default: {
     name: 'MapPanel',
+    props: ['onBoundsChange'],
     template: '<div class="map-panel-stub" />',
     methods: { panTo: () => {} },
   },
@@ -209,5 +210,17 @@ describe.skip('page-header slot', () => {
     const w = await mountPinboardBody()
     expect(w.find('.finder-page-header').exists()).toBe(false)
     expect(w.find('.finder-panel').classes()).not.toContain('finder-panel--with-page-header')
+  })
+})
+
+describe('PinboardBody - bounds-change emit', () => {
+  it('re-emits bounds reported by MapPanel', async () => {
+    const w = await mountPinboardBody({ isMobile: false })
+    const bounds = { west: -75.2, south: 39.9, east: -75.1, north: 40.0 }
+    const onBoundsChange = w.findComponent({ name: 'MapPanel' }).props('onBoundsChange') as (
+      b: unknown
+    ) => void
+    onBoundsChange(bounds)
+    expect(w.emitted('bounds-change')).toEqual([[bounds]])
   })
 })
