@@ -23,12 +23,12 @@ app.use(
   createSSOPlugin({
     clientConfig: {
       provider: new B2CProvider({
-        clientId: import.meta.env.VITE_SSO_311_CLIENT_ID,
-        b2cEnvironment: import.meta.env.VITE_SSO_311_TENANT,
-        authorityDomain: import.meta.env.VITE_SSO_311_AUTHORITY_DOMAIN,
-        redirectUri: import.meta.env.VITE_SSO_311_REDIRECT_URI,
-        apiScopes: import.meta.env.VITE_SSO_311_API_SCOPE
-          ? [import.meta.env.VITE_SSO_311_API_SCOPE]
+        clientId: import.meta.env.VITE_311_SSO_CLIENT_ID,
+        b2cEnvironment: import.meta.env.VITE_311_SSO_TENANT,
+        authorityDomain: import.meta.env.VITE_311_SSO_AUTHORITY_DOMAIN,
+        redirectUri: import.meta.env.VITE_311_SSO_REDIRECT_URI,
+        apiScopes: import.meta.env.VITE_311_SSO_API_SCOPE
+          ? [import.meta.env.VITE_311_SSO_API_SCOPE]
           : [],
         policies: {
           signUpSignIn: 'B2C_1A_SIGNUP_SIGNIN',

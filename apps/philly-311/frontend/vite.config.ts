@@ -21,13 +21,4 @@ export default defineConfig({
       '@pinboard/ui': fileURLToPath(new URL('../../../packages/ui/src/index.ts', import.meta.url)),
     },
   },
-  server: {
-    proxy: {
-      '/api': {
-        target: process.env.VITE_311_API_URL,
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, `${process.env.VITE_311_API_PROXY}`),
-      },
-    },
-  },
 })

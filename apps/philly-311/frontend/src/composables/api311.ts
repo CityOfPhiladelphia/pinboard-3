@@ -12,8 +12,9 @@ const key = ref('')
 
 async function apiKey(): Promise<string> {
   if (key.value) return key.value
+  const apiId = import.meta.env.VITE_311_API_URL.slice(8, 18)
   const params = new URLSearchParams({
-    apiUrl: 'wdw5s1yfxg',
+    apiUrl: apiId,
   })
   const url = `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/get311Info?${params.toString()}`
   try {
@@ -51,7 +52,10 @@ export function buildUrl(base: string, path: string, query?: QueryParams): strin
 }
 
 function api311Url(path: string, query?: QueryParams): string {
-  return buildUrl(import.meta.env.VITE_311_API_BASE_URL ?? '', path, query)
+  return buildUrl(import.meta.env.VITE_311_API_BASE_URL ?? '', path, query).replace(
+    '/api',
+    `${import.meta.env.VITE_311_API_URL}${import.meta.env.VITE_311_API_PROXY}`,
+  )
 }
 
 interface Api311HeaderOptions {
