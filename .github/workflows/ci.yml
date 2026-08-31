@@ -67,6 +67,7 @@ jobs:
           VITE_SSO_311_AUTHORITY_DOMAIN: ${{ matrix.app.name == 'philly-311' && ((env.branch == 'prod' && secrets.SSO_311_AUTHORITY_DOMAIN_PROD) || (env.branch == 'test' && secrets.SSO_311_AUTHORITY_DOMAIN_TEST) || secrets.SSO_311_AUTHORITY_DOMAIN_DEV) }}
           VITE_SSO_311_REDIRECT_URI: ${{ matrix.app.name == 'philly-311' && ((env.branch == 'prod' && secrets.SSO_311_REDIRECT_URI_PROD) || (env.branch == 'test' && secrets.SSO_311_REDIRECT_URI_TEST) || secrets.SSO_311_REDIRECT_URI_DEV) }}
           VITE_SSO_311_API_SCOPE: ${{ matrix.app.name == 'philly-311' && ((env.branch == 'prod' && secrets.SSO_311_API_SCOPE_PROD) || (env.branch == 'test' && secrets.SSO_311_API_SCOPE_TEST) || secrets.SSO_API_SCOPE_DEV) }}
+          VITE_311_API_URL: ${{ matrix.app.name == 'philly-311' && ((env.branch == 'prod' && secrets.API_311_URL_PROD) || (env.branch == 'test' && secrets.API_311_URL_TEST) || secrets.API_311_URL_DEV) }}
           VITE_311_API_BASE_URL: ${{ matrix.app.name == 'philly-311' && '/api' }}
           VITE_311_API_PROXY: ${{ matrix.app.name == 'philly-311' && ((env.branch == 'prod' && '/prod') || (env.branch == 'test' && '/test') || '/dev') }}
           VITE_311_AIS_BASE_URL: ${{ matrix.app.name == 'philly-311' && secrets.AIS_URL }}
