@@ -207,6 +207,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../../packages/typescript-config
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.3.0
       aws-cdk:
         specifier: 'catalog:'
         version: 2.1138.0
@@ -308,6 +311,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../../packages/typescript-config
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.3.0
       aws-cdk:
         specifier: ^2.1120.0
         version: 2.1138.0
@@ -460,6 +466,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../../packages/typescript-config
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.3.0
       aws-cdk:
         specifier: 'catalog:'
         version: 2.1138.0
