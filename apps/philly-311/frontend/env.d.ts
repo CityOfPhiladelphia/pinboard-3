@@ -1,5 +1,5 @@
 // ABOUTME: Vite env var type declarations for philly-311.
-// ABOUTME: Declares the VITE_SSO_311_*, VITE_API_*, VITE_AIS_* names.
+// ABOUTME: Declares the VITE_311_SSO_*, VITE_311_API_*, VITE_311_AIS_* names.
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
