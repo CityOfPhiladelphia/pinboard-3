@@ -55,9 +55,18 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Ship to ${{ env.branch }} with ctl
+      - name: (Action) Ship to ${{ env.branch }} with ctl
         uses: ./.github/actions/ship-app
         with:
           app-name: ${{ matrix.app.name }}
           environment-name: ${{ env.branch }}
           role-arn: ${{ matrix.app.role }}
+        env:
+          VITE_311_SSO_CLIENT_ID: ${{ matrix.app.name == 'philly-311' && ((env.branch == 'prod' && secrets.311_SSO_CLIENT_ID_PROD) || (env.branch == 'test' && secrets.311_SSO_CLIENT_ID_TEST) || secrets.311_SSO_CLIENT_ID_DEV) }}
+          VITE_311_SSO_TENANT: ${{ matrix.app.name == 'philly-311' && ((env.branch == 'prod' && secrets.311_SSO_TENANT_PROD) || (env.branch == 'test' && secrets.311_SSO_TENANT_TEST) || secrets.311_SSO_TENANT_DEV) }}
+          VITE_311_SSO_AUTHORITY_DOMAIN: ${{ matrix.app.name == 'philly-311' && ((env.branch == 'prod' && secrets.311_SSO_AUTHORITY_DOMAIN_PROD) || (env.branch == 'test' && secrets.311_SSO_AUTHORITY_DOMAIN_TEST) || secrets.311_SSO_AUTHORITY_DOMAIN_DEV) }}
+          VITE_311_SSO_REDIRECT_URI: ${{ matrix.app.name == 'philly-311' && ((env.branch == 'prod' && secrets.311_SSO_REDIRECT_URI_PROD) || (env.branch == 'test' && secrets.311_SSO_REDIRECT_URI_TEST) || secrets.311_SSO_REDIRECT_URI_DEV) }}
+          VITE_311_SSO_API_SCOPE: ${{ matrix.app.name == 'philly-311' && ((env.branch == 'prod' && secrets.311_SSO_API_SCOPE_PROD) || (env.branch == 'test' && secrets.311_SSO_API_SCOPE_TEST) || secrets.SSO_API_SCOPE_DEV) }}
+          VITE_311_API_BASE_URL: ${{ matrix.app.name == 'philly-311' && '/api' }}
+          VITE_311_API_PROXY: ${{ matrix.app.name == 'philly-311' && ((env.branch == 'prod' && '/prod') || (env.branch == 'test' && '/test') || '/dev') }}
+          VITE_311_AIS_BASE_URL: ${{ matrix.app.name == 'philly-311' && secrets.AIS_BASE_URL }}

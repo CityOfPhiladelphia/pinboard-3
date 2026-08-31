@@ -1,5 +1,5 @@
 // ABOUTME: Shared URL + header + fetch wrappers for the 311 API. Concatenates
-// ABOUTME: path onto VITE_API_BASE_URL so stage paths (".../test", ".../dev")
+// ABOUTME: path onto VITE_311_API_BASE_URL so stage paths (".../test", ".../dev")
 // ABOUTME: and the same-origin dev proxy ("/api") both round-trip cleanly.
 import type { useAuth } from '@phila/sso-vue'
 import { ref } from 'vue'
@@ -51,7 +51,7 @@ export function buildUrl(base: string, path: string, query?: QueryParams): strin
 }
 
 function api311Url(path: string, query?: QueryParams): string {
-  return buildUrl(import.meta.env.VITE_API_BASE_URL ?? '', path, query)
+  return buildUrl(import.meta.env.VITE_311_API_BASE_URL ?? '', path, query)
 }
 
 interface Api311HeaderOptions {

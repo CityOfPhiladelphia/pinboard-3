@@ -29,13 +29,13 @@ afterEach(() => {
 })
 
 describe('useApi - URL building', () => {
-  it('joins VITE_API_BASE_URL with opts.url', async () => {
+  it('joins VITE_311_API_BASE_URL with opts.url', async () => {
     fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true })))
     const { fetchData } = useApi<{ ok: boolean }>({ url: '/private/key/health' })
     await fetchData()
     const calledUrl = fetchMock.mock.calls[0][0] as string
     expect(calledUrl).toContain('/private/key/health')
-    expect(calledUrl.startsWith(import.meta.env.VITE_API_BASE_URL)).toBe(true)
+    expect(calledUrl.startsWith(import.meta.env.VITE_311_API_BASE_URL)).toBe(true)
   })
 
   it('appends query params, skipping undefined', async () => {

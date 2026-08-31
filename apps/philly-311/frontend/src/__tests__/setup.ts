@@ -15,14 +15,14 @@ vi.stubGlobal(
   },
 )
 
-vi.stubEnv('VITE_API_BASE_URL', 'https://api.example.test')
-vi.stubEnv('VITE_SSO_CLIENT_ID', 'test-client')
-vi.stubEnv('VITE_SSO_TENANT', 'test')
-vi.stubEnv('VITE_SSO_AUTHORITY_DOMAIN', 'test.b2clogin.com')
-vi.stubEnv('VITE_SSO_REDIRECT_URI', 'http://localhost/auth/redirect')
-vi.stubEnv('VITE_AIS_BASE_URL', 'https://ais.example.test')
-vi.stubEnv('VITE_AIS_AUTOCOMPLETE_BASE_URL', 'https://ais-ac.example.test')
-vi.stubEnv('VITE_AIS_GATEKEEPER_KEY', 'test-gatekeeper')
+vi.stubEnv('VITE_311_API_BASE_URL', 'https://api.example.test')
+vi.stubEnv('VITE_311_SSO_CLIENT_ID', 'test-client')
+vi.stubEnv('VITE_311_SSO_TENANT', 'test')
+vi.stubEnv('VITE_311_SSO_AUTHORITY_DOMAIN', 'test.b2clogin.com')
+vi.stubEnv('VITE_311_SSO_REDIRECT_URI', 'http://localhost/auth/redirect')
+vi.stubEnv('VITE_311_AIS_BASE_URL', 'https://ais.example.test')
+vi.stubEnv('VITE_311_AIS_BASE_URL', 'https://ais-ac.example.test')
+vi.stubEnv('VITE_311_AIS_GATEKEEPER_KEY', 'test-gatekeeper')
 
 const stub = (name: string, tag = 'div') =>
   defineComponent({
