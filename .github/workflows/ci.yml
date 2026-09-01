@@ -6,16 +6,16 @@ on:
     branches: [main, test]
 
 jobs:
-  # check:
-  #   name: Lint, type-check, build
-  #   runs-on: ubuntu-latest
+  check:
+    name: Lint, type-check, build
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/checkout@v7
-  #       with:
-  #         fetch-depth: 2
-  #     - name: (Action) Check code
-  #       uses: ./.github/actions/check-code
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+      - name: (Action) Check code
+        uses: ./.github/actions/check-code
 
   detect-changes:
     name: Detect changed apps
@@ -56,7 +56,7 @@ jobs:
           fetch-depth: 2
 
       - name: (Action) Ship to ${{ env.branch }} with ctl
-        # if: github.event.push
+        if: github.event.push
         uses: ./.github/actions/ship-app
         with:
           app-name: ${{ matrix.app.name }}
@@ -64,7 +64,7 @@ jobs:
           role-arn: ${{ case(
             matrix.app.role == 'AWS_ROLE_ARN_TEST_OEM', secrets.AWS_ROLE_ARN_TEST_OEM,
             matrix.app.role == 'AWS_ROLE_ARN_PROD_OEM', secrets.AWS_ROLE_ARN_PROD_OEM,
-            matrix.app.role == 'AWS_ROLE_ARN_TEST_PCF', format('secrets.', matrix.app.role),
+            matrix.app.role == 'AWS_ROLE_ARN_TEST_PCF', secrets.AWS_ROLE_ARN_TEST_PCF,
             matrix.app.role == 'AWS_ROLE_ARN_PROD_PCF', secrets.AWS_ROLE_ARN_PROD_PCF,
             matrix.app.role == 'AWS_ROLE_ARN_311', secrets.AWS_ROLE_ARN_311,
             ''
