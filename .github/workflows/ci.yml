@@ -61,7 +61,7 @@ jobs:
         with:
           app-name: ${{ matrix.app.name }}
           environment-name: ${{ env.branch }}
-          role-arn: ${{ secrets.{matrix.app.role} }}
+          role-arn: ${{ matrix.app.role }}
         env:
           VITE_311_SSO_CLIENT_ID: ${{ matrix.app.name == 'philly-311' && secrets.SSO_311_CLIENT_ID }}
           VITE_311_SSO_TENANT: ${{ matrix.app.name == 'philly-311' && ((env.branch == 'prod' && secrets.SSO_311_TENANT_PROD) || (env.branch == 'test' && secrets.SSO_311_TENANT_TEST) || secrets.SSO_311_TENANT_DEV) }}
