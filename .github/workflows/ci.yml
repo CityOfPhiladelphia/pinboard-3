@@ -58,7 +58,7 @@ jobs:
       - name: Set deploy role
         run: |
           ROLE_VAR=${{ matrix.app.role }}
-          echo "ROLE_ARN=${{ $ROLE_VAR }}" >> "$GITHUB_ENV"
+          echo "ROLE_ARN=${$ROLE_VAR}" >> "$GITHUB_ENV"
 
       - name: (Action) Ship to ${{ env.branch }} with ctl
         # if: github.event.push
