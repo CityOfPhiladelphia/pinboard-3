@@ -20,7 +20,7 @@ jobs:
   detect-changes:
     name: Detect changed apps
     runs-on: ubuntu-latest
-    # needs: check
+    needs: check
     outputs:
       updated: ${{ steps.changes.outputs.updated }}
 
