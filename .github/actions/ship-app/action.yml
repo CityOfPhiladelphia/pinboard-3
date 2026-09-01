@@ -42,4 +42,4 @@ runs:
     - name: Ship to ${{ inputs.environment-name }}
       working-directory: ${{ join('apps/', inputs.app-name) }}
       shell: bash
-      run: city ship ${ inputs.environment-name } --web
+      run: city ship ${{ inputs.environment-name }} --web
