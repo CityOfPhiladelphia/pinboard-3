@@ -1,10 +1,5 @@
 {
-  "extends": "@repo/typescript-config/base.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": ".",
-    "types": ["node"]
-  },
+  "extends": "@repo/typescript-config/cdk.json",
   "include": ["*.ts"],
   "exclude": ["node_modules", "cdk.out"]
 }

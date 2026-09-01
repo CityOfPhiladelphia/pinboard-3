@@ -21,13 +21,4 @@ export default defineConfig({
       '@pinboard/ui': fileURLToPath(new URL('../../../packages/ui/src/index.ts', import.meta.url)),
     },
   },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'https://wdw5s1yfxg.execute-api.us-east-1.amazonaws.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/dev'),
-      },
-    },
-  },
 })

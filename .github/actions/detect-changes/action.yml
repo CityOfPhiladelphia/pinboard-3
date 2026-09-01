@@ -1,0 +1,48 @@
+name: Detect changed apps
+description: 'Check which apps have changes that need to be shipped'
+inputs:
+  branch:
+    required: true
+    description: 'Branch param to chose deployment role when role is tied to branch'
+outputs:
+  updated:
+    description: 'Objects with app name and deploy role ARN'
+    value: ${{ steps.detect-changes.outputs.updated }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Check changed files
+      id: detect-changes
+      shell: bash
+      run: |
+        UPDATED_APPS=""
+        DEPLOY_ARNS=""
+        CHANGED=$(git diff --name-only HEAD^1 HEAD)
+        echo "$CHANGED"
+
+        packages_changed() { echo "$CHANGED" | grep -q "^packages/"; }
+        app_changed() { echo "$CHANGED" | grep -q "^apps/$1/"; }
+        ci_changed() { echo "$CHANGED" | grep -q "^\.github/"; }
+
+        if packages_changed || ci_changed || app_changed "oem-flood-finder"; then
+          ROLE=AWS_ROLE_ARN_TEST_OEM
+          if [ $inputs.branch == "prod" ]; then
+            ROLE=AWS_ROLE_ARN_PROD_OEM
+          fi
+          UPDATED_APPS+=",{\"name\":\"oem-flood-finder\",\"role\":\"$ROLE\"}"
+        fi
+
+        if packages_changed || ci_changed || app_changed "primary-care-finder"; then
+          ROLE=AWS_ROLE_ARN_TEST_PCF
+          if [ $inputs.branch == "prod" ]; then
+            ROLE=AWS_ROLE_ARN_PROD_PCF
+          fi
+          UPDATED_APPS+=",{\"name\":\"primary-care-finder\",\"role\":\"$ROLE\"}"
+        fi
+
+        if packages_changed || ci_changed || app_changed "philly-311"; then
+          UPDATED_APPS+=",{\"name\":\"philly-311\",\"role\":\"AWS_ROLE_ARN_311\"}"
+        fi
+
+        echo "updated=[${UPDATED_APPS:1}]" >> "$GITHUB_OUTPUT"

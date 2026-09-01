@@ -1,0 +1,45 @@
+name: 'Ship app with ctl'
+description: 'Uses cloud template library to deploy apps to AWS'
+inputs:
+  app-name:
+    required: true
+    description: 'App to ship'
+  environment-name:
+    required: true
+    description: 'Environment to ship to'
+  role-arn:
+    required: true
+    description: 'ARN for deployment role'
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: pnpm/setup@v2
+
+    - uses: actions/setup-node@v7
+      with:
+        node-version: 24
+        cache: pnpm
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile
+
+    - name: Install city CLI
+      shell: bash
+      run: npm install -g @phila/cli
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v6
+      with:
+        role-to-assume: ${{ inputs.role-arn }}
+        aws-region: us-east-1
+
+    - name: Build workspace dependencies
+      shell: bash
+      run: pnpm turbo build --filter=@pinboard/${{ inputs.app-name }}^...
+
+    - name: Ship to ${{ inputs.environment-name }}
+      working-directory: ${{ format('apps/{0}', inputs.app-name) }}
+      shell: bash
+      run: city ship ${{ inputs.environment-name }} --web
