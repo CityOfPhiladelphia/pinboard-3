@@ -59,12 +59,7 @@ function onDragEnd(p: { lng: number; lat: number }) {
 <style scoped>
 .location-map {
   width: 100%;
-  height: 420px;
-  position: relative;
-}
-.location-map :deep(.map-wrapper),
-.location-map :deep(.maplibregl-map) {
-  width: 100%;
   height: 100%;
+  position: relative;
 }
 </style>

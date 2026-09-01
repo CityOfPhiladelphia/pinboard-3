@@ -17,7 +17,7 @@ const fileUploadUrl = ref<string>(store.photo.previewUrl || store.photo.mediaUrl
 const errorMessage = ref('')
 const markupComplete = ref(!!fileUploadUrl.value)
 
-const stepTitle = 'Image (optional)'
+const stepTitle = 'Image'
 const stepDescription = `This app uses machine learning to pull location data from your photo and suggest the issue type
     to report. Do not upload any images with personal or sensitive information.`
 

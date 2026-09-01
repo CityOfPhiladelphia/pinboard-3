@@ -109,9 +109,8 @@ function discardAndExit() {
 
 <template>
   <div ref="wizardEl" class="wizard">
-    <div class="wizard__header">
+    <header class="wizard__header">
       <Breadcrumbs :items="[{ label: 'Report an issue' }]" class="wizard__bradcrumbs" />
-
       <StepIndicator
         :steps="STEPS"
         :current-step="currentStep"
@@ -119,10 +118,11 @@ function discardAndExit() {
         class="wizard__steps"
         @navigate="(path: string) => router.push(path)"
       />
-    </div>
+    </header>
     <div class="wizard__content">
       <RouterView />
     </div>
+    <span class="wizard__nav-border" />
     <footer class="wizard__nav">
       <PhilaButton
         size="extra-small"
@@ -161,71 +161,75 @@ function discardAndExit() {
 <style scoped>
 .wizard {
   display: grid;
-  grid-template-areas:
-    'w_header'
-    'w_content'
-    'w_footer';
-  grid-template-rows: 9rem 1fr 7rem;
-  row-gap: var(--spacing-s, 0.75rem);
+  grid-template-columns:
+    [full-start] var(--spacing-xl, 2rem)
+    [breadcrumb-start] var(--spacing-xl, 2rem)
+    [wizard-start] 1fr
+    [steps-start] auto [steps-end]
+    1fr [wizard-end]
+    var(--spacing-xl, 2rem) [breadcrumb-end]
+    var(--spacing-xl, 2rem) [full-end];
+  grid-template-rows:
+    var(--spacing-l, 1.5rem)
+    auto
+    auto
+    var(--spacing-l, 1.5rem)
+    var(--spacing-l, 1.5rem)
+    1fr
+    var(--spacing-l, 1.5rem)
+    0
+    var(--spacing-m, 1rem)
+    auto
+    var(--spacing-m, 1rem);
   height: 100%;
   width: 100%;
-  margin: 0 auto;
 }
 
 .wizard__header {
-  grid-area: w_header;
-  grid-template-areas:
-    'w_breadcrumbs'
-    'w_stepindicator';
-  grid-template-rows: 3fr 5fr;
-  width: 100%;
-  padding: var(--spacing-l, 1.5rem) var(--spacing-xl, 2rem);
+  grid-column: full;
+  grid-row: 1 / 4;
+  padding: 0;
 }
 
 .wizard__bradcrumbs {
-  grid-area: w_breadcrumbs;
-  padding: var(--spacing-xs, 0.5rem);
-}
-
-.wizard__bradcrumbs :deep(li) {
-  margin-bottom: 0;
-  padding-left: 0;
+  grid-column: breadcrumb;
+  grid-row: 2;
+  padding: 0;
 }
 
 .wizard__steps {
-  grid-area: w_stepindicator;
-  display: grid;
+  grid-column: steps;
+  grid-row: 3;
   place-content: center;
 }
 
 .wizard__content {
-  grid-area: w_content;
-  margin: 0 var(--scale-1000, 5rem);
+  grid-column: wizard;
+  grid-row: 6;
+  place-content: center;
   overflow: hidden;
 }
 
-/* Sticky so Exit/Back/Next stay reachable: the wizard scrolls internally
-   (the shell locks the viewport) and steps like Location put a wheel-capturing
-   map over most of the content, so controls at the end of the scroll run
-   can otherwise sit below the fold with no way to reach them. */
+.wizard__nav-border {
+  grid-column: full;
+  grid-row: 8;
+  border-top: 1px solid var(--Schemes-Border-low, #ccc);
+}
+
 .wizard__nav {
-  grid-area: w_footer;
+  grid-column: wizard;
+  grid-row: 10;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-m, 1rem) 0;
-  border-top: 1px solid var(--Schemes-Border-low, #d6d6d6);
-  background: var(--Schemes-Background, #fff);
 }
 
 .wizard__nav-right {
   display: flex;
-  gap: var(--spacing-s, 0.75rem);
-  margin-right: var(--scale-1000, 5rem);
+  column-gap: var(--spacing-m, 1rem);
 }
 
 .wizard__exit {
-  margin-left: var(--scale-1000, 5rem);
   text-decoration: underline;
 }
 </style>
