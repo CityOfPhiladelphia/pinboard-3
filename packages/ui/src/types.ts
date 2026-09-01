@@ -22,6 +22,14 @@ export interface ZipcodePolygon {
   nodes: LongitudeLatitude[]
 }
 
+/** A map viewport's extent, matching the shape @phila/phila-ui-map-core emits on load/moveend. */
+export interface MapBounds {
+  west: number
+  south: number
+  east: number
+  north: number
+}
+
 export type SortMode = 'AlphaAsc' | 'AlphaDesc' | 'DistAsc' | 'DistDesc' | ''
 
 export type SortFunction<T> = (locations: Ref<T[]> | T[]) => T[]

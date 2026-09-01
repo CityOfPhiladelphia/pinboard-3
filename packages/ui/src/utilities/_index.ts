@@ -6,6 +6,7 @@ Contains references to exported functions and useful constants and regular expre
 import { sortLocations } from './sortLocations'
 import { getHaversineDistance } from './getHaversineDistance'
 import { hasLocationData } from './hasLocationData'
+import { isLocationInBounds } from './isLocationInBounds'
 import { slugify } from './slugify'
 export * from './scaleImagesContainers'
 
@@ -24,6 +25,7 @@ export {
   sortLocations,
   getHaversineDistance,
   hasLocationData,
+  isLocationInBounds,
   slugify,
   StreetAddress,
   StreetIntersection,
