@@ -2,10 +2,16 @@
 // ABOUTME: Mocks @pinboard/ui locally so the map library isn't loaded in vitest.
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { defineComponent, h, ref } from 'vue'
+import { defineComponent, h, ref, computed } from 'vue'
 import { mount, flushPromises, RouterLinkStub } from '@vue/test-utils'
+import { createRouter, createMemoryHistory } from 'vue-router'
 import { useOpenIssuesStore } from '@/stores/openIssues'
 import type { Report } from '@/composables/useNearbyReports'
+
+const router = createRouter({
+  history: createMemoryHistory(),
+  routes: [{ path: '/:pathMatch(.*)*', component: { template: '<div />' } }],
+})
 
 vi.mock('@pinboard/ui', () => {
   const Pinboard = defineComponent({
@@ -20,7 +26,7 @@ vi.mock('@pinboard/ui', () => {
       'locationPanelCountNoun',
       'locationSearchMode',
     ],
-    emits: ['search'],
+    emits: ['search', 'bounds-change'],
     setup:
       (props, { slots, emit }) =>
       () =>
@@ -82,7 +88,14 @@ vi.mock('@pinboard/ui', () => {
     MapNavigationControl: passthrough('MapNavigationControl'),
     GeolocationButton: passthrough('GeolocationButton'),
     BasemapToggle: passthrough('BasemapToggle'),
-    PinboardComposables: { useIsMobile: () => ref(false) },
+    PinboardComposables: {
+      useIsMobile: () => ref(false),
+      useMapBoundsFilter: (locations: { value: unknown[] }) => ({
+        mapBounds: ref(null),
+        visibleLocations: computed(() => locations.value),
+        setMapBounds: () => {},
+      }),
+    },
   }
 })
 vi.mock('@/composables/useGeolocation', () => ({
@@ -132,7 +145,9 @@ beforeEach(() => {
 
 describe('LandingPage', () => {
   it('mounts the Pinboard with mapped locations after init', async () => {
-    const w = mount(LandingPage, { global: { stubs: { RouterLink: RouterLinkStub } } })
+    const w = mount(LandingPage, {
+      global: { plugins: [router], stubs: { RouterLink: RouterLinkStub } },
+    })
     await flushPromises()
     expect(w.find('.pinboard-stub').exists()).toBe(true)
     expect(w.find('.count').text()).toBe('2')
@@ -141,7 +156,7 @@ describe('LandingPage', () => {
 
   it('renders the report callout with "Submit request" CTA; trending articles are gone', async () => {
     searchAddress.mockResolvedValue(null)
-    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    const w = mount(LandingPage, { global: { plugins: [router], stubs: globalStubs } })
     await flushPromises()
     const header = w.find('.header')
     expect(header.text()).toContain('Submit a report to 311')
@@ -152,7 +167,7 @@ describe('LandingPage', () => {
   })
 
   it('FilterChips receives only the service types present in the data, prevalence-sorted', async () => {
-    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    const w = mount(LandingPage, { global: { plugins: [router], stubs: globalStubs } })
     await flushPromises()
     const chips = w.findComponent(FilterChips)
     // One option per service type in the data; tie on count breaks alphabetically.
@@ -163,19 +178,19 @@ describe('LandingPage', () => {
   })
 
   it('Pinboard does not receive locationPanelFilter', async () => {
-    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    const w = mount(LandingPage, { global: { plugins: [router], stubs: globalStubs } })
     await flushPromises()
     expect(w.find('.panel-filter-debug').attributes('data-filter-set')).toBe('false')
   })
 
   it('Pinboard receives "report" as the count noun for the desktop count line', async () => {
-    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    const w = mount(LandingPage, { global: { plugins: [router], stubs: globalStubs } })
     await flushPromises()
     expect(w.find('.count-noun-debug').text()).toBe('report')
   })
 
   it('location-card slot renders ReportListingCard for known report and plain text for unknown', async () => {
-    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    const w = mount(LandingPage, { global: { plugins: [router], stubs: globalStubs } })
     await flushPromises()
     const knownCard = w.find('.card-known')
     expect(knownCard.findComponent({ name: 'Report311' }).exists()).toBe(true)
@@ -187,7 +202,9 @@ describe('LandingPage', () => {
 
   it('resolves a search query and recenters the finder', async () => {
     searchAddress.mockResolvedValue({ streetAddress: '1234 Market St', lat: 39.95, lng: -75.16 })
-    const w = mount(LandingPage, { global: { stubs: { RouterLink: RouterLinkStub } } })
+    const w = mount(LandingPage, {
+      global: { plugins: [router], stubs: { RouterLink: RouterLinkStub } },
+    })
     await flushPromises()
     ensureLoaded.mockClear()
     await w.find('.do-search').trigger('click')
@@ -198,7 +215,7 @@ describe('LandingPage', () => {
 
   it('sets address search mode after a successful geocode so the map pans', async () => {
     searchAddress.mockResolvedValue({ lat: 39.9526, lng: -75.1652 })
-    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    const w = mount(LandingPage, { global: { plugins: [router], stubs: globalStubs } })
     await flushPromises()
     expect(w.find('.search-mode-debug').text()).toBe('')
 
@@ -209,7 +226,7 @@ describe('LandingPage', () => {
 
   it('leaves search mode unset when the geocode finds nothing', async () => {
     searchAddress.mockResolvedValue(null)
-    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    const w = mount(LandingPage, { global: { plugins: [router], stubs: globalStubs } })
     await flushPromises()
     await w.find('.do-search').trigger('click')
     await flushPromises()
@@ -217,7 +234,7 @@ describe('LandingPage', () => {
   })
 
   it('renders the accuracy circle after a geolocation fix, absent before', async () => {
-    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    const w = mount(LandingPage, { global: { plugins: [router], stubs: globalStubs } })
     await flushPromises()
     expect(w.findComponent({ name: 'LocationAccuracyCircle' }).exists()).toBe(false)
 
@@ -237,13 +254,13 @@ describe('LandingPage', () => {
   })
 
   it('passes rounded zoom to ClusteredMarkers so pins skip per-frame re-renders', async () => {
-    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    const w = mount(LandingPage, { global: { plugins: [router], stubs: globalStubs } })
     await flushPromises()
     expect(w.findComponent({ name: 'ClusteredMarkers' }).props('zoom')).toBe(13)
   })
 
   it('joins BasemapToggle to the bottom-right desktop control stack with GeolocationButton', async () => {
-    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    const w = mount(LandingPage, { global: { plugins: [router], stubs: globalStubs } })
     await flushPromises()
     expect(w.findComponent({ name: 'BasemapToggle' }).attributes('position')).toBe('bottom-right')
     expect(w.findComponent({ name: 'GeolocationButton' }).attributes('position')).toBe(
@@ -252,7 +269,7 @@ describe('LandingPage', () => {
   })
 
   it('selecting a category chip filters the location list; "All Filters" restores it', async () => {
-    const w = mount(LandingPage, { global: { stubs: globalStubs } })
+    const w = mount(LandingPage, { global: { plugins: [router], stubs: globalStubs } })
     await flushPromises()
     expect(w.find('.count').text()).toBe('2')
 

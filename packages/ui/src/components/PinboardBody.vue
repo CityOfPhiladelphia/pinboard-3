@@ -32,6 +32,7 @@ import type {
   BasicLocation,
   LatLon,
   LocationFilterOption,
+  MapBounds,
   MapCardPropsGetter,
   SearchMode,
   SortLocationsOptions,
@@ -109,6 +110,7 @@ const emit = defineEmits<{
   sortLocationsOption: [sort: SortMode]
   deselect: [locationId: string]
   'update:filterValues': [value: FilterValues]
+  'bounds-change': [bounds: MapBounds]
 }>()
 
 const { t } = useI18n()
@@ -416,6 +418,10 @@ function handleApplyFilter(value: FilterValues) {
   emit('update:filterValues', value)
 }
 
+function handleBoundsChange(bounds: MapBounds) {
+  emit('bounds-change', bounds)
+}
+
 // utility functions
 const effectiveMapConfig = (() => {
   // Merge mobile overrides into the map config ONCE at setup — not reactively.
@@ -537,6 +543,7 @@ function selectedLocationValue(): PinboardLocation {
           :on-hover="handleHover"
           :on-hover-end="handleHoverEnd"
           :on-select="handleMapSelect"
+          :on-bounds-change="handleBoundsChange"
         />
         <div
           v-if="isMobile"

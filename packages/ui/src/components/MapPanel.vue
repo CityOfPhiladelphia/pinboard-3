@@ -6,7 +6,24 @@ import { Map as PhilaMap } from '@phila/phila-ui-map-core'
 // into component chunks). This one file bundles every map-core component's styles
 // plus maplibre's own CSS, so importing it once here is required and covers it all.
 import '@phila/phila-ui-map-core/dist/assets/phila-ui-map-core.css'
-import type { MapConfig, LatLon } from '../types'
+import type { MapConfig, LatLon, MapBounds } from '../types'
+
+/** Structural subset of maplibre-gl's LngLatBounds - avoids depending on maplibre-gl directly for types. */
+interface BoundsLike {
+  getWest: () => number
+  getSouth: () => number
+  getEast: () => number
+  getNorth: () => number
+}
+
+function toMapBounds(bounds: BoundsLike): MapBounds {
+  return {
+    west: bounds.getWest(),
+    south: bounds.getSouth(),
+    east: bounds.getEast(),
+    north: bounds.getNorth(),
+  }
+}
 
 const props = defineProps<{
   config?: MapConfig
@@ -19,6 +36,7 @@ const props = defineProps<{
   onHover?: (id: string) => void
   onHoverEnd?: () => void
   onSelect?: (loc: PinboardLocation) => void
+  onBoundsChange?: (bounds: MapBounds) => void
   mobileControlsTarget?: HTMLDivElement | null
   mobileControlsTargetLeft?: HTMLDivElement | null
   mapContentSlot?: (props: {
@@ -53,6 +71,14 @@ function panTo(coordinates: LatLon) {
 
 defineExpose({ panTo })
 
+function handleMapLoad(mapInstance: { getBounds: () => BoundsLike }) {
+  props.onBoundsChange?.(toMapBounds(mapInstance.getBounds()))
+}
+
+function handleMoveEnd(data: { bounds: MapBounds }) {
+  props.onBoundsChange?.(data.bounds)
+}
+
 const slotProps = computed(() => ({
   locations: props.locations,
   geojson: props.geojson,
@@ -81,7 +107,13 @@ const SlotRenderer = defineComponent({
 
 <template>
   <div class="map-panel">
-    <PhilaMap ref="mapRef" v-bind="config" @zoom="zoom = $event">
+    <PhilaMap
+      ref="mapRef"
+      v-bind="config"
+      @zoom="zoom = $event"
+      @load="handleMapLoad"
+      @moveend="handleMoveEnd"
+    >
       <SlotRenderer v-if="mapContentSlot" :render-fn="mapContentSlot" :render-props="slotProps" />
     </PhilaMap>
 
