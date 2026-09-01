@@ -62,12 +62,12 @@ jobs:
           app-name: ${{ matrix.app.name }}
           environment-name: ${{ env.branch }}
           role-arn: ${{ case(
-            matrix.app.role == 'AWS_ROLE_ARN_TEST_OEM', secrets.AWS_ROLE_ARN_TEST_OEM,
-            matrix.app.role == 'AWS_ROLE_ARN_PROD_OEM', secrets.AWS_ROLE_ARN_PROD_OEM,
-            matrix.app.role == 'AWS_ROLE_ARN_TEST_PCF', secrets.AWS_ROLE_ARN_TEST_PCF,
-            matrix.app.role == 'AWS_ROLE_ARN_PROD_PCF', secrets.AWS_ROLE_ARN_PROD_PCF,
-            matrix.app.role == 'AWS_ROLE_ARN_311', secrets.AWS_ROLE_ARN_311,
-            secrets.AWS_ROLE_ARN_TEST_OEM
+            matrix.app.role == 'AWS_ROLE_ARN_TEST_OEM', secrets.$matrix.app.role,
+            matrix.app.role == 'AWS_ROLE_ARN_PROD_OEM', secrets.$matrix.app.role,
+            matrix.app.role == 'AWS_ROLE_ARN_TEST_PCF', secrets.$matrix.app.role,
+            matrix.app.role == 'AWS_ROLE_ARN_PROD_PCF', secrets.$matrix.app.role,
+            matrix.app.role == 'AWS_ROLE_ARN_311', secrets.$matrix.app.role,
+            secrets.$matrix.app.role
             ) }}
         env:
           VITE_311_SSO_CLIENT_ID: ${{ matrix.app.name == 'philly-311' && secrets.SSO_311_CLIENT_ID }}
