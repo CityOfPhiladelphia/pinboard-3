@@ -1,24 +1,28 @@
 // ABOUTME: Shared URL + header + fetch wrappers for the 311 API. Concatenates
-// ABOUTME: path onto VITE_API_BASE_URL so stage paths (".../test", ".../dev")
-// ABOUTME: and the same-origin dev proxy ("/api") both round-trip cleanly.
+// ABOUTME: request params onto VITE_311_API_URL and stage paths VITE_311_API_PROXY (".../test", ".../dev")
 import type { useAuth } from '@phila/sso-vue'
+import { ref } from 'vue'
 
 export type Auth = ReturnType<typeof useAuth>
 
 export type QueryParams = Record<string, string | number | boolean | undefined>
 
+const key = ref('')
+
 async function apiKey(): Promise<string> {
-  const url = 'https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/get311Info'
+  if (key.value) return key.value
+  const apiId = import.meta.env.VITE_311_API_URL.slice(8, 18)
   const params = new URLSearchParams({
-    apiUrl: 'wdw5s1yfxg',
+    apiUrl: apiId,
   })
+  const url = `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/get311Info?${params.toString()}`
   try {
-    const response = await fetch(`${url}?${params.toString()}`)
+    const response = await fetch(url)
     if (!response.ok) {
       return ''
     }
-    const res = (await response.text()) as string
-    return res
+    key.value = (await response.text()) as string
+    return key.value
   } catch (e) {
     console.error(e)
     return ''
@@ -47,7 +51,14 @@ export function buildUrl(base: string, path: string, query?: QueryParams): strin
 }
 
 function api311Url(path: string, query?: QueryParams): string {
-  return buildUrl(import.meta.env.VITE_API_BASE_URL ?? '', path, query)
+  const url =
+    import.meta.env.VITE_311_API_URL && import.meta.env.VITE_311_API_PROXY
+      ? `${import.meta.env.VITE_311_API_URL}${import.meta.env.VITE_311_API_PROXY}`
+      : ''
+  if (!url) {
+    throw new Error('Failed to load ENVs to build 311 api url')
+  }
+  return buildUrl(url, path, query)
 }
 
 interface Api311HeaderOptions {

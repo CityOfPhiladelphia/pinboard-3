@@ -15,9 +15,9 @@ export interface AisFeature {
   lng: number
 }
 
-const autocompleteBase = () => import.meta.env.VITE_AIS_AUTOCOMPLETE_BASE_URL ?? ''
-const searchBase = () => import.meta.env.VITE_AIS_BASE_URL ?? ''
-const gatekeeperKey = () => import.meta.env.VITE_AIS_GATEKEEPER_KEY ?? ''
+const autocompleteBase = () => import.meta.env.VITE_311_AIS_BASE_URL ?? ''
+const searchBase = () => import.meta.env.VITE_311_AIS_BASE_URL ?? ''
+const gatekeeperKey = () => import.meta.env.VITE_311_AIS_GATEKEEPER_KEY ?? ''
 
 export async function autocompleteAddresses(
   q: string,

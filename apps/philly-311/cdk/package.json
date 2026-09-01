@@ -21,6 +21,7 @@
     "@repo/typescript-config": "workspace:*",
     "aws-cdk": "^2.1120.0",
     "ts-node": "^10.9.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "@types/node": "catalog:"
   }
 }

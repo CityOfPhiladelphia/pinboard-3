@@ -4,12 +4,6 @@
     "@vue/tsconfig/tsconfig.json",
     "./base.json"
   ],
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.vue",
-    "eslint.config.mjs",
-    "vite.config.ts"
-  ],
   "types": ["node", "vue"],
   "compilerOptions": {
     "plugins": [

@@ -1,0 +1,32 @@
+name: Check Code
+description: 'Check code compliance and testing'
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: pnpm/setup@v2
+
+    - uses: actions/setup-node@v7
+      with:
+        node-version: 24
+        cache: pnpm
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile
+
+    - name: Lint
+      shell: bash
+      run: pnpm turbo lint
+
+    - name: Format check
+      shell: bash
+      run: pnpm turbo format:check
+
+    - name: Type-check
+      shell: bash
+      run: pnpm turbo type-check
+
+    - name: Build
+      shell: bash
+      run: pnpm turbo build
