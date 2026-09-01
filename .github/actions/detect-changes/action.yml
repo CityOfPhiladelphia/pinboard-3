@@ -26,23 +26,23 @@ runs:
         ci_changed() { echo "$CHANGED" | grep -q "^\.github/"; }
 
         if packages_changed || ci_changed || app_changed "oem-flood-finder"; then
-          ROLE=$secrets.AWS_ROLE_ARN_TEST_OEM
+          ROLE=AWS_ROLE_ARN_TEST_OEM
           if [ $inputs.branch == "prod" ]; then
-            ROLE=$secrets.AWS_ROLE_ARN_PROD_OEM
+            ROLE=AWS_ROLE_ARN_PROD_OEM
           fi
           UPDATED_APPS+=",{\"name\":\"oem-flood-finder\",\"role\":\"$ROLE\"}"
         fi
 
         if packages_changed || ci_changed || app_changed "primary-care-finder"; then
-          ROLE=$secrets.AWS_ROLE_ARN_TEST_PCF
+          ROLE=AWS_ROLE_ARN_TEST_PCF
           if [ $inputs.branch == "prod" ]; then
-            ROLE=$secrets.AWS_ROLE_ARN_PROD_PCF
+            ROLE=AWS_ROLE_ARN_PROD_PCF
           fi
           UPDATED_APPS+=",{\"name\":\"primary-care-finder\",\"role\":\"$ROLE\"}"
         fi
 
         if packages_changed || ci_changed || app_changed "philly-311"; then
-          UPDATED_APPS+=",{\"name\":\"philly-311\",\"role\":\"$secrets.AWS_ROLE_ARN_311\"}"
+          UPDATED_APPS+=",{\"name\":\"philly-311\",\"role\":\"AWS_ROLE_ARN_311\"}"
         fi
 
         echo "updated=[${UPDATED_APPS:1}]" >> "$GITHUB_OUTPUT"
