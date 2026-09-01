@@ -55,18 +55,20 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Set deploy role
-        run: |
-          ROLE_VAR=${{ matrix.app.role }}
-          echo "ROLE_ARN=${$ROLE_VAR}" >> "$GITHUB_ENV"
-
       - name: (Action) Ship to ${{ env.branch }} with ctl
         # if: github.event.push
         uses: ./.github/actions/ship-app
         with:
           app-name: ${{ matrix.app.name }}
           environment-name: ${{ env.branch }}
-          role-arn: ${{ env.ROLE_ARN }}
+          role-arn: ${{ case(
+            matrix.app.role == 'AWS_ROLE_ARN_TEST_OEM', secrets.AWS_ROLE_ARN_TEST_OEM,
+            matrix.app.role == 'AWS_ROLE_ARN_PROD_OEM', secrets.AWS_ROLE_ARN_PROD_OEM,
+            matrix.app.role == 'AWS_ROLE_ARN_TEST_PCF', secrets.AWS_ROLE_ARN_TEST_PCF,
+            matrix.app.role == 'AWS_ROLE_ARN_PROD_PCF', secrets.AWS_ROLE_ARN_PROD_PCF,
+            matrix.app.role == 'AWS_ROLE_ARN_311', secrets.AWS_ROLE_ARN_311,
+            secrets.AWS_ROLE_ARN_TEST_OEM
+            ) }}
         env:
           VITE_311_SSO_CLIENT_ID: ${{ matrix.app.name == 'philly-311' && secrets.SSO_311_CLIENT_ID }}
           VITE_311_SSO_TENANT: ${{ matrix.app.name == 'philly-311' && ((env.branch == 'prod' && secrets.SSO_311_TENANT_PROD) || (env.branch == 'test' && secrets.SSO_311_TENANT_TEST) || secrets.SSO_311_TENANT_DEV) }}
