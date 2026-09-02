@@ -9,6 +9,8 @@ import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useWizardValidity } from '@/composables/useWizardValidity'
 import ReportStep from '@/components/wizard/ReportStep.vue'
 import ImageUploadDialog from '@/components/wizard/ImageUploadDialog.vue'
+import { getImgLocationInfo } from '@pinboard/core'
+import { reverseGeocode } from '@/composables/useAis'
 
 const store = useReportSubmissionStore()
 
@@ -73,12 +75,25 @@ function removeImage() {
 
 function validateFileType(maybeFile: File | undefined) {
   if (maybeFile && /image\/(?:jpe?g|png)/.test(maybeFile?.type)) {
+    getLocationFromImage(maybeFile)
     return URL.createObjectURL(maybeFile)
   } else {
     errorMessage.value = `Invalid file type: ${maybeFile?.type}. Must be jpeg or png.`
     console.error(errorMessage.value)
     return ''
   }
+}
+
+function getLocationFromImage(image: File) {
+  getImgLocationInfo(image).then((loc) => {
+    if (loc.latitude) {
+      reverseGeocode(loc.latitude, loc.longitude).then((response) => {
+        if (response) {
+          store.setLocation(response)
+        }
+      })
+    }
+  })
 }
 </script>
 

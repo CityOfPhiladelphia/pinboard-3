@@ -8,8 +8,8 @@ import {
   autocompleteAddresses,
   searchAddress,
   type AisAutocompleteResult,
-  type AisFeature,
 } from '@/composables/useAis'
+import type { AisFeature } from '@/types/wizard'
 
 const emit = defineEmits<{ select: [feature: AisFeature] }>()
 

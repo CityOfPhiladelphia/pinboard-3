@@ -126,7 +126,7 @@ function handleMouseLeave(ev: MouseEvent) {
   height: 0px;
   border: var(--border-width-s, 0.0625rem) solid var(--Schemes-Border-low, rgb(204, 204, 204));
   margin: var(--spacing-m, 1rem) 0;
-  width: var(--scale-450, 2.25rem);
+  width: clamp(var(--spacing-s, 0.75rem), 3vw, var(--scale-450, 2.25rem));
 }
 
 .step-button {

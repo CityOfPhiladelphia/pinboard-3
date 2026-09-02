@@ -11,7 +11,6 @@ import { useRouter, useRoute } from 'vue-router'
 import StepIndicator from '@/components/wizard/StepIndicator.vue'
 import ExitDialog from '@/components/wizard/ExitDialog.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
-import { Breadcrumbs } from '@phila/phila-ui-breadcrumbs'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useMyCasesStore } from '@/stores/myCases'
 import { WIZARD_CAN_ADVANCE_KEY, WIZARD_SHOW_ERRORS_KEY } from '@/composables/useWizardValidity'
@@ -109,16 +108,13 @@ function discardAndExit() {
 
 <template>
   <div ref="wizardEl" class="wizard">
-    <header class="wizard__header">
-      <Breadcrumbs :items="[{ label: 'Report an issue' }]" class="wizard__bradcrumbs" />
-      <StepIndicator
-        :steps="STEPS"
-        :current-step="currentStep"
-        :completed-through="completedThrough"
-        class="wizard__steps"
-        @navigate="(path: string) => router.push(path)"
-      />
-    </header>
+    <StepIndicator
+      :steps="STEPS"
+      :current-step="currentStep"
+      :completed-through="completedThrough"
+      class="wizard__steps"
+      @navigate="(path: string) => router.push(path)"
+    />
     <div class="wizard__content">
       <RouterView />
     </div>
@@ -162,63 +158,47 @@ function discardAndExit() {
 .wizard {
   display: grid;
   grid-template-columns:
-    [full-start] var(--spacing-xl, 2rem)
-    [breadcrumb-start] var(--spacing-xl, 2rem)
+    [full-start] var(--scale-800, 4rem)
     [wizard-start] 1fr
     [steps-start] auto [steps-end]
     1fr [wizard-end]
-    var(--spacing-xl, 2rem) [breadcrumb-end]
-    var(--spacing-xl, 2rem) [full-end];
+    var(--scale-800, 4rem) [full-end];
   grid-template-rows:
     var(--spacing-l, 1.5rem)
-    auto
-    auto
+    [steps-row] auto
     var(--spacing-l, 1.5rem)
+    [wizard-row] 1fr
     var(--spacing-l, 1.5rem)
-    1fr
-    var(--spacing-l, 1.5rem)
-    0
+    [footer-border] 0
     var(--spacing-m, 1rem)
-    auto
+    [wizard-footer] auto
     var(--spacing-m, 1rem);
   height: 100%;
   width: 100%;
-}
-
-.wizard__header {
-  grid-column: full;
-  grid-row: 1 / 4;
-  padding: 0;
-}
-
-.wizard__bradcrumbs {
-  grid-column: breadcrumb;
-  grid-row: 2;
-  padding: 0;
+  overflow: auto;
 }
 
 .wizard__steps {
   grid-column: steps;
-  grid-row: 3;
+  grid-row: steps-row;
   place-content: center;
 }
 
 .wizard__content {
   grid-column: wizard;
-  grid-row: 6;
+  grid-row: wizard-row;
   place-content: center;
-  overflow: hidden;
 }
 
 .wizard__nav-border {
   grid-column: full;
-  grid-row: 8;
+  grid-row: footer-border;
   border-top: 1px solid var(--Schemes-Border-low, #ccc);
 }
 
 .wizard__nav {
   grid-column: wizard;
-  grid-row: 10;
+  grid-row: wizard-footer;
   display: flex;
   justify-content: space-between;
   align-items: center;

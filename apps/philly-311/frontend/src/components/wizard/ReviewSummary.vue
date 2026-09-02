@@ -33,7 +33,7 @@ const answers = computed(() => {
 const locationText = computed(() => {
   const loc = store.location
   if (!loc) return '—'
-  const base = loc.address || `${loc.lat}, ${loc.lng}`
+  const base = loc.streetAddress || `${loc.lat}, ${loc.lng}`
   return loc.zipCode ? `${base} (${loc.zipCode})` : base
 })
 </script>

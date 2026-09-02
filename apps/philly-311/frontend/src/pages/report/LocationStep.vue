@@ -1,10 +1,10 @@
 <!-- ABOUTME: Wizard step 3 — location. AIS address search is primary; a persistent
      map shows the chosen point with a draggable pin; "Use my current location" uses
-     browser geolocation. Stores a complete WizardLocation; Next gated on in-Philly. -->
+     browser geolocation. Stores a complete AisFeature; Next gated on in-Philly. -->
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
-import { reverseGeocode, type AisFeature } from '@/composables/useAis'
+import { reverseGeocode } from '@/composables/useAis'
 // import { getCurrentPosition } from '@/composables/useGeolocation'
 import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { isInPhilly } from '@/utils/bounds'
@@ -13,6 +13,7 @@ import { Callout } from '@phila/phila-ui-callout'
 // import AddressSearch from '@/components/wizard/AddressSearch.vue'
 import LocationMap from '@/components/wizard/LocationMap.vue'
 import ReportStep from '@/components/wizard/ReportStep.vue'
+import type { AisFeature } from '@/types/wizard'
 
 const stepTitle = 'Confirm Location'
 const defaultError = 'Choose an address to continue'
@@ -42,7 +43,7 @@ const mapLocation = computed(() =>
 
 function onSelect(f: AisFeature) {
   intent++
-  store.setLocation({ address: f.streetAddress, zipCode: f.zipCode, lat: f.lat, lng: f.lng })
+  store.setLocation(f)
   if (isInPhilly(f.lat, f.lng)) locationError.value = ''
 }
 

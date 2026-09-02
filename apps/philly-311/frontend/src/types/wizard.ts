@@ -18,8 +18,8 @@ export interface ContactInfo {
   phone?: string
 }
 
-export interface WizardLocation {
-  address: string
+export interface AisFeature {
+  streetAddress: string
   zipCode?: string
   lat: number
   lng: number
@@ -58,7 +58,7 @@ export interface ReportDraft {
   savedAt: string
   category: string | null
   customFields: Record<string, string>
-  location: WizardLocation | null
+  location: AisFeature | null
   description: string
   contact: ContactInfo
   publicVisibility: boolean
