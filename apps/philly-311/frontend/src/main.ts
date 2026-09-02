@@ -44,7 +44,7 @@ app.use(router)
 app.provide('router', router)
 app.use(
   createPinboard({
-    title: 'Philly 311',
+    title: 'Philly311',
     map: {
       center: [-75.1652, 39.9526],
       zoom: 11,

@@ -65,7 +65,7 @@ function login() {
       variant: 'city',
       layout: 'single-line',
       colorScheme: 'on-primary',
-      customName: 'Philly 311',
+      customName: 'Philly311',
       href: '/',
     }"
     :links="navLinks"

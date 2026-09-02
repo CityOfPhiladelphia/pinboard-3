@@ -135,5 +135,6 @@ async function onMove({ lat, lng }: { lat: number; lng: number }) {
 .location-step__map {
   grid-column: 1 / -1;
   grid-row: 2;
+  overflow: hidden;
 }
 </style>

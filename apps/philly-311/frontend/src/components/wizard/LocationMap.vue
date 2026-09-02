@@ -60,6 +60,11 @@ function onDragEnd(p: { lng: number; lat: number }) {
 .location-map {
   width: 100%;
   height: 100%;
-  position: relative;
+}
+
+/* disabled lint check because linter has no way of detecting classes of imported PhilaMap component */
+/* eslint-disable-next-line vue-scoped-css/no-unused-selector */
+.location-map > .map-wrapper {
+  position: static;
 }
 </style>
