@@ -12,12 +12,9 @@ function mountCallout() {
 }
 
 describe('ReportCallout', () => {
-  it('renders the heading and a CTA linking to /report', () => {
+  it('renders the heading', () => {
     const w = mountCallout()
     expect(w.text()).toContain('Submit a report to 311')
-    const cta = w.find('a[href="/report"]')
-    expect(cta.exists()).toBe(true)
-    expect(cta.text()).toContain('Submit request')
   })
 
   it('renders the intro copy with an About Philly311 link opening in a new tab', () => {

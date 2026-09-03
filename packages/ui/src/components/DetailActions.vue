@@ -3,7 +3,7 @@ import { ref, nextTick, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { Tooltip } from '@phila/phila-ui-tooltip'
-import { IconPrint, IconShareNodes, IconCheck } from '@phila/phila-ui-core/icons'
+import { IconPrint, IconShare, IconCheck } from '@phila/phila-ui-core/icons'
 
 defineProps<{
   onPrint?: () => void
@@ -47,7 +47,7 @@ onBeforeUnmount(() => {
   <div class="detail-actions">
     <Tooltip ref="shareTip" type="plain" :trigger="copied ? 'click' : 'hover'">
       <PhilaButton
-        :icon="copied ? IconCheck : IconShareNodes"
+        :icon="copied ? IconCheck : IconShare"
         :icon-only="true"
         variant="standard"
         size="small"

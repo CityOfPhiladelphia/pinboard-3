@@ -1,14 +1,13 @@
-<!-- ABOUTME: Landing-header callout: heading + lede + the primary "Submit request" CTA
-     routing to /report. The CTA used to carry its own document illustration, but that
-     glyph now lives on the header's "Report an issue" link, so it's dropped here. -->
-<script setup lang="ts">
-import { PhilaButton } from '@phila/phila-ui-button'
-</script>
+<!-- ABOUTME: Landing-header callout: heading + lede intro copy. Used to also carry the
+     primary "Submit request" CTA, but that's now a floating "Report an issue" button
+     overlaying the bottom of the locations panel instead (see ReportCta.vue) — the CTA's
+     document illustration lives on the header's "Report an issue" nav link, unrelated. -->
+<script setup lang="ts"></script>
 
 <template>
   <section class="report-callout">
-    <h2 class="report-callout__title">Submit a report to 311</h2>
-    <p class="report-callout__lede">
+    <div class="report-callout__title has-text-heading-5">Submit a report to 311</div>
+    <div class="report-callout__lede has-text-body-small">
       Let us know if there's a non-emergency issue that needs attention. The Philly311 team will
       direct your report to the right department.
       <a
@@ -18,33 +17,31 @@ import { PhilaButton } from '@phila/phila-ui-button'
         rel="noopener"
         >About Philly311.</a
       >
-    </p>
-    <PhilaButton variant="primary" size="large" to="/report" class="report-callout__cta">
-      Submit request
-    </PhilaButton>
+    </div>
   </section>
 </template>
 
 <style scoped>
 .report-callout {
-  padding: var(--spacing-m, 1rem);
+  /* Figma's Header frame: 16px sides, 24px top/bottom — not a uniform inset. */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs, 0.5rem);
+  padding: var(--spacing-l, 1.5rem) var(--spacing-m, 1rem);
 }
 .report-callout__title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 var(--spacing-xs, 0.5rem);
+  /* Font comes from .has-text-heading-5 (matches Figma's "Heading/H5" text
+     style) — this class only carries what that utility doesn't. */
+  margin: 0;
 }
 .report-callout__lede {
-  margin: 0 0 var(--spacing-s, 0.75rem);
+  /* Font comes from .has-text-body-small. */
+  margin: 0;
   color: var(--Schemes-On-Surface-Variant, #4a4a4a);
 }
 .report-callout__about-link {
   color: var(--Schemes-Primary, #1034f4);
   font-weight: 700;
   text-decoration: underline;
-}
-.report-callout__cta {
-  width: 100%;
-  max-width: none;
 }
 </style>

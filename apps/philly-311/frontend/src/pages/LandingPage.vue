@@ -15,6 +15,7 @@ import { useReportFinder } from '@/composables/useReportFinder'
 import ReportDetail from '@/components/ReportDetail.vue'
 import { searchAddress } from '@/composables/useAis'
 import ReportCallout from '@/components/ReportCallout.vue'
+import ReportCta from '@/components/ReportCta.vue'
 import FilterChips from '@/components/FilterChips.vue'
 import ReportListingCard from '@/components/ReportListingCard.vue'
 import MapConstraints from '@/components/MapConstraints.vue'
@@ -80,6 +81,10 @@ async function onSearch(query: string) {
   >
     <template #locations-header>
       <ReportCallout />
+    </template>
+
+    <template #locations-footer>
+      <ReportCta />
     </template>
 
     <template #locations-filters>
@@ -153,6 +158,19 @@ async function onSearch(query: string) {
 </template>
 
 <style>
+.location-search:not(.mobile) {
+  padding-top: 0 !important;
+}
+
+.phila-input .content {
+  height: var(--scale-400) !important;
+}
+.phila-input .phila-text-field-input::placeholder {
+  font-family: var(--Body-Small-font-body-small-family) !important;
+  font-size: var(--Body-Small-font-body-small-size) !important;
+  line-height: var(--Body-Small-font-body-small-lineheight) !important;
+}
+
 .location-card--custom:not(.location-card--selected) {
   border: none;
   border-radius: 0;

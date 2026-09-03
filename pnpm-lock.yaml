@@ -13,80 +13,80 @@ catalogs:
       specifier: ^0.11.4
       version: 0.11.5
     '@phila/phila-ui-app-footer':
-      specifier: 1.2.5-beta.2
-      version: 1.2.5-beta.2
+      specifier: 1.2.5-beta.4
+      version: 1.2.5-beta.4
     '@phila/phila-ui-app-header':
-      specifier: 2.0.0-beta.3
-      version: 2.0.0-beta.3
+      specifier: 2.0.0-beta.5
+      version: 2.0.0-beta.5
     '@phila/phila-ui-bottom-sheet':
-      specifier: 0.1.2-beta.2
-      version: 0.1.2-beta.2
+      specifier: 0.1.2-beta.4
+      version: 0.1.2-beta.4
     '@phila/phila-ui-breadcrumbs':
-      specifier: 0.2.5-beta.2
-      version: 0.2.5-beta.2
+      specifier: 0.2.5-beta.4
+      version: 0.2.5-beta.4
     '@phila/phila-ui-button':
-      specifier: 2.3.2-beta.2
-      version: 2.3.2-beta.2
+      specifier: 2.3.2-beta.4
+      version: 2.3.2-beta.4
     '@phila/phila-ui-callout':
-      specifier: 1.1.0-beta.3
-      version: 1.1.0-beta.3
+      specifier: 1.1.0-beta.5
+      version: 1.1.0-beta.5
     '@phila/phila-ui-cards':
-      specifier: 0.3.0-beta.3
-      version: 0.3.0-beta.3
+      specifier: 0.3.0-beta.5
+      version: 0.3.0-beta.5
     '@phila/phila-ui-charts':
-      specifier: 0.1.2-beta.3
-      version: 0.1.2-beta.3
+      specifier: 0.1.2-beta.5
+      version: 0.1.2-beta.5
     '@phila/phila-ui-checkbox':
-      specifier: 1.1.0-beta.2
-      version: 1.1.0-beta.2
+      specifier: 1.1.0-beta.4
+      version: 1.1.0-beta.4
     '@phila/phila-ui-core':
-      specifier: 3.1.0-beta.2
-      version: 3.1.0-beta.2
+      specifier: 3.1.0-beta.4
+      version: 3.1.0-beta.4
     '@phila/phila-ui-date-field':
-      specifier: 0.1.2-beta.2
-      version: 0.1.2-beta.2
+      specifier: 0.1.2-beta.4
+      version: 0.1.2-beta.4
     '@phila/phila-ui-filter-chip':
-      specifier: 1.1.2-beta.3
-      version: 1.1.2-beta.3
+      specifier: 1.1.2-beta.5
+      version: 1.1.2-beta.5
     '@phila/phila-ui-filter-panel':
-      specifier: 1.0.2-beta.3
-      version: 1.0.2-beta.3
+      specifier: 1.0.2-beta.5
+      version: 1.0.2-beta.5
     '@phila/phila-ui-link':
-      specifier: 1.1.2-beta.2
-      version: 1.1.2-beta.2
+      specifier: 1.1.2-beta.4
+      version: 1.1.2-beta.4
     '@phila/phila-ui-logo':
-      specifier: 0.1.5-beta.2
-      version: 0.1.5-beta.2
+      specifier: 0.1.5-beta.4
+      version: 0.1.5-beta.4
     '@phila/phila-ui-map-core':
-      specifier: 1.3.0-beta.6
-      version: 1.3.0-beta.6
+      specifier: 1.3.0-beta.9
+      version: 1.3.0-beta.9
     '@phila/phila-ui-menu':
-      specifier: 0.1.3-beta.2
-      version: 0.1.3-beta.2
+      specifier: 0.1.3-beta.4
+      version: 0.1.3-beta.4
     '@phila/phila-ui-radio':
-      specifier: 1.1.0-beta.2
-      version: 1.1.0-beta.2
+      specifier: 1.1.0-beta.4
+      version: 1.1.0-beta.4
     '@phila/phila-ui-search':
-      specifier: 1.2.2-beta.2
-      version: 1.2.2-beta.2
+      specifier: 1.2.2-beta.4
+      version: 1.2.2-beta.4
     '@phila/phila-ui-switch':
-      specifier: 0.0.7-beta.2
-      version: 0.0.7-beta.2
+      specifier: 0.0.7-beta.4
+      version: 0.0.7-beta.4
     '@phila/phila-ui-table':
-      specifier: 1.0.2-beta.2
-      version: 1.0.2-beta.2
+      specifier: 1.0.2-beta.4
+      version: 1.0.2-beta.4
     '@phila/phila-ui-tabs':
-      specifier: 2.0.0-beta.2
-      version: 2.0.0-beta.2
+      specifier: 2.0.0-beta.4
+      version: 2.0.0-beta.4
     '@phila/phila-ui-tags':
-      specifier: 0.1.2-beta.3
-      version: 0.1.2-beta.3
+      specifier: 0.1.2-beta.5
+      version: 0.1.2-beta.5
     '@phila/phila-ui-text-field':
-      specifier: 1.2.2-beta.2
-      version: 1.2.2-beta.2
+      specifier: 1.2.2-beta.4
+      version: 1.2.2-beta.4
     '@phila/phila-ui-tooltip':
-      specifier: 0.1.2-beta.2
-      version: 0.1.2-beta.2
+      specifier: 0.1.2-beta.4
+      version: 0.1.2-beta.4
     '@types/node':
       specifier: ^26.3.0
       version: 26.4.0
@@ -150,6 +150,9 @@ catalogs:
     vue-tsc:
       specifier: ^3.3.11
       version: 3.3.11
+
+overrides:
+  '@cyclomedia/streetsmart-api': 26.3.1
 
 importers:
 
@@ -224,28 +227,28 @@ importers:
     dependencies:
       '@phila/phila-ui-button':
         specifier: 'catalog:'
-        version: 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-charts':
         specifier: 'catalog:'
-        version: 0.1.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.1.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-core':
         specifier: 'catalog:'
-        version: 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-link':
         specifier: 'catalog:'
-        version: 1.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-logo':
         specifier: 'catalog:'
-        version: 0.1.5-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.1.5-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-table':
         specifier: 'catalog:'
-        version: 1.0.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.0.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-tabs':
         specifier: 'catalog:'
-        version: 2.0.0-beta.2(@phila/phila-ui-core@3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 2.0.0-beta.4(@phila/phila-ui-core@3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-tags':
         specifier: 'catalog:'
-        version: 0.1.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.1.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@pinboard/ui':
         specifier: workspace:*
         version: link:../../../packages/ui
@@ -328,52 +331,52 @@ importers:
     dependencies:
       '@phila/phila-ui-app-header':
         specifier: 'catalog:'
-        version: 2.0.0-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 2.0.0-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-breadcrumbs':
         specifier: 'catalog:'
-        version: 0.2.5-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.2.5-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-button':
         specifier: 'catalog:'
-        version: 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-callout':
         specifier: 'catalog:'
-        version: 1.1.0-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.1.0-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-cards':
         specifier: 'catalog:'
-        version: 0.3.0-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.3.0-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-checkbox':
         specifier: 'catalog:'
-        version: 1.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-core':
         specifier: 'catalog:'
-        version: 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-date-field':
         specifier: 'catalog:'
-        version: 0.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-filter-chip':
         specifier: 'catalog:'
-        version: 1.1.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.1.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-filter-panel':
         specifier: 'catalog:'
-        version: 1.0.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.0.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-map-core':
         specifier: 'catalog:'
-        version: 1.3.0-beta.6(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.3.0-beta.9(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-radio':
         specifier: 'catalog:'
-        version: 1.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-search':
         specifier: 'catalog:'
-        version: 1.2.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.2.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-switch':
         specifier: 'catalog:'
-        version: 0.0.7-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.0.7-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-tags':
         specifier: 'catalog:'
-        version: 0.1.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.1.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-text-field':
         specifier: 'catalog:'
-        version: 1.2.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.2.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/sso-core':
         specifier: ^0.2.0
         version: 0.2.0
@@ -483,13 +486,13 @@ importers:
     dependencies:
       '@phila/phila-ui-button':
         specifier: 'catalog:'
-        version: 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-core':
         specifier: 'catalog:'
-        version: 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-tags':
         specifier: 'catalog:'
-        version: 0.1.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.1.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@pinboard/ui':
         specifier: workspace:*
         version: link:../../../packages/ui
@@ -602,70 +605,70 @@ importers:
     dependencies:
       '@phila/phila-ui-app-footer':
         specifier: 'catalog:'
-        version: 1.2.5-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.2.5-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-app-header':
         specifier: 'catalog:'
-        version: 2.0.0-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 2.0.0-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-bottom-sheet':
         specifier: 'catalog:'
-        version: 0.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-button':
         specifier: 'catalog:'
-        version: 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-callout':
         specifier: 'catalog:'
-        version: 1.1.0-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.1.0-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-cards':
         specifier: 'catalog:'
-        version: 0.3.0-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.3.0-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-charts':
         specifier: 'catalog:'
-        version: 0.1.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.1.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-checkbox':
         specifier: 'catalog:'
-        version: 1.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-core':
         specifier: 'catalog:'
-        version: 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-filter-chip':
         specifier: 'catalog:'
-        version: 1.1.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.1.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-filter-panel':
         specifier: 'catalog:'
-        version: 1.0.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.0.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-link':
         specifier: 'catalog:'
-        version: 1.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-logo':
         specifier: 'catalog:'
-        version: 0.1.5-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.1.5-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-map-core':
         specifier: 'catalog:'
-        version: 1.3.0-beta.6(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.3.0-beta.9(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-menu':
         specifier: 'catalog:'
-        version: 0.1.3-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.1.3-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-radio':
         specifier: 'catalog:'
-        version: 1.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-search':
         specifier: 'catalog:'
-        version: 1.2.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.2.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-table':
         specifier: 'catalog:'
-        version: 1.0.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.0.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-tabs':
         specifier: 'catalog:'
-        version: 2.0.0-beta.2(@phila/phila-ui-core@3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 2.0.0-beta.4(@phila/phila-ui-core@3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-tags':
         specifier: 'catalog:'
-        version: 0.1.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.1.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-text-field':
         specifier: 'catalog:'
-        version: 1.2.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 1.2.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-tooltip':
         specifier: 'catalog:'
-        version: 0.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+        version: 0.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@pinboard/core':
         specifier: workspace:*
         version: link:../core
@@ -936,8 +939,8 @@ packages:
     resolution: {integrity: sha512-QxULHAm7cNu72w97JUNCBFODFaXpbDg+dP8b/oWFAZ2MTRppA3U00Y2L1HqaS4J6yBqxwa/Y3nMBaxVKbB/NsA==}
     engines: {node: '>=20.19.0'}
 
-  '@cyclomedia/streetsmart-api@25.7.1':
-    resolution: {integrity: sha512-TmBsV1fr94EyRRJDU6A9B2Cbh7REQ6exIcZlv/kQyzbiFk9/rpSF1UU8SdxUE+ONpC1NvAGGEQaHX85VVle12w==}
+  '@cyclomedia/streetsmart-api@26.3.1':
+    resolution: {integrity: sha512-0G30iJR8VwQ1/P2p034LUAi0NLTjSDVyvvoGPuJX4LPhh2akBNmbFHiuJ1JhxcFr04F+RNDCY8asMiwiIi3kCA==}
     peerDependencies:
       react: 18.3.1
       react-dom: 18.3.1
@@ -1276,140 +1279,140 @@ packages:
       cdk-nag: ^2.28.0
       constructs: ^10.4.4
 
-  '@phila/phila-ui-app-footer@1.2.5-beta.2':
-    resolution: {integrity: sha512-1zkpTWDEq/5FCa+kwLUIk3uD3WyIw2jjOG3p2AgG5TGE8FI0r7ZJXrMGx2tM7IBK6LSKti12ju4B/XYac53ehw==}
+  '@phila/phila-ui-app-footer@1.2.5-beta.4':
+    resolution: {integrity: sha512-cOjdf/P9P+eLo/mRQP0wxonEIn24aug2aMK9bPFidh6ge+h6PQzhG9bStPvlU+Pnfuvp4o7XGkRDlaV+7ry43Q==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-app-header@2.0.0-beta.3':
-    resolution: {integrity: sha512-UqcdeYAYiGpzrXZZRNxqtxhpNruFIaN1yccdtgl1NUvskFnlxw2X6T8nGDNwV8n071EtdN2C24yaWOBrHEF4Tg==}
+  '@phila/phila-ui-app-header@2.0.0-beta.5':
+    resolution: {integrity: sha512-Ru45HsleMgic5Zycpo0Vds+ly2PJcxcO2M1toMtE3/qeNVI0s24Hj+NWmhSFvmTtRd4k1Syzo3r386mn0tQR4A==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-bottom-sheet@0.1.2-beta.2':
-    resolution: {integrity: sha512-6LrhtbcXIrYR5VQ5GSRQxWuWH3V3jsdBtKtHljaT1v5mSn0O4kYUa8NsvcQBDjch2aqhF/s6nBOIiginvpkY1Q==}
+  '@phila/phila-ui-bottom-sheet@0.1.2-beta.4':
+    resolution: {integrity: sha512-id9c3VZ0rYyswb7KoBQpwBEZWsdfgysZQVpwb4tEfwTAZSnkvyAaJvEr0UF849jsC30+wWaPs4M7Js3d3CDChA==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-breadcrumbs@0.2.5-beta.2':
-    resolution: {integrity: sha512-uHNvMalugA+H1BgOQuJ6aN8TeLC5+CHw79S6D6/dcrSTh1d9Ec9P5Ro0xx5Csl/n05slFiYh68BwcjfyAuFxNQ==}
+  '@phila/phila-ui-breadcrumbs@0.2.5-beta.4':
+    resolution: {integrity: sha512-WbYZgaXmY2tO4K7lLrmCS3L+iqfDf2wfIAhuDkkmUH4eoAs7wAi2/KP7ptH9vTuoMirXN+Za8uWuf4TWYCxJOA==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-button@2.3.2-beta.2':
-    resolution: {integrity: sha512-u9Hezb/UHxLYgVpHg68NnQEQrNMc8DK+U/xvpcmwUeI5PaiMykbpXQ0KZwMxfCk8PJJ6SJLEciFOAXp6Y6RGQQ==}
+  '@phila/phila-ui-button@2.3.2-beta.4':
+    resolution: {integrity: sha512-uFX3D007tKar9Yev68v4iliI6+D4L3ZTxb/x4gHbBRu+5eueqkIHI6ZhI3IQhy+U2o5WeAljfhWkRDwrIb/5bw==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-callout@1.1.0-beta.3':
-    resolution: {integrity: sha512-Cek+xowXy6AHmDhWb3cPkmEY7M34vP3ICzdDzLLAmxHeCHM2+WImdkRie5xaFd19fKXXNPZ2PKud/Hi1ufrHTg==}
+  '@phila/phila-ui-callout@1.1.0-beta.5':
+    resolution: {integrity: sha512-exgTooDD7KKHsq9KdsoBUfYnuAQ6WXrWj3s4jss2lf4DjtKZwkEUKOGq+KcOrOIhuojXD3g3DuK9rC/yIw6KhQ==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-cards@0.3.0-beta.3':
-    resolution: {integrity: sha512-++EOthmFmi+4QFEtHmUtTpCG6lfC7xHjCFGkC87RUHI2DQm8O1Tb1b9UKZNCnSI5IjHjIMe7sYYLpAnMASY5XQ==}
+  '@phila/phila-ui-cards@0.3.0-beta.5':
+    resolution: {integrity: sha512-DER1DF+XTXySQMutThR3LBr8aj7M+gnVGQ5kOHbRwS08hMVl7WiT8PlIJ3l02uQ0ACSZqxhEqKZwVDvXw4TaaA==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-charts@0.1.2-beta.3':
-    resolution: {integrity: sha512-C4zTVoLlNSpiYHopZPbdRaFx0zRNwGzLNkOQL4JRT8mpOYo0y/d4vSa2kSorZnUDjPzlIO9BjN7V3iFOXfd2Bw==}
+  '@phila/phila-ui-charts@0.1.2-beta.5':
+    resolution: {integrity: sha512-G+cIl+VmAjLk5O9bIb65ewqOlkN9q02ewr/5trDbTWrc3k51WuTNuj8S0Ke5QW2+dPiY6kg3VAgmTY+vueqpLg==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-checkbox@1.1.0-beta.2':
-    resolution: {integrity: sha512-WK2z7xeKptSkQ5WiFH5wvFD5tkUqArWhIyNKS8pI+kkPvepZ9pDd2XoG7OpAGfoFbjuWFMsJ5/V0cbBAxg6Qkg==}
+  '@phila/phila-ui-checkbox@1.1.0-beta.4':
+    resolution: {integrity: sha512-V1r01/+DoEu8fHI3yTWQ2/rezzp0YvEEwm7moHncJMiBym0xT/HfYoZAz4P2F9wgFACE8jz/9hul1gYGUvsD3w==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-collapse-panel@0.2.2-beta.2':
-    resolution: {integrity: sha512-HCLLNihXztvhoZkx2j0hhIOnCgkM6Wxzhps2KWBwq+ie1zc6eRHZV1TMoPmvNbZqlS+Abg9fWgooFQb037LMTw==}
+  '@phila/phila-ui-collapse-panel@0.2.2-beta.4':
+    resolution: {integrity: sha512-sbYZRF56L6fUMmK5WHp9HTxnN5pBuSqtfml0RGkhgTM5Qro7BKdtNJai92JoZSQfYje21Y0CqeG5Fmv/kEb+Og==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-core@3.1.0-beta.2':
-    resolution: {integrity: sha512-+H3XMP15KIV0tneSuZL5NUiVmhpOr5HKFxUyma8CdTtIH1K7Q0778LMbMKUZI9XNpNPe4jqhJDnpRbHUmN5f/w==}
+  '@phila/phila-ui-core@3.1.0-beta.4':
+    resolution: {integrity: sha512-k4hKskeS6XQi1jaCvnxSy3JbpIXaDM4njRbn0OF53Mympz4EdtnA1BVO3peeoSWQclZDdYveQyspZxICk14nBw==}
     peerDependencies:
-      vue: ^3.0.0
-      vue-router: ^4.0.0
+      vue: ^3.5.34
+      vue-router: ^5.0.0
     peerDependenciesMeta:
       vue-router:
         optional: true
 
-  '@phila/phila-ui-date-field@0.1.2-beta.2':
-    resolution: {integrity: sha512-Gl/PmBjP6ekKMU9fR/n6WcSmLasXpoNkR3T2X1AXg8eZN50UM9P2o2wd/61OP9hb4c6Hc2+fOYm8VHCxAME46A==}
+  '@phila/phila-ui-date-field@0.1.2-beta.4':
+    resolution: {integrity: sha512-ieKjPPl05gl9vslSGZsiB2ZD5fJZ/JIwx2zdY+/6ukMkIuCV5MsY3hUYA0Uqu0vAv5/CvxedJE425tluhP4C1Q==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-filter-chip@1.1.2-beta.3':
-    resolution: {integrity: sha512-iHqpuJcp69aiNcd0ZLg1HnBMCdGYKPJHUIyfgVLLdj+ZV7Rv5IXTrUbHkN2qp3KJDDxY8GNaB+WzECe9eUV1yA==}
+  '@phila/phila-ui-filter-chip@1.1.2-beta.5':
+    resolution: {integrity: sha512-nh2+dLBVWxK7tDngTJRmm2UWFMHv5uYjpbp+i6tSfcyEmL4/egpEu4ikU5zUd3o66hj/m3G54AfsPlmatmT8aw==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-filter-panel@1.0.2-beta.3':
-    resolution: {integrity: sha512-oBrHbljK+3CauncLwwUxftv9kTerRW7FX68H421X/H7vs4AiwujezAZIoAmBb0zQXQZJjdMjVjA7MgfYFmXwiA==}
+  '@phila/phila-ui-filter-panel@1.0.2-beta.5':
+    resolution: {integrity: sha512-Ff/u4rHglMHX2YYxd48tl15QUndGe1CyC9LNRNRmZTAyoUE6T+XQFdnWsOcuZyjWvFvIqvt0F0GJTOkIdI3IQw==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-link@1.1.2-beta.2':
-    resolution: {integrity: sha512-0bbYzJUAkfLZLkMyZ1BSL5d4llmJsSMglq5RmfJx2CKxe34rwYlk28/W/eFBHmd2pdCK8P36YOX7Ev0OkHzogQ==}
+  '@phila/phila-ui-link@1.1.2-beta.4':
+    resolution: {integrity: sha512-y4HXR0DIbcqmen1TQvEFdH2pIvCX+ReO4sO+AemK7UDQ9/X7+/4haIVktv104gCMyHyveDg7yV09eQh4YMwyww==}
     peerDependencies:
-      vue: ^3.0.0
-      vue-router: ^4.0.0
+      vue: ^3.5.34
+      vue-router: ^5.0.0
     peerDependenciesMeta:
       vue-router:
         optional: true
 
-  '@phila/phila-ui-logo@0.1.5-beta.2':
-    resolution: {integrity: sha512-zaNIxFJW2pMyZLAdKDGTmZfX88Iqdw2J31u5LD/+fEKTkPN60oLZMgFDdUmfX0bcYk8tDjOVxWAugiCNa1qyyg==}
+  '@phila/phila-ui-logo@0.1.5-beta.4':
+    resolution: {integrity: sha512-Li2RwBEgXWFL+DYoa6g3YnTbj94G4MeOghMn3bDzOIgS590QULzqwknenPgLEymOFa0XtB5KzsQhDbIMtuczBw==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-map-core@1.3.0-beta.6':
-    resolution: {integrity: sha512-iAeZzrbacPadh7cccZKCgsOoP4fQTD/t9osxR/tltdVYlvdbmxysNaaF7zcisuFJBQ4gF1LyUXelG7aBFZszHg==}
+  '@phila/phila-ui-map-core@1.3.0-beta.9':
+    resolution: {integrity: sha512-bKpYvcYH1uXDL0HIvYaqXXB7frZiYQT/LCjq4GdppcwjSxHqaW9N7MOOjlTtZq1OJ5NKJYBFsrD8jnoj1Utq2Q==}
 
-  '@phila/phila-ui-menu@0.1.3-beta.2':
-    resolution: {integrity: sha512-44+xhqlDKwmqSicse8pos/fqFEWo9XGpm3c0YHc5nFCMlg5hYcost/lc8lr0rinxgRvR2e/nZOdWifFj3udNhQ==}
+  '@phila/phila-ui-menu@0.1.3-beta.4':
+    resolution: {integrity: sha512-VXvzb19gx+JAUuETgX5rHKY/RMEKhgqRLMG754sN061iWL87wJJMm7M0n+GbAVZq/SnWHCtkVXpYUYSmfTBhnA==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-radio@1.1.0-beta.2':
-    resolution: {integrity: sha512-ffyk7ydmB1BPqRDnlZ5FHNusmZDu95smYQujYdtxa/RVJo6RCPahdDxNz9XfOVMiEGSOl/TFiZMDH5bq1fC4Dw==}
+  '@phila/phila-ui-radio@1.1.0-beta.4':
+    resolution: {integrity: sha512-y34+eAlaiosx6AxvL50DB5pGW+EgxouOo+im7n4RddQPwavXmBgid1AuAcyLPcJLuLRSvfgX6K8Lm2hs8jXcmw==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-search@1.2.2-beta.2':
-    resolution: {integrity: sha512-imMmC+VI6NH+UkXKtfV6G6/pbrettit+Y8mUwY+t8ZJRQ9YV+MhQAtqjxd1AJiFCvMKYj1wIUNCL5jQC7zVgNA==}
+  '@phila/phila-ui-search@1.2.2-beta.4':
+    resolution: {integrity: sha512-3yIPfaCTMMcxR4z7U+B8E4ARkG8bcbFG9mW2Ug2atYTKoS7shn1RO8SPQQ5KeJ1w3tyhH1JaZhYo9nQtl6lc6A==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-switch@0.0.7-beta.2':
-    resolution: {integrity: sha512-3/SYdgqqnjIa5xNi9acJ6QhwmCMXAZc9OkALVnYyJ4YUd/VsD4sVWDAWtH6Prq2EKAEBqbhqk0+ESKX20woFRg==}
+  '@phila/phila-ui-switch@0.0.7-beta.4':
+    resolution: {integrity: sha512-fxhlz/W09gI5t4o/qpDK4nlk8wQK6Z5vpwHIhDtrAqWba2ja0nVKYiwt741yldwltl5Jg2kCpImcstcp/cSvjg==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-table@1.0.2-beta.2':
-    resolution: {integrity: sha512-DBHN1wQ8NWTexpBOiXRUCDoawT5Lv2MUjdsmVE2sv288jAGq+yoTIBsYa5EPIFEZimoFx8/NRtflmIfYV6+lMA==}
+  '@phila/phila-ui-table@1.0.2-beta.4':
+    resolution: {integrity: sha512-9C+B1E2+IbiDCjvDu1TEH+TibmCjYtSfaLxVMKc0b5P5NCmIGe/P2njq/SrtLNlJWT6F+AslAswtAvgUaeUBiQ==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-tabs@2.0.0-beta.2':
-    resolution: {integrity: sha512-Kpp43BmOgaRXHier7K/stjUXMSeLc8U7BPsq0dXu0eB3WV2U7Ldi9+sAbahsBn8QT/CnVucq+I7M+PC3ZaAIVg==}
+  '@phila/phila-ui-tabs@2.0.0-beta.4':
+    resolution: {integrity: sha512-UVfxYG9GsVI1s0vUxgEhm5KyTOht9FXunU3trl49MBNiHWPhrNqqBddNHreZk/FPzhVJ7NzucgQS1pIZ2shtwg==}
     peerDependencies:
-      '@phila/phila-ui-core': 3.1.0-beta.2
+      '@phila/phila-ui-core': 3.1.0-beta.4
       vue: ^3.0.0
 
-  '@phila/phila-ui-tags@0.1.2-beta.3':
-    resolution: {integrity: sha512-giN30GHp1TW7XoZUM2ka6jYCNAaB0bsU6UrwWD5n59TYDbnxVJ5Yj3jaXkMe5k0tMPDvUNIl3SRdT8Xykw6T5w==}
-    peerDependencies:
-      vue: ^3.0.0
-
-  '@phila/phila-ui-text-field@1.2.2-beta.2':
-    resolution: {integrity: sha512-HGfcPipmumoWGBGbsEP7+tyUl08JOvTOLhpzMx4W4/lzMDF/VfzT2bACeteRbze7AHblrIYqvK6m9wc8v5wXog==}
+  '@phila/phila-ui-tags@0.1.2-beta.5':
+    resolution: {integrity: sha512-5b0Mvvoa6SwqEmYSdabYa4p4ued+2603fH4qC4a6mrbcVc33NOL1YOg8iKoOVxhvgasTiO6HfMCRQylJiPxgCQ==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@phila/phila-ui-tooltip@0.1.2-beta.2':
-    resolution: {integrity: sha512-+oE51e2rU6qFJefHaI6Hqvyum4zLKpw/3i0v6m7WCXXQr/VW0IOxkfIbkI0rh0gEm54+CbSmRtYspJNSus+L/A==}
+  '@phila/phila-ui-text-field@1.2.2-beta.4':
+    resolution: {integrity: sha512-OzbEFIswgFtkB2mBNBOFh/iskmxM+Giqixhf171YsVRU7FMAwBJGTupqhff/7CLTMMjf38OBNyWNmJSrbm4u0A==}
+    peerDependencies:
+      vue: ^3.0.0
+
+  '@phila/phila-ui-tooltip@0.1.2-beta.4':
+    resolution: {integrity: sha512-8a0+nXUsQZCdKGahaAdjg3KaeIuLGMUugsK7XY4fUiXZc7+omqMTygGxNTs0n0cNRT7EIVYerikMcBId41aa4Q==}
     peerDependencies:
       vue: ^3.0.0
 
@@ -3708,7 +3711,7 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.0': {}
 
-  '@cyclomedia/streetsmart-api@25.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@cyclomedia/streetsmart-api@26.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@types/gl-matrix': 2.4.5
       '@types/ol': 6.5.3
@@ -3980,92 +3983,92 @@ snapshots:
       cdk-nag: 2.38.2(aws-cdk-lib@2.267.0(constructs@10.8.1))(constructs@10.8.1)
       constructs: 10.8.1
 
-  '@phila/phila-ui-app-footer@1.2.5-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-app-footer@1.2.5-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-link': 1.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-link': 1.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-app-header@2.0.0-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-app-header@2.0.0-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-button': 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-callout': 1.1.0-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-collapse-panel': 0.2.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-logo': 0.1.5-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-tooltip': 0.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-button': 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-callout': 1.1.0-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-collapse-panel': 0.2.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-logo': 0.1.5-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-tooltip': 0.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-bottom-sheet@0.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-bottom-sheet@0.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-breadcrumbs@0.2.5-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-breadcrumbs@0.2.5-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-link': 1.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-link': 1.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-button@2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-button@2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-callout@1.1.0-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-callout@1.1.0-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-button': 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-button': 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-cards@0.3.0-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-cards@0.3.0-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-button': 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-filter-chip': 1.1.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-tags': 0.1.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-button': 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-filter-chip': 1.1.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-tags': 0.1.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-charts@0.1.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-charts@0.1.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-button': 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-tags': 0.1.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-button': 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-tags': 0.1.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       d3: 7.9.0
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-checkbox@1.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-checkbox@1.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-tooltip': 0.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-tooltip': 0.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-collapse-panel@0.2.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-collapse-panel@0.2.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-core@3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-core@3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
       clsx: 2.1.1
       date-fns: 4.4.0
@@ -4073,61 +4076,61 @@ snapshots:
     optionalDependencies:
       vue-router: 5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3))
 
-  '@phila/phila-ui-date-field@0.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-date-field@0.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-button': 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-collapse-panel': 0.2.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-text-field': 1.2.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-button': 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-collapse-panel': 0.2.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-text-field': 1.2.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       dayjs: 1.11.23
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue-router
 
-  '@phila/phila-ui-filter-chip@1.1.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-filter-chip@1.1.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-button': 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-checkbox': 1.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-radio': 1.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-button': 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-checkbox': 1.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-radio': 1.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-filter-panel@1.0.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-filter-panel@1.0.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-button': 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-checkbox': 1.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-radio': 1.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-search': 1.2.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-button': 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-checkbox': 1.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-radio': 1.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-search': 1.2.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue-router
 
-  '@phila/phila-ui-link@1.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-link@1.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     optionalDependencies:
       vue-router: 5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3))
 
-  '@phila/phila-ui-logo@0.1.5-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-logo@0.1.5-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-map-core@1.3.0-beta.6(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-map-core@1.3.0-beta.9(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@cyclomedia/streetsmart-api': 25.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@phila/phila-ui-checkbox': 1.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-search': 1.2.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-tooltip': 0.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@cyclomedia/streetsmart-api': 26.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@phila/phila-ui-checkbox': 1.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-search': 1.2.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-tooltip': 0.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@turf/helpers': 7.4.0
       clsx: 2.1.1
       maplibre-gl: 5.24.0
@@ -4139,75 +4142,75 @@ snapshots:
       - vue
       - vue-router
 
-  '@phila/phila-ui-menu@0.1.3-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-menu@0.1.3-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-button': 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-checkbox': 1.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-button': 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-checkbox': 1.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-radio@1.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-radio@1.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-tooltip': 0.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-tooltip': 0.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-search@1.2.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-search@1.2.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-button': 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-text-field': 1.2.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-button': 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-text-field': 1.2.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue-router
 
-  '@phila/phila-ui-switch@0.0.7-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-switch@0.0.7-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-table@1.0.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-table@1.0.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-button': 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-checkbox': 1.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-button': 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-checkbox': 1.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-tabs@2.0.0-beta.2(@phila/phila-ui-core@3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-tabs@2.0.0-beta.4(@phila/phila-ui-core@3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
 
-  '@phila/phila-ui-tags@0.1.2-beta.3(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-tags@0.1.2-beta.5(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
 
-  '@phila/phila-ui-text-field@1.2.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-text-field@1.2.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-button': 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-button': 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
       vue-imask: 7.6.1(vue@3.5.42(typescript@6.0.3))
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue-router
 
-  '@phila/phila-ui-tooltip@0.1.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+  '@phila/phila-ui-tooltip@0.1.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
-      '@phila/phila-ui-button': 2.3.2-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
-      '@phila/phila-ui-core': 3.1.0-beta.2(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-button': 2.3.2-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      '@phila/phila-ui-core': 3.1.0-beta.4(vue-router@5.3.0(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.0))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
     transitivePeerDependencies:
       - vue-router
