@@ -6,9 +6,10 @@ import { IconCheck } from '@phila/phila-ui-core/icons'
 import ServiceTypeIcon from '@/components/ServiceTypeIcon.vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { computed } from 'vue'
+import type { Service } from '@/types/app'
 
-const props = defineProps<{ serviceType: string; description: string }>()
-const selected = defineModel<string>('selected')
+const props = defineProps<{ serviceType: Service; description: string }>()
+const selected = defineModel<Service>('selected')
 
 const store = useReportSubmissionStore()
 

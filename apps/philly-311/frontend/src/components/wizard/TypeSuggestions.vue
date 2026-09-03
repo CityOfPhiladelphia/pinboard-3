@@ -6,9 +6,10 @@ import { Callout } from '@phila/phila-ui-callout'
 import type { ServiceType } from '@/types/api'
 import type { PhotoSuggestion } from '@/types/wizard'
 import ServiceTypeCard from './ServiceTypeCard.vue'
+import type { Service } from '@/types/app.ts'
 
 const props = defineProps<{ suggestions: PhotoSuggestion[]; catalog: ServiceType[] }>()
-const selected = defineModel<string>('selected')
+const selected = defineModel<Service>('selected')
 
 const calloutText = 'AI generated recommendations based on photo'
 

@@ -175,7 +175,6 @@ function discardAndExit() {
     var(--spacing-m, 1rem);
   height: 100%;
   width: 100%;
-  overflow: auto;
 }
 
 .wizard__steps {
@@ -188,6 +187,7 @@ function discardAndExit() {
   grid-column: wizard;
   grid-row: wizard-row;
   place-content: center;
+  overflow: hidden;
 }
 
 .wizard__nav-border {

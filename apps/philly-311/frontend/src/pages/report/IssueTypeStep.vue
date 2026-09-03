@@ -15,6 +15,7 @@ import ImageAnalysis from '@/components/wizard/ImageAnalysis.vue'
 import ReportStep from '@/components/wizard/ReportStep.vue'
 import WizardLoadError from '@/components/wizard/WizardLoadError.vue'
 import type { ServiceType } from '@/types/api.ts'
+import type { Service } from '@/types/app'
 
 const issueStepId = useId()
 const store = useReportSubmissionStore()
@@ -23,7 +24,7 @@ const { list, isLoading, error, load } = useServiceTypes()
 const searchMatchedIssueTypes = ref<ServiceType[]>([])
 const classifying = ref(false)
 const errorMessage = ref('')
-const selectedServiceType = ref<string>('')
+const selectedServiceType = ref<Service | undefined>(undefined)
 const searchTerms = ref('')
 
 const stepTitle = `Select an issue type`

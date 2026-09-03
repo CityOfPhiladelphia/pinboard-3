@@ -8,6 +8,7 @@ import { useClusters } from '@/composables/useClusters'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import { serviceTypeColor } from '@/utils/serviceTypeMeta'
 import ClusterBadge from '@/components/ClusterBadge.vue'
+import type { Service } from '@/types/app'
 
 const props = defineProps<{
   locations: PinboardTypes.BasicLocation[]
@@ -25,7 +26,7 @@ const emit = defineEmits<{
 
 const { clusters, expansionZoom } = useClusters(toRef(props, 'locations'), toRef(props, 'zoom'))
 
-const locationById = computed<Map<string, PinboardTypes.BasicLocation>>(() => {
+const locationById = computed(() => {
   const m = new Map<string, PinboardTypes.BasicLocation>()
   for (const loc of props.locations) m.set(loc.id, loc)
   return m
@@ -48,8 +49,8 @@ function onClusterClick(item: { id: number; lng: number; lat: number }) {
     <MapMarker v-else-if="locationById.get(item.id)" :lng-lat="[item.lng, item.lat]">
       <MapIconTextPin
         :zoom="zoom"
-        :icon="serviceTypeIconComponent(locationById.get(item.id)!.name)"
-        :color="serviceTypeColor(locationById.get(item.id)!.name)"
+        :icon="serviceTypeIconComponent(locationById.get(item.id)?.name as Service)"
+        :color="serviceTypeColor(locationById.get(item.id)?.name as Service)"
         :hovered="hoveredId === item.id"
         :selected="selectedId === item.id"
         @mouseenter="emit('hover', item.id)"

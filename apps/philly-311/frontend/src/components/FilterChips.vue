@@ -9,11 +9,12 @@ import { FilterPanel } from '@phila/phila-ui-filter-panel'
 import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import { serviceTypeColor } from '@/utils/serviceTypeMeta'
+import type { Service } from '@/types/app'
 
 const PANEL_FILTER_KEY = 'serviceType'
 
 const props = defineProps<{
-  options: { value: string; label: string }[]
+  options: { value: string; label: Service }[]
   modelValue: string
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()

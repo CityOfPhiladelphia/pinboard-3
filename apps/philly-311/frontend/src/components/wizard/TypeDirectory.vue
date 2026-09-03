@@ -7,12 +7,13 @@ import { fuzzyScore } from '@/utils/fuzzy'
 import serviceTypeInfo from '@/data/service_types.json'
 import CaseTypeCard from './CaseTypeCard.vue'
 import ServiceTypeCard from './ServiceTypeCard.vue'
+import type { Service } from '@/types/app.ts'
 
 const props = defineProps<{ catalog: ServiceType[] }>()
-const selected = defineModel<string>('selected')
+const selected = defineModel<Service>('selected')
 const query = ref('')
 
-const INFO = serviceTypeInfo as Record<string, { description: string; keywords: string[] }>
+const INFO = serviceTypeInfo as Record<Service, { description: string; keywords: string[] }>
 
 function matches(s: ServiceType): boolean {
   const q = query.value.trim()

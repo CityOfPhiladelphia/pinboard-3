@@ -2,13 +2,14 @@
 <script setup lang="ts">
 import { useApi } from '@/composables/useApi'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
+import type { Service } from '@/types/app'
 import { Icon } from '@phila/phila-ui-core'
 import { IconStar } from '@phila/phila-ui-core/icons'
 import { PinboardUtilities, type PinboardTypes } from '@pinboard/ui'
 import { computed, onMounted, onUnmounted, useTemplateRef } from 'vue'
 
 interface ClassifyResponse {
-  classifications: { serviceType: string; confidence: number; caseType: string }[]
+  classifications: { serviceType: Service; confidence: number; caseType: string }[]
   imageUrl: string
 }
 

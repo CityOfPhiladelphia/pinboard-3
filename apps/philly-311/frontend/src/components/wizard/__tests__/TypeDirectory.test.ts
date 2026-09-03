@@ -5,7 +5,7 @@ import TypeDirectory from '../TypeDirectory.vue'
 import type { ServiceType } from '@/types/api'
 
 const st = (
-  serviceType: string,
+  serviceType: Service,
   caseType: string,
   description = `${serviceType} desc`,
 ): ServiceType => ({

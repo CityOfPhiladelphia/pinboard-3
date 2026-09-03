@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils'
 import TypeSuggestions from '../TypeSuggestions.vue'
 import type { ServiceType } from '@/types/api'
 
-const st = (serviceType: string, description = `${serviceType} desc`): ServiceType => ({
+const st = (serviceType: Service, description = `${serviceType} desc`): ServiceType => ({
   serviceType,
   caseType: serviceType,
   description,

@@ -14,9 +14,10 @@ import { charCodeToString, stringToCharCode } from '@pinboard/core'
 import type { LocationQuery } from 'vue-router'
 import type { PinboardTypes } from '@pinboard/ui'
 import { decodePhotoInfo, encodePhotoInfo } from '@/utils/encodeDecodePhoto'
+import type { Service } from '@/types/app'
 
 interface State {
-  category: string | null
+  category: Service | undefined
   customFields: Record<string, string>
   location: AisFeature | null
   description: string
@@ -42,7 +43,7 @@ interface T extends LocationQuery {
 type QueryParams = Pick<T, 'c' | 'cf' | 'l' | 'd' | 'p' | 'co' | 'pv' | 'ps'>
 
 const initial = (): State => ({
-  category: null,
+  category: undefined,
   customFields: {},
   location: null,
   description: '',
@@ -61,7 +62,7 @@ const initial = (): State => ({
 export const useReportSubmissionStore = defineStore('reportSubmission', {
   state: initial,
   actions: {
-    setCategory(category: string | null) {
+    setCategory(category: Service | undefined) {
       // Clear customFields when category changes — answers don't carry across types.
       if (this.category !== category) this.customFields = {}
       this.category = category
@@ -191,7 +192,7 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
       Object.entries(params as QueryParams).forEach(([queryKey, queryValue]) => {
         switch (queryKey as keyof QueryParams) {
           case 'c': {
-            this.category = decodeURIComponent(queryValue)
+            this.category = decodeURIComponent(queryValue) as Service
             break
           }
           case 'cf': {

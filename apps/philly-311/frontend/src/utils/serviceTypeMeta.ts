@@ -3,7 +3,11 @@
 // ABOUTME: to a neutral gray for unknown types, including any future service
 // ABOUTME: types added in Salesforce.
 
-const COLORS: Record<string, string> = {
+import type { Service } from '@/types/app'
+
+const FALLBACK_COLOR = '#666673'
+
+const COLORS: Record<Service, string> = {
   'Abandoned Vehicle': '#734db3',
   'Abandoned Bike': '#4d8ce6',
   'Illegal Dumping': '#e63333',
@@ -41,7 +45,7 @@ const COLORS: Record<string, string> = {
   'Inlet Cleaning': '#1a8ce6',
   'Hydrant Knocked Down': '#e61a26',
   'Manhole Cover Missing': '#4d4d59',
-  'Manhole Other Problem': '#666673',
+  'Manhole Other Problem': FALLBACK_COLOR,
   'Homeless Encampment': '#8c59b3',
   'Parks and Rec Safety and Maintenance': '#1ab373',
   'Demolition Complaint': '#e6730d',
@@ -52,7 +56,7 @@ const COLORS: Record<string, string> = {
   'Icy Road Surface': '#26bfe6',
   'Snow Removal': '#40a6f2',
   'Complaint (Streets)': '#737380',
-  'Other (Streets)': '#666673',
+  'Other (Streets)': FALLBACK_COLOR,
   'Vendor Complaint': '#d9a60d',
   'Unlicensed Business Complaint': '#cc8c0d',
   'Short Term Rental Complaint': '#3373cc',
@@ -60,14 +64,11 @@ const COLORS: Record<string, string> = {
   'Needle Collection': '#bf1a66',
 }
 
-const FALLBACK_COLOR = '#666673'
-
-export function serviceTypeColor(serviceType: string | undefined | null): string {
-  if (!serviceType) return FALLBACK_COLOR
-  return COLORS[serviceType] ?? FALLBACK_COLOR
+export function serviceTypeColor(serviceType?: Service): string {
+  return serviceType ? COLORS[serviceType] : FALLBACK_COLOR
 }
 
-export function serviceTypeTintStyle(serviceType: string | undefined | null): {
+export function serviceTypeTintStyle(serviceType?: Service): {
   backgroundColor: string
   color: string
 } {

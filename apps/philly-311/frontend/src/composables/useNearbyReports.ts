@@ -1,5 +1,6 @@
 // ABOUTME: Nearby issues fetched from /private/key/nearby-issues, one page per call
 // ABOUTME: with Link-header offsets. Anonymous-ok route, so no auth handle is passed.
+import type { Service } from '@/types/app'
 import { api311Fetch } from './api311'
 import { parseError } from './useApiError'
 
@@ -8,7 +9,7 @@ export interface Report {
   id: string
   lat: number
   lng: number
-  serviceType: string
+  serviceType: Service
   status: string
   address: string
   mediaUrl?: string
@@ -35,7 +36,7 @@ export interface PageResult {
 export interface ApiNearbyIssue {
   id: string
   caseNumber: string
-  serviceType: string | null
+  serviceType: Service
   department: string | null
   status: string
   address: string
@@ -54,7 +55,7 @@ export function toReport(i: ApiNearbyIssue): Report {
     id: i.id,
     lat: i.latitude,
     lng: i.longitude,
-    serviceType: i.serviceType ?? '',
+    serviceType: i.serviceType,
     status: i.status,
     address: i.address,
     mediaUrl: i.mediaUrl ?? undefined,

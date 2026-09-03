@@ -3,6 +3,7 @@
 
 import type { PinboardTypes } from '@pinboard/ui'
 import type { Issue } from './api'
+import type { Service } from './app'
 
 export interface PhotoAsset {
   /** CloudFront URL returned by /classify (which doubles as the upload endpoint). */
@@ -27,7 +28,7 @@ export interface AisFeature {
 
 /** A photo-classification suggestion from /classify. */
 export interface PhotoSuggestion {
-  serviceType: string
+  serviceType: Service
   confidence: number
 }
 
@@ -56,7 +57,7 @@ export type SubmittedReport = Issue
 export interface ReportDraft {
   id: string
   savedAt: string
-  category: string | null
+  category: Service | undefined
   customFields: Record<string, string>
   location: AisFeature | null
   description: string

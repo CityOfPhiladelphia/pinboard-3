@@ -7,9 +7,10 @@ import type { ServiceType } from '@/types/api'
 import { Icon } from '@phila/phila-ui-core'
 import { IconLocationDot } from '@phila/phila-ui-core/icons'
 import ServiceTypeCard from './ServiceTypeCard.vue'
+import type { Service } from '@/types/app.ts'
 
 defineProps<{ caseType: string; serviceTypes: ServiceType[] }>()
-const selected = defineModel<string>('selected')
+const selected = defineModel<Service>('selected')
 </script>
 
 <template>
