@@ -19,9 +19,9 @@ jobs:
 
   detect-changes:
     name: Detect changed apps
-    if: github.event.push
     runs-on: ubuntu-latest
     needs: check
+    if: github.event_name == 'push'
     outputs:
       updated: ${{ steps.changes.outputs.updated }}
 
