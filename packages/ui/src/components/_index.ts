@@ -5,6 +5,7 @@ import DetailActions from './DetailActions.vue'
 import LocationFilter from './LocationFilter.vue'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 import LocationPanel from './LocationsPanel.vue'
+import LocationThumbnail from './LocationThumbnail.vue'
 import MapPanel from './MapPanel.vue'
 import MobileNavPanel from './MobileNavPanel.vue'
 import SearchSuggestions from './SearchSuggestions.vue'
@@ -20,6 +21,7 @@ export {
   LocationFilter,
   LocationSearchFilterPanel,
   LocationPanel,
+  LocationThumbnail,
   MapPanel,
   MobileNavPanel,
   SearchSuggestions,

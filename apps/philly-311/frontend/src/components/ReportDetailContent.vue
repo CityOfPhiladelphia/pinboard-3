@@ -1,15 +1,25 @@
-<!-- ABOUTME: Full report-details view (Figma "Report details"): photo, status/private
-     badges, description, upvote/share actions, a summary table, an SLA callout, and
-     the service type's custom-field answers. Shared by the location-detail panel
-     (map pin / my-requests selection) and the post-submit confirmation page. -->
+<!-- ABOUTME: Full report-details view (Figma "Report details"): a full-bleed photo hero
+     (status pill + action icons floating on it), title/description, a static Request
+     Number card, a location map, a Next Steps progress tracker, and the service type's
+     custom-field answers. Shared by the location-detail panel (map pin / my-requests
+     selection) and the post-submit confirmation page. -->
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { CloseButton, PhilaButton } from '@phila/phila-ui-button'
 import { Callout } from '@phila/phila-ui-callout'
-import { FilterChip } from '@phila/phila-ui-filter-chip'
 import { Icon } from '@phila/phila-ui-core'
-import { IconArrowUp, IconLock, IconGlobe, IconBars } from '@phila/phila-ui-core/icons'
-import { DetailActions } from '@pinboard/ui'
+import {
+  IconArrowRight,
+  IconCheckDouble,
+  IconCircleInfo,
+  IconClock,
+  IconComments,
+  IconCopy,
+  IconBars,
+  IconLocationDot,
+} from '@phila/phila-ui-core/icons'
+import { DetailActions, LocationThumbnail, Tags, Tooltip } from '@pinboard/ui'
+import ReportStepProgress from './ReportStepProgress.vue'
 import type { Issue } from '@/types/api'
 import {
   statusBucket,
@@ -17,7 +27,8 @@ import {
   statusTagIcon,
   statusTagStyle,
 } from '@/composables/useReportStatus'
-import { serviceTypeTintStyle } from '@/utils/serviceTypeMeta'
+import { useReportSteps } from '@/composables/useReportSteps'
+import { serviceTypeColor, serviceTypeTintStyle } from '@/utils/serviceTypeMeta'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
 
 const props = withDefaults(
@@ -30,6 +41,9 @@ const props = withDefaults(
     upvoteError?: string | null
     /** Resolves to whether the upvote succeeded, so the dialog can stay open to retry on failure. */
     onUpvote?: (description: string) => Promise<boolean>
+    /** Show the location map thumbnail — only the confirmation page needs it; the
+     *  location-detail flyout already overlays a map with the same pin. */
+    showMap?: boolean
   }>(),
   {
     // An absent optional boolean prop is cast to false by Vue, not undefined —
@@ -38,6 +52,7 @@ const props = withDefaults(
     onClose: undefined,
     upvoteError: null,
     onUpvote: undefined,
+    showMap: false,
   },
 )
 
@@ -61,12 +76,14 @@ function formatDeadline(iso: string): string {
   return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { timeZone: 'UTC' })
 }
 
+const metaWhen = computed(() => formatWhen(props.report.updatedAt ?? props.report.createdAt))
+
+const steps = computed(() => useReportSteps(props.report))
+
+const requestNumber = computed(() => props.report.caseNumber ?? props.report.id)
+
 // The SLA callout defaults to closed; start it open (the user can still collapse it).
 const slaOpen = ref(true)
-
-// Upvote and Share are hidden pending an updated design; the wiring underneath
-// (props, dialog, useIssue calls) stays intact so this is a one-line flip to restore.
-const SHOW_ACTIONS = false
 
 const upvoteDialog = ref<HTMLDialogElement | null>(null)
 const upvoteDescription = ref('')
@@ -84,105 +101,155 @@ async function confirmUpvote() {
   const succeeded = await props.onUpvote(description)
   if (succeeded) closeUpvoteDialog()
 }
+
+// Activity isn't wired to the real comments API yet (GET/POST
+// /private/key/issues/:id/comments) — UX is still designing that flow. This
+// just makes the button interactive instead of disabled, with a placeholder.
+const activityDialog = ref<HTMLDialogElement | null>(null)
+function openActivityDialog() {
+  activityDialog.value?.showModal?.()
+}
+function closeActivityDialog() {
+  activityDialog.value?.close?.()
+}
 </script>
 
 <template>
   <div class="report-detail">
-    <div class="report-detail__header">
-      <h2 class="has-text-heading-5">{{ report.serviceType }}</h2>
-      <CloseButton v-if="onClose" class="report-detail__close" @click="onClose" />
-    </div>
-
     <div class="report-detail__body">
-      <div class="report-detail__body-inner">
-        <div v-if="bucket || report.private !== undefined" class="report-detail__badges">
-          <FilterChip
-            v-if="bucket"
-            tabindex="-1"
-            size="small"
-            :color="statusTagColor(bucket)"
-            :icon="statusTagIcon(bucket)"
-            :style="statusTagStyle(bucket)"
-            :text="report.status"
-          />
-          <FilterChip
-            v-if="report.private !== undefined"
-            tabindex="-1"
-            size="small"
-            color="white"
-            style="cursor: default"
-            :icon="report.private ? IconLock : IconGlobe"
-            :text="report.private ? 'Private' : 'Public'"
-          />
+      <div class="report-detail__hero-toolbar-anchor">
+        <div class="report-detail__hero-toolbar">
+          <div class="report-detail__hero-actions">
+            <Tooltip v-if="onUpvote && showUpvote" type="plain" trigger="hover">
+              <PhilaButton
+                :icon="IconCheckDouble"
+                :icon-only="true"
+                variant="standard"
+                size="small"
+                aria-label="I see this"
+                @click="openUpvoteDialog"
+              />
+              <template #body>I see this</template>
+            </Tooltip>
+            <Tooltip type="plain" trigger="hover">
+              <PhilaButton
+                :icon="IconComments"
+                :icon-only="true"
+                variant="standard"
+                size="small"
+                aria-label="Activity"
+                @click="openActivityDialog"
+              />
+              <template #body>Activity</template>
+            </Tooltip>
+            <DetailActions />
+          </div>
+          <div v-if="onClose" class="report-detail__close">
+            <Tooltip type="plain" trigger="hover">
+              <CloseButton size="small" @click="onClose" />
+              <template #body>Close</template>
+            </Tooltip>
+          </div>
         </div>
+      </div>
+
+      <div class="report-detail__hero" :style="report.mediaUrl ? undefined : placeholderStyle">
         <img
           v-if="report.mediaUrl"
           :src="report.mediaUrl"
           :alt="report.serviceType"
-          class="report-detail__img"
+          class="report-detail__hero-img"
         />
-        <div
+        <Icon
           v-else
-          class="report-detail__img report-detail__img--placeholder"
-          :style="placeholderStyle"
-          aria-hidden="true"
-        >
-          <Icon :icon="placeholderIcon" decorative size="extra-large" />
-        </div>
-        <p v-if="report.description" class="report-detail__desc">{{ report.description }}</p>
-        <div v-if="SHOW_ACTIONS" class="report-detail__actions">
-          <PhilaButton
-            v-if="onUpvote && showUpvote"
-            variant="standard"
-            size="small"
-            :icon="IconArrowUp"
-            @click="openUpvoteDialog"
-          >
-            Upvote
-          </PhilaButton>
-          <DetailActions />
-        </div>
-        <table class="report-detail__fields">
-          <tbody>
-            <tr>
-              <th scope="row">Issue type</th>
-              <td>{{ report.serviceType }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Location</th>
-              <td>{{ report.address }}</td>
-            </tr>
-            <tr v-if="report.createdAt">
-              <th scope="row">Submitted</th>
-              <td>{{ formatWhen(report.createdAt) }}</td>
-            </tr>
-            <tr>
-              <th scope="row">Request ID</th>
-              <td>{{ report.caseNumber ?? report.id }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <Callout
-          v-if="report.slaDate"
-          v-model:open="slaOpen"
-          class="report-detail__sla"
-          type="info"
-          title="Estimated update"
-          :message="`Report will be reviewed by: ${formatDeadline(report.slaDate)}`"
+          :icon="placeholderIcon"
+          decorative
+          size="extra-large"
+          class="report-detail__hero-placeholder-icon"
         />
+
+        <Tags
+          v-if="bucket"
+          class="report-detail__hero-status"
+          variant="readonly"
+          size="medium"
+          :color="statusTagColor(bucket)"
+          :icon="statusTagIcon(bucket)"
+          :style="statusTagStyle(bucket)"
+          :text="report.status"
+        />
+      </div>
+
+      <div class="report-detail__body-inner">
+        <div class="report-detail__title-block">
+          <div class="report-detail__title has-text-label-xlarge">{{ report.serviceType }}</div>
+          <div v-if="report.address || metaWhen" class="report-detail__meta">
+            <span v-if="report.address" class="report-detail__meta-item">
+              <Icon :icon="IconLocationDot" decorative size="extra-small" />
+              {{ report.address }}
+            </span>
+            <span v-if="metaWhen" class="report-detail__meta-item">
+              <Icon :icon="IconClock" decorative size="extra-small" />
+              {{ metaWhen }}
+            </span>
+          </div>
+        </div>
+
+        <div v-if="report.description" class="report-detail__desc">{{ report.description }}</div>
+
+        <div class="report-detail__request-card">
+          <Icon :icon="IconCopy" decorative size="medium" />
+          <div class="report-detail__request-card-text">
+            <div class="report-detail__request-card-label">Service Request #</div>
+            <div class="report-detail__request-card-value">{{ requestNumber }}</div>
+          </div>
+        </div>
+
+        <div v-if="showMap" class="report-detail__map-thumb">
+          <LocationThumbnail
+            :latitude="report.latitude"
+            :longitude="report.longitude"
+            :icon="placeholderIcon"
+            :color="serviceTypeColor(report.serviceType)"
+          />
+        </div>
+
+        <div class="report-detail__next-steps">
+          <div class="report-detail__section-title has-text-label-xlarge">
+            <span class="report-detail__next-steps-icon">
+              <Icon :icon="IconArrowRight" decorative size="extra-small" />
+            </span>
+            Next Steps
+          </div>
+          <Callout
+            v-if="report.slaDate"
+            v-model:open="slaOpen"
+            class="report-detail__sla"
+            type="info"
+            title="Estimated update"
+            :message="`Report will be reviewed by: ${formatDeadline(report.slaDate)}`"
+          />
+        </div>
+        <ReportStepProgress :sections="steps.sections" :current-step="steps.currentStep" />
         <div
           v-if="report.customFields?.some((cf) => cf.value)"
-          class="report-detail__custom-fields"
+          class="report-detail__additional-details"
         >
-          <div
-            v-for="cf in (report.customFields ?? []).filter((cf) => cf.value)"
-            :key="cf.field"
-            class="report-detail__custom-field"
-          >
-            <Icon :icon="IconBars" decorative size="extra-small" />
-            <div class="report-detail__custom-field-text">
-              <div class="report-detail__custom-field-label">{{ cf.label }}</div>
-              <div class="report-detail__custom-field-value">{{ cf.value }}</div>
+          <div class="report-detail__section-title has-text-label-xlarge">
+            <Icon :icon="IconCircleInfo" decorative size="small" />
+            Additional details
+          </div>
+          <div class="report-detail__custom-fields">
+            <div
+              v-for="cf in (report.customFields ?? []).filter((cf) => cf.value)"
+              :key="cf.field"
+              class="report-detail__custom-field"
+            >
+              <Icon :icon="IconBars" decorative size="extra-small" />
+              <div class="report-detail__custom-field-text">
+                <div class="report-detail__custom-field-label">{{ cf.label }}</div>
+                <div class="report-detail__custom-field-value">{{ cf.value }}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -190,27 +257,25 @@ async function confirmUpvote() {
     </div>
 
     <dialog
-      v-if="SHOW_ACTIONS && onUpvote && showUpvote"
+      v-if="onUpvote && showUpvote"
       ref="upvoteDialog"
-      class="report-detail__upvote-dialog"
+      class="report-detail__dialog"
       aria-labelledby="upvote-dialog-title"
       @close="closeUpvoteDialog"
       @cancel="closeUpvoteDialog"
     >
-      <h2 id="upvote-dialog-title" class="report-detail__upvote-dialog-title">
-        Upvote this report
-      </h2>
-      <p class="report-detail__upvote-dialog-body">
-        Tell us about your experience with this issue.
-      </p>
+      <h2 id="upvote-dialog-title" class="report-detail__dialog-title">Upvote this report</h2>
+      <div class="report-detail__dialog-body">Tell us about your experience with this issue.</div>
       <textarea
         v-model="upvoteDescription"
         class="report-detail__upvote-textarea"
         placeholder="Same pothole, still there as of today."
         rows="3"
       />
-      <p v-if="upvoteError" class="report-detail__upvote-error" role="alert">{{ upvoteError }}</p>
-      <div class="report-detail__upvote-actions">
+      <div v-if="upvoteError" class="report-detail__upvote-error" role="alert">
+        {{ upvoteError }}
+      </div>
+      <div class="report-detail__dialog-actions">
         <button
           type="button"
           class="report-detail__upvote-cancel"
@@ -229,6 +294,24 @@ async function confirmUpvote() {
         </PhilaButton>
       </div>
     </dialog>
+
+    <dialog
+      ref="activityDialog"
+      class="report-detail__dialog"
+      aria-labelledby="activity-dialog-title"
+      @close="closeActivityDialog"
+      @cancel="closeActivityDialog"
+    >
+      <h2 id="activity-dialog-title" class="report-detail__dialog-title">Activity</h2>
+      <div class="report-detail__dialog-body">
+        Comments and activity history for this report aren't available yet — check back soon.
+      </div>
+      <div class="report-detail__dialog-actions">
+        <PhilaButton variant="primary" data-test="activity-close" @click="closeActivityDialog">
+          Close
+        </PhilaButton>
+      </div>
+    </dialog>
   </div>
 </template>
 
@@ -238,84 +321,180 @@ async function confirmUpvote() {
   flex-direction: column;
   height: 100%;
 }
-.report-detail__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--spacing-s, 0.75rem);
-  padding: var(--spacing-m, 1rem);
-  flex-shrink: 0;
+.report-detail__hero {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 579 / 253;
+  overflow: hidden;
+  background: var(--Sidewalk-Grey-700-Sidewalk-Grey, #f1f1f1);
 }
-.report-detail__header h2 {
-  margin: 0;
+.report-detail__hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.report-detail__hero-placeholder-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.report-detail__hero-status {
+  position: absolute;
+  left: var(--spacing-s, 0.75rem);
+  bottom: var(--spacing-s, 0.75rem);
+}
+
+.report-detail__hero-toolbar-anchor {
+  position: sticky;
+  top: 0;
+  height: 0;
+  overflow: visible;
+  z-index: 2;
+}
+.report-detail__hero-toolbar {
+  position: absolute;
+  top: var(--spacing-s, 0.75rem);
+  right: var(--spacing-s, 0.75rem);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 0.5rem);
+}
+.report-detail__hero-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs, 0.25rem);
+  padding: var(--spacing-2xs, 0.25rem);
+  border-radius: var(--border-radius-full, 9999px);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 .report-detail__close {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xs, 0.25rem);
+  border-radius: var(--border-radius-full, 9999px);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.report-detail__hero-actions :deep(.icon-button),
+.report-detail__close :deep(.icon-button) {
+  border-radius: var(--border-radius-full, 9999px) !important;
+}
+
+.report-detail__hero-actions :deep(.icon-button),
+.report-detail__hero-actions :deep(.detail-actions svg),
+.report-detail__close :deep(.icon-button) {
+  color: var(--Schemes-On-Surface-Low, #636363) !important;
 }
 .report-detail__body {
   /* The chassis's detail panel (.detail-overlay / .bottom-sheet-detail) is a
      fixed-height flex column with overflow: hidden — it expects its slotted
-     content to scroll itself rather than overflowing or getting clipped. The
-     header above stays put; only this body scrolls. */
+     content to scroll itself rather than overflowing or getting clipped. This
+     is now the single scroll container for everything: the sticky toolbar
+     anchor, the hero photo, and the body-inner content all live inside it —
+     only the toolbar itself stays pinned as the rest scrolls underneath. */
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
-  padding: 0 var(--spacing-m, 1rem) var(--spacing-m, 1rem);
 }
 .report-detail__body-inner {
-  /* .report-detail__body stays full width so its scrollbar sits at the edge
-     of whatever panel it's in; the content itself is capped and left-aligned. */
+  /* Figma's "Content" container: every top-level section (title block,
+     description, Request # card, map, Next Steps, the step tracker,
+     Additional details) sits a uniform 1.5rem apart — one `gap` here instead
+     of each section carrying its own ad-hoc margin.
+     No top padding — the hero photo sits flush above it, edge-to-edge, so
+     .report-detail__body itself carries no padding (that would inset the
+     hero too); this is the one place side/bottom padding is applied. */
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-l, 1.5rem);
+  padding: 0 var(--spacing-m, 1rem) var(--spacing-m, 1rem);
   max-width: 640px;
 }
-.report-detail__img {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-.report-detail__img--placeholder {
+.report-detail__title-block {
   display: flex;
+  flex-direction: column;
+}
+.report-detail__title {
+  color: var(--Schemes-On-Surface-High, #000);
+  margin: 0;
+}
+.report-detail__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-m, 1rem);
+  color: var(--Schemes-On-Surface-Low, #636363);
+}
+.report-detail__meta-item {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: var(--spacing-2xs, 0.25rem);
 }
-.report-detail__badges {
-  display: flex;
-  gap: var(--spacing-xs, 0.5rem);
-  margin-bottom: var(--spacing-s, 0.5rem);
+.report-detail__map-thumb {
+  width: 100%;
+  aspect-ratio: 579 / 169;
+  border: 1px solid var(--Schemes-Border-low, #ccc);
+  border-radius: 12px;
+  overflow: hidden;
 }
 .report-detail__desc {
-  margin: 0 0 var(--spacing-m, 1rem);
+  margin: 0;
 }
-.report-detail__actions {
+.report-detail__request-card {
   display: flex;
   align-items: center;
-  gap: var(--spacing-s, 0.75rem);
-  margin: var(--spacing-s, 0.5rem) 0;
+  background: var(--Sidewalk-Grey-700-Sidewalk-Grey, #f1f1f1);
+  border: 1px solid var(--Schemes-Border-low, #ccc);
+  border-radius: var(--border-radius-m, 12px);
+  padding: var(--spacing-s, 0.75rem) var(--spacing-m, 1rem);
 }
-.report-detail__fields {
-  width: 100%;
-  border-collapse: collapse;
-  margin: var(--spacing-s, 0.5rem) 0;
+.report-detail__request-card-text {
+  min-width: 0;
 }
-.report-detail__fields tr {
-  border-bottom: 1px solid var(--Schemes-Border-low, #ccc);
+.report-detail__request-card-label {
+  color: var(--Schemes-On-Surface, #343434);
 }
-.report-detail__fields th {
-  text-align: left;
-  font-weight: bold;
-  padding: 0.5rem 0.5rem 0.5rem 0;
+.report-detail__request-card-value {
+  font-size: 1rem;
+  color: var(--Schemes-On-Background, #000);
 }
-.report-detail__fields td {
-  padding: 0.5rem 0;
+.report-detail__next-steps,
+.report-detail__additional-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m, 1rem);
+}
+.report-detail__section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 0.5rem);
+  margin: 0;
+}
+.report-detail__next-steps-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--Schemes-On-Surface, #343434);
 }
 .report-detail__sla {
-  margin: var(--spacing-s, 0.5rem) 0;
+  margin: 0;
+}
+
+.report-detail__sla :deep(.callout-icon) {
+  display: none;
 }
 .report-detail__custom-fields {
-  background: var(--Fills-Secondary, rgba(120, 120, 128, 0.16));
-  border-radius: 16px;
-  padding: var(--spacing-m, 1rem);
-  margin: var(--spacing-s, 0.5rem) 0;
+  border: 1px solid var(--Schemes-Border-low, #ccc);
+  border-radius: var(--border-radius-l, 16px);
+  padding: 0 var(--spacing-m, 1rem);
 }
 .report-detail__custom-field {
   display: flex;
@@ -338,7 +517,7 @@ async function confirmUpvote() {
   margin: 0;
   color: var(--Schemes-On-Background, #000);
 }
-.report-detail__upvote-dialog {
+.report-detail__dialog {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -350,13 +529,13 @@ async function confirmUpvote() {
   border-radius: 12px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
 }
-.report-detail__upvote-dialog::backdrop {
+.report-detail__dialog::backdrop {
   background: rgba(0, 0, 0, 0.5);
 }
-.report-detail__upvote-dialog-title {
+.report-detail__dialog-title {
   margin: 0 0 var(--spacing-s, 0.75rem);
 }
-.report-detail__upvote-dialog-body {
+.report-detail__dialog-body {
   margin: 0 0 var(--spacing-s, 0.75rem);
   color: var(--Schemes-On-Surface-Variant, #4a4a4a);
 }
@@ -372,7 +551,7 @@ async function confirmUpvote() {
   color: var(--Schemes-Error, #b3261e);
   margin: var(--spacing-s, 0.5rem) 0 0;
 }
-.report-detail__upvote-actions {
+.report-detail__dialog-actions {
   display: flex;
   justify-content: flex-end;
   align-items: center;

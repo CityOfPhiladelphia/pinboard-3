@@ -31,6 +31,7 @@ onMounted(async () => {
         v-if="store.submitted"
         class="confirmation__detail"
         :report="store.submitted"
+        show-map
       />
     </div>
     <div class="confirmation__actions">

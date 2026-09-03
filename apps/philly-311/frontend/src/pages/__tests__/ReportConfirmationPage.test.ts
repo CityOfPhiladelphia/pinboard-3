@@ -9,11 +9,34 @@ import ReportConfirmationPage from '../ReportConfirmationPage.vue'
 
 // The chassis index pulls phila dist CSS vitest can't load; stub DetailActions.
 // Share behavior itself is covered by the chassis's DetailActions.test.ts.
+// LocationThumbnail needs a real MapLibre/WebGL context, which jsdom doesn't
+// provide — stub it too. Its own map-rendering behavior is covered by
+// packages/ui's LocationThumbnail.test.ts.
 vi.mock('@pinboard/ui', () => ({
   DetailActions: defineComponent({
     name: 'DetailActions',
     setup() {
       return () => h('div')
+    },
+  }),
+  LocationThumbnail: defineComponent({
+    name: 'LocationThumbnail',
+    props: ['latitude', 'longitude', 'icon', 'color'],
+    setup() {
+      return () => h('div')
+    },
+  }),
+  Tags: defineComponent({
+    name: 'Tags',
+    props: ['text', 'variant', 'size', 'color', 'icon'],
+    setup(props) {
+      return () => h('span', props.text)
+    },
+  }),
+  Tooltip: defineComponent({
+    name: 'Tooltip',
+    setup(_, { slots }) {
+      return () => h('div', [slots.default?.(), slots.body?.()])
     },
   }),
 }))
@@ -51,6 +74,21 @@ describe('ReportConfirmationPage', () => {
     expect(w.find('.confirmation__detail').text()).toContain('Pothole Repair')
     expect(w.find('.confirmation__detail').text()).toContain('1234 Market St')
     expect(w.find('.confirmation__detail').text()).toContain('311-0042')
+  })
+
+  it('shows the location map thumbnail, unlike the location-detail flyout', () => {
+    useReportSubmissionStore().recordSubmission({
+      id: 'a1',
+      caseNumber: '311-0042',
+      latitude: 39.9526,
+      longitude: -75.1652,
+    })
+    const w = mountPage()
+    const thumb = w.find('.confirmation__detail .report-detail__map-thumb')
+    expect(thumb.exists()).toBe(true)
+    const map = thumb.findComponent({ name: 'LocationThumbnail' })
+    expect(map.props('latitude')).toBe(39.9526)
+    expect(map.props('longitude')).toBe(-75.1652)
   })
 
   it('renders without a detail panel when nothing was submitted', () => {

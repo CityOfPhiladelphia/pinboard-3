@@ -40,6 +40,7 @@ vi.mock('@pinboard/ui', () => {
           h('div', { class: 'search-mode-debug' }, String(props.locationSearchMode ?? '')),
           h('div', { class: 'header' }, slots['locations-header']?.()),
           h('div', { class: 'filters' }, slots['locations-filters']?.()),
+          h('div', { class: 'footer' }, slots['locations-footer']?.()),
           h(
             'button',
             { class: 'do-search', onClick: () => emit('search', '1234 Market St') },
@@ -154,16 +155,23 @@ describe('LandingPage', () => {
     expect(ensureLoaded).toHaveBeenCalled()
   })
 
-  it('renders the report callout with "Submit request" CTA; trending articles are gone', async () => {
+  it('renders the report callout heading; trending articles are gone', async () => {
     searchAddress.mockResolvedValue(null)
     const w = mount(LandingPage, { global: { plugins: [router], stubs: globalStubs } })
     await flushPromises()
     const header = w.find('.header')
     expect(header.text()).toContain('Submit a report to 311')
-    expect(header.text()).toContain('Submit request')
     expect(header.text()).not.toContain('Trending articles')
     expect(header.find('.filter-chips').exists()).toBe(false)
     expect(w.find('.filters').find('.filter-chips').exists()).toBe(true)
+  })
+
+  it('renders the floating "Report an issue" CTA in the locations-footer slot', async () => {
+    const w = mount(LandingPage, { global: { plugins: [router], stubs: globalStubs } })
+    await flushPromises()
+    const footer = w.find('.footer')
+    expect(footer.text()).toContain('Report an issue')
+    expect(footer.find('a[href="/report"]').exists()).toBe(true)
   })
 
   it('FilterChips receives only the service types present in the data, prevalence-sorted', async () => {

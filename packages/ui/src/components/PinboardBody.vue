@@ -48,6 +48,7 @@ const slots = defineSlots<{
   'page-header'?: unknown
   'locations-header'?: unknown
   'locations-filters'?: unknown
+  'locations-footer'?: unknown
   'location-card'?(props: { location: PinboardLocation }): unknown
   'location-detail'?(props: {
     location: PinboardLocation
@@ -525,6 +526,10 @@ function selectedLocationValue(): PinboardLocation {
             </template>
           </LocationsPanel>
         </Teleport>
+
+        <div v-if="!isMobile && slots['locations-footer']" class="finder-panel-locations-footer">
+          <slot name="locations-footer" />
+        </div>
       </div>
 
       <div :class="isMobile ? 'finder-panel-map' : ''">
@@ -676,10 +681,21 @@ function selectedLocationValue(): PinboardLocation {
 }
 
 .finder-panel-locations {
+  position: relative;
   display: flex;
   flex-direction: column;
   border-right: 1px solid #ccc;
   overflow: hidden;
+}
+
+/* Overlays the bottom of the panel rather than sitting in flow — the list
+   scrolls underneath it instead of the footer pushing the list up. */
+.finder-panel-locations-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
 }
 
 .finder-panel-map {
