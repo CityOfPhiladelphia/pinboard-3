@@ -79,7 +79,7 @@ beforeEach(() => {
 })
 
 describe('LocationStep - AIS select', () => {
-  it('stores a full WizardLocation and enables canAdvance', async () => {
+  it('stores a full AisFeature and enables canAdvance', async () => {
     const { w, canAdvance } = mountStep()
     expect(canAdvance.value).toBe(false)
 

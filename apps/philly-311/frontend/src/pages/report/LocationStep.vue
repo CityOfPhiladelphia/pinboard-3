@@ -1,26 +1,37 @@
 <!-- ABOUTME: Wizard step 3 — location. AIS address search is primary; a persistent
      map shows the chosen point with a draggable pin; "Use my current location" uses
-     browser geolocation. Stores a complete WizardLocation; Next gated on in-Philly. -->
+     browser geolocation. Stores a complete AisFeature; Next gated on in-Philly. -->
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
-import { reverseGeocode, type AisFeature } from '@/composables/useAis'
-import { getCurrentPosition } from '@/composables/useGeolocation'
+import { reverseGeocode } from '@/composables/useAis'
+// import { getCurrentPosition } from '@/composables/useGeolocation'
 import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { isInPhilly } from '@/utils/bounds'
-import { PhilaButton } from '@phila/phila-ui-button'
-import AddressSearch from '@/components/wizard/AddressSearch.vue'
+import { Callout } from '@phila/phila-ui-callout'
+// import { PhilaButton } from '@phila/phila-ui-button'
+// import AddressSearch from '@/components/wizard/AddressSearch.vue'
 import LocationMap from '@/components/wizard/LocationMap.vue'
+import ReportStep from '@/components/wizard/ReportStep.vue'
+import type { AisFeature } from '@/types/wizard'
+
+const stepTitle = 'Confirm Location'
+const defaultError = 'Choose an address to continue'
 
 const store = useReportSubmissionStore()
-const error = ref<string | null>(null)
-const lookingUp = ref(false)
+const errorMessage = ref('')
+const locationError = ref('')
+// const lookingUp = ref(false)
 
 const isValidLocation = computed(
   () => !!store.location && isInPhilly(store.location.lat, store.location.lng),
 )
 useWizardValidity(isValidLocation)
-const showErrors = useWizardErrors()
+const wizardError = useWizardErrors()
+
+watch([locationError, wizardError], ([newLocationError, newWizardError]) => {
+  errorMessage.value = (newWizardError ? defaultError : newLocationError) ?? ''
+})
 
 // Each location intent increments this counter so that stale async resolutions
 // (slow geocodes, late geolocation callbacks) never clobber a newer selection.
@@ -32,12 +43,12 @@ const mapLocation = computed(() =>
 
 function onSelect(f: AisFeature) {
   intent++
-  store.setLocation({ address: f.streetAddress, zipCode: f.zipCode, lat: f.lat, lng: f.lng })
-  if (isInPhilly(f.lat, f.lng)) error.value = null
+  store.setLocation(f)
+  if (isInPhilly(f.lat, f.lng)) locationError.value = ''
 }
 
 function onOutOfBounds() {
-  error.value = '311 only handles requests in Philadelphia.'
+  locationError.value = '311 only handles requests in Philadelphia.'
 }
 
 async function onMove({ lat, lng }: { lat: number; lng: number }) {
@@ -55,98 +66,75 @@ async function onMove({ lat, lng }: { lat: number; lng: number }) {
   }
   if (store.location) {
     store.setLocation({ ...store.location, lat, lng })
-    if (isInPhilly(lat, lng)) error.value = null
+    if (isInPhilly(lat, lng)) locationError.value = ''
   }
 }
 
-async function useMyLocation() {
-  const my = ++intent
-  lookingUp.value = true
-  error.value = null
-  try {
-    const pos = await getCurrentPosition()
-    if (my !== intent) return
-    if (!pos) {
-      error.value = "We couldn't access your location. Type an address instead."
-      return
-    }
-    const feature = await reverseGeocode(pos.lat, pos.lng)
-    if (my !== intent) return
-    if (feature) onSelect(feature)
-    else error.value = "We couldn't resolve your location to an address."
-  } catch {
-    if (my !== intent) return
-    error.value = "We couldn't resolve your location to an address."
-  } finally {
-    lookingUp.value = false
-  }
-}
+// async function useMyLocation() {
+//   const my = ++intent
+//   lookingUp.value = true
+//   locationError.value = ''
+//   try {
+//     const pos = await getCurrentPosition()
+//     if (my !== intent) return
+//     if (!pos) {
+//       locationError.value = "We couldn't access your location. Type an address instead."
+//       return
+//     }
+//     const feature = await reverseGeocode(pos.lat, pos.lng)
+//     if (my !== intent) return
+//     if (feature) onSelect(feature)
+//     else locationError.value = "We couldn't resolve your location to an address."
+//   } catch {
+//     if (my !== intent) return
+//     locationError.value = "We couldn't resolve your location to an address."
+//   } finally {
+//     lookingUp.value = false
+//   }
+// }
 </script>
 
 <template>
-  <div class="location-step">
-    <h1 class="location-step__title">
-      Location <span class="location-step__required">* (required)</span>
-    </h1>
-    <p v-if="showErrors && !isValidLocation" class="location-step__error" role="alert">
-      Choose a location to continue
-    </p>
-
-    <div class="location-step__columns">
-      <div class="location-step__form">
-        <AddressSearch @select="onSelect" />
-        <PhilaButton
-          variant="secondary"
-          class="location-step__geolocate"
-          data-test="use-my-location"
-          :disabled="lookingUp"
-          @click="useMyLocation"
+  <ReportStep :step-title="stepTitle" :error-active="false" :required="true">
+    <template #step-content>
+      <div
+        class="location-step"
+        :style="{ 'row-gap': errorMessage ? 'var(--spacing-xs, 0.5rem)' : '0' }"
+      >
+        <div
+          class="location-step__error"
+          :style="{ 'padding-bottom': errorMessage ? 'var(--spacing-xs, 0.5rem)' : '0' }"
         >
-          {{ lookingUp ? 'Locating…' : 'Use my current location' }}
-        </PhilaButton>
-        <p v-if="store.location" class="location-step__chosen" data-test="chosen-address">
-          <strong>{{
-            store.location.address || `${store.location.lat}, ${store.location.lng}`
-          }}</strong>
-        </p>
-        <p v-if="error" class="location-step__error" role="alert">{{ error }}</p>
+          <Callout v-if="wizardError && !isValidLocation" :title="errorMessage" :type="'error'" />
+        </div>
+        <LocationMap
+          class="location-step__map"
+          :location="mapLocation"
+          @move="onMove"
+          @out-of-bounds="onOutOfBounds"
+        />
       </div>
-
-      <LocationMap :location="mapLocation" @move="onMove" @out-of-bounds="onOutOfBounds" />
-    </div>
-  </div>
+    </template>
+  </ReportStep>
 </template>
 
 <style scoped>
-.location-step__title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0 0 var(--spacing-m, 1rem);
-}
-.location-step__required {
-  font-weight: 400;
-  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
-  font-size: 1rem;
-}
-.location-step__columns {
+.location-step {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-  gap: var(--spacing-m, 1rem);
-  align-items: start;
+  height: 100%;
+  width: 100%;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows: auto 1fr;
 }
-.location-step__geolocate {
-  margin-top: var(--spacing-s, 0.75rem);
-}
-.location-step__chosen {
-  margin: var(--spacing-s, 0.75rem) 0 0;
-}
+
 .location-step__error {
-  margin: var(--spacing-s, 0.75rem) 0 0;
-  color: var(--Schemes-Error, #c0392b);
+  grid-column: 1 / -1;
+  grid-row: 1;
 }
-@media (max-width: 768px) {
-  .location-step__columns {
-    grid-template-columns: 1fr;
-  }
+
+.location-step__map {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  overflow: hidden;
 }
 </style>

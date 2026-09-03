@@ -9,6 +9,8 @@ import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useWizardValidity } from '@/composables/useWizardValidity'
 import ReportStep from '@/components/wizard/ReportStep.vue'
 import ImageUploadDialog from '@/components/wizard/ImageUploadDialog.vue'
+import { getImgLocationInfo } from '@pinboard/core'
+import { reverseGeocode } from '@/composables/useAis'
 
 const store = useReportSubmissionStore()
 
@@ -17,7 +19,7 @@ const fileUploadUrl = ref<string>(store.photo.previewUrl || store.photo.mediaUrl
 const errorMessage = ref('')
 const markupComplete = ref(!!fileUploadUrl.value)
 
-const stepTitle = 'Image (optional)'
+const stepTitle = 'Image'
 const stepDescription = `This app uses machine learning to pull location data from your photo and suggest the issue type
     to report. Do not upload any images with personal or sensitive information.`
 
@@ -73,12 +75,25 @@ function removeImage() {
 
 function validateFileType(maybeFile: File | undefined) {
   if (maybeFile && /image\/(?:jpe?g|png)/.test(maybeFile?.type)) {
+    getLocationFromImage(maybeFile)
     return URL.createObjectURL(maybeFile)
   } else {
     errorMessage.value = `Invalid file type: ${maybeFile?.type}. Must be jpeg or png.`
     console.error(errorMessage.value)
     return ''
   }
+}
+
+function getLocationFromImage(image: File) {
+  getImgLocationInfo(image).then((loc) => {
+    if (loc.latitude) {
+      reverseGeocode(loc.latitude, loc.longitude).then((response) => {
+        if (response) {
+          store.setLocation(response)
+        }
+      })
+    }
+  })
 }
 </script>
 

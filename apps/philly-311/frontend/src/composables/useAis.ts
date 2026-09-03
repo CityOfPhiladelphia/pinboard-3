@@ -1,18 +1,12 @@
 // ABOUTME: AIS — Phila's Address Information System. Autocomplete returns
 // ABOUTME: matching address strings; search resolves an address (or lat/lng)
 // ABOUTME: to a feature with coordinates + street_address + zip_code.
+import type { AisFeature } from '@/types/wizard'
 import { buildUrl } from './api311'
 
 export interface AisAutocompleteResult {
   address: string
   searchAddress: string
-}
-
-export interface AisFeature {
-  streetAddress: string
-  zipCode?: string
-  lat: number
-  lng: number
 }
 
 const autocompleteBase = () => import.meta.env.VITE_311_AIS_BASE_URL ?? ''
@@ -54,11 +48,14 @@ async function searchByPath(path: string, signal?: AbortSignal): Promise<AisFeat
   }
 }
 
-export function searchAddress(query: string, signal?: AbortSignal): Promise<AisFeature | null> {
-  return searchByPath(query, signal)
+export async function searchAddress(
+  query: string,
+  signal?: AbortSignal,
+): Promise<AisFeature | null> {
+  return await searchByPath(query, signal)
 }
 
-export function reverseGeocode(
+export async function reverseGeocode(
   lat: number,
   lng: number,
   signal?: AbortSignal,

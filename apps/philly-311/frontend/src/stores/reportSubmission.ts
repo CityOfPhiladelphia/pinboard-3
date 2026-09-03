@@ -8,7 +8,7 @@ import type {
   PhotoSuggestion,
   SubmitPayload,
   SubmittedReport,
-  WizardLocation,
+  AisFeature,
 } from '@/types/wizard'
 import { charCodeToString, stringToCharCode } from '@pinboard/core'
 import type { LocationQuery } from 'vue-router'
@@ -18,7 +18,7 @@ import { decodePhotoInfo, encodePhotoInfo } from '@/utils/encodeDecodePhoto'
 interface State {
   category: string | null
   customFields: Record<string, string>
-  location: WizardLocation | null
+  location: AisFeature | null
   description: string
   photo: PhotoAsset
   contact: ContactInfo
@@ -69,7 +69,7 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     setQuestion(field: string, value: string) {
       this.customFields[field] = value
     },
-    setLocation(location: WizardLocation | null) {
+    setLocation(location: AisFeature | null) {
       this.location = location
     },
     setPhotoSuggestions(suggestions: PhotoSuggestion[]) {
@@ -131,7 +131,7 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
         serviceRequestType: this.category,
         description: this.description,
         private: !this.publicVisibility,
-        address: this.location.address,
+        address: this.location.streetAddress,
         latitude: this.location.lat,
         longitude: this.location.lng,
       }

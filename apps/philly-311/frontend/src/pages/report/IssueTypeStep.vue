@@ -26,7 +26,7 @@ const errorMessage = ref('')
 const selectedServiceType = ref<string>('')
 const searchTerms = ref('')
 
-const stepTitle = `Select an issue type * (required)`
+const stepTitle = `Select an issue type`
 const searchPlaceholder = `Search by issue type`
 
 const hasSurvivingSuggestions = computed(() =>

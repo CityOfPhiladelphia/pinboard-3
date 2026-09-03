@@ -11,7 +11,6 @@ import { useRouter, useRoute } from 'vue-router'
 import StepIndicator from '@/components/wizard/StepIndicator.vue'
 import ExitDialog from '@/components/wizard/ExitDialog.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
-import { Breadcrumbs } from '@phila/phila-ui-breadcrumbs'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useMyCasesStore } from '@/stores/myCases'
 import { WIZARD_CAN_ADVANCE_KEY, WIZARD_SHOW_ERRORS_KEY } from '@/composables/useWizardValidity'
@@ -109,20 +108,17 @@ function discardAndExit() {
 
 <template>
   <div ref="wizardEl" class="wizard">
-    <div class="wizard__header">
-      <Breadcrumbs :items="[{ label: 'Report an issue' }]" class="wizard__bradcrumbs" />
-
-      <StepIndicator
-        :steps="STEPS"
-        :current-step="currentStep"
-        :completed-through="completedThrough"
-        class="wizard__steps"
-        @navigate="(path: string) => router.push(path)"
-      />
-    </div>
+    <StepIndicator
+      :steps="STEPS"
+      :current-step="currentStep"
+      :completed-through="completedThrough"
+      class="wizard__steps"
+      @navigate="(path: string) => router.push(path)"
+    />
     <div class="wizard__content">
       <RouterView />
     </div>
+    <span class="wizard__nav-border" />
     <footer class="wizard__nav">
       <PhilaButton
         size="extra-small"
@@ -161,71 +157,59 @@ function discardAndExit() {
 <style scoped>
 .wizard {
   display: grid;
-  grid-template-areas:
-    'w_header'
-    'w_content'
-    'w_footer';
-  grid-template-rows: 9rem 1fr 7rem;
-  row-gap: var(--spacing-s, 0.75rem);
+  grid-template-columns:
+    [full-start] var(--scale-800, 4rem)
+    [wizard-start] 1fr
+    [steps-start] auto [steps-end]
+    1fr [wizard-end]
+    var(--scale-800, 4rem) [full-end];
+  grid-template-rows:
+    var(--spacing-l, 1.5rem)
+    [steps-row] auto
+    var(--spacing-l, 1.5rem)
+    [wizard-row] 1fr
+    var(--spacing-l, 1.5rem)
+    [footer-border] 0
+    var(--spacing-m, 1rem)
+    [wizard-footer] auto
+    var(--spacing-m, 1rem);
   height: 100%;
   width: 100%;
-  margin: 0 auto;
-}
-
-.wizard__header {
-  grid-area: w_header;
-  grid-template-areas:
-    'w_breadcrumbs'
-    'w_stepindicator';
-  grid-template-rows: 3fr 5fr;
-  width: 100%;
-  padding: var(--spacing-l, 1.5rem) var(--spacing-xl, 2rem);
-}
-
-.wizard__bradcrumbs {
-  grid-area: w_breadcrumbs;
-  padding: var(--spacing-xs, 0.5rem);
-}
-
-.wizard__bradcrumbs :deep(li) {
-  margin-bottom: 0;
-  padding-left: 0;
+  overflow: auto;
 }
 
 .wizard__steps {
-  grid-area: w_stepindicator;
-  display: grid;
+  grid-column: steps;
+  grid-row: steps-row;
   place-content: center;
 }
 
 .wizard__content {
-  grid-area: w_content;
-  margin: 0 var(--scale-1000, 5rem);
-  overflow: hidden;
+  grid-column: wizard;
+  grid-row: wizard-row;
+  place-content: center;
 }
 
-/* Sticky so Exit/Back/Next stay reachable: the wizard scrolls internally
-   (the shell locks the viewport) and steps like Location put a wheel-capturing
-   map over most of the content, so controls at the end of the scroll run
-   can otherwise sit below the fold with no way to reach them. */
+.wizard__nav-border {
+  grid-column: full;
+  grid-row: footer-border;
+  border-top: 1px solid var(--Schemes-Border-low, #ccc);
+}
+
 .wizard__nav {
-  grid-area: w_footer;
+  grid-column: wizard;
+  grid-row: wizard-footer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-m, 1rem) 0;
-  border-top: 1px solid var(--Schemes-Border-low, #d6d6d6);
-  background: var(--Schemes-Background, #fff);
 }
 
 .wizard__nav-right {
   display: flex;
-  gap: var(--spacing-s, 0.75rem);
-  margin-right: var(--scale-1000, 5rem);
+  column-gap: var(--spacing-m, 1rem);
 }
 
 .wizard__exit {
-  margin-left: var(--scale-1000, 5rem);
   text-decoration: underline;
 }
 </style>
