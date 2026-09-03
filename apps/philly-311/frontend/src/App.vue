@@ -11,7 +11,7 @@ import { useAuth } from '@phila/sso-vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAccountProvisioning } from '@/composables/useAccountProvisioning'
-import ReportDocumentIcon from '@/components/ReportDocumentIcon'
+import ReportIssueIcon from '@/components/ReportIssueIcon'
 
 const route = useRoute()
 const { signIn, signOut, isAuthenticated, userName } = useAuth()
@@ -33,11 +33,11 @@ const navLinks = computed(
       {
         text: 'Report an issue',
         href: '/report',
-        icon: ReportDocumentIcon,
-        iconSize: 'large' as const,
+        icon: ReportIssueIcon,
+        iconSize: 'medium' as const,
       },
       { text: 'Map', href: '/' },
-      { text: 'My Requests', href: '/reports' },
+      { text: 'Requests', href: '/reports' },
       { text: 'Answers', href: '/answers' },
       ...(isAuthenticated.value
         ? [

@@ -1,4 +1,4 @@
-// ABOUTME: Tests for App — the header's Report-an-issue/Map/My Requests/Answers/
+// ABOUTME: Tests for App — the header's Report-an-issue/Map/Requests/Answers/
 // ABOUTME: login nav links (now all passed through PinboardShell's `links` prop
 // ABOUTME: rather than app-provided slots), the sub-footer links, and the phila
 // ABOUTME: .content wrapper.
@@ -79,26 +79,26 @@ beforeEach(() => {
 type TestNavLink = { text: string; href?: string; selected?: boolean; onClick?: () => void }
 
 describe('App', () => {
-  it('passes Report an issue, Map, My Requests, Answers, and Login / Sign up as the header nav links', async () => {
+  it('passes Report an issue, Map, Requests, Answers, and Login / Sign up as the header nav links', async () => {
     const w = await mountApp()
     const shell = w.findComponent({ name: 'PinboardShell' })
     const links = shell.props('links') as TestNavLink[]
     expect(links.map(({ text, href }) => ({ text, href }))).toEqual([
       { text: 'Report an issue', href: '/report' },
       { text: 'Map', href: '/' },
-      { text: 'My Requests', href: '/reports' },
+      { text: 'Requests', href: '/reports' },
       { text: 'Answers', href: '/answers' },
       { text: 'Login / Sign up', href: '#' },
     ])
   })
 
-  it('gives the "Report an issue" link a large icon', async () => {
+  it('gives the "Report an issue" link a medium icon', async () => {
     const w = await mountApp()
     const shell = w.findComponent({ name: 'PinboardShell' })
     const links = shell.props('links') as (TestNavLink & { icon?: unknown; iconSize?: string })[]
     const reportLink = links.find((link) => link.text === 'Report an issue')
     expect(reportLink?.icon).toBeTruthy()
-    expect(reportLink?.iconSize).toBe('large')
+    expect(reportLink?.iconSize).toBe('medium')
   })
 
   it('marks the nav link matching the current route as selected', async () => {

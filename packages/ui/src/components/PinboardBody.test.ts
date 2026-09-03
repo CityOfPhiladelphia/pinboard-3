@@ -111,6 +111,32 @@ describe('PinboardBody - locations-filters slot forwarding (desktop)', () => {
   })
 })
 
+describe('PinboardBody - locations-footer slot (floating panel CTA)', () => {
+  it('renders footer slot content on desktop, absolutely positioned over the panel', async () => {
+    const w = await mountPinboardBody({
+      isMobile: false,
+      slots: { 'locations-footer': '<div class="my-footer">Report an issue</div>' },
+    })
+    const footer = w.find('.finder-panel-locations-footer')
+    expect(footer.exists()).toBe(true)
+    expect(footer.find('.my-footer').exists()).toBe(true)
+  })
+
+  it('omits the footer wrapper entirely when no locations-footer slot is given', async () => {
+    const w = await mountPinboardBody({ isMobile: false })
+    expect(w.find('.finder-panel-locations-footer').exists()).toBe(false)
+  })
+
+  it('does not render the footer slot on mobile — desktop-only for now', async () => {
+    const w = await mountPinboardBody({
+      isMobile: true,
+      slots: { 'locations-footer': '<div class="my-footer">Report an issue</div>' },
+    })
+    expect(w.find('.finder-panel-locations-footer').exists()).toBe(false)
+    expect(w.find('.my-footer').exists()).toBe(false)
+  })
+})
+
 // The mobile-only DOM (behind the `isMobile: true` prop) is a single Teleported
 // LocationsPanel instance rather than a second separate mount — the Teleport's
 // target (#locations-panel-mobile) lives inside the bottom sheet, so setting
