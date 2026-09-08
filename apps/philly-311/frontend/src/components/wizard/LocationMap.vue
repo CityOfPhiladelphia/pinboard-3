@@ -3,14 +3,21 @@
      emits move({lat,lng}) on dragend; emits outOfBounds for non-Philly points. -->
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { Map as PhilaMap, MapMarker } from '@phila/phila-ui-map-core'
+import { Map as PhilaMap, MapMarker, MapPopup } from '@phila/phila-ui-map-core'
+import { MapCard } from '@phila/phila-ui-cards'
 import type { Map as MapLibreMap } from 'maplibre-gl'
 import { isInPhilly } from '@/utils/bounds'
 import { readExposed, useMapBounds, type MapVMComponent } from '@/composables/useMapBounds'
+import { IconLocationDot } from '@phila/phila-ui-core/icons'
+import { Icon } from '@phila/phila-ui-core'
 
 const PHILLY_DEFAULT: [number, number] = [-75.163789, 39.952335] // City Hall [lng, lat]
 
-const props = defineProps<{ location: { lat: number; lng: number } | null }>()
+const props = defineProps<{
+  location?: { lat: number; lng: number }
+  address?: string
+  imgSrc?: string
+}>()
 const emit = defineEmits<{
   move: [point: { lat: number; lng: number }]
   outOfBounds: []
@@ -51,7 +58,26 @@ function onDragEnd(p: { lng: number; lat: number }) {
         draggable
         aria-label="Drag to refine the location"
         @dragend="onDragEnd"
-      />
+      >
+        <Icon :icon="IconLocationDot" size="large" style="margin: auto" />
+        <MapPopup
+          :lng-lat="[location.lng, location.lat]"
+          :close-on-click="false"
+          :close-button="false"
+          :anchor="'left'"
+          :offset="[20, -20]"
+          max-width="550px"
+        >
+          <MapCard
+            :heading="address"
+            :body="'Possible address from photo'"
+            :icon-props="{ icon: IconLocationDot }"
+            :src="imgSrc"
+            alt="Image subitted for report"
+          >
+          </MapCard>
+        </MapPopup>
+      </MapMarker>
     </PhilaMap>
   </div>
 </template>

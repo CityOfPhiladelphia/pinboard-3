@@ -23,7 +23,7 @@ export function useClusters(
   points: Ref<PinboardTypes.BasicLocation[]>,
   zoom: Ref<number>,
 ): { clusters: ComputedRef<ClusterItem[]>; expansionZoom: (clusterId: number) => number } {
-  const index = new Supercluster<PointProperties>({ radius: 60, maxZoom: 16 })
+  const index = new Supercluster<PointProperties>({ radius: 50, maxZoom: 16 })
   const indexVersion = ref(0)
 
   // Throttled re-index: leading + trailing, 400 ms window.

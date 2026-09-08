@@ -2,7 +2,7 @@
      map shows the chosen point with a draggable pin; "Use my current location" uses
      browser geolocation. Stores a complete AisFeature; Next gated on in-Philly. -->
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { reverseGeocode } from '@/composables/useAis'
 // import { getCurrentPosition } from '@/composables/useGeolocation'
@@ -38,7 +38,7 @@ watch([locationError, wizardError], ([newLocationError, newWizardError]) => {
 let intent = 0
 
 const mapLocation = computed(() =>
-  store.location ? { lat: store.location.lat, lng: store.location.lng } : null,
+  store.location ? { lat: store.location.lat, lng: store.location.lng } : undefined,
 )
 
 function onSelect(f: AisFeature) {
@@ -69,6 +69,10 @@ async function onMove({ lat, lng }: { lat: number; lng: number }) {
     if (isInPhilly(lat, lng)) locationError.value = ''
   }
 }
+
+onMounted(() => {
+  console.log('state: ', store.$state)
+})
 
 // async function useMyLocation() {
 //   const my = ++intent
@@ -110,6 +114,8 @@ async function onMove({ lat, lng }: { lat: number; lng: number }) {
         <LocationMap
           class="location-step__map"
           :location="mapLocation"
+          :address="store.location?.streetAddress"
+          :img-src="store.photo.mediaUrl"
           @move="onMove"
           @out-of-bounds="onOutOfBounds"
         />
