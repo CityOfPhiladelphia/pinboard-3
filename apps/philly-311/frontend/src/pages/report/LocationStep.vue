@@ -9,7 +9,8 @@ import { reverseGeocode } from '@/composables/useAis'
 import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { isInPhilly } from '@/utils/bounds'
 import { Callout } from '@phila/phila-ui-callout'
-// import { PhilaButton } from '@phila/phila-ui-button'
+import { Search } from '@phila/phila-ui-search'
+import { PhilaButton } from '@phila/phila-ui-button'
 // import AddressSearch from '@/components/wizard/AddressSearch.vue'
 import LocationMap from '@/components/wizard/LocationMap.vue'
 import ReportStep from '@/components/wizard/ReportStep.vue'
@@ -120,6 +121,13 @@ onMounted(() => {
           @move="onMove"
           @out-of-bounds="onOutOfBounds"
         />
+        <Search
+          :placeholder="store.location?.streetAddress ?? 'Enter an address, intersection, or place'"
+          :elevated="true"
+          class="location-step__overlay location-step__search"
+        />
+        <PhilaButton class="location-step__overlay location-step__reset"> Reset </PhilaButton>
+        <p class="location-step__overlay location-step__readonly">Click and drag to move pin</p>
       </div>
     </template>
   </ReportStep>
@@ -128,19 +136,61 @@ onMounted(() => {
 <style scoped>
 .location-step {
   display: grid;
+  grid-template-columns:
+    [full-start] var(--spacing-l, 1.5rem)
+    [inset-start] 1fr
+    [search-col-start] auto
+    [readonly-col-start] auto [readonly-col-end]
+    auto [search-col-end]
+    1fr [inset-end]
+    var(--spacing-l, 1.5rem) [full-end];
+  grid-template-rows:
+    [error-row]
+    auto
+    [map-start]
+    var(--spacing-l, 1.5rem)
+    [search-row-start]
+    auto
+    [search-row-end]
+    1fr
+    [readonly-row-start]
+    auto
+    [readonly-row-end]
+    var(--spacing-l, 1.5rem)
+    [map-end];
   height: 100%;
   width: 100%;
-  grid-template-columns: 1fr 2fr 1fr;
-  grid-template-rows: auto 1fr;
 }
 
 .location-step__error {
-  grid-column: 1 / -1;
-  grid-row: 1;
+  grid-column: full-start / full-end;
+  grid-row: error-row;
 }
 
 .location-step__map {
-  grid-column: 1 / -1;
-  grid-row: 2;
+  grid-column: full-start / full-end;
+  grid-row: map-start / map-end;
+}
+
+.location-step__overlay {
+  z-index: 0;
+}
+
+.location-step__search {
+  grid-column: search-col-start / search-col-end;
+  grid-row: search-row-start / search-row-end;
+  width: 100%;
+}
+
+.location-step__reset {
+  grid-column: inset-start / readonly-col-start;
+  grid-row: readonly-row-start / readonly-row-end;
+  width: fit-content;
+}
+
+.location-step__readonly {
+  grid-column: readonly-col-start / readonly-col-end;
+  grid-row: readonly-row-start / readonly-row-end;
+  width: 100%;
 }
 </style>
