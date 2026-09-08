@@ -114,6 +114,7 @@ onMounted(() => {
         <LocationMap
           class="location-step__map"
           :location="mapLocation"
+          :name="store.category"
           :address="store.location?.streetAddress"
           :img-src="store.photo.mediaUrl"
           @move="onMove"
