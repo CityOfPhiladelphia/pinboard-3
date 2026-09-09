@@ -4,13 +4,14 @@
      custom-field answers. Shared by the location-detail panel (map pin / my-requests
      selection) and the post-submit confirmation page. -->
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { CloseButton, PhilaButton } from '@phila/phila-ui-button'
 import { Callout } from '@phila/phila-ui-callout'
 import { Icon } from '@phila/phila-ui-core'
 import {
   IconArrowRight,
   IconCheckDouble,
+  IconCircleCheck,
   IconCircleInfo,
   IconClock,
   IconComments,
@@ -18,7 +19,9 @@ import {
   IconBars,
   IconLocationDot,
 } from '@phila/phila-ui-core/icons'
-import { DetailActions, LocationThumbnail, Tags, Tooltip } from '@pinboard/ui'
+import { Switch } from '@phila/phila-ui-switch'
+import { TextArea } from '@phila/phila-ui-text-area'
+import { DetailActions, DetailSubpanel, LocationThumbnail, Tags, Tooltip } from '@pinboard/ui'
 import ReportStepProgress from './ReportStepProgress.vue'
 import type { Issue } from '@/types/api'
 import {
@@ -37,9 +40,13 @@ const props = withDefaults(
     onClose?: () => void
     /** Hide the Upvote action even when onUpvote is provided (e.g. the user's own report). */
     showUpvote?: boolean
+    /** This browser already upvoted this report anonymously — the trigger becomes a
+     *  no-op showing that state instead of reopening the sub-panel (the API can't
+     *  reject a repeat anonymous upvote itself; there's no account to dedupe it against). */
+    alreadyUpvoted?: boolean
     upvoting?: boolean
     upvoteError?: string | null
-    /** Resolves to whether the upvote succeeded, so the dialog can stay open to retry on failure. */
+    /** Resolves to whether the upvote succeeded, so the sub-panel can stay open to retry on failure. */
     onUpvote?: (description: string) => Promise<boolean>
     /** Show the location map thumbnail — only the confirmation page needs it; the
      *  location-detail flyout already overlays a map with the same pin. */
@@ -49,6 +56,7 @@ const props = withDefaults(
     // An absent optional boolean prop is cast to false by Vue, not undefined —
     // default it to true so Upvote shows unless a caller explicitly opts out.
     showUpvote: true,
+    alreadyUpvoted: false,
     onClose: undefined,
     upvoteError: null,
     onUpvote: undefined,
@@ -85,21 +93,48 @@ const requestNumber = computed(() => props.report.caseNumber ?? props.report.id)
 // The SLA callout defaults to closed; start it open (the user can still collapse it).
 const slaOpen = ref(true)
 
-const upvoteDialog = ref<HTMLDialogElement | null>(null)
+// --- Sub-panel navigation --------------------------------------------------
+type SubpanelKey = 'upvote'
+
+const SUBPANEL_TRIGGER_SELECTOR: Record<SubpanelKey, string> = {
+  upvote: '[aria-label="I see this"]',
+}
+const activeSubpanel = ref<SubpanelKey | null>(null)
+const subpanelRoot = ref<HTMLElement | null>(null)
+let subpanelTrigger: string | null = null
+
+function openSubpanel(key: SubpanelKey) {
+  subpanelTrigger = SUBPANEL_TRIGGER_SELECTOR[key]
+  activeSubpanel.value = key
+  nextTick(() => {
+    const heading = subpanelRoot.value?.querySelector<HTMLElement>('.detail-subpanel__title')
+    heading?.setAttribute('tabindex', '-1')
+    heading?.focus()
+  })
+}
+function closeSubpanel() {
+  const trigger = subpanelTrigger
+  activeSubpanel.value = null
+  subpanelTrigger = null
+  nextTick(() => {
+    if (trigger) subpanelRoot.value?.querySelector<HTMLElement>(trigger)?.focus()
+  })
+}
+
 const upvoteDescription = ref('')
 
-function openUpvoteDialog() {
+const upvoteCommentPrivate = ref(false)
+
+function openUpvoteSubpanel() {
+  if (props.alreadyUpvoted) return
   upvoteDescription.value = ''
-  upvoteDialog.value?.showModal?.()
-}
-function closeUpvoteDialog() {
-  upvoteDialog.value?.close?.()
+  upvoteCommentPrivate.value = false
+  openSubpanel('upvote')
 }
 async function confirmUpvote() {
-  const description = upvoteDescription.value.trim()
-  if (!description || !props.onUpvote) return
-  const succeeded = await props.onUpvote(description)
-  if (succeeded) closeUpvoteDialog()
+  if (!props.onUpvote) return
+  const succeeded = await props.onUpvote(upvoteDescription.value.trim())
+  if (succeeded) closeSubpanel()
 }
 
 // Activity isn't wired to the real comments API yet (GET/POST
@@ -116,184 +151,190 @@ function closeActivityDialog() {
 
 <template>
   <div class="report-detail">
-    <div class="report-detail__body">
-      <div class="report-detail__hero-toolbar-anchor">
-        <div class="report-detail__hero-toolbar">
-          <div class="report-detail__hero-actions">
-            <Tooltip v-if="onUpvote && showUpvote" type="plain" trigger="hover">
-              <PhilaButton
-                :icon="IconCheckDouble"
-                :icon-only="true"
-                variant="standard"
-                size="small"
-                aria-label="I see this"
-                @click="openUpvoteDialog"
-              />
-              <template #body>I see this</template>
-            </Tooltip>
-            <Tooltip type="plain" trigger="hover">
-              <PhilaButton
-                :icon="IconComments"
-                :icon-only="true"
-                variant="standard"
-                size="small"
-                aria-label="Activity"
-                @click="openActivityDialog"
-              />
-              <template #body>Activity</template>
-            </Tooltip>
-            <DetailActions />
-          </div>
-          <div v-if="onClose" class="report-detail__close">
-            <Tooltip type="plain" trigger="hover">
-              <CloseButton size="small" @click="onClose" />
-              <template #body>Close</template>
-            </Tooltip>
-          </div>
-        </div>
-      </div>
-
-      <div class="report-detail__hero" :style="report.mediaUrl ? undefined : placeholderStyle">
-        <img
-          v-if="report.mediaUrl"
-          :src="report.mediaUrl"
-          :alt="report.serviceType"
-          class="report-detail__hero-img"
-        />
-        <Icon
-          v-else
-          :icon="placeholderIcon"
-          decorative
-          size="extra-large"
-          class="report-detail__hero-placeholder-icon"
-        />
-
-        <Tags
-          v-if="bucket"
-          class="report-detail__hero-status"
-          variant="readonly"
-          size="medium"
-          :color="statusTagColor(bucket)"
-          :icon="statusTagIcon(bucket)"
-          :style="statusTagStyle(bucket)"
-          :text="report.status"
-        />
-      </div>
-
-      <div class="report-detail__body-inner">
-        <div class="report-detail__title-block">
-          <div class="report-detail__title has-text-label-xlarge">{{ report.serviceType }}</div>
-          <div v-if="report.address || metaWhen" class="report-detail__meta">
-            <span v-if="report.address" class="report-detail__meta-item">
-              <Icon :icon="IconLocationDot" decorative size="extra-small" />
-              {{ report.address }}
-            </span>
-            <span v-if="metaWhen" class="report-detail__meta-item">
-              <Icon :icon="IconClock" decorative size="extra-small" />
-              {{ metaWhen }}
-            </span>
+    <div ref="subpanelRoot" class="report-detail__body">
+      <template v-if="!activeSubpanel">
+        <div class="report-detail__hero-toolbar-anchor">
+          <div class="report-detail__hero-toolbar">
+            <div class="report-detail__hero-actions">
+              <Tooltip v-if="onUpvote && showUpvote" type="plain" trigger="hover">
+                <PhilaButton
+                  :icon="alreadyUpvoted ? IconCircleCheck : IconCheckDouble"
+                  :icon-only="true"
+                  variant="standard"
+                  size="small"
+                  :selected="alreadyUpvoted"
+                  aria-label="I see this"
+                  @click="openUpvoteSubpanel"
+                />
+                <template #body>{{
+                  alreadyUpvoted ? 'You already flagged this' : 'I see this'
+                }}</template>
+              </Tooltip>
+              <Tooltip type="plain" trigger="hover">
+                <PhilaButton
+                  :icon="IconComments"
+                  :icon-only="true"
+                  variant="standard"
+                  size="small"
+                  aria-label="Activity"
+                  @click="openActivityDialog"
+                />
+                <template #body>Activity</template>
+              </Tooltip>
+              <DetailActions />
+            </div>
+            <div v-if="onClose" class="report-detail__close">
+              <Tooltip type="plain" trigger="hover">
+                <CloseButton size="small" @click="onClose" />
+                <template #body>Close</template>
+              </Tooltip>
+            </div>
           </div>
         </div>
 
-        <div v-if="report.description" class="report-detail__desc">{{ report.description }}</div>
-
-        <div class="report-detail__request-card">
-          <Icon :icon="IconCopy" decorative size="medium" />
-          <div class="report-detail__request-card-text">
-            <div class="report-detail__request-card-label">Service Request #</div>
-            <div class="report-detail__request-card-value">{{ requestNumber }}</div>
-          </div>
-        </div>
-
-        <div v-if="showMap" class="report-detail__map-thumb">
-          <LocationThumbnail
-            :latitude="report.latitude"
-            :longitude="report.longitude"
+        <div class="report-detail__hero" :style="report.mediaUrl ? undefined : placeholderStyle">
+          <img
+            v-if="report.mediaUrl"
+            :src="report.mediaUrl"
+            :alt="report.serviceType"
+            class="report-detail__hero-img"
+          />
+          <Icon
+            v-else
             :icon="placeholderIcon"
-            :color="serviceTypeColor(report.serviceType)"
+            decorative
+            size="extra-large"
+            class="report-detail__hero-placeholder-icon"
+          />
+
+          <Tags
+            v-if="bucket"
+            class="report-detail__hero-status"
+            variant="readonly"
+            size="medium"
+            :color="statusTagColor(bucket)"
+            :icon="statusTagIcon(bucket)"
+            :style="statusTagStyle(bucket)"
+            :text="report.status"
           />
         </div>
 
-        <div class="report-detail__next-steps">
-          <div class="report-detail__section-title has-text-label-xlarge">
-            <span class="report-detail__next-steps-icon">
-              <Icon :icon="IconArrowRight" decorative size="extra-small" />
-            </span>
-            Next Steps
+        <div class="report-detail__body-inner">
+          <div class="report-detail__title-block">
+            <div class="report-detail__title has-text-label-xlarge">{{ report.serviceType }}</div>
+            <div v-if="report.address || metaWhen" class="report-detail__meta">
+              <span v-if="report.address" class="report-detail__meta-item">
+                <Icon :icon="IconLocationDot" decorative size="extra-small" />
+                {{ report.address }}
+              </span>
+              <span v-if="metaWhen" class="report-detail__meta-item">
+                <Icon :icon="IconClock" decorative size="extra-small" />
+                {{ metaWhen }}
+              </span>
+            </div>
           </div>
-          <Callout
-            v-if="report.slaDate"
-            v-model:open="slaOpen"
-            class="report-detail__sla"
-            type="info"
-            title="Estimated update"
-            :message="`Report will be reviewed by: ${formatDeadline(report.slaDate)}`"
-          />
-        </div>
-        <ReportStepProgress :sections="steps.sections" :current-step="steps.currentStep" />
-        <div
-          v-if="report.customFields?.some((cf) => cf.value)"
-          class="report-detail__additional-details"
-        >
-          <div class="report-detail__section-title has-text-label-xlarge">
-            <Icon :icon="IconCircleInfo" decorative size="small" />
-            Additional details
+
+          <div v-if="report.description" class="report-detail__desc">{{ report.description }}</div>
+
+          <div class="report-detail__request-card">
+            <Icon :icon="IconCopy" decorative size="medium" />
+            <div class="report-detail__request-card-text">
+              <div class="report-detail__request-card-label">Service Request #</div>
+              <div class="report-detail__request-card-value">{{ requestNumber }}</div>
+            </div>
           </div>
-          <div class="report-detail__custom-fields">
-            <div
-              v-for="cf in (report.customFields ?? []).filter((cf) => cf.value)"
-              :key="cf.field"
-              class="report-detail__custom-field"
-            >
-              <Icon :icon="IconBars" decorative size="extra-small" />
-              <div class="report-detail__custom-field-text">
-                <div class="report-detail__custom-field-label">{{ cf.label }}</div>
-                <div class="report-detail__custom-field-value">{{ cf.value }}</div>
+
+          <div v-if="showMap" class="report-detail__map-thumb">
+            <LocationThumbnail
+              :latitude="report.latitude"
+              :longitude="report.longitude"
+              :icon="placeholderIcon"
+              :color="serviceTypeColor(report.serviceType)"
+            />
+          </div>
+
+          <div class="report-detail__next-steps">
+            <div class="report-detail__section-title has-text-label-xlarge">
+              <span class="report-detail__next-steps-icon">
+                <Icon :icon="IconArrowRight" decorative size="extra-small" />
+              </span>
+              Next Steps
+            </div>
+            <Callout
+              v-if="report.slaDate"
+              v-model:open="slaOpen"
+              class="report-detail__sla"
+              type="info"
+              title="Estimated update"
+              :message="`Report will be reviewed by: ${formatDeadline(report.slaDate)}`"
+            />
+          </div>
+          <ReportStepProgress :sections="steps.sections" :current-step="steps.currentStep" />
+          <div
+            v-if="report.customFields?.some((cf) => cf.value)"
+            class="report-detail__additional-details"
+          >
+            <div class="report-detail__section-title has-text-label-xlarge">
+              <Icon :icon="IconCircleInfo" decorative size="small" />
+              Additional details
+            </div>
+            <div class="report-detail__custom-fields">
+              <div
+                v-for="cf in (report.customFields ?? []).filter((cf) => cf.value)"
+                :key="cf.field"
+                class="report-detail__custom-field"
+              >
+                <Icon :icon="IconBars" decorative size="extra-small" />
+                <div class="report-detail__custom-field-text">
+                  <div class="report-detail__custom-field-label">{{ cf.label }}</div>
+                  <div class="report-detail__custom-field-value">{{ cf.value }}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </template>
 
-    <dialog
-      v-if="onUpvote && showUpvote"
-      ref="upvoteDialog"
-      class="report-detail__dialog"
-      aria-labelledby="upvote-dialog-title"
-      @close="closeUpvoteDialog"
-      @cancel="closeUpvoteDialog"
-    >
-      <h2 id="upvote-dialog-title" class="report-detail__dialog-title">Upvote this report</h2>
-      <div class="report-detail__dialog-body">Tell us about your experience with this issue.</div>
-      <textarea
-        v-model="upvoteDescription"
-        class="report-detail__upvote-textarea"
-        placeholder="Same pothole, still there as of today."
-        rows="3"
-      />
-      <div v-if="upvoteError" class="report-detail__upvote-error" role="alert">
-        {{ upvoteError }}
-      </div>
-      <div class="report-detail__dialog-actions">
-        <button
-          type="button"
-          class="report-detail__upvote-cancel"
-          data-test="upvote-cancel"
-          @click="closeUpvoteDialog"
-        >
-          Cancel
-        </button>
-        <PhilaButton
-          variant="primary"
-          data-test="upvote-confirm"
-          :disabled="!upvoteDescription.trim() || upvoting"
-          @click="confirmUpvote"
-        >
-          {{ upvoting ? 'Submitting…' : 'Submit' }}
-        </PhilaButton>
-      </div>
-    </dialog>
+      <DetailSubpanel
+        v-else-if="activeSubpanel === 'upvote'"
+        title="I see this"
+        back-label="Request details"
+        :on-back="closeSubpanel"
+        :on-close="onClose"
+      >
+        <div class="report-detail__upvote-label">
+          <div class="report-detail__upvote-label-title has-text-label-default">
+            Add a comment (optional)
+          </div>
+          <div class="report-detail__dialog-body has-text-body-default">
+            Do you have additional information about this issue to share with 311?
+          </div>
+          <Switch v-model="upvoteCommentPrivate" aria-label="Comment privately">
+            Comment privately
+          </Switch>
+        </div>
+        <TextArea
+          v-model="upvoteDescription"
+          placeholder="Enter comment here..."
+          aria-label="Comment"
+          :rows="6"
+        />
+        <div v-if="upvoteError" class="report-detail__upvote-error" role="alert">
+          {{ upvoteError }}
+        </div>
+        <template #footer>
+          <PhilaButton
+            variant="text-flat"
+            data-test="upvote-confirm"
+            class="report-detail__upvote-submit"
+            :disabled="upvoting"
+            @click="confirmUpvote"
+          >
+            {{ upvoting ? 'Submitting…' : 'Submit' }}
+          </PhilaButton>
+        </template>
+      </DetailSubpanel>
+    </div>
 
     <dialog
       ref="activityDialog"
@@ -303,7 +344,7 @@ function closeActivityDialog() {
       @cancel="closeActivityDialog"
     >
       <h2 id="activity-dialog-title" class="report-detail__dialog-title">Activity</h2>
-      <div class="report-detail__dialog-body">
+      <div class="report-detail__dialog-body has-text-body-default">
         Comments and activity history for this report aren't available yet — check back soon.
       </div>
       <div class="report-detail__dialog-actions">
@@ -385,13 +426,15 @@ function closeActivityDialog() {
 }
 
 .report-detail__hero-actions :deep(.icon-button),
-.report-detail__close :deep(.icon-button) {
+.report-detail__close :deep(.icon-button),
+.report-detail__body :deep(.detail-subpanel__close .icon-button) {
   border-radius: var(--border-radius-full, 9999px) !important;
 }
 
 .report-detail__hero-actions :deep(.icon-button),
 .report-detail__hero-actions :deep(.detail-actions svg),
-.report-detail__close :deep(.icon-button) {
+.report-detail__close :deep(.icon-button),
+.report-detail__body :deep(.detail-subpanel__close .icon-button) {
   color: var(--Schemes-On-Surface-Low, #636363) !important;
 }
 .report-detail__body {
@@ -539,13 +582,18 @@ function closeActivityDialog() {
   margin: 0 0 var(--spacing-s, 0.75rem);
   color: var(--Schemes-On-Surface-Variant, #4a4a4a);
 }
-.report-detail__upvote-textarea {
-  width: 100%;
-  resize: vertical;
-  font: inherit;
-  padding: var(--spacing-s, 0.5rem);
-  border: 1px solid var(--Schemes-Border-low, #ccc);
-  border-radius: 8px;
+.report-detail__upvote-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs, 0.25rem);
+  color: var(--Schemes-On-Surface-High, #000);
+}
+.report-detail__upvote-label-title {
+  margin: 0;
+}
+
+.report-detail__upvote-label .report-detail__dialog-body {
+  margin-bottom: 0;
 }
 .report-detail__upvote-error {
   color: var(--Schemes-Error, #b3261e);
@@ -558,12 +606,8 @@ function closeActivityDialog() {
   gap: var(--spacing-s, 0.75rem);
   margin-top: var(--spacing-l, 1.5rem);
 }
-.report-detail__upvote-cancel {
-  margin-right: auto;
-  background: none;
-  border: none;
-  color: var(--Schemes-Primary, #0f4d90);
-  font-weight: 600;
-  cursor: pointer;
+.report-detail__upvote-submit {
+  display: block;
+  margin-left: auto;
 }
 </style>

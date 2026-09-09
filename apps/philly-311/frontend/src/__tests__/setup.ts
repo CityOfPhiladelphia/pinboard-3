@@ -216,12 +216,31 @@ vi.mock('@phila/phila-ui-checkbox', () => ({
   CheckboxGroup: formStub('CheckboxGroup', GROUP_PROPS, 'groupLabel'),
   Checkbox: formStub('Checkbox', ['text', 'value', 'modelValue', 'disabled', 'error'], 'text'),
 }))
+
 vi.mock('@phila/phila-ui-switch', () => ({
-  Switch: formStub(
-    'Switch',
-    ['id', 'name', 'modelValue', 'value', 'offValue', 'disabled', 'ariaLabel', 'autofocus'],
-    'ariaLabel',
-  ),
+  Switch: defineComponent({
+    name: 'Switch',
+    props: ['id', 'name', 'modelValue', 'value', 'offValue', 'disabled', 'ariaLabel', 'autofocus'],
+    emits: ['update:modelValue', 'change'],
+    setup(props: Record<string, unknown>, { slots, emit }) {
+      return () =>
+        h('label', {}, [
+          h('input', {
+            type: 'checkbox',
+            'aria-label': props.ariaLabel,
+            checked: Boolean(props.modelValue),
+            disabled: props.disabled,
+            onChange: (e: Event) => {
+              const checked = (e.target as HTMLInputElement).checked
+              const next = checked ? (props.value ?? true) : (props.offValue ?? false)
+              emit('update:modelValue', next)
+              emit('change', next, e)
+            },
+          }),
+          slots.default?.(),
+        ])
+    },
+  }),
 }))
 vi.mock('@phila/phila-ui-date-field', () => ({
   DateField: formStub(
@@ -229,6 +248,38 @@ vi.mock('@phila/phila-ui-date-field', () => ({
     [...TEXT_FIELD_PROPS, 'format', 'datePicker', 'datePickerOptions', 'min', 'max'],
     'label',
   ),
+}))
+
+vi.mock('@phila/phila-ui-text-area', () => ({
+  TextArea: defineComponent({
+    name: 'TextArea',
+    inheritAttrs: false,
+    props: ['modelValue', 'label', 'maxLength', 'rows'],
+    emits: ['update:modelValue'],
+    setup(props: Record<string, unknown>, { attrs, emit }) {
+      return () => {
+        const maxLength = props.maxLength === undefined ? 500 : (props.maxLength as number | null)
+        const value = (props.modelValue as string) ?? ''
+        return h('div', {}, [
+          (props.label as string) ?? '',
+          h('textarea', {
+            ...attrs,
+            rows: props.rows,
+            value,
+            onInput: (e: Event) =>
+              emit('update:modelValue', (e.target as HTMLTextAreaElement).value),
+          }),
+          maxLength != null
+            ? h(
+                'div',
+                { class: 'phila-text-area-counter' },
+                `${value.length}/${maxLength} characters`,
+              )
+            : null,
+        ])
+      }
+    },
+  }),
 }))
 
 // Fallback mock for @phila/sso-vue. Tests that need to control auth state

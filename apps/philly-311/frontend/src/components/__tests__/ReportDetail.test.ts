@@ -1,10 +1,13 @@
 // ABOUTME: Tests for ReportDetail — the location-detail panel wrapper that renders
-// ABOUTME: instantly from the lightweight Report, then loads the full issue by id.
+// ABOUTME: instantly from the lightweight Report, then loads the full issue by id, and
+// ABOUTME: folds anonymousActivity (already-upvoted / own-submitted-report) into props.
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { ref } from 'vue'
+import { setActivePinia, createPinia } from 'pinia'
 import ReportDetail from '../ReportDetail.vue'
 import ReportDetailContent from '../ReportDetailContent.vue'
+import { useAnonymousActivityStore } from '@/stores/anonymousActivity'
 import type { Report } from '@/composables/useNearbyReports'
 
 const issue = ref<unknown>(null)
@@ -19,7 +22,15 @@ vi.mock('@/composables/useIssue', () => ({
 vi.mock('../ReportDetailContent.vue', () => ({
   default: {
     name: 'ReportDetailContent',
-    props: ['report', 'onClose', 'showUpvote', 'upvoting', 'upvoteError', 'onUpvote'],
+    props: [
+      'report',
+      'onClose',
+      'showUpvote',
+      'alreadyUpvoted',
+      'upvoting',
+      'upvoteError',
+      'onUpvote',
+    ],
     template: '<div />',
   },
 }))
@@ -42,6 +53,8 @@ beforeEach(() => {
   upvoteError.value = null
   load.mockReset()
   upvote.mockReset()
+  localStorage.clear()
+  setActivePinia(createPinia())
 })
 
 describe('ReportDetail', () => {
@@ -96,5 +109,22 @@ describe('ReportDetail', () => {
     expect(content.props('showUpvote')).toBe(false)
     expect(content.props('upvoting')).toBe(true)
     expect(content.props('upvoteError')).toBe('boom')
+  })
+
+  it('passes alreadyUpvoted through from the anonymousActivity store', () => {
+    useAnonymousActivityStore().markUpvoted('12345678')
+    const w = mount(ReportDetail, { props: { report, onClose: vi.fn() } })
+    expect(w.findComponent(ReportDetailContent).props('alreadyUpvoted')).toBe(true)
+  })
+
+  it('defaults alreadyUpvoted to false for a report this browser has not upvoted', () => {
+    const w = mount(ReportDetail, { props: { report, onClose: vi.fn() } })
+    expect(w.findComponent(ReportDetailContent).props('alreadyUpvoted')).toBe(false)
+  })
+
+  it('suppresses showUpvote for a report this browser submitted anonymously, even when the caller opts in', () => {
+    useAnonymousActivityStore().markSubmitted('12345678')
+    const w = mount(ReportDetail, { props: { report, onClose: vi.fn(), showUpvote: true } })
+    expect(w.findComponent(ReportDetailContent).props('showUpvote')).toBe(false)
   })
 })

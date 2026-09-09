@@ -38,6 +38,29 @@ vi.mock('@pinboard/ui', () => ({
       return () => h('div', [slots.default?.(), slots.body?.()])
     },
   }),
+  // A lightweight stand-in for the real shell (covered on its own by the
+  // chassis's DetailSubpanel.test.ts) — just enough markup for
+  // ReportDetailContent's own sub-panel-orchestration tests below.
+  DetailSubpanel: defineComponent({
+    name: 'DetailSubpanel',
+    props: ['title', 'backLabel', 'onBack', 'onClose'],
+    setup(props, { slots }) {
+      return () =>
+        h('div', { class: 'detail-subpanel' }, [
+          h(
+            'button',
+            { 'data-test': 'subpanel-back', onClick: () => props.onBack() },
+            props.backLabel,
+          ),
+          h('h2', { class: 'detail-subpanel__title' }, props.title),
+          props.onClose
+            ? h('button', { 'aria-label': 'Close', onClick: () => props.onClose() })
+            : null,
+          h('div', { class: 'detail-subpanel__body' }, slots.default?.()),
+          slots.footer ? h('div', { class: 'detail-subpanel__footer' }, slots.footer()) : null,
+        ])
+    },
+  }),
 }))
 
 const baseIssue: Issue = {
@@ -291,50 +314,125 @@ describe('ReportDetailContent', () => {
       expect(w.find('[aria-label="Follow"]').exists()).toBe(false)
     })
 
-    it('opens the dialog on click and submits the trimmed description', async () => {
-      // jsdom doesn't implement showModal/close, so stub them directly.
-      const showModal = vi.fn()
-      const close = vi.fn()
-      HTMLDialogElement.prototype.showModal = showModal
-      HTMLDialogElement.prototype.close = close
+    it('shows the already-upvoted state and does not open the sub-panel when alreadyUpvoted', async () => {
+      const onUpvote = vi.fn()
+      const w = mount(ReportDetailContent, {
+        props: { report: baseIssue, onUpvote, alreadyUpvoted: true },
+      })
+      const trigger = w.find('[aria-label="I see this"]')
+      expect(trigger.attributes('selected')).toBe('true')
+      expect(w.text()).toContain('You already flagged this')
 
+      await trigger.trigger('click')
+      expect(w.find('.detail-subpanel__title').exists()).toBe(false)
+    })
+
+    it('swaps to the "I see this" sub-panel on click, replacing the main content', async () => {
+      const onUpvote = vi.fn()
+      const w = mount(ReportDetailContent, { props: { report: baseIssue, onUpvote } })
+      await w.find('[aria-label="I see this"]').trigger('click')
+
+      expect(w.find('.detail-subpanel__title').text()).toBe('I see this')
+      expect(w.find('.report-detail__hero').exists()).toBe(false)
+      expect(w.find('.report-detail__body-inner').exists()).toBe(false)
+    })
+
+    it('shows the comment prompt, a 500-char counter, and a privacy toggle', async () => {
+      const onUpvote = vi.fn()
+      const w = mount(ReportDetailContent, { props: { report: baseIssue, onUpvote } })
+      await w.find('[aria-label="I see this"]').trigger('click')
+
+      expect(w.text()).toContain('Add a comment (optional)')
+      expect(w.find('textarea').attributes('placeholder')).toBe('Enter comment here...')
+      expect(w.find('.phila-text-area-counter').text()).toBe('0/500 characters')
+
+      await w.find('textarea').setValue('Still an issue.')
+      expect(w.find('.phila-text-area-counter').text()).toBe('15/500 characters')
+
+      const privacyToggle = w.find('input[aria-label="Comment privately"]')
+      expect(privacyToggle.exists()).toBe(true)
+      expect((privacyToggle.element as HTMLInputElement).checked).toBe(false)
+      await privacyToggle.setValue(true)
+      expect((privacyToggle.element as HTMLInputElement).checked).toBe(true)
+    })
+
+    it('resets the comment and privacy toggle each time the sub-panel is reopened', async () => {
+      const onUpvote = vi.fn()
+      const w = mount(ReportDetailContent, { props: { report: baseIssue, onUpvote } })
+      await w.find('[aria-label="I see this"]').trigger('click')
+      await w.find('textarea').setValue('Still an issue.')
+      await w.find('input[aria-label="Comment privately"]').setValue(true)
+      await w.find('[data-test="subpanel-back"]').trigger('click')
+
+      await w.find('[aria-label="I see this"]').trigger('click')
+      expect((w.find('textarea').element as HTMLTextAreaElement).value).toBe('')
+      expect(
+        (w.find('input[aria-label="Comment privately"]').element as HTMLInputElement).checked,
+      ).toBe(false)
+    })
+
+    it('the sub-panel Back button returns to the main report content and refocuses the trigger', async () => {
+      const onUpvote = vi.fn()
+      const w = mount(ReportDetailContent, {
+        props: { report: baseIssue, onUpvote },
+        attachTo: document.body,
+      })
+      await w.find('[aria-label="I see this"]').trigger('click')
+      await w.find('[data-test="subpanel-back"]').trigger('click')
+
+      expect(w.find('.detail-subpanel__title').exists()).toBe(false)
+      expect(w.find('.report-detail__hero').exists()).toBe(true)
+      // The main content (including the trigger button) was remounted, not just
+      // revealed, so it's a fresh DOM node — assert on the element's identity
+      // (its aria-label), not object equality with the pre-remount reference.
+      expect(document.activeElement?.getAttribute('aria-label')).toBe('I see this')
+      w.unmount()
+    })
+
+    it('submits the trimmed description and returns to the main content on success', async () => {
       const onUpvote = vi.fn().mockResolvedValue(true)
       const w = mount(ReportDetailContent, { props: { report: baseIssue, onUpvote } })
       await w.find('[aria-label="I see this"]').trigger('click')
-      expect(showModal).toHaveBeenCalled()
 
-      await w.find('.report-detail__upvote-textarea').setValue('  Still there today.  ')
+      await w.find('textarea').setValue('  Still there today.  ')
       await w.find('[data-test="upvote-confirm"]').trigger('click')
       await flushPromises()
       expect(onUpvote).toHaveBeenCalledWith('Still there today.')
-      expect(close).toHaveBeenCalled()
+      expect(w.find('.detail-subpanel__title').exists()).toBe(false)
     })
 
-    it('keeps the dialog open and shows upvoteError when the upvote fails', async () => {
-      HTMLDialogElement.prototype.showModal = vi.fn()
-      const close = vi.fn()
-      HTMLDialogElement.prototype.close = close
-
+    it('stays on the sub-panel and shows upvoteError when the upvote fails', async () => {
       const onUpvote = vi.fn().mockResolvedValue(false)
       const w = mount(ReportDetailContent, {
         props: { report: baseIssue, onUpvote, upvoteError: 'Issue has already been upvoted' },
       })
       await w.find('[aria-label="I see this"]').trigger('click')
-      await w.find('.report-detail__upvote-textarea').setValue('Still an issue.')
+      await w.find('textarea').setValue('Still an issue.')
       await w.find('[data-test="upvote-confirm"]').trigger('click')
       await flushPromises()
-      expect(close).not.toHaveBeenCalled()
+      expect(w.find('.detail-subpanel__title').exists()).toBe(true)
       expect(w.text()).toContain('Issue has already been upvoted')
     })
 
-    it('disables the submit button while an empty description or upvoting is in progress', async () => {
-      HTMLDialogElement.prototype.showModal = vi.fn()
+    it('disables the submit button while upvoting is in progress', async () => {
       const onUpvote = vi.fn()
       const w = mount(ReportDetailContent, {
         props: { report: baseIssue, onUpvote, upvoting: true },
       })
       await w.find('[aria-label="I see this"]').trigger('click')
       expect(w.find('[data-test="upvote-confirm"]').attributes('disabled')).toBeDefined()
+    })
+
+    it('submits with an empty comment — the comment is optional', async () => {
+      const onUpvote = vi.fn().mockResolvedValue(true)
+      const w = mount(ReportDetailContent, { props: { report: baseIssue, onUpvote } })
+      await w.find('[aria-label="I see this"]').trigger('click')
+
+      expect(w.find('[data-test="upvote-confirm"]').attributes('disabled')).toBeUndefined()
+      await w.find('[data-test="upvote-confirm"]').trigger('click')
+      await flushPromises()
+      expect(onUpvote).toHaveBeenCalledWith('')
+      expect(w.find('.detail-subpanel__title').exists()).toBe(false)
     })
   })
 })

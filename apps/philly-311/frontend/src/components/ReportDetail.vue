@@ -5,6 +5,7 @@
 import { computed, watch } from 'vue'
 import ReportDetailContent from './ReportDetailContent.vue'
 import { useIssue } from '@/composables/useIssue'
+import { useAnonymousActivityStore } from '@/stores/anonymousActivity'
 import type { Report } from '@/composables/useNearbyReports'
 import type { Issue } from '@/types/api'
 
@@ -16,6 +17,16 @@ const props = withDefaults(
 )
 
 const { issue, isUpvoting, upvoteError, load, upvote } = useIssue()
+const anonymousActivity = useAnonymousActivityStore()
+
+// The API 400s if you try to upvote a report you submitted yourself, but it can only
+// catch that server-side for a signed-in submitter (it has no account to check an
+// anonymous one against) — same reason the upvote itself can't be deduped anonymously.
+// Suppress the action client-side for both cases rather than surfacing that error.
+const canUpvote = computed(
+  () => props.showUpvote && !anonymousActivity.isSubmitted(props.report.id),
+)
+const alreadyUpvoted = computed(() => anonymousActivity.isUpvoted(props.report.id))
 
 /** Placeholder Issue built from the lightweight Report, shown until the full fetch resolves. */
 function reportToIssue(r: Report): Issue {
@@ -50,7 +61,8 @@ function handleUpvote(description: string): Promise<boolean> {
   <ReportDetailContent
     :report="displayIssue"
     :on-close="onClose"
-    :show-upvote="showUpvote"
+    :show-upvote="canUpvote"
+    :already-upvoted="alreadyUpvoted"
     :upvoting="isUpvoting"
     :upvote-error="upvoteError"
     :on-upvote="handleUpvote"
