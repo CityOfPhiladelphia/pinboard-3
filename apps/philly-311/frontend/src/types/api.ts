@@ -52,3 +52,17 @@ export interface Issue {
   childCount?: number
   customFields?: CustomFieldValue[]
 }
+
+export interface CommentCreator {
+  id: string
+  name: string
+}
+
+export interface Comment {
+  id: string
+  content: string
+  createdAt: string
+  updatedAt: string
+  private: boolean
+  creator: CommentCreator
+}

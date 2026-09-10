@@ -15,6 +15,11 @@ const PAGE_LIMIT = 200
 // SOQL OFFSET cap mirrored from the backend — only the first 2000 nearest issues load.
 const OFFSET_CAP = 2000
 
+function nextOffset(page: PageResult, requestedOffset: number): number | null {
+  if (page.nextOffset !== null) return page.nextOffset
+  return page.reports.length === PAGE_LIMIT ? requestedOffset + PAGE_LIMIT : null
+}
+
 export interface EnsureLoadedOpts {
   /** Override the clock; defaults to Date.now. Useful in tests. */
   now?: () => number
@@ -93,15 +98,16 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
     }
 
     // Background paging driven by nextOffset from each page
-    let next = page1.nextOffset
+    let next = nextOffset(page1, 0)
     while (next !== null && next < OFFSET_CAP) {
+      const requestedOffset = next
       try {
         const page = await fetch({
           lat: anchor.lat,
           lng: anchor.lng,
           radius: CITYWIDE_RADIUS,
           limit: PAGE_LIMIT,
-          offset: next,
+          offset: requestedOffset,
         })
         for (const r of page.reports) {
           if (!byId.value.has(r.id)) {
@@ -110,7 +116,7 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
           }
         }
         if (page.reports.length === 0) break
-        next = page.nextOffset
+        next = nextOffset(page, requestedOffset)
       } catch (e) {
         error.value = e as Error
         return

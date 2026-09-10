@@ -55,10 +55,65 @@ vi.mock('@phila/phila-ui-tags', () => ({
 vi.mock('@phila/phila-ui-filter-chip', () => ({
   FilterChipGroup: formStub(
     'FilterChipGroup',
-    ['filters', 'modelValue', 'filterButton', 'filterButtonText', 'elevated'],
+    ['filters', 'modelValue', 'color', 'filterButton', 'filterButtonText', 'elevated'],
     'filterButtonText',
   ),
-  FilterChip: formStub('FilterChip', ['color', 'icon', 'text', 'size'], 'text'),
+  // Mirrors the real FilterChip's two modes: a `choices` dropdown (emits
+  // update:model-value with a { [choiceValue]: true } map) or a plain
+  // toggle chip keyed on `selected`/`text` (emits update:selected).
+  FilterChip: defineComponent({
+    name: 'FilterChip',
+    props: ['label', 'text', 'icon', 'size', 'color', 'choices', 'modelValue', 'selected'],
+    emits: ['update:modelValue', 'update:selected'],
+    setup(props: Record<string, unknown>, { emit }) {
+      return () => {
+        const choices = props.choices as { text: string; value: string }[] | undefined
+        if (choices) {
+          const modelValue = (props.modelValue as Record<string, boolean>) ?? {}
+          return h('div', { class: 'filter-chip' }, [
+            (props.label as string) ?? '',
+            ...choices.map((c) =>
+              h(
+                'button',
+                {
+                  type: 'button',
+                  'data-choice': c.value,
+                  'aria-pressed': String(Boolean(modelValue[c.value])),
+                  onClick: () => emit('update:modelValue', { [c.value]: true }),
+                },
+                c.text,
+              ),
+            ),
+            // Mirrors the real dropdown panel's Reset button: emits every choice as
+            // false (not an empty/omitted map) rather than clearing the selection itself.
+            h(
+              'button',
+              {
+                type: 'button',
+                'data-choice-reset': true,
+                onClick: () =>
+                  emit(
+                    'update:modelValue',
+                    Object.fromEntries(choices.map((c) => [c.value, false])),
+                  ),
+              },
+              'Reset',
+            ),
+          ])
+        }
+        return h(
+          'button',
+          {
+            type: 'button',
+            class: 'filter-chip',
+            'aria-pressed': String(Boolean(props.selected)),
+            onClick: () => emit('update:selected', !props.selected),
+          },
+          (props.text as string) ?? '',
+        )
+      }
+    },
+  }),
 }))
 
 // Mirrors Report311's own contract: renders an <img> when src is present, else the
@@ -254,14 +309,16 @@ vi.mock('@phila/phila-ui-text-area', () => ({
   TextArea: defineComponent({
     name: 'TextArea',
     inheritAttrs: false,
-    props: ['modelValue', 'label', 'maxLength', 'rows'],
+    props: ['modelValue', 'label', 'supportingText', 'maxLength', 'rows'],
     emits: ['update:modelValue'],
-    setup(props: Record<string, unknown>, { attrs, emit }) {
+    setup(props: Record<string, unknown>, { attrs, emit, slots }) {
       return () => {
         const maxLength = props.maxLength === undefined ? 500 : (props.maxLength as number | null)
         const value = (props.modelValue as string) ?? ''
         return h('div', {}, [
           (props.label as string) ?? '',
+          (props.supportingText as string) ?? '',
+          slots['before-input']?.(),
           h('textarea', {
             ...attrs,
             rows: props.rows,

@@ -4,7 +4,7 @@
      custom-field answers. Shared by the location-detail panel (map pin / my-requests
      selection) and the post-submit confirmation page. -->
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { CloseButton, PhilaButton } from '@phila/phila-ui-button'
 import { Callout } from '@phila/phila-ui-callout'
 import { Icon } from '@phila/phila-ui-core'
@@ -19,10 +19,10 @@ import {
   IconBars,
   IconLocationDot,
 } from '@phila/phila-ui-core/icons'
-import { Switch } from '@phila/phila-ui-switch'
-import { TextArea } from '@phila/phila-ui-text-area'
-import { DetailActions, DetailSubpanel, LocationThumbnail, Tags, Tooltip } from '@pinboard/ui'
+import { DetailActions, LocationThumbnail, Tags, Tooltip } from '@pinboard/ui'
 import ReportStepProgress from './ReportStepProgress.vue'
+import ReportUpvotePanel from './ReportUpvotePanel.vue'
+import ReportActivityPanel from './ReportActivityPanel.vue'
 import type { Issue } from '@/types/api'
 import {
   statusBucket,
@@ -33,6 +33,11 @@ import {
 import { useReportSteps } from '@/composables/useReportSteps'
 import { serviceTypeColor, serviceTypeTintStyle } from '@/utils/serviceTypeMeta'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
+
+/** Which sub-panel (if any) has swapped in for the main report content. Exported so
+ *  callers that deep-link into a sub-panel (see initialSubpanel/onSubpanelChange
+ *  below) can share this type instead of re-declaring the same two values. */
+export type SubpanelKey = 'upvote' | 'activity'
 
 const props = withDefaults(
   defineProps<{
@@ -51,6 +56,12 @@ const props = withDefaults(
     /** Show the location map thumbnail — only the confirmation page needs it; the
      *  location-detail flyout already overlays a map with the same pin. */
     showMap?: boolean
+    /** Opens directly to this sub-panel on mount, and reacts to it changing later (e.g.
+     *  browser back/forward) — lets a caller deep-link a URL straight to a sub-panel. */
+    initialSubpanel?: SubpanelKey
+    /** Fires whenever the active sub-panel opens, switches, or closes, so a caller can
+     *  keep a URL query param in sync for shareable/deep-linkable sub-panel URLs. */
+    onSubpanelChange?: (panel: SubpanelKey | null) => void
   }>(),
   {
     // An absent optional boolean prop is cast to false by Vue, not undefined —
@@ -61,6 +72,8 @@ const props = withDefaults(
     upvoteError: null,
     onUpvote: undefined,
     showMap: false,
+    initialSubpanel: undefined,
+    onSubpanelChange: undefined,
   },
 )
 
@@ -94,10 +107,9 @@ const requestNumber = computed(() => props.report.caseNumber ?? props.report.id)
 const slaOpen = ref(true)
 
 // --- Sub-panel navigation --------------------------------------------------
-type SubpanelKey = 'upvote'
-
 const SUBPANEL_TRIGGER_SELECTOR: Record<SubpanelKey, string> = {
   upvote: '[aria-label="I see this"]',
+  activity: '[aria-label="Activity"]',
 }
 const activeSubpanel = ref<SubpanelKey | null>(null)
 const subpanelRoot = ref<HTMLElement | null>(null)
@@ -106,6 +118,7 @@ let subpanelTrigger: string | null = null
 function openSubpanel(key: SubpanelKey) {
   subpanelTrigger = SUBPANEL_TRIGGER_SELECTOR[key]
   activeSubpanel.value = key
+  props.onSubpanelChange?.(key)
   nextTick(() => {
     const heading = subpanelRoot.value?.querySelector<HTMLElement>('.detail-subpanel__title')
     heading?.setAttribute('tabindex', '-1')
@@ -116,37 +129,45 @@ function closeSubpanel() {
   const trigger = subpanelTrigger
   activeSubpanel.value = null
   subpanelTrigger = null
+  props.onSubpanelChange?.(null)
   nextTick(() => {
     if (trigger) subpanelRoot.value?.querySelector<HTMLElement>(trigger)?.focus()
   })
 }
 
-const upvoteDescription = ref('')
-
-const upvoteCommentPrivate = ref(false)
+watch(
+  () => props.report.id,
+  () => {
+    nextTick(() => {
+      if (subpanelRoot.value) subpanelRoot.value.scrollTop = 0
+    })
+  },
+)
 
 function openUpvoteSubpanel() {
   if (props.alreadyUpvoted) return
-  upvoteDescription.value = ''
-  upvoteCommentPrivate.value = false
   openSubpanel('upvote')
 }
-async function confirmUpvote() {
-  if (!props.onUpvote) return
-  const succeeded = await props.onUpvote(upvoteDescription.value.trim())
-  if (succeeded) closeSubpanel()
+
+function openActivitySubpanel() {
+  openSubpanel('activity')
 }
 
-// Activity isn't wired to the real comments API yet (GET/POST
-// /private/key/issues/:id/comments) — UX is still designing that flow. This
-// just makes the button interactive instead of disabled, with a placeholder.
-const activityDialog = ref<HTMLDialogElement | null>(null)
-function openActivityDialog() {
-  activityDialog.value?.showModal?.()
-}
-function closeActivityDialog() {
-  activityDialog.value?.close?.()
-}
+// Deep-links a URL straight to a sub-panel: opens on mount, and reacts to
+// initialSubpanel changing later (e.g. a caller syncing it with the URL as the
+// user navigates browser back/forward). Guarded against activeSubpanel already
+// matching so this doesn't loop with onSubpanelChange echoing a caller's own
+// change back down as a prop update.
+watch(
+  () => props.initialSubpanel,
+  (panel) => {
+    if (panel === activeSubpanel.value) return
+    if (panel === 'upvote') openUpvoteSubpanel()
+    else if (panel === 'activity') openActivitySubpanel()
+    else closeSubpanel()
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -177,7 +198,7 @@ function closeActivityDialog() {
                   variant="standard"
                   size="small"
                   aria-label="Activity"
-                  @click="openActivityDialog"
+                  @click="openActivitySubpanel"
                 />
                 <template #body>Activity</template>
               </Tooltip>
@@ -295,64 +316,22 @@ function closeActivityDialog() {
         </div>
       </template>
 
-      <DetailSubpanel
+      <ReportUpvotePanel
         v-else-if="activeSubpanel === 'upvote'"
-        title="I see this"
-        back-label="Request details"
         :on-back="closeSubpanel"
         :on-close="onClose"
-      >
-        <div class="report-detail__upvote-label">
-          <div class="report-detail__upvote-label-title has-text-label-default">
-            Add a comment (optional)
-          </div>
-          <div class="report-detail__dialog-body has-text-body-default">
-            Do you have additional information about this issue to share with 311?
-          </div>
-          <Switch v-model="upvoteCommentPrivate" aria-label="Comment privately">
-            Comment privately
-          </Switch>
-        </div>
-        <TextArea
-          v-model="upvoteDescription"
-          placeholder="Enter comment here..."
-          aria-label="Comment"
-          :rows="6"
-        />
-        <div v-if="upvoteError" class="report-detail__upvote-error" role="alert">
-          {{ upvoteError }}
-        </div>
-        <template #footer>
-          <PhilaButton
-            variant="text-flat"
-            data-test="upvote-confirm"
-            class="report-detail__upvote-submit"
-            :disabled="upvoting"
-            @click="confirmUpvote"
-          >
-            {{ upvoting ? 'Submitting…' : 'Submit' }}
-          </PhilaButton>
-        </template>
-      </DetailSubpanel>
-    </div>
+        :upvoting="upvoting"
+        :upvote-error="upvoteError"
+        :on-upvote="onUpvote"
+      />
 
-    <dialog
-      ref="activityDialog"
-      class="report-detail__dialog"
-      aria-labelledby="activity-dialog-title"
-      @close="closeActivityDialog"
-      @cancel="closeActivityDialog"
-    >
-      <h2 id="activity-dialog-title" class="report-detail__dialog-title">Activity</h2>
-      <div class="report-detail__dialog-body has-text-body-default">
-        Comments and activity history for this report aren't available yet — check back soon.
-      </div>
-      <div class="report-detail__dialog-actions">
-        <PhilaButton variant="primary" data-test="activity-close" @click="closeActivityDialog">
-          Close
-        </PhilaButton>
-      </div>
-    </dialog>
+      <ReportActivityPanel
+        v-else-if="activeSubpanel === 'activity'"
+        :report="report"
+        :on-back="closeSubpanel"
+        :on-close="onClose"
+      />
+    </div>
   </div>
 </template>
 
@@ -559,55 +538,5 @@ function closeActivityDialog() {
 .report-detail__custom-field-value {
   margin: 0;
   color: var(--Schemes-On-Background, #000);
-}
-.report-detail__dialog {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  max-width: 28rem;
-  width: 100%;
-  padding: var(--spacing-l, 2rem);
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-}
-.report-detail__dialog::backdrop {
-  background: rgba(0, 0, 0, 0.5);
-}
-.report-detail__dialog-title {
-  margin: 0 0 var(--spacing-s, 0.75rem);
-}
-.report-detail__dialog-body {
-  margin: 0 0 var(--spacing-s, 0.75rem);
-  color: var(--Schemes-On-Surface-Variant, #4a4a4a);
-}
-.report-detail__upvote-label {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2xs, 0.25rem);
-  color: var(--Schemes-On-Surface-High, #000);
-}
-.report-detail__upvote-label-title {
-  margin: 0;
-}
-
-.report-detail__upvote-label .report-detail__dialog-body {
-  margin-bottom: 0;
-}
-.report-detail__upvote-error {
-  color: var(--Schemes-Error, #b3261e);
-  margin: var(--spacing-s, 0.5rem) 0 0;
-}
-.report-detail__dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: var(--spacing-s, 0.75rem);
-  margin-top: var(--spacing-l, 1.5rem);
-}
-.report-detail__upvote-submit {
-  display: block;
-  margin-left: auto;
 }
 </style>

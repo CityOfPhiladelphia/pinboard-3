@@ -291,6 +291,61 @@ describe('useOpenIssuesStore', () => {
     })
   })
 
+  // The API's Link header (nextOffset/lastOffset) isn't in its
+  // Access-Control-Expose-Headers, so the browser hides it — fetchPage's
+  // nextOffset/lastOffset come back null even on a full page that really does
+  // have more behind it. These mock that exact real-world response shape,
+  // rather than a working Link header like the tests above.
+  describe('nextOffset fallback when the Link header is unreadable', () => {
+    it('keeps paging past a full page even when nextOffset comes back null', async () => {
+      const store = useOpenIssuesStore()
+      const page1Reports = Array.from({ length: 200 }, (_, i) => makeReport(`p1_${i}`))
+
+      const mockFetch = vi
+        .fn()
+        // Page 1: a full page, but nextOffset/lastOffset null, as a hidden Link
+        // header would look — should still be inferred as "there's more".
+        .mockResolvedValueOnce(pageResult(page1Reports, null, null))
+        // Background page at the inferred offset (200): short, ends pagination.
+        .mockResolvedValueOnce(pageResult([makeReport('last')], null, null))
+
+      await store.ensureLoaded(SEED, { fetchPage: mockFetch })
+
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+      expect(mockFetch.mock.calls[1][0]).toMatchObject({ offset: 200 })
+      expect(store.reports).toHaveLength(201)
+    })
+
+    it('stops immediately when page 1 itself comes back short of PAGE_LIMIT, nextOffset null', async () => {
+      const store = useOpenIssuesStore()
+      // Fewer than 200 — the fallback must not infer a next page from this.
+      const page1Reports = Array.from({ length: 150 }, (_, i) => makeReport(`p1_${i}`))
+      const mockFetch = vi.fn().mockResolvedValueOnce(pageResult(page1Reports, null, null))
+
+      await store.ensureLoaded(SEED, { fetchPage: mockFetch })
+
+      expect(mockFetch).toHaveBeenCalledTimes(1) // no background page — inferred as the only one
+      expect(store.reports).toHaveLength(150)
+    })
+
+    it('also stops at OFFSET_CAP when relying purely on page length, not a real nextOffset', async () => {
+      const store = useOpenIssuesStore()
+      const calledOffsets: number[] = []
+      const mockFetch = vi.fn().mockImplementation(async (params: PageParams) => {
+        const offset = params.offset ?? 0
+        calledOffsets.push(offset)
+        if (params.limit === 1) return pageResult([makeReport('probe')], null, null)
+        const reports = Array.from({ length: 200 }, (_, i) => makeReport(`${offset}_${i}`))
+        return pageResult(reports, null, null)
+      })
+
+      await store.ensureLoaded(SEED, { fetchPage: mockFetch })
+
+      expect(calledOffsets).not.toContain(2000)
+      expect(Math.max(...calledOffsets)).toBe(1800)
+    })
+  })
+
   describe('OFFSET_CAP', () => {
     it('stops paging at OFFSET_CAP even when total exceeds it', async () => {
       const store = useOpenIssuesStore()
