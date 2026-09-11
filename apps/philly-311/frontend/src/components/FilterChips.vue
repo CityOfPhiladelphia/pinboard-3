@@ -75,6 +75,7 @@ function onPanelUpdate(next: FilterValues) {
     <FilterChipGroup
       :filters="filters"
       :model-value="values"
+      color="white"
       :filter-button="true"
       filter-button-text="All Filters"
       @update:model-value="onUpdate"

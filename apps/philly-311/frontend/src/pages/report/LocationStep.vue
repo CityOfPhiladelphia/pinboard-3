@@ -11,6 +11,8 @@ import { isInPhilly } from '@/utils/bounds'
 import { Callout } from '@phila/phila-ui-callout'
 import { Search } from '@phila/phila-ui-search'
 import { PhilaButton } from '@phila/phila-ui-button'
+import { Tags } from '@phila/phila-ui-tags'
+import { IconRotateLeft, IconArrowsUpDownLeftRight } from '@phila/phila-ui-core/icons'
 // import AddressSearch from '@/components/wizard/AddressSearch.vue'
 import LocationMap from '@/components/wizard/LocationMap.vue'
 import ReportStep from '@/components/wizard/ReportStep.vue'
@@ -126,8 +128,21 @@ onMounted(() => {
           :elevated="true"
           class="location-step__overlay location-step__search"
         />
-        <PhilaButton class="location-step__overlay location-step__reset"> Reset </PhilaButton>
-        <p class="location-step__overlay location-step__readonly">Click and drag to move pin</p>
+        <PhilaButton
+          v-if="store.location?.streetAddress"
+          variant="text"
+          :icon="IconRotateLeft"
+          size="small"
+          class="location-step__overlay location-step__reset"
+          >Reset</PhilaButton
+        >
+        <Tags
+          text="Click and drag to move pin"
+          variant="readonly"
+          :icon="IconArrowsUpDownLeftRight"
+          selected
+          class="location-step__overlay location-step__readonly"
+        />
       </div>
     </template>
   </ReportStep>
@@ -186,6 +201,10 @@ onMounted(() => {
   grid-column: inset-start / readonly-col-start;
   grid-row: readonly-row-start / readonly-row-end;
   width: fit-content;
+
+  & > * :is(.phila-icon-core) {
+    font-size: var(--Icon-Solid-ExtraSmall-font-icon-solid-xs-size, 1rem);
+  }
 }
 
 .location-step__readonly {

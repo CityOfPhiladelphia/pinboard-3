@@ -1,10 +1,16 @@
 // ABOUTME: Tests for useIssue — GET /issues/:id load and POST /issues/:id/upvote,
-// ABOUTME: including loading/error state and that a successful upvote replaces the issue.
+// ABOUTME: including loading/error state and that a successful upvote replaces the issue,
+// ABOUTME: recording anonymousActivity only when the caller isn't authenticated.
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { setActivePinia, createPinia } from 'pinia'
 import { useIssue } from '../useIssue'
 import { api311Fetch } from '../api311'
+import { useAnonymousActivityStore } from '@/stores/anonymousActivity'
 
-vi.mock('@phila/sso-vue', () => ({ useAuth: () => ({ isAuthenticated: { value: false } }) }))
+// A plain mutable object rather than a Vue ref — vi.hoisted runs before the
+// `vue` import initializes, so `ref` itself isn't callable here yet.
+const isAuthenticated = vi.hoisted(() => ({ value: false }))
+vi.mock('@phila/sso-vue', () => ({ useAuth: () => ({ isAuthenticated }) }))
 vi.mock('../api311', () => ({ api311Fetch: vi.fn() }))
 const mockFetch = vi.mocked(api311Fetch)
 
@@ -24,7 +30,12 @@ const issue = {
   status: 'New',
 }
 
-beforeEach(() => mockFetch.mockReset())
+beforeEach(() => {
+  mockFetch.mockReset()
+  isAuthenticated.value = false
+  localStorage.clear()
+  setActivePinia(createPinia())
+})
 
 describe('useIssue - load', () => {
   it('fetches the issue by id and exposes it', async () => {
@@ -71,6 +82,20 @@ describe('useIssue - upvote', () => {
     expect(upvoteError.value).toBeNull()
   })
 
+  it('omits description from the request when blank — it is an optional field', async () => {
+    const updated = { ...issue, status: 'In Progress', childCount: 1 }
+    mockFetch.mockResolvedValueOnce(respond(updated))
+    const { upvote } = useIssue()
+    await upvote('25012345', '   ')
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: '/private/key/issues/25012345/upvote',
+        method: 'POST',
+        body: {},
+      }),
+    )
+  })
+
   it('returns false and sets upvoteError on failure, without touching issue', async () => {
     mockFetch.mockResolvedValueOnce(respond({ error: 'Cannot upvote your own issue' }, false, 400))
     const { issue: result, upvote, upvoteError } = useIssue()
@@ -78,5 +103,27 @@ describe('useIssue - upvote', () => {
     expect(succeeded).toBe(false)
     expect(upvoteError.value).toBe('Cannot upvote your own issue')
     expect(result.value).toBeNull()
+  })
+
+  it('records the upvote in anonymousActivity when not authenticated — the API has no account to dedupe it', async () => {
+    mockFetch.mockResolvedValueOnce(respond(issue))
+    const { upvote } = useIssue()
+    await upvote('25012345', 'Still there today.')
+    expect(useAnonymousActivityStore().isUpvoted('25012345')).toBe(true)
+  })
+
+  it('does not record to anonymousActivity when authenticated — the server tracks it instead', async () => {
+    isAuthenticated.value = true
+    mockFetch.mockResolvedValueOnce(respond(issue))
+    const { upvote } = useIssue()
+    await upvote('25012345', 'Still there today.')
+    expect(useAnonymousActivityStore().isUpvoted('25012345')).toBe(false)
+  })
+
+  it('does not record to anonymousActivity on failure', async () => {
+    mockFetch.mockResolvedValueOnce(respond({ error: 'boom' }, false, 400))
+    const { upvote } = useIssue()
+    await upvote('25012345', 'Still there today.')
+    expect(useAnonymousActivityStore().isUpvoted('25012345')).toBe(false)
   })
 })

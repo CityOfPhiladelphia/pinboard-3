@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import { useAuth } from '@phila/sso-vue'
 import { api311Fetch } from './api311'
 import { parseError } from './useApiError'
+import { useAnonymousActivityStore } from '@/stores/anonymousActivity'
 import type { Issue } from '@/types/api'
 
 const GENERIC_LOAD_ERROR = 'Something went wrong loading this report.'
@@ -12,6 +13,7 @@ const GENERIC_UPVOTE_ERROR = 'Something went wrong upvoting this report.'
 
 export function useIssue() {
   const auth = useAuth()
+  const anonymousActivity = useAnonymousActivityStore()
   const issue = ref<Issue | null>(null)
   const isLoading = ref(false)
   const errorMessage = ref<string | null>(null)
@@ -32,19 +34,25 @@ export function useIssue() {
     }
   }
 
-  /** Returns whether the upvote succeeded, so callers can keep a confirmation dialog open on failure. */
+  /** Returns whether the upvote succeeded, so callers can keep a confirmation dialog open on failure.
+   *  `description` is optional per the API — an empty/blank string is omitted from the request
+   *  entirely rather than sent as `""`. */
   async function upvote(id: string, description: string): Promise<boolean> {
     isUpvoting.value = true
     upvoteError.value = null
     try {
+      const trimmed = description.trim()
       const res = await api311Fetch({
         path: `/private/key/issues/${id}/upvote`,
         method: 'POST',
-        body: { description },
+        body: trimmed ? { description: trimmed } : {},
         auth,
       })
       if (!res.ok) throw await parseError(res)
       issue.value = (await res.json()) as Issue
+      // The API can't dedupe an anonymous upvote (no account to key it off of) — an
+      // authenticated one is tracked server-side instead, via the Salesforce contact.
+      if (!auth.isAuthenticated.value) anonymousActivity.markUpvoted(id)
       return true
     } catch (e) {
       upvoteError.value = e instanceof Error ? e.message : GENERIC_UPVOTE_ERROR

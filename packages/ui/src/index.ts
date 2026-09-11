@@ -6,6 +6,7 @@ export {
   PinboardShell,
   PinboardInfoPage,
   DetailActions,
+  DetailSubpanel,
   DrawingCanvas,
   LoadingCards,
   LocationThumbnail,

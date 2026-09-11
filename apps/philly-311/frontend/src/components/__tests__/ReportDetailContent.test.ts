@@ -1,5 +1,8 @@
 // ABOUTME: Tests for ReportDetailContent — the shared report-details view rendered
-// ABOUTME: in both the location-detail panel and the confirmation page.
+// ABOUTME: in both the location-detail panel and the confirmation page. Sub-panel
+// ABOUTME: content itself is covered by ReportUpvotePanel/ReportActivityPanel's own tests;
+// ABOUTME: these only cover which sub-panel is shown, and the orchestration around it
+// ABOUTME: (opening, closing, focus return, scroll reset, deep-linking).
 import { describe, it, expect, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
@@ -7,7 +10,24 @@ import { CloseButton } from '@phila/phila-ui-button'
 import { IconCar, IconLocationDot } from '@phila/phila-ui-core/icons'
 import ReportDetailContent from '../ReportDetailContent.vue'
 import ReportStepProgress from '../ReportStepProgress.vue'
+import ReportUpvotePanel from '../ReportUpvotePanel.vue'
+import ReportActivityPanel from '../ReportActivityPanel.vue'
 import type { Issue } from '@/types/api'
+
+vi.mock('../ReportUpvotePanel.vue', () => ({
+  default: {
+    name: 'ReportUpvotePanel',
+    props: ['onBack', 'onClose', 'upvoting', 'upvoteError', 'onUpvote'],
+    template: '<div><button data-test="subpanel-back" @click="onBack">Back</button></div>',
+  },
+}))
+vi.mock('../ReportActivityPanel.vue', () => ({
+  default: {
+    name: 'ReportActivityPanel',
+    props: ['report', 'onBack', 'onClose'],
+    template: '<div><button data-test="subpanel-back" @click="onBack">Back</button></div>',
+  },
+}))
 
 // The chassis index pulls phila dist CSS vitest can't load; stub DetailActions.
 // Share behavior itself is covered by the chassis's DetailActions.test.ts.
@@ -214,6 +234,26 @@ describe('ReportDetailContent', () => {
     expect(w.text()).not.toContain('Private')
   })
 
+  it('resets scroll position when switching to a different report while mounted', async () => {
+    const w = mount(ReportDetailContent, { props: { report: baseIssue } })
+    const scrollContainer = w.find('.report-detail__body').element as HTMLElement
+    scrollContainer.scrollTop = 200
+
+    await w.setProps({ report: { ...baseIssue, id: 'different-id' } })
+    await flushPromises()
+    expect(scrollContainer.scrollTop).toBe(0)
+  })
+
+  it('does not reset scroll position on updates that keep the same report', async () => {
+    const w = mount(ReportDetailContent, { props: { report: baseIssue } })
+    const scrollContainer = w.find('.report-detail__body').element as HTMLElement
+    scrollContainer.scrollTop = 200
+
+    await w.setProps({ report: { ...baseIssue, description: 'Updated description.' } })
+    await flushPromises()
+    expect(scrollContainer.scrollTop).toBe(200)
+  })
+
   describe('custom fields', () => {
     const withFields: Issue = {
       ...baseIssue,
@@ -272,69 +312,130 @@ describe('ReportDetailContent', () => {
       expect(activity.attributes('disabled')).toBeUndefined()
     })
 
-    it('opens a placeholder Activity dialog on click — not wired to real comments yet', async () => {
-      HTMLDialogElement.prototype.showModal = vi.fn()
-      const close = vi.fn()
-      HTMLDialogElement.prototype.close = close
-
-      const w = mount(ReportDetailContent, { props: { report: baseIssue } })
-      await w.find('[aria-label="Activity"]').trigger('click')
-      expect(w.text()).toContain('Activity')
-      expect(w.text()).toContain("aren't available yet")
-
-      await w.find('[data-test="activity-close"]').trigger('click')
-      expect(close).toHaveBeenCalled()
-    })
-
     it('has no Follow action — dropped due to mobile technical limitations', () => {
       const w = mount(ReportDetailContent, { props: { report: baseIssue } })
       expect(w.find('[aria-label="Follow"]').exists()).toBe(false)
     })
 
-    it('opens the dialog on click and submits the trimmed description', async () => {
-      // jsdom doesn't implement showModal/close, so stub them directly.
-      const showModal = vi.fn()
-      const close = vi.fn()
-      HTMLDialogElement.prototype.showModal = showModal
-      HTMLDialogElement.prototype.close = close
-
-      const onUpvote = vi.fn().mockResolvedValue(true)
-      const w = mount(ReportDetailContent, { props: { report: baseIssue, onUpvote } })
-      await w.find('[aria-label="I see this"]').trigger('click')
-      expect(showModal).toHaveBeenCalled()
-
-      await w.find('.report-detail__upvote-textarea').setValue('  Still there today.  ')
-      await w.find('[data-test="upvote-confirm"]').trigger('click')
-      await flushPromises()
-      expect(onUpvote).toHaveBeenCalledWith('Still there today.')
-      expect(close).toHaveBeenCalled()
-    })
-
-    it('keeps the dialog open and shows upvoteError when the upvote fails', async () => {
-      HTMLDialogElement.prototype.showModal = vi.fn()
-      const close = vi.fn()
-      HTMLDialogElement.prototype.close = close
-
-      const onUpvote = vi.fn().mockResolvedValue(false)
-      const w = mount(ReportDetailContent, {
-        props: { report: baseIssue, onUpvote, upvoteError: 'Issue has already been upvoted' },
-      })
-      await w.find('[aria-label="I see this"]').trigger('click')
-      await w.find('.report-detail__upvote-textarea').setValue('Still an issue.')
-      await w.find('[data-test="upvote-confirm"]').trigger('click')
-      await flushPromises()
-      expect(close).not.toHaveBeenCalled()
-      expect(w.text()).toContain('Issue has already been upvoted')
-    })
-
-    it('disables the submit button while an empty description or upvoting is in progress', async () => {
-      HTMLDialogElement.prototype.showModal = vi.fn()
+    it('shows the already-upvoted state and does not open the sub-panel when alreadyUpvoted', async () => {
       const onUpvote = vi.fn()
       const w = mount(ReportDetailContent, {
-        props: { report: baseIssue, onUpvote, upvoting: true },
+        props: { report: baseIssue, onUpvote, alreadyUpvoted: true },
+      })
+      const trigger = w.find('[aria-label="I see this"]')
+      expect(trigger.attributes('selected')).toBe('true')
+      expect(w.text()).toContain('You already flagged this')
+
+      await trigger.trigger('click')
+      expect(w.findComponent(ReportUpvotePanel).exists()).toBe(false)
+    })
+
+    it('swaps to the ReportUpvotePanel on click, replacing the main content', async () => {
+      const onUpvote = vi.fn()
+      const w = mount(ReportDetailContent, { props: { report: baseIssue, onUpvote } })
+      await w.find('[aria-label="I see this"]').trigger('click')
+
+      expect(w.findComponent(ReportUpvotePanel).exists()).toBe(true)
+      expect(w.find('.report-detail__hero').exists()).toBe(false)
+      expect(w.find('.report-detail__body-inner').exists()).toBe(false)
+    })
+
+    it('swaps to the ReportActivityPanel on click, passing the report through', async () => {
+      const w = mount(ReportDetailContent, { props: { report: baseIssue } })
+      await w.find('[aria-label="Activity"]').trigger('click')
+
+      const panel = w.findComponent(ReportActivityPanel)
+      expect(panel.exists()).toBe(true)
+      expect(panel.props('report')).toEqual(baseIssue)
+      expect(w.find('.report-detail__hero').exists()).toBe(false)
+    })
+
+    it('the sub-panel Back button returns to the main report content and refocuses the trigger', async () => {
+      const onUpvote = vi.fn()
+      const w = mount(ReportDetailContent, {
+        props: { report: baseIssue, onUpvote },
+        attachTo: document.body,
       })
       await w.find('[aria-label="I see this"]').trigger('click')
-      expect(w.find('[data-test="upvote-confirm"]').attributes('disabled')).toBeDefined()
+      await w.find('[data-test="subpanel-back"]').trigger('click')
+
+      expect(w.findComponent(ReportUpvotePanel).exists()).toBe(false)
+      expect(w.find('.report-detail__hero').exists()).toBe(true)
+      // The main content (including the trigger button) was remounted, not just
+      // revealed, so it's a fresh DOM node — assert on the element's identity
+      // (its aria-label), not object equality with the pre-remount reference.
+      expect(document.activeElement?.getAttribute('aria-label')).toBe('I see this')
+      w.unmount()
+    })
+
+    it('passes onUpvote/upvoting/upvoteError through to ReportUpvotePanel', () => {
+      const onUpvote = vi.fn()
+      const w = mount(ReportDetailContent, {
+        // initialSubpanel opens it without needing a click, since these are just
+        // prop-forwarding assertions — see the "sub-panel deep-linking" describe below.
+        props: {
+          report: baseIssue,
+          onUpvote,
+          upvoting: true,
+          upvoteError: 'boom',
+          initialSubpanel: 'upvote',
+        },
+      })
+      const panel = w.findComponent(ReportUpvotePanel)
+      expect(panel.props('onUpvote')).toBe(onUpvote)
+      expect(panel.props('upvoting')).toBe(true)
+      expect(panel.props('upvoteError')).toBe('boom')
+    })
+  })
+
+  describe('sub-panel deep-linking', () => {
+    it('opens directly to the upvote sub-panel when initialSubpanel is "upvote"', () => {
+      const w = mount(ReportDetailContent, {
+        props: { report: baseIssue, onUpvote: vi.fn(), initialSubpanel: 'upvote' },
+      })
+      expect(w.findComponent(ReportUpvotePanel).exists()).toBe(true)
+    })
+
+    it('opens directly to the Activity sub-panel when initialSubpanel is "activity"', () => {
+      const w = mount(ReportDetailContent, {
+        props: { report: baseIssue, initialSubpanel: 'activity' },
+      })
+      expect(w.findComponent(ReportActivityPanel).exists()).toBe(true)
+    })
+
+    it('does not open the upvote sub-panel via initialSubpanel when the report is already upvoted', () => {
+      const w = mount(ReportDetailContent, {
+        props: {
+          report: baseIssue,
+          onUpvote: vi.fn(),
+          alreadyUpvoted: true,
+          initialSubpanel: 'upvote',
+        },
+      })
+      expect(w.findComponent(ReportUpvotePanel).exists()).toBe(false)
+    })
+
+    it('calls onSubpanelChange when a sub-panel opens and when it closes', async () => {
+      const onSubpanelChange = vi.fn()
+      const w = mount(ReportDetailContent, {
+        props: { report: baseIssue, onSubpanelChange },
+      })
+      await w.find('[aria-label="Activity"]').trigger('click')
+      expect(onSubpanelChange).toHaveBeenLastCalledWith('activity')
+
+      await w.find('[data-test="subpanel-back"]').trigger('click')
+      expect(onSubpanelChange).toHaveBeenLastCalledWith(null)
+    })
+
+    it('reacts to initialSubpanel changing after mount (e.g. browser back/forward)', async () => {
+      const w = mount(ReportDetailContent, { props: { report: baseIssue } })
+      expect(w.findComponent(ReportActivityPanel).exists()).toBe(false)
+
+      await w.setProps({ initialSubpanel: 'activity' })
+      expect(w.findComponent(ReportActivityPanel).exists()).toBe(true)
+
+      await w.setProps({ initialSubpanel: undefined })
+      expect(w.findComponent(ReportActivityPanel).exists()).toBe(false)
     })
   })
 })
