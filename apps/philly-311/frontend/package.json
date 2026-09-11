@@ -32,6 +32,7 @@
     "@phila/phila-ui-search": "catalog:",
     "@phila/phila-ui-switch": "catalog:",
     "@phila/phila-ui-tags": "catalog:",
+    "@phila/phila-ui-text-area": "catalog:",
     "@phila/phila-ui-text-field": "catalog:",
     "@phila/sso-core": "^0.2.0",
     "@phila/sso-vue": "^0.3.0",

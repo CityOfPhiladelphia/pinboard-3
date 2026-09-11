@@ -1,10 +1,13 @@
 // ABOUTME: Tests for ReviewStep — submit gating, lazy-body useApi wiring, error
-// ABOUTME: display, and success recording + navigation. useApi and router are mocked.
+// ABOUTME: display, success recording + navigation, and marking anonymousActivity
+// ABOUTME: on an anonymous (not signed-in) submit. useApi and router are mocked.
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { ref } from 'vue'
 import { setActivePinia, createPinia } from 'pinia'
+import { useAuth } from '@phila/sso-vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
+import { useAnonymousActivityStore } from '@/stores/anonymousActivity'
 import { ApiError } from '@/composables/useApiError'
 
 vi.mock('@/components/wizard/ReviewSummary.vue', () => ({
@@ -31,12 +34,14 @@ function fillStore() {
 }
 
 beforeEach(() => {
+  localStorage.clear()
   setActivePinia(createPinia())
   fetchData.mockReset()
   push.mockClear()
   useApiMock.mockClear()
   apiError.value = null
   isLoading.value = false
+  useAuth().isAuthenticated.value = false
 })
 
 describe('ReviewStep - setup and gating', () => {
@@ -96,6 +101,25 @@ describe('ReviewStep - submit', () => {
     expect(store.submitted).toEqual({ id: 'a1', caseNumber: '311-0042' })
     expect(store.category).toBeNull()
     expect(push).toHaveBeenCalledWith('/report/confirmation')
+  })
+
+  it('records the submitted report in anonymousActivity when not signed in — the API has no account to check upvote-ownership against', async () => {
+    fillStore()
+    fetchData.mockResolvedValue({ id: 'a1', caseNumber: '311-0042' })
+    const w = mount(ReviewStep)
+    await w.find('[data-test="review-submit"]').trigger('click')
+    await flushPromises()
+    expect(useAnonymousActivityStore().isSubmitted('a1')).toBe(true)
+  })
+
+  it('does not record to anonymousActivity when signed in — the account tracks ownership instead', async () => {
+    useAuth().isAuthenticated.value = true
+    fillStore()
+    fetchData.mockResolvedValue({ id: 'a1', caseNumber: '311-0042' })
+    const w = mount(ReviewStep)
+    await w.find('[data-test="review-submit"]').trigger('click')
+    await flushPromises()
+    expect(useAnonymousActivityStore().isSubmitted('a1')).toBe(false)
   })
 
   it('shows the API error message and stays on failure', async () => {

@@ -2,6 +2,7 @@ import PinboardBody from './PinboardBody.vue'
 import PinboardShell from './PinboardShell.vue'
 import PinboardInfoPage from './PinboardInfoPage.vue'
 import DetailActions from './DetailActions.vue'
+import DetailSubpanel from './DetailSubpanel.vue'
 import LocationFilter from './LocationFilter.vue'
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
 import LocationPanel from './LocationsPanel.vue'
@@ -18,6 +19,7 @@ export {
   PinboardShell,
   PinboardInfoPage,
   DetailActions,
+  DetailSubpanel,
   LocationFilter,
   LocationSearchFilterPanel,
   LocationPanel,

@@ -3,7 +3,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuth } from '@phila/sso-vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
+import { useAnonymousActivityStore } from '@/stores/anonymousActivity'
 import { useApi } from '@/composables/useApi'
 import ReviewSummary from '@/components/wizard/ReviewSummary.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
@@ -14,6 +16,8 @@ import ReportStep from '@/components/wizard/ReportStep.vue'
 const GENERIC_ERROR = 'Something went wrong submitting your report. Please try again.'
 const router = useRouter()
 const store = useReportSubmissionStore()
+const auth = useAuth()
+const anonymousActivity = useAnonymousActivityStore()
 
 // Created at setup — useApi → useAuth() → inject() is setup-scoped. The body
 // is assigned per submit; fetchData reads opts.body when called.
@@ -40,6 +44,11 @@ async function submit() {
     return
   }
   store.recordSubmission(result)
+  // The API can't tell an anonymous submitter's own report apart from anyone
+  // else's later (no account to check against), so upvoting it 400s server-side
+  // unless this browser remembers submitting it — same reason upvotes themselves
+  // need anonymousActivity tracking.
+  if (!auth.isAuthenticated.value) anonymousActivity.markSubmitted(result.id)
   router.push('/report/confirmation')
 }
 </script>
