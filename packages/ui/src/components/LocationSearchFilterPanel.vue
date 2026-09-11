@@ -235,12 +235,12 @@ function focusSearchInput() {
     'search search'
     'filters sort';
   grid-template-columns: 1fr auto;
+  row-gap: var(--spacing-s, 0.75rem);
+  padding: var(--spacing-l, 1.5rem) var(--spacing-m, 1rem);
 }
 
 .location-search {
   grid-area: search;
-  padding: 1rem 0.9rem 0.25rem 0.9rem;
-  width: 100%;
 }
 
 /* Teleported onto the map (mobile): the container supplies the top inset, so
@@ -249,22 +249,8 @@ function focusSearchInput() {
   padding: 0 1rem;
 }
 
-.location-search :deep(.search) {
-  width: 100%;
-}
-
-.location-search.mobile :deep(.state-layer) {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-.location-search.mobile :deep(.phila-text-field) {
-  padding: 0 var(--scale-small, 0.5rem);
-}
-
 .location-filters {
   grid-area: filters;
-  padding: 0rem 0rem 0rem 1rem;
 }
 
 /* 19px left inset aligns the filter chips with the search input on mobile. */
@@ -277,6 +263,5 @@ function focusSearchInput() {
 .location-sort {
   grid-area: sort;
   margin-left: auto;
-  padding: 0rem 1rem 1.25rem 0rem;
 }
 </style>

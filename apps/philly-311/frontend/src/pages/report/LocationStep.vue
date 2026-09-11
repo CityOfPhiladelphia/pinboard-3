@@ -2,7 +2,7 @@
      map shows the chosen point with a draggable pin; "Use my current location" uses
      browser geolocation. Stores a complete AisFeature; Next gated on in-Philly. -->
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { reverseGeocode } from '@/composables/useAis'
 // import { getCurrentPosition } from '@/composables/useGeolocation'
@@ -12,11 +12,17 @@ import { Callout } from '@phila/phila-ui-callout'
 import { Search } from '@phila/phila-ui-search'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { Tags } from '@phila/phila-ui-tags'
-import { IconRotateLeft, IconArrowsUpDownLeftRight } from '@phila/phila-ui-core/icons'
+import {
+  IconRotateLeft,
+  IconArrowsUpDownLeftRight,
+  IconLocationDot,
+} from '@phila/phila-ui-core/icons'
 // import AddressSearch from '@/components/wizard/AddressSearch.vue'
 import LocationMap from '@/components/wizard/LocationMap.vue'
 import ReportStep from '@/components/wizard/ReportStep.vue'
 import type { AisFeature } from '@/types/wizard'
+
+type AddressSource = 'image' | 'search' | 'geoLocation'
 
 const stepTitle = 'Confirm Location'
 const defaultError = 'Choose an address to continue'
@@ -24,6 +30,7 @@ const defaultError = 'Choose an address to continue'
 const store = useReportSubmissionStore()
 const errorMessage = ref('')
 const locationError = ref('')
+const addressSource = ref<AddressSource | undefined>(store.photo.mediaUrl ? 'image' : undefined)
 // const lookingUp = ref(false)
 
 const isValidLocation = computed(
@@ -43,6 +50,15 @@ let intent = 0
 const mapLocation = computed(() =>
   store.location ? { lat: store.location.lat, lng: store.location.lng } : undefined,
 )
+
+const locationFrom = computed(() => {
+  const messages: Record<AddressSource, string> = {
+    image: 'Possible address from photo',
+    search: 'Address search',
+    geoLocation: 'Geolocation',
+  }
+  return !addressSource.value ? addressSource.value : messages[addressSource.value]
+})
 
 function onSelect(f: AisFeature) {
   intent++
@@ -73,10 +89,10 @@ async function onMove({ lat, lng }: { lat: number; lng: number }) {
   }
 }
 
-onMounted(() => {
-  console.log('state: ', store.$state)
-})
-
+function resetLocation() {
+  store.setLocation(null)
+  console.log('CLICK!')
+}
 // async function useMyLocation() {
 //   const my = ++intent
 //   lookingUp.value = true
@@ -117,7 +133,8 @@ onMounted(() => {
         <LocationMap
           class="location-step__map"
           :location="mapLocation"
-          :name="store.category"
+          :popup-text="locationFrom"
+          :service-type="store.category"
           :address="store.location?.streetAddress"
           :img-src="store.photo.mediaUrl"
           @move="onMove"
@@ -126,6 +143,7 @@ onMounted(() => {
         <Search
           :placeholder="store.location?.streetAddress ?? 'Enter an address, intersection, or place'"
           :elevated="true"
+          :leading-icon="IconLocationDot"
           class="location-step__overlay location-step__search"
         />
         <PhilaButton
@@ -134,6 +152,7 @@ onMounted(() => {
           :icon="IconRotateLeft"
           size="small"
           class="location-step__overlay location-step__reset"
+          @click="resetLocation"
           >Reset</PhilaButton
         >
         <Tags
@@ -188,7 +207,7 @@ onMounted(() => {
 }
 
 .location-step__overlay {
-  z-index: 0;
+  isolation: isolate;
 }
 
 .location-step__search {

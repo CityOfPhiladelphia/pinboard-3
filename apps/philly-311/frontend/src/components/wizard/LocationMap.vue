@@ -5,9 +5,7 @@
 import { computed, ref, watch } from 'vue'
 import { Map as PhilaMap, MapMarker, MapPopup } from '@phila/phila-ui-map-core'
 import { MapIconTextPin } from '@pinboard/ui'
-import type { Map as MapLibreMap } from 'maplibre-gl'
-import { isInPhilly } from '@/utils/bounds'
-import { readExposed, useMapBounds, type MapVMComponent } from '@/composables/useMapBounds'
+import { useMapBounds, type MapVMComponent } from '@/composables/useMapBounds'
 import { IconLocationDot } from '@phila/phila-ui-core/icons'
 import { Icon } from '@phila/phila-ui-core'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
@@ -18,15 +16,19 @@ const PHILLY_DEFAULT: [number, number] = [-75.163789, 39.952335] // City Hall [l
 
 const props = defineProps<{
   location?: { lat: number; lng: number }
-  name?: Service
+  popupText?: string
+  serviceType?: Service
   address?: string
   imgSrc?: string
 }>()
+
 const emit = defineEmits<{
   move: [point: { lat: number; lng: number }]
   outOfBounds: []
 }>()
 
+const popupMessage = ref(props.popupText)
+const draggingPin = ref(false)
 const philaMap = ref<MapVMComponent | null>(null)
 useMapBounds(philaMap)
 
@@ -36,19 +38,19 @@ const center = computed<[number, number]>(() =>
 const zoom = computed(() => (props.location ? 16 : 12))
 
 watch(
-  () => props.location,
-  (loc) => {
-    if (!loc) return
-    if (!isInPhilly(loc.lat, loc.lng)) emit('outOfBounds')
-    // The wrapper only honors :center at mount; recenter the live map ourselves.
-    // Keep the user's zoom unless they're zoomed too far out to see the pin.
-    const m = readExposed<MapLibreMap>(philaMap.value?.map)
-    if (m) m.flyTo({ center: [loc.lng, loc.lat], zoom: Math.max(m.getZoom(), 16) })
+  () => props.popupText,
+  (newMessage) => {
+    popupMessage.value = newMessage
   },
-  { immediate: true },
 )
 
+function onDragStart() {
+  draggingPin.value = true
+}
+
 function onDragEnd(p: { lng: number; lat: number }) {
+  draggingPin.value = false
+  popupMessage.value = 'Map pin location'
   emit('move', { lat: p.lat, lng: p.lng })
 }
 </script>
@@ -61,16 +63,17 @@ function onDragEnd(p: { lng: number; lat: number }) {
         :lng-lat="[location.lng, location.lat]"
         draggable
         aria-label="Drag to refine the location"
+        @dragstart="onDragStart"
         @dragend="onDragEnd"
       >
         <MapIconTextPin
           :zoom="zoom"
-          :icon="serviceTypeIconComponent(name)"
-          :color="serviceTypeColor(name)"
+          :icon="serviceTypeIconComponent(serviceType)"
+          :color="serviceTypeColor(serviceType)"
         />
       </MapMarker>
       <MapPopup
-        v-if="location"
+        v-if="location && !draggingPin"
         :lng-lat="[location.lng, location.lat]"
         :close-on-click="false"
         :close-button="false"
@@ -83,7 +86,7 @@ function onDragEnd(p: { lng: number; lat: number }) {
             <Icon class="location-map__popup-icon" :icon="IconLocationDot" size="small" />
             <p class="location-map__popup-title" v-text="address" />
           </header>
-          <p class="location-map__popup-subheader">Possible address from photo</p>
+          <p class="location-map__popup-subheader" v-text="popupMessage" />
           <div
             class="location-map__popup-image"
             :style="{ 'background-image': `url(${imgSrc})` }"
