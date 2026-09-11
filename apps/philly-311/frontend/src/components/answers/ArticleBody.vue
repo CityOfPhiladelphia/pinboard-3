@@ -30,4 +30,20 @@ const safe = computed(() => sanitize(props.html))
 .article-body :deep(a) {
   color: var(--Schemes-Primary, #0f4d90);
 }
+.article-body :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.article-body :deep(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--spacing-s, 0.75rem);
+}
+.article-body :deep(th),
+.article-body :deep(td) {
+  padding: var(--spacing-xs, 0.5rem);
+  text-align: left;
+  border-bottom: 1px solid var(--Schemes-Border-low, #d6d6d6);
+}
 </style>

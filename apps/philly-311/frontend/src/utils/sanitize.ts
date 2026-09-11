@@ -29,7 +29,16 @@ export function sanitize(html: string): string {
       'blockquote',
       'code',
       'pre',
+      'img',
+      'div',
+      'span',
+      'table',
+      'thead',
+      'tbody',
+      'tr',
+      'td',
+      'th',
     ],
-    ALLOWED_ATTR: ['href', 'rel', 'target', 'title'],
+    ALLOWED_ATTR: ['href', 'rel', 'target', 'title', 'src', 'alt'],
   })
 }

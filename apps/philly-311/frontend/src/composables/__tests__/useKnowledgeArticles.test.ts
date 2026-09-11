@@ -89,6 +89,15 @@ describe('useKnowledgeArticles.loadArticles', () => {
     expect(calledUrl.searchParams.get('limit')).toBe('4')
   })
 
+  it('forwards the abort signal to fetch, so a superseded search stops the request', async () => {
+    fetchMock.mockResolvedValueOnce(okResponse({ articles: [ARTICLE_A] }))
+    const { loadArticles } = useKnowledgeArticles()
+    const controller = new AbortController()
+    await loadArticles({ search: 'pothole', signal: controller.signal })
+    const requestInit = fetchMock.mock.calls[0][1] as RequestInit
+    expect(requestInit.signal).toBe(controller.signal)
+  })
+
   it('returns empty items array when articles list is empty', async () => {
     fetchMock.mockResolvedValueOnce(okResponse({ articles: [] }))
     const { loadArticles } = useKnowledgeArticles()
