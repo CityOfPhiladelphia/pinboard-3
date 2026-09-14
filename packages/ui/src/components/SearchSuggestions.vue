@@ -144,7 +144,7 @@ defineExpose({ focusFirst })
   font-family: var(--Body-Large-font-body-large-family);
   font-size: var(--Body-Large-font-body-large-size);
   line-height: var(--Body-Large-font-body-large-lineheight);
-  outline: none;
+  outline: transparent;
 }
 
 .search-suggestion:hover,

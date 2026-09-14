@@ -105,10 +105,10 @@ function handleSearchChange(search: string) {
 // composes ordinary words — so searchString would sit stale until the keyboard
 // closed, and the suggestions never fetched. Read the value off the DOM instead.
 // Vue skips writing back to the input while composing, so the IME is unaffected.
-function handleSearchInput(event: Event) {
-  const target = event.target as HTMLElement
+function handleSearchInput(event: InputEvent) {
+  const target = event.target as HTMLInputElement
   if (target.tagName === 'INPUT') {
-    searchString.value = (target as HTMLInputElement).value
+    searchString.value = target.value
   }
 }
 

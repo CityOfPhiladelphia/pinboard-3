@@ -54,6 +54,8 @@ export function useKnowledgeArticles() {
       sort?: 'title' | 'lastPublishedAt'
       direction?: 'asc' | 'desc'
       limit?: number
+      /** Aborts the underlying fetch, e.g. when a newer search supersedes this one. */
+      signal?: AbortSignal
     } = {},
   ): Promise<{ items: Article[]; nextPageToken?: string }> {
     const response = await api311Fetch({
@@ -66,6 +68,7 @@ export function useKnowledgeArticles() {
         direction: opts.direction,
         limit: opts.limit,
       },
+      signal: opts.signal,
       auth,
     })
 

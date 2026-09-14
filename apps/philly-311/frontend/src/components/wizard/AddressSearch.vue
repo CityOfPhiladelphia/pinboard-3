@@ -2,37 +2,52 @@
      /autocomplete (debounced); picking a suggestion fires /search and emits select(feature). -->
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Search, SearchSuggestions } from '@phila/phila-ui-search'
+import { useReportSubmissionStore } from '@/stores/reportSubmission'
+import { Search } from '@phila/phila-ui-search'
+import { SearchSuggestions } from '../../../../../../packages/ui/src/components/_index'
+import { PhilaButton } from '@phila/phila-ui-button'
 import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
 import {
   autocompleteAddresses,
+  reverseGeocode,
   searchAddress,
   type AisAutocompleteResult,
 } from '@/composables/useAis'
-import type { AisFeature } from '@/types/wizard'
+import { IconLocationCrosshairs, IconLocationDot } from '@phila/phila-ui-core/icons'
+import type { AddressResult, AddressSource } from '@/pages/report/LocationStep.vue'
+import { getCurrentPosition } from '@/composables/useGeolocation'
 
-const emit = defineEmits<{ select: [feature: AisFeature] }>()
+const addressSource = defineModel<AddressSource | undefined>('addressSource', {
+  default: undefined,
+})
+const currentSearch = defineModel<Exclude<AddressSource, 'image'> | null>('currentSearch', {
+  default: null,
+})
+
+const emit = defineEmits<{
+  select: [feature: AddressResult]
+}>()
 
 const RESOLVE_ERROR = "Couldn't resolve that address."
 
-const { query, results, loading, error } = useDebouncedSearch<AisAutocompleteResult[]>({
+const store = useReportSubmissionStore()
+const { query, results, error } = useDebouncedSearch<AisAutocompleteResult[]>({
   initial: [],
   fetcher: (q, signal) => autocompleteAddresses(q, signal),
 })
+
+const locationError = ref('')
 
 // Closed after a pick: echoing the resolved address into `query` re-fires the
 // debounced autocomplete, and the list must not reopen until the user types.
 const open = ref(false)
 
-// True while searchAddress is resolving a picked result (open is false during this).
-const resolving = ref(false)
-
 const searchRef = ref<InstanceType<typeof Search> | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
 
 const isOpen = computed(() => open.value && results.value.length > 0)
-// SearchSuggestions renders flat strings, so the city rides along in the label.
-const suggestions = computed(() => results.value.map((r) => `${r.address} — Philadelphia, PA`))
+
+const suggestions = computed(() => results.value.map((r) => r.address))
 
 function onQueryChange(value: string) {
   query.value = value
@@ -60,16 +75,22 @@ function onDismiss() {
 }
 
 async function onSelect(suggestion: string) {
-  const r = results.value[suggestions.value.indexOf(suggestion)]
-  if (!r) return
+  if (!suggestion) return
+  query.value = suggestion
+  await handleSearch()
+}
+
+async function handleSearch() {
   open.value = false
-  resolving.value = true
-  error.value = null
+  currentSearch.value = 'search'
+  error.value = undefined
   try {
-    const feature = await searchAddress(r.searchAddress)
-    if (feature) {
-      emit('select', feature)
-      query.value = feature.streetAddress
+    const feature = await searchAddress(query.value)
+    if (feature && currentSearch.value === 'search') {
+      addressSource.value = 'search'
+      emit('select', {
+        feature: feature,
+      })
       results.value = []
     } else {
       error.value = RESOLVE_ERROR
@@ -77,7 +98,30 @@ async function onSelect(suggestion: string) {
   } catch {
     error.value = RESOLVE_ERROR
   } finally {
-    resolving.value = false
+    currentSearch.value = null
+  }
+}
+
+async function useMyLocation() {
+  currentSearch.value = 'geoLocation'
+  locationError.value = ''
+  try {
+    const pos = await getCurrentPosition()
+    if (!pos) {
+      locationError.value = "We couldn't access your location. Type an address instead."
+      return
+    }
+    const feature = await reverseGeocode(pos.lat, pos.lng)
+    if (feature && currentSearch.value === 'geoLocation') {
+      addressSource.value = 'geoLocation'
+      emit('select', {
+        feature: feature,
+      })
+    } else locationError.value = "We couldn't resolve your location to an address."
+  } catch {
+    locationError.value = "We couldn't resolve your location to an address."
+  } finally {
+    currentSearch.value = null
   }
 }
 </script>
@@ -86,16 +130,27 @@ async function onSelect(suggestion: string) {
   <div class="address-search" @keydown="onKeydown" @focusout="onFocusOut">
     <Search
       ref="searchRef"
+      shape="pill"
       :model-value="query"
-      placeholder="Enter an address, intersection, or place"
+      :placeholder="store.location?.streetAddress ?? 'Enter an address, intersection, or zipcode'"
+      :leading-icon="IconLocationDot"
+      :error="error"
       @update:model-value="onQueryChange"
+      @search="handleSearch"
     />
-    <p v-if="(open && loading) || resolving" class="address-search__loading">Searching&hellip;</p>
-    <p v-if="error" class="address-search__error" role="alert">{{ error }}</p>
+    <span>
+      <PhilaButton
+        text="Use my current location"
+        variant="text-flat"
+        :icon="IconLocationCrosshairs"
+        :loading="currentSearch === 'geoLocation'"
+        @click="useMyLocation"
+      ></PhilaButton>
+    </span>
     <SearchSuggestions
-      v-if="isOpen"
       ref="suggestionsRef"
       :suggestions="suggestions"
+      :style="{ border: 'none' }"
       @select="onSelect"
       @dismiss="onDismiss"
     />
@@ -103,12 +158,11 @@ async function onSelect(suggestion: string) {
 </template>
 
 <style scoped>
-.address-search__loading,
-.address-search__error {
-  margin: var(--spacing-xs, 0.5rem) 0 0;
-  font-size: 0.875rem;
-}
-.address-search__error {
-  color: var(--Schemes-Error, #c0392b);
+.address-search {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  border-radius: var(--border-radius-s, 0.5rem) var(--border-radius-s, 0.5rem) 0 0;
+  background-color: var(--colors-White);
+  box-shadow: var(--elevation-light-2);
 }
 </style>

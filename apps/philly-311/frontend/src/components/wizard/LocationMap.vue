@@ -50,7 +50,6 @@ function onDragStart() {
 
 function onDragEnd(p: { lng: number; lat: number }) {
   draggingPin.value = false
-  popupMessage.value = 'Map pin location'
   emit('move', { lat: p.lat, lng: p.lng })
 }
 </script>

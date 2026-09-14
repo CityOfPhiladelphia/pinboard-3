@@ -513,6 +513,11 @@ function selectedLocationValue(): PinboardLocation {
                 </div>
               </Teleport>
             </template>
+            <template v-if="slots['locations-filters']" #filters>
+              <div :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'">
+                <slot name="locations-filters" />
+              </div>
+            </template>
             <template #list-header>
               <div v-if="!isMobile && !locationPanelCountNoun" class="location-list-header">
                 <span>{{ locationCountLabel }}</span>

@@ -9,20 +9,18 @@ import { reverseGeocode } from '@/composables/useAis'
 import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { isInPhilly } from '@/utils/bounds'
 import { Callout } from '@phila/phila-ui-callout'
-import { Search } from '@phila/phila-ui-search'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { Tags } from '@phila/phila-ui-tags'
-import {
-  IconRotateLeft,
-  IconArrowsUpDownLeftRight,
-  IconLocationDot,
-} from '@phila/phila-ui-core/icons'
-// import AddressSearch from '@/components/wizard/AddressSearch.vue'
+import { IconRotateLeft, IconArrowsUpDownLeftRight } from '@phila/phila-ui-core/icons'
+import AddressSearch from '@/components/wizard/AddressSearch.vue'
 import LocationMap from '@/components/wizard/LocationMap.vue'
 import ReportStep from '@/components/wizard/ReportStep.vue'
 import type { AisFeature } from '@/types/wizard'
 
-type AddressSource = 'image' | 'search' | 'geoLocation'
+export type AddressSource = 'image' | 'search' | 'geoLocation' | 'mapPin'
+export interface AddressResult {
+  feature: AisFeature
+}
 
 const stepTitle = 'Confirm Location'
 const defaultError = 'Choose an address to continue'
@@ -30,8 +28,8 @@ const defaultError = 'Choose an address to continue'
 const store = useReportSubmissionStore()
 const errorMessage = ref('')
 const locationError = ref('')
+const currentSearch = ref<Exclude<AddressSource, 'image'> | null>(null)
 const addressSource = ref<AddressSource | undefined>(store.photo.mediaUrl ? 'image' : undefined)
-// const lookingUp = ref(false)
 
 const isValidLocation = computed(
   () => !!store.location && isInPhilly(store.location.lat, store.location.lng),
@@ -43,10 +41,6 @@ watch([locationError, wizardError], ([newLocationError, newWizardError]) => {
   errorMessage.value = (newWizardError ? defaultError : newLocationError) ?? ''
 })
 
-// Each location intent increments this counter so that stale async resolutions
-// (slow geocodes, late geolocation callbacks) never clobber a newer selection.
-let intent = 0
-
 const mapLocation = computed(() =>
   store.location ? { lat: store.location.lat, lng: store.location.lng } : undefined,
 )
@@ -56,65 +50,48 @@ const locationFrom = computed(() => {
     image: 'Possible address from photo',
     search: 'Address search',
     geoLocation: 'Geolocation',
+    mapPin: 'Map pin location',
   }
   return !addressSource.value ? addressSource.value : messages[addressSource.value]
 })
 
-function onSelect(f: AisFeature) {
-  intent++
-  store.setLocation(f)
-  if (isInPhilly(f.lat, f.lng)) locationError.value = ''
-}
+const hasLocation = computed(
+  () => store.location?.streetAddress || (store.location?.lat && store.location.lng),
+)
 
 function onOutOfBounds() {
   locationError.value = '311 only handles requests in Philadelphia.'
 }
 
 async function onMove({ lat, lng }: { lat: number; lng: number }) {
-  const my = ++intent
-  try {
-    const feature = await reverseGeocode(lat, lng)
-    if (my !== intent) return
-    if (feature) {
-      onSelect(feature)
-      return
+  if (isInPhilly(lat, lng)) {
+    currentSearch.value = 'mapPin'
+    try {
+      const feature = await reverseGeocode(lat, lng)
+      if (feature && currentSearch.value === 'mapPin') {
+        store.setLocation(feature)
+        addressSource.value = 'mapPin'
+        return
+      }
+    } catch {
+      /* fall through to the coords-only update */
+    } finally {
+      currentSearch.value = null
     }
-  } catch {
-    if (my !== intent) return
-    /* fall through to the coords-only update */
-  }
-  if (store.location) {
-    store.setLocation({ ...store.location, lat, lng })
-    if (isInPhilly(lat, lng)) locationError.value = ''
+    if (store.location) {
+      store.setLocation({ ...store.location, lat, lng })
+      if (isInPhilly(lat, lng)) locationError.value = ''
+    }
   }
 }
 
 function resetLocation() {
   store.setLocation(null)
-  console.log('CLICK!')
 }
-// async function useMyLocation() {
-//   const my = ++intent
-//   lookingUp.value = true
-//   locationError.value = ''
-//   try {
-//     const pos = await getCurrentPosition()
-//     if (my !== intent) return
-//     if (!pos) {
-//       locationError.value = "We couldn't access your location. Type an address instead."
-//       return
-//     }
-//     const feature = await reverseGeocode(pos.lat, pos.lng)
-//     if (my !== intent) return
-//     if (feature) onSelect(feature)
-//     else locationError.value = "We couldn't resolve your location to an address."
-//   } catch {
-//     if (my !== intent) return
-//     locationError.value = "We couldn't resolve your location to an address."
-//   } finally {
-//     lookingUp.value = false
-//   }
-// }
+
+function handleSearch(result: AddressResult) {
+  store.setLocation(result.feature)
+}
 </script>
 
 <template>
@@ -140,14 +117,14 @@ function resetLocation() {
           @move="onMove"
           @out-of-bounds="onOutOfBounds"
         />
-        <Search
-          :placeholder="store.location?.streetAddress ?? 'Enter an address, intersection, or place'"
-          :elevated="true"
-          :leading-icon="IconLocationDot"
+        <AddressSearch
+          v-model:current-search="currentSearch"
+          v-model:address-source="addressSource"
           class="location-step__overlay location-step__search"
+          @select="handleSearch"
         />
         <PhilaButton
-          v-if="store.location?.streetAddress"
+          v-if="hasLocation"
           variant="text"
           :icon="IconRotateLeft"
           size="small"
@@ -156,6 +133,7 @@ function resetLocation() {
           >Reset</PhilaButton
         >
         <Tags
+          v-if="hasLocation"
           text="Click and drag to move pin"
           variant="readonly"
           :icon="IconArrowsUpDownLeftRight"

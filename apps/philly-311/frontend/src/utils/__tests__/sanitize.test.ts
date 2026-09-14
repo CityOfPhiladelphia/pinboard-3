@@ -51,4 +51,25 @@ describe('sanitize', () => {
     expect(result).toContain('<p>Body</p>')
     expect(result).toContain('<ul><li>Item</li></ul>')
   })
+
+  it('preserves images with their src and alt', () => {
+    const result = sanitize('<img src="https://example.com/photo.jpg" alt="A photo">')
+    expect(result).toBe('<img src="https://example.com/photo.jpg" alt="A photo">')
+  })
+
+  it('strips javascript: URIs from an image src', () => {
+    const result = sanitize('<img src="javascript:alert(1)" alt="x">')
+    expect(result).not.toContain('javascript:')
+  })
+
+  it('preserves tables, and formatting divs/spans', () => {
+    const input =
+      '<table><thead><tr><th>Fee</th></tr></thead><tbody><tr><td>$5</td></tr></tbody></table>' +
+      '<div><span>note</span></div>'
+    const result = sanitize(input)
+    expect(result).toBe(
+      '<table><thead><tr><th>Fee</th></tr></thead><tbody><tr><td>$5</td></tr></tbody></table>' +
+        '<div><span>note</span></div>',
+    )
+  })
 })
