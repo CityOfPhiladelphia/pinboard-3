@@ -74,7 +74,7 @@ async function onMove({ lat, lng }: { lat: number; lng: number }) {
         return
       }
     } catch {
-      /* fall through to the coords-only update */
+      locationError.value = 'Failed to get address from map pin location'
     } finally {
       currentSearch.value = null
     }
@@ -120,6 +120,7 @@ function handleSearch(result: AddressResult) {
         <AddressSearch
           v-model:current-search="currentSearch"
           v-model:address-source="addressSource"
+          v-model:location-error="locationError"
           class="location-step__overlay location-step__search"
           @select="handleSearch"
         />

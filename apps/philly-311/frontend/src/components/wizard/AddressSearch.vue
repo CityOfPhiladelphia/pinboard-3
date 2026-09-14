@@ -23,6 +23,9 @@ const addressSource = defineModel<AddressSource | undefined>('addressSource', {
 const currentSearch = defineModel<Exclude<AddressSource, 'image'> | null>('currentSearch', {
   default: null,
 })
+const locationError = defineModel<string>('locationError', {
+  default: '',
+})
 
 const emit = defineEmits<{
   select: [feature: AddressResult]
@@ -35,8 +38,6 @@ const { query, results, error } = useDebouncedSearch<AisAutocompleteResult[]>({
   initial: [],
   fetcher: (q, signal) => autocompleteAddresses(q, signal),
 })
-
-const locationError = ref('')
 
 // Closed after a pick: echoing the resolved address into `query` re-fires the
 // debounced autocomplete, and the list must not reopen until the user types.
