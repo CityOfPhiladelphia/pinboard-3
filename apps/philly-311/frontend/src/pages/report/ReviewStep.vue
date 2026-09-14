@@ -54,7 +54,12 @@ async function submit() {
 </script>
 
 <template>
-  <ReportStep :required="true" :error-active="false" :hide-required="true" :step-title="'Review'">
+  <ReportStep
+    :required="true"
+    :error-active="false"
+    :hide-required="true"
+    :step-title="'Review your report'"
+  >
     <template #step-content>
       <div class="review-step">
         <p class="review-step__intro">Check your report before submitting.</p>

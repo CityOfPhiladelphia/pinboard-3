@@ -24,6 +24,9 @@ interface State {
   contact: ContactInfo
   /** When true, the report is publicly visible. Default false (matches mobile). */
   publicVisibility: boolean
+  /** When true (and contact.name/phone are set), payload() includes contact
+   *  info for anonymous submissions. Default false (matches mobile). */
+  shareContactInfo: boolean
   photoSuggestions: PhotoSuggestion[]
   submitted: SubmittedReport | null
 }
@@ -36,10 +39,11 @@ interface T extends LocationQuery {
   p: string
   co: string
   pv: string
+  sc: string
   ps: string
 }
 
-type QueryParams = Pick<T, 'c' | 'cf' | 'l' | 'd' | 'p' | 'co' | 'pv' | 'ps'>
+type QueryParams = Pick<T, 'c' | 'cf' | 'l' | 'd' | 'p' | 'co' | 'pv' | 'sc' | 'ps'>
 
 const initial = (): State => ({
   category: null,
@@ -54,6 +58,7 @@ const initial = (): State => ({
   },
   contact: {},
   publicVisibility: false,
+  shareContactInfo: false,
   photoSuggestions: [],
   submitted: null,
 })
@@ -99,6 +104,9 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     setPrivacy(publicVisibility: boolean) {
       this.publicVisibility = publicVisibility
     },
+    setShareContactInfo(shareContactInfo: boolean) {
+      this.shareContactInfo = shareContactInfo
+    },
     resetPhoto() {
       this.setPhoto(undefined)
       this.setPhotoPreview(undefined)
@@ -140,6 +148,14 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
       if (Object.keys(this.customFields).length > 0) {
         body.customFields = { ...this.customFields }
       }
+      const name = this.contact.name?.trim()
+      const phone = this.contact.phone?.trim()
+      if (this.shareContactInfo && name && phone) {
+        // Matches the mobile apps' split: first word is the first name, the
+        // rest (possibly empty) is the last name.
+        const [firstName, ...rest] = name.split(' ')
+        body.contact = { firstName, lastName: rest.join(' '), phone }
+      }
       return body
     },
     stateToUrlQueryParams(): string {
@@ -173,6 +189,9 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
             }
             case 'publicVisibility': {
               return storeValue ? 'pv=t' : null
+            }
+            case 'shareContactInfo': {
+              return storeValue ? 'sc=t' : null
             }
             case 'photoSuggestions': {
               return Object.keys(storeValue).length
@@ -216,6 +235,10 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
           }
           case 'pv': {
             this.publicVisibility = true
+            break
+          }
+          case 'sc': {
+            this.shareContactInfo = true
             break
           }
           case 'ps': {

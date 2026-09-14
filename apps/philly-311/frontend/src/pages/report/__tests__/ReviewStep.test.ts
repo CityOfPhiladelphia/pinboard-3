@@ -54,6 +54,12 @@ describe('ReviewStep - setup and gating', () => {
     )
   })
 
+  it('titles the step "Review your report" with no required marker, per Figma', () => {
+    const w = mount(ReviewStep)
+    expect(w.find('.report-step__text').text()).toBe('Review your report')
+    expect(w.find('.report-step__required').exists()).toBe(false)
+  })
+
   it('renders the summary and disables Submit while the store is incomplete', () => {
     const w = mount(ReviewStep)
     expect(w.find('[data-testid="review-summary"]').exists()).toBe(true)

@@ -1,52 +1,100 @@
 <!-- ABOUTME: Read-only summary of the report wizard store for the Review step.
-     Four sections (photo, issue type + answers, location, details), each with an Edit link. -->
+     Five sections (images, issue type, location, details, visibility & contact)
+     in ReviewSectionCard chrome. The first four Edit to the step that owns them;
+     visibility & contact instead opens VisibilityContactModal. -->
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, useTemplateRef } from 'vue'
+import { useAuth } from '@phila/sso-vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useServiceTypes } from '@/composables/useServiceTypes'
+import { serviceTypeIconComponent } from '@/utils/reportIcon'
+import { serviceTypeColor } from '@/utils/serviceTypeMeta'
+import { LocationThumbnail } from '@pinboard/ui'
+import ReviewSectionCard from './ReviewSectionCard.vue'
+import VisibilityContactModal from './VisibilityContactModal.vue'
+import {
+  IconImage,
+  IconFolder,
+  IconLocationDot,
+  IconCircleQuestion,
+  IconUsers,
+} from '@phila/phila-ui-core/icons'
+
+const CITY_STATE = 'Philadelphia, PA'
 
 const store = useReportSubmissionStore()
+const auth = useAuth()
 const { list, load } = useServiceTypes()
 onMounted(() => {
   load()
 })
 
+const visibilityContactModal = useTemplateRef('visibilityContactModal')
+
+/** Contact summary line under the visibility & contact section. Signed-in
+ *  users' contact comes from their account, not this wizard, so it's never
+ *  shown as unshared even though shareContactInfo/contact aren't set. */
+const contactSummary = computed(() => {
+  if (auth.isAuthenticated.value) return 'Contact info is linked to your account'
+  if (store.shareContactInfo && store.contact.name && store.contact.phone) {
+    return `Shared: ${store.contact.name}, ${store.contact.phone}`
+  }
+  return 'Contact info not shared'
+})
+
 const photoSrc = computed(() => store.photo?.previewUrl ?? store.photo?.mediaUrl ?? null)
+
+const category = computed(() => list.value?.find((s) => s.serviceType === store.category) ?? null)
 
 /** Answered questions in catalog order, unknown fields last with the raw key as label. */
 const answers = computed(() => {
   const entries = Object.entries(store.customFields)
   if (entries.length === 0) return []
-  const questions = list.value?.find((s) => s.serviceType === store.category)?.questions ?? []
+  const questions = category.value?.questions ?? []
   const rank = new Map(questions.map((q, i) => [q.field, i]))
   const label = new Map(questions.map((q) => [q.field, q.label]))
+  const required = new Map(questions.map((q) => [q.field, q.required]))
   return entries
     .map(([field, value]) => ({
       field,
       label: label.get(field) ?? field,
       value,
+      required: required.get(field) ?? false,
       rank: rank.get(field) ?? Number.MAX_SAFE_INTEGER,
     }))
     .sort((a, b) => a.rank - b.rank)
 })
 
-const locationText = computed(() => {
+/** Category answers, then the free-text description, as one list of label/value rows. */
+const detailRows = computed(() => [
+  ...answers.value.map((a) => ({
+    field: a.field,
+    label: a.required ? `${a.label} * (required)` : a.label,
+    value: a.value,
+  })),
+  {
+    field: '__description',
+    label: 'Describe the issue * (required)',
+    value: store.description || '—',
+  },
+])
+
+const locationIcon = computed(() => serviceTypeIconComponent(store.category))
+const locationColor = computed(() => serviceTypeColor(store.category))
+const locationLines = computed(() => {
   const loc = store.location
-  if (!loc) return '—'
-  const base = loc.streetAddress || `${loc.lat}, ${loc.lng}`
-  return loc.zipCode ? `${base} (${loc.zipCode})` : base
+  if (!loc) return null
+  return {
+    street: loc.streetAddress || null,
+    cityStateZip: loc.zipCode ? `${CITY_STATE} ${loc.zipCode}` : CITY_STATE,
+    coords: `${loc.lat}, ${loc.lng}`,
+  }
 })
 </script>
 
 <template>
   <div class="review-summary">
-    <section class="review-summary__section">
-      <header class="review-summary__header">
-        <h2 class="review-summary__heading">Photo</h2>
-        <RouterLink class="review-summary__edit" to="/report" aria-label="Edit photo">
-          Edit
-        </RouterLink>
-      </header>
+    <ReviewSectionCard :icon="IconImage" label="Images" edit-to="/report" edit-label="Edit photo">
       <img
         v-if="photoSrc"
         class="review-summary__photo"
@@ -54,103 +102,138 @@ const locationText = computed(() => {
         alt="Photo attached to this report"
       />
       <p v-else class="review-summary__value">—</p>
-    </section>
+    </ReviewSectionCard>
 
-    <section class="review-summary__section">
-      <header class="review-summary__header">
-        <h2 class="review-summary__heading">Issue type</h2>
-        <RouterLink
-          class="review-summary__edit"
-          to="/report/issue-type"
-          aria-label="Edit issue type"
-        >
-          Edit
-        </RouterLink>
-      </header>
+    <ReviewSectionCard
+      :icon="IconFolder"
+      label="Issue type"
+      edit-to="/report/issue-type"
+      edit-label="Edit issue type"
+    >
       <p class="review-summary__value">{{ store.category ?? '—' }}</p>
-      <dl v-if="answers.length" class="review-summary__answers">
-        <template v-for="a in answers" :key="a.field">
-          <dt class="review-summary__dt">{{ a.label }}</dt>
-          <dd class="review-summary__dd">{{ a.value }}</dd>
+      <p v-if="category?.description" class="review-summary__category-description">
+        {{ category.description }}
+      </p>
+    </ReviewSectionCard>
+
+    <ReviewSectionCard
+      :icon="IconLocationDot"
+      label="Location"
+      edit-to="/report/location"
+      edit-label="Edit location"
+    >
+      <div v-if="locationLines" class="review-summary__location">
+        <div class="review-summary__map">
+          <LocationThumbnail
+            :latitude="store.location?.lat"
+            :longitude="store.location?.lng"
+            :icon="locationIcon"
+            :color="locationColor"
+          />
+        </div>
+        <div class="review-summary__location-text">
+          <p v-if="locationLines.street" class="review-summary__location-street">
+            {{ locationLines.street }}
+          </p>
+          <p class="review-summary__location-line">{{ locationLines.cityStateZip }}</p>
+          <p class="review-summary__location-line">{{ locationLines.coords }}</p>
+        </div>
+      </div>
+      <p v-else class="review-summary__value">—</p>
+    </ReviewSectionCard>
+
+    <ReviewSectionCard
+      :icon="IconCircleQuestion"
+      label="Details"
+      edit-to="/report/details"
+      edit-label="Edit details"
+    >
+      <dl class="review-summary__details">
+        <template v-for="row in detailRows" :key="row.field">
+          <dt class="review-summary__dt">{{ row.label }}</dt>
+          <dd class="review-summary__dd">{{ row.value }}</dd>
         </template>
       </dl>
-    </section>
+    </ReviewSectionCard>
 
-    <section class="review-summary__section">
-      <header class="review-summary__header">
-        <h2 class="review-summary__heading">Location</h2>
-        <RouterLink class="review-summary__edit" to="/report/location" aria-label="Edit location">
-          Edit
-        </RouterLink>
-      </header>
-      <p class="review-summary__value">{{ locationText }}</p>
-    </section>
-
-    <section class="review-summary__section">
-      <header class="review-summary__header">
-        <h2 class="review-summary__heading">Details</h2>
-        <RouterLink class="review-summary__edit" to="/report/details" aria-label="Edit details">
-          Edit
-        </RouterLink>
-      </header>
-      <dl class="review-summary__details">
-        <dt class="review-summary__dt">Description</dt>
-        <dd class="review-summary__dd">{{ store.description || '—' }}</dd>
-        <dt class="review-summary__dt">Name</dt>
-        <dd class="review-summary__dd">{{ store.contact.name || '—' }}</dd>
-        <dt class="review-summary__dt">Email</dt>
-        <dd class="review-summary__dd">{{ store.contact.email || '—' }}</dd>
-        <dt class="review-summary__dt">Phone</dt>
-        <dd class="review-summary__dd">{{ store.contact.phone || '—' }}</dd>
-        <dt class="review-summary__dt">Public visibility</dt>
-        <dd class="review-summary__dd">{{ store.publicVisibility ? 'Yes' : 'No' }}</dd>
-      </dl>
-    </section>
+    <ReviewSectionCard
+      :icon="IconUsers"
+      label="Visibility & contact"
+      edit-label="Edit visibility and contact info"
+      @edit="visibilityContactModal?.open()"
+    >
+      <p class="review-summary__value">{{ store.publicVisibility ? 'Public' : 'Private' }}</p>
+      <p class="review-summary__category-description">{{ contactSummary }}</p>
+    </ReviewSectionCard>
   </div>
+
+  <VisibilityContactModal ref="visibilityContactModal" />
 </template>
 
 <style scoped>
-.review-summary__section {
-  border: 1px solid var(--Schemes-Border-low, #e3e3e3);
-  border-radius: 8px;
-  padding: var(--spacing-m, 1rem);
-  margin-bottom: var(--spacing-m, 1rem);
-}
-.review-summary__header {
+.review-summary {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-.review-summary__heading {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0 0 var(--spacing-s, 0.75rem);
-}
-.review-summary__edit {
-  font-size: 0.875rem;
-  color: var(--Schemes-Primary, #0f4d90);
+  flex-direction: column;
+  gap: var(--spacing-l, 1.5rem);
 }
 .review-summary__photo {
-  max-width: 200px;
-  max-height: 150px;
-  border-radius: 8px;
+  max-width: 247px;
+  max-height: 200px;
+  border-radius: var(--border-radius-l, 16px);
   object-fit: cover;
 }
 .review-summary__value {
   margin: 0;
 }
-.review-summary__answers,
-.review-summary__details {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 4px var(--spacing-m, 1rem);
+.review-summary__category-description {
   margin: var(--spacing-s, 0.75rem) 0 0;
+  color: var(--Schemes-On-Surface-High, #000);
+}
+.review-summary__location {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-l, 1.5rem);
+  width: 100%;
+  padding: var(--spacing-m, 1rem);
+  background: var(--Schemes-On-Primary, #f5f5f5);
+  border-radius: var(--border-radius-s, 8px);
+  box-sizing: border-box;
+}
+.review-summary__map {
+  flex-shrink: 0;
+  width: 222px;
+  height: 186px;
+  border: 1px solid var(--Schemes-Border-low, #ccc);
+  border-radius: var(--border-radius-s, 8px);
+  overflow: hidden;
+}
+.review-summary__location-text {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.review-summary__location-street {
+  margin: 0;
+  font-weight: 600;
+}
+.review-summary__location-line {
+  margin: 0;
+}
+.review-summary__details {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  width: 100%;
 }
 .review-summary__dt {
   font-weight: 600;
+  margin-top: var(--spacing-m, 1rem);
+}
+.review-summary__dt:first-child {
+  margin-top: 0;
 }
 .review-summary__dd {
   margin: 0;
   overflow-wrap: anywhere;
+  color: var(--Schemes-On-Surface-Low, #636363);
 }
 </style>

@@ -22,14 +22,18 @@ defineSlots<{
 }>()
 
 const requiredText = computed(() => `(${props.required ? 'required' : 'optional'})`)
-const titleText = computed(() => `${props.stepTitle} *`)
+const titleText = computed(() => (props.hideRequired ? props.stepTitle : `${props.stepTitle} *`))
 </script>
 
 <template>
   <div class="report__step">
     <span class="report-step__title">
       <h5 :class="['report-step__text', errorActive ? 'error' : '']" v-text="titleText" />
-      <h5 :class="['report-step__required', errorActive ? 'error' : '']" v-text="requiredText" />
+      <h5
+        v-if="!hideRequired"
+        :class="['report-step__required', errorActive ? 'error' : '']"
+        v-text="requiredText"
+      />
     </span>
     <span class="report-step__note" v-text="stepNote" />
     <div class="report-step__content">

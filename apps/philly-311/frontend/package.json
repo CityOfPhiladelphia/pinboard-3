@@ -28,6 +28,7 @@
     "@phila/phila-ui-filter-chip": "catalog:",
     "@phila/phila-ui-filter-panel": "catalog:",
     "@phila/phila-ui-map-core": "catalog:",
+    "@phila/phila-ui-modal": "catalog:",
     "@phila/phila-ui-radio": "catalog:",
     "@phila/phila-ui-search": "catalog:",
     "@phila/phila-ui-switch": "catalog:",
