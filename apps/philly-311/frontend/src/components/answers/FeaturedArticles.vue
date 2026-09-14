@@ -3,7 +3,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { Icon } from '@phila/phila-ui-core'
-import { IconStar } from '@phila/phila-ui-core/icons'
+import { IconArrowTrendUp } from '@phila/phila-ui-core/icons'
+import { BaseCard } from '@phila/phila-ui-cards'
 import { useKnowledgeArticles, type Article } from '@/composables/useKnowledgeArticles'
 
 const k = useKnowledgeArticles()
@@ -33,8 +34,14 @@ onMounted(async () => {
   <ul v-if="articles.length > 0" class="featured" aria-label="Featured articles">
     <li v-for="article in articles" :key="article.id" class="featured__card">
       <RouterLink class="featured__link" :to="`/answers/${article.id}`">
-        <Icon :icon="IconStar" decorative class="featured__icon" />
-        <span class="featured__title">{{ article.title }}</span>
+        <!-- BaseCard's own href only ever renders a plain <a> (no vue-router
+             support), so navigation stays on the RouterLink above; the
+             clickable/hover treatment is forced via class since that's tied
+             to BaseCard's href/onClick presence, not a dedicated prop. -->
+        <BaseCard layout="horizontal" class="phila-card featured__base-card phila-card--clickable">
+          <Icon :icon="IconArrowTrendUp" decorative class="featured__icon" />
+          <span class="featured__title">{{ article.title }}</span>
+        </BaseCard>
       </RouterLink>
     </li>
   </ul>
@@ -52,19 +59,25 @@ onMounted(async () => {
 .featured__card {
   flex: 1 0 220px;
   max-width: 256px;
-  background: #fff;
-  border: 1px solid var(--Schemes-Border-low, #d6d6d6);
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 .featured__link {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-s, 0.75rem);
+  display: block;
   height: 100%;
-  padding: var(--spacing-s, 0.75rem);
   color: var(--Schemes-On-Surface-High, #0f0f0f);
   text-decoration: none;
+}
+/* Compound with .phila-card (BaseCard's own root class) so this outweighs
+   BaseCard's own same-specificity `.phila-card { min-width: 300px }` rule
+   regardless of CSS load order — these cards run narrower than that in this
+   horizontal strip. */
+.phila-card.featured__base-card {
+  min-width: 0;
+  height: 100%;
+  --phila-card-inner-gap: var(--spacing-s, 0.75rem);
+  --phila-card-inner-padding: var(--spacing-s, 0.75rem);
+}
+.featured__base-card :deep(.phila-card__inner) {
+  align-items: center;
 }
 .featured__link:hover .featured__title {
   text-decoration: underline;

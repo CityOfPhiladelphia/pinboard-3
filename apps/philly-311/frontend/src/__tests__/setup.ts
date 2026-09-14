@@ -132,6 +132,17 @@ vi.mock('@phila/phila-ui-cards', () => ({
         ])
     },
   }),
+  // Mirrors BaseCard's own contract: a div wrapping the default slot, with
+  // fallthrough attrs (e.g. a forced clickable class) applied to that div.
+  // Real navigation lives on whatever RouterLink wraps it, not on BaseCard's
+  // own href, so href isn't modeled here.
+  BaseCard: defineComponent({
+    name: 'BaseCard',
+    props: ['layout', 'variant', 'radius', 'elevated', 'border', 'href'],
+    setup(_props, { slots, attrs }) {
+      return () => h('div', { ...attrs }, slots.default?.())
+    },
+  }),
 }))
 
 vi.mock('@phila/phila-ui-filter-panel', () => ({
@@ -157,22 +168,28 @@ vi.mock('@phila/phila-ui-button', () => ({
   }),
 }))
 
-// Mirrors the real Search/SearchSuggestions contract: an input bound to
-// modelValue, and a listbox of flat suggestion strings emitting select.
+// Mirrors the real Search/SearchSuggestions contract: an optional label above
+// an input bound to modelValue, and a listbox of flat suggestion strings
+// emitting select. labelIcon is accepted (so passing it doesn't warn) but not
+// rendered, same as every other icon prop these stubs ignore.
 vi.mock('@phila/phila-ui-search', () => ({
   Search: defineComponent({
     name: 'Search',
-    props: ['modelValue', 'placeholder'],
+    props: ['modelValue', 'placeholder', 'label', 'labelIcon', 'id'],
     emits: ['update:modelValue', 'search'],
     setup(props: Record<string, unknown>, { emit, expose }) {
       expose({ focus: () => undefined })
       return () =>
-        h('input', {
-          type: 'search',
-          placeholder: props.placeholder,
-          value: props.modelValue,
-          onInput: (e: Event) => emit('update:modelValue', (e.target as HTMLInputElement).value),
-        })
+        h('div', [
+          props.label ? h('label', { for: props.id }, props.label as string) : null,
+          h('input', {
+            id: props.id,
+            type: 'search',
+            placeholder: props.placeholder,
+            value: props.modelValue,
+            onInput: (e: Event) => emit('update:modelValue', (e.target as HTMLInputElement).value),
+          }),
+        ])
     },
   }),
   SearchSuggestions: defineComponent({

@@ -8,9 +8,19 @@ import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
 import ArticleCard from '@/components/answers/ArticleCard.vue'
 import FeaturedArticles from '@/components/answers/FeaturedArticles.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
+import { FilterChip } from '@phila/phila-ui-filter-chip'
+import { Search } from '@phila/phila-ui-search'
 import heroPhoto from '@/assets/answers-hero.jpg'
-import { Icon } from '@phila/phila-ui-core'
-import { IconMagnifyingGlass, IconSort } from '@phila/phila-ui-core/icons'
+import { IconSort, IconCircleInfo } from '@phila/phila-ui-core/icons'
+
+const SORT_CHOICES = [
+  { text: 'Title A–Z', value: 'title:asc' },
+  { text: 'Title Z–A', value: 'title:desc' },
+  { text: 'Newest first', value: 'lastPublishedAt:desc' },
+  { text: 'Oldest first', value: 'lastPublishedAt:asc' },
+]
+
+const DEFAULT_SORT = 'lastPublishedAt:desc'
 
 const k = useKnowledgeArticles()
 
@@ -20,12 +30,26 @@ const browseLoading = ref(false)
 const browseError = ref<string | null>(null)
 
 // 'sort:direction' for the API, or '' for the server's default order.
-const sortChoice = ref('')
+const sortChoice = ref(DEFAULT_SORT)
+const sortChosen = ref(false)
 
 function sortParams(): { sort?: 'title' | 'lastPublishedAt'; direction?: 'asc' | 'desc' } {
   if (!sortChoice.value) return {}
   const [sort, direction] = sortChoice.value.split(':')
   return { sort, direction } as ReturnType<typeof sortParams>
+}
+
+const sortModelValue = computed<Record<string, boolean>>(() =>
+  sortChosen.value ? { [sortChoice.value]: true } : {},
+)
+
+function onSortChange(next: Record<string, boolean>) {
+  const selected = Object.keys(next).find((key) => next[key])
+  const nextSort = selected ?? DEFAULT_SORT
+  sortChosen.value = selected !== undefined
+  if (nextSort === sortChoice.value) return
+  sortChoice.value = nextSort
+  loadPage()
 }
 
 // With a token, appends the next page; without one, (re)loads the first page.
@@ -54,7 +78,7 @@ const {
   error: searchError,
 } = useDebouncedSearch<Article[] | null>({
   initial: null,
-  fetcher: async (q) => (await k.loadArticles({ search: q })).items,
+  fetcher: async (q, signal) => (await k.loadArticles({ search: q, signal })).items,
   onEmpty: () => {
     void loadPage()
     return null
@@ -84,35 +108,27 @@ onMounted(loadPage)
     <FeaturedArticles class="answers__featured" />
 
     <div class="answers__content">
-      <label class="sr-only" for="answers-search">Search articles</label>
-      <div class="answers__search">
-        <input
-          id="answers-search"
-          v-model="query"
-          type="search"
-          class="answers__search-input"
-          placeholder="Search by topic or keyword"
-        />
-        <Icon :icon="IconMagnifyingGlass" decorative class="answers__search-icon" />
-      </div>
+      <Search
+        id="answers-search"
+        v-model="query"
+        label="Use natural language to search phila.gov"
+        :label-icon="IconCircleInfo"
+        placeholder="Search by topic or keyword"
+        class="answers__search"
+      />
 
       <div v-if="!isSearching" class="answers__chips">
-        <label class="answers__chip">
-          <Icon :icon="IconSort" decorative size="extra-small" />
-          <select
-            v-model="sortChoice"
-            class="answers__chip-select"
-            aria-label="Sort articles"
-            data-test="answers-sort"
-            @change="loadPage()"
-          >
-            <option value="">Sort</option>
-            <option value="title:asc">Title A–Z</option>
-            <option value="title:desc">Title Z–A</option>
-            <option value="lastPublishedAt:desc">Newest first</option>
-            <option value="lastPublishedAt:asc">Oldest first</option>
-          </select>
-        </label>
+        <FilterChip
+          label="Sort"
+          :icon="IconSort"
+          color="white"
+          size="extra-large"
+          :choices="SORT_CHOICES"
+          :multiple="false"
+          :model-value="sortModelValue"
+          data-test="answers-sort"
+          @update:model-value="onSortChange"
+        />
       </div>
 
       <p v-if="isLoading" class="answers__status">Loading articles&hellip;</p>
@@ -192,7 +208,7 @@ onMounted(loadPage)
 .answers__content {
   max-width: 960px;
   margin: 0 auto;
-  padding: var(--spacing-xl, 2rem) var(--spacing-m, 1rem);
+  padding: 0 var(--spacing-m, 1rem) var(--spacing-xl, 2rem);
 }
 .answers__more {
   margin: var(--spacing-l, 1.5rem) 0;
@@ -201,45 +217,11 @@ onMounted(loadPage)
   margin-bottom: var(--spacing-m, 1rem);
 }
 .answers__search {
-  position: relative;
   margin-bottom: var(--spacing-l, 1.5rem);
-}
-.answers__search-input {
-  width: 100%;
-  padding: var(--spacing-s, 0.75rem) 3rem var(--spacing-s, 0.75rem) var(--spacing-s, 0.75rem);
-  background: #fff;
-  border: 1px solid var(--Schemes-Border-low, #d6d6d6);
-  border-radius: 8px;
-  font-size: 1rem;
-}
-.answers__search-icon {
-  position: absolute;
-  right: var(--spacing-s, 0.75rem);
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--Schemes-Primary, #0f4d90);
-  pointer-events: none;
 }
 .answers__chips {
   display: flex;
   gap: var(--spacing-s, 0.75rem);
-  margin-bottom: var(--spacing-l, 1.5rem);
-}
-.answers__chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-2xs, 0.25rem);
-  height: 32px;
-  padding: 0 var(--spacing-xs, 0.5rem);
-  background: #fff;
-  border: 1px solid var(--Schemes-Border-low, #d6d6d6);
-  border-radius: 16px;
-}
-.answers__chip-select {
-  border: none;
-  background: transparent;
-  font: inherit;
-  cursor: pointer;
 }
 .answers__list {
   list-style: none;

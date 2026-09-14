@@ -15,6 +15,15 @@ describe('ArticleBody', () => {
     expect(w.text()).toContain('safe')
   })
 
+  it('renders images from the article body', () => {
+    const w = mount(ArticleBody, {
+      props: { html: '<img src="https://example.com/photo.jpg" alt="A photo">' },
+    })
+    const img = w.find('img')
+    expect(img.attributes('src')).toBe('https://example.com/photo.jpg')
+    expect(img.attributes('alt')).toBe('A photo')
+  })
+
   it('rewrites links with noopener/_blank', () => {
     const w = mount(ArticleBody, { props: { html: '<a href="https://example.com">x</a>' } })
     const a = w.find('a')
