@@ -33,5 +33,9 @@
     "turbo": "^2.10.12",
     "typescript": "catalog:",
     "vue-tsc": "catalog:"
+  },
+  "dependencies": {
+    "@phila/phila-ui-modal": "link:../phila-ui-4/packages/modal",
+    "@phila/phila-ui-text-field": "link:../phila-ui-4/packages/text-field"
   }
 }

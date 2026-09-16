@@ -3,7 +3,8 @@
      Next always stays enabled; canAdvance and showErrors are provided so an
      invalid attempt surfaces the active step's error messages instead of
      blocking the click. A step can register nav handlers to intercept
-     Back/Next before the shell changes routes. Exit opens ExitDialog, which
+     Back/Next before the shell changes routes, or (on the last step) a
+     Submit action that replaces Next entirely. Exit opens ExitDialog, which
      either saves the in-progress report as a draft or discards it. -->
 <script setup lang="ts">
 import { provide, ref, computed, watch } from 'vue'
@@ -15,6 +16,7 @@ import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useMyCasesStore } from '@/stores/myCases'
 import { WIZARD_CAN_ADVANCE_KEY, WIZARD_SHOW_ERRORS_KEY } from '@/composables/useWizardValidity'
 import { WIZARD_NAV_KEY, type WizardNavHandlers } from '@/composables/useWizardNav'
+import { WIZARD_SUBMIT_KEY, type WizardSubmitHandler } from '@/composables/useWizardSubmit'
 
 const STEPS = [
   { title: 'Image', path: '/report' },
@@ -33,10 +35,12 @@ const wizardEl = ref<HTMLElement | null>(null)
 const canAdvance = ref(true)
 const showErrors = ref(false)
 const navHandlers = ref<WizardNavHandlers | null>(null)
+const submitHandler = ref<WizardSubmitHandler | null>(null)
 
 provide(WIZARD_CAN_ADVANCE_KEY, canAdvance)
 provide(WIZARD_SHOW_ERRORS_KEY, showErrors)
 provide(WIZARD_NAV_KEY, navHandlers)
+provide(WIZARD_SUBMIT_KEY, submitHandler)
 
 watch(
   // The wizard is its own scroll container (the shell locks the viewport), so
@@ -140,7 +144,16 @@ function discardAndExit() {
           Back
         </PhilaButton>
         <PhilaButton
-          v-if="!isLast"
+          v-if="isLast"
+          variant="primary"
+          data-test="wizard-submit"
+          :disabled="!submitHandler || submitHandler.disabled"
+          @click="submitHandler?.onSubmit()"
+        >
+          {{ submitHandler?.label ?? 'Submit report' }}
+        </PhilaButton>
+        <PhilaButton
+          v-else
           variant="primary"
           data-test="wizard-next"
           :disabled="!nextPath"

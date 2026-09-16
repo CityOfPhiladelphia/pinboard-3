@@ -230,6 +230,24 @@ vi.mock('@phila/phila-ui-app-header', () => ({
   AppHeader: stub('AppHeader', 'nav'),
 }))
 
+// Fallback mock for @phila/phila-ui-modal. Tests that need to exercise a
+// modal's own open/close behavior declare their own vi.mock('@phila/phila-ui-modal',
+// ...) that overrides this one (see VisibilityContactModal.test.ts). This
+// fallback lets everything else (e.g. App.vue's always-mounted <ModalTarget />)
+// mount without pulling in the package's real dist CSS.
+vi.mock('@phila/phila-ui-modal', () => ({
+  Modal: defineComponent({
+    name: 'Modal',
+    props: ['id', 'title', 'dissmissible', 'cancellable', 'actionLabel'],
+    emits: ['submit', 'cancel', 'close'],
+    setup(_props, { slots }) {
+      return () =>
+        h('div', { class: 'modal-stub' }, slots.default?.({ open: true, close: () => undefined }))
+    },
+  }),
+  ModalTarget: stub('ModalTarget', 'div'),
+}))
+
 vi.mock('@phila/phila-ui-app-footer', () => ({
   AppFooter: stub('AppFooter', 'footer'),
 }))

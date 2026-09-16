@@ -45,6 +45,14 @@ export interface SubmitPayload {
   longitude: number
   mediaUrl?: string
   customFields?: Record<string, string>
+  /** Included only when the user opted to share contact info while signed out
+   *  (or is signed in — the API derives contact from the account and ignores
+   *  this either way in that case); omitted entirely when they declined. */
+  contact?: {
+    firstName: string
+    lastName: string
+    phone: string
+  }
 }
 
 /** The POST /private/key/submit success response — the full created Issue. */

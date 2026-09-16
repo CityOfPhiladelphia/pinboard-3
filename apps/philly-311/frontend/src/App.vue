@@ -7,13 +7,16 @@ import '@pinboard/ui/style.css'
 import '@/assets/a11y.css'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { Callout } from '@phila/phila-ui-callout'
+import { ModalTarget } from '@phila/phila-ui-modal'
 import { useAuth } from '@phila/sso-vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAccountProvisioning } from '@/composables/useAccountProvisioning'
+import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import ReportIssueIcon from '@/components/ReportIssueIcon'
 
 const route = useRoute()
+const store = useReportSubmissionStore()
 const { signIn, signOut, isAuthenticated, userName } = useAuth()
 const {
   status: accountStatus,
@@ -50,10 +53,14 @@ const navLinks = computed(
 
 const feedbackHref = 'https://www.phila.gov/feedback/'
 
-// Mirrors authGuard's redirect mechanism (router/index.ts) so a header-initiated
-// login returns the user to where they clicked from, not '/' or a stale guard redirect.
+// Mirrors authGuard's redirect mechanism (router/index.ts) so login returns
+// the user to where they clicked from. If that's a wizard step, the SSO
+// round-trip's reload wipes the in-memory store, so its state rides along
+// in the query too — wizardGuard rehydrates it, same as an external deep link.
 function login() {
-  sessionStorage.setItem('auth:redirectTo', route.fullPath)
+  const query = store.stateToUrlQueryParams()
+  const path = route.fullPath.split('?')[0]
+  sessionStorage.setItem('auth:redirectTo', query ? `${path}?${query}` : path)
   signIn()
 }
 </script>
@@ -92,6 +99,7 @@ function login() {
       <RouterView v-else />
     </div>
   </PinboardShell>
+  <ModalTarget />
 </template>
 
 <style scoped>
@@ -123,5 +131,35 @@ function login() {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* @phila/phila-ui-modal 0.1.4-beta.1 (pinned) shipped with several bugs
+ * (no z-index, no max-height/scroll, a BaseCard container-query breaking
+ * that fix on mobile, dead cancelButtonProps/cancelLabel, Cancel/Apply
+ * overflow) — all fixed in phila-ui-4's fix/modal-scroll-and-overflow
+ * branch, not yet published. Once published and the catalog bumped, this
+ * can shrink to just what's left: tuning the package's 24px default
+ * padding/gap to this dialog's 32px Figma spec, overriding Modal.vue's own
+ * classes directly rather than stacking this content's own padding on top. */
+:global(.phila-modal .modal-header) {
+  padding: var(--spacing-xl, 2rem) var(--spacing-xl, 2rem) 0 var(--spacing-xl, 2rem);
+}
+:global(.phila-modal .modal-content__inner) {
+  padding: 0 var(--spacing-xl, 2rem);
+}
+:global(.phila-modal .modal-actions) {
+  padding: 0 var(--spacing-xl, 2rem) var(--spacing-xl, 2rem) var(--spacing-xl, 2rem);
+  margin-top: var(--spacing-xl, 2rem);
+}
+/* Modal.vue's title renders with "has-text-label-3xl" (36px, growing to
+ * 40px/48px-line-height on desktop) instead of the Subtitle/Subtitle-1 style
+ * Figma specs for a dialog title (24px/36px). Left as a local override
+ * rather than ported upstream — unlike everything above, this one's
+ * arguably intentional for other dialog variants (Announcement/Event/Task/
+ * Confirm all wrap the same Modal), so it needs design input first.
+ * !important since the utility class sets its own. */
+:global(.phila-modal .has-text-label-3xl) {
+  font-size: var(--Subtitle-Subtitle-1-font-subtitle-1-size, 1.5rem) !important;
+  line-height: var(--Subtitle-Subtitle-1-font-subtitle-1-lineheight, 2.25rem) !important;
 }
 </style>
