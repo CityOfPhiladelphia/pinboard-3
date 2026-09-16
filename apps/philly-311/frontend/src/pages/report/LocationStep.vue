@@ -5,7 +5,6 @@
 import { computed, ref, watch } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { reverseGeocode } from '@/composables/useAis'
-// import { getCurrentPosition } from '@/composables/useGeolocation'
 import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { isInPhilly } from '@/utils/bounds'
 import { Callout } from '@phila/phila-ui-callout'
@@ -16,11 +15,9 @@ import AddressSearch from '@/components/wizard/AddressSearch.vue'
 import LocationMap from '@/components/wizard/LocationMap.vue'
 import ReportStep from '@/components/wizard/ReportStep.vue'
 import type { AisFeature } from '@/types/wizard'
+import NoAddressDropdown from '@/components/wizard/NoAddressDropdown.vue'
 
 export type AddressSource = 'image' | 'search' | 'geoLocation' | 'mapPin'
-export interface AddressResult {
-  feature: AisFeature
-}
 
 const stepTitle = 'Confirm Location'
 const defaultError = 'Choose an address to continue'
@@ -30,6 +27,12 @@ const errorMessage = ref('')
 const locationError = ref('')
 const currentSearch = ref<Exclude<AddressSource, 'image'> | null>(null)
 const addressSource = ref<AddressSource | undefined>(store.photo.mediaUrl ? 'image' : undefined)
+const searchReturnedNull = ref(false)
+
+const searchIsdNull = computed(() => {
+  return addressSource.value === 'search' && searchReturnedNull.value
+  // return true
+})
 
 const isValidLocation = computed(
   () => !!store.location && isInPhilly(store.location.lat, store.location.lng),
@@ -87,10 +90,16 @@ async function onMove({ lat, lng }: { lat: number; lng: number }) {
 
 function resetLocation() {
   store.setLocation(null)
+  addressSource.value = undefined
 }
 
-function handleSearch(result: AddressResult) {
-  store.setLocation(result.feature)
+function handleSearch(result: AisFeature | null) {
+  if (result) {
+    searchReturnedNull.value = false
+    store.setLocation(result)
+  } else {
+    searchReturnedNull.value = true
+  }
 }
 </script>
 
@@ -121,7 +130,7 @@ function handleSearch(result: AddressResult) {
           v-model:current-search="currentSearch"
           v-model:address-source="addressSource"
           v-model:location-error="locationError"
-          class="location-step__overlay location-step__search"
+          class="location-step__search"
           @select="handleSearch"
         />
         <PhilaButton
@@ -129,7 +138,7 @@ function handleSearch(result: AddressResult) {
           variant="text"
           :icon="IconRotateLeft"
           size="small"
-          class="location-step__overlay location-step__reset"
+          class="location-step__reset"
           @click="resetLocation"
           >Reset</PhilaButton
         >
@@ -139,7 +148,12 @@ function handleSearch(result: AddressResult) {
           variant="readonly"
           :icon="IconArrowsUpDownLeftRight"
           selected
-          class="location-step__overlay location-step__readonly"
+          class="location-step__readonly"
+        />
+        <NoAddressDropdown
+          v-if="searchIsdNull"
+          class="location-step__no-address"
+          @reset="resetLocation"
         />
       </div>
     </template>
@@ -185,10 +199,6 @@ function handleSearch(result: AddressResult) {
   grid-row: map-start / map-end;
 }
 
-.location-step__overlay {
-  isolation: isolate;
-}
-
 .location-step__search {
   grid-column: search-col-start / search-col-end;
   grid-row: search-row-start / search-row-end;
@@ -196,6 +206,7 @@ function handleSearch(result: AddressResult) {
 }
 
 .location-step__reset {
+  isolation: isolate;
   grid-column: inset-start / readonly-col-start;
   grid-row: readonly-row-start / readonly-row-end;
   width: fit-content;
@@ -206,8 +217,13 @@ function handleSearch(result: AddressResult) {
 }
 
 .location-step__readonly {
+  isolation: isolate;
   grid-column: readonly-col-start / readonly-col-end;
   grid-row: readonly-row-start / readonly-row-end;
-  width: 100%;
+}
+
+.location-step__no-address {
+  grid-column: search-col-start / search-col-end;
+  grid-row: search-row-end / map-end;
 }
 </style>

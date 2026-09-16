@@ -28,6 +28,7 @@ const emit = defineEmits<{
 }>()
 
 const popupMessage = ref(props.popupText)
+const showPopup = ref(true)
 const draggingPin = ref(false)
 const philaMap = ref<MapVMComponent | null>(null)
 useMapBounds(philaMap)
@@ -49,8 +50,13 @@ function onDragStart() {
 }
 
 function onDragEnd(p: { lng: number; lat: number }) {
+  showPopup.value = true
   draggingPin.value = false
   emit('move', { lat: p.lat, lng: p.lng })
+}
+
+function togglePopup() {
+  showPopup.value = !showPopup.value
 }
 </script>
 
@@ -69,10 +75,11 @@ function onDragEnd(p: { lng: number; lat: number }) {
           :zoom="zoom"
           :icon="serviceTypeIconComponent(serviceType)"
           :color="serviceTypeColor(serviceType)"
+          @click="togglePopup"
         />
       </MapMarker>
       <MapPopup
-        v-if="location && !draggingPin"
+        v-if="location && showPopup && !draggingPin"
         :lng-lat="[location.lng, location.lat]"
         :close-on-click="false"
         :close-button="false"
@@ -98,6 +105,7 @@ function onDragEnd(p: { lng: number; lat: number }) {
 
 <style scoped>
 .location-map {
+  isolation: isolate;
   width: 100%;
   height: 100%;
 }

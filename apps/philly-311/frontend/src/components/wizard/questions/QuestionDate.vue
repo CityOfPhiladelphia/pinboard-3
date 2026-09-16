@@ -11,8 +11,8 @@ const props = defineProps<{
   initialValue: string
 }>()
 
-const modelValue = defineModel<string>('model-value')
-const error = defineModel<string>('error')
+const modelValue = defineModel<string>('model-value', { default: '' })
+const error = defineModel<string>('error', { default: '' })
 
 const labelText = computed(() =>
   props.question.required ? `${props.question.label} *` : props.question.label,

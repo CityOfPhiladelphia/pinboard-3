@@ -14,8 +14,9 @@ import {
   type AisAutocompleteResult,
 } from '@/composables/useAis'
 import { IconLocationCrosshairs, IconLocationDot } from '@phila/phila-ui-core/icons'
-import type { AddressResult, AddressSource } from '@/pages/report/LocationStep.vue'
+import type { AddressSource } from '@/pages/report/LocationStep.vue'
 import { getCurrentPosition } from '@/composables/useGeolocation'
+import type { AisFeature } from '@/types/wizard'
 
 const addressSource = defineModel<AddressSource | undefined>('addressSource', {
   default: undefined,
@@ -28,7 +29,7 @@ const locationError = defineModel<string>('locationError', {
 })
 
 const emit = defineEmits<{
-  select: [feature: AddressResult]
+  select: [feature: AisFeature | null]
 }>()
 
 const RESOLVE_ERROR = "Couldn't resolve that address."
@@ -38,6 +39,8 @@ const { query, results, error } = useDebouncedSearch<AisAutocompleteResult[]>({
   initial: [],
   fetcher: (q, signal) => autocompleteAddresses(q, signal),
 })
+
+// const imageInfo = store.photo.mediaUrl ? '' : null
 
 // Closed after a pick: echoing the resolved address into `query` re-fires the
 // debounced autocomplete, and the list must not reopen until the user types.
@@ -88,18 +91,18 @@ async function handleSearch() {
   try {
     const feature = await searchAddress(query.value)
     if (feature && currentSearch.value === 'search') {
-      addressSource.value = 'search'
-      emit('select', {
-        feature: feature,
-      })
-      results.value = []
+      emit('select', feature)
     } else {
       error.value = RESOLVE_ERROR
+      emit('select', null)
     }
   } catch {
     error.value = RESOLVE_ERROR
+    emit('select', null)
   } finally {
     currentSearch.value = null
+    addressSource.value = 'search'
+    results.value = []
   }
 }
 
@@ -115,9 +118,7 @@ async function useMyLocation() {
     const feature = await reverseGeocode(pos.lat, pos.lng)
     if (feature && currentSearch.value === 'geoLocation') {
       addressSource.value = 'geoLocation'
-      emit('select', {
-        feature: feature,
-      })
+      emit('select', feature)
     } else locationError.value = "We couldn't resolve your location to an address."
   } catch {
     locationError.value = "We couldn't resolve your location to an address."
@@ -125,10 +126,14 @@ async function useMyLocation() {
     currentSearch.value = null
   }
 }
+
+function handleFocus() {
+  open.value = true
+}
 </script>
 
 <template>
-  <div class="address-search" @keydown="onKeydown" @focusout="onFocusOut">
+  <div class="address-search" @keydown="onKeydown" @focusin="handleFocus" @focusout="onFocusOut">
     <Search
       ref="searchRef"
       shape="pill"
@@ -139,18 +144,19 @@ async function useMyLocation() {
       @update:model-value="onQueryChange"
       @search="handleSearch"
     />
-    <span>
+    <span class="geolocate_button" :style="{ display: open ? 'flex' : 'none' }">
       <PhilaButton
         text="Use my current location"
-        variant="text-flat"
+        size="extra-small"
         :icon="IconLocationCrosshairs"
         :loading="currentSearch === 'geoLocation'"
         @click="useMyLocation"
-      ></PhilaButton>
+      />
     </span>
     <SearchSuggestions
       ref="suggestionsRef"
       :suggestions="suggestions"
+      :icon="IconLocationDot"
       :style="{ border: 'none' }"
       @select="onSelect"
       @dismiss="onDismiss"
@@ -160,10 +166,21 @@ async function useMyLocation() {
 
 <style scoped>
 .address-search {
-  display: grid;
-  grid-template-rows: auto auto auto;
+  z-index: 1;
   border-radius: var(--border-radius-s, 0.5rem) var(--border-radius-s, 0.5rem) 0 0;
   background-color: var(--colors-White);
   box-shadow: var(--elevation-light-2);
+}
+
+.geolocate_button {
+  padding: var(--spacing-m, 1rem) var(--spacing-m, 1rem) var(--spacing-m, 1rem) 1rem;
+}
+
+.geolocate_button
+  > button
+  > :is(.phila-button__stack)
+  > :is(.phila-button__content)
+  > :is(.phila-icon-core) {
+  font-size: var(--Icon-Solid-Small-font-icon-solid-small-size, 1.125rem);
 }
 </style>

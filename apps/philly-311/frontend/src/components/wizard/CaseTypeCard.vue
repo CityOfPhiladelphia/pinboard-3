@@ -10,7 +10,7 @@ import ServiceTypeCard from './ServiceTypeCard.vue'
 import type { Service } from '@/types/app.ts'
 
 defineProps<{ caseType: string; serviceTypes: ServiceType[] }>()
-const selected = defineModel<Service>('selected')
+const selected = defineModel<Service | undefined>('selected', { default: undefined })
 </script>
 
 <template>
