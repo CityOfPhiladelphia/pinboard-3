@@ -16,7 +16,7 @@ interface ClassifyResponse {
 const store = useReportSubmissionStore()
 
 const classifying = defineModel<boolean>('classifying')
-const error = defineModel<string>('error')
+const error = defineModel<string>('error', { default: '' })
 const imageContainerRef = useTemplateRef('imageContainerRef')
 
 const imageContainerDim = computed(() => {

@@ -10,7 +10,7 @@ import ServiceTypeCard from './ServiceTypeCard.vue'
 import type { Service } from '@/types/app.ts'
 
 const props = defineProps<{ catalog: ServiceType[] }>()
-const selected = defineModel<Service>('selected')
+const selected = defineModel<Service | undefined>('selected', { default: undefined })
 const query = ref('')
 
 const INFO = serviceTypeInfo as Record<Service, { description: string; keywords: string[] }>

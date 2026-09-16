@@ -11,8 +11,8 @@ import type { IQuestionField } from '@/types/api.ts'
 import { computed } from 'vue'
 
 const props = defineProps<{ current: IQuestionField }>()
-const response = defineModel<string>('response')
-const error = defineModel<string>('error')
+const response = defineModel<string>('response', { default: '' })
+const error = defineModel<string>('error', { default: '' })
 
 const store = useReportSubmissionStore()
 

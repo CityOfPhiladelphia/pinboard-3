@@ -9,7 +9,7 @@ import ServiceTypeCard from './ServiceTypeCard.vue'
 import type { Service } from '@/types/app.ts'
 
 const props = defineProps<{ suggestions: PhotoSuggestion[]; catalog: ServiceType[] }>()
-const selected = defineModel<Service>('selected')
+const selected = defineModel<Service | undefined>('selected', { default: undefined })
 
 const calloutText = 'AI generated recommendations based on photo'
 

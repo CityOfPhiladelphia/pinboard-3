@@ -9,7 +9,7 @@ import { computed } from 'vue'
 import type { Service } from '@/types/app'
 
 const props = defineProps<{ serviceType: Service; description: string }>()
-const selected = defineModel<Service>('selected')
+const selected = defineModel<Service | undefined>('selected', { default: undefined })
 
 const store = useReportSubmissionStore()
 
