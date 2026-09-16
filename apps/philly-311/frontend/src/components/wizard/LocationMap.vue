@@ -97,13 +97,12 @@ function togglePopup() {
   height: 100%;
 }
 
-/* disabled lint check because linter has no way of detecting classes of imported PhilaMap component */
-/* eslint-disable-next-line vue-scoped-css/no-unused-selector */
-.location-map > .map-wrapper {
+.location-map > :is(.map-wrapper) {
   position: static;
 }
 
 .location-map :is(.maplibregl-popup-content) {
-  width: 21rem !important;
+  width: fit-content !important;
+  padding: 0 !important;
 }
 </style>

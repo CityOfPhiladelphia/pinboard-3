@@ -149,14 +149,16 @@ onBeforeMount(() => {
           @click="resetLocation"
           >Reset</PhilaButton
         >
-        <Tags
-          v-if="hasLocation"
-          text="Click and drag to move pin"
-          variant="readonly"
-          :icon="IconArrowsUpDownLeftRight"
-          selected
-          class="location-step__readonly"
-        />
+        <div class="location-step__readonly">
+          <Tags
+            v-if="hasLocation"
+            text="Click and drag to move pin"
+            variant="readonly"
+            :icon="IconArrowsUpDownLeftRight"
+            selected
+          />
+        </div>
+
         <NoAddressDropdown
           v-if="searchIsdNull"
           class="location-step__no-address"
@@ -173,9 +175,9 @@ onBeforeMount(() => {
   grid-template-columns:
     [full-start] var(--spacing-l, 1.5rem)
     [inset-start] 1fr
-    [search-col-start] auto
-    [readonly-col-start] auto [readonly-col-end]
-    auto [search-col-end]
+    [search-col-start] 10ch
+    [readonly-col-start] 20ch [readonly-col-end]
+    10ch [search-col-end]
     1fr [inset-end]
     var(--spacing-l, 1.5rem) [full-end];
   grid-template-rows:
@@ -207,8 +209,11 @@ onBeforeMount(() => {
 }
 
 .location-step__search {
+  isolation: isolate;
   grid-column: search-col-start / search-col-end;
   grid-row: search-row-start / search-row-end;
+  display: grid;
+  place-content: center;
   width: 100%;
 }
 
@@ -224,9 +229,11 @@ onBeforeMount(() => {
 }
 
 .location-step__readonly {
+  display: grid;
   isolation: isolate;
   grid-column: readonly-col-start / readonly-col-end;
   grid-row: readonly-row-start / readonly-row-end;
+  justify-content: center;
 }
 
 .location-step__no-address {

@@ -1,6 +1,3 @@
-<!-- ABOUTME: Location-step map using @phila/phila-ui-map-core (MapLibre). Shows a
-     Philly default view until a location exists, then a draggable marker that
-     emits move({lat,lng}) on dragend; emits outOfBounds for non-Philly points. -->
 <script setup lang="ts">
 import { IconLocationDot } from '@phila/phila-ui-core/icons'
 import { Icon } from '@phila/phila-ui-core'
@@ -39,6 +36,7 @@ defineProps<{
 <style scoped>
 .location-image-card {
   display: grid;
+  min-height: 6rem;
   grid-template-areas:
     'icon street image'
     'empty cityzip image'
@@ -46,6 +44,8 @@ defineProps<{
   grid-template-columns: 2ch 2fr 1fr;
   grid-template-rows: auto minmax(1ch, auto) auto;
   column-gap: var(--spacing-xs, 0.5rem);
+  text-align: start;
+  padding: var(--spacing-s, 0.75rem) var(--spacing-m, 1rem);
 }
 
 .location-image-card__icon {
@@ -62,6 +62,7 @@ defineProps<{
 
 .location-image-card__source {
   grid-area: source;
+  padding-top: var(--spacing-2xs, 0.25rem);
 }
 
 .location-image-card__image {

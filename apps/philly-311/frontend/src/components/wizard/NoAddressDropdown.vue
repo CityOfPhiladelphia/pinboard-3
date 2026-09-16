@@ -2,13 +2,17 @@
      map shows the chosen point with a draggable pin; "Use my current location" uses
      browser geolocation. Stores a complete AisFeature; Next gated on in-Philly. -->
 <script setup lang="ts">
+import { useTemplateRef } from 'vue'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { Icon } from '@phila/phila-ui-core'
 import { IconRotateLeft, IconLocationDot, IconArrowRight } from '@phila/phila-ui-core/icons'
+import ManualAddressModal from './ManualAddressModal.vue'
 
 const emit = defineEmits<{
   (e: 'reset'): void
 }>()
+
+const manualAddressModal = useTemplateRef('manualAddressModal')
 </script>
 
 <template>
@@ -31,10 +35,12 @@ const emit = defineEmits<{
       size="extra-small"
       icon-right
       class="no-address__header_continue"
+      @click="manualAddressModal?.open()"
     />
     <PhilaButton :icon="IconRotateLeft" class="no-address__header_reset" @click="emit('reset')"
       >Reset search</PhilaButton
     >
+    <ManualAddressModal ref="manualAddressModal"></ManualAddressModal>
   </div>
 </template>
 

@@ -17,6 +17,7 @@ import { IconLocationCrosshairs, IconLocationDot } from '@phila/phila-ui-core/ic
 import type { AddressSource } from '@/pages/report/LocationStep.vue'
 import { getCurrentPosition } from '@/composables/useGeolocation'
 import type { AisFeature } from '@/types/wizard'
+import LocationImageCard from './LocationImageCard.vue'
 
 const addressSource = defineModel<AddressSource | undefined>('addressSource', {
   default: undefined,
@@ -130,6 +131,11 @@ async function useMyLocation() {
 function handleFocus() {
   open.value = true
 }
+
+function setLocToImage() {
+  store.setLocation(store.photo.location)
+  addressSource.value = 'image'
+}
 </script>
 
 <template>
@@ -140,7 +146,6 @@ function handleFocus() {
       :model-value="query"
       :placeholder="store.location?.streetAddress ?? 'Enter an address, intersection, or zipcode'"
       :leading-icon="IconLocationDot"
-      :error="error"
       @update:model-value="onQueryChange"
       @search="handleSearch"
     />
@@ -153,18 +158,23 @@ function handleFocus() {
         @click="useMyLocation"
       />
     </span>
-    <span
-      v-if="store.photo.location?.streetAddress"
+    <div
+      v-if="store.photo.location && !store.location && !suggestions.length"
       class="image_location"
-      :style="{ display: open ? 'flex' : 'none' }"
+      :style="{ display: open ? 'grid' : 'none' }"
     >
-      <LocationImageCard
-        :popup-text="'Possible address based on photo'"
-        :address="store.photo.location"
-        :img-src="store.photo.previewUrl ?? store.photo.mediaUrl"
-      />
-    </span>
+      <button class="image_location__button" @click="setLocToImage">
+        <LocationImageCard
+          :popup-text="'Possible address based on photo'"
+          :address="store.photo.location"
+          :img-src="store.photo.previewUrl ?? store.photo.mediaUrl"
+          show-city-zip
+        />
+      </button>
+    </div>
+
     <SearchSuggestions
+      v-else
       ref="suggestionsRef"
       :suggestions="suggestions"
       :icon="IconLocationDot"
@@ -177,17 +187,38 @@ function handleFocus() {
 
 <style scoped>
 .address-search {
-  z-index: 1;
-  border-radius: var(--border-radius-s, 0.5rem) var(--border-radius-s, 0.5rem) 0 0;
+  display: grid;
   background-color: var(--colors-White);
   box-shadow: var(--elevation-light-2);
+  border-radius: 2.4rem 2.4rem 2.4rem 2.4rem;
+  width: 100%;
 }
 
 .geolocate_button {
+  width: 100%;
   padding: var(--spacing-m, 1rem) var(--spacing-m, 1rem) var(--spacing-m, 1rem) 1rem;
 
   & > button > :is(.phila-button__stack) > :is(.phila-button__content) > :is(.phila-icon-core) {
     font-size: var(--Icon-Solid-Small-font-icon-solid-small-size, 1.125rem);
   }
+}
+
+.image_location {
+  place-content: center;
+  padding: 0 var(--spacing-l, 1.5rem) var(--spacing-l, 1.5rem) var(--spacing-l, 1.5rem);
+  width: 100%;
+}
+
+.image_location__button {
+  cursor: pointer;
+  display: grid;
+  background-color: transparent;
+  border-radius: var(--border-radius-l, 1rem);
+  border: 1px solid var(--Schemes-Border-low, #ccc);
+  background: var(--Schemes-Background, #fff);
+}
+
+.image_location__button:focus-within {
+  outline-color: var(--Schemes-Primary, #2b55db);
 }
 </style>

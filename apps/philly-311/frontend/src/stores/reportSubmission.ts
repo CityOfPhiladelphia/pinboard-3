@@ -16,10 +16,16 @@ import type { PinboardTypes } from '@pinboard/ui'
 import { decodePhotoInfo, encodePhotoInfo } from '@/utils/encodeDecodePhoto'
 import type { Service } from '@/types/app'
 
+interface Location extends Omit<AisFeature, 'lat' | 'lng'> {
+  unit: string
+  city: string
+  state: string
+}
+
 interface State {
   category: Service | undefined
   customFields: Record<string, string>
-  location: AisFeature | undefined
+  location: (AisFeature & Location) | undefined
   description: string
   photo: PhotoAsset
   contact: ContactInfo
@@ -46,10 +52,30 @@ interface T extends LocationQuery {
 
 type QueryParams = Pick<T, 'c' | 'cf' | 'l' | 'd' | 'p' | 'co' | 'pv' | 'sc' | 'ps'>
 
+const initialLocation = {
+  streetAddress: '',
+  unit: '',
+  lat: NaN,
+  lng: NaN,
+  city: 'Philadelphia',
+  state: 'PA',
+  zipCode: '',
+}
+
+export type LocationField = Exclude<keyof typeof initialLocation, 'lat' | 'lng'>
+
 const initial = (): State => ({
   category: undefined,
   customFields: {},
-  location: undefined,
+  location: {
+    streetAddress: '',
+    unit: '',
+    lat: NaN,
+    lng: NaN,
+    city: 'Philadelphia',
+    state: 'PA',
+    zipCode: '',
+  },
   description: '',
   photo: {
     dimensions: {
@@ -75,8 +101,10 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     setQuestion(field: string, value: string) {
       this.customFields[field] = value
     },
-    setLocation(location: AisFeature | undefined) {
+    setLocation(location: AisFeature | Location | undefined) {
       this.location = location
+        ? { ...initialLocation, ...this.location, ...location }
+        : initialLocation
     },
     setPhotoSuggestions(suggestions: PhotoSuggestion[]) {
       this.photoSuggestions = suggestions
