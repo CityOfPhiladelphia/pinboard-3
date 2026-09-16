@@ -153,6 +153,14 @@ describe('useReportSubmissionStore', () => {
     })
   })
 
+  describe('setShareContactInfo', () => {
+    it('sets shareContactInfo', () => {
+      const store = useReportSubmissionStore()
+      store.setShareContactInfo(true)
+      expect(store.shareContactInfo).toBe(true)
+    })
+  })
+
   describe('reset', () => {
     it('returns all fields to initial state', () => {
       const store = useReportSubmissionStore()
@@ -160,11 +168,13 @@ describe('useReportSubmissionStore', () => {
       store.setDescription('Big hole')
       store.setLocation({ address: '1234 Main St', lat: 39.95, lng: -75.16 })
       store.setPrivacy(true)
+      store.setShareContactInfo(true)
       store.reset()
       expect(store.category).toBeNull()
       expect(store.description).toBe('')
       expect(store.location).toBeNull()
       expect(store.publicVisibility).toBe(false)
+      expect(store.shareContactInfo).toBe(false)
     })
 
     it('clears customFields and contact', () => {
@@ -188,7 +198,12 @@ describe('useReportSubmissionStore', () => {
     it('returns the correct SubmitPayload for a happy path', () => {
       const store = useReportSubmissionStore()
       store.setCategory('Pothole Repair')
-      store.setLocation({ address: '1234 Main St', zipCode: '19107', lat: 39.95, lng: -75.16 })
+      store.setLocation({
+        streetAddress: '1234 Main St',
+        zipCode: '19107',
+        lat: 39.95,
+        lng: -75.16,
+      })
       store.setDescription('Large pothole near the bus stop')
 
       expect(store.payload()).toEqual({
@@ -292,6 +307,55 @@ describe('useReportSubmissionStore', () => {
       store.setQuestion('severity', 'high')
       expect(store.payload().customFields).toEqual({ severity: 'high' })
     })
+
+    it('omits contact when shareContactInfo is false, even with name and phone set', () => {
+      const store = useReportSubmissionStore()
+      store.setCategory('Pothole Repair')
+      store.setLocation({ address: '1234 Main St', lat: 39.95, lng: -75.16 })
+      store.setDescription('A problem')
+      store.setContact({ name: 'Jane Doe', phone: '2155550100' })
+      const result = store.payload()
+      expect(result).not.toHaveProperty('contact')
+    })
+
+    it('omits contact when shareContactInfo is true but name or phone is missing', () => {
+      const store = useReportSubmissionStore()
+      store.setCategory('Pothole Repair')
+      store.setLocation({ address: '1234 Main St', lat: 39.95, lng: -75.16 })
+      store.setDescription('A problem')
+      store.setShareContactInfo(true)
+      store.setContact({ name: 'Jane Doe' }) // no phone
+      const result = store.payload()
+      expect(result).not.toHaveProperty('contact')
+    })
+
+    it('includes contact split into firstName/lastName when shared', () => {
+      const store = useReportSubmissionStore()
+      store.setCategory('Pothole Repair')
+      store.setLocation({ address: '1234 Main St', lat: 39.95, lng: -75.16 })
+      store.setDescription('A problem')
+      store.setShareContactInfo(true)
+      store.setContact({ name: 'Jane Doe', phone: '2155550100' })
+      expect(store.payload().contact).toEqual({
+        firstName: 'Jane',
+        lastName: 'Doe',
+        phone: '2155550100',
+      })
+    })
+
+    it('sends an empty lastName for a single-word name — matches the mobile apps', () => {
+      const store = useReportSubmissionStore()
+      store.setCategory('Pothole Repair')
+      store.setLocation({ address: '1234 Main St', lat: 39.95, lng: -75.16 })
+      store.setDescription('A problem')
+      store.setShareContactInfo(true)
+      store.setContact({ name: 'Cher', phone: '2155550100' })
+      expect(store.payload().contact).toEqual({
+        firstName: 'Cher',
+        lastName: '',
+        phone: '2155550100',
+      })
+    })
   })
 
   it('stores and clears photo suggestions', () => {
@@ -319,6 +383,7 @@ describe('useReportSubmissionStore', () => {
       store.setDescription('Big hole in the road')
       store.setContact({ name: 'Darren' })
       store.setPrivacy(true)
+      store.setShareContactInfo(true)
       store.setPhoto({ mediaUrl: 'https://cdn.example.com/p.jpg' })
       store.recordSubmission({ id: 'a1' })
       expect(store.category).toBeNull()
@@ -327,8 +392,28 @@ describe('useReportSubmissionStore', () => {
       expect(store.description).toBe('')
       expect(store.contact).toEqual({})
       expect(store.publicVisibility).toBe(false)
+      expect(store.shareContactInfo).toBe(false)
       expect(store.photo).toBeNull()
       expect(store.photoSuggestions).toEqual([])
+    })
+  })
+
+  describe('shareContactInfo URL query round-trip', () => {
+    it('round-trips through stateToUrlQueryParams/urlQueryParamsToState', () => {
+      const store = useReportSubmissionStore()
+      store.setShareContactInfo(true)
+      const params = new URLSearchParams(store.stateToUrlQueryParams())
+      expect(params.get('sc')).toBe('t')
+
+      const fresh = useReportSubmissionStore()
+      fresh.reset()
+      fresh.urlQueryParamsToState(Object.fromEntries(params))
+      expect(fresh.shareContactInfo).toBe(true)
+    })
+
+    it('omits sc from the query string when false', () => {
+      const store = useReportSubmissionStore()
+      expect(store.stateToUrlQueryParams()).not.toContain('sc=')
     })
   })
 })

@@ -1,5 +1,6 @@
 <!-- ABOUTME: Wizard step 5 — review the report and submit it to the API.
-     Owns the Submit button; the shell hides Next on the last step. -->
+     Registers its Submit action into the shell's footer via useWizardSubmit,
+     in place of Next, rather than rendering its own button. -->
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -7,8 +8,8 @@ import { useAuth } from '@phila/sso-vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useAnonymousActivityStore } from '@/stores/anonymousActivity'
 import { useApi } from '@/composables/useApi'
+import { useWizardSubmit } from '@/composables/useWizardSubmit'
 import ReviewSummary from '@/components/wizard/ReviewSummary.vue'
-import { PhilaButton } from '@phila/phila-ui-button'
 import { Callout } from '@phila/phila-ui-callout'
 import type { SubmitResponse } from '@/types/wizard'
 import ReportStep from '@/components/wizard/ReportStep.vue'
@@ -51,10 +52,23 @@ async function submit() {
   if (!auth.isAuthenticated.value) anonymousActivity.markSubmitted(result.id)
   router.push('/report/confirmation')
 }
+
+useWizardSubmit(
+  computed(() => ({
+    label: submitting.value ? 'Submitting…' : 'Submit report',
+    disabled: !canSubmit.value,
+    onSubmit: submit,
+  })),
+)
 </script>
 
 <template>
-  <ReportStep :required="true" :error-active="false" :hide-required="true" :step-title="'Review'">
+  <ReportStep
+    :required="true"
+    :error-active="false"
+    :hide-required="true"
+    :step-title="'Review your report'"
+  >
     <template #step-content>
       <div class="review-step">
         <p class="review-step__intro">Check your report before submitting.</p>
@@ -68,16 +82,6 @@ async function submit() {
           role="alert"
           :message="errorMessage"
         />
-
-        <PhilaButton
-          type="button"
-          class="review-step__submit"
-          data-test="review-submit"
-          :disabled="!canSubmit"
-          @click="submit"
-        >
-          {{ submitting ? 'Submitting…' : 'Submit report' }}
-        </PhilaButton>
       </div>
     </template>
   </ReportStep>
@@ -96,9 +100,5 @@ async function submit() {
 
 .review-step__error {
   margin: var(--spacing-m, 1rem) 0;
-}
-
-.review-step__submit {
-  margin-top: var(--spacing-m, 1rem);
 }
 </style>
