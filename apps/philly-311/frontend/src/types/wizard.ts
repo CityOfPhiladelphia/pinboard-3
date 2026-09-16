@@ -11,6 +11,7 @@ export interface PhotoAsset {
   /** Local preview URL (object URL) for the thumbnail before submit. */
   previewUrl?: string
   dimensions: PinboardTypes.Dimensions
+  location?: AisFeature
 }
 
 export interface ContactInfo {
@@ -59,7 +60,7 @@ export interface ReportDraft {
   savedAt: string
   category: Service | undefined
   customFields: Record<string, string>
-  location: AisFeature | null
+  location: AisFeature | undefined
   description: string
   contact: ContactInfo
   publicVisibility: boolean

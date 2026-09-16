@@ -153,6 +153,17 @@ function handleFocus() {
         @click="useMyLocation"
       />
     </span>
+    <span
+      v-if="store.photo.location?.streetAddress"
+      class="image_location"
+      :style="{ display: open ? 'flex' : 'none' }"
+    >
+      <LocationImageCard
+        :popup-text="'Possible address based on photo'"
+        :address="store.photo.location"
+        :img-src="store.photo.previewUrl ?? store.photo.mediaUrl"
+      />
+    </span>
     <SearchSuggestions
       ref="suggestionsRef"
       :suggestions="suggestions"
@@ -174,13 +185,9 @@ function handleFocus() {
 
 .geolocate_button {
   padding: var(--spacing-m, 1rem) var(--spacing-m, 1rem) var(--spacing-m, 1rem) 1rem;
-}
 
-.geolocate_button
-  > button
-  > :is(.phila-button__stack)
-  > :is(.phila-button__content)
-  > :is(.phila-icon-core) {
-  font-size: var(--Icon-Solid-Small-font-icon-solid-small-size, 1.125rem);
+  & > button > :is(.phila-button__stack) > :is(.phila-button__content) > :is(.phila-icon-core) {
+    font-size: var(--Icon-Solid-Small-font-icon-solid-small-size, 1.125rem);
+  }
 }
 </style>

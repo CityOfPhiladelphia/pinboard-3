@@ -89,7 +89,7 @@ function getLocationFromImage(image: File) {
     if (loc.latitude) {
       reverseGeocode(loc.latitude, loc.longitude).then((response) => {
         if (response) {
-          store.setLocation(response)
+          store.setPhotoLocation(response)
         }
       })
     }

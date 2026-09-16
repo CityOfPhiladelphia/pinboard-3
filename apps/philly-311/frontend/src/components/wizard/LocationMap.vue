@@ -2,15 +2,15 @@
      Philly default view until a location exists, then a draggable marker that
      emits move({lat,lng}) on dragend; emits outOfBounds for non-Philly points. -->
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { Map as PhilaMap, MapMarker, MapPopup } from '@phila/phila-ui-map-core'
 import { MapIconTextPin } from '@pinboard/ui'
 import { useMapBounds, type MapVMComponent } from '@/composables/useMapBounds'
-import { IconLocationDot } from '@phila/phila-ui-core/icons'
-import { Icon } from '@phila/phila-ui-core'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import { serviceTypeColor } from '@/utils/serviceTypeMeta'
 import type { Service } from '@/types/app'
+import LocationImageCard from './LocationImageCard.vue'
+import type { AisFeature } from '@/types/wizard.ts'
 
 const PHILLY_DEFAULT: [number, number] = [-75.163789, 39.952335] // City Hall [lng, lat]
 
@@ -18,7 +18,7 @@ const props = defineProps<{
   location?: { lat: number; lng: number }
   popupText?: string
   serviceType?: Service
-  address?: string
+  address?: AisFeature
   imgSrc?: string
 }>()
 
@@ -27,7 +27,6 @@ const emit = defineEmits<{
   outOfBounds: []
 }>()
 
-const popupMessage = ref(props.popupText)
 const showPopup = ref(true)
 const draggingPin = ref(false)
 const philaMap = ref<MapVMComponent | null>(null)
@@ -37,13 +36,6 @@ const center = computed<[number, number]>(() =>
   props.location ? [props.location.lng, props.location.lat] : PHILLY_DEFAULT,
 )
 const zoom = computed(() => (props.location ? 16 : 12))
-
-watch(
-  () => props.popupText,
-  (newMessage) => {
-    popupMessage.value = newMessage
-  },
-)
 
 function onDragStart() {
   draggingPin.value = true
@@ -87,17 +79,12 @@ function togglePopup() {
         :offset="[30, -34]"
         max-width="21.25rem"
       >
-        <div class="location-map__popup-content">
-          <header>
-            <Icon class="location-map__popup-icon" :icon="IconLocationDot" size="small" />
-            <p class="location-map__popup-title" v-text="address" />
-          </header>
-          <p class="location-map__popup-subheader" v-text="popupMessage" />
-          <div
-            class="location-map__popup-image"
-            :style="{ 'background-image': `url(${imgSrc})` }"
-          />
-        </div>
+        <LocationImageCard
+          v-if="popupText && address"
+          :popup-text="popupText"
+          :address="address"
+          :img-src="imgSrc"
+        />
       </MapPopup>
     </PhilaMap>
   </div>

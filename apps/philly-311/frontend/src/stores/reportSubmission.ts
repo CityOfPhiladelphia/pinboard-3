@@ -19,7 +19,7 @@ import type { Service } from '@/types/app'
 interface State {
   category: Service | undefined
   customFields: Record<string, string>
-  location: AisFeature | null
+  location: AisFeature | undefined
   description: string
   photo: PhotoAsset
   contact: ContactInfo
@@ -45,7 +45,7 @@ type QueryParams = Pick<T, 'c' | 'cf' | 'l' | 'd' | 'p' | 'co' | 'pv' | 'ps'>
 const initial = (): State => ({
   category: undefined,
   customFields: {},
-  location: null,
+  location: undefined,
   description: '',
   photo: {
     dimensions: {
@@ -70,7 +70,7 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     setQuestion(field: string, value: string) {
       this.customFields[field] = value
     },
-    setLocation(location: AisFeature | null) {
+    setLocation(location: AisFeature | undefined) {
       this.location = location
     },
     setPhotoSuggestions(suggestions: PhotoSuggestion[]) {
@@ -90,6 +90,9 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     },
     setPhotoDimensions(dimensions: PinboardTypes.Dimensions) {
       this.photo.dimensions = dimensions
+    },
+    setPhotoLocation(location: AisFeature) {
+      this.photo.location = location
     },
     setDescription(description: string) {
       this.description = description

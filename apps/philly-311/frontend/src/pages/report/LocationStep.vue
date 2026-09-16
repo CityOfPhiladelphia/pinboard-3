@@ -2,7 +2,7 @@
      map shows the chosen point with a draggable pin; "Use my current location" uses
      browser geolocation. Stores a complete AisFeature; Next gated on in-Philly. -->
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { reverseGeocode } from '@/composables/useAis'
 import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
@@ -26,7 +26,7 @@ const store = useReportSubmissionStore()
 const errorMessage = ref('')
 const locationError = ref('')
 const currentSearch = ref<Exclude<AddressSource, 'image'> | null>(null)
-const addressSource = ref<AddressSource | undefined>(store.photo.mediaUrl ? 'image' : undefined)
+const addressSource = ref<AddressSource | undefined>('image')
 const searchReturnedNull = ref(false)
 
 const searchIsdNull = computed(() => {
@@ -50,10 +50,10 @@ const mapLocation = computed(() =>
 
 const locationFrom = computed(() => {
   const messages: Record<AddressSource, string> = {
-    image: 'Possible address from photo',
-    search: 'Address search',
-    geoLocation: 'Geolocation',
-    mapPin: 'Map pin location',
+    image: 'Possible address based on photo',
+    search: 'From address search',
+    geoLocation: 'Possible address based on geolocation',
+    mapPin: 'Nearest address to pin location',
   }
   return !addressSource.value ? addressSource.value : messages[addressSource.value]
 })
@@ -89,7 +89,7 @@ async function onMove({ lat, lng }: { lat: number; lng: number }) {
 }
 
 function resetLocation() {
-  store.setLocation(null)
+  store.setLocation(undefined)
   addressSource.value = undefined
 }
 
@@ -101,6 +101,13 @@ function handleSearch(result: AisFeature | null) {
     searchReturnedNull.value = true
   }
 }
+
+onBeforeMount(() => {
+  if (store.photo.location) {
+    store.setLocation(store.photo.location)
+    addressSource.value = 'image'
+  }
+})
 </script>
 
 <template>
@@ -121,7 +128,7 @@ function handleSearch(result: AisFeature | null) {
           :location="mapLocation"
           :popup-text="locationFrom"
           :service-type="store.category"
-          :address="store.location?.streetAddress"
+          :address="store.location"
           :img-src="store.photo.mediaUrl"
           @move="onMove"
           @out-of-bounds="onOutOfBounds"
@@ -211,7 +218,7 @@ function handleSearch(result: AisFeature | null) {
   grid-row: readonly-row-start / readonly-row-end;
   width: fit-content;
 
-  & > * :is(.phila-icon-core) {
+  & > :is(.phila-button__stack) > :is(.phila-button__content) > :is(.phila-icon-core) {
     font-size: var(--Icon-Solid-ExtraSmall-font-icon-solid-xs-size, 1rem);
   }
 }
