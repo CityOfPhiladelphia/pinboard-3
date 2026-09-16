@@ -94,7 +94,7 @@ defineEmits<{ edit: [] }>()
   border-top: 1px solid var(--Schemes-Border-low, #ccc);
 }
 .review-section-card__content {
-  padding: 0 var(--spacing-l, 1.5rem) var(--spacing-l, 1.5rem);
+  padding: var(--spacing-l, 1.5rem);
   width: 100%;
   box-sizing: border-box;
 }

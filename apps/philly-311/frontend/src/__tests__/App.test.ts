@@ -6,7 +6,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { defineComponent, h, ref, computed } from 'vue'
 import { mount, RouterLinkStub } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
+import { createPinia, setActivePinia } from 'pinia'
 import App from '../App.vue'
+import { useReportSubmissionStore } from '@/stores/reportSubmission'
 
 vi.mock('@pinboard/ui', () => ({
   PinboardShell: defineComponent({
@@ -65,6 +67,7 @@ async function mountApp(initialPath = '/') {
 }
 
 beforeEach(() => {
+  setActivePinia(createPinia())
   sessionStorage.clear()
   signIn.mockClear()
   signOut.mockClear()
@@ -110,12 +113,27 @@ describe('App', () => {
   })
 
   it('starts the sso-vue login flow and records the current route as the post-login redirect when Login / Sign up is triggered', async () => {
+    const store = useReportSubmissionStore()
     const w = await mountApp('/report/location')
     const shell = w.findComponent({ name: 'PinboardShell' })
     const links = shell.props('links') as TestNavLink[]
     links.find((link) => link.text === 'Login / Sign up')?.onClick?.()
     expect(signIn).toHaveBeenCalledOnce()
-    expect(sessionStorage.getItem('auth:redirectTo')).toBe('/report/location')
+    expect(sessionStorage.getItem('auth:redirectTo')).toBe(
+      `/report/location?${store.stateToUrlQueryParams()}`,
+    )
+  })
+
+  it('carries the wizard state in the redirect so it survives the SSO round-trip', async () => {
+    const store = useReportSubmissionStore()
+    store.setCategory('Graffiti')
+    const w = await mountApp('/report/location')
+    const shell = w.findComponent({ name: 'PinboardShell' })
+    const links = shell.props('links') as TestNavLink[]
+    links.find((link) => link.text === 'Login / Sign up')?.onClick?.()
+    expect(sessionStorage.getItem('auth:redirectTo')).toBe(
+      `/report/location?${store.stateToUrlQueryParams()}`,
+    )
   })
 
   it('does not populate the mobile-nav slot, so no burger menu renders', async () => {

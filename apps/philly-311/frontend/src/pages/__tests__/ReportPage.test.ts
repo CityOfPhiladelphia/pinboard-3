@@ -1,7 +1,8 @@
 // ABOUTME: Tests for ReportPage wizard shell — stepper rendering, contextual
 // ABOUTME: nav controls (Exit/Skip/Back), Next advancing to the next step, an
 // ABOUTME: always-enabled Next that surfaces errors on an invalid attempt,
-// ABOUTME: step-registered nav handlers intercepting Back/Next, and Exit
+// ABOUTME: step-registered nav handlers intercepting Back/Next, a step-
+// ABOUTME: registered Submit action replacing Next on the last step, and Exit
 // ABOUTME: saving a draft (with/without a photo) or discarding via ExitDialog.
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
@@ -14,6 +15,7 @@ import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useMyCasesStore } from '@/stores/myCases'
 import { WIZARD_CAN_ADVANCE_KEY, WIZARD_SHOW_ERRORS_KEY } from '@/composables/useWizardValidity'
 import { WIZARD_NAV_KEY, type WizardNavHandlers } from '@/composables/useWizardNav'
+import { WIZARD_SUBMIT_KEY, type WizardSubmitHandler } from '@/composables/useWizardSubmit'
 
 const Stub = (text: string) =>
   defineComponent({ setup: () => () => text, template: `<div>${text}</div>` })
@@ -361,5 +363,79 @@ describe('ReportPage shell', () => {
     await flushPromises()
 
     expect(w.text()).toContain('image-step')
+  })
+
+  it('shows a Submit button instead of Next on the review step, wired to the registered handler', async () => {
+    const onSubmit = vi.fn()
+
+    const ReviewStub = defineComponent({
+      setup() {
+        const submit = inject<Ref<WizardSubmitHandler | null>>(WIZARD_SUBMIT_KEY)
+        if (submit) submit.value = { label: 'Submit report', disabled: false, onSubmit }
+        return {}
+      },
+      template: '<div>review-step</div>',
+    })
+
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        {
+          path: '/report',
+          component: ReportPage,
+          children: [
+            { path: '', component: Stub('image-step') },
+            { path: 'review', component: ReviewStub },
+          ],
+        },
+      ],
+    })
+
+    router.push('/report/review')
+    await router.isReady()
+    const w = mount(ReportPage, { global: { plugins: [router] } })
+    await flushPromises()
+
+    expect(w.find('[data-test="wizard-next"]').exists()).toBe(false)
+    const submitBtn = w.find('[data-test="wizard-submit"]')
+    expect(submitBtn.text()).toBe('Submit report')
+    expect(submitBtn.attributes('disabled')).toBeUndefined()
+
+    await submitBtn.trigger('click')
+    expect(onSubmit).toHaveBeenCalledTimes(1)
+  })
+
+  it('disables the Submit button and reflects its label while the review step reports it as disabled', async () => {
+    const ReviewStub = defineComponent({
+      setup() {
+        const submit = inject<Ref<WizardSubmitHandler | null>>(WIZARD_SUBMIT_KEY)
+        if (submit) submit.value = { label: 'Submitting…', disabled: true, onSubmit: () => {} }
+        return {}
+      },
+      template: '<div>review-step</div>',
+    })
+
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        {
+          path: '/report',
+          component: ReportPage,
+          children: [
+            { path: '', component: Stub('image-step') },
+            { path: 'review', component: ReviewStub },
+          ],
+        },
+      ],
+    })
+
+    router.push('/report/review')
+    await router.isReady()
+    const w = mount(ReportPage, { global: { plugins: [router] } })
+    await flushPromises()
+
+    const submitBtn = w.find('[data-test="wizard-submit"]')
+    expect(submitBtn.text()).toBe('Submitting…')
+    expect(submitBtn.attributes('disabled')).toBeDefined()
   })
 })

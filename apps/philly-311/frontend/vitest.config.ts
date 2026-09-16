@@ -25,10 +25,16 @@ export default defineConfig({
     // side-effect `import './index.css'`. Left externalized, Vitest loads them via
     // Node's own resolver, which can't handle a bare .css import; inlining routes
     // it through Vite's transform instead, which strips/no-ops CSS imports like it
-    // does for the real app build.
+    // does for the real app build. @phila/phila-ui-bottom-sheet needs the same
+    // treatment: left externalized, its own internal import of @phila/phila-ui-core
+    // resolves via Node too, hitting the same unhandled .css import one level down.
     server: {
       deps: {
-        inline: ['@phila/phila-ui-core', '@phila/phila-ui-breadcrumbs'],
+        inline: [
+          '@phila/phila-ui-core',
+          '@phila/phila-ui-breadcrumbs',
+          '@phila/phila-ui-bottom-sheet',
+        ],
       },
     },
   },

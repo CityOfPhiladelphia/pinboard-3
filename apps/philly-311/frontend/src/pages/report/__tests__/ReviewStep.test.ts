@@ -1,6 +1,8 @@
 // ABOUTME: Tests for ReviewStep — submit gating, lazy-body useApi wiring, error
 // ABOUTME: display, success recording + navigation, and marking anonymousActivity
 // ABOUTME: on an anonymous (not signed-in) submit. useApi and router are mocked.
+// ABOUTME: The Submit button itself lives in ReportPage's footer (useWizardSubmit),
+// ABOUTME: so it's exercised here via the injected handler, not a rendered button.
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { ref } from 'vue'
@@ -9,6 +11,7 @@ import { useAuth } from '@phila/sso-vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useAnonymousActivityStore } from '@/stores/anonymousActivity'
 import { ApiError } from '@/composables/useApiError'
+import { WIZARD_SUBMIT_KEY, type WizardSubmitHandler } from '@/composables/useWizardSubmit'
 
 vi.mock('@/components/wizard/ReviewSummary.vue', () => ({
   default: { name: 'ReviewSummary', template: '<div data-testid="review-summary" />' },
@@ -24,6 +27,12 @@ const useApiMock = vi.fn(() => ({ fetchData, error: apiError, isLoading }))
 vi.mock('@/composables/useApi', () => ({ useApi: (...args: unknown[]) => useApiMock(...args) }))
 
 import ReviewStep from '../ReviewStep.vue'
+
+function mountStep() {
+  const submit = ref<WizardSubmitHandler | null>(null)
+  const w = mount(ReviewStep, { global: { provide: { [WIZARD_SUBMIT_KEY]: submit } } })
+  return { w, submit }
+}
 
 function fillStore() {
   const store = useReportSubmissionStore()
@@ -47,7 +56,7 @@ beforeEach(() => {
 describe('ReviewStep - setup and gating', () => {
   it('creates the submit api during setup, not in the click handler', () => {
     fillStore()
-    mount(ReviewStep)
+    mountStep()
     expect(useApiMock).toHaveBeenCalledTimes(1)
     expect(useApiMock).toHaveBeenCalledWith(
       expect.objectContaining({ url: '/private/key/submit', method: 'POST' }),
@@ -55,31 +64,30 @@ describe('ReviewStep - setup and gating', () => {
   })
 
   it('titles the step "Review your report" with no required marker, per Figma', () => {
-    const w = mount(ReviewStep)
+    const { w } = mountStep()
     expect(w.find('.report-step__text').text()).toBe('Review your report')
     expect(w.find('.report-step__required').exists()).toBe(false)
   })
 
   it('renders the summary and disables Submit while the store is incomplete', () => {
-    const w = mount(ReviewStep)
+    const { w, submit } = mountStep()
     expect(w.find('[data-testid="review-summary"]').exists()).toBe(true)
-    expect(w.find('[data-test="review-submit"]').attributes('disabled')).toBeDefined()
+    expect(submit.value?.disabled).toBe(true)
   })
 
   it('enables Submit when category, location, and description are set', () => {
     fillStore()
-    const w = mount(ReviewStep)
-    expect(w.find('[data-test="review-submit"]').attributes('disabled')).toBeUndefined()
+    const { submit } = mountStep()
+    expect(submit.value?.disabled).toBe(false)
   })
 
   it('disables Submit and relabels while loading', async () => {
     fillStore()
-    const w = mount(ReviewStep)
+    const { submit } = mountStep()
     isLoading.value = true
     await flushPromises()
-    const btn = w.find('[data-test="review-submit"]')
-    expect(btn.attributes('disabled')).toBeDefined()
-    expect(btn.text()).toBe('Submitting…')
+    expect(submit.value?.disabled).toBe(true)
+    expect(submit.value?.label).toBe('Submitting…')
   })
 })
 
@@ -90,8 +98,8 @@ describe('ReviewStep - submit', () => {
     // the store, so payload() would throw afterwards.
     const expected = store.payload()
     fetchData.mockResolvedValue({ id: 'a1' })
-    const w = mount(ReviewStep)
-    await w.find('[data-test="review-submit"]').trigger('click')
+    const { submit } = mountStep()
+    submit.value?.onSubmit()
     await flushPromises()
     const opts = useApiMock.mock.calls[0][0] as { body: unknown }
     expect(opts.body).toEqual(expected)
@@ -101,8 +109,8 @@ describe('ReviewStep - submit', () => {
   it('records the submission and navigates to confirmation on success', async () => {
     const store = fillStore()
     fetchData.mockResolvedValue({ id: 'a1', caseNumber: '311-0042' })
-    const w = mount(ReviewStep)
-    await w.find('[data-test="review-submit"]').trigger('click')
+    const { submit } = mountStep()
+    submit.value?.onSubmit()
     await flushPromises()
     expect(store.submitted).toEqual({ id: 'a1', caseNumber: '311-0042' })
     expect(store.category).toBeNull()
@@ -112,8 +120,8 @@ describe('ReviewStep - submit', () => {
   it('records the submitted report in anonymousActivity when not signed in — the API has no account to check upvote-ownership against', async () => {
     fillStore()
     fetchData.mockResolvedValue({ id: 'a1', caseNumber: '311-0042' })
-    const w = mount(ReviewStep)
-    await w.find('[data-test="review-submit"]').trigger('click')
+    const { submit } = mountStep()
+    submit.value?.onSubmit()
     await flushPromises()
     expect(useAnonymousActivityStore().isSubmitted('a1')).toBe(true)
   })
@@ -122,8 +130,8 @@ describe('ReviewStep - submit', () => {
     useAuth().isAuthenticated.value = true
     fillStore()
     fetchData.mockResolvedValue({ id: 'a1', caseNumber: '311-0042' })
-    const w = mount(ReviewStep)
-    await w.find('[data-test="review-submit"]').trigger('click')
+    const { submit } = mountStep()
+    submit.value?.onSubmit()
     await flushPromises()
     expect(useAnonymousActivityStore().isSubmitted('a1')).toBe(false)
   })
@@ -137,8 +145,8 @@ describe('ReviewStep - submit', () => {
       )
       return null
     })
-    const w = mount(ReviewStep)
-    await w.find('[data-test="review-submit"]').trigger('click')
+    const { w, submit } = mountStep()
+    submit.value?.onSubmit()
     await flushPromises()
     const alert = w.find('[role="alert"]')
     expect(alert.text()).toContain('latitude must be within Philadelphia bounds')
@@ -153,8 +161,8 @@ describe('ReviewStep - submit', () => {
       apiError.value = new ApiError(0, '')
       return null
     })
-    const w = mount(ReviewStep)
-    await w.find('[data-test="review-submit"]').trigger('click')
+    const { w, submit } = mountStep()
+    submit.value?.onSubmit()
     await flushPromises()
     expect(w.find('[role="alert"]').text()).toBe(
       'Something went wrong submitting your report. Please try again.',
@@ -167,13 +175,13 @@ describe('ReviewStep - submit', () => {
       apiError.value = new ApiError(400, 'boom')
       return null
     })
-    const w = mount(ReviewStep)
-    await w.find('[data-test="review-submit"]').trigger('click')
+    const { w, submit } = mountStep()
+    submit.value?.onSubmit()
     await flushPromises()
     expect(w.find('[role="alert"]').exists()).toBe(true)
     apiError.value = null
     fetchData.mockResolvedValue({ id: 'a1' })
-    await w.find('[data-test="review-submit"]').trigger('click')
+    submit.value?.onSubmit()
     await flushPromises()
     expect(w.find('[role="alert"]').exists()).toBe(false)
   })
@@ -181,9 +189,9 @@ describe('ReviewStep - submit', () => {
   it('ignores re-entrant clicks while a submit is in flight', async () => {
     fillStore()
     fetchData.mockResolvedValue({ id: 'a1' })
-    const w = mount(ReviewStep)
+    const { submit } = mountStep()
     isLoading.value = true
-    await w.find('[data-test="review-submit"]').trigger('click')
+    submit.value?.onSubmit()
     await flushPromises()
     expect(fetchData).not.toHaveBeenCalled()
   })
@@ -193,8 +201,8 @@ describe('ReviewStep - submit', () => {
     vi.spyOn(store, 'payload').mockImplementation(() => {
       throw new Error('location is required')
     })
-    const w = mount(ReviewStep)
-    await w.find('[data-test="review-submit"]').trigger('click')
+    const { w, submit } = mountStep()
+    submit.value?.onSubmit()
     await flushPromises()
     expect(w.find('[role="alert"]').text()).toBe('location is required')
     expect(fetchData).not.toHaveBeenCalled()

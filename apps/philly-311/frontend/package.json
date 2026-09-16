@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@phila/phila-ui-app-header": "catalog:",
+    "@phila/phila-ui-bottom-sheet": "catalog:",
     "@phila/phila-ui-breadcrumbs": "catalog:",
     "@phila/phila-ui-button": "catalog:",
     "@phila/phila-ui-callout": "catalog:",

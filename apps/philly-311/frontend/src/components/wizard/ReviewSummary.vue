@@ -132,11 +132,11 @@ const locationLines = computed(() => {
           />
         </div>
         <div class="review-summary__location-text">
-          <p v-if="locationLines.street" class="review-summary__location-street">
+          <div v-if="locationLines.street" class="review-summary__location-street">
             {{ locationLines.street }}
-          </p>
-          <p class="review-summary__location-line">{{ locationLines.cityStateZip }}</p>
-          <p class="review-summary__location-line">{{ locationLines.coords }}</p>
+          </div>
+          <div class="review-summary__location-line">{{ locationLines.cityStateZip }}</div>
+          <div class="review-summary__location-line">{{ locationLines.coords }}</div>
         </div>
       </div>
       <p v-else class="review-summary__value">—</p>
@@ -194,8 +194,12 @@ const locationLines = computed(() => {
   align-items: center;
   gap: var(--spacing-l, 1.5rem);
   width: 100%;
-  padding: var(--spacing-m, 1rem);
-  background: var(--Schemes-On-Primary, #f5f5f5);
+  /* No padding, per Figma — the map sits flush against this background
+   * (matching border-radius on both), reading as one connected widget.
+   * Literal color: --Schemes-On-Primary (Figma's token for this fill)
+   * resolves to white in @phila/phila-ui-core, not grey — no shipped
+   * variable matches Figma's actual #f5f5f5 here. */
+  background: #f5f5f5;
   border-radius: var(--border-radius-s, 8px);
   box-sizing: border-box;
 }
@@ -211,12 +215,27 @@ const locationLines = computed(() => {
   flex: 1 1 0;
   min-width: 0;
 }
-.review-summary__location-street {
-  margin: 0;
-  font-weight: 600;
+
+/* The map's fixed 222px width + flex-shrink:0 never gives up room to the
+ * address text, so on a narrow phone the row either overflows or squeezes
+ * the text illegibly thin. Stacking the map above the text avoids both. */
+@media (max-width: 768px) {
+  .review-summary__location {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .review-summary__map {
+    width: 100%;
+  }
+  /* Stacked, the text has nothing to its left (the map sits above it, not
+   * beside it) or below (it's the last element) — desktop needs neither,
+   * since the map and the card's own edge fill those roles instead. */
+  .review-summary__location-text {
+    padding: 0 0 var(--spacing-m, 1rem) var(--spacing-m, 1rem);
+  }
 }
-.review-summary__location-line {
-  margin: 0;
+.review-summary__location-street {
+  font-weight: 600;
 }
 .review-summary__details {
   display: flex;

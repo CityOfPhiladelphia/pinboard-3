@@ -56,6 +56,15 @@ vi.mock('vue-router', () => ({
   useRoute: () => ({ fullPath: '/report/review' }),
 }))
 
+// Fixed to desktop so these tests exercise the Modal branch (matching the
+// .modal-stub assertions below) rather than the BottomSheet one — same
+// pattern LandingPage.test.ts uses to avoid a real matchMedia call in jsdom.
+vi.mock('@pinboard/ui', () => ({
+  PinboardComposables: {
+    useIsMobile: () => ref(false),
+  },
+}))
+
 function open(w: ReturnType<typeof mount>) {
   return (w.vm as unknown as { open: () => void }).open()
 }
@@ -105,11 +114,25 @@ describe('VisibilityContactModal - contact info', () => {
   })
 
   it('sign-in row stores a redirect and calls auth.signIn()', async () => {
+    const store = useReportSubmissionStore()
     const w = mount(VisibilityContactModal)
     await w.find('input[type="checkbox"]').setValue(true)
     await w.find('.vc-modal__signin').trigger('click')
-    expect(sessionStorage.getItem('auth:redirectTo')).toBe('/report/review')
+    expect(sessionStorage.getItem('auth:redirectTo')).toBe(
+      `/report/review?${store.stateToUrlQueryParams()}`,
+    )
     expect(signIn).toHaveBeenCalledTimes(1)
+  })
+
+  it('sign-in redirect carries the wizard state so it survives the SSO round-trip', async () => {
+    const store = useReportSubmissionStore()
+    store.setCategory('Graffiti')
+    const w = mount(VisibilityContactModal)
+    await w.find('input[type="checkbox"]').setValue(true)
+    await w.find('.vc-modal__signin').trigger('click')
+    expect(sessionStorage.getItem('auth:redirectTo')).toBe(
+      `/report/review?${store.stateToUrlQueryParams()}`,
+    )
   })
 
   it('blocks Apply with an error when sharing is on but name is blank', async () => {
