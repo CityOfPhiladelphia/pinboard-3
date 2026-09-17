@@ -45,7 +45,9 @@ watch([locationError, wizardError], ([newLocationError, newWizardError]) => {
 })
 
 const mapLocation = computed(() =>
-  store.location ? { lat: store.location.lat, lng: store.location.lng } : undefined,
+  store.location?.lat && store.location.lng
+    ? { lat: store.location.lat, lng: store.location.lng }
+    : undefined,
 )
 
 const locationFrom = computed(() => {
@@ -58,9 +60,7 @@ const locationFrom = computed(() => {
   return !addressSource.value ? addressSource.value : messages[addressSource.value]
 })
 
-const hasLocation = computed(
-  () => store.location?.streetAddress || (store.location?.lat && store.location.lng),
-)
+const hasLocation = computed(() => store.location?.lat && store.location.lng)
 
 function onOutOfBounds() {
   locationError.value = '311 only handles requests in Philadelphia.'

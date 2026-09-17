@@ -15,7 +15,6 @@ import type { LocationQuery } from 'vue-router'
 import type { PinboardTypes } from '@pinboard/ui'
 import { decodePhotoInfo, encodePhotoInfo } from '@/utils/encodeDecodePhoto'
 import type { Service } from '@/types/app'
-import { DEFAULT_CENTER } from '@/utils/geoDefaults'
 
 interface Location extends Omit<AisFeature, 'lat' | 'lng'> {
   unit: string
@@ -54,12 +53,13 @@ interface StateFields extends LocationQuery {
 type QueryParams = Pick<StateFields, 'c' | 'cf' | 'l' | 'd' | 'p' | 'co' | 'pv' | 'sc' | 'ps'>
 
 const initialLocation = {
-  ...DEFAULT_CENTER,
   streetAddress: '',
   unit: '',
   city: 'Philadelphia',
   state: 'PA',
   zipCode: '',
+  lat: NaN,
+  lng: NaN,
 }
 
 export type LocationField = Exclude<keyof typeof initialLocation, 'lat' | 'lng'>

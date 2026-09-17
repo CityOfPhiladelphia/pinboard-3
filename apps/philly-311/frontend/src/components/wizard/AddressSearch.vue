@@ -159,7 +159,9 @@ function setLocToImage() {
       />
     </span>
     <div
-      v-if="store.photo.location && !store.location && !suggestions.length"
+      v-if="
+        store.photo.location && !(store.location?.lat && store.location.lng) && !suggestions.length
+      "
       class="image_location"
       :style="{ display: open ? 'grid' : 'none' }"
     >
