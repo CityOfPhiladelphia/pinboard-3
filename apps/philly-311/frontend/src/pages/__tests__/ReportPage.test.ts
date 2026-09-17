@@ -108,9 +108,10 @@ describe('ReportPage shell', () => {
     submission.setQuestion('Q1', 'Yes')
     submission.setDescription('Trash on the corner')
     submission.setPrivacy(true)
+    const backSpy = vi.spyOn(router, 'back')
 
     await w.find('[data-test="wizard-exit"]').trigger('click')
-    await w.findComponent(ExitDialog).vm.$emit('save')
+    await w.find('[data-test="exit-save"]').trigger('click')
     await flushPromises()
 
     const myCases = useMyCasesStore()
@@ -125,6 +126,9 @@ describe('ReportPage shell', () => {
     expect(submission.customFields).toEqual({})
     expect(submission.description).toBe('')
     expect(router.currentRoute.value.path).toBe('/')
+    // Same regression as the discard test below — save's own router.push('/')
+    // must not race against the exitOpen watcher's compensating back().
+    expect(backSpy).not.toHaveBeenCalled()
   })
 
   it('includes mediaUrl in the saved draft when a photo was uploaded', async () => {
@@ -140,7 +144,7 @@ describe('ReportPage shell', () => {
     submission.setPhoto({ mediaUrl: 'https://cdn.example/photo.jpg' })
 
     await w.find('[data-test="wizard-exit"]').trigger('click')
-    await w.findComponent(ExitDialog).vm.$emit('save')
+    await w.find('[data-test="exit-save"]').trigger('click')
     await flushPromises()
 
     expect(useMyCasesStore().drafts[0].mediaUrl).toBe('https://cdn.example/photo.jpg')
@@ -155,14 +159,21 @@ describe('ReportPage shell', () => {
 
     const submission = useReportSubmissionStore()
     submission.setCategory('Illegal Dumping')
+    const backSpy = vi.spyOn(router, 'back')
 
     await w.find('[data-test="wizard-exit"]').trigger('click')
-    await w.findComponent(ExitDialog).vm.$emit('discard')
+    await w.find('[data-test="exit-discard"]').trigger('click')
     await flushPromises()
 
     expect(useMyCasesStore().drafts).toHaveLength(0)
     expect(submission.category).toBeNull()
     expect(router.currentRoute.value.path).toBe('/')
+    // Regression: the exitOpen watcher's compensating back() (meant to undo
+    // the query-string push from opening the dialog, on Cancel/Escape) must
+    // not also fire here. In production it raced against this navigation,
+    // and since store.reset() had already run by the time it fired,
+    // wizardGuard redirected it to the start of the wizard instead of home.
+    expect(backSpy).not.toHaveBeenCalled()
   })
 
   it('Next advances to the next step', async () => {
