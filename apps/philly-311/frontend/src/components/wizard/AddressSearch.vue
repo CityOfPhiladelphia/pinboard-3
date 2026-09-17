@@ -180,6 +180,7 @@ function setLocToImage() {
       ref="suggestionsRef"
       :suggestions="suggestions"
       :icon="IconLocationDot"
+      search-shape="pill"
       :style="{ border: 'none' }"
       @select="onSelect"
       @dismiss="onDismiss"

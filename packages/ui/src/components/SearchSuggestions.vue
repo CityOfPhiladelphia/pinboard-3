@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Icon, type IconComponent } from '@phila/phila-ui-core'
 import { IconClose } from '@phila/phila-ui-core/icons'
 
@@ -9,6 +9,7 @@ const props = defineProps<{
   removable?: boolean
   removeLabel?: string
   icon?: IconComponent
+  searchShape?: 'rectangle' | 'pill'
 }>()
 
 const emit = defineEmits<{
@@ -26,6 +27,15 @@ watch(
     activeIndex.value = -1
   }
 )
+
+const cornerShape = computed(() => {
+  return {
+    'border-radius':
+      props.searchShape === 'pill'
+        ? '0 0 2.4rem 2.4rem'
+        : '0 0 var(--border-radius-s, 4px) var(--border-radius-s, 4px)',
+  }
+})
 
 function focusItem(index: number) {
   const items = listRef.value?.querySelectorAll<HTMLElement>('.search-suggestion')
@@ -81,32 +91,34 @@ defineExpose({ focusFirst })
 
 <template>
   <div v-if="suggestions.length" class="search-suggestions-anchor">
-    <ul ref="listRef" class="search-suggestions" role="listbox" @keydown="handleKeydown">
-      <li v-if="heading" class="search-suggestions-heading" role="presentation">
-        {{ heading }}
-      </li>
-      <li
-        v-for="(suggestion, index) in suggestions"
-        :key="suggestion"
-        class="search-suggestion"
-        :class="{ 'search-suggestion--active': index === activeIndex }"
-        role="option"
-        tabindex="0"
-        @click="emit('select', suggestion)"
-      >
-        <Icon v-if="icon" :icon="icon" inline decorative></Icon>
-        <span class="search-suggestion-text has-text-label-default">{{ suggestion }}</span>
-        <button
-          v-if="removable"
-          type="button"
-          class="search-suggestion-remove"
-          :aria-label="removeLabel"
-          @click.stop="emit('remove', suggestion)"
+    <div class="search-suggestions-container" :style="cornerShape">
+      <ul ref="listRef" class="search-suggestions" role="listbox" @keydown="handleKeydown">
+        <li v-if="heading" class="search-suggestions-heading" role="presentation">
+          {{ heading }}
+        </li>
+        <li
+          v-for="(suggestion, index) in suggestions"
+          :key="suggestion"
+          class="search-suggestion"
+          :class="{ 'search-suggestion--active': index === activeIndex }"
+          role="option"
+          tabindex="0"
+          @click="emit('select', suggestion)"
         >
-          <Icon :icon="IconClose" decorative />
-        </button>
-      </li>
-    </ul>
+          <Icon v-if="icon" :icon="icon" inline decorative></Icon>
+          <span class="search-suggestion-text has-text-label-default">{{ suggestion }}</span>
+          <button
+            v-if="removable"
+            type="button"
+            class="search-suggestion-remove"
+            :aria-label="removeLabel"
+            @click.stop="emit('remove', suggestion)"
+          >
+            <Icon :icon="IconClose" decorative />
+          </button>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -117,22 +129,27 @@ defineExpose({ focusFirst })
   height: 0;
 }
 
-.search-suggestions {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.search-suggestions-container {
+  width: 100%;
+  z-index: -1;
   position: absolute;
-  top: 0;
+  top: -2.07rem;
   left: 0;
   right: 0;
+  padding-right: 5rem;
   background-color: var(--Schemes-Background, #fff);
-  border: 0px solid var(--Schemes-Border-low, #ccc);
-  border-top: none;
-  border-radius: 0 0 var(--border-radius-s, 4px) var(--border-radius-s, 4px);
+  border: 0px dotted var(--Schemes-Border-low, #ccc);
   box-shadow: var(--elevation-light-2);
   clip-path: inset(0 -8px -8px -8px);
   max-height: 20ch;
-  overflow-y: auto;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+.search-suggestions {
+  margin: 0;
+  padding: 0 1.05rem;
+  list-style: none;
 }
 
 .search-suggestion {

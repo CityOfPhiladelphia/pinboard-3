@@ -175,9 +175,7 @@ onBeforeMount(() => {
   grid-template-columns:
     [full-start] var(--spacing-l, 1.5rem)
     [inset-start] 1fr
-    [search-col-start] 10ch
-    [readonly-col-start] 20ch [readonly-col-end]
-    10ch [search-col-end]
+    [search-col-start] auto [search-col-end]
     1fr [inset-end]
     var(--spacing-l, 1.5rem) [full-end];
   grid-template-rows:
@@ -231,7 +229,7 @@ onBeforeMount(() => {
 .location-step__readonly {
   display: grid;
   isolation: isolate;
-  grid-column: readonly-col-start / readonly-col-end;
+  grid-column: search-col-start / search-col-end;
   grid-row: readonly-row-start / readonly-row-end;
   justify-content: center;
 }
