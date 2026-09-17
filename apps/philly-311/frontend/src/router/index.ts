@@ -10,6 +10,7 @@ import {
 import { watch } from 'vue'
 import { useAuth } from '@phila/sso-vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
+import type { Service } from '@/types/app'
 
 export const routes: RouteRecordRaw[] = [
   { path: '/', component: () => import('@/pages/LandingPage.vue') },
@@ -76,7 +77,7 @@ export function wizardGuard(to: RouteLocationNormalized): true | string {
   // when the category actually changes, so old answers don't leak into the
   // new questions.
   if (typeof to.query.category === 'string' && to.query.category !== store.category) {
-    store.setCategory(to.query.category)
+    store.setCategory(to.query.category as Service)
   }
 
   // Issue type is always reachable (it's where a category is chosen); Image is optional.

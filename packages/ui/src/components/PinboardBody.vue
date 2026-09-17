@@ -459,7 +459,7 @@ function selectedLocationValue(): PinboardLocation {
       ]"
     >
       <div class="finder-panel-locations">
-        <slot name="locations-header" />
+        <slot name="locations-header" class="locations-header" />
 
         <div v-if="errorMessage" class="status-message status-message--error">
           {{ errorMessage }}
@@ -497,7 +497,7 @@ function selectedLocationValue(): PinboardLocation {
           >
             <template v-if="filters" #below-search>
               <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
-                <div class="filter-chip-bar">
+                <div :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'">
                   <FilterChipGroup
                     :filters="orderedChipFilters"
                     :model-value="filterValues"
@@ -514,7 +514,9 @@ function selectedLocationValue(): PinboardLocation {
               </Teleport>
             </template>
             <template v-if="slots['locations-filters']" #filters>
-              <slot name="locations-filters" />
+              <div :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'">
+                <slot name="locations-filters" />
+              </div>
             </template>
             <template #list-header>
               <div v-if="!isMobile && !locationPanelCountNoun" class="location-list-header">
@@ -673,7 +675,7 @@ function selectedLocationValue(): PinboardLocation {
 
 .finder-panel-desktop {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: min(430px, 40%) 1fr;
 }
 
 .finder-panel-mobile {
@@ -728,7 +730,7 @@ function selectedLocationValue(): PinboardLocation {
 
 /* Desktop: item count above the locations list (mirrors the mobile sheet count). */
 .location-list-header {
-  padding: 0.75rem 1rem 0.5rem;
+  padding: 0 1rem 0.5rem;
   font-family: var(--Body-Default-font-body-default-family);
   font-weight: 700;
 }
@@ -805,7 +807,13 @@ function selectedLocationValue(): PinboardLocation {
 }
 
 .filter-chip-bar {
+  padding: 0 0 0.5rem 0;
+  margin-top: -2rem;
+}
+
+.filter-chip-bar-mobile {
   padding: 0.5rem 0;
+  margin-top: -0.5rem;
 }
 
 .all-filters-overlay {

@@ -1,6 +1,7 @@
 // ABOUTME: Resolve a 311 service type to a phila-ui icon, kept in parity with the iOS
 // ABOUTME: (ServiceType.swift) and Android (ServiceTypeIcon.kt) icon choices where an
 // ABOUTME: equivalent phila-ui-core icon exists; neutral pin fallback otherwise.
+import type { Service } from '@/types/app'
 import {
   IconArrowDown,
   IconBagShopping,
@@ -53,7 +54,7 @@ import {
 } from '@phila/phila-ui-core/icons'
 import type { IconComponent } from '@phila/phila-ui-core/icons'
 
-const ICONS: Record<string, IconComponent> = {
+const ICONS: Record<Service, IconComponent> = {
   'Abandoned Vehicle': IconCar,
   'Abandoned Bike': IconBicycle,
   'Illegal Dumping': IconTrashCan,
@@ -112,7 +113,6 @@ const ICONS: Record<string, IconComponent> = {
 
 // Icon components are imported constants, so identity is stable by construction —
 // consumers can key v-for/props off the returned reference safely.
-export function serviceTypeIconComponent(serviceType: string | undefined | null): IconComponent {
-  if (!serviceType) return IconLocationDot
-  return ICONS[serviceType] ?? IconLocationDot
+export function serviceTypeIconComponent(serviceType?: Service): IconComponent {
+  return serviceType ? ICONS[serviceType] : IconLocationDot
 }

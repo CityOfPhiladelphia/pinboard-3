@@ -1,55 +1,31 @@
 <!-- ABOUTME: Renders a single wizard question's input field for questions of type 'boolean'  -->
 <script setup lang="ts">
-import { computed } from 'vue'
 import { RadioGroup } from '@phila/phila-ui-radio'
 import type { IQuestionField } from '@/types/api'
 
 const radioErrorMsg = 'Select an option to continue'
 
-const props = defineProps<{
+defineProps<{
   question: IQuestionField
   initialValue: string
 }>()
 
-const modelValue = defineModel<string>('model-value')
-const error = defineModel<string>('error')
+const modelValue = defineModel<string | undefined>('model-value', { default: undefined })
+const error = defineModel<string>('error', { default: '' })
 
 const choices = [
   {
     text: 'Yes',
-    value: 'true',
+    value: 'Yes',
   },
   {
     text: 'No',
-    value: 'false',
+    value: 'No',
   },
 ]
 
-const booleanValue = computed<Record<string, boolean>>(() => {
-  let a
-  console.log('initial: ', props.initialValue)
-  if (props.initialValue === 'true') {
-    a = {
-      Yes: true,
-      No: false,
-    }
-  } else if (props.initialValue === 'false') {
-    a = {
-      Yes: false,
-      No: true,
-    }
-  } else {
-    a = {
-      Yes: false,
-      No: false,
-    }
-  }
-  console.log(a)
-  return a
-})
-
 function setBoolean(record: Record<string, boolean>) {
-  modelValue.value = String(record['true'])
+  modelValue.value = String(record['Yes'])
 }
 </script>
 
@@ -60,9 +36,12 @@ function setBoolean(record: Record<string, boolean>) {
          own); hideLabel visually hides it via the :deep() rule below instead of emptying it. -->
   <RadioGroup
     :group-label="question.label"
-    :hide-title="{ hideFromScreenReader: true }"
+    :hide-title="{ hideFromScreenReader: false }"
     :choices="choices"
-    :model-value="booleanValue"
+    :model-value="{
+      Yes: initialValue === 'true',
+      No: initialValue === 'false',
+    }"
     :aria-required="question.required || false"
     :error="!!error"
     :error-message="radioErrorMsg"

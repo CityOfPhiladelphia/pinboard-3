@@ -40,8 +40,4 @@ function handleChange(values: Array<string | number>) {
   </div>
 </template>
 
-<style scoped>
-.location-filters {
-  padding: 0.75rem 1rem;
-}
-</style>
+<style scoped></style>

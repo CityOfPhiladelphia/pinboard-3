@@ -144,30 +144,3 @@ export interface DrawingOptions {
   lineCap?: 'butt' | 'round' | 'square'
   strokeStyle?: CanvasGradient | CanvasPattern | string
 }
-
-// type GeoJsonGeometryType =
-//   | 'Point'
-//   | 'MultiPoint'
-//   | 'LineString'
-//   | 'MultiLineString'
-//   | 'Polygon'
-//   | 'MultiPolygon'
-//   | 'GeometryCollection'
-
-// type GeoJsonType = GeoJsonGeometryType | 'Feature' | 'FeatureCollection'
-
-// type GeoJsonCoordinate = [number, number] | [number, number, number] | [number, number, number, number]
-
-// interface GeoJsonPoint {
-//   type: Extract<GeoJsonGeometryType, 'Point'>
-//   coordinates: GeoJsonCoordinate
-// }
-
-// interface GeoJsonLineString {
-//   type: Extract<GeoJsonGeometryType, 'LineString'>
-//   coordinates: GeoJsonCoordinate[]
-// }
-
-// export interface GeoJSON {
-//   type: GeoJsonType
-// }
