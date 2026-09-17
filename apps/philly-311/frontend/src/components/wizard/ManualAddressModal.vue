@@ -127,24 +127,19 @@ defineExpose({ open })
         <TextField
           v-model="draftUnit"
           label="Apartment, suite, unit, etc."
-          :placeholder="draftUnit"
+          placeholder="Apt, suite, unit, etc."
         />
         <TextField
           v-model="draftCity"
           label="City/town"
-          :placeholder="draftCity"
+          placeholder="City name"
           :error="cityError"
         />
-        <TextField
-          v-model="draftState"
-          label="State"
-          :placeholder="draftState"
-          :error="stateError"
-        />
+        <TextField v-model="draftState" label="State" placeholder="PA" :error="stateError" />
         <TextField
           v-model="draftZipcode"
           label="Zip Code"
-          :placeholder="draftZipcode"
+          placeholder="Zipcode"
           :error="zipcodeError"
         />
       </fieldset>
