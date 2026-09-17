@@ -15,6 +15,7 @@ import type { LocationQuery } from 'vue-router'
 import type { PinboardTypes } from '@pinboard/ui'
 import { decodePhotoInfo, encodePhotoInfo } from '@/utils/encodeDecodePhoto'
 import type { Service } from '@/types/app'
+import { DEFAULT_CENTER } from '@/utils/geoDefaults'
 
 interface Location extends Omit<AisFeature, 'lat' | 'lng'> {
   unit: string
@@ -38,7 +39,7 @@ interface State {
   submitted: SubmittedReport | null
 }
 
-interface T extends LocationQuery {
+interface StateFields extends LocationQuery {
   c: string
   cf: string
   l: string
@@ -50,13 +51,12 @@ interface T extends LocationQuery {
   ps: string
 }
 
-type QueryParams = Pick<T, 'c' | 'cf' | 'l' | 'd' | 'p' | 'co' | 'pv' | 'sc' | 'ps'>
+type QueryParams = Pick<StateFields, 'c' | 'cf' | 'l' | 'd' | 'p' | 'co' | 'pv' | 'sc' | 'ps'>
 
 const initialLocation = {
+  ...DEFAULT_CENTER,
   streetAddress: '',
   unit: '',
-  lat: NaN,
-  lng: NaN,
   city: 'Philadelphia',
   state: 'PA',
   zipCode: '',
@@ -67,15 +67,7 @@ export type LocationField = Exclude<keyof typeof initialLocation, 'lat' | 'lng'>
 const initial = (): State => ({
   category: undefined,
   customFields: {},
-  location: {
-    streetAddress: '',
-    unit: '',
-    lat: NaN,
-    lng: NaN,
-    city: 'Philadelphia',
-    state: 'PA',
-    zipCode: '',
-  },
+  location: initialLocation,
   description: '',
   photo: {
     dimensions: {
