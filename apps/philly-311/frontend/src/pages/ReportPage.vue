@@ -51,13 +51,15 @@ watch(
   },
 )
 
+let exiting = false
+
 watch(
   exitOpen,
   (isOpen, wasOpen) => {
     if (isOpen) {
       router.push(`?${store.stateToUrlQueryParams()}`)
     } else if (!isOpen && wasOpen) {
-      router.back()
+      if (!exiting) router.back()
     } else {
       router.replace({ query: {} })
     }
@@ -90,6 +92,7 @@ function goNext() {
 }
 
 function saveAndExit() {
+  exiting = true
   const { category, customFields, location, description, contact, publicVisibility, photo } = store
   myCases.saveDraft({
     category,
@@ -105,6 +108,7 @@ function saveAndExit() {
 }
 
 function discardAndExit() {
+  exiting = true
   store.reset()
   router.push('/')
 }
