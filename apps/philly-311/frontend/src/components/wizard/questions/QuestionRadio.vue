@@ -40,7 +40,7 @@ function setRadio(record: Record<string, boolean>) {
   <RadioGroup
     v-if="['boolean', 'picklist'].includes(question.type)"
     :group-label="question.label"
-    :hide-title="{ hideFromScreenReader: true }"
+    :hide-title="{ hideFromScreenReader: false }"
     :choices="choices"
     :model-value="radioValue"
     :aria-required="question.required || false"

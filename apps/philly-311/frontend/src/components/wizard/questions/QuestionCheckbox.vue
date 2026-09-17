@@ -38,7 +38,7 @@ function setCheckbox(record: Record<string, boolean>) {
   <!-- phila-ui gap: CheckboxGroup has no required prop and doesn't forward $attrs to its <input type="checkbox"> elements -->
   <CheckboxGroup
     :group-label="question.label"
-    :hide-title="{ hideFromScreenReader: true }"
+    :hide-title="{ hideFromScreenReader: false }"
     :choices="choices"
     :model-value="checkboxValue"
     :aria-required="question.required || false"
