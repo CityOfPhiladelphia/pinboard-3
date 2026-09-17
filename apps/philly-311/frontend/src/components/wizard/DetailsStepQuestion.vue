@@ -11,7 +11,7 @@ import type { IQuestionField } from '@/types/api.ts'
 import { computed } from 'vue'
 
 const props = defineProps<{ current: IQuestionField }>()
-const response = defineModel<string>('response', { default: '' })
+const response = defineModel<string | undefined>('response', { default: undefined })
 const error = defineModel<string>('error', { default: '' })
 
 const store = useReportSubmissionStore()
@@ -42,7 +42,7 @@ const initialValue = computed(() => {
           :initial-value="initialValue"
         />
         <QuestionRadio
-          v-else-if="current.type === 'picklist'"
+          v-else-if="current.type === 'picklist' || current.type === 'boolean'"
           v-model:model-value="response"
           v-model:error="error"
           :question="current"

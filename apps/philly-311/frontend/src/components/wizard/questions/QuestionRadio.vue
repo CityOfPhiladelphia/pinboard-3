@@ -11,7 +11,7 @@ const props = defineProps<{
   initialValue: string
 }>()
 
-const modelValue = defineModel<string>('model-value', { default: '' })
+const modelValue = defineModel<string | undefined>('model-value', { default: undefined })
 const error = defineModel<string>('error', { default: '' })
 
 const choices = computed(() => {
@@ -38,7 +38,6 @@ function setRadio(record: Record<string, boolean>) {
   <!-- group-label always renders the real text (RadioGroup has no accessible-name prop of its
          own); hideLabel visually hides it via the :deep() rule below instead of emptying it. -->
   <RadioGroup
-    v-if="['boolean', 'picklist'].includes(question.type)"
     :group-label="question.label"
     :hide-title="{ hideFromScreenReader: false }"
     :choices="choices"
