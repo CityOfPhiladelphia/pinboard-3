@@ -12,7 +12,7 @@ const props = defineProps<{
   initialValue: string
 }>()
 
-const modelValue = defineModel<string>('model-value', { default: '' })
+const modelValue = defineModel<string | undefined>('model-value', { default: undefined })
 const error = defineModel<string>('error', { default: '' })
 
 const choices = computed(() => {
