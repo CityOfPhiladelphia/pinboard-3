@@ -40,6 +40,13 @@ import type {
   UserLocationState,
 } from '../types'
 
+// models
+const locationFilterMode = defineModel<string | undefined>('location-filter-mode', {
+  default: undefined,
+})
+const locationSortMode = defineModel<SortMode>('location-sort-mode', { default: '' })
+const searchString = defineModel<string>('search-string', { default: '' })
+
 // props
 const props = defineProps<{
   searchPlaceholder: string | undefined
@@ -52,14 +59,11 @@ const props = defineProps<{
 // emits
 const emit = defineEmits<{
   search: []
-  searchString: [search: string]
   selectedFilter: [filter: string]
   sortOption: [sort: SortMode]
 }>()
 
 // refs
-const appliedSort = ref<SortMode>('')
-const searchString = ref<string>('')
 const searchWrapperRef = ref<HTMLElement | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
 const { searchSuggestions, dismissSuggestions, hideSuggestions, refetchSuggestions } =
@@ -87,19 +91,6 @@ const showingRecents = computed(() => !searchString.value)
 // computed refs
 
 // event handlers
-function handleFilterChange(option: string) {
-  emit('selectedFilter', option)
-}
-
-function handleSortChange(value: SortMode) {
-  appliedSort.value = value
-  emit('sortOption', value)
-}
-
-function handleSearchChange(search: string) {
-  emit('searchString', search)
-  searchString.value = search
-}
 
 // v-model does not update while an IME is composing, and Android predictive text
 // composes ordinary words — so searchString would sit stale until the keyboard
@@ -118,7 +109,6 @@ function handleSearchSubmit() {
     addRecentSearch(term)
     if (term !== searchString.value) {
       searchString.value = term
-      emit('searchString', term)
     }
   }
   emit('search')
@@ -127,7 +117,6 @@ function handleSearchSubmit() {
 function handleSuggestionSelect(suggestion: string) {
   dismissSuggestions()
   searchString.value = suggestion
-  emit('searchString', suggestion)
   handleSearchSubmit()
   focusSearchInput()
 }
@@ -192,7 +181,6 @@ function focusSearchInput() {
           class="location-search-input"
           :placeholder="searchPlaceholder"
           :elevated="elevatedSearch"
-          @update:model-value="handleSearchChange"
           @search="handleSearchSubmit"
         />
         <SearchSuggestions
@@ -208,21 +196,20 @@ function focusSearchInput() {
       </div>
       <LocationFilter
         v-if="filterOptions"
+        v-model:location-filter-mode="locationFilterMode"
         class="location-filters"
         :class="{ mobile: isMobile }"
         :filter-options="filterOptions"
-        @selected-filter="handleFilterChange"
       />
     </Teleport>
 
     <Teleport to="#bottom-sheet-sort" :disabled="!isMobile">
       <div v-if="sortOptions" class="location-sort content">
         <SortPanel
+          v-model:location-sort-mode="locationSortMode"
           :sort-options="sortOptions"
-          :applied-sort="appliedSort"
           :user-location-state="props.userLocationState"
           :is-mobile="isMobile"
-          @update:applied-sort="handleSortChange"
         />
       </div>
     </Teleport>

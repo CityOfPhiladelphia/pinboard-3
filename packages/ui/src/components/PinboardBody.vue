@@ -70,36 +70,45 @@ const slots = defineSlots<{
   }): unknown
 }>()
 
+// models
+const isLoading = defineModel<string | false>('is-loading', { default: false })
+const filterValues = defineModel<FilterValues | undefined>('filter-values', { default: undefined })
+const locationSearchMode = defineModel<SearchMode | undefined>('location-search-mode', {
+  default: undefined,
+})
+const userLocationState = defineModel<UserLocationState>('user-location-state', {
+  default: 'unknown',
+})
+const searchOrUserLocation = defineModel<LatLon | undefined>('search-or-user-location', {
+  default: undefined,
+})
+const locationFilterMode = defineModel<string | undefined>('location-filter-mode', {
+  default: undefined,
+})
+const locationSortMode = defineModel<SortMode>('location-sort-mode', { default: '' })
+const errorMessage = defineModel<string | null>('error-message', { default: null })
+
 // props
 const props = withDefaults(
   defineProps<{
     locations: PinboardLocation[]
     getMapCardProps: MapCardPropsGetter<PinboardLocation>
     isMobile: boolean
-    errorMessage: string | null
-    searchOrUserLocation: LatLon
-    isLoading: string | false
     waitForUserLocation?: boolean
-    userLocationState?: UserLocationState
     locationPanelFilter?: LocationFilterOption[]
     locationPanelSearch?: string
     locationPanelSort?: SortLocationsOptions
-    locationSearchMode?: SearchMode
     geojson?: unknown
     filters?: FilterDefinition[]
-    filterValues?: FilterValues
     locationPanelCountNoun?: string
   }>(),
   {
     waitForUserLocation: false,
-    userLocationState: 'unknown',
     locationPanelFilter: undefined,
     locationPanelSearch: undefined,
     locationPanelSort: undefined,
-    locationSearchMode: undefined,
     geojson: undefined,
     filters: undefined,
-    filterValues: undefined,
     locationPanelCountNoun: undefined,
   }
 )
@@ -172,7 +181,7 @@ const locationCountLabel = computed(() => {
     : props.locations.length
       ? t('pinboard.itemCount', { count: props.locations.length }, props.locations.length)
       : t('pinboard.noLocations')
-  return props.isLoading || message
+  return isLoading.value || message
 })
 
 // Filter chips in use bubble up to sit right after the (pinned) Sort chip. The
@@ -183,7 +192,7 @@ const chipOrderKeys = ref<string[]>([])
 
 function recomputeChipOrder() {
   const all = props.filters ?? []
-  const values = props.filterValues ?? {}
+  const values = filterValues.value ?? {}
   const isActive = (key: string) => {
     const v = values[key]
     return v && typeof v === 'object' ? Object.values(v).some(Boolean) : v === true
@@ -331,18 +340,25 @@ watch([() => route.query.location, () => props.locations], resolveLocationFromRo
 })
 
 watch(
-  () => props.searchOrUserLocation,
+  () => searchOrUserLocation.value,
   (newLocation) => {
     if (
+      newLocation &&
       hasLocationData(newLocation) &&
-      props.locationSearchMode &&
-      ['address', 'zipcode'].includes(props.locationSearchMode)
+      locationSearchMode.value &&
+      ['address', 'zipcode'].includes(locationSearchMode.value)
     ) {
       mapPanelRef.value?.panTo(newLocation)
     }
   },
   { deep: 1 }
 )
+
+watch(searchString, () => {
+  if (!searchString.value) {
+    emit('search', '')
+  }
+})
 
 // event handlers
 function handleHover(id: string) {
@@ -372,21 +388,6 @@ function handleMapSelect(location: PinboardLocation) {
     handleCloseLocationDetail()
   } else {
     selectLocation(location)
-  }
-}
-
-function handleLocationFilterChange(selectedLocationsFilter: string) {
-  emit('selectedLocationsFilter', selectedLocationsFilter)
-}
-
-function handleLocationSortChange(sortLocationsOption: SortMode) {
-  emit('sortLocationsOption', sortLocationsOption)
-}
-
-function handleSearchChange(search: string) {
-  searchString.value = search
-  if (!searchString.value) {
-    emit('search', '')
   }
 }
 
@@ -461,9 +462,11 @@ function selectedLocationValue(): PinboardLocation {
       <div class="finder-panel-locations">
         <slot name="locations-header" class="locations-header" />
 
-        <div v-if="errorMessage" class="status-message status-message--error">
-          {{ errorMessage }}
-        </div>
+        <div
+          v-if="errorMessage"
+          class="status-message status-message--error"
+          v-text="errorMessage"
+        />
 
         <!-- Skeleton cards only on desktop, where the list lives in this left panel.
            On mobile the list is in the bottom sheet, so these would flash in the
@@ -476,6 +479,9 @@ function selectedLocationValue(): PinboardLocation {
         <Teleport v-else-if="!isLoading" to="#locations-panel-mobile" :disabled="!isMobile">
           <LocationsPanel
             ref="locationsPanelRef"
+            v-model:location-filter-mode="locationFilterMode"
+            v-model:location-sort-mode="locationSortMode"
+            v-model:search-string="searchString"
             :locations="locations"
             :get-map-card-props="getMapCardProps"
             :location-filter="locationPanelFilter"
@@ -490,10 +496,7 @@ function selectedLocationValue(): PinboardLocation {
             @select="handleSelect"
             @hover="handleHover"
             @hover-end="handleHoverEnd"
-            @search-string="handleSearchChange"
             @search="handleSearchSubmit"
-            @selected-filter="handleLocationFilterChange"
-            @sort-option="handleLocationSortChange"
           >
             <template v-if="filters" #below-search>
               <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">

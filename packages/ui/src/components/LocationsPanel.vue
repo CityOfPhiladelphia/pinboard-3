@@ -21,6 +21,13 @@ import type {
   UserLocationState,
 } from '../types'
 
+// models
+const locationFilterMode = defineModel<string | undefined>('location-filter-mode', {
+  default: undefined,
+})
+const locationSortMode = defineModel<SortMode>('location-sort-mode', { default: '' })
+const searchString = defineModel<string>('search-string', { default: '' })
+
 // props
 const props = defineProps<{
   locations: PinboardLocation[]
@@ -40,9 +47,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   select: [location: PinboardLocation]
   search: []
-  searchString: [search: string]
-  selectedFilter: [filter: string]
-  sortOption: [sort: SortMode]
   hover: [id: string]
   'hover-end': []
 }>()
@@ -71,18 +75,6 @@ watch(
   }
 )
 // event handlers
-function handleFilterChange(selectedFilter: string) {
-  emit('selectedFilter', selectedFilter)
-}
-
-function handleSortChange(sortOption: SortMode) {
-  emit('sortOption', sortOption)
-}
-
-function handleSearchChange(searchString: string) {
-  emit('searchString', searchString)
-}
-
 function handleCardKeyup(location: PinboardLocation) {
   if (pendingKeydown.value) {
     emit('select', location)
@@ -103,14 +95,14 @@ defineExpose({ scrollToCard })
 <template>
   <LocationSearchFilterPanel
     v-if="locationSearch || locationFilter || locationSort"
+    v-model:location-filter-mode="locationFilterMode"
+    v-model:location-sort-mode="locationSortMode"
+    v-model:search-string="searchString"
     :search-placeholder="locationSearch"
     :filter-options="locationFilter"
     :sort-options="locationSort"
     :user-location-state="props.userLocationState"
     :is-mobile="isMobile"
-    @selected-filter="handleFilterChange"
-    @sort-option="handleSortChange"
-    @search-string="handleSearchChange"
     @search="emit('search')"
   />
 

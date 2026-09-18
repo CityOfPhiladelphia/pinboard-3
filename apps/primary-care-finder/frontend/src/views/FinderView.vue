@@ -15,7 +15,7 @@ import {
   applyFilters,
   IS_MOBILE_KEY,
 } from '@pinboard/ui'
-import type { FilterChoiceBitfieldGroup, FilterValues, MapCardProps } from '@pinboard/ui'
+import type { FilterChoiceBitfieldGroup, MapCardProps } from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
 import { useFilterChipDefinitions } from '@/composables/filters/useFilterChipDefinitions.ts'
 import { useFilterLogic } from '@/composables/filters/useFilterLogic'
@@ -189,10 +189,6 @@ function mapFilterTextToFilterLogic(
   })
 }
 
-function handleApplyFilter(values: FilterValues) {
-  filterState.value = values as PrimaryCareFilters
-}
-
 function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
   return {
     heading: String(location.properties.record ?? location.properties.address ?? ''),
@@ -204,19 +200,18 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
 
 <template>
   <PinboardBody
+    v-model:filter-values="filterState"
+    v-model:is-loading="isLoading"
+    v-model:location-search-mode="locationSearchMode"
+    v-model:search-or-user-location="searchOrUserLocation"
+    v-model:error-message="errorMessage"
     :locations="filteredLocations"
     :get-map-card-props="getMapCardProps"
-    :search-or-user-location="searchOrUserLocation"
-    :location-search-mode="locationSearchMode"
-    :is-loading="isLoading"
-    :error-message="errorMessage"
     :location-panel-search="t('searchPlaceholder')"
     :geojson="filteredGeojson"
     :is-mobile="isMobile"
     :filters="filterChipDefinitions"
-    :filter-values="filterState"
     @search="handleSearchSubmit"
-    @update:filter-values="handleApplyFilter"
   >
     <template #locations-header>
       <div v-if="!isMobile" class="locations-callout">

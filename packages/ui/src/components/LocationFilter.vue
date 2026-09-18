@@ -4,12 +4,13 @@ import { TagGroup } from '@phila/phila-ui-tags'
 import type { TagGroupChoice } from '@phila/phila-ui-tags'
 import type { LocationFilterOption } from '../types'
 
+// models
+const locationFilterMode = defineModel<string | undefined>('location-filter-mode', {
+  default: undefined,
+})
+
 const props = defineProps<{
   filterOptions: LocationFilterOption[]
-}>()
-
-const emit = defineEmits<{
-  selectedFilter: [filter: string]
 }>()
 
 const choices = computed<TagGroupChoice[]>(() =>
@@ -21,7 +22,7 @@ const selected = ref<Array<string | number>>([props.filterOptions[0]?.value ?? '
 function handleChange(values: Array<string | number>) {
   selected.value = values
   if (values[0] !== undefined) {
-    emit('selectedFilter', String(values[0]))
+    locationFilterMode.value = String(values[0])
   }
 }
 </script>

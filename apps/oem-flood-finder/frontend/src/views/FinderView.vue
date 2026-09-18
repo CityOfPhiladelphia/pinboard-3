@@ -106,14 +106,6 @@ watch(
 )
 
 // event handlers
-function handleLocationFilterChange(selectedFilter: string) {
-  locationFilterMode.value = selectedFilter as Filters
-}
-
-function handleLocationSortChange(sortLocationsOption: PinboardTypes.SortMode) {
-  locationSortMode.value = sortLocationsOption
-}
-
 function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
   onSelect(loc)
 }
@@ -145,21 +137,21 @@ function getMapCardProps(location: OemLocation): MapCardProps {
 
 <template>
   <PinboardBody
+    v-model:is-loading="isLoading"
+    v-model:location-search-mode="locationSearchMode"
+    v-model:user-location-state="userLocationState"
+    v-model:search-or-user-location="searchOrUserLocation"
+    v-model:location-filter-mode="locationFilterMode"
+    v-model:location-sort-mode="locationSortMode"
+    v-model:error-message="errorMessage"
     :locations="currentLocations"
     :get-map-card-props="getMapCardProps"
-    :search-or-user-location="searchOrUserLocation"
-    :is-loading="isLoading"
-    :error-message="errorMessage"
     :location-panel-search="searchPlaceholderText"
     :location-panel-filter="filterOptions"
     :location-panel-sort="sortLocationsOptions"
-    :location-search-mode="locationSearchMode"
     :wait-for-user-location="false"
-    :user-location-state="userLocationState"
     :is-mobile="isMobile"
     @search="handleSearchSubmit"
-    @selected-locations-filter="handleLocationFilterChange"
-    @sort-locations-option="handleLocationSortChange"
     @deselect="handleDeselect"
   >
     <template #location-detail="{ location, onClose }">

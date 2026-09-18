@@ -7,15 +7,13 @@ import { PhilaButton, CloseButton } from '@phila/phila-ui-button'
 import { IconSort } from '@phila/phila-ui-core/icons'
 import type { SortLocationsOptions, SortMode, UserLocationState } from '../types'
 
+// models
+const locationSortMode = defineModel<SortMode>('location-sort-mode', { default: '' })
+
 const props = defineProps<{
   sortOptions: SortLocationsOptions
-  appliedSort: SortMode
   userLocationState: UserLocationState
   isMobile: boolean
-}>()
-
-const emit = defineEmits<{
-  'update:appliedSort': [value: SortMode]
 }>()
 
 const { t } = useI18n()
@@ -24,8 +22,8 @@ const panelOpen = ref(false)
 const pendingSelection = ref<SortMode>('')
 
 const triggerLabel = computed(() => {
-  return props.appliedSort
-    ? t('pinboard.sortBy', { label: props.sortOptions[props.appliedSort] })
+  return locationSortMode.value
+    ? t('pinboard.sortBy', { label: props.sortOptions[locationSortMode.value] })
     : t('pinboard.sort')
 })
 
@@ -34,7 +32,7 @@ const locationAvailable = computed(() => {
 })
 
 function openPanel() {
-  pendingSelection.value = props.appliedSort
+  pendingSelection.value = locationSortMode.value
   panelOpen.value = true
   // The panel is teleported to <body>, so it's outside the trigger's tab order.
   // Move focus into the options (the selected one, else the first enabled) so a
@@ -69,12 +67,12 @@ function onFocusGuard() {
 }
 
 function applySort() {
-  emit('update:appliedSort', pendingSelection.value)
+  locationSortMode.value = pendingSelection.value
   closePanel()
 }
 
 function resetSort() {
-  emit('update:appliedSort', '')
+  locationSortMode.value = ''
   closePanel()
 }
 
