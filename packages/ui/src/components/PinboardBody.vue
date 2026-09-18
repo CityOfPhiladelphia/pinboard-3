@@ -47,7 +47,6 @@ const slots = defineSlots<{
   nav?(): unknown
   'page-header'?: unknown
   'locations-header'?: unknown
-  'locations-filters'?: unknown
   'locations-footer'?: unknown
   'location-card'?(props: { location: PinboardLocation }): unknown
   'location-detail'?(props: {
@@ -446,28 +445,6 @@ function selectedLocationValue(): PinboardLocation {
             @hover-end="handleHoverEnd"
             @search="handleSearchSubmit"
           >
-            <template v-if="filters" #below-search>
-              <!-- <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
-                <div :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'">
-                  <FilterChipGroup
-                    v-model="filterValues"
-                    :filters="orderedChipFilters"
-                    color="white"
-                    filter-button
-                    :filter-button-text="t('pinboard.filters')"
-                    :reset-text="t('pinboard.reset')"
-                    :elevated="isMobile && chipsOnMap"
-                    @open-filters="allFiltersOpen = true"
-                    @dropdown-close="recomputeChipOrder"
-                  />
-                </div>
-              </Teleport> -->
-            </template>
-            <template v-if="slots['locations-filters']" #filters>
-              <div :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'">
-                <slot name="locations-filters" />
-              </div>
-            </template>
             <template #list-header>
               <div v-if="!isMobile && !locationPanelCountNoun" class="location-list-header">
                 <span>{{ locationCountLabel }}</span>

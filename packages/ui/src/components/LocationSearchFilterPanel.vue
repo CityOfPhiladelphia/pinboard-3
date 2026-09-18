@@ -298,6 +298,7 @@ function focusSearchInput() {
     'search search'
     'filters sort';
   grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
   row-gap: var(--spacing-m, 1rem);
   padding: var(--spacing-l, 1.5rem) var(--spacing-m, 1rem);
 }
@@ -335,6 +336,7 @@ function focusSearchInput() {
 .filter-chip-bar {
   grid-area: filters;
   z-index: -1;
+  height: fit-content;
   overflow-x: auto;
 }
 

@@ -113,10 +113,6 @@ defineExpose({ scrollToCard })
     @search="emit('search')"
   />
 
-  <slot name="below-search" />
-
-  <slot name="filters" />
-
   <div v-if="countLabel" class="location-count">{{ countLabel }}</div>
 
   <slot name="list-header" />

@@ -46,7 +46,6 @@ export { Tags } from '@phila/phila-ui-tags'
 export { Tooltip } from '@phila/phila-ui-tooltip'
 export { NavbarInfo } from '@phila/phila-ui-app-header'
 export type { NavLink } from '@phila/phila-ui-app-header'
-export { PinboardBody as Pinboard } from './components/_index'
 
 export { Icon } from '@phila/phila-ui-core'
 export type { FilterDefinition, FilterValues, FilterChoice } from '@phila/phila-ui-core'

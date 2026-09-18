@@ -1,26 +1,27 @@
 <!-- ABOUTME: The 311 reports finder — Pinboard map + list of nearby reports with
      service-type filter chips, geolocation-seeded load, and inline report detail. -->
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import {
-  Pinboard,
+  PinboardBody,
   MapNavigationControl,
   GeolocationButton,
   BasemapToggle,
   PinboardComposables,
 } from '@pinboard/ui'
-import type { PinboardTypes, MapCardProps } from '@pinboard/ui'
+import type { PinboardTypes, MapCardProps, FilterDefinition } from '@pinboard/ui'
 import { useReportFinder } from '@/composables/useReportFinder'
 import ReportDetail from '@/components/ReportDetail.vue'
 import { searchAddress } from '@/composables/useAis'
 import ReportCallout from '@/components/ReportCallout.vue'
 import ReportCta from '@/components/ReportCta.vue'
-import FilterChips from '@/components/FilterChips.vue'
 import ReportListingCard from '@/components/ReportListingCard.vue'
 import MapConstraints from '@/components/MapConstraints.vue'
 import ClusteredMarkers from '@/components/ClusteredMarkers.vue'
 import LocationAccuracyCircle from '@/components/LocationAccuracyCircle.vue'
+import { serviceTypeIconComponent } from '@/utils/reportIcon'
+import { serviceTypeColor } from '@/utils/serviceTypeMeta'
 
 const finder = useReportFinder()
 const isMobile = PinboardComposables.useIsMobile()
@@ -48,6 +49,30 @@ const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
 
 const locatedFix = ref<{ latitude: number; longitude: number; accuracy: number } | null>(null)
 
+const filters = computed<FilterDefinition[]>(() =>
+  finder.filterOptions.value.map((o) => ({
+    key: o.value,
+    label: o.label,
+    // FilterChipGroup icons are Vue functional components; the shared cached
+    // wrapper keeps chips visually in sync with the map markers.
+    icon: serviceTypeIconComponent(o.label),
+    iconColor: serviceTypeColor(o.label),
+  })),
+)
+
+const filterValues = ref<Record<string, boolean>>(
+  Object.fromEntries(
+    finder.filterOptions.value.map((o) => [o.value, o.value === finder.filter.value]),
+  ),
+)
+
+watch(filterValues, (newValue) => {
+  const on = Object.keys(newValue).filter((k) => newValue[k] === true)
+  const added = on.find((k) => k !== finder.filter.value)
+  const value = added ?? (on.length > 0 ? finder.filter.value : 'all')
+  if (value !== finder.filter.value) finder.filter.value = value
+})
+
 function onLocated(data: { longitude: number; latitude: number; accuracy: number }) {
   locatedFix.value = data
 }
@@ -66,7 +91,8 @@ async function onSearch(query: string) {
 </script>
 
 <template>
-  <Pinboard
+  <PinboardBody
+    v-model:filter-values="filterValues"
     v-model:is-loading="finder.isLoading.value"
     v-model:search-or-user-location="finder.searchOrUserLocation.value"
     v-model:location-search-mode="locationSearchMode"
@@ -76,6 +102,7 @@ async function onSearch(query: string) {
     :is-mobile="isMobile"
     :location-panel-search="searchPlaceholder"
     location-panel-count-noun="report"
+    :filters="filters"
     @search="onSearch"
     @bounds-change="setMapBounds"
   >
@@ -85,14 +112,6 @@ async function onSearch(query: string) {
 
     <template #locations-footer>
       <ReportCta />
-    </template>
-
-    <template #locations-filters>
-      <FilterChips
-        :options="finder.filterOptions.value"
-        :model-value="finder.filter.value"
-        @update:model-value="finder.setFilter"
-      />
     </template>
 
     <template #location-card="{ location }">
@@ -154,7 +173,7 @@ async function onSearch(query: string) {
         @select="onSelect"
       />
     </template>
-  </Pinboard>
+  </PinboardBody>
 </template>
 
 <style>
