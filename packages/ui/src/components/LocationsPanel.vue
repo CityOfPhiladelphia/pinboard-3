@@ -20,6 +20,7 @@ import type {
   SortMode,
   UserLocationState,
 } from '../types'
+import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
 
 // models
 const locationFilterMode = defineModel<string | undefined>('location-filter-mode', {
@@ -27,6 +28,8 @@ const locationFilterMode = defineModel<string | undefined>('location-filter-mode
 })
 const locationSortMode = defineModel<SortMode>('location-sort-mode', { default: '' })
 const searchString = defineModel<string>('search-string', { default: '' })
+const filterValues = defineModel<FilterValues | undefined>('filter-values', { default: undefined })
+const allFiltersOpen = defineModel<boolean>('all-filters-open', { default: false })
 
 // props
 const props = defineProps<{
@@ -40,6 +43,7 @@ const props = defineProps<{
   locationSearch: string | undefined
   locationFilter: LocationFilterOption[] | undefined
   locationSort: SortLocationsOptions | undefined
+  filters?: FilterDefinition[]
   countNoun?: string
 }>()
 
@@ -98,8 +102,11 @@ defineExpose({ scrollToCard })
     v-model:location-filter-mode="locationFilterMode"
     v-model:location-sort-mode="locationSortMode"
     v-model:search-string="searchString"
+    v-model:filter-values="filterValues"
+    v-model:all-filters-open="allFiltersOpen"
     :search-placeholder="locationSearch"
     :filter-options="locationFilter"
+    :filters="filters"
     :sort-options="locationSort"
     :user-location-state="props.userLocationState"
     :is-mobile="isMobile"

@@ -15,7 +15,7 @@ export interface UseReportFinder {
   locations: ComputedRef<PinboardTypes.BasicLocation[]>
   filterOptions: ComputedRef<{ value: Service; label: Service }[]>
   searchOrUserLocation: Ref<PinboardTypes.LatLon>
-  isLoading: Ref<boolean>
+  isLoading: Ref<string | false>
   errorMessage: ComputedRef<string | null>
   filter: Ref<string>
   init: () => Promise<void>

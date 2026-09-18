@@ -67,15 +67,15 @@ async function onSearch(query: string) {
 
 <template>
   <Pinboard
+    v-model:is-loading="finder.isLoading.value"
+    v-model:search-or-user-location="finder.searchOrUserLocation.value"
+    v-model:location-search-mode="locationSearchMode"
+    v-model:error-message="finder.errorMessage.value"
     :locations="visibleLocations"
-    :search-or-user-location="finder.searchOrUserLocation.value"
-    :is-loading="finder.isLoading.value ? 'Loading reports…' : false"
-    :error-message="finder.errorMessage.value"
     :get-map-card-props="getMapCardProps"
     :is-mobile="isMobile"
     :location-panel-search="searchPlaceholder"
     location-panel-count-noun="report"
-    :location-search-mode="locationSearchMode"
     @search="onSearch"
     @bounds-change="setMapBounds"
   >

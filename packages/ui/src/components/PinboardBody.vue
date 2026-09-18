@@ -19,7 +19,7 @@ import { PINBOARD_CONFIG_KEY } from '../keys'
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
-import { FilterChipGroup } from '@phila/phila-ui-filter-chip'
+
 import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
 // pinboard composables and utilities imports
@@ -116,10 +116,7 @@ const props = withDefaults(
 // emits to parent app to handle
 const emit = defineEmits<{
   search: [search: string]
-  selectedLocationsFilter: [filter: string]
-  sortLocationsOption: [sort: SortMode]
   deselect: [locationId: string]
-  'update:filterValues': [value: FilterValues]
   'bounds-change': [bounds: MapBounds]
 }>()
 
@@ -130,8 +127,6 @@ const router = useRouter()
 // component variables
 const snapPoints = [15, 50, 100]
 const config = inject(PINBOARD_CONFIG_KEY)
-// Mobile: chips render under the on-map search bar when 'map', else in the bottom sheet.
-const chipsOnMap = computed(() => config?.mobileFilterPlacement === 'map')
 
 // refs
 const hoveredLocationId = ref<string | undefined>(undefined)
@@ -183,50 +178,6 @@ const locationCountLabel = computed(() => {
       : t('pinboard.noLocations')
   return isLoading.value || message
 })
-
-// Filter chips in use bubble up to sit right after the (pinned) Sort chip. The
-// order is a snapshot recomputed only at safe moments — initial load, a chip's
-// dropdown closing, and the All-Filters panel closing — never live while a
-// dropdown is open, so a chip never moves out from under its own popover.
-const chipOrderKeys = ref<string[]>([])
-
-function recomputeChipOrder() {
-  const all = props.filters ?? []
-  const values = filterValues.value ?? {}
-  const isActive = (key: string) => {
-    const v = values[key]
-    return v && typeof v === 'object' ? Object.values(v).some(Boolean) : v === true
-  }
-  const pinned = all.filter((f) => f.excludeFromCount)
-  const rest = all.filter((f) => !f.excludeFromCount)
-  chipOrderKeys.value = [
-    ...pinned,
-    ...rest.filter((f) => isActive(f.key)),
-    ...rest.filter((f) => !isActive(f.key)),
-  ].map((f) => f.key)
-}
-
-// Map the snapshot order onto the current filter definitions, so locale/label
-// changes still flow through while the order stays put. Any filter not yet in the
-// snapshot falls back to source order at the end.
-const orderedChipFilters = computed(() => {
-  const all = props.filters ?? []
-  if (!chipOrderKeys.value.length) return all
-  const byKey = new Map(all.map((f) => [f.key, f]))
-  const ordered = chipOrderKeys.value
-    .map((k) => byKey.get(k))
-    .filter((f): f is FilterDefinition => !!f)
-  const known = new Set(chipOrderKeys.value)
-  return [...ordered, ...all.filter((f) => !known.has(f.key))]
-})
-
-// Seed on load and refresh on locale (filters) changes. Otherwise the order only
-// updates on dropdown-close / panel-close (wired in the template + watcher below).
-watch(
-  () => props.filters,
-  () => recomputeChipOrder(),
-  { immediate: true }
-)
 
 // --- detail panel focus management ---
 // The panel opens over the card that triggered it, so keyboard focus has to be
@@ -307,8 +258,6 @@ watch(allFiltersOpen, (open) => {
   if (open && !props.isMobile) {
     handleCloseLocationDetail()
   }
-  // Reorder chips to reflect what was toggled in the panel, once it's closed.
-  if (!open) recomputeChipOrder()
 })
 
 // Reflect the selected location in the URL as ?location=<id>. push (not replace) so Back walks
@@ -416,10 +365,6 @@ function handleCloseLocationDetail() {
   }
 }
 
-function handleApplyFilter(value: FilterValues) {
-  emit('update:filterValues', value)
-}
-
 function handleBoundsChange(bounds: MapBounds) {
   emit('bounds-change', bounds)
 }
@@ -482,11 +427,14 @@ function selectedLocationValue(): PinboardLocation {
             v-model:location-filter-mode="locationFilterMode"
             v-model:location-sort-mode="locationSortMode"
             v-model:search-string="searchString"
+            v-model:filter-values="filterValues"
+            v-model:all-filters-open="allFiltersOpen"
             :locations="locations"
             :get-map-card-props="getMapCardProps"
             :location-filter="locationPanelFilter"
             :location-search="locationPanelSearch"
             :location-sort="locationPanelSort"
+            :filters="filters"
             :user-location-state="userLocationState"
             :wait-for-user-location="waitForUserLocation"
             :hovered-id="hoveredLocationId"
@@ -499,22 +447,21 @@ function selectedLocationValue(): PinboardLocation {
             @search="handleSearchSubmit"
           >
             <template v-if="filters" #below-search>
-              <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
+              <!-- <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
                 <div :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'">
                   <FilterChipGroup
+                    v-model="filterValues"
                     :filters="orderedChipFilters"
-                    :model-value="filterValues"
                     color="white"
                     filter-button
                     :filter-button-text="t('pinboard.filters')"
                     :reset-text="t('pinboard.reset')"
                     :elevated="isMobile && chipsOnMap"
-                    @update:model-value="handleApplyFilter"
                     @open-filters="allFiltersOpen = true"
                     @dropdown-close="recomputeChipOrder"
                   />
                 </div>
-              </Teleport>
+              </Teleport> -->
             </template>
             <template v-if="slots['locations-filters']" #filters>
               <div :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'">
@@ -577,12 +524,11 @@ function selectedLocationValue(): PinboardLocation {
       >
         <FilterPanel
           v-if="allFiltersOpen"
+          v-model="filterValues"
           :filters="filters"
-          :model-value="filterValues"
           :full-screen="isMobile"
           :title="t('pinboard.allFilters')"
           :reset-text="t('pinboard.reset')"
-          @update:model-value="handleApplyFilter"
           @close="allFiltersOpen = false"
         />
       </div>
@@ -678,7 +624,7 @@ function selectedLocationValue(): PinboardLocation {
 
 .finder-panel-desktop {
   display: grid;
-  grid-template-columns: min(430px, 40%) 1fr;
+  grid-template-columns: max(450px, 33%) 1fr;
 }
 
 .finder-panel-mobile {
@@ -809,16 +755,6 @@ function selectedLocationValue(): PinboardLocation {
   height: auto;
 }
 
-.filter-chip-bar {
-  padding: 0 0 0.5rem 0;
-  margin-top: -2rem;
-}
-
-.filter-chip-bar-mobile {
-  padding: 0.5rem 0;
-  margin-top: -0.5rem;
-}
-
 .all-filters-overlay {
   position: absolute;
   top: 0;
@@ -867,7 +803,6 @@ function selectedLocationValue(): PinboardLocation {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 2;
   padding: 10px 0;
 }
 </style>

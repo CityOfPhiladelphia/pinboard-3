@@ -28,11 +28,12 @@ export interface EnsureLoadedOpts {
 }
 
 export const useOpenIssuesStore = defineStore('openIssues', () => {
+  const loadingMessage = 'Loading reports…'
   const reports = ref<Report[]>([])
   const byId = ref(new Map<string, Report>())
   const total = ref<number | null>(null)
   const fetchedAt = ref<number | null>(null)
-  const isLoading = ref(true)
+  const isLoading = ref<string | false>(loadingMessage)
   const error = ref<Error | null>(null)
 
   // Not part of exposed state — tracks the in-flight Promise to prevent concurrent loads.
@@ -69,7 +70,7 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
       total.value = null
     }
     error.value = null
-    isLoading.value = true
+    isLoading.value = loadingMessage
 
     let page1: PageResult
     try {
