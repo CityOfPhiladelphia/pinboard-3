@@ -58,8 +58,8 @@ const initialLocation = {
   city: 'Philadelphia',
   state: 'PA',
   zipCode: '',
-  lat: NaN,
-  lng: NaN,
+  lat: 0,
+  lng: 0,
 }
 
 export type LocationField = Exclude<keyof typeof initialLocation, 'lat' | 'lng'>

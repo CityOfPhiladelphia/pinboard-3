@@ -175,7 +175,7 @@ onBeforeMount(() => {
   grid-template-columns:
     [full-start] var(--spacing-l, 1.5rem)
     [inset-start] 1fr
-    [search-col-start] auto [search-col-end]
+    [search-col-start] min-content [search-col-end]
     1fr [inset-end]
     var(--spacing-l, 1.5rem) [full-end];
   grid-template-rows:

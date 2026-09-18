@@ -33,7 +33,9 @@ const philaMap = ref<MapVMComponent | null>(null)
 useMapBounds(philaMap)
 
 const center = computed<[number, number]>(() =>
-  props.location ? [props.location.lng, props.location.lat] : PHILLY_DEFAULT,
+  props.location?.lng && props.location.lat
+    ? [props.location.lng, props.location.lat]
+    : PHILLY_DEFAULT,
 )
 const zoom = computed(() => (props.location ? 16 : 12))
 
@@ -93,8 +95,6 @@ function togglePopup() {
 <style scoped>
 .location-map {
   isolation: isolate;
-  width: 100%;
-  height: 100%;
 }
 
 .location-map > :is(.map-wrapper) {

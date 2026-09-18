@@ -1,7 +1,7 @@
 <!-- ABOUTME: AIS-backed address search on phila-ui Search/SearchSuggestions. Typing fires
      /autocomplete (debounced); picking a suggestion fires /search and emits select(feature). -->
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, useId } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { Search } from '@phila/phila-ui-search'
 import { SearchSuggestions } from '../../../../../../packages/ui/src/components/_index'
@@ -18,6 +18,8 @@ import type { AddressSource } from '@/pages/report/LocationStep.vue'
 import { getCurrentPosition } from '@/composables/useGeolocation'
 import type { AisFeature } from '@/types/wizard'
 import LocationImageCard from './LocationImageCard.vue'
+
+const geolocate = useId()
 
 const addressSource = defineModel<AddressSource | undefined>('addressSource', {
   default: undefined,
@@ -149,7 +151,7 @@ function setLocToImage() {
       @update:model-value="onQueryChange"
       @search="handleSearch"
     />
-    <span class="geolocate_button" :style="{ display: open ? 'flex' : 'none' }">
+    <span :id="geolocate" class="geolocate_button" :style="{ display: open ? 'flex' : 'none' }">
       <PhilaButton
         text="Use my current location"
         size="extra-small"
@@ -159,9 +161,7 @@ function setLocToImage() {
       />
     </span>
     <div
-      v-if="
-        store.photo.location && !(store.location?.lat && store.location.lng) && !suggestions.length
-      "
+      v-if="store.photo.location && !store.location?.streetAddress && !suggestions.length"
       class="image_location"
       :style="{ display: open ? 'grid' : 'none' }"
     >
@@ -184,22 +184,35 @@ function setLocToImage() {
       :style="{ border: 'none' }"
       @select="onSelect"
       @dismiss="onDismiss"
-    />
+    >
+      <template #default>
+        <Teleport :to="geolocate" :disabled="!open">
+          <span class="geolocate_button">
+            <PhilaButton
+              text="Use my current location"
+              size="extra-small"
+              :icon="IconLocationCrosshairs"
+              :loading="currentSearch === 'geoLocation'"
+              @click="useMyLocation"
+            />
+          </span>
+        </Teleport>
+      </template>
+    </SearchSuggestions>
   </div>
 </template>
 
 <style scoped>
 .address-search {
+  position: relative;
   display: grid;
   background-color: var(--colors-White);
   box-shadow: var(--elevation-light-2);
   border-radius: 2.4rem 2.4rem 2.4rem 2.4rem;
-  width: 100%;
 }
 
 .geolocate_button {
-  width: 100%;
-  padding: var(--spacing-m, 1rem) var(--spacing-m, 1rem) var(--spacing-m, 1rem) 1rem;
+  padding: var(--spacing-m, 1rem);
 
   & > button > :is(.phila-button__stack) > :is(.phila-button__content) > :is(.phila-icon-core) {
     font-size: var(--Icon-Solid-Small-font-icon-solid-small-size, 1.125rem);
@@ -209,7 +222,6 @@ function setLocToImage() {
 .image_location {
   place-content: center;
   padding: 0 var(--spacing-l, 1.5rem) var(--spacing-l, 1.5rem) var(--spacing-l, 1.5rem);
-  width: 100%;
 }
 
 .image_location__button {

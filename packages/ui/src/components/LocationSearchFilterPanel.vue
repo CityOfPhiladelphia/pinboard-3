@@ -189,6 +189,7 @@ function focusSearchInput() {
       >
         <Search
           v-model="searchString"
+          class="location-search-input"
           :placeholder="searchPlaceholder"
           :elevated="elevatedSearch"
           @update:model-value="handleSearchChange"
@@ -241,6 +242,10 @@ function focusSearchInput() {
 
 .location-search {
   grid-area: search;
+}
+
+.location-search-input {
+  position: relative;
 }
 
 /* Teleported onto the map (mobile): the container supplies the top inset, so

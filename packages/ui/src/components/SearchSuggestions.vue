@@ -90,66 +90,61 @@ defineExpose({ focusFirst })
 </script>
 
 <template>
-  <div v-if="suggestions.length" class="search-suggestions-anchor">
-    <div class="search-suggestions-container" :style="cornerShape">
-      <ul ref="listRef" class="search-suggestions" role="listbox" @keydown="handleKeydown">
-        <li v-if="heading" class="search-suggestions-heading" role="presentation">
-          {{ heading }}
-        </li>
-        <li
-          v-for="(suggestion, index) in suggestions"
-          :key="suggestion"
-          class="search-suggestion"
-          :class="{ 'search-suggestion--active': index === activeIndex }"
-          role="option"
-          tabindex="0"
-          @click="emit('select', suggestion)"
+  <div v-if="suggestions.length" class="search-suggestions-container" :style="cornerShape">
+    <slot />
+    <ul ref="listRef" class="search-suggestions" role="listbox" @keydown="handleKeydown">
+      <li v-if="heading" class="search-suggestions-heading" role="presentation">
+        {{ heading }}
+      </li>
+
+      <li
+        v-for="(suggestion, index) in suggestions"
+        :key="suggestion"
+        class="search-suggestion"
+        :class="{ 'search-suggestion--active': index === activeIndex }"
+        role="option"
+        tabindex="0"
+        @click="emit('select', suggestion)"
+      >
+        <Icon v-if="icon" :icon="icon" inline decorative></Icon>
+        <span class="search-suggestion-text has-text-label-default">{{ suggestion }}</span>
+        <button
+          v-if="removable"
+          type="button"
+          class="search-suggestion-remove"
+          :aria-label="removeLabel"
+          @click.stop="emit('remove', suggestion)"
         >
-          <Icon v-if="icon" :icon="icon" inline decorative></Icon>
-          <span class="search-suggestion-text has-text-label-default">{{ suggestion }}</span>
-          <button
-            v-if="removable"
-            type="button"
-            class="search-suggestion-remove"
-            :aria-label="removeLabel"
-            @click.stop="emit('remove', suggestion)"
-          >
-            <Icon :icon="IconClose" decorative />
-          </button>
-        </li>
-      </ul>
-    </div>
+          <Icon :icon="IconClose" decorative />
+        </button>
+      </li>
+    </ul>
   </div>
 </template>
 
 <style scoped>
-.search-suggestions-anchor {
-  position: relative;
-  width: 100%;
-  height: 0;
-}
-
 .search-suggestions-container {
   width: 100%;
-  z-index: -1;
   position: absolute;
-  top: -2.07rem;
+  top: 50%;
   left: 0;
   right: 0;
-  padding-right: 5rem;
   background-color: var(--Schemes-Background, #fff);
   border: 0px dotted var(--Schemes-Border-low, #ccc);
   box-shadow: var(--elevation-light-2);
   clip-path: inset(0 -8px -8px -8px);
   max-height: 20ch;
-  overflow: auto;
+  overflow: hidden;
   scrollbar-width: thin;
 }
 
 .search-suggestions {
-  margin: 0;
+  margin: 3.5rem 0 0 0;
   padding: 0 1.05rem;
   list-style: none;
+  height: 100%;
+  overflow: auto;
+  scrollbar-width: thin;
 }
 
 .search-suggestion {
