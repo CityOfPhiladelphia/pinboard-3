@@ -161,6 +161,16 @@ describe('PinboardBody - locations-filters slot forwarding (mobile bottom sheet)
     // second raw <slot> in the sheet would double-render the app's filters UI.
     expect(w.findAll('.my-filters')).toHaveLength(1)
   })
+
+  it('renders locations-header slot content exactly once on mobile', async () => {
+    const w = await mountPinboardBody({ isMobile: true })
+    // finder-panel-locations (the desktop panel) isn't teleported away or
+    // hidden on mobile — it just stacks in normal flow above the map unless
+    // its own <slot> is explicitly gated, which would double-render whatever
+    // the app put in #locations-header (see the bottom sheet's own copy above).
+    expect(w.findAll('.my-header')).toHaveLength(1)
+    expect(w.find('.finder-panel-locations').find('.my-header').exists()).toBe(false)
+  })
 })
 
 // PinboardBody still declares locationPanelCountNoun, but no longer binds :count-noun
@@ -189,6 +199,24 @@ describe.skip('PinboardBody - locationPanelCountNoun forwarding', () => {
 
     const withoutNoun = await mountPinboardBody()
     expect(withoutNoun.find('.location-sheet-header').text()).toContain('2 items')
+  })
+})
+
+describe('PinboardBody - detail panel focus', () => {
+  it('focuses the detail heading with preventScroll, not the browser default scroll-into-view', async () => {
+    const w = await mountPinboardBody({
+      slots: { 'location-detail': '<h2>{{ params.location.name }}</h2>' },
+    })
+    const focusSpy = vi.spyOn(HTMLElement.prototype, 'focus')
+    const router = (config.global.plugins as [Router])[0]
+    await router.push({ query: { location: 'a1' } })
+    await nextTick()
+    await nextTick()
+    expect(w.find('h2').text()).toBe('Pothole Repair')
+    // Without preventScroll, focus() on an element not fully in view triggers
+    // the browser's own scroll-into-view — which isn't top-aligned — fighting
+    // the panel's own already-correct opening scroll position.
+    expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true })
   })
 })
 

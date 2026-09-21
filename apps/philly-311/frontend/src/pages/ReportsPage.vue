@@ -1,8 +1,8 @@
 <!-- ABOUTME: My Requests — the signed-in user's 311 cases on the Pinboard chassis:
      stat tiles in the page header, case cards + map pins, case detail panel. -->
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { Pinboard, MapNavigationControl, BasemapToggle, PinboardComposables } from '@pinboard/ui'
+import { computed, onMounted, inject, ref } from 'vue'
+import { Pinboard, MapNavigationControl, BasemapToggle, IS_MOBILE_KEY } from '@pinboard/ui'
 import { Callout } from '@phila/phila-ui-callout'
 import type { PinboardTypes, MapCardProps } from '@pinboard/ui'
 import { useAuth } from '@phila/sso-vue'
@@ -18,7 +18,7 @@ import MapConstraints from '@/components/MapConstraints.vue'
 
 const auth = useAuth()
 const cases = useMyCases(auth)
-const isMobile = PinboardComposables.useIsMobile()
+const isMobile = inject(IS_MOBILE_KEY, ref(true))
 
 const locations = computed(() => cases.reports.value.map(reportToLocation))
 // Required by Pinboard; without a location-search-mode the map never pans to it.

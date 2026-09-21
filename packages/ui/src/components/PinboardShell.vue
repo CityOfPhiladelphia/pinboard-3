@@ -78,7 +78,11 @@ watch(isMobile, (newVal) => {
 onMounted(async () => {
   await router.isReady()
   if (route.path === '/') {
-    infoSheetOpen.value = isMobile.value
+    // Matches the #navbar-end info-icon's own gate below: without a
+    // tooltip or an info page to link to, the sheet has nothing to show —
+    // opening it anyway (as this used to, unconditionally) is just an empty
+    // bottom sheet with a close button.
+    infoSheetOpen.value = isMobile.value && (props.showHeaderTooltip || !!props.infoHref)
     if (isMobile.value || !props.showHeaderTooltip) {
       navbarInfo.value?.hide()
     } else {

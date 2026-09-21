@@ -233,6 +233,11 @@ const DETAIL_FOCUSABLE =
 // Prefer the site-name heading so a screen reader announces which location this
 // is; fall back to the first control. The heading is not otherwise focusable, so
 // it takes tabindex=-1, and its id labels the dialog.
+// preventScroll: true on both — an unqualified focus() here fights the panel's
+// own opening scroll position with the browser's default scroll-into-view
+// (which isn't top-aligned), landing partway down the detail instead of at
+// its top. The panel already starts scrolled to 0 on its own; this just stops
+// focus() from moving it anywhere else.
 function focusDetailPanel() {
   nextTick(() => {
     const root = detailPanelRef.value
@@ -241,9 +246,9 @@ function focusDetailPanel() {
     if (heading) {
       heading.id = 'pinboard-detail-heading'
       heading.setAttribute('tabindex', '-1')
-      heading.focus()
+      heading.focus({ preventScroll: true })
     } else {
-      root.querySelector<HTMLElement>(DETAIL_FOCUSABLE)?.focus()
+      root.querySelector<HTMLElement>(DETAIL_FOCUSABLE)?.focus({ preventScroll: true })
     }
   })
 }
@@ -459,7 +464,12 @@ function selectedLocationValue(): PinboardLocation {
       ]"
     >
       <div class="finder-panel-locations">
-        <slot name="locations-header" />
+        <!-- Desktop-only: on mobile the list itself teleports into the bottom
+             sheet below, but this slot isn't part of that teleport — left
+             unguarded, it stacks in normal flow above the map (finder-panel-
+             mobile is just display: block) instead of being replaced by the
+             bottom sheet's own copy of it. -->
+        <slot v-if="!isMobile" name="locations-header" />
 
         <div v-if="errorMessage" class="status-message status-message--error">
           {{ errorMessage }}
