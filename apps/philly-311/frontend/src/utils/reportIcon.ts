@@ -114,5 +114,5 @@ const ICONS: Record<Service, IconComponent> = {
 // Icon components are imported constants, so identity is stable by construction —
 // consumers can key v-for/props off the returned reference safely.
 export function serviceTypeIconComponent(serviceType?: Service): IconComponent {
-  return serviceType ? ICONS[serviceType] : IconLocationDot
+  return (serviceType && ICONS[serviceType]) || IconLocationDot
 }

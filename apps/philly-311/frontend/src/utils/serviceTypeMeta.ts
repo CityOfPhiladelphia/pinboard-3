@@ -65,7 +65,7 @@ const COLORS: Record<Service, string> = {
 }
 
 export function serviceTypeColor(serviceType?: Service): string {
-  return serviceType ? COLORS[serviceType] : FALLBACK_COLOR
+  return (serviceType && COLORS[serviceType]) || FALLBACK_COLOR
 }
 
 export function serviceTypeTintStyle(serviceType?: Service): {
