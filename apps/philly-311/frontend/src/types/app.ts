@@ -1,4 +1,4 @@
-export type ServiceType =
+export type Service =
   | 'Abandoned Vehicle'
   | 'Abandoned Bike'
   | 'Illegal Dumping'

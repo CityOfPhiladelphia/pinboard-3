@@ -22,7 +22,7 @@ const description = ref(store.description)
 const index = ref(
   Object.keys(store.customFields).length ? Object.keys(store.customFields).length - 1 : 0,
 )
-const questionResponse = ref('')
+const questionResponse = ref<string | undefined>(undefined)
 
 // A deep link (?category=X) can land here before the catalog has loaded, or
 // after it's failed to load — in both cases the category's questions are
@@ -43,7 +43,10 @@ const questions = computed(() => {
 const current = computed(() => questions.value?.[index.value] ?? null)
 
 watch(questionResponse, () => {
-  if (store.customFields[current.value.field] !== questionResponse.value)
+  if (
+    typeof questionResponse.value === 'string' &&
+    store.customFields[current.value.field] !== questionResponse.value
+  )
     answer(current.value.field, questionResponse.value, current.value.type)
 })
 
@@ -58,6 +61,7 @@ watch(description, (v) => {
 
 onBeforeMount(async () => {
   await load()
+  console.log(store.$state)
 })
 
 onBeforeUnmount(cancelAutoAdvance)
@@ -85,6 +89,7 @@ function answer(field: string, value: string, type: string) {
       if (current.value) next()
     }, AUTO_ADVANCE_MS)
   }
+  questionResponse.value = undefined
 }
 
 function next(): boolean {

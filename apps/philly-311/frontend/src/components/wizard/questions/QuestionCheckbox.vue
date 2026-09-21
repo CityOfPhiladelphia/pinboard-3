@@ -12,8 +12,8 @@ const props = defineProps<{
   initialValue: string
 }>()
 
-const modelValue = defineModel<string>('model-value')
-const error = defineModel<string>('error')
+const modelValue = defineModel<string | undefined>('model-value', { default: undefined })
+const error = defineModel<string>('error', { default: '' })
 
 const choices = computed(() => {
   return (props.question.options ?? []).map((o) => ({ text: o, value: o }))
@@ -38,7 +38,7 @@ function setCheckbox(record: Record<string, boolean>) {
   <!-- phila-ui gap: CheckboxGroup has no required prop and doesn't forward $attrs to its <input type="checkbox"> elements -->
   <CheckboxGroup
     :group-label="question.label"
-    :hide-title="{ hideFromScreenReader: true }"
+    :hide-title="{ hideFromScreenReader: false }"
     :choices="choices"
     :model-value="checkboxValue"
     :aria-required="question.required || false"

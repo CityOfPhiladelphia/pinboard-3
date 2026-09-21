@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Icon } from '@phila/phila-ui-core'
+import { Icon, type IconComponent } from '@phila/phila-ui-core'
 import { IconClose } from '@phila/phila-ui-core/icons'
 
 const props = defineProps<{
@@ -8,6 +8,7 @@ const props = defineProps<{
   heading?: string
   removable?: boolean
   removeLabel?: string
+  icon?: IconComponent
 }>()
 
 const emit = defineEmits<{
@@ -90,10 +91,11 @@ defineExpose({ focusFirst })
         class="search-suggestion"
         :class="{ 'search-suggestion--active': index === activeIndex }"
         role="option"
-        tabindex="-1"
+        tabindex="0"
         @click="emit('select', suggestion)"
       >
-        <span class="search-suggestion-text">{{ suggestion }}</span>
+        <Icon v-if="icon" :icon="icon" inline decorative></Icon>
+        <span class="search-suggestion-text has-text-label-default">{{ suggestion }}</span>
         <button
           v-if="removable"
           type="button"
@@ -124,19 +126,20 @@ defineExpose({ focusFirst })
   left: 0;
   right: 0;
   background-color: var(--Schemes-Background, #fff);
-  border: 1px solid var(--Schemes-Border-low, #ccc);
+  border: 0px solid var(--Schemes-Border-low, #ccc);
   border-top: none;
   border-radius: 0 0 var(--border-radius-s, 4px) var(--border-radius-s, 4px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-height: 15rem;
+  box-shadow: var(--elevation-light-2);
+  clip-path: inset(0 -8px -8px -8px);
+  max-height: 20ch;
   overflow-y: auto;
-  z-index: 10;
 }
 
 .search-suggestion {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin: 0;
   gap: var(--spacing-xs, 0.5rem);
   padding: var(--spacing-2xs, 0.25rem) var(--spacing-xs, 0.5rem);
   cursor: pointer;
@@ -144,7 +147,7 @@ defineExpose({ focusFirst })
   font-family: var(--Body-Large-font-body-large-family);
   font-size: var(--Body-Large-font-body-large-size);
   line-height: var(--Body-Large-font-body-large-lineheight);
-  outline: none;
+  outline: transparent;
 }
 
 .search-suggestion:hover,

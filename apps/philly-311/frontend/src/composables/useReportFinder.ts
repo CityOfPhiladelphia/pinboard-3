@@ -9,10 +9,11 @@ import { useOpenIssuesStore } from '@/stores/openIssues'
 import { getCurrentPosition } from '@/composables/useGeolocation'
 import { reportToLocation } from '@/utils/reportCard'
 import { DEFAULT_CENTER } from '@/utils/geoDefaults'
+import type { Service } from '@/types/app'
 
 export interface UseReportFinder {
   locations: ComputedRef<PinboardTypes.BasicLocation[]>
-  filterOptions: ComputedRef<{ value: string; label: string }[]>
+  filterOptions: ComputedRef<{ value: Service; label: Service }[]>
   searchOrUserLocation: Ref<PinboardTypes.LatLon>
   isLoading: Ref<boolean>
   errorMessage: ComputedRef<string | null>
@@ -60,8 +61,8 @@ export function useReportFinder(): UseReportFinder {
     return mapped.sort((a, b) => rankingDistance(a, from) - rankingDistance(b, from))
   })
 
-  const filterOptions = computed<{ value: string; label: string }[]>(() => {
-    const counts = new Map<string, number>()
+  const filterOptions = computed(() => {
+    const counts = new Map<Service, number>()
     for (const r of reports.value) {
       if (!r.serviceType) continue
       counts.set(r.serviceType, (counts.get(r.serviceType) ?? 0) + 1)

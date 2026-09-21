@@ -30,7 +30,7 @@
     "eslint-plugin-vue": "catalog:",
     "globals": "catalog:",
     "prettier": "catalog:",
-    "turbo": "^2.10.12",
+    "turbo": "^2.10.13",
     "typescript": "catalog:",
     "vue-tsc": "catalog:"
   },

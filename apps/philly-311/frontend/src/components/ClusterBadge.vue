@@ -1,16 +1,27 @@
 <!-- ABOUTME: Map badge button for a supercluster — shows report count, zooms in on click.
      Size tier class scales with magnitude: <10, <100, or ≥100. -->
 <script setup lang="ts">
-defineProps<{ count: number }>()
+const props = defineProps<{ count: number; maxCount: number }>()
+const t = props.count / props.maxCount
+
+const minSize = 2
+const maxSize = 3.5
+const clusterSize = `${scaleVals(t, minSize, maxSize)}em`
+
+const minText = 1.5
+const maxText = 2
+const textSize = `${scaleVals(t, minText, maxText)}rem`
+
+function scaleVals(t: number, min: number, max: number): string {
+  return (min + t * (max - min)).toFixed(2)
+}
 </script>
 
 <template>
   <button
     type="button"
     class="cluster-badge"
-    :class="
-      count < 10 ? 'cluster-badge--sm' : count < 100 ? 'cluster-badge--md' : 'cluster-badge--lg'
-    "
+    :style="{ width: clusterSize, height: clusterSize, 'font-size': textSize }"
     :aria-label="`${count} reports — zoom in`"
   >
     {{ count }}
@@ -30,23 +41,5 @@ defineProps<{ count: number }>()
   border: 2px solid #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   line-height: 1;
-}
-
-.cluster-badge--sm {
-  width: 32px;
-  height: 32px;
-  font-size: 0.75rem;
-}
-
-.cluster-badge--md {
-  width: 42px;
-  height: 42px;
-  font-size: 0.875rem;
-}
-
-.cluster-badge--lg {
-  width: 54px;
-  height: 54px;
-  font-size: 1rem;
 }
 </style>

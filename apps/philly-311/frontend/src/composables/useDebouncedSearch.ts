@@ -26,7 +26,7 @@ export interface UseDebouncedSearch<T> {
   query: Ref<string>
   results: Ref<T>
   loading: Ref<boolean>
-  error: Ref<string | null>
+  error: Ref<string | undefined>
 }
 
 export function useDebouncedSearch<T>(opts: Options<T>): UseDebouncedSearch<T> {
@@ -35,7 +35,7 @@ export function useDebouncedSearch<T>(opts: Options<T>): UseDebouncedSearch<T> {
   const query = ref('')
   const results = ref(opts.initial) as Ref<T>
   const loading = ref(false)
-  const error = ref<string | null>(null)
+  const error = ref<string | undefined>(undefined)
 
   let timer: ReturnType<typeof setTimeout> | null = null
   let abort: AbortController | null = null
@@ -51,7 +51,7 @@ export function useDebouncedSearch<T>(opts: Options<T>): UseDebouncedSearch<T> {
 
   watch(query, (q) => {
     cancel()
-    error.value = null
+    error.value = undefined
     const trimmed = q.trim()
     if (!trimmed) {
       loading.value = false

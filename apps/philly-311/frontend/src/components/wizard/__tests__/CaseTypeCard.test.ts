@@ -10,7 +10,7 @@ beforeEach(() => {
   setActivePinia(createPinia())
 })
 
-function st(serviceType: string, description = `${serviceType} desc`): ServiceType {
+function st(serviceType: Service, description = `${serviceType} desc`): ServiceType {
   return {
     serviceType,
     caseType: 'Street Defect',
