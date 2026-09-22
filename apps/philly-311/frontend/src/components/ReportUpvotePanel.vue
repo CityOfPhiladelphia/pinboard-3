@@ -58,15 +58,16 @@ async function confirmUpvote() {
       {{ upvoteError }}
     </div>
     <template #footer>
-      <PhilaButton
-        variant="text-flat"
-        data-test="upvote-confirm"
-        class="upvote-panel__submit"
-        :disabled="upvoting"
-        @click="confirmUpvote"
-      >
-        {{ upvoting ? 'Submitting…' : 'Submit' }}
-      </PhilaButton>
+      <div class="upvote-panel__footer">
+        <PhilaButton
+          variant="text-flat"
+          data-test="upvote-confirm"
+          :disabled="upvoting"
+          @click="confirmUpvote"
+        >
+          {{ upvoting ? 'Submitting…' : 'Submit' }}
+        </PhilaButton>
+      </div>
     </template>
   </DetailSubpanel>
 </template>
@@ -76,8 +77,9 @@ async function confirmUpvote() {
   color: var(--Schemes-Error, #b3261e);
   margin: var(--spacing-s, 0.5rem) 0 0;
 }
-.upvote-panel__submit {
-  display: block;
-  margin-left: auto;
+
+.upvote-panel__footer {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>
