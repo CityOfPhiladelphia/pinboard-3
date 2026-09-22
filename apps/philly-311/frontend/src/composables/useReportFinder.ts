@@ -67,9 +67,11 @@ export function useReportFinder(): UseReportFinder {
       if (!r.serviceType) continue
       counts.set(r.serviceType, (counts.get(r.serviceType) ?? 0) + 1)
     }
-    return [...counts.entries()]
+    const a = [...counts.entries()]
       .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
       .map(([serviceType]) => ({ value: serviceType, label: serviceType }))
+    console.log('useReportFinder-filterOptions: ', a)
+    return a
   })
 
   function reportById(id: string): Report | undefined {

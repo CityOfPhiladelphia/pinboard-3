@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="PinboardLocation extends BasicLocation">
 // vue imports
-import { inject, ref, computed, watch, toRef, nextTick } from 'vue'
+import { inject, ref, computed, watch, toRef, nextTick, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -20,7 +20,7 @@ import { PINBOARD_CONFIG_KEY } from '../keys'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 
-import { FilterPanel } from '@phila/phila-ui-filter-panel'
+import { FilterPanel } from '../../../../../phila-ui-4/packages/filter-panel/dist/'
 
 // pinboard composables and utilities imports
 import { hasLocationData } from '../utilities/hasLocationData'
@@ -388,6 +388,12 @@ function selectedLocationValue(): PinboardLocation {
   if (selectedLocation.value) return selectedLocation.value
   throw new Error('selectedLocationValue() called without a selection')
 }
+
+onMounted(() => {
+  if (props.filters) {
+    console.log('FILTERS: ', props.filters)
+  }
+})
 </script>
 
 <template>
@@ -589,14 +595,6 @@ function selectedLocationValue(): PinboardLocation {
   height: auto;
   min-height: 0;
   flex: 1 1 auto;
-}
-
-.finder-panel :deep(.phila-filter-panel__title) {
-  font-family: var(--Body-Default-font-body-default-family, 'Montserrat', sans-serif);
-}
-
-.finder-panel :deep(.phila-filter-panel__section-toggle) {
-  font-family: var(--Body-Default-font-body-default-family, 'Montserrat', sans-serif);
 }
 
 .finder-panel-desktop {

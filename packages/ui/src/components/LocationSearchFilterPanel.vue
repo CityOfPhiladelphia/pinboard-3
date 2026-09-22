@@ -340,11 +340,6 @@ function focusSearchInput() {
   overflow-x: auto;
 }
 
-.filter-chip-bar :is(.phila-filter-chip-group__row) {
-  padding-inline: 0;
-  padding-block: 0;
-}
-
 .filter-chip-bar-mobile {
   padding: 0.5rem 0;
 }

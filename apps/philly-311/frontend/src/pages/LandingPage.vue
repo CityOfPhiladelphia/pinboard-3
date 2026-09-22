@@ -49,16 +49,18 @@ const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
 
 const locatedFix = ref<{ latitude: number; longitude: number; accuracy: number } | null>(null)
 
-const filters = computed<FilterDefinition[]>(() =>
-  finder.filterOptions.value.map((o) => ({
+const filters = computed<FilterDefinition[]>(() => {
+  const a = finder.filterOptions.value.map((o) => ({
     key: o.value,
     label: o.label,
     // FilterChipGroup icons are Vue functional components; the shared cached
     // wrapper keeps chips visually in sync with the map markers.
     icon: serviceTypeIconComponent(o.label),
     iconColor: serviceTypeColor(o.label),
-  })),
-)
+  }))
+  console.log('LandingPage-filters: ', a)
+  return a
+})
 
 const filterValues = ref<Record<string, boolean>>(
   Object.fromEntries(
@@ -67,7 +69,8 @@ const filterValues = ref<Record<string, boolean>>(
 )
 
 watch(filterValues, (newValue) => {
-  const on = Object.keys(newValue).filter((k) => newValue[k] === true)
+  // console.log("newValue: ", newValue)
+  const on = Object.keys(filterValues.value).filter((k) => filterValues.value[k] === true)
   const added = on.find((k) => k !== finder.filter.value)
   const value = added ?? (on.length > 0 ? finder.filter.value : 'all')
   if (value !== finder.filter.value) finder.filter.value = value

@@ -15,7 +15,7 @@ async function apiKey(): Promise<string> {
   const params = new URLSearchParams({
     apiUrl: apiId,
   })
-  const url = `https://0spy4bb9w1.execute-api.us-east-1.amazonaws.com/get311Info?${params.toString()}`
+  const url = `https://haydr3k097.execute-api.us-east-1.amazonaws.com/get311Info?${params.toString()}`
   try {
     const response = await fetch(url)
     if (!response.ok) {
