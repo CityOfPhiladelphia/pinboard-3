@@ -61,6 +61,13 @@ const zoom = ref(props.config?.zoom ?? 14)
 // The underlying maplibre instance exposed by the <Map> component, once loaded.
 const liveMap = computed(() => mapRef.value?.map ?? null)
 
+const philaMapConfig = computed(() => {
+  if (!props.config) return props.config
+  const rest = { ...props.config }
+  delete rest.padding
+  return rest
+})
+
 function panTo(coordinates: LatLon) {
   const mapInstance = liveMap.value
   if (mapInstance) {
@@ -71,7 +78,20 @@ function panTo(coordinates: LatLon) {
 
 defineExpose({ panTo })
 
-function handleMapLoad(mapInstance: { getBounds: () => BoundsLike }) {
+function handleMapLoad(mapInstance: {
+  getBounds: () => BoundsLike
+  getCenter?: () => { lng: number; lat: number }
+  getZoom?: () => number
+  jumpTo?: (options: Record<string, unknown>) => void
+}) {
+  if (props.config?.padding && mapInstance.jumpTo) {
+    const center = mapInstance.getCenter?.()
+    mapInstance.jumpTo({
+      center: center && [center.lng, center.lat],
+      zoom: mapInstance.getZoom?.(),
+      padding: props.config.padding,
+    })
+  }
   props.onBoundsChange?.(toMapBounds(mapInstance.getBounds()))
 }
 
@@ -109,7 +129,7 @@ const SlotRenderer = defineComponent({
   <div class="map-panel">
     <PhilaMap
       ref="mapRef"
-      v-bind="config"
+      v-bind="philaMapConfig"
       @zoom="zoom = $event"
       @load="handleMapLoad"
       @moveend="handleMoveEnd"

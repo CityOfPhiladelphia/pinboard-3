@@ -59,6 +59,7 @@ onMounted(() => {
     :get-map-card-props="getMapCardProps"
     :is-mobile="isMobile"
     location-panel-count-noun="request"
+    :initial-bottom-sheet-snap-index="1"
   >
     <template #page-header>
       <div class="reports-page-header">
@@ -154,7 +155,9 @@ onMounted(() => {
   margin: 0;
 }
 
-/* Bounded 2x2 grid on narrow screens so the header leaves room for map + sheet. */
+/* Bounded 2x2 grid on narrow screens — this now renders inside the mobile
+   bottom sheet (PinboardBody moves the page-header slot there) rather than
+   above the map, but the sheet itself is still comparatively narrow there. */
 @media (max-width: 768px) {
   .reports-page-header {
     padding: var(--spacing-s, 0.75rem) var(--spacing-m, 1rem);

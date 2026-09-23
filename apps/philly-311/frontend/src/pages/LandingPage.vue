@@ -77,6 +77,7 @@ async function onSearch(query: string) {
     :location-panel-search="searchPlaceholder"
     location-panel-count-noun="report"
     :location-search-mode="locationSearchMode"
+    :initial-bottom-sheet-snap-index="1"
     @search="onSearch"
     @bounds-change="setMapBounds"
   >

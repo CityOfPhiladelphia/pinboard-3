@@ -89,6 +89,7 @@ const props = withDefaults(
     filters?: FilterDefinition[]
     filterValues?: FilterValues
     locationPanelCountNoun?: string
+    initialBottomSheetSnapIndex?: number
   }>(),
   {
     waitForUserLocation: false,
@@ -101,6 +102,7 @@ const props = withDefaults(
     filters: undefined,
     filterValues: undefined,
     locationPanelCountNoun: undefined,
+    initialBottomSheetSnapIndex: undefined,
   }
 )
 
@@ -135,6 +137,7 @@ const bottomSheetRef = ref<{
 } | null>(null)
 const mobileControlsTarget = ref<HTMLDivElement | null>(null)
 const mobileControlsTargetLeft = ref<HTMLDivElement | null>(null)
+const locationsPanelMobileTarget = ref<HTMLDivElement | null>(null)
 const locationsPanelRef = ref<{
   scrollToCard: (id: string, behavior?: ScrollBehavior) => void
 } | null>(null)
@@ -453,14 +456,14 @@ function selectedLocationValue(): PinboardLocation {
 <template>
   <div id="detail-overlay-desktop" />
   <div class="finder-body">
-    <div v-if="slots['page-header']" class="finder-page-header">
+    <div v-if="slots['page-header'] && !isMobile" class="finder-page-header">
       <slot name="page-header" />
     </div>
     <div
       class="finder-panel"
       :class="[
         isMobile ? 'finder-panel-mobile' : 'finder-panel-desktop',
-        { 'finder-panel--with-page-header': !!slots['page-header'] },
+        { 'finder-panel--with-page-header': !!slots['page-header'] && !isMobile },
       ]"
     >
       <div class="finder-panel-locations">
@@ -483,7 +486,11 @@ function selectedLocationValue(): PinboardLocation {
           <LoadingCards />
         </div>
 
-        <Teleport v-else-if="!isLoading" to="#locations-panel-mobile" :disabled="!isMobile">
+        <Teleport
+          v-else-if="!isLoading && (!isMobile || locationsPanelMobileTarget)"
+          :to="locationsPanelMobileTarget ?? '#locations-panel-mobile'"
+          :disabled="!isMobile"
+        >
           <LocationsPanel
             ref="locationsPanelRef"
             :locations="locations"
@@ -597,6 +604,7 @@ function selectedLocationValue(): PinboardLocation {
     ref="bottomSheetRef"
     v-model="bottomSheetOpen"
     :snap-points="snapPoints"
+    :initial-snap-index="initialBottomSheetSnapIndex"
     :collapse-label="selectedLocation ? '' : t('pinboard.mapView')"
     :collapse-icon="selectedLocation ? undefined : IconMap"
     :style="{ display: isMobile ? 'block' : 'none' }"
@@ -604,12 +612,13 @@ function selectedLocationValue(): PinboardLocation {
   >
     <div class="bottom-sheet-stack">
       <div class="bottom-sheet-list-scroll" :class="{ 'is-hidden': selectedLocation }">
+        <slot name="page-header" />
         <slot name="locations-header" />
         <div class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
           <div id="bottom-sheet-sort" />
         </div>
-        <div id="locations-panel-mobile" />
+        <div id="locations-panel-mobile" ref="locationsPanelMobileTarget" />
       </div>
 
       <div v-if="selectedLocation">

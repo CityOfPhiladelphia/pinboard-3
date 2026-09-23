@@ -50,16 +50,21 @@ afterEach(() => {
   mounted.length = 0
 })
 
-// On mobile, LocationsPanel is Teleported to #locations-panel-mobile — an id
-// PinboardBody renders itself, inside the bottom sheet. Vue's Teleport can only
-// resolve a target that (a) already exists in the real `document` (hence
-// attachTo, not VTU's default detached container) and (b) was created in an
-// earlier patch than the Teleport itself. The real app satisfies (b) for free
-// because it boots with isLoading true and flips false once data loads, so the
-// bottom sheet (and #locations-panel-mobile within it) is already in the DOM
-// by the time Teleport activates. Mounting straight to isLoading: false skips
-// that first patch and Teleport fails to find its target — so every mount here
-// replays the same isLoading true → false sequence.
+// On mobile, LocationsPanel is Teleported into #locations-panel-mobile, a div
+// PinboardBody renders itself inside the bottom sheet — hence attachTo (a
+// detached container never round-trips through the real `document`, and the
+// ref below only resolves once actually attached). The Teleport's target used
+// to be a plain CSS selector, string-resolved once at the moment the Teleport
+// itself patched in; that only worked if the target div had already been
+// created in an earlier patch. A fresh page load satisfied that for free
+// (isLoading starts true, so the Teleport doesn't exist for that first patch;
+// by the time it flips in, the bottom sheet — and the target div — is already
+// mounted), but navigating back to an already-loaded page mounts with
+// isLoading already false, racing the Teleport against the target div within
+// the very same patch. The target is now passed as a ref instead (see
+// PinboardBody.vue), which Vue tracks and moves the content to once
+// populated regardless of patch order — see the isLoading:false-from-the-
+// start case below, which used to fail this exact way.
 async function mountPinboardBody(
   extraProps: Record<string, unknown> & {
     isLoading?: string | false
@@ -173,6 +178,47 @@ describe('PinboardBody - locations-filters slot forwarding (mobile bottom sheet)
   })
 })
 
+// Regression coverage for the ref-based Teleport target fix: navigating back
+// to an already-loaded page mounts PinboardBody with isLoading false from the
+// very first patch, racing the Teleport (which only renders once !isLoading)
+// against #locations-panel-mobile (rendered by the bottom sheet, in the same
+// patch) for creation order. A CSS-selector target lost that race often
+// enough to be user-visible; the ref-based target self-heals via Vue's own
+// reactivity regardless of order (see PinboardBody.vue).
+describe('PinboardBody - mobile Teleport target on a mount that starts past loading', () => {
+  it('resolves the Teleport target and renders the locations panel without warning', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+
+    const wrapper = mount(PinboardBody, {
+      attachTo: container,
+      props: {
+        locations: locations(),
+        getMapCardProps,
+        isMobile: true,
+        isLoading: false,
+        searchOrUserLocation: { latitude: NaN, longitude: NaN },
+        errorMessage: null,
+        locationPanelSearch: 'Search by address or ZIP',
+      },
+      global: {
+        stubs: { MapCard: MapCardStub, BottomSheet: BottomSheetStub },
+      },
+    })
+    await nextTick()
+    await nextTick()
+
+    const sheet = wrapper.find('.bottom-sheet-stub')
+    expect(sheet.findAll('.mapcard-stub')).toHaveLength(2)
+    expect(warnSpy).not.toHaveBeenCalledWith(expect.stringContaining('Teleport target'))
+
+    wrapper.unmount()
+    container.remove()
+    warnSpy.mockRestore()
+  })
+})
+
 // PinboardBody still declares locationPanelCountNoun, but no longer binds :count-noun
 // on LocationsPanel, so the noun never arrives and the count line falls back to "items".
 // Skipped rather than deleted: these assertions are the record of the seam added in
@@ -243,12 +289,10 @@ describe.skip('PinboardBody - selection survives locations array replacement', (
   })
 })
 
-// The slot itself still renders; what went missing is the finder-panel--with-page-header
-// modifier and its layout rule (height:auto, flex:1, min-height:0), added in d899904 and
-// dropped in 8bab5f7. philly-311's /reports is the only page that fills this slot.
-describe.skip('page-header slot', () => {
-  it('renders page-header content above the finder panel when the slot is filled', async () => {
+describe('page-header slot', () => {
+  it('renders page-header content above the finder panel on desktop', async () => {
     const w = await mountPinboardBody({
+      isMobile: false,
       slots: { 'page-header': '<h1 data-test="ph">My Requests</h1>' },
     })
     const header = w.find('.finder-page-header')
@@ -261,9 +305,27 @@ describe.skip('page-header slot', () => {
   })
 
   it('renders no header wrapper and no modifier class when the slot is absent', async () => {
-    const w = await mountPinboardBody()
+    const w = await mountPinboardBody({ isMobile: false })
     expect(w.find('.finder-page-header').exists()).toBe(false)
     expect(w.find('.finder-panel').classes()).not.toContain('finder-panel--with-page-header')
+  })
+
+  // On mobile the map should get the full height rather than losing space to
+  // a banner above it — page-header content moves into the bottom sheet
+  // instead (ahead of locations-header, matching reading order: page title/
+  // stats, then any list-level callout, then the list itself).
+  it('moves into the bottom sheet instead of above the map on mobile', async () => {
+    const w = await mountPinboardBody({
+      isMobile: true,
+      slots: { 'page-header': '<h1 data-test="ph">My Requests</h1>' },
+    })
+    expect(w.find('.finder-page-header').exists()).toBe(false)
+    expect(w.find('.finder-panel').classes()).not.toContain('finder-panel--with-page-header')
+
+    const sheet = w.find('.bottom-sheet-stub')
+    const header = sheet.find('[data-test="ph"]')
+    expect(header.exists()).toBe(true)
+    expect(sheet.html().indexOf('data-test="ph"')).toBeLessThan(sheet.html().indexOf('my-header'))
   })
 })
 

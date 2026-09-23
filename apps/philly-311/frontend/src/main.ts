@@ -49,7 +49,10 @@ app.use(
       center: [-75.1652, 39.9526],
       zoom: 11,
       minZoom: 10.5,
-      mobile: { zoom: 9.5 },
+      mobile: {
+        zoom: 11,
+        padding: { bottom: 300 },
+      },
     },
   }),
 )
