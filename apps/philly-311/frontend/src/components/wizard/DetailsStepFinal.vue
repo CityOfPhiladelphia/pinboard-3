@@ -6,8 +6,8 @@ import ReportStep from './ReportStep.vue'
 
 const isRequired = true
 
-const description = defineModel<string>('description')
-const error = defineModel<string>('error')
+const description = defineModel<string>('description', { default: '' })
+const error = defineModel<string>('error', { default: '' })
 </script>
 
 <template>

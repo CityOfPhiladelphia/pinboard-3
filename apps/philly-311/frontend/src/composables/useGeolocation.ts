@@ -12,7 +12,7 @@ export function getCurrentPosition(): Promise<{ lat: number; lng: number } | nul
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
       () => resolve(null),
-      { timeout: TIMEOUT_MS, maximumAge: 60_000, enableHighAccuracy: false },
+      { timeout: TIMEOUT_MS, maximumAge: 0, enableHighAccuracy: false },
     )
   })
 }

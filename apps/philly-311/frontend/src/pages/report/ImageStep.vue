@@ -89,7 +89,7 @@ function getLocationFromImage(image: File) {
     if (loc.latitude) {
       reverseGeocode(loc.latitude, loc.longitude).then((response) => {
         if (response) {
-          store.setLocation(response)
+          store.setPhotoLocation(response)
         }
       })
     }
@@ -165,9 +165,7 @@ function getLocationFromImage(image: File) {
   border-radius: 0.75rem;
 
   /* Elevation/Elevation Light/2 */
-  box-shadow:
-    0 1px 2px 0 rgba(0, 0, 0, 0.3),
-    0 2px 6px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--elevation-light-2);
   corner-top-right-shape: scoop;
   border-top-right-radius: 1.25em;
 }
@@ -189,7 +187,6 @@ function getLocationFromImage(image: File) {
   background: var(--Schemes-Error, #cc3000);
   color: var(--Schemes-On-Error, #fff);
   text-align: center;
-  /* Elevation/Elevation Light/1 */
   box-shadow: var(
     --elevation-light-1,
     0 1px 2px 0 rgba(0, 0, 0, 0.3),

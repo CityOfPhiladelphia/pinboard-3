@@ -184,7 +184,7 @@ onMounted(() => {
   background: transparent;
 }
 .location-card--custom.location-card--hovered:not(.location-card--selected) {
-  outline: none;
+  outline: transparent;
 }
 
 .location-list {

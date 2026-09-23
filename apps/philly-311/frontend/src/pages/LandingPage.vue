@@ -54,7 +54,7 @@ function onLocated(data: { longitude: number; latitude: number; accuracy: number
 }
 
 onMounted(() => {
-  void finder.init()
+  finder.init()
 })
 
 async function onSearch(query: string) {
@@ -160,26 +160,13 @@ async function onSearch(query: string) {
 </template>
 
 <style>
-.location-search:not(.mobile) {
-  padding-top: 0 !important;
-}
-
-.phila-input .content {
-  height: var(--scale-400) !important;
-}
-.phila-input .phila-text-field-input::placeholder {
-  font-family: var(--Body-Small-font-body-small-family) !important;
-  font-size: var(--Body-Small-font-body-small-size) !important;
-  line-height: var(--Body-Small-font-body-small-lineheight) !important;
-}
-
 .location-card--custom:not(.location-card--selected) {
   border: none;
   border-radius: 0;
   background: transparent;
 }
 .location-card--custom.location-card--hovered:not(.location-card--selected) {
-  outline: none;
+  outline: transparent;
 }
 
 .location-list {

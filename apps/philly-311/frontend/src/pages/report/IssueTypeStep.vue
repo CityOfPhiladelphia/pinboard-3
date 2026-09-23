@@ -15,6 +15,7 @@ import ImageAnalysis from '@/components/wizard/ImageAnalysis.vue'
 import ReportStep from '@/components/wizard/ReportStep.vue'
 import WizardLoadError from '@/components/wizard/WizardLoadError.vue'
 import type { ServiceType } from '@/types/api.ts'
+import type { Service } from '@/types/app'
 
 const issueStepId = useId()
 const store = useReportSubmissionStore()
@@ -23,7 +24,7 @@ const { list, isLoading, error, load } = useServiceTypes()
 const searchMatchedIssueTypes = ref<ServiceType[]>([])
 const classifying = ref(false)
 const errorMessage = ref('')
-const selectedServiceType = ref<string>('')
+const selectedServiceType = ref<Service | undefined>(undefined)
 const searchTerms = ref('')
 
 const stepTitle = `Select an issue type`
@@ -55,7 +56,10 @@ onBeforeMount(() => {
   }
 })
 
-watch(selectedServiceType, (selectedService) => store.setCategory(selectedService))
+watch(selectedServiceType, (selectedService) => {
+  console.log(selectedService)
+  store.setCategory(selectedService)
+})
 
 function handleSearchChange(search: string) {
   if (!search) searchMatchedIssueTypes.value = [...list.value]
@@ -164,9 +168,11 @@ function handleSearchSubmit() {
   border-radius: 0.75rem;
 
   /* Elevation/Elevation Light/2 */
-  box-shadow:
+  box-shadow: var(
+    --elevation-light-2,
     0 1px 2px 0 rgba(0, 0, 0, 0.3),
-    0 2px 6px 2px rgba(0, 0, 0, 0.15);
+    0 2px 6px 2px rgba(0, 0, 0, 0.15)
+  );
 }
 
 .issue-step__search {

@@ -14,11 +14,18 @@ import { charCodeToString, stringToCharCode } from '@pinboard/core'
 import type { LocationQuery } from 'vue-router'
 import type { PinboardTypes } from '@pinboard/ui'
 import { decodePhotoInfo, encodePhotoInfo } from '@/utils/encodeDecodePhoto'
+import type { Service } from '@/types/app'
+
+interface Location extends Omit<AisFeature, 'lat' | 'lng'> {
+  unit: string
+  city: string
+  state: string
+}
 
 interface State {
-  category: string | null
+  category: Service | undefined
   customFields: Record<string, string>
-  location: AisFeature | null
+  location: (AisFeature & Location) | undefined
   description: string
   photo: PhotoAsset
   contact: ContactInfo
@@ -31,7 +38,7 @@ interface State {
   submitted: SubmittedReport | null
 }
 
-interface T extends LocationQuery {
+interface StateFields extends LocationQuery {
   c: string
   cf: string
   l: string
@@ -43,12 +50,24 @@ interface T extends LocationQuery {
   ps: string
 }
 
-type QueryParams = Pick<T, 'c' | 'cf' | 'l' | 'd' | 'p' | 'co' | 'pv' | 'sc' | 'ps'>
+type QueryParams = Pick<StateFields, 'c' | 'cf' | 'l' | 'd' | 'p' | 'co' | 'pv' | 'sc' | 'ps'>
+
+const initialLocation = {
+  streetAddress: '',
+  unit: '',
+  city: 'Philadelphia',
+  state: 'PA',
+  zipCode: '',
+  lat: NaN,
+  lng: NaN,
+}
+
+export type LocationField = Exclude<keyof typeof initialLocation, 'lat' | 'lng'>
 
 const initial = (): State => ({
-  category: null,
+  category: undefined,
   customFields: {},
-  location: null,
+  location: initialLocation,
   description: '',
   photo: {
     dimensions: {
@@ -66,7 +85,7 @@ const initial = (): State => ({
 export const useReportSubmissionStore = defineStore('reportSubmission', {
   state: initial,
   actions: {
-    setCategory(category: string | null) {
+    setCategory(category: Service | undefined) {
       // Clear customFields when category changes — answers don't carry across types.
       if (this.category !== category) this.customFields = {}
       this.category = category
@@ -74,8 +93,10 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     setQuestion(field: string, value: string) {
       this.customFields[field] = value
     },
-    setLocation(location: AisFeature | null) {
+    setLocation(location: AisFeature | Location | undefined) {
       this.location = location
+        ? { ...initialLocation, ...this.location, ...location }
+        : initialLocation
     },
     setPhotoSuggestions(suggestions: PhotoSuggestion[]) {
       this.photoSuggestions = suggestions
@@ -94,6 +115,9 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     },
     setPhotoDimensions(dimensions: PinboardTypes.Dimensions) {
       this.photo.dimensions = dimensions
+    },
+    setPhotoLocation(location: AisFeature) {
+      this.photo.location = location
     },
     setDescription(description: string) {
       this.description = description
@@ -210,7 +234,7 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
       Object.entries(params as QueryParams).forEach(([queryKey, queryValue]) => {
         switch (queryKey as keyof QueryParams) {
           case 'c': {
-            this.category = decodeURIComponent(queryValue)
+            this.category = decodeURIComponent(queryValue) as Service
             break
           }
           case 'cf': {

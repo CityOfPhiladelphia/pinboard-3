@@ -4,8 +4,9 @@
 import { computed } from 'vue'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import { serviceTypeColor } from '@/utils/serviceTypeMeta'
+import type { Service } from '@/types/app'
 
-const props = withDefaults(defineProps<{ serviceType: string; size?: number }>(), { size: 36 })
+const props = withDefaults(defineProps<{ serviceType: Service; size?: number }>(), { size: 36 })
 
 const style = computed(() => ({
   backgroundColor: serviceTypeColor(props.serviceType),
