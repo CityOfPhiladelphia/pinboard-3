@@ -62,7 +62,7 @@ onMounted(() => {
     :initial-bottom-sheet-snap-index="1"
   >
     <template #page-header>
-      <div class="reports-page-header">
+      <div class="reports-page-header" :class="{ 'is-mobile': isMobile }">
         <h1>My Requests</h1>
         <ul class="reports-stats">
           <li><StatTile label="Total" :value="cases.reports.value.length" tone="neutral" /></li>
@@ -155,21 +155,19 @@ onMounted(() => {
   margin: 0;
 }
 
-/* Bounded 2x2 grid on narrow screens — this now renders inside the mobile
-   bottom sheet (PinboardBody moves the page-header slot there) rather than
-   above the map, but the sheet itself is still comparatively narrow there. */
-@media (max-width: 768px) {
-  .reports-page-header {
-    padding: var(--spacing-s, 0.75rem) var(--spacing-m, 1rem);
-  }
-  .reports-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-s, 0.75rem);
-  }
-  .reports-stats :deep(.stat-tile__value) {
-    font-size: 1.75rem;
-  }
+/* Bounded 2x2 grid on mobile — this renders inside the mobile bottom sheet
+   (PinboardBody moves the page-header slot there) rather than above the map,
+   and the sheet is comparatively narrow.  */
+.reports-page-header.is-mobile {
+  padding: var(--spacing-s, 0.75rem) var(--spacing-m, 1rem);
+}
+.reports-page-header.is-mobile .reports-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-s, 0.75rem);
+}
+.reports-page-header.is-mobile .reports-stats :deep(.stat-tile__value) {
+  font-size: 1.75rem;
 }
 
 .reports-empty {
