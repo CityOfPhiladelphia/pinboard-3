@@ -10,7 +10,7 @@ import {
   BasemapToggle,
   PinboardComposables,
 } from '@pinboard/ui'
-import type { PinboardTypes, MapCardProps, FilterDefinition } from '@pinboard/ui'
+import type { PinboardTypes, MapCardProps } from '@pinboard/ui'
 import { useReportFinder } from '@/composables/useReportFinder'
 import ReportDetail from '@/components/ReportDetail.vue'
 import { searchAddress } from '@/composables/useAis'
@@ -20,8 +20,6 @@ import ReportListingCard from '@/components/ReportListingCard.vue'
 import MapConstraints from '@/components/MapConstraints.vue'
 import ClusteredMarkers from '@/components/ClusteredMarkers.vue'
 import LocationAccuracyCircle from '@/components/LocationAccuracyCircle.vue'
-import { serviceTypeIconComponent } from '@/utils/reportIcon'
-import { serviceTypeColor } from '@/utils/serviceTypeMeta'
 
 const finder = useReportFinder()
 const isMobile = PinboardComposables.useIsMobile()
@@ -49,31 +47,22 @@ const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
 
 const locatedFix = ref<{ latitude: number; longitude: number; accuracy: number } | null>(null)
 
-const filters = computed<FilterDefinition[]>(() => {
-  const a = finder.filterOptions.value.map((o) => ({
-    key: o.value,
-    label: o.label,
-    // FilterChipGroup icons are Vue functional components; the shared cached
-    // wrapper keeps chips visually in sync with the map markers.
-    icon: serviceTypeIconComponent(o.label),
-    iconColor: serviceTypeColor(o.label),
-  }))
-  console.log('LandingPage-filters: ', a)
-  return a
-})
-
 const filterValues = ref<Record<string, boolean>>(
-  Object.fromEntries(
-    finder.filterOptions.value.map((o) => [o.value, o.value === finder.filter.value]),
-  ),
+  Object.fromEntries(finder.filterOptions.value.map((o) => [o.key, o.key === finder.filter.value])),
 )
 
 watch(filterValues, (newValue) => {
-  // console.log("newValue: ", newValue)
-  const on = Object.keys(filterValues.value).filter((k) => filterValues.value[k] === true)
-  const added = on.find((k) => k !== finder.filter.value)
-  const value = added ?? (on.length > 0 ? finder.filter.value : 'all')
-  if (value !== finder.filter.value) finder.filter.value = value
+  console.log('newValue: ', newValue)
+  // const on = Object.keys(filterValues.value).filter((k) => filterValues.value[k] === true)
+  // const added = on.find((k) => k !== finder.filter.value)
+  // const value = added ?? (on.length > 0 ? finder.filter.value : 'all')
+  // if (value !== finder.filter.value) finder.filter.value = value
+  if (finder.filter.value !== 'all') {
+    filterValues.value[finder.filter.value] = false
+  }
+  const iOfTrue = Object.values(filterValues.value).indexOf(true)
+  console.log('iOfTrue: ', iOfTrue)
+  finder.filter.value = iOfTrue >= 0 ? Object.keys(filterValues.value)[iOfTrue] : 'all'
 })
 
 function onLocated(data: { longitude: number; latitude: number; accuracy: number }) {
@@ -105,7 +94,7 @@ async function onSearch(query: string) {
     :is-mobile="isMobile"
     :location-panel-search="searchPlaceholder"
     location-panel-count-noun="report"
-    :filters="filters"
+    :filters="finder.filterOptions.value"
     @search="onSearch"
     @bounds-change="setMapBounds"
   >

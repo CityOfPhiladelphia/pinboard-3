@@ -3,24 +3,25 @@
 // ABOUTME: BasicLocation list + reportById lookup the Pinboard view binds.
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import type { PinboardTypes } from '@pinboard/ui'
+import type { FilterDefinition, PinboardTypes } from '@pinboard/ui'
 import type { Report } from '@/composables/useNearbyReports'
 import { useOpenIssuesStore } from '@/stores/openIssues'
 import { getCurrentPosition } from '@/composables/useGeolocation'
 import { reportToLocation } from '@/utils/reportCard'
 import { DEFAULT_CENTER } from '@/utils/geoDefaults'
 import type { Service } from '@/types/app'
+import { serviceTypeIconComponent } from '@/utils/reportIcon'
+import { serviceTypeColor } from '@/utils/serviceTypeMeta'
 
 export interface UseReportFinder {
   locations: ComputedRef<PinboardTypes.BasicLocation[]>
-  filterOptions: ComputedRef<{ value: Service; label: Service }[]>
+  filterOptions: ComputedRef<FilterDefinition[]>
   searchOrUserLocation: Ref<PinboardTypes.LatLon>
   isLoading: Ref<string | false>
   errorMessage: ComputedRef<string | null>
   filter: Ref<string>
   init: () => Promise<void>
   setCenter: (loc: PinboardTypes.LatLon) => void
-  setFilter: (value: string) => void
   reportById: (id: string) => Report | undefined
 }
 
@@ -61,7 +62,7 @@ export function useReportFinder(): UseReportFinder {
     return mapped.sort((a, b) => rankingDistance(a, from) - rankingDistance(b, from))
   })
 
-  const filterOptions = computed(() => {
+  const filterOptions = computed<FilterDefinition[]>(() => {
     const counts = new Map<Service, number>()
     for (const r of reports.value) {
       if (!r.serviceType) continue
@@ -69,7 +70,12 @@ export function useReportFinder(): UseReportFinder {
     }
     const a = [...counts.entries()]
       .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-      .map(([serviceType]) => ({ value: serviceType, label: serviceType }))
+      .map(([serviceType]) => ({
+        key: serviceType,
+        label: serviceType,
+        icon: serviceTypeIconComponent(serviceType),
+        iconColor: serviceTypeColor(serviceType),
+      }))
     console.log('useReportFinder-filterOptions: ', a)
     return a
   })
@@ -91,10 +97,6 @@ export function useReportFinder(): UseReportFinder {
     await store.ensureLoaded({ lat: center.lat, lng: center.lng })
   }
 
-  function setFilter(value: string) {
-    filter.value = value
-  }
-
   return {
     locations,
     filterOptions,
@@ -104,7 +106,6 @@ export function useReportFinder(): UseReportFinder {
     filter,
     init,
     setCenter,
-    setFilter,
     reportById,
   }
 }
