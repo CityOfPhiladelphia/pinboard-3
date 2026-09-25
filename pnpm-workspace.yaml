@@ -63,6 +63,7 @@ catalog:
   vue-router: ^5.0.6
   vue-tsc: '^3.3.11'
   '@types/node': '^26.3.0'
+  'vitest': '^4.1.5'
 
 minimumReleaseAgeExclude:
   - '@phila/phila-ui-app-footer@1.2.7-beta.3'
