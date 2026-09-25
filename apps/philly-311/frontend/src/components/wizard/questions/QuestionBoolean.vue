@@ -36,7 +36,7 @@ function setBoolean(record: Record<string, boolean>) {
          own); hideLabel visually hides it via the :deep() rule below instead of emptying it. -->
   <RadioGroup
     :group-label="question.label"
-    :hide-title="{ hideFromScreenReader: false }"
+    :hide-title="true"
     :choices="choices"
     :model-value="{
       Yes: initialValue === 'true',

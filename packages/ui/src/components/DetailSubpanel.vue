@@ -6,9 +6,11 @@
      (if any) is active and what fills the slots; this only supplies the navigation shell
      around it. -->
 <script setup lang="ts">
+import { inject, ref } from 'vue'
 import { CloseButton, PhilaButton } from '@phila/phila-ui-button'
 import { IconChevronLeft } from '@phila/phila-ui-core/icons'
 import { Tooltip } from '@phila/phila-ui-tooltip'
+import { IS_MOBILE_KEY } from '../keys'
 
 defineProps<{
   title: string
@@ -16,6 +18,8 @@ defineProps<{
   onBack: () => void
   onClose?: () => void
 }>()
+
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 </script>
 
 <template>
@@ -23,13 +27,15 @@ defineProps<{
     <div class="detail-subpanel__header">
       <PhilaButton
         :icon="IconChevronLeft"
-        variant="text-flat"
+        :icon-only="isMobile"
+        :variant="isMobile ? 'standard' : 'text-flat'"
         size="small"
         class="detail-subpanel__back"
         data-test="subpanel-back"
+        :aria-label="isMobile ? `Back to ${backLabel}` : undefined"
         @click="onBack"
       >
-        {{ backLabel }}
+        <template v-if="!isMobile">{{ backLabel }}</template>
       </PhilaButton>
       <h2 class="detail-subpanel__title has-text-label-large">{{ title }}</h2>
       <div v-if="onClose" class="detail-subpanel__close">
@@ -66,6 +72,10 @@ defineProps<{
   justify-self: start;
   min-width: 0;
   --phila-button-color: var(--Schemes-On-Surface-Low, #636363);
+}
+
+.detail-subpanel__back.icon-button--standard :deep(svg) {
+  color: var(--Schemes-On-Primary-Container);
 }
 .detail-subpanel__title {
   grid-column: 2;

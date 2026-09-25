@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { defineComponent, h, ref, computed } from 'vue'
 import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
+import { IS_MOBILE_KEY } from '@pinboard/ui'
 import VisibilityContactModal from '../VisibilityContactModal.vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 
@@ -56,14 +57,22 @@ vi.mock('vue-router', () => ({
   useRoute: () => ({ fullPath: '/report/review' }),
 }))
 
-// Fixed to desktop so these tests exercise the Modal branch (matching the
-// .modal-stub assertions below) rather than the BottomSheet one — same
-// pattern LandingPage.test.ts uses to avoid a real matchMedia call in jsdom.
-vi.mock('@pinboard/ui', () => ({
-  PinboardComposables: {
-    useIsMobile: () => ref(false),
-  },
-}))
+// IS_MOBILE_KEY is a real Symbol here (not mocked) so the injected default in
+// ResponsiveModal.vue would resolve to mobile if left unprovided — every
+// mount() below provides it fixed to desktop instead, so these tests exercise
+// the Modal branch (matching the .modal-stub assertions) rather than the
+// BottomSheet one, same pattern ReportsPage.test.ts uses to avoid a real
+// matchMedia call in jsdom.
+vi.mock('@pinboard/ui', async () => {
+  const actual = await vi.importActual<typeof import('@pinboard/ui')>('@pinboard/ui')
+  return { IS_MOBILE_KEY: actual.IS_MOBILE_KEY }
+})
+
+function mountModal() {
+  return mount(VisibilityContactModal, {
+    global: { provide: { [IS_MOBILE_KEY]: ref(false) } },
+  })
+}
 
 function open(w: ReturnType<typeof mount>) {
   return (w.vm as unknown as { open: () => void }).open()
@@ -79,12 +88,12 @@ beforeEach(() => {
 
 describe('VisibilityContactModal - visibility', () => {
   it('defaults to Private, matching the store default', () => {
-    const w = mount(VisibilityContactModal)
+    const w = mountModal()
     expect(w.find('[role="radio"][aria-checked="true"]').text()).toContain('Private')
   })
 
   it('selects Public and Apply commits it to the store', async () => {
-    const w = mount(VisibilityContactModal)
+    const w = mountModal()
     const [publicOption] = w.findAll('[role="radio"]')
     await publicOption.trigger('click')
     await w.find('.modal-stub__submit').trigger('click')
@@ -95,19 +104,19 @@ describe('VisibilityContactModal - visibility', () => {
 describe('VisibilityContactModal - contact info', () => {
   it('hides the contact section entirely when signed in', () => {
     authState.isAuthenticated.value = true
-    const w = mount(VisibilityContactModal)
+    const w = mountModal()
     expect(w.text()).not.toContain('Contact info')
   })
 
   it('shows the contact section, share off by default, when signed out', () => {
-    const w = mount(VisibilityContactModal)
+    const w = mountModal()
     expect(w.text()).toContain('Contact info')
     expect((w.find('input[type="checkbox"]').element as HTMLInputElement).checked).toBe(false)
     expect(w.find('.vc-modal__signin').exists()).toBe(false)
   })
 
   it('reveals the sign-in row and name/phone fields once sharing is toggled on', async () => {
-    const w = mount(VisibilityContactModal)
+    const w = mountModal()
     await w.find('input[type="checkbox"]').setValue(true)
     expect(w.find('.vc-modal__signin').exists()).toBe(true)
     expect(w.findAll('input[id^="vc-modal-"]')).toHaveLength(2)
@@ -115,7 +124,7 @@ describe('VisibilityContactModal - contact info', () => {
 
   it('sign-in row stores a redirect and calls auth.signIn()', async () => {
     const store = useReportSubmissionStore()
-    const w = mount(VisibilityContactModal)
+    const w = mountModal()
     await w.find('input[type="checkbox"]').setValue(true)
     await w.find('.vc-modal__signin').trigger('click')
     expect(sessionStorage.getItem('auth:redirectTo')).toBe(
@@ -127,7 +136,7 @@ describe('VisibilityContactModal - contact info', () => {
   it('sign-in redirect carries the wizard state so it survives the SSO round-trip', async () => {
     const store = useReportSubmissionStore()
     store.setCategory('Graffiti')
-    const w = mount(VisibilityContactModal)
+    const w = mountModal()
     await w.find('input[type="checkbox"]').setValue(true)
     await w.find('.vc-modal__signin').trigger('click')
     expect(sessionStorage.getItem('auth:redirectTo')).toBe(
@@ -136,7 +145,7 @@ describe('VisibilityContactModal - contact info', () => {
   })
 
   it('blocks Apply with an error when sharing is on but name is blank', async () => {
-    const w = mount(VisibilityContactModal)
+    const w = mountModal()
     await w.find('input[type="checkbox"]').setValue(true)
     await w.find('.modal-stub__submit').trigger('click')
     expect(w.text()).toContain('Please enter your name.')
@@ -144,7 +153,7 @@ describe('VisibilityContactModal - contact info', () => {
   })
 
   it('blocks Apply with an error when the phone number is not 10 digits', async () => {
-    const w = mount(VisibilityContactModal)
+    const w = mountModal()
     await w.find('input[type="checkbox"]').setValue(true)
     const inputs = w.findAll('input[id^="vc-modal-"]')
     await inputs[0].setValue('Jane Doe')
@@ -155,7 +164,7 @@ describe('VisibilityContactModal - contact info', () => {
   })
 
   it('Apply commits shareContactInfo and contact, stripping non-digit phone characters', async () => {
-    const w = mount(VisibilityContactModal)
+    const w = mountModal()
     await w.find('input[type="checkbox"]').setValue(true)
     const inputs = w.findAll('input[id^="vc-modal-"]')
     await inputs[0].setValue('Jane Doe')
@@ -168,7 +177,7 @@ describe('VisibilityContactModal - contact info', () => {
   })
 
   it('Cancel discards draft edits — the store is untouched', async () => {
-    const w = mount(VisibilityContactModal)
+    const w = mountModal()
     const [, privateOption] = w.findAll('[role="radio"]')
     await privateOption.trigger('click')
     await w.find('input[type="checkbox"]').setValue(true)
@@ -185,7 +194,7 @@ describe('VisibilityContactModal - contact info', () => {
 describe('VisibilityContactModal - open() reseeds from the store', () => {
   it('reflects the store’s current values each time it is opened, discarding any prior unapplied draft', async () => {
     const store = useReportSubmissionStore()
-    const w = mount(VisibilityContactModal)
+    const w = mountModal()
 
     // Edit without applying, then reopen — the edit should be gone.
     const [publicOption] = w.findAll('[role="radio"]')

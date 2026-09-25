@@ -48,6 +48,13 @@ export type UserLocationState = 'unknown' | 'acquiring' | 'located' | 'watching'
 
 export type MapControlPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
+export interface MapPadding {
+  top?: number
+  bottom?: number
+  left?: number
+  right?: number
+}
+
 export interface MapConfig {
   center?: LongitudeLatitude
   zoom?: number
@@ -55,6 +62,7 @@ export interface MapConfig {
   bearing?: number
   minZoom?: number
   maxZoom?: number
+  padding?: MapPadding
   basemapChangeControls?: {
     toggle?: boolean
     dropdown?: boolean
@@ -67,6 +75,7 @@ export interface MapConfig {
   mobile?: {
     center?: LongitudeLatitude
     zoom?: number
+    padding?: MapPadding
   }
 }
 

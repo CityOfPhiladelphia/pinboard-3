@@ -100,6 +100,7 @@ const props = withDefaults(
     geojson?: unknown
     filters?: FilterDefinition[]
     locationPanelCountNoun?: string
+    initialBottomSheetSnapIndex?: number
   }>(),
   {
     waitForUserLocation: false,
@@ -109,6 +110,7 @@ const props = withDefaults(
     geojson: undefined,
     filters: undefined,
     locationPanelCountNoun: undefined,
+    initialBottomSheetSnapIndex: undefined,
   }
 )
 
@@ -138,6 +140,7 @@ const bottomSheetRef = ref<{
 } | null>(null)
 const mobileControlsTarget = ref<HTMLDivElement | null>(null)
 const mobileControlsTargetLeft = ref<HTMLDivElement | null>(null)
+const locationsPanelMobileTarget = ref<HTMLDivElement | null>(null)
 const locationsPanelRef = ref<{
   scrollToCard: (id: string, behavior?: ScrollBehavior) => void
 } | null>(null)
@@ -192,6 +195,11 @@ const DETAIL_FOCUSABLE =
 // Prefer the site-name heading so a screen reader announces which location this
 // is; fall back to the first control. The heading is not otherwise focusable, so
 // it takes tabindex=-1, and its id labels the dialog.
+// preventScroll: true on both — an unqualified focus() here fights the panel's
+// own opening scroll position with the browser's default scroll-into-view
+// (which isn't top-aligned), landing partway down the detail instead of at
+// its top. The panel already starts scrolled to 0 on its own; this just stops
+// focus() from moving it anywhere else.
 function focusDetailPanel() {
   nextTick(() => {
     const root = detailPanelRef.value
@@ -200,9 +208,9 @@ function focusDetailPanel() {
     if (heading) {
       heading.id = 'pinboard-detail-heading'
       heading.setAttribute('tabindex', '-1')
-      heading.focus()
+      heading.focus({ preventScroll: true })
     } else {
-      root.querySelector<HTMLElement>(DETAIL_FOCUSABLE)?.focus()
+      root.querySelector<HTMLElement>(DETAIL_FOCUSABLE)?.focus({ preventScroll: true })
     }
   })
 }
@@ -399,18 +407,23 @@ onMounted(() => {
 <template>
   <div id="detail-overlay-desktop" />
   <div class="finder-body">
-    <div v-if="slots['page-header']" class="finder-page-header">
+    <div v-if="slots['page-header'] && !isMobile" class="finder-page-header">
       <slot name="page-header" />
     </div>
     <div
       class="finder-panel"
       :class="[
         isMobile ? 'finder-panel-mobile' : 'finder-panel-desktop',
-        { 'finder-panel--with-page-header': !!slots['page-header'] },
+        { 'finder-panel--with-page-header': !!slots['page-header'] && !isMobile },
       ]"
     >
       <div class="finder-panel-locations">
-        <slot name="locations-header" class="locations-header" />
+        <!-- Desktop-only: on mobile the list itself teleports into the bottom
+             sheet below, but this slot isn't part of that teleport — left
+             unguarded, it stacks in normal flow above the map (finder-panel-
+             mobile is just display: block) instead of being replaced by the
+             bottom sheet's own copy of it. -->
+        <slot v-if="!isMobile" name="locations-header" class="locations-header" />
 
         <div
           v-if="errorMessage"
@@ -426,7 +439,11 @@ onMounted(() => {
           <LoadingCards />
         </div>
 
-        <Teleport v-else-if="!isLoading" to="#locations-panel-mobile" :disabled="!isMobile">
+        <Teleport
+          v-else-if="!isLoading && (!isMobile || locationsPanelMobileTarget)"
+          :to="locationsPanelMobileTarget ?? '#locations-panel-mobile'"
+          :disabled="!isMobile"
+        >
           <LocationsPanel
             ref="locationsPanelRef"
             v-model:location-filter-mode="locationFilterMode"
@@ -521,6 +538,7 @@ onMounted(() => {
     ref="bottomSheetRef"
     v-model="bottomSheetOpen"
     :snap-points="snapPoints"
+    :initial-snap-index="initialBottomSheetSnapIndex"
     :collapse-label="selectedLocation ? '' : t('pinboard.mapView')"
     :collapse-icon="selectedLocation ? undefined : IconMap"
     :style="{ display: isMobile ? 'block' : 'none' }"
@@ -528,12 +546,13 @@ onMounted(() => {
   >
     <div class="bottom-sheet-stack">
       <div class="bottom-sheet-list-scroll" :class="{ 'is-hidden': selectedLocation }">
+        <slot name="page-header" />
         <slot name="locations-header" />
         <div class="location-sheet-header">
           <span>{{ locationCountLabel }}</span>
           <div id="bottom-sheet-sort" />
         </div>
-        <div id="locations-panel-mobile" />
+        <div id="locations-panel-mobile" ref="locationsPanelMobileTarget" />
       </div>
 
       <div v-if="selectedLocation">

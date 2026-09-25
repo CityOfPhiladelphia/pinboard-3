@@ -10,14 +10,14 @@
      through yet since no current consumer needs them. Add them when the
      next modal does. -->
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import { Modal } from '@phila/phila-ui-modal'
 import type { ModalEmits } from '@phila/phila-ui-modal'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { useVisibility, FocusTrap } from '@phila/phila-ui-core'
 import { PhilaButton, CloseButton } from '@phila/phila-ui-button'
 import type { ButtonProps } from '@phila/phila-ui-button'
-import { PinboardComposables } from '@pinboard/ui'
+import { IS_MOBILE_KEY } from '@pinboard/ui'
 
 const props = withDefaults(
   defineProps<{
@@ -45,7 +45,7 @@ const props = withDefaults(
 
 const emit = defineEmits<ModalEmits>()
 
-const isMobile = PinboardComposables.useIsMobile()
+const isMobile = inject(IS_MOBILE_KEY, ref(true))
 // Set explicitly (not left to Modal.vue's own defaults) so this registry
 // entry doesn't depend on mount history across a desktop/mobile resize.
 // outsideClickHide is false since the scrim's own tap-to-close covers that.
