@@ -44,7 +44,7 @@ function clearError() {
     :id="fieldId"
     :label="labelText"
     :model-value="initialValue"
-    :max="Date.now()"
+    :max="new Date(Date.now())"
     :aria-required="question.required || false"
     @complete="validateDate"
     @update:model-value="clearError"

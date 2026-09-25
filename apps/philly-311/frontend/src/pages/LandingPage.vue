@@ -1,7 +1,7 @@
 <!-- ABOUTME: The 311 reports finder — Pinboard map + list of nearby reports with
      service-type filter chips, geolocation-seeded load, and inline report detail. -->
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, inject, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   Pinboard,
@@ -9,6 +9,7 @@ import {
   GeolocationButton,
   BasemapToggle,
   PinboardComposables,
+  IS_MOBILE_KEY,
 } from '@pinboard/ui'
 import type { PinboardTypes, MapCardProps } from '@pinboard/ui'
 import { useReportFinder } from '@/composables/useReportFinder'
@@ -23,7 +24,7 @@ import ClusteredMarkers from '@/components/ClusteredMarkers.vue'
 import LocationAccuracyCircle from '@/components/LocationAccuracyCircle.vue'
 
 const finder = useReportFinder()
-const isMobile = PinboardComposables.useIsMobile()
+const isMobile = inject(IS_MOBILE_KEY, ref(true))
 const searchPlaceholder = 'Search by address or ZIP'
 
 const route = useRoute()
@@ -76,6 +77,7 @@ async function onSearch(query: string) {
     :location-panel-search="searchPlaceholder"
     location-panel-count-noun="report"
     :location-search-mode="locationSearchMode"
+    :initial-bottom-sheet-snap-index="1"
     @search="onSearch"
     @bounds-change="setMapBounds"
   >

@@ -3,6 +3,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { defineComponent, h, ref } from 'vue'
 import { mount, RouterLinkStub } from '@vue/test-utils'
+import { IS_MOBILE_KEY } from '@pinboard/ui'
 import ReportsPage from '../ReportsPage.vue'
 import type { Report } from '@/composables/useNearbyReports'
 
@@ -34,7 +35,7 @@ vi.mock('@pinboard/ui', async () => ({
   }),
   MapNavigationControl: { template: '<div />' },
   BasemapToggle: { template: '<div />' },
-  PinboardComposables: { useIsMobile: () => ref(false) },
+  IS_MOBILE_KEY: Symbol('is-mobile'),
 }))
 
 const rpt = (id: string, status: string): Report => ({
@@ -56,6 +57,10 @@ function mountPage() {
         MapConstraints: true,
         ReportDetail: true,
       },
+      // ReportsPage reads isMobile via inject(IS_MOBILE_KEY) now (matching
+      // the other pinboard apps instead of calling useIsMobile() itself) —
+      // provide it here the same way PinboardShell does in the real app.
+      provide: { [IS_MOBILE_KEY]: ref(false) },
     },
   })
 }

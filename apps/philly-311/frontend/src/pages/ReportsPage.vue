@@ -1,8 +1,8 @@
 <!-- ABOUTME: My Requests — the signed-in user's 311 cases on the Pinboard chassis:
      stat tiles in the page header, case cards + map pins, case detail panel. -->
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import { Pinboard, MapNavigationControl, BasemapToggle, PinboardComposables } from '@pinboard/ui'
+import { computed, onMounted, inject, ref } from 'vue'
+import { Pinboard, MapNavigationControl, BasemapToggle, IS_MOBILE_KEY } from '@pinboard/ui'
 import { Callout } from '@phila/phila-ui-callout'
 import type { PinboardTypes, MapCardProps } from '@pinboard/ui'
 import { useAuth } from '@phila/sso-vue'
@@ -18,7 +18,7 @@ import MapConstraints from '@/components/MapConstraints.vue'
 
 const auth = useAuth()
 const cases = useMyCases(auth)
-const isMobile = PinboardComposables.useIsMobile()
+const isMobile = inject(IS_MOBILE_KEY, ref(true))
 
 const locations = computed(() => cases.reports.value.map(reportToLocation))
 // Required by Pinboard; without a location-search-mode the map never pans to it.
@@ -59,9 +59,10 @@ onMounted(() => {
     :get-map-card-props="getMapCardProps"
     :is-mobile="isMobile"
     location-panel-count-noun="request"
+    :initial-bottom-sheet-snap-index="1"
   >
     <template #page-header>
-      <div class="reports-page-header">
+      <div class="reports-page-header" :class="{ 'is-mobile': isMobile }">
         <h1>My Requests</h1>
         <ul class="reports-stats">
           <li><StatTile label="Total" :value="cases.reports.value.length" tone="neutral" /></li>
@@ -154,19 +155,19 @@ onMounted(() => {
   margin: 0;
 }
 
-/* Bounded 2x2 grid on narrow screens so the header leaves room for map + sheet. */
-@media (max-width: 768px) {
-  .reports-page-header {
-    padding: var(--spacing-s, 0.75rem) var(--spacing-m, 1rem);
-  }
-  .reports-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-s, 0.75rem);
-  }
-  .reports-stats :deep(.stat-tile__value) {
-    font-size: 1.75rem;
-  }
+/* Bounded 2x2 grid on mobile — this renders inside the mobile bottom sheet
+   (PinboardBody moves the page-header slot there) rather than above the map,
+   and the sheet is comparatively narrow.  */
+.reports-page-header.is-mobile {
+  padding: var(--spacing-s, 0.75rem) var(--spacing-m, 1rem);
+}
+.reports-page-header.is-mobile .reports-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-s, 0.75rem);
+}
+.reports-page-header.is-mobile .reports-stats :deep(.stat-tile__value) {
+  font-size: 1.75rem;
 }
 
 .reports-empty {

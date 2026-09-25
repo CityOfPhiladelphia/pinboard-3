@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { AppFooter } from '@phila/phila-ui-app-footer'
-import { AppHeader, NavbarInfo } from '@phila/phila-ui-app-header'
+import { AppHeader, NavbarInfo, NavbarLinks } from '@phila/phila-ui-app-header'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
 import { CloseButton } from '@phila/phila-ui-button'
 import { Callout } from '@phila/phila-ui-callout'
+import { useVisibility } from '@phila/phila-ui-core'
 import MobileNavPanel from './MobileNavPanel.vue'
 import PinboardSubFooter from './PinboardSubFooter.vue'
 import { computed, onMounted, useTemplateRef, watch } from 'vue'
@@ -16,6 +17,7 @@ import { languages } from '../i18n/languages.ts'
 const props = defineProps<{
   title: string
   logo?: NavbarBrandProps['logo']
+  logoSrc?: string
   translations: boolean
   bannerTitle?: string
   bannerMessage?: string
@@ -59,6 +61,17 @@ const navbarInfo = useTemplateRef<InstanceType<typeof NavbarInfo>>('navbarInfo')
 const router = useRouter()
 const route = useRoute()
 
+const HEADER_ID = 'pinboard-nav'
+const MOBILE_NAV_ID = `mobile-nav-${HEADER_ID}`
+const { setState: setMobileNavVisibility } = useVisibility({
+  id: MOBILE_NAV_ID,
+  group: HEADER_ID,
+})
+
+function closeMobileNav() {
+  setMobileNavVisibility(MOBILE_NAV_ID, false)
+}
+
 watch(
   () => route.fullPath,
   () => {
@@ -78,7 +91,11 @@ watch(isMobile, (newVal) => {
 onMounted(async () => {
   await router.isReady()
   if (route.path === '/') {
-    infoSheetOpen.value = isMobile.value
+    // Matches the #navbar-end info-icon's own gate below: without a
+    // tooltip or an info page to link to, the sheet has nothing to show —
+    // opening it anyway (as this used to, unconditionally) is just an empty
+    // bottom sheet with a close button.
+    infoSheetOpen.value = isMobile.value && (props.showHeaderTooltip || !!props.infoHref)
     if (isMobile.value || !props.showHeaderTooltip) {
       navbarInfo.value?.hide()
     } else {
@@ -90,24 +107,40 @@ onMounted(async () => {
 
 <template>
   <div class="pinboard">
-    <!-- showNavbarToggle/showSearch are left unset: AppHeader shows each
-         button only when its slot (mobile-nav / search-panel) actually has
-         content. We never provide search-panel, and mobile-nav below is only
-         forwarded when the caller provides it, so both do the right thing
-         automatically. -->
+    <!-- showSearch is left unset: AppHeader shows the search button only when
+         the search-panel slot actually has content, which we never provide.
+         showNavbarToggle needs to be explicit, though: its own doc comment
+         says it defaults to "show only if the mobile-nav slot has content",
+         via `showNavbarToggle ?? !!$slots['mobile-nav']` internally, but an
+         omitted Boolean prop is cast to false by Vue, not undefined — so
+         that `??` never falls through and the burger never auto-shows (same
+         gotcha ReportDetail.vue's showUpvote default works around). Passed
+         explicitly here instead of relying on that. -->
     <AppHeader
-      id="pinboard-nav"
+      :id="HEADER_ID"
       :compact-mobile="true"
       :show-trusted-site="true"
+      :show-navbar-toggle="!!$slots['mobile-nav'] || !!links?.length"
       :navbar-brand="navbarBrandProps"
       :links="links"
       :languages="translations ? languages : undefined"
       :locale="locale"
       @update:locale="setLocale"
     >
-      <template v-if="$slots['mobile-nav']" #mobile-nav>
-        <MobileNavPanel>
+      <template v-if="logoSrc" #navbar-brand>
+        <div class="phila-navbar-brand is-flex">
+          <RouterLink to="/" class="pinboard-brand">
+            <img :src="logoSrc" :alt="title" class="pinboard-brand__img" />
+          </RouterLink>
+        </div>
+      </template>
+
+      <template v-if="$slots['mobile-nav'] || links?.length" #mobile-nav>
+        <MobileNavPanel v-if="$slots['mobile-nav']" @click="closeMobileNav">
           <slot name="mobile-nav" />
+        </MobileNavPanel>
+        <MobileNavPanel v-else @click="closeMobileNav">
+          <NavbarLinks :links="links" />
         </MobileNavPanel>
       </template>
 
@@ -191,6 +224,20 @@ onMounted(async () => {
   margin: auto;
 }
 
+.pinboard-brand {
+  display: flex;
+  align-items: center;
+}
+
+.pinboard-brand__img {
+  height: 2rem;
+  width: auto;
+}
+
+.pinboard :deep(.phila-navbar) {
+  column-gap: var(--spacing-l);
+}
+
 .pinboard-main {
   position: relative;
   flex: 1;
@@ -246,6 +293,10 @@ onMounted(async () => {
     height: 2rem;
   }
 
+  .pinboard-brand__img {
+    height: 1.375rem;
+  }
+
   .pinboard :deep(.phila-navbar-logo.logo--single-line) {
     font-size: 1rem;
     white-space: nowrap;
@@ -254,5 +305,36 @@ onMounted(async () => {
   .pinboard :deep(.phila-navbar-brand-link) {
     margin-left: var(--spacing-s);
   }
+}
+
+/*Temp mobile nav styles */
+
+@media screen and (min-width: 1025px) {
+  .pinboard :deep(.phila-navbar-burger) {
+    display: none !important;
+  }
+}
+
+.pinboard :deep(.phila-mobile-nav .phila-navbar-item.phila-navbar-list) {
+  display: flex !important;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-2xs, 0.25rem);
+}
+
+.pinboard :deep(.phila-mobile-nav .phila-navbar-link) {
+  color: var(--Schemes-On-Surface, #343434);
+}
+.pinboard :deep(.phila-mobile-nav .phila-navbar-link:hover),
+.pinboard :deep(.phila-mobile-nav .phila-navbar-link:active),
+.pinboard :deep(.phila-mobile-nav .phila-navbar-link.phila-navbar-item-flyout-active) {
+  color: var(--Schemes-On-Surface, #343434);
+  background-color: var(--sidewalk-grey-700-sidewalk-grey, #f1f1f1);
+}
+.pinboard :deep(.phila-mobile-nav .phila-navbar-link.phila-navbar-link-text:hover),
+.pinboard :deep(.phila-mobile-nav .phila-navbar-link.phila-navbar-link-text:focus),
+.pinboard :deep(.phila-mobile-nav .phila-navbar-link.phila-navbar-link-text:active) {
+  color: var(--Schemes-On-Surface, #343434);
+  background-color: transparent;
 }
 </style>
