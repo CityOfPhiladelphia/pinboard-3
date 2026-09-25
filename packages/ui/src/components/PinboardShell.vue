@@ -17,6 +17,7 @@ import { languages } from '../i18n/languages.ts'
 const props = defineProps<{
   title: string
   logo?: NavbarBrandProps['logo']
+  logoSrc?: string
   translations: boolean
   bannerTitle?: string
   bannerMessage?: string
@@ -126,6 +127,14 @@ onMounted(async () => {
       :locale="locale"
       @update:locale="setLocale"
     >
+      <template v-if="logoSrc" #navbar-brand>
+        <div class="phila-navbar-brand is-flex">
+          <RouterLink to="/" class="pinboard-brand">
+            <img :src="logoSrc" :alt="title" class="pinboard-brand__img" />
+          </RouterLink>
+        </div>
+      </template>
+
       <template v-if="$slots['mobile-nav'] || links?.length" #mobile-nav>
         <MobileNavPanel v-if="$slots['mobile-nav']" @click="closeMobileNav">
           <slot name="mobile-nav" />
@@ -215,6 +224,20 @@ onMounted(async () => {
   margin: auto;
 }
 
+.pinboard-brand {
+  display: flex;
+  align-items: center;
+}
+
+.pinboard-brand__img {
+  height: 2rem;
+  width: auto;
+}
+
+.pinboard :deep(.phila-navbar) {
+  column-gap: var(--spacing-l);
+}
+
 .pinboard-main {
   position: relative;
   flex: 1;
@@ -268,6 +291,10 @@ onMounted(async () => {
 @media (max-width: 768px), (max-width: 1064px) and (max-height: 600px) {
   .pinboard :deep(#trusted-site) {
     height: 2rem;
+  }
+
+  .pinboard-brand__img {
+    height: 1.375rem;
   }
 
   .pinboard :deep(.phila-navbar-logo.logo--single-line) {

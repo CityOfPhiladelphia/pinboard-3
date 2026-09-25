@@ -5,6 +5,7 @@ import { PinboardShell } from '@pinboard/ui'
 import type { NavLink } from '@phila/phila-ui-app-header'
 import '@pinboard/ui/style.css'
 import '@/assets/a11y.css'
+import logoSrc from '@/assets/Philly311-Full-Logo-Color-Dark.svg'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { Callout } from '@phila/phila-ui-callout'
 import { ModalTarget } from '@phila/phila-ui-modal'
@@ -68,13 +69,7 @@ function login() {
 <template>
   <PinboardShell
     title="Philly 311"
-    :logo="{
-      variant: 'city',
-      layout: 'single-line',
-      colorScheme: 'on-primary',
-      customName: 'Philly311',
-      href: '/',
-    }"
+    :logo-src="logoSrc"
     :links="navLinks"
     :translations="false"
     :show-header-tooltip="false"
