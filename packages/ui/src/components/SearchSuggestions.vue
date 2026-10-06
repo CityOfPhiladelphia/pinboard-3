@@ -1,22 +1,40 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { Icon, type IconComponent } from '@phila/phila-ui-core'
-import { IconClose } from '@phila/phila-ui-core/icons'
+import { IconLocationCrosshairs } from '@phila/phila-ui-core/icons'
+import { CloseButton, PhilaButton } from '@phila/phila-ui-button'
+import { useUserLocation } from '../composables/_index'
+import type { UserLocationState } from '../types'
 
-const props = defineProps<{
-  suggestions: string[]
-  heading?: string
-  removable?: boolean
-  removeLabel?: string
-  icon?: IconComponent
-  searchShape?: 'rectangle' | 'pill'
-}>()
+const userLocationState = defineModel<UserLocationState>('user-location-state', {
+  default: 'unknown',
+})
+
+const props = withDefaults(
+  defineProps<{
+    suggestions: string[]
+    showGeolocate?: boolean
+    heading?: string
+    removable?: boolean
+    removeLabel?: string
+    icon?: IconComponent
+  }>(),
+  {
+    showGeolocate: true,
+    heading: undefined,
+    removable: true,
+    removeLabel: undefined,
+    icon: undefined,
+  }
+)
 
 const emit = defineEmits<{
   select: [suggestion: string]
   dismiss: []
   remove: [suggestion: string]
 }>()
+
+const { handleGeolocate } = useUserLocation(false, false)
 
 const activeIndex = ref(-1)
 const listRef = ref<HTMLUListElement | null>(null)
@@ -27,15 +45,6 @@ watch(
     activeIndex.value = -1
   }
 )
-
-const cornerShape = computed(() => {
-  return {
-    'border-radius':
-      props.searchShape === 'pill'
-        ? '0 0 2.4rem 2.4rem'
-        : '0 0 var(--border-radius-s, 4px) var(--border-radius-s, 4px)',
-  }
-})
 
 function focusItem(index: number) {
   const items = listRef.value?.querySelectorAll<HTMLElement>('.search-suggestion')
@@ -90,13 +99,20 @@ defineExpose({ focusFirst })
 </script>
 
 <template>
-  <div v-if="suggestions.length" class="search-suggestions-container" :style="cornerShape">
+  <div v-if="suggestions.length">
+    <span class="geolocate_button">
+      <PhilaButton
+        text="Use my current location"
+        size="extra-small"
+        :icon="IconLocationCrosshairs"
+        :loading="userLocationState === 'acquiring'"
+        :style="{ background: 'red' }"
+        @click="handleGeolocate"
+      />
+    </span>
     <slot />
     <ul ref="listRef" class="search-suggestions" role="listbox" @keydown="handleKeydown">
-      <li v-if="heading" class="search-suggestions-heading" role="presentation">
-        {{ heading }}
-      </li>
-
+      <li v-if="heading" class="search-suggestions-heading" role="presentation" v-text="heading" />
       <li
         v-for="(suggestion, index) in suggestions"
         :key="suggestion"
@@ -106,40 +122,28 @@ defineExpose({ focusFirst })
         tabindex="0"
         @click="emit('select', suggestion)"
       >
-        <Icon v-if="icon" :icon="icon" inline decorative></Icon>
-        <span class="search-suggestion-text has-text-label-default">{{ suggestion }}</span>
-        <button
+        <Icon v-if="icon" :icon="icon" inline decorative />
+        <span class="search-suggestion-text has-text-label-default" v-text="suggestion" />
+        <CloseButton
           v-if="removable"
-          type="button"
-          class="search-suggestion-remove"
           :aria-label="removeLabel"
           @click.stop="emit('remove', suggestion)"
-        >
-          <Icon :icon="IconClose" decorative />
-        </button>
+        />
       </li>
     </ul>
   </div>
 </template>
 
 <style scoped>
-.search-suggestions-container {
-  width: 100%;
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  background-color: var(--Schemes-Background, #fff);
-  border: 0px dotted var(--Schemes-Border-low, #ccc);
-  box-shadow: var(--elevation-light-2);
-  clip-path: inset(0 -8px -8px -8px);
-  max-height: 20ch;
-  overflow: hidden;
-  scrollbar-width: thin;
+.geolocate_button {
+  padding: var(--spacing-m, 1rem);
+
+  & > button > :is(.phila-button__stack) > :is(.phila-button__content) > :is(.phila-icon-core) {
+    font-size: var(--Icon-Solid-Small-font-icon-solid-small-size, 1.125rem);
+  }
 }
 
 .search-suggestions {
-  margin: 3.5rem 0 0 0;
   padding: 0 1.05rem;
   list-style: none;
   height: 100%;
@@ -182,22 +186,5 @@ defineExpose({ focusFirst })
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.search-suggestion-remove {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.15rem;
-  border: none;
-  background: transparent;
-  color: var(--Schemes-On-Surface-Variant, #555);
-  cursor: pointer;
-  border-radius: var(--border-radius-s, 4px);
-}
-
-.search-suggestion-remove:hover {
-  background: var(--Schemes-Surface-Container, #eee);
 }
 </style>

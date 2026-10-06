@@ -30,6 +30,9 @@ const locationSortMode = defineModel<SortMode>('location-sort-mode', { default: 
 const searchString = defineModel<string>('search-string', { default: '' })
 const filterValues = defineModel<FilterValues | undefined>('filter-values', { default: undefined })
 const allFiltersOpen = defineModel<boolean>('all-filters-open', { default: false })
+const userLocationState = defineModel<UserLocationState>('user-location-state', {
+  default: 'unknown',
+})
 
 // props
 const props = defineProps<{
@@ -39,7 +42,6 @@ const props = defineProps<{
   hoveredId: string | undefined
   selectedId: string | undefined
   waitForUserLocation: boolean
-  userLocationState: UserLocationState
   locationSearch: string | undefined
   locationFilter: LocationFilterOption[] | undefined
   locationSort: SortLocationsOptions | undefined
@@ -104,16 +106,16 @@ defineExpose({ scrollToCard })
     v-model:search-string="searchString"
     v-model:filter-values="filterValues"
     v-model:all-filters-open="allFiltersOpen"
+    v-model:user-location-state="userLocationState"
     :search-placeholder="locationSearch"
     :filter-options="locationFilter"
     :filters="filters"
     :sort-options="locationSort"
-    :user-location-state="props.userLocationState"
     :is-mobile="isMobile"
     @search="emit('search')"
   />
 
-  <div v-if="countLabel" class="location-count">{{ countLabel }}</div>
+  <div v-if="countLabel" class="location-count" v-text="countLabel" />
 
   <slot name="list-header" />
 

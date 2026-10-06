@@ -15,23 +15,17 @@ To render a feature:
 
 <script setup lang="ts">
 // vue imports
-import { ref, computed, inject, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // 3rd party imports
 // philly ui imports
-import { Search } from '@phila/phila-ui-search'
 import { FilterChipGroup } from '@phila/phila-ui-filter-chip'
 
 // pinboard component imports
 import LocationFilter from './LocationFilter.vue'
 import SortPanel from './SortPanel.vue'
-import SearchSuggestions from './SearchSuggestions.vue'
-
-// pinboard composables imports
-import { useSearchSuggestions } from '../composables/useSearchSuggestions'
-import { useRecentSearches } from '../composables/useRecentSearches'
-import { PINBOARD_CONFIG_KEY } from '../keys.ts'
+import LocationSearch from './LocationSearch.vue'
 
 // type imports
 import type {
@@ -50,13 +44,15 @@ const locationSortMode = defineModel<SortMode>('location-sort-mode', { default: 
 const searchString = defineModel<string>('search-string', { default: '' })
 const filterValues = defineModel<FilterValues | undefined>('filter-values', { default: undefined })
 const allFiltersOpen = defineModel<boolean>('all-filters-open', { default: false })
+const userLocationState = defineModel<UserLocationState>('user-location-state', {
+  default: 'unknown',
+})
 
 // props
 const props = defineProps<{
   searchPlaceholder: string | undefined
   filterOptions: LocationFilterOption[] | undefined
   sortOptions: SortLocationsOptions | undefined
-  userLocationState: UserLocationState
   filters?: FilterDefinition[]
   isMobile: boolean
 }>()
@@ -68,21 +64,9 @@ const emit = defineEmits<{
   sortOption: [sort: SortMode]
 }>()
 
-const config = inject(PINBOARD_CONFIG_KEY)
 const { t } = useI18n()
 
 // refs
-const searchWrapperRef = ref<HTMLElement | null>(null)
-const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
-const { searchSuggestions, dismissSuggestions, hideSuggestions, refetchSuggestions } =
-  useSearchSuggestions(searchString)
-const {
-  recentSearches,
-  add: addRecentSearch,
-  remove: removeRecentSearch,
-} = useRecentSearches(config?.appId)
-const searchFocused = ref(false)
-
 // Filter chips in use bubble up to sit right after the (pinned) Sort chip. The
 // order is a snapshot recomputed only at safe moments — initial load, a chip's
 // dropdown closing, and the All-Filters panel closing — never live while a
@@ -137,123 +121,18 @@ watch(allFiltersOpen, (open) => {
   // Reorder chips to reflect what was toggled in the panel, once it's closed.
   if (!open) recomputeChipOrder()
 })
-
-// computed refs
-const showingRecents = computed(() => !searchString.value)
-
-const dropdownSuggestions = computed(() => {
-  // Empty field → recent searches; typing → AIS autocomplete.
-  if (!searchFocused.value) return []
-  return searchString.value ? searchSuggestions.value : recentSearches.value
-})
-
-const elevatedSearch = computed(() => {
-  // Elevate the floating search only when the cluster sits over the map (mobile + map placement).
-  return props.isMobile && config?.mobileFilterPlacement === 'map'
-})
-
-// event handlers
-function handleSearchInput(event: InputEvent) {
-  // v-model does not update while an IME is composing, and Android predictive text
-  // composes ordinary words — so searchString would sit stale until the keyboard
-  // closed, and the suggestions never fetched. Read the value off the DOM instead.
-  // Vue skips writing back to the input while composing, so the IME is unaffected.
-  const target = event.target as HTMLInputElement
-  if (target.tagName === 'INPUT') {
-    searchString.value = target.value
-  }
-}
-
-function handleSearchSubmit() {
-  const term = searchString.value.trim()
-  if (term) {
-    addRecentSearch(term)
-    if (term !== searchString.value) {
-      searchString.value = term
-    }
-  }
-  emit('search')
-}
-
-function handleSuggestionSelect(suggestion: string) {
-  dismissSuggestions()
-  searchString.value = suggestion
-  handleSearchSubmit()
-  focusSearchInput()
-}
-
-function handleSuggestionRemove(term: string) {
-  removeRecentSearch(term)
-  // Keep focus in the search area so the dropdown stays open for removing more.
-  focusSearchInput()
-}
-
-function handleSearchKeydown(event: KeyboardEvent) {
-  const target = event.target as HTMLElement
-  if (event.key === 'ArrowDown' && dropdownSuggestions.value.length && target.tagName === 'INPUT') {
-    event.preventDefault()
-    suggestionsRef.value?.focusFirst()
-  }
-}
-
-function handleSuggestionDismiss() {
-  focusSearchInput()
-}
-
-function handleSearchFocusOut(event: FocusEvent) {
-  const relatedTarget = event.relatedTarget as HTMLElement | null
-  if (!searchWrapperRef.value?.contains(relatedTarget)) {
-    searchFocused.value = false
-    hideSuggestions()
-  }
-}
-
-function handleSearchFocusIn(event: FocusEvent) {
-  searchFocused.value = true
-  const relatedTarget = event.relatedTarget as HTMLElement | null
-  if (!searchWrapperRef.value?.contains(relatedTarget)) {
-    refetchSuggestions()
-  }
-}
-
-// utility functions
-function focusSearchInput() {
-  const input = searchWrapperRef.value?.querySelector<HTMLElement>('input')
-  input?.focus()
-}
 </script>
 
 <template>
   <div class="location-search-filter-sort">
     <Teleport to="#mobile-map-search-filter" :disabled="!isMobile">
-      <div
-        v-if="searchPlaceholder"
-        ref="searchWrapperRef"
-        class="location-search"
-        :class="{ mobile: isMobile }"
-        @keydown="handleSearchKeydown"
-        @focusout="handleSearchFocusOut"
-        @focusin="handleSearchFocusIn"
-        @input="handleSearchInput"
-      >
-        <Search
-          v-model="searchString"
-          class="location-search-input"
-          :placeholder="searchPlaceholder"
-          :elevated="elevatedSearch"
-          @search="handleSearchSubmit"
-        />
-        <SearchSuggestions
-          ref="suggestionsRef"
-          :suggestions="dropdownSuggestions"
-          :heading="showingRecents ? t('pinboard.recentSearches') : undefined"
-          :removable="showingRecents"
-          :remove-label="t('pinboard.removeRecentSearch')"
-          @select="handleSuggestionSelect"
-          @dismiss="handleSuggestionDismiss"
-          @remove="handleSuggestionRemove"
-        />
-      </div>
+      <LocationSearch
+        v-model:search-string="searchString"
+        v-model:user-location-state="userLocationState"
+        :search-placeholder="searchPlaceholder"
+        :is-mobile="isMobile"
+        @search="emit('search')"
+      />
       <LocationFilter
         v-if="filterOptions && !filterValues"
         v-model:location-filter-mode="locationFilterMode"
@@ -262,7 +141,7 @@ function focusSearchInput() {
         :filter-options="filterOptions"
       />
 
-      <div v-if="filters" :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'">
+      <div v-else-if="filters" :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'">
         <FilterChipGroup
           v-model="filterValues"
           :filters="orderedChipFilters"
@@ -278,11 +157,11 @@ function focusSearchInput() {
     </Teleport>
 
     <Teleport to="#bottom-sheet-sort" :disabled="!isMobile">
-      <div v-if="sortOptions && !filterValues" class="location-sort content">
+      <div v-if="sortOptions && !filterValues" class="location-sort">
         <SortPanel
           v-model:location-sort-mode="locationSortMode"
           :sort-options="sortOptions"
-          :user-location-state="props.userLocationState"
+          :user-location-state="userLocationState"
           :is-mobile="isMobile"
         />
       </div>
@@ -303,20 +182,6 @@ function focusSearchInput() {
   padding: var(--spacing-l, 1.5rem) var(--spacing-m, 1rem);
 }
 
-.location-search {
-  grid-area: search;
-}
-
-.location-search-input {
-  position: relative;
-}
-
-/* Teleported onto the map (mobile): the container supplies the top inset, so
-   keep only the 1rem side inset that aligns the search bar with the chip row. */
-.location-search.mobile {
-  padding: 0 1rem;
-}
-
 .location-filters {
   grid-area: filters;
 }
@@ -330,7 +195,7 @@ function focusSearchInput() {
 
 .location-sort {
   grid-area: sort;
-  margin-left: auto;
+  z-index: -1;
 }
 
 .filter-chip-bar {

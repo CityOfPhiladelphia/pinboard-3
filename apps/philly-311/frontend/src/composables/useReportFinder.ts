@@ -71,7 +71,7 @@ export function useReportFinder(): UseReportFinder {
     const a = [...counts.entries()]
       .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
       .map(([serviceType]) => ({
-        key: serviceType,
+        name: serviceType,
         label: serviceType,
         icon: serviceTypeIconComponent(serviceType),
         iconColor: serviceTypeColor(serviceType),

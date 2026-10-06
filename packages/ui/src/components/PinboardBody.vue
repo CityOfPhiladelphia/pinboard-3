@@ -20,7 +20,7 @@ import { PINBOARD_CONFIG_KEY } from '../keys'
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
 
-import { FilterPanel } from '../../../../../phila-ui-4/packages/filter-panel/dist/'
+import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
 // pinboard composables and utilities imports
 import { hasLocationData } from '../utilities/hasLocationData'
@@ -451,13 +451,13 @@ onMounted(() => {
             v-model:search-string="searchString"
             v-model:filter-values="filterValues"
             v-model:all-filters-open="allFiltersOpen"
+            v-model:user-location-state="userLocationState"
             :locations="locations"
             :get-map-card-props="getMapCardProps"
             :location-filter="locationPanelFilter"
             :location-search="locationPanelSearch"
             :location-sort="locationPanelSort"
             :filters="filters"
-            :user-location-state="userLocationState"
             :wait-for-user-location="waitForUserLocation"
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"
@@ -618,7 +618,7 @@ onMounted(() => {
 
 .finder-panel-desktop {
   display: grid;
-  grid-template-columns: max(450px, 33%) 1fr;
+  grid-template-columns: max(480px, 33%) 1fr;
 }
 
 .finder-panel-mobile {

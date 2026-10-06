@@ -1,7 +1,7 @@
 <!-- ABOUTME: AIS-backed address search on phila-ui Search/SearchSuggestions. Typing fires
      /autocomplete (debounced); picking a suggestion fires /search and emits select(feature). -->
 <script setup lang="ts">
-import { computed, ref, useId } from 'vue'
+import { computed, onMounted, ref, useId } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { Search } from '@phila/phila-ui-search'
 import { SearchSuggestions } from '../../../../../../packages/ui/src/components/_index'
@@ -42,8 +42,6 @@ const { query, results, error } = useDebouncedSearch<AisAutocompleteResult[]>({
   initial: [],
   fetcher: (q, signal) => autocompleteAddresses(q, signal),
 })
-
-// const imageInfo = store.photo.mediaUrl ? '' : null
 
 // Closed after a pick: echoing the resolved address into `query` re-fires the
 // debounced autocomplete, and the list must not reopen until the user types.
@@ -138,6 +136,10 @@ function setLocToImage() {
   store.setLocation(store.photo.location)
   addressSource.value = 'image'
 }
+
+onMounted(() => {
+  console.log(store.photo.location)
+})
 </script>
 
 <template>
@@ -161,7 +163,7 @@ function setLocToImage() {
       />
     </span>
     <div
-      v-if="store.photo.location && !store.location?.streetAddress && !suggestions.length"
+      v-if="store.photo.location && store.location?.streetAddress && !suggestions.length"
       class="image_location"
       :style="{ display: open ? 'grid' : 'none' }"
     >
