@@ -49,7 +49,7 @@ export type { NavLink } from '@phila/phila-ui-app-header'
 export { PinboardBody as Pinboard } from './components/_index'
 
 export { Icon } from '@phila/phila-ui-core'
-export type { FilterDefinition, FilterValues, FilterChoice } from '@phila/phila-ui-core'
+export type { FilterProps, FilterValue, FilterChoice } from '@phila/phila-ui-filter-chip'
 
 export { mergeDeep, languages, languageCodes, pinboardMessages, type Language } from './i18n'
 export * from './keys'

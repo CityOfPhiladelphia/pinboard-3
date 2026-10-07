@@ -39,7 +39,7 @@ import type {
   SortMode,
   UserLocationState,
 } from '../types'
-import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
+import type { FilterProps, FilterValue } from '@phila/phila-ui-filter-chip'
 import LoadingCards from './LoadingCards.vue'
 
 // slots
@@ -86,8 +86,8 @@ const props = withDefaults(
     locationPanelSort?: SortLocationsOptions
     locationSearchMode?: SearchMode
     geojson?: unknown
-    filters?: FilterDefinition[]
-    filterValues?: FilterValues
+    filters?: FilterProps[]
+    filterValues?: FilterValue
     locationPanelCountNoun?: string
     initialBottomSheetSnapIndex?: number
   }>(),
@@ -112,7 +112,7 @@ const emit = defineEmits<{
   selectedLocationsFilter: [filter: string]
   sortLocationsOption: [sort: SortMode]
   deselect: [locationId: string]
-  'update:filterValues': [value: FilterValues]
+  'update:filterValues': [value: FilterValue]
   'bounds-change': [bounds: MapBounds]
 }>()
 
@@ -218,9 +218,9 @@ function recomputeChipOrder() {
   const rest = all.filter((f) => !f.excludeFromCount)
   chipOrderKeys.value = [
     ...pinned,
-    ...rest.filter((f) => isActive(f.key)),
-    ...rest.filter((f) => !isActive(f.key)),
-  ].map((f) => f.key)
+    ...rest.filter((f) => isActive(f.name)),
+    ...rest.filter((f) => !isActive(f.name)),
+  ].map((f) => f.name)
 }
 
 // Map the snapshot order onto the current filter definitions, so locale/label
@@ -229,12 +229,10 @@ function recomputeChipOrder() {
 const orderedChipFilters = computed(() => {
   const all = props.filters ?? []
   if (!chipOrderKeys.value.length) return all
-  const byKey = new Map(all.map((f) => [f.key, f]))
-  const ordered = chipOrderKeys.value
-    .map((k) => byKey.get(k))
-    .filter((f): f is FilterDefinition => !!f)
+  const byKey = new Map(all.map((f) => [f.name, f]))
+  const ordered = chipOrderKeys.value.map((k) => byKey.get(k)).filter((f): f is FilterProps => !!f)
   const known = new Set(chipOrderKeys.value)
-  return [...ordered, ...all.filter((f) => !known.has(f.key))]
+  return [...ordered, ...all.filter((f) => !known.has(f.name))]
 })
 
 // Seed on load and refresh on locale (filters) changes. Otherwise the order only
@@ -446,7 +444,7 @@ function handleCloseLocationDetail() {
   }
 }
 
-function handleApplyFilter(value: FilterValues) {
+function handleApplyFilter(value: FilterValue) {
   emit('update:filterValues', value)
 }
 
@@ -545,6 +543,7 @@ function selectedLocationValue(): PinboardLocation {
               <Teleport to="#mobile-map-search-filter" :disabled="!isMobile || !chipsOnMap">
                 <div :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'">
                   <FilterChipGroup
+                    :label="t('pinboard.allFilters')"
                     :filters="orderedChipFilters"
                     :model-value="filterValues"
                     color="white"
@@ -626,8 +625,7 @@ function selectedLocationValue(): PinboardLocation {
           v-if="allFiltersOpen"
           :filters="filters"
           :model-value="filterValues"
-          :full-screen="isMobile"
-          :title="t('pinboard.allFilters')"
+          :label="t('pinboard.allFilters')"
           :reset-text="t('pinboard.reset')"
           @update:model-value="handleApplyFilter"
           @close="allFiltersOpen = false"

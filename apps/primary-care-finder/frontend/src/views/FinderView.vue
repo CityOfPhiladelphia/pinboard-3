@@ -15,7 +15,7 @@ import {
   applyFilters,
   IS_MOBILE_KEY,
 } from '@pinboard/ui'
-import type { FilterChoiceBitfieldGroup, FilterValues, MapCardProps } from '@pinboard/ui'
+import type { FilterChoiceBitfieldGroup, FilterValue, MapCardProps } from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
 import { useFilterChipDefinitions } from '@/composables/filters/useFilterChipDefinitions.ts'
 import { useFilterLogic } from '@/composables/filters/useFilterLogic'
@@ -189,7 +189,7 @@ function mapFilterTextToFilterLogic(
   })
 }
 
-function handleApplyFilter(values: FilterValues) {
+function handleApplyFilter(values: FilterValue) {
   filterState.value = values as PrimaryCareFilters
 }
 
