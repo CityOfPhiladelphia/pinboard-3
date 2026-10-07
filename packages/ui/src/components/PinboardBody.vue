@@ -140,6 +140,7 @@ const mobileControlsTargetLeft = ref<HTMLDivElement | null>(null)
 const locationsPanelMobileTarget = ref<HTMLDivElement | null>(null)
 const locationsPanelRef = ref<{
   scrollToCard: (id: string, behavior?: ScrollBehavior) => void
+  scrollbarWidth: number
 } | null>(null)
 const mapPanelRef = ref<{ panTo: (coordinates: LatLon) => void } | null>(null)
 
@@ -490,7 +491,10 @@ function selectedLocationValue(): PinboardLocation {
     >
       <div
         class="finder-panel-locations"
-        :style="{ '--locations-footer-clearance': `${footerHeight}px` }"
+        :style="{
+          '--locations-footer-clearance': `${footerHeight}px`,
+          '--locations-scrollbar-width': `${locationsPanelRef?.scrollbarWidth ?? 0}px`,
+        }"
       >
         <!-- Desktop-only: on mobile the list itself teleports into the bottom
              sheet below, but this slot isn't part of that teleport — left
@@ -739,11 +743,12 @@ function selectedLocationValue(): PinboardLocation {
 }
 
 /* Overlays the bottom of the panel rather than sitting in flow — the list
-   scrolls underneath it instead of the footer pushing the list up. */
+   scrolls underneath it instead of the footer pushing the list up. It stops
+   short of the list's scrollbar so the scrollbar stays visible and clickable. */
 .finder-panel-locations-footer {
   position: absolute;
   left: 0;
-  right: 0;
+  right: var(--locations-scrollbar-width, 0px);
   bottom: 0;
   z-index: 3;
 }
