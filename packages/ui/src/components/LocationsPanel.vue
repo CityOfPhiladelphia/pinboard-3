@@ -20,6 +20,19 @@ import type {
   SortMode,
   UserLocationState,
 } from '../types'
+import type { FilterProps, FilterValue } from '@phila/phila-ui-filter-chip'
+
+// models
+const locationFilterMode = defineModel<string | undefined>('location-filter-mode', {
+  default: undefined,
+})
+const locationSortMode = defineModel<SortMode>('location-sort-mode', { default: '' })
+const searchString = defineModel<string>('search-string', { default: '' })
+const filterValues = defineModel<FilterValue | undefined>('filter-values', { default: undefined })
+const allFiltersOpen = defineModel<boolean>('all-filters-open', { default: false })
+const userLocationState = defineModel<UserLocationState>('user-location-state', {
+  default: 'unknown',
+})
 
 // props
 const props = defineProps<{
@@ -29,10 +42,10 @@ const props = defineProps<{
   hoveredId: string | undefined
   selectedId: string | undefined
   waitForUserLocation: boolean
-  userLocationState: UserLocationState
   locationSearch: string | undefined
   locationFilter: LocationFilterOption[] | undefined
   locationSort: SortLocationsOptions | undefined
+  filters?: FilterProps[]
   countNoun?: string
 }>()
 
@@ -40,9 +53,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   select: [location: PinboardLocation]
   search: []
-  searchString: [search: string]
-  selectedFilter: [filter: string]
-  sortOption: [sort: SortMode]
   hover: [id: string]
   'hover-end': []
 }>()
@@ -96,18 +106,6 @@ watch(
   }
 )
 // event handlers
-function handleFilterChange(selectedFilter: string) {
-  emit('selectedFilter', selectedFilter)
-}
-
-function handleSortChange(sortOption: SortMode) {
-  emit('sortOption', sortOption)
-}
-
-function handleSearchChange(searchString: string) {
-  emit('searchString', searchString)
-}
-
 function handleCardKeyup(location: PinboardLocation) {
   if (pendingKeydown.value) {
     emit('select', location)
@@ -128,22 +126,21 @@ defineExpose({ scrollToCard, scrollbarWidth })
 <template>
   <LocationSearchFilterPanel
     v-if="locationSearch || locationFilter || locationSort"
+    v-model:location-filter-mode="locationFilterMode"
+    v-model:location-sort-mode="locationSortMode"
+    v-model:search-string="searchString"
+    v-model:filter-values="filterValues"
+    v-model:all-filters-open="allFiltersOpen"
+    v-model:user-location-state="userLocationState"
     :search-placeholder="locationSearch"
     :filter-options="locationFilter"
+    :filters="filters"
     :sort-options="locationSort"
-    :user-location-state="props.userLocationState"
     :is-mobile="isMobile"
-    @selected-filter="handleFilterChange"
-    @sort-option="handleSortChange"
-    @search-string="handleSearchChange"
     @search="emit('search')"
   />
 
-  <slot name="below-search" />
-
-  <slot name="filters" />
-
-  <div v-if="countLabel" class="location-count">{{ countLabel }}</div>
+  <div v-if="countLabel" class="location-count" v-text="countLabel" />
 
   <slot name="list-header" />
 
@@ -214,6 +211,8 @@ defineExpose({ scrollToCard, scrollbarWidth })
 }
 
 .location-list {
+  isolation: isolate;
+  z-index: -1;
   display: flex;
   flex-direction: column;
   flex: 1;
