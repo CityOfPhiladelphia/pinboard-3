@@ -197,7 +197,7 @@ defineExpose({ scrollToCard })
   /* Left inset stays 1rem. The right inset is 0.5rem padding + the reserved
      scrollbar gutter (~0.5rem for a thin bar), so the scrollbar sits *inside* a
      right gap that visually matches the 1rem on the left. */
-  padding: 0.5rem 0.5rem 1rem 1rem;
+  padding: 0.5rem 0.5rem calc(1rem + var(--locations-footer-clearance, 0px)) 1rem;
   scrollbar-width: thin;
   scrollbar-gutter: stable;
 }

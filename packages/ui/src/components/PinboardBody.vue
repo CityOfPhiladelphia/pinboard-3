@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="PinboardLocation extends BasicLocation">
 // vue imports
-import { inject, ref, computed, watch, toRef, nextTick } from 'vue'
+import { inject, ref, computed, watch, toRef, nextTick, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -142,6 +142,28 @@ const locationsPanelRef = ref<{
   scrollToCard: (id: string, behavior?: ScrollBehavior) => void
 } | null>(null)
 const mapPanelRef = ref<{ panTo: (coordinates: LatLon) => void } | null>(null)
+
+// The locations-footer overlays the bottom of the list rather than sitting in
+// flow, so its measured height is passed to the list as bottom clearance —
+// otherwise the last card can't scroll out from under it.
+const footerRef = ref<HTMLElement | null>(null)
+const footerHeight = ref(0)
+let footerObserver: ResizeObserver | undefined
+watch(footerRef, (el) => {
+  footerObserver?.disconnect()
+  footerObserver = undefined
+  if (!el) {
+    footerHeight.value = 0
+    return
+  }
+  footerHeight.value = el.offsetHeight
+  if (typeof ResizeObserver === 'undefined') return
+  footerObserver = new ResizeObserver(() => {
+    footerHeight.value = el.offsetHeight
+  })
+  footerObserver.observe(el)
+})
+onBeforeUnmount(() => footerObserver?.disconnect())
 const searchString = ref<string>('')
 // filter state
 const allFiltersOpen = ref(false)
@@ -466,7 +488,10 @@ function selectedLocationValue(): PinboardLocation {
         { 'finder-panel--with-page-header': !!slots['page-header'] && !isMobile },
       ]"
     >
-      <div class="finder-panel-locations">
+      <div
+        class="finder-panel-locations"
+        :style="{ '--locations-footer-clearance': `${footerHeight}px` }"
+      >
         <!-- Desktop-only: on mobile the list itself teleports into the bottom
              sheet below, but this slot isn't part of that teleport — left
              unguarded, it stacks in normal flow above the map (finder-panel-
@@ -546,7 +571,11 @@ function selectedLocationValue(): PinboardLocation {
           </LocationsPanel>
         </Teleport>
 
-        <div v-if="!isMobile && slots['locations-footer']" class="finder-panel-locations-footer">
+        <div
+          v-if="!isMobile && slots['locations-footer']"
+          ref="footerRef"
+          class="finder-panel-locations-footer"
+        >
           <slot name="locations-footer" />
         </div>
       </div>
