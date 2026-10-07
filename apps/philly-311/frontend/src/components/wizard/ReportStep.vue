@@ -22,7 +22,9 @@ defineSlots<{
 }>()
 
 const requiredText = computed(() => `(${props.required ? 'required' : 'optional'})`)
-const titleText = computed(() => (props.hideRequired ? props.stepTitle : `${props.stepTitle} *`))
+const titleText = computed(() =>
+  props.required && !props.hideRequired ? `${props.stepTitle} *` : props.stepTitle,
+)
 </script>
 
 <template>

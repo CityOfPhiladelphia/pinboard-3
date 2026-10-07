@@ -74,7 +74,7 @@ const detailRows = computed(() => [
   })),
   {
     field: '__description',
-    label: 'Describe the issue * (required)',
+    label: 'Describe the issue',
     value: store.description || '—',
   },
 ])

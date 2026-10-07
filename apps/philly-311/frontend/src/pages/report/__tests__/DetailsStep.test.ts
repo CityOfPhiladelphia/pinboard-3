@@ -405,60 +405,22 @@ describe('DetailsStep - final screen', () => {
     expect(w.find('.details-step__privacy').exists()).toBe(true)
   })
 
-  it("next() with a 9-character description shows 'Add a description to continue' and returns true", async () => {
+  it('next() with an empty description returns false and shows no error — it is optional', async () => {
     useReportSubmissionStore().setCategory('Graffiti Removal')
     const { w, nav } = mountStep()
     await flushPromises()
-    await w.find('textarea').setValue('123456789')
-    expect(nav.value?.next()).toBe(true)
-    await flushPromises()
-    expect(w.text()).toContain('Add a description to continue')
-  })
-
-  it('next() with whitespace padding (13 raw / 7 trimmed chars) still fails the floor', async () => {
-    useReportSubmissionStore().setCategory('Graffiti Removal')
-    const { w, nav } = mountStep()
-    await flushPromises()
-    await w.find('textarea').setValue('   1234567   ')
-    expect(nav.value?.next()).toBe(true)
-    await flushPromises()
-    expect(w.find('[role="alert"]').text()).toBe('Add a description to continue')
-  })
-
-  it('next() with a valid (10 trimmed chars) description returns false', async () => {
-    useReportSubmissionStore().setCategory('Graffiti Removal')
-    const { w, nav } = mountStep()
-    await flushPromises()
-    await w.find('textarea').setValue('1234567890')
     expect(nav.value?.next()).toBe(false)
-  })
-
-  it('renders the error under role=alert with details-step__error, and marks the textarea errored', async () => {
-    useReportSubmissionStore().setCategory('Graffiti Removal')
-    const { w, nav } = mountStep()
-    await flushPromises()
-    await w.find('textarea').setValue('short')
-    expect(nav.value?.next()).toBe(true)
-    await flushPromises()
-
-    const alert = w.find('[role="alert"]')
-    expect(alert.exists()).toBe(true)
-    expect(alert.classes()).toContain('details-step__error')
-    expect(alert.text()).toBe('Add a description to continue')
-    expect(w.find('textarea').classes()).toContain('details-step__textarea--error')
-  })
-
-  it('typing in the description clears the error before any next() call', async () => {
-    useReportSubmissionStore().setCategory('Graffiti Removal')
-    const { w, nav } = mountStep()
-    await flushPromises()
-    expect(nav.value?.next()).toBe(true) // empty description -> error
-    await flushPromises()
-    expect(w.find('[role="alert"]').exists()).toBe(true)
-
-    await w.find('textarea').setValue('a')
     await flushPromises()
     expect(w.find('[role="alert"]').exists()).toBe(false)
+    expect(w.find('textarea').classes()).not.toContain('details-step__textarea--error')
+  })
+
+  it('next() with a short description (no minimum length) returns false', async () => {
+    useReportSubmissionStore().setCategory('Graffiti Removal')
+    const { w, nav } = mountStep()
+    await flushPromises()
+    await w.find('textarea').setValue('a')
+    expect(nav.value?.next()).toBe(false)
   })
 })
 
@@ -553,10 +515,10 @@ describe('DetailsStep - composition', () => {
 })
 
 describe('DetailsStep - aria wiring', () => {
-  it('description textarea has aria-required="true"', async () => {
+  it('description textarea has aria-required="false"', async () => {
     const { w } = mountStep()
     await flushPromises()
-    expect(w.find('textarea').attributes('aria-required')).toBe('true')
+    expect(w.find('textarea').attributes('aria-required')).toBe('false')
   })
 
   it('description textarea has aria-describedby pointing at the hint', async () => {
