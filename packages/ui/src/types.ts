@@ -17,6 +17,17 @@ export interface LatLon {
   longitude: Longitude
 }
 
+export interface GeoLocation extends LatLon {
+  accuracy: number
+}
+
+export interface GeolocationOptions {
+  timeout?: number
+  promptOnPageLoad?: boolean
+  watchLocation?: boolean
+  enableHighAccuracy?: boolean
+}
+
 export interface ZipcodePolygon {
   centroid: LatLon
   nodes: LongitudeLatitude[]

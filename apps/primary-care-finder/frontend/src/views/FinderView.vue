@@ -80,6 +80,7 @@ const { filterChipDefinitions } = useFilterChipDefinitions(languages)
 const calloutOpen = ref(true)
 const {
   keywordsForSearch,
+  userLocationState,
   locationSearchMode,
   searchOrUserLocation,
   handleSearchSubmit,
@@ -202,6 +203,7 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
   <PinboardBody
     v-model:filter-values="filterState"
     v-model:is-loading="isLoading"
+    v-model:user-location-state="userLocationState"
     v-model:location-search-mode="locationSearchMode"
     v-model:search-or-user-location="searchOrUserLocation"
     v-model:error-message="errorMessage"

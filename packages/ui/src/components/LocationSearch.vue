@@ -49,6 +49,7 @@ const {
   add: addRecentSearch,
   remove: removeRecentSearch,
 } = useRecentSearches(config?.appId)
+// const searchFocused = ref(false)
 const searchFocused = ref(true)
 
 // computed refs
@@ -126,7 +127,8 @@ function handleSuggestionDismiss() {
 function handleSearchFocusOut(event: FocusEvent) {
   const relatedTarget = event.relatedTarget as HTMLElement | null
   if (!searchWrapperRef.value?.contains(relatedTarget)) {
-    searchFocused.value = false
+    // searchFocused.value = false
+    searchFocused.value = true
     hideSuggestions()
   }
 }

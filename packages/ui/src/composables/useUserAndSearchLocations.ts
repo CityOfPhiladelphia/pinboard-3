@@ -1,6 +1,6 @@
 import { ref, toValue, watch, type Ref } from 'vue'
 import { hasLocationData } from '../utilities/hasLocationData'
-import type { BasicLocation, LatLon, SearchMode } from '../types'
+import type { BasicLocation, GeolocationOptions, LatLon, SearchMode } from '../types'
 import { useSearchAddress, useSearchZipcode, useUserLocation } from './_index'
 import {
   getHaversineDistance,
@@ -11,11 +11,10 @@ import {
 
 export function useUserAndSearchLocations<PinboardLocation extends BasicLocation>(
   locations: Ref<PinboardLocation[]>,
-  promptLocationOnPageLoad: boolean = false,
-  watchLocation: boolean = false
+  geolocOptions: GeolocationOptions = {}
 ) {
   const { userLocation, userLocationState, endWatch, handleGeolocate, handleGeolocateError } =
-    useUserLocation(promptLocationOnPageLoad, watchLocation)
+    useUserLocation(geolocOptions)
   const addressForSearch = ref<string>('')
   const { addressCoordinates, finishedAddressFetch } = useSearchAddress(addressForSearch)
   const zipcodeForSearch = ref<string>('')
@@ -24,20 +23,14 @@ export function useUserAndSearchLocations<PinboardLocation extends BasicLocation
   const locationSearchMode = ref<SearchMode>(undefined)
   const searchOrUserLocation = ref<LatLon>(userLocation.value)
 
-  watch(
-    () => userLocation.value,
-    (newLoc) => {
-      if (
-        hasLocationData(newLoc) &&
-        !(
-          hasLocationData(zipcodePolygon.value.centroid) ||
-          hasLocationData(addressCoordinates.value)
-        )
-      ) {
-        searchOrUserLocation.value = userLocation.value
-      }
+  watch(userLocation, (newLoc) => {
+    if (
+      hasLocationData(newLoc) &&
+      !(hasLocationData(zipcodePolygon.value.centroid) || hasLocationData(addressCoordinates.value))
+    ) {
+      searchOrUserLocation.value = userLocation.value
     }
-  )
+  })
 
   watch(zipcodePolygon.value.centroid, (newLoc) => {
     if (!hasLocationData(newLoc)) {
@@ -45,32 +38,26 @@ export function useUserAndSearchLocations<PinboardLocation extends BasicLocation
     }
   })
 
-  watch(addressCoordinates.value, (newLoc) => {
+  watch(addressCoordinates, (newLoc) => {
     if (!hasLocationData(newLoc)) {
       searchOrUserLocation.value = userLocation.value
     }
   })
 
-  watch(
-    () => finishedAddressFetch.value,
-    (newState) => {
-      if (newState && hasLocationData(addressCoordinates.value)) {
-        searchOrUserLocation.value = addressCoordinates.value
-      }
+  watch(finishedAddressFetch, (newState) => {
+    if (newState && hasLocationData(addressCoordinates.value)) {
+      searchOrUserLocation.value = addressCoordinates.value
     }
-  )
+  })
+
+  watch(finishedZipFetch, (newState) => {
+    if (newState && hasLocationData(zipcodePolygon.value.centroid)) {
+      searchOrUserLocation.value = zipcodePolygon.value.centroid
+    }
+  })
 
   watch(
-    () => finishedZipFetch.value,
-    (newState) => {
-      if (newState && hasLocationData(zipcodePolygon.value.centroid)) {
-        searchOrUserLocation.value = zipcodePolygon.value.centroid
-      }
-    }
-  )
-
-  watch(
-    () => searchOrUserLocation.value,
+    searchOrUserLocation,
     () => {
       if (hasLocationData(searchOrUserLocation.value)) {
         findLocationDistances()

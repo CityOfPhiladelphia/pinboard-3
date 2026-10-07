@@ -3,7 +3,6 @@ import { ref, watch } from 'vue'
 import { Icon, type IconComponent } from '@phila/phila-ui-core'
 import { IconLocationCrosshairs } from '@phila/phila-ui-core/icons'
 import { CloseButton, PhilaButton } from '@phila/phila-ui-button'
-import { useUserLocation } from '../composables/_index'
 import type { UserLocationState } from '../types'
 
 const userLocationState = defineModel<UserLocationState>('user-location-state', {
@@ -30,11 +29,9 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   select: [suggestion: string]
-  dismiss: []
   remove: [suggestion: string]
+  dismiss: []
 }>()
-
-const { handleGeolocate } = useUserLocation(false, false)
 
 const activeIndex = ref(-1)
 const listRef = ref<HTMLUListElement | null>(null)
@@ -99,15 +96,14 @@ defineExpose({ focusFirst })
 </script>
 
 <template>
-  <div v-if="suggestions.length">
+  <div v-if="suggestions.length" class="search-suggestions-panel">
     <span class="geolocate_button">
       <PhilaButton
         text="Use my current location"
         size="extra-small"
         :icon="IconLocationCrosshairs"
         :loading="userLocationState === 'acquiring'"
-        :style="{ background: 'red' }"
-        @click="handleGeolocate"
+        @click="userLocationState = 'acquiring'"
       />
     </span>
     <slot />
@@ -135,6 +131,10 @@ defineExpose({ focusFirst })
 </template>
 
 <style scoped>
+.search-suggestions-panel {
+  display: grid;
+}
+
 .geolocate_button {
   padding: var(--spacing-m, 1rem);
 

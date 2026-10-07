@@ -62,7 +62,10 @@ const {
   handleSearchSubmit,
   handleGeolocate,
   handleGeolocateError,
-} = PinboardComposables.useUserAndSearchLocations(oemLocations, true, true)
+} = PinboardComposables.useUserAndSearchLocations(oemLocations, {
+  promptOnPageLoad: true,
+  watchLocation: true,
+})
 const locationSortMode = ref<PinboardTypes.SortMode>(
   ['located', 'watching'].includes(userLocationState.value) ? 'DistAsc' : '',
 )

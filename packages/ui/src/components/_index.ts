@@ -1,33 +1,16 @@
-import PinboardBody from './PinboardBody.vue'
-import PinboardShell from './PinboardShell.vue'
-import PinboardInfoPage from './PinboardInfoPage.vue'
-import DetailActions from './DetailActions.vue'
-import DetailSubpanel from './DetailSubpanel.vue'
-import LocationFilter from './LocationFilter.vue'
-import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
-import LocationPanel from './LocationsPanel.vue'
-import LocationThumbnail from './LocationThumbnail.vue'
-import MapPanel from './MapPanel.vue'
-import MobileNavPanel from './MobileNavPanel.vue'
-import SearchSuggestions from './SearchSuggestions.vue'
-import SortPanel from './SortPanel.vue'
-import DrawingCanvas from './DrawingCanvas.vue'
-import LoadingCards from './LoadingCards.vue'
-
-export {
-  PinboardBody,
-  PinboardShell,
-  PinboardInfoPage,
-  DetailActions,
-  DetailSubpanel,
-  LocationFilter,
-  LocationSearchFilterPanel,
-  LocationPanel,
-  LocationThumbnail,
-  MapPanel,
-  MobileNavPanel,
-  SearchSuggestions,
-  SortPanel,
-  DrawingCanvas,
-  LoadingCards,
-}
+export { default as PinboardBody } from './PinboardBody.vue'
+export { default as PinboardShell } from './PinboardShell.vue'
+export { default as PinboardInfoPage } from './PinboardInfoPage.vue'
+export { default as DetailActions } from './DetailActions.vue'
+export { default as DetailSubpanel } from './DetailSubpanel.vue'
+export { default as LocationFilter } from './LocationFilter.vue'
+export { default as LocationSearchFilterPanel } from './LocationSearchFilterPanel.vue'
+export { default as LocationPanel } from './LocationsPanel.vue'
+export { default as LocationSearch } from './LocationSearch.vue'
+export { default as LocationThumbnail } from './LocationThumbnail.vue'
+export { default as MapPanel } from './MapPanel.vue'
+export { default as MobileNavPanel } from './MobileNavPanel.vue'
+export { default as SearchSuggestions } from './SearchSuggestions.vue'
+export { default as SortPanel } from './SortPanel.vue'
+export { default as DrawingCanvas } from './DrawingCanvas.vue'
+export { default as LoadingCards } from './LoadingCards.vue'

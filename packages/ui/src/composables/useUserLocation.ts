@@ -1,23 +1,39 @@
 import { ref, watch } from 'vue'
 import type {
+  GeoLocation,
+  GeolocationOptions,
   Latitude,
-  LatLon,
   LocationPermissionState,
   Longitude,
   UserLocationState,
 } from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
-export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation: boolean = false) {
-  const userLocation = ref<LatLon>({
+export function useUserLocation(
+  options: GeolocationOptions = {
+    timeout: Infinity,
+    promptOnPageLoad: false,
+    watchLocation: false,
+    enableHighAccuracy: false,
+  }
+) {
+  const promptOnPageLoad = options?.promptOnPageLoad || false
+  const watchLocation = options?.watchLocation || false
+  const geolocationOptions = {
+    timeout: options?.timeout || Infinity,
+    maximumAge: 0,
+    enableHighAccuracy: options.enableHighAccuracy,
+  }
+
+  const userLocation = ref<GeoLocation>({
     latitude: NaN,
     longitude: NaN,
+    accuracy: NaN,
   })
   const userLocationPermissionState = ref<LocationPermissionState>('prompt')
   const userLocationState = ref<UserLocationState>('unknown')
   const gotInitialLocation = ref<boolean>(false)
   const watchId = ref<number | null>(null)
-  const geolocationOptions = { timeout: Infinity, maximumAge: 0, enableHighAccuracy: false }
 
   try {
     navigator.permissions
@@ -87,6 +103,19 @@ export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation
     { immediate: promptOnPageLoad }
   )
 
+  watch(
+    userLocationState,
+    (newState, oldState) => {
+      console.log('newState: ', newState)
+      if (newState === 'acquiring' && newState !== oldState) {
+        getUserLocation()
+      }
+    },
+    {
+      immediate: true,
+    }
+  )
+
   function getUserLocation() {
     userLocationState.value = 'acquiring'
     navigator.geolocation.getCurrentPosition(locationSuccess, locationError, geolocationOptions)
@@ -94,17 +123,20 @@ export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation
 
   function locationSuccess(position: GeolocationPosition) {
     // only show location on map if user is in or near Philly
-    userLocation.value.latitude = checkLatitudeInRange(position.coords.latitude)
-      ? position.coords.latitude
-      : NaN
-    userLocation.value.longitude = checkLongitudeInRange(position.coords.longitude)
+    const newLat = checkLatitudeInRange(position.coords.latitude) ? position.coords.latitude : NaN
+    const newLon = checkLongitudeInRange(position.coords.longitude)
       ? position.coords.longitude
       : NaN
-    if (!hasLocationData(userLocation)) {
-      console.error(`Location not in range`)
-      userLocation.value.latitude = NaN
-      userLocation.value.longitude = NaN
-    }
+
+    userLocation.value = hasLocationData({ latitude: newLat, longitude: newLon })
+      ? {
+          latitude: newLat,
+          longitude: newLon,
+          accuracy: position.coords.accuracy,
+        }
+      : { latitude: NaN, longitude: NaN, accuracy: NaN }
+
+    if (Number.isNaN(userLocation.value.latitude)) console.error(`Location not in range`)
 
     if (!gotInitialLocation.value) {
       // if navigator.permissions is 'prompt' or 'granted' resolve both to 'granted' if user allows location services
@@ -117,9 +149,18 @@ export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation
   }
 
   function locationError(error: GeolocationPositionError) {
-    userLocationPermissionState.value = 'denied'
-    userLocationState.value = 'unknown'
-    console.error(error)
+    console.error(error.message)
+    switch (error.code) {
+      case error.PERMISSION_DENIED: {
+        userLocationPermissionState.value = 'denied'
+        userLocationState.value = 'unknown'
+        break
+      }
+      case error.POSITION_UNAVAILABLE:
+      case error.TIMEOUT: {
+        if (userLocationPermissionState.value !== 'denied') getUserLocation()
+      }
+    }
   }
 
   function clearUserLocation() {
@@ -137,16 +178,8 @@ export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation
     clearUserLocation()
   }
 
-  function handleGeolocate(locationData: {
-    latitude: number
-    longitude: number
-    accuracy: number
-  }) {
-    console.log('Geolocation Accuracy: ', locationData.accuracy)
-    userLocation.value = {
-      latitude: locationData.latitude,
-      longitude: locationData.longitude,
-    }
+  function handleGeolocate(locationData: GeoLocation) {
+    userLocation.value = locationData
   }
 
   function handleGeolocateError(error: Error | GeolocationPositionError) {
@@ -164,9 +197,10 @@ export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation
 }
 
 // verify location is in or near enough to Philadelphia
-function checkLongitudeInRange(longitude: Longitude) {
-  return -75.35227 < longitude && longitude < -74.91583
-}
 function checkLatitudeInRange(latitude: Latitude) {
   return 39.84911 < latitude && latitude < 40.175
+}
+
+function checkLongitudeInRange(longitude: Longitude) {
+  return -75.35227 < longitude && longitude < -74.91583
 }
