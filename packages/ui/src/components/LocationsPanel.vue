@@ -20,7 +20,7 @@ import type {
   SortMode,
   UserLocationState,
 } from '../types'
-import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
+import type { FilterProps, FilterValue } from '@phila/phila-ui-filter-chip'
 
 // models
 const locationFilterMode = defineModel<string | undefined>('location-filter-mode', {
@@ -28,7 +28,7 @@ const locationFilterMode = defineModel<string | undefined>('location-filter-mode
 })
 const locationSortMode = defineModel<SortMode>('location-sort-mode', { default: '' })
 const searchString = defineModel<string>('search-string', { default: '' })
-const filterValues = defineModel<FilterValues | undefined>('filter-values', { default: undefined })
+const filterValues = defineModel<FilterValue | undefined>('filter-values', { default: undefined })
 const allFiltersOpen = defineModel<boolean>('all-filters-open', { default: false })
 const userLocationState = defineModel<UserLocationState>('user-location-state', {
   default: 'unknown',
@@ -45,7 +45,7 @@ const props = defineProps<{
   locationSearch: string | undefined
   locationFilter: LocationFilterOption[] | undefined
   locationSort: SortLocationsOptions | undefined
-  filters?: FilterDefinition[]
+  filters?: FilterProps[]
   countNoun?: string
 }>()
 

@@ -34,7 +34,7 @@ import type {
   SortMode,
   UserLocationState,
 } from '../types'
-import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
+import type { FilterProps, FilterValue } from '@phila/phila-ui-filter-chip'
 
 // models
 const locationFilterMode = defineModel<string | undefined>('location-filter-mode', {
@@ -42,7 +42,7 @@ const locationFilterMode = defineModel<string | undefined>('location-filter-mode
 })
 const locationSortMode = defineModel<SortMode>('location-sort-mode', { default: '' })
 const searchString = defineModel<string>('search-string', { default: '' })
-const filterValues = defineModel<FilterValues | undefined>('filter-values', { default: undefined })
+const filterValues = defineModel<FilterValue | undefined>('filter-values', { default: undefined })
 const allFiltersOpen = defineModel<boolean>('all-filters-open', { default: false })
 const userLocationState = defineModel<UserLocationState>('user-location-state', {
   default: 'unknown',
@@ -53,7 +53,7 @@ const props = defineProps<{
   searchPlaceholder: string | undefined
   filterOptions: LocationFilterOption[] | undefined
   sortOptions: SortLocationsOptions | undefined
-  filters?: FilterDefinition[]
+  filters?: FilterProps[]
   isMobile: boolean
 }>()
 
@@ -84,9 +84,9 @@ function recomputeChipOrder() {
   const rest = all.filter((f) => !f.excludeFromCount)
   chipOrderKeys.value = [
     ...pinned,
-    ...rest.filter((f) => isActive(f.key)),
-    ...rest.filter((f) => !isActive(f.key)),
-  ].map((f) => f.key)
+    ...rest.filter((f) => isActive(f.name)),
+    ...rest.filter((f) => !isActive(f.name)),
+  ].map((f) => f.name)
 }
 
 // Map the snapshot order onto the current filter definitions, so locale/label
@@ -95,12 +95,10 @@ function recomputeChipOrder() {
 const orderedChipFilters = computed(() => {
   const all = props.filters ?? []
   if (!chipOrderKeys.value.length) return all
-  const byKey = new Map(all.map((f) => [f.key, f]))
-  const ordered = chipOrderKeys.value
-    .map((k) => byKey.get(k))
-    .filter((f): f is FilterDefinition => !!f)
+  const byKey = new Map(all.map((f) => [f.name, f]))
+  const ordered = chipOrderKeys.value.map((k) => byKey.get(k)).filter((f): f is FilterProps => !!f)
   const known = new Set(chipOrderKeys.value)
-  return [...ordered, ...all.filter((f) => !known.has(f.key))]
+  return [...ordered, ...all.filter((f) => !known.has(f.name))]
 })
 
 // Seed on load and refresh on locale (filters) changes. Otherwise the order only
@@ -145,6 +143,7 @@ watch(allFiltersOpen, (open) => {
         <FilterChipGroup
           v-model="filterValues"
           :filters="orderedChipFilters"
+          :label="t('pinboard.allFilters')"
           color="white"
           filter-button
           :filter-button-text="t('pinboard.filters')"

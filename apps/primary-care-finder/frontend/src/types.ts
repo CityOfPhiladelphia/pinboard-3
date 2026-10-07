@@ -2,7 +2,7 @@ import type {
   FilterChoiceBitfield,
   FilterChoiceBitfieldGroup,
   FilterGroup,
-  FilterValues,
+  FilterValue,
   PinboardTypes,
 } from '@pinboard/ui'
 import * as en from './i18n/en'
@@ -185,7 +185,7 @@ export type PrimaryCareFilterKey =
   | TestsFilterKey
   | LanguagesFilterKey
 
-export interface PrimaryCareFilters extends FilterValues {
+export interface PrimaryCareFilters extends FilterValue {
   sort: {
     distance: boolean
     name: boolean

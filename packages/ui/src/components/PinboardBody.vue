@@ -39,7 +39,7 @@ import type {
   SortMode,
   UserLocationState,
 } from '../types'
-import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
+import type { FilterProps, FilterValue } from '@phila/phila-ui-filter-chip'
 import LoadingCards from './LoadingCards.vue'
 
 // slots
@@ -71,7 +71,7 @@ const slots = defineSlots<{
 
 // models
 const isLoading = defineModel<string | false>('is-loading', { default: false })
-const filterValues = defineModel<FilterValues | undefined>('filter-values', { default: undefined })
+const filterValues = defineModel<FilterValue | undefined>('filter-values', { default: undefined })
 const locationSearchMode = defineModel<SearchMode | undefined>('location-search-mode', {
   default: undefined,
 })
@@ -98,7 +98,7 @@ const props = withDefaults(
     locationPanelSearch?: string
     locationPanelSort?: SortLocationsOptions
     geojson?: unknown
-    filters?: FilterDefinition[]
+    filters?: FilterProps[]
     locationPanelCountNoun?: string
     initialBottomSheetSnapIndex?: number
   }>(),
@@ -419,12 +419,6 @@ function selectedLocationValue(): PinboardLocation {
   if (selectedLocation.value) return selectedLocation.value
   throw new Error('selectedLocationValue() called without a selection')
 }
-
-onMounted(() => {
-  if (props.filters) {
-    console.log('FILTERS: ', props.filters)
-  }
-})
 </script>
 
 <template>
@@ -560,7 +554,7 @@ onMounted(() => {
           v-model="filterValues"
           :filters="filters"
           :full-screen="isMobile"
-          :title="t('pinboard.allFilters')"
+          :label="t('pinboard.allFilters')"
           :reset-text="t('pinboard.reset')"
           @close="allFiltersOpen = false"
         />
