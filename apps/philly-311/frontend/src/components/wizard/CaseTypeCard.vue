@@ -38,12 +38,15 @@ details {
   background: var(--Schemes-Background, #fff);
 }
 
-details > .service-type-card,
-details:is(:open) > summary {
+details > .service-type-card {
   margin-bottom: var(--spacing-s, 0.75rem);
 }
 
 summary {
+  cursor: pointer;
+  margin: calc(-1 * var(--spacing-m, 1rem));
+  padding: var(--spacing-m, 1rem);
+  border-radius: var(--border-radius-s, 0.5rem);
   display: flex;
   align-items: center;
   gap: var(--spacing-xs, 0.5rem);
@@ -53,6 +56,14 @@ summary {
   font-style: normal;
   font-weight: 600;
   line-height: var(--Label-Default-font-label-default-lineheight, 1.5rem); /* 150% */
+}
+
+summary:hover {
+  background: var(--Schemes-Surface-Container-Surface-Container-Low, #f3f3f3);
+}
+
+details:is(:open) > summary {
+  margin-bottom: calc(var(--spacing-s, 0.75rem) - var(--spacing-m, 1rem));
 }
 
 summary::marker {

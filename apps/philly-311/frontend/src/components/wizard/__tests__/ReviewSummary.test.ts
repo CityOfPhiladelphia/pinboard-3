@@ -200,7 +200,7 @@ describe('ReviewSummary - details', () => {
       'Body Style * (required)', // required: true in the catalog
       'Color', // required: false — no marker
       'Mystery__c', // unknown field — falls back to the raw key, no marker
-      'Describe the issue * (required)', // always required
+      'Describe the issue', // always optional
     ])
     const dds = w.findAll('.review-summary__dd').map((d) => d.text())
     expect(dds).toEqual(['Sedan', 'Red', 'huh', 'Rusty sedan on blocks'])

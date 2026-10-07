@@ -81,6 +81,12 @@ describe('ReviewStep - setup and gating', () => {
     expect(submit.value?.disabled).toBe(false)
   })
 
+  it('enables Submit without a description, since it is optional', () => {
+    fillStore().setDescription('')
+    const { submit } = mountStep()
+    expect(submit.value?.disabled).toBe(false)
+  })
+
   it('disables Submit and relabels while loading', async () => {
     fillStore()
     const { submit } = mountStep()

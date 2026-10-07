@@ -1,6 +1,6 @@
 <!-- ABOUTME: Wizard step 4 — details: walks the issue type's questions one per
-     screen (auto-advancing single-choice answers), ending with the required
-     description (10-char floor), contact info, and report visibility. -->
+     screen (auto-advancing single-choice answers), ending with the optional
+     description, contact info, and report visibility. -->
 <script setup lang="ts">
 import { computed, onBeforeMount, onBeforeUnmount, ref, watch } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
@@ -11,7 +11,6 @@ import WizardLoadError from '@/components/wizard/WizardLoadError.vue'
 import DetailsStepQuestion from '@/components/wizard/DetailsStepQuestion.vue'
 import DetailsStepFinal from '@/components/wizard/DetailsStepFinal.vue'
 
-const MIN_DESCRIPTION = 10
 const AUTO_ADVANCE_MS = 300
 
 const store = useReportSubmissionStore()
@@ -105,10 +104,7 @@ function next(): boolean {
     index.value += 1
     return true
   }
-  if (description.value.trim().length < MIN_DESCRIPTION) {
-    error.value = 'Add a description to continue'
-    return true
-  }
+  // The final description screen is optional, so there's nothing to validate.
   return false
 }
 

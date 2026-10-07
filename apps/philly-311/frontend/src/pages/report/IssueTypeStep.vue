@@ -30,6 +30,7 @@ const searchTerms = ref('')
 const stepTitle = `Select an issue type`
 const searchPlaceholder = `Search by issue type`
 
+const hasPhoto = computed(() => !!(store.photo.previewUrl || store.photo.mediaUrl))
 const hasSurvivingSuggestions = computed(() =>
   store.photoSuggestions.some((s) => list.value.some((c) => c.serviceType === s.serviceType)),
 )
@@ -91,20 +92,22 @@ function handleSearchSubmit() {
 <template>
   <ReportStep :id="issueStepId" :error-active="false" :step-title="stepTitle" :required="true">
     <template #step-content>
-      <div :id="issueStepId" class="issue-step">
-        <template v-if="store.photo.previewUrl || store.photo.mediaUrl">
+      <div :id="issueStepId" class="issue-step" :class="{ 'issue-step--no-photo': !hasPhoto }">
+        <template v-if="hasPhoto">
           <ImageAnalysis
             v-if="!store.photoSuggestions.length"
             v-model:classifying="classifying"
             v-model:error="errorMessage"
             class="issue-step__analysis"
           />
-          <img
-            v-else-if="store.photoSuggestions.length"
-            :src="store.photo.previewUrl || store.photo.mediaUrl"
-            class="issue-step__photo"
-            :style="imageHeightWidthStyle"
-          />
+          <div v-else class="issue-step__photo-container">
+            <img
+              :src="store.photo.previewUrl || store.photo.mediaUrl"
+              alt="Your uploaded photo"
+              class="issue-step__photo"
+              :style="imageHeightWidthStyle"
+            />
+          </div>
         </template>
 
         <Search
@@ -155,16 +158,31 @@ function handleSearchSubmit() {
   overflow: auto;
 }
 
+.issue-step--no-photo {
+  grid-template-areas:
+    'search .'
+    'issueTypes .';
+}
+
 .issue-step__analysis {
   grid-area: uploadedImage;
   display: grid;
   place-items: center;
 }
 
-.issue-step__photo {
+.issue-step__photo-container {
   grid-area: uploadedImage;
-  display: grid;
-  margin: auto auto;
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+}
+
+.issue-step__photo {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  max-width: 100%;
+  max-height: 100%;
   border-radius: 0.75rem;
 
   /* Elevation/Elevation Light/2 */

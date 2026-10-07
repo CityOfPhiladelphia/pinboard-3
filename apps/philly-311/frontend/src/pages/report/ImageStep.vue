@@ -157,6 +157,11 @@ function getLocationFromImage(image: File) {
   place-content: center;
   border-radius: 0.75rem;
   border: var(--border-width-s, 1px) dashed var(--Schemes-Border-high, #9b9b9b);
+  cursor: pointer;
+}
+
+.image-step__upload:hover {
+  background: var(--Schemes-Surface-Container-Surface-Container-Low, #f3f3f3);
 }
 
 .image-step__preview {
@@ -201,6 +206,6 @@ function getLocationFromImage(image: File) {
 
 .image-step__upload:focus-within {
   outline: var(--border-width-m, 0.125rem) solid var(--Schemes-Primary, rgb(16, 52, 244));
-  outline-offset: 0.125rem;
+  outline-offset: calc(-1 * var(--border-width-m, 0.125rem));
 }
 </style>
