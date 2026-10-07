@@ -3,8 +3,6 @@
 import { useApi } from '@/composables/useApi'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import type { Service } from '@/types/app'
-import { Icon } from '@phila/phila-ui-core'
-import { IconStar } from '@phila/phila-ui-core/icons'
 import { PinboardUtilities, type PinboardTypes } from '@pinboard/ui'
 import { computed, onMounted, onUnmounted, useTemplateRef } from 'vue'
 
@@ -78,7 +76,7 @@ async function classifyImage() {
 
 <template>
   <div class="image-analysis">
-    <Icon class="image-analysis-icon" :icon="IconStar" />
+    <span class="image-analysis-spinner" role="status" aria-label="Analyzing your photo" />
     <label class="image-analysis-title" v-text="title" />
     <span class="image-analysis-subhead" v-text="subHead" />
     <div ref="imageContainerRef" class="image-analysis-image-container">
@@ -110,16 +108,27 @@ async function classifyImage() {
   padding: var(--spacing-2xl, 2.5rem);
 }
 
-.image-analysis-icon {
+.image-analysis-spinner {
   grid-area: ia-icon;
-  color: #000;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: var(--spacing-xs, 0.5rem);
+  border: 3px solid var(--Schemes-Border-low, #e3e3e3);
+  border-top-color: var(--Schemes-Primary, #002855);
+  border-radius: 50%;
+  animation: image-analysis-spin 0.8s linear infinite;
+}
 
-  /* Icons/Solid/Default */
-  font-family: var(--Icon-Solid-Default-font-icon-solid-default-family, 'Font Awesome 7 Pro');
-  font-size: var(--Icon-Solid-Default-font-icon-solid-default-size, 1.5rem);
-  font-style: normal;
-  font-weight: 900;
-  line-height: normal;
+@keyframes image-analysis-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image-analysis-spinner {
+    animation-duration: 2.4s;
+  }
 }
 
 .image-analysis-title {

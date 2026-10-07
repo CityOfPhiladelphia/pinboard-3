@@ -26,9 +26,7 @@ const submitOpts = { url: '/private/key/submit', method: 'POST', body: undefined
 const { fetchData, error: submitError, isLoading: submitting } = useApi<SubmitResponse>(submitOpts)
 
 const errorMessage = ref<string | null>(null)
-const canSubmit = computed(
-  () => !!store.category && !!store.location && !!store.description && !submitting.value,
-)
+const canSubmit = computed(() => !!store.category && !!store.location && !submitting.value)
 
 async function submit() {
   if (submitting.value) return

@@ -158,7 +158,6 @@ export const useReportSubmissionStore = defineStore('reportSubmission', {
     payload(): SubmitPayload {
       if (!this.category) throw new Error('category is required')
       if (!this.location) throw new Error('location is required')
-      if (!this.description) throw new Error('description is required')
       const body: SubmitPayload = {
         serviceRequestType: this.category,
         description: this.description,

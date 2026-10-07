@@ -248,11 +248,11 @@ describe('useReportSubmissionStore', () => {
       expect(() => store.payload()).toThrow('location is required')
     })
 
-    it('throws when description is missing', () => {
+    it('allows an empty description, since it is optional', () => {
       const store = useReportSubmissionStore()
       store.setCategory('Pothole Repair')
       store.setLocation({ address: '1234 Main St', lat: 39.95, lng: -75.16 })
-      expect(() => store.payload()).toThrow('description is required')
+      expect(store.payload().description).toBe('')
     })
 
     it('omits zipCode when not set', () => {

@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="PinboardLocation extends BasicLocation">
 // vue imports
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 // philly ui imports
 import { MapCard } from '@phila/phila-ui-cards'
@@ -67,6 +67,31 @@ const countLabel = computed(() =>
   props.countNoun ? locationCountLabel(props.locations.length, props.countNoun) : null
 )
 
+// Width of the list's scrollbar gutter (0 for overlay scrollbars), exposed so a
+// parent overlaying the list can stop short of the scrollbar and leave it clickable.
+const scrollbarWidth = ref(0)
+let listObserver: ResizeObserver | undefined
+watch(
+  listRef,
+  (el) => {
+    listObserver?.disconnect()
+    listObserver = undefined
+    if (!el) {
+      scrollbarWidth.value = 0
+      return
+    }
+    const measure = () => {
+      scrollbarWidth.value = el.offsetWidth - el.clientWidth
+    }
+    measure()
+    if (typeof ResizeObserver === 'undefined') return
+    listObserver = new ResizeObserver(measure)
+    listObserver.observe(el)
+  },
+  { flush: 'post' }
+)
+onBeforeUnmount(() => listObserver?.disconnect())
+
 // watchers
 watch(
   () => props.selectedId,
@@ -95,7 +120,7 @@ function scrollToCard(id: string, behavior: ScrollBehavior = 'smooth') {
 }
 
 // expose
-defineExpose({ scrollToCard })
+defineExpose({ scrollToCard, scrollbarWidth })
 </script>
 
 <template>
@@ -196,7 +221,7 @@ defineExpose({ scrollToCard })
   /* Left inset stays 1rem. The right inset is 0.5rem padding + the reserved
      scrollbar gutter (~0.5rem for a thin bar), so the scrollbar sits *inside* a
      right gap that visually matches the 1rem on the left. */
-  padding: 0.5rem 0.5rem 1rem 1rem;
+  padding: 0.5rem 0.5rem calc(1rem + var(--locations-footer-clearance, 0px)) 1rem;
   scrollbar-width: thin;
   scrollbar-gutter: stable;
 }

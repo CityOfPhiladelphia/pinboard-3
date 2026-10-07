@@ -25,13 +25,9 @@ function select() {
     <summary @click.prevent>
       <ServiceTypeIcon :service-type="serviceType" :size="24" />
       {{ serviceType }}
-      <Icon
-        v-if="currentlySelected"
-        :icon="IconCheck"
-        decorative
-        size="small"
-        class="selected-check"
-      />
+      <span v-if="currentlySelected" class="selected-check">
+        <Icon :icon="IconCheck" decorative size="small" />
+      </span>
     </summary>
     {{ description }}
   </details>
@@ -43,9 +39,15 @@ details {
   border-radius: var(--border-radius-s, 0.5rem);
   border: var(--border-width-s, 1px) solid var(--Schemes-Border-low, #ccc);
   background: var(--Schemes-Background, #fff);
+  cursor: pointer;
+}
+
+details:hover {
+  background: var(--Schemes-Surface-Container-Surface-Container-Low, #f3f3f3);
 }
 
 summary {
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: var(--spacing-xs, 0.5rem);
@@ -65,10 +67,17 @@ summary::marker {
 
 .selected {
   border-radius: var(--border-radius-s, 0.5rem);
-  border: var(--border-width-s, 1px) solid var(--sixers-blue-550-sixers-blue, #1f50f7);
+  border: var(--border-width-m, 0.125rem) solid var(--sixers-blue-550-sixers-blue, #1f50f7);
+  padding: calc(
+    var(--spacing-m, 1rem) - (var(--border-width-m, 0.125rem) - var(--border-width-s, 1px))
+  );
 }
 
 .selected-check {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  height: var(--Label-Default-font-label-default-lineheight, 1.5rem);
+  color: var(--Palettes-Success-Success-300, #0c7216);
 }
 </style>

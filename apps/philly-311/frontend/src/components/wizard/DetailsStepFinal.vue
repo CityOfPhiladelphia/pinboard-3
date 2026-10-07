@@ -1,10 +1,10 @@
 <!-- ABOUTME: Wizard step 4 — details: walks the issue type's questions one per
-     screen (auto-advancing single-choice answers), ending with the required
-     description (10-char floor), contact info, and report visibility. -->
+     screen (auto-advancing single-choice answers), ending with the optional
+     description, contact info, and report visibility. -->
 <script setup lang="ts">
 import ReportStep from './ReportStep.vue'
 
-const isRequired = true
+const isRequired = false
 
 const description = defineModel<string>('description', { default: '' })
 const error = defineModel<string>('error', { default: '' })
