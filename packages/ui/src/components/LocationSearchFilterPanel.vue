@@ -129,30 +129,32 @@ watch(allFiltersOpen, (open) => {
         v-model:user-location-state="userLocationState"
         :search-placeholder="searchPlaceholder"
         :is-mobile="isMobile"
+        class="location-search"
         @search="emit('search')"
       />
+
       <LocationFilter
-        v-if="filterOptions && !filterValues"
+        v-if="filterOptions && !filters"
         v-model:location-filter-mode="locationFilterMode"
         class="location-filters"
         :class="{ mobile: isMobile }"
         :filter-options="filterOptions"
       />
 
-      <div v-else-if="filters" :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'">
-        <FilterChipGroup
-          v-model="filterValues"
-          :filters="orderedChipFilters"
-          :label="t('pinboard.allFilters')"
-          color="white"
-          filter-button
-          :filter-button-text="t('pinboard.filters')"
-          :reset-text="t('pinboard.reset')"
-          :elevated="isMobile"
-          @open-filters="allFiltersOpen = true"
-          @dropdown-close="recomputeChipOrder"
-        />
-      </div>
+      <FilterChipGroup
+        v-else-if="filters"
+        v-model="filterValues"
+        v-model:open-filters="allFiltersOpen"
+        :filters="orderedChipFilters"
+        :label="t('pinboard.allFilters')"
+        color="white"
+        filter-button
+        :filter-button-text="t('pinboard.filters')"
+        :reset-text="t('pinboard.reset')"
+        :elevated="isMobile"
+        :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'"
+        @dropdown-close="recomputeChipOrder"
+      />
     </Teleport>
 
     <Teleport to="#bottom-sheet-sort" :disabled="!isMobile">
@@ -181,6 +183,9 @@ watch(allFiltersOpen, (open) => {
   padding: var(--spacing-l, 1.5rem) var(--spacing-m, 1rem);
 }
 
+.location-search {
+}
+
 .location-filters {
   grid-area: filters;
 }
@@ -199,9 +204,8 @@ watch(allFiltersOpen, (open) => {
 
 .filter-chip-bar {
   grid-area: filters;
-  z-index: -1;
   height: fit-content;
-  overflow-x: auto;
+  z-index: -1;
 }
 
 .filter-chip-bar-mobile {

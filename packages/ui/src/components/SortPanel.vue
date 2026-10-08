@@ -19,7 +19,11 @@ const props = defineProps<{
 const { t } = useI18n()
 
 const panelOpen = ref(false)
-const pendingSelection = ref<SortMode>('')
+const pendingSelection = ref<Record<string, boolean>>(
+  Object.fromEntries(
+    Object.keys(props.sortOptions).map((option) => [option, option === locationSortMode.value])
+  )
+)
 
 const triggerLabel = computed(() => {
   return locationSortMode.value
@@ -32,7 +36,9 @@ const locationAvailable = computed(() => {
 })
 
 function openPanel() {
-  pendingSelection.value = locationSortMode.value
+  pendingSelection.value = Object.fromEntries(
+    Object.keys(props.sortOptions).map((option) => [option, option === locationSortMode.value])
+  )
   panelOpen.value = true
   // The panel is teleported to <body>, so it's outside the trigger's tab order.
   // Move focus into the options (the selected one, else the first enabled) so a
@@ -67,7 +73,9 @@ function onFocusGuard() {
 }
 
 function applySort() {
-  locationSortMode.value = pendingSelection.value
+  locationSortMode.value = Object.keys(pendingSelection.value)[
+    Object.values(pendingSelection.value).indexOf(true)
+  ] as SortMode
   closePanel()
 }
 
@@ -104,6 +112,12 @@ function handleKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape' && panelOpen.value) {
     closePanel()
   }
+}
+
+function handleUpdate(selected: string) {
+  const model = Object.fromEntries(Object.keys(props.sortOptions).map((option) => [option, false]))
+  model[selected] = true
+  pendingSelection.value = model
 }
 
 watch(panelOpen, (isOpen) => {
@@ -172,10 +186,10 @@ watch(panelOpen, (isOpen) => {
             <Radio
               name="sort-panel-radio"
               :value="value"
-              :text="label"
-              :model-value="pendingSelection"
+              :label="label"
+              :model-value="pendingSelection[value]"
               :disabled="value === 'DistAsc' && !locationAvailable"
-              @update:model-value="pendingSelection = $event as SortMode"
+              @update:model-value="handleUpdate(value)"
             />
             <p v-if="value === 'DistAsc'" class="sort-panel-hint content">
               {{ locationAvailable ? t('pinboard.sortClosest') : t('pinboard.sortShareLocation') }}

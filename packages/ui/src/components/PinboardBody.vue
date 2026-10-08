@@ -547,16 +547,16 @@ function selectedLocationValue(): PinboardLocation {
       <div
         v-if="filters"
         class="all-filters-overlay"
-        :style="{ display: allFiltersOpen && !isMobile ? 'block' : 'none' }"
+        :class="{ 'all-filters-overlay--mobile': isMobile }"
+        :style="{ display: allFiltersOpen ? 'block' : 'none' }"
       >
         <FilterPanel
-          v-if="allFiltersOpen"
           v-model="filterValues"
+          v-model:open-filters="allFiltersOpen"
           :filters="filters"
           :full-screen="isMobile"
           :label="t('pinboard.allFilters')"
           :reset-text="t('pinboard.reset')"
-          @close="allFiltersOpen = false"
         />
       </div>
     </div>
@@ -782,11 +782,15 @@ function selectedLocationValue(): PinboardLocation {
   top: 0;
   left: 0;
   bottom: 0;
-  /* Match the locations panel: the 1fr of the finder's `1fr 2fr` grid = 1/3. */
-  width: calc(100% / 3);
-  z-index: 12;
   background: var(--Schemes-Surface-Bright, #fff);
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.all-filters-overlay--mobile {
+  position: fixed;
+  box-shadow: none;
+  width: 100dvw;
+  z-index: 10000;
 }
 
 .mobile-controls-float {
