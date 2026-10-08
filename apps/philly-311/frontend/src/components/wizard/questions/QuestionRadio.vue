@@ -15,7 +15,7 @@ const modelValue = defineModel<string | undefined>('model-value', { default: und
 const error = defineModel<string>('error', { default: '' })
 
 const choices = computed(() => {
-  return (props.question.options ?? []).map((o) => ({ text: o, value: o }))
+  return (props.question.options ?? []).map((o) => ({ label: o, value: o }))
 })
 
 // RadioGroup/CheckboxGroup model a Record<choice value, checked>; the wizard
@@ -38,7 +38,7 @@ function setRadio(record: Record<string, boolean>) {
   <!-- group-label always renders the real text (RadioGroup has no accessible-name prop of its
          own); hideLabel visually hides it via the :deep() rule below instead of emptying it. -->
   <RadioGroup
-    :group-label="question.label"
+    :label="question.label"
     :hide-title="true"
     :choices="choices"
     :model-value="radioValue"

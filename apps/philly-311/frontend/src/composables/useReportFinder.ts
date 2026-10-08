@@ -38,7 +38,7 @@ export function useReportFinder(): UseReportFinder {
   // address) rather than the default city center; gates distance sorting.
   const hasAnchor = ref(false)
 
-  const errorMessage = computed(() => error.value?.message ?? null)
+  const errorMessage = computed(() => error.value?.message ?? '')
 
   // Ranking-only squared distance: equirectangular approximation is monotonic
   // with great-circle distance at city scale, so ordering is exact for Philly.

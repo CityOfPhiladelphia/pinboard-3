@@ -6,7 +6,7 @@
 import { computed, ref } from 'vue'
 import { FilterChipGroup } from '@phila/phila-ui-filter-chip'
 import { FilterPanel } from '@phila/phila-ui-filter-panel'
-import type { FilterDefinition, FilterValues } from '@phila/phila-ui-core'
+import type { FilterProps, FilterValue } from '@phila/phila-ui-filter-chip'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import { serviceTypeColor } from '@/utils/serviceTypeMeta'
 import type { Service } from '@/types/app'
@@ -19,9 +19,9 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
 
-const filters = computed<FilterDefinition[]>(() =>
+const filters = computed<FilterProps[]>(() =>
   props.options.map((o) => ({
-    key: o.value,
+    name: o.value,
     label: o.label,
     // FilterChipGroup icons are Vue functional components; the shared cached
     // wrapper keeps chips visually in sync with the map markers.
@@ -35,7 +35,7 @@ const values = computed<Record<string, boolean>>(() =>
 )
 
 /** Single-select on top of toggle chips: a newly toggled-on chip wins; none on → 'all'. */
-function onUpdate(next: FilterValues) {
+function onUpdate(next: FilterValue) {
   const on = Object.keys(next).filter((k) => next[k] === true)
   const added = on.find((k) => k !== props.modelValue)
   const value = added ?? (on.length > 0 ? props.modelValue : 'all')
@@ -52,18 +52,18 @@ function closePanel() {
   showPanel.value = false
 }
 
-const panelFilters = computed<FilterDefinition[]>(() => [
+const panelFilters = computed<FilterProps[]>(() => [
   {
-    key: PANEL_FILTER_KEY,
+    name: PANEL_FILTER_KEY,
     label: 'Service Type',
-    choices: props.options.map((o) => ({ text: o.label, value: o.value })),
+    choices: props.options.map((o) => ({ label: o.label, value: o.value })),
   },
 ])
 
-const panelValues = computed<FilterValues>(() => ({ [PANEL_FILTER_KEY]: values.value }))
+const panelValues = computed<FilterValue>(() => ({ [PANEL_FILTER_KEY]: values.value }))
 
 /** Panel choices are a radio group: at most one selected. None selected → 'all'. */
-function onPanelUpdate(next: FilterValues) {
+function onPanelUpdate(next: FilterValue) {
   const choices = (next[PANEL_FILTER_KEY] as Record<string, boolean> | undefined) ?? {}
   const value = Object.keys(choices).find((k) => choices[k]) ?? 'all'
   if (value !== props.modelValue) emit('update:modelValue', value)

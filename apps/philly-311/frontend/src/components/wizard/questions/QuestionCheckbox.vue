@@ -16,7 +16,7 @@ const modelValue = defineModel<string | undefined>('model-value', { default: und
 const error = defineModel<string>('error', { default: '' })
 
 const choices = computed(() => {
-  return (props.question.options ?? []).map((o) => ({ text: o, value: o }))
+  return (props.question.options ?? []).map((o) => ({ label: o, value: o }))
 })
 
 // RadioGroup/CheckboxGroup model a Record<choice value, checked>; the wizard
@@ -37,7 +37,7 @@ function setCheckbox(record: Record<string, boolean>) {
   <!-- multipicklist: CheckboxGroup -->
   <!-- phila-ui gap: CheckboxGroup has no required prop and doesn't forward $attrs to its <input type="checkbox"> elements -->
   <CheckboxGroup
-    :group-label="question.label"
+    :label="question.label"
     :hide-title="true"
     :choices="choices"
     :model-value="checkboxValue"

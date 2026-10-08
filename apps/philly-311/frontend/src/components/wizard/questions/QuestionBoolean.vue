@@ -15,11 +15,11 @@ const error = defineModel<string>('error', { default: '' })
 
 const choices = [
   {
-    text: 'Yes',
+    label: 'Yes',
     value: 'Yes',
   },
   {
-    text: 'No',
+    label: 'No',
     value: 'No',
   },
 ]
@@ -35,7 +35,7 @@ function setBoolean(record: Record<string, boolean>) {
   <!-- group-label always renders the real text (RadioGroup has no accessible-name prop of its
          own); hideLabel visually hides it via the :deep() rule below instead of emptying it. -->
   <RadioGroup
-    :group-label="question.label"
+    :label="question.label"
     :hide-title="true"
     :choices="choices"
     :model-value="{

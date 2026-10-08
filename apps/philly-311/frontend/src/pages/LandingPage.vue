@@ -4,7 +4,7 @@
 import { computed, inject, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import {
-  Pinboard,
+  PinboardBody,
   MapNavigationControl,
   GeolocationButton,
   BasemapToggle,
@@ -17,7 +17,6 @@ import ReportDetail from '@/components/ReportDetail.vue'
 import { searchAddress } from '@/composables/useAis'
 import ReportCallout from '@/components/ReportCallout.vue'
 import ReportCta from '@/components/ReportCta.vue'
-import FilterChips from '@/components/FilterChips.vue'
 import ReportListingCard from '@/components/ReportListingCard.vue'
 import MapConstraints from '@/components/MapConstraints.vue'
 import ClusteredMarkers from '@/components/ClusteredMarkers.vue'
@@ -67,16 +66,16 @@ async function onSearch(query: string) {
 </script>
 
 <template>
-  <Pinboard
+  <PinboardBody
+    v-model:location-search-mode="locationSearchMode"
+    v-model:search-or-user-location="finder.searchOrUserLocation.value"
+    v-model:error-message="finder.errorMessage.value"
     :locations="visibleLocations"
-    :search-or-user-location="finder.searchOrUserLocation.value"
     :is-loading="finder.isLoading.value ? 'Loading reports…' : false"
-    :error-message="finder.errorMessage.value"
     :get-map-card-props="getMapCardProps"
     :is-mobile="isMobile"
     :location-panel-search="searchPlaceholder"
     location-panel-count-noun="report"
-    :location-search-mode="locationSearchMode"
     :initial-bottom-sheet-snap-index="1"
     @search="onSearch"
     @bounds-change="setMapBounds"
@@ -87,14 +86,6 @@ async function onSearch(query: string) {
 
     <template #locations-footer>
       <ReportCta />
-    </template>
-
-    <template #locations-filters>
-      <FilterChips
-        :options="finder.filterOptions.value"
-        :model-value="finder.filter.value"
-        @update:model-value="finder.setFilter"
-      />
     </template>
 
     <template #location-card="{ location }">
@@ -156,7 +147,7 @@ async function onSearch(query: string) {
         @select="onSelect"
       />
     </template>
-  </Pinboard>
+  </PinboardBody>
 </template>
 
 <style>
