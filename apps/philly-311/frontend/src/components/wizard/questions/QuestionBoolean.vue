@@ -43,7 +43,6 @@ watch(
   (newValue) => {
     const keys = Object.keys(newValue)
     modelValue.value = keys.find((k) => newValue[k]) ?? ''
-    console.log(modelValue.value)
   },
   { deep: 1 },
 )
