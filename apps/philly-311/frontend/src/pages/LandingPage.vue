@@ -150,7 +150,7 @@ async function onSearch(query: string) {
       <!-- Rounded zoom: clustering and pin sizing are integer-granular, and a
            fractional zoom prop would re-render every marker per animation frame. -->
       <ClusteredMarkers
-        :locations="finder.locations.value"
+        :locations="filteredLocations"
         :zoom="Math.round(zoom)"
         :map="map"
         :hovered-id="hoveredId"
