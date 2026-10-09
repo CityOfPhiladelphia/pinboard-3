@@ -43,7 +43,6 @@ watch(
   (newValue) => {
     const keys = Object.keys(newValue)
     modelValue.value = keys.find((k) => newValue[k]) ?? ''
-    console.log(modelValue.value)
   },
   { deep: 1 },
 )
@@ -51,9 +50,6 @@ watch(
 
 <template>
   <!-- picklist: RadioGroup -->
-  <!-- phila-ui gap: RadioGroup has no required prop and doesn't forward $attrs to its <input type="radio"> elements -->
-  <!-- group-label always renders the real text (RadioGroup has no accessible-name prop of its
-         own); hideLabel visually hides it via the :deep() rule below instead of emptying it. -->
   <RadioGroup
     v-model="radioValue"
     :label="question.label"
