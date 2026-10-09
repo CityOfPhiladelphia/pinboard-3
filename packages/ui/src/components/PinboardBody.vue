@@ -554,7 +554,6 @@ function selectedLocationValue(): PinboardLocation {
           v-model="filterValues"
           v-model:open-filters="allFiltersOpen"
           :filters="filters"
-          :full-screen="isMobile"
           :label="t('pinboard.allFilters')"
           :reset-text="t('pinboard.reset')"
         />

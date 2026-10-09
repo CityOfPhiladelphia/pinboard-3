@@ -11,7 +11,7 @@ import {
   PinboardComposables,
   IS_MOBILE_KEY,
 } from '@pinboard/ui'
-import type { PinboardTypes, MapCardProps } from '@pinboard/ui'
+import type { PinboardTypes, MapCardProps, FilterValue } from '@pinboard/ui'
 import { useReportFinder } from '@/composables/useReportFinder'
 import ReportDetail from '@/components/ReportDetail.vue'
 import { searchAddress } from '@/composables/useAis'
@@ -48,6 +48,17 @@ const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
 
 const locatedFix = ref<{ latitude: number; longitude: number; accuracy: number } | null>(null)
 
+const filterValues = ref<FilterValue>({ toggles: {} })
+
+const filteredLocations = computed(() => {
+  const iOfTrue = Object.values(filterValues.value?.toggles).indexOf(true)
+  const selectedService =
+    iOfTrue >= 0 ? Object.keys(filterValues.value?.toggles)[iOfTrue] : undefined
+  return selectedService
+    ? visibleLocations.value.filter((location) => location.name === selectedService)
+    : visibleLocations.value
+})
+
 function onLocated(data: { longitude: number; latitude: number; accuracy: number }) {
   locatedFix.value = data
 }
@@ -67,10 +78,12 @@ async function onSearch(query: string) {
 
 <template>
   <PinboardBody
+    v-model:filter-values="filterValues"
     v-model:location-search-mode="locationSearchMode"
     v-model:search-or-user-location="finder.searchOrUserLocation.value"
     v-model:error-message="finder.errorMessage.value"
-    :locations="visibleLocations"
+    :locations="filteredLocations"
+    :filters="finder.filterOptions.value"
     :is-loading="finder.isLoading.value ? 'Loading reports…' : false"
     :get-map-card-props="getMapCardProps"
     :is-mobile="isMobile"

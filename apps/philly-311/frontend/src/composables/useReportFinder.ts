@@ -3,17 +3,18 @@
 // ABOUTME: BasicLocation list + reportById lookup the Pinboard view binds.
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import type { PinboardTypes } from '@pinboard/ui'
+import type { FilterProps, PinboardTypes } from '@pinboard/ui'
 import type { Report } from '@/composables/useNearbyReports'
 import { useOpenIssuesStore } from '@/stores/openIssues'
 import { getCurrentPosition } from '@/composables/useGeolocation'
 import { reportToLocation } from '@/utils/reportCard'
 import { DEFAULT_CENTER } from '@/utils/geoDefaults'
-import type { Service } from '@/types/app'
+import { serviceTypeIconComponent } from '@/utils/reportIcon'
+import { serviceTypeColor } from '@/utils/serviceTypeMeta'
 
 export interface UseReportFinder {
   locations: ComputedRef<PinboardTypes.BasicLocation[]>
-  filterOptions: ComputedRef<{ value: Service; label: Service }[]>
+  filterOptions: ComputedRef<FilterProps[]>
   searchOrUserLocation: Ref<PinboardTypes.LatLon>
   isLoading: Ref<boolean>
   errorMessage: ComputedRef<string | null>
@@ -61,15 +62,16 @@ export function useReportFinder(): UseReportFinder {
     return mapped.sort((a, b) => rankingDistance(a, from) - rankingDistance(b, from))
   })
 
-  const filterOptions = computed(() => {
-    const counts = new Map<Service, number>()
-    for (const r of reports.value) {
-      if (!r.serviceType) continue
-      counts.set(r.serviceType, (counts.get(r.serviceType) ?? 0) + 1)
-    }
-    return [...counts.entries()]
-      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-      .map(([serviceType]) => ({ value: serviceType, label: serviceType }))
+  const filterOptions = computed<FilterProps[]>(() => {
+    return [...new Set(reports.value.map((report) => report.serviceType))]
+      .filter(Boolean)
+      .sort()
+      .map((serviceType) => ({
+        name: serviceType,
+        label: serviceType,
+        icon: serviceTypeIconComponent(serviceType),
+        iconColor: serviceTypeColor(serviceType),
+      }))
   })
 
   function reportById(id: string): Report | undefined {
