@@ -1,11 +1,24 @@
-import { defineConfig } from '@playwright/test'
+import { defineConfig } from '@playwright/test';
 
-const isCI = !!process.env.CI
+const isCI = !!process.env.CI;
+
+// Local headless control:
+// HEADLESS=true  -> run headless locally
+// HEADLESS=false -> run headed locally
+// If HEADLESS is not provided:
+//   CI = headless
+//   Local = headed
+const localHeadless =
+  process.env.HEADLESS === 'true'
+    ? true
+    : process.env.HEADLESS === 'false'
+      ? false
+      : isCI;
 
 export default defineConfig({
   testDir: './',
-  fullyParallel: false,
-  workers: 1,
+  fullyParallel: true,
+  workers: 2,
 
   retries: isCI ? 1 : 0,
   preserveOutput: 'always',
@@ -13,16 +26,20 @@ export default defineConfig({
   use: {
     browserName: 'chromium',
 
-    // Local = headed, CI = headless
-    headless: isCI,
+    // CI runs headless by default.
+    // Local can be controlled with HEADLESS=true or HEADLESS=false.
+    headless: localHeadless,
 
-    // Maximize browser window
+    // Desktop tests use full browser window.
+    // Mobile tests can override this inside the spec file with test.use({ ...devices['iPhone 13'] }).
     viewport: null,
 
     launchOptions: {
-      //Playwright waits about (1000 milliseconds = 1 sec) between actions.
-      slowMo: 1000,
-      args: ['--start-maximized'],
+      // Slow motion is helpful only when watching headed local runs.
+      slowMo: localHeadless ? 0 : 1000,
+
+      // Maximize browser window for headed desktop runs.
+      args: localHeadless ? [] : ['--start-maximized'],
     },
 
     permissions: ['geolocation'],
@@ -38,4 +55,4 @@ export default defineConfig({
   },
 
   reporter: [['html', { open: 'never' }]],
-})
+});
