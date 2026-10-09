@@ -4,20 +4,19 @@
 import { computed, inject, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import {
-  Pinboard,
+  PinboardBody,
   MapNavigationControl,
   GeolocationButton,
   BasemapToggle,
   PinboardComposables,
   IS_MOBILE_KEY,
 } from '@pinboard/ui'
-import type { PinboardTypes, MapCardProps } from '@pinboard/ui'
+import type { PinboardTypes, MapCardProps, FilterValue } from '@pinboard/ui'
 import { useReportFinder } from '@/composables/useReportFinder'
 import ReportDetail from '@/components/ReportDetail.vue'
 import { searchAddress } from '@/composables/useAis'
 import ReportCallout from '@/components/ReportCallout.vue'
 import ReportCta from '@/components/ReportCta.vue'
-import FilterChips from '@/components/FilterChips.vue'
 import ReportListingCard from '@/components/ReportListingCard.vue'
 import MapConstraints from '@/components/MapConstraints.vue'
 import ClusteredMarkers from '@/components/ClusteredMarkers.vue'
@@ -49,6 +48,17 @@ const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
 
 const locatedFix = ref<{ latitude: number; longitude: number; accuracy: number } | null>(null)
 
+const filterValues = ref<FilterValue>({ toggles: {} })
+
+const filteredLocations = computed(() => {
+  const iOfTrue = Object.values(filterValues.value?.toggles).indexOf(true)
+  const selectedService =
+    iOfTrue >= 0 ? Object.keys(filterValues.value?.toggles)[iOfTrue] : undefined
+  return selectedService
+    ? visibleLocations.value.filter((location) => location.name === selectedService)
+    : visibleLocations.value
+})
+
 function onLocated(data: { longitude: number; latitude: number; accuracy: number }) {
   locatedFix.value = data
 }
@@ -67,16 +77,18 @@ async function onSearch(query: string) {
 </script>
 
 <template>
-  <Pinboard
-    :locations="visibleLocations"
-    :search-or-user-location="finder.searchOrUserLocation.value"
+  <PinboardBody
+    v-model:filter-values="filterValues"
+    v-model:location-search-mode="locationSearchMode"
+    v-model:search-or-user-location="finder.searchOrUserLocation.value"
+    v-model:error-message="finder.errorMessage.value"
+    :locations="filteredLocations"
+    :filters="finder.filterOptions.value"
     :is-loading="finder.isLoading.value ? 'Loading reports…' : false"
-    :error-message="finder.errorMessage.value"
     :get-map-card-props="getMapCardProps"
     :is-mobile="isMobile"
     :location-panel-search="searchPlaceholder"
     location-panel-count-noun="report"
-    :location-search-mode="locationSearchMode"
     :initial-bottom-sheet-snap-index="1"
     @search="onSearch"
     @bounds-change="setMapBounds"
@@ -87,14 +99,6 @@ async function onSearch(query: string) {
 
     <template #locations-footer>
       <ReportCta />
-    </template>
-
-    <template #locations-filters>
-      <FilterChips
-        :options="finder.filterOptions.value"
-        :model-value="finder.filter.value"
-        @update:model-value="finder.setFilter"
-      />
     </template>
 
     <template #location-card="{ location }">
@@ -146,7 +150,7 @@ async function onSearch(query: string) {
       <!-- Rounded zoom: clustering and pin sizing are integer-granular, and a
            fractional zoom prop would re-render every marker per animation frame. -->
       <ClusteredMarkers
-        :locations="finder.locations.value"
+        :locations="filteredLocations"
         :zoom="Math.round(zoom)"
         :map="map"
         :hovered-id="hoveredId"
@@ -156,7 +160,7 @@ async function onSearch(query: string) {
         @select="onSelect"
       />
     </template>
-  </Pinboard>
+  </PinboardBody>
 </template>
 
 <style>

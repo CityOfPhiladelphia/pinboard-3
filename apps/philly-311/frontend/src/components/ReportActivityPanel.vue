@@ -5,7 +5,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { Icon } from '@phila/phila-ui-core'
-import type { FilterChoice } from '@phila/phila-ui-core'
+import type { FilterChoice } from '@phila/phila-ui-filter-chip'
 import {
   IconArrowDown,
   IconArrowUp,
@@ -45,8 +45,8 @@ const {
 onMounted(() => void loadComments(props.report.id))
 
 const SORT_CHOICES: FilterChoice[] = [
-  { text: 'Newest first', value: 'newest' },
-  { text: 'Oldest first', value: 'oldest' },
+  { label: 'Newest first', value: 'newest' },
+  { label: 'Oldest first', value: 'oldest' },
 ]
 const sortOrder = ref<'newest' | 'oldest'>('newest')
 const sortIcon = computed(() => (sortOrder.value === 'newest' ? IconArrowDown : IconArrowUp))

@@ -1,49 +1,57 @@
 <!-- ABOUTME: Renders a single wizard question's input field by question.type using phila-ui components.
      SelectField (large picklist) and textarea remain native HTML; all other types use phila-ui packages. -->
 <script setup lang="ts">
-import { computed } from 'vue'
-import { CheckboxGroup } from '@phila/phila-ui-checkbox'
+import { computed, ref, watch } from 'vue'
+import { CheckboxGroup, type SelectInputGroupValue } from '@phila/phila-ui-checkbox'
 import type { IQuestionField } from '@/types/api'
 
 const checkboxErrorMsg = 'Select at least one option to continue'
+
+const modelValue = defineModel<string | undefined>('model-value', { default: undefined })
+const error = defineModel<string>('error', { default: '' })
 
 const props = defineProps<{
   question: IQuestionField
   initialValue: string
 }>()
 
-const modelValue = defineModel<string | undefined>('model-value', { default: undefined })
-const error = defineModel<string>('error', { default: '' })
-
+const checkboxValue = ref<SelectInputGroupValue>({})
 const choices = computed(() => {
-  return (props.question.options ?? []).map((o) => ({ text: o, value: o }))
+  return (props.question.options ?? []).map((o) => ({ label: o, value: o }))
 })
 
-// RadioGroup/CheckboxGroup model a Record<choice value, checked>; the wizard
-// stores answers as strings ('A' / 'A;B'), so translate at this boundary.l
-const checkboxValue = computed<Record<string, boolean>>(() => {
-  const checked = new Set(props.initialValue ? props.initialValue.split(';').filter(Boolean) : [])
-  return Object.fromEntries((props.question.options ?? []).map((o) => [o, checked.has(o)]))
-})
+watch(
+  () => props.question.field,
+  () => {
+    const checked = new Set(props.initialValue ? props.initialValue.split(';').filter(Boolean) : [])
+    checkboxValue.value = Object.fromEntries(
+      (props.question.options ?? []).map((o) => [o, checked.has(o)]),
+    )
+  },
+  { immediate: true },
+)
 
-function setCheckbox(record: Record<string, boolean>) {
-  modelValue.value = Object.keys(record)
-    .filter((k) => record[k])
-    .join(';')
-}
+watch(
+  checkboxValue,
+  (newValue) => {
+    modelValue.value = Object.keys(newValue)
+      .filter((k) => newValue[k])
+      .join(';')
+  },
+  { deep: 1 },
+)
 </script>
 
 <template>
   <!-- multipicklist: CheckboxGroup -->
   <!-- phila-ui gap: CheckboxGroup has no required prop and doesn't forward $attrs to its <input type="checkbox"> elements -->
   <CheckboxGroup
-    :group-label="question.label"
+    v-model="checkboxValue"
+    :label="question.label"
     :hide-title="true"
     :choices="choices"
-    :model-value="checkboxValue"
     :aria-required="question.required || false"
     :error="!!error"
     :error-message="checkboxErrorMsg"
-    @update:model-value="setCheckbox"
   />
 </template>

@@ -2,7 +2,7 @@
      stat tiles in the page header, case cards + map pins, case detail panel. -->
 <script setup lang="ts">
 import { computed, onMounted, inject, ref } from 'vue'
-import { Pinboard, MapNavigationControl, BasemapToggle, IS_MOBILE_KEY } from '@pinboard/ui'
+import { PinboardBody, MapNavigationControl, BasemapToggle, IS_MOBILE_KEY } from '@pinboard/ui'
 import { Callout } from '@phila/phila-ui-callout'
 import type { PinboardTypes, MapCardProps } from '@pinboard/ui'
 import { useAuth } from '@phila/sso-vue'
@@ -51,7 +51,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Pinboard
+  <PinboardBody
     :locations="locations"
     :search-or-user-location="searchOrUserLocation"
     :is-loading="cases.isLoading.value ? 'Loading your requests…' : false"
@@ -129,7 +129,7 @@ onMounted(() => {
         @select="onSelect"
       />
     </template>
-  </Pinboard>
+  </PinboardBody>
 </template>
 
 <style scoped>
