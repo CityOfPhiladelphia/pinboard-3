@@ -1,8 +1,12 @@
 import { test, expect, type Page } from '@playwright/test'
+import { waitForDeployment } from './wait-for-deploy'
 
 // A freshly deployed app or a cold CDN edge can be slow to first paint, so the
 // load-dependent assertions get more than Playwright's 5s default.
 const LOAD_TIMEOUT = 15000
+
+// How long to wait for a just-shipped bundle to start being served.
+const DEPLOY_TIMEOUT = 5 * 60 * 1000
 
 export interface SmokeOptions {
   // Used in the describe title
@@ -37,11 +41,48 @@ export function defineSmokeTests({ name, url, title, searchValue }: SmokeOptions
   test.setTimeout(60000)
 
   test.describe(`${name} @smoke`, () => {
+    // Runs once per worker. Cheap when the deployment is already serving.
+    test.beforeAll(async ({}, testInfo) => {
+      testInfo.setTimeout(DEPLOY_TIMEOUT + 30000)
+      await waitForDeployment(url, DEPLOY_TIMEOUT)
+    })
+
     test.beforeEach(async ({ page }) => {
-      await page.goto(url, { waitUntil: 'domcontentloaded' })
+      const problems: string[] = []
+      page.on('console', (msg) => {
+        if (msg.type() === 'error') problems.push(`console error: ${msg.text()}`)
+      })
+      page.on('pageerror', (error) => problems.push(`page error: ${error.message}`))
+      page.on('requestfailed', (request) =>
+        problems.push(`request failed: ${request.url()} (${request.failure()?.errorText})`)
+      )
+
+      const response = await page.goto(url, { waitUntil: 'domcontentloaded' })
       // No networkidle wait: the apps poll, so it can stall for tens of
       // seconds. The assertions below auto-wait for what they need.
-      await expect(searchBox(page)).toBeVisible({ timeout: LOAD_TIMEOUT })
+      try {
+        await expect(searchBox(page)).toBeVisible({ timeout: LOAD_TIMEOUT })
+      } catch (error) {
+        // "element not found" says nothing about why; say what the page did.
+        const body = (
+          (await page
+            .locator('body')
+            .innerText()
+            .catch(() => '')) || '(empty)'
+        )
+          .slice(0, 300)
+          .replace(/\s+/g, ' ')
+        const report = [
+          `App did not render at ${url}`,
+          `  HTTP status: ${response?.status() ?? 'no response'}`,
+          `  Page title: ${(await page.title().catch(() => '')) || '(none)'}`,
+          `  Body text: ${body}`,
+          ...(problems.length
+            ? problems.slice(0, 10).map((p) => `  ${p}`)
+            : ['  (no browser errors)']),
+        ].join('\n')
+        throw new Error(`${report}\n\n${error instanceof Error ? error.message : String(error)}`)
+      }
       await dismissTooltipIfOpen(page)
     })
 
