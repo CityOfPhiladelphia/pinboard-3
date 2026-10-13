@@ -33,6 +33,11 @@ const emit = defineEmits<{
   dismiss: []
 }>()
 
+// slots
+const slots = defineSlots<{
+  'suggestion-card'?: unknown
+}>()
+
 const activeIndex = ref(-1)
 const listRef = ref<HTMLUListElement | null>(null)
 
@@ -106,7 +111,9 @@ defineExpose({ focusFirst })
         @click="userLocationState = 'acquiring'"
       />
     </span>
-    <slot name="suggestion-card" />
+    <template v-if="slots['suggestion-card']">
+      <slot name="suggestion-card" />
+    </template>
     <ul ref="listRef" class="search-suggestions" role="listbox" @keydown="handleKeydown">
       <li v-if="heading" class="search-suggestions-heading" role="presentation" v-text="heading" />
       <li

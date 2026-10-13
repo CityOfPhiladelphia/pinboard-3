@@ -29,11 +29,18 @@ const props = defineProps<{
   searchPlaceholder: string | undefined
   searchShape?: 'rectangle' | 'pill'
   isMobile: boolean
+  showGeolocate?: boolean
 }>()
 
 // emits
 const emit = defineEmits<{
   search: []
+  geolocate: []
+}>()
+
+// slots
+const slots = defineSlots<{
+  'suggestion-card'?: unknown
 }>()
 
 const config = inject(PINBOARD_CONFIG_KEY)
@@ -58,11 +65,6 @@ const dropdownSuggestions = computed(() => {
   // Empty field → recent searches; typing → AIS autocomplete.
   if (!searchFocused.value) return []
   return searchString.value ? searchSuggestions.value : recentSearches.value
-})
-
-const elevatedSearch = computed(() => {
-  // Elevate the floating search only when the cluster sits over the map (mobile + map placement).
-  return props.isMobile && config?.mobileFilterPlacement === 'map'
 })
 
 const cornerShape = computed(() => {
@@ -161,7 +163,8 @@ function focusSearchInput() {
       v-model="searchString"
       class="location-search-input"
       :placeholder="searchPlaceholder"
-      :elevated="elevatedSearch"
+      :elevated="isMobile"
+      :shape="searchShape || (isMobile ? 'pill' : 'rectangle')"
       @search="handleSearchSubmit"
     />
     <div class="search-suggestions-container" :style="cornerShape">
@@ -170,12 +173,17 @@ function focusSearchInput() {
         v-model:user-location-state="userLocationState"
         :suggestions="dropdownSuggestions"
         :heading="showingRecents ? t('pinboard.recentSearches') : undefined"
+        :show-geolocate="showGeolocate"
         :removable="showingRecents"
         :remove-label="t('pinboard.removeRecentSearch')"
         @select="handleSuggestionSelect"
         @dismiss="handleSuggestionDismiss"
         @remove="handleSuggestionRemove"
-      />
+      >
+        <template v-if="slots['suggestion-card']" #suggestion-card>
+          <slot name="suggestion-card" />
+        </template>
+      </SearchSuggestions>
     </div>
   </div>
 </template>

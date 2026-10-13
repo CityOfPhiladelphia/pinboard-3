@@ -18,6 +18,7 @@ import type { AddressSource } from '@/pages/report/LocationStep.vue'
 import { getCurrentPosition } from '@/composables/useGeolocation'
 import type { AisFeature } from '@/types/wizard'
 import LocationImageCard from './LocationImageCard.vue'
+import { LocationSearch, type PinboardTypes } from '@pinboard/ui'
 
 const addressSource = defineModel<AddressSource | undefined>('addressSource', {
   default: undefined,
@@ -49,6 +50,8 @@ const open = ref(false)
 
 const searchRef = ref<InstanceType<typeof Search> | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
+
+const userLocationState = ref<PinboardTypes.UserLocationState>('unknown')
 
 const isOpen = computed(() => open.value && results.value.length > 0)
 
@@ -139,52 +142,30 @@ function setLocToImage() {
 </script>
 
 <template>
-  <div class="address-search" @keydown="onKeydown" @focusin="handleFocus" @focusout="onFocusOut">
-    <Search
-      ref="searchRef"
-      shape="pill"
-      :model-value="query"
-      :placeholder="store.location?.streetAddress ?? 'Enter an address, intersection, or zipcode'"
-      :leading-icon="IconLocationDot"
-      @update:model-value="onQueryChange"
-      @search="handleSearch"
-    />
-    <span class="geolocate_button" :style="{ display: open ? 'flex' : 'none' }">
-      <PhilaButton
-        text="Use my current location"
-        size="extra-small"
-        :icon="IconLocationCrosshairs"
-        :loading="currentSearch === 'geoLocation'"
-        @click="useMyLocation"
-      />
-    </span>
-    <div
-      v-if="
-        store.photo.location && store.location?.lat && store.location.lng && !suggestions.length
-      "
-      class="image_location"
-      :style="{ display: open ? 'grid' : 'none' }"
-    >
-      <button class="image_location__button" @click="setLocToImage">
-        <LocationImageCard
-          :popup-text="'Possible address based on photo'"
-          :address="store.photo.location"
-          :img-src="store.photo.previewUrl ?? store.photo.mediaUrl"
-          show-city-zip
-        />
-      </button>
-    </div>
-
-    <SearchSuggestions
-      v-else
-      ref="suggestionsRef"
-      :suggestions="suggestions"
-      :icon="IconLocationDot"
-      :style="{ border: 'none' }"
-      @select="onSelect"
-      @dismiss="onDismiss"
-    />
-  </div>
+  <LocationSearch
+    v-model:search-string="query"
+    v-model:user-location-state="userLocationState"
+    :search-placeholder="
+      store.location?.streetAddress ?? 'Enter an address, intersection, or zipcode'
+    "
+    :is-mobile="true"
+    :show-geolocate="true"
+    class="location-search"
+    @search="handleSearch"
+  >
+    <template #suggestion-card>
+      <div v-if="store.photo.location && !suggestions.length" class="image_location">
+        <button class="image_location__button" @click="setLocToImage">
+          <LocationImageCard
+            :popup-text="'Possible address based on photo'"
+            :address="store.photo.location"
+            :img-src="store.photo.previewUrl ?? store.photo.mediaUrl"
+            show-city-zip
+          />
+        </button>
+      </div>
+    </template>
+  </LocationSearch>
 </template>
 
 <style scoped>
