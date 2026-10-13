@@ -13,6 +13,7 @@ inputs:
 
 runs:
   using: 'composite'
+  if: ${{ inputs.environment-name && inputs.app-name != 'oem-flood-finder' }}
   steps:
     - uses: pnpm/setup@v2
 
