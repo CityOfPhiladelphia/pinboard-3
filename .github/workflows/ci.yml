@@ -58,6 +58,7 @@ jobs:
 
       - name: (Action) Ship to ${{ env.branch }} with ctl
         uses: ./.github/actions/ship-app
+        if: env.branch != 'dev' && matrix.app.name != 'oem-flood-finder'
         with:
           app-name: ${{ matrix.app.name }}
           environment-name: ${{ env.branch }}
