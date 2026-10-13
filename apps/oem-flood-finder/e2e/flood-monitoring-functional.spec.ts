@@ -1,11 +1,10 @@
 // Import Playwright test runner, assertion library, and Page type
 import { test, expect, Page } from '@playwright/test'
+import { showTestNameOnPage } from '@repo/playwright-config'
+import { APP_URL } from './app-url'
 
 // Give this file more time because some tests loop through multiple ZIP codes
 test.setTimeout(120000)
-
-// Store the app URL in one place so it is easy to update later
-const APP_URL = 'https://flood-monitoring-test.phila.gov/'
 
 // =====================================================
 // CENTRALIZED TEXT / EXPECTED VALUES
@@ -221,71 +220,6 @@ async function closeAboutTooltipIfOpen(page: Page) {
   if (isDismissVisible) {
     await dismissButton.click()
   }
-}
-
-// Shows the current test name on the browser page during runtime
-async function showTestNameOnPage(page: Page, testName: string) {
-  // Inject a banner into the browser page
-  await page.evaluate<void, string>((name: string) => {
-    // Remove existing banner if one already exists
-    const existingBanner = document.getElementById('playwright-test-banner')
-
-    // Remove old banner before creating a new one
-    if (existingBanner) {
-      existingBanner.remove()
-    }
-
-    // Create a new banner element
-    const banner = document.createElement('div')
-
-    // Set unique banner ID
-    banner.id = 'playwright-test-banner'
-
-    // Set banner text
-    banner.textContent = `Running test: ${name}`
-
-    // Keep banner fixed at the top of the browser
-    banner.style.position = 'fixed'
-
-    // Position banner from the top
-    banner.style.top = '10px'
-
-    // Center banner horizontally
-    banner.style.left = '50%'
-
-    // Adjust center alignment
-    banner.style.transform = 'translateX(-50%)'
-
-    // Keep banner above app UI
-    banner.style.zIndex = '999999'
-
-    // Set banner background color
-    banner.style.background = '#111827'
-
-    // Set banner text color
-    banner.style.color = 'white'
-
-    // Add spacing inside banner
-    banner.style.padding = '10px 16px'
-
-    // Round banner corners
-    banner.style.borderRadius = '8px'
-
-    // Set readable font size
-    banner.style.fontSize = '24px'
-
-    // Set font family
-    banner.style.fontFamily = 'Arial, sans-serif'
-
-    // Add shadow so banner stands out
-    banner.style.boxShadow = '0 4px 12px rgba(0,0,0,0.25)'
-
-    // Prevent banner from blocking clicks on the app
-    banner.style.pointerEvents = 'none'
-
-    // Add banner to the page body
-    document.body.appendChild(banner)
-  }, testName)
 }
 
 // Get all visible mileage values from the location list
@@ -525,6 +459,17 @@ test('Multiple Philadelphia ZIP code searches update mileage values', async ({ p
     // Search by current ZIP code
     await searchByValue(page, zipCode)
 
+    // Wait for the list to refresh: the previous ZIP's values can still be
+    // on screen right after the search is submitted
+    if (previousMilesValues) {
+      const previous = previousMilesValues
+      await expect
+        .poll(async () => getMilesText(page), {
+          message: `Mileage values should change after searching ${zipCode}`,
+        })
+        .not.toEqual(previous)
+    }
+
     // Capture mileage values after current ZIP code search
     const currentMilesValues = await getMilesText(page)
 
@@ -533,12 +478,6 @@ test('Multiple Philadelphia ZIP code searches update mileage values', async ({ p
 
     // Verify at least one mileage value is visible for the ZIP code
     expect(currentMilesValues.length).toBeGreaterThan(0)
-
-    // Compare current ZIP mileage values with previous ZIP mileage values
-    if (previousMilesValues) {
-      // Verify mileage values changed between ZIP code searches
-      expect(currentMilesValues).not.toEqual(previousMilesValues)
-    }
 
     // Save current mileage values for the next loop comparison
     previousMilesValues = currentMilesValues

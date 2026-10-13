@@ -11,3 +11,7 @@ AGENTS.md
 .vscode/
 .playwright-mcp/
 .DS_Store
+
+# Playwright output
+test-results
+playwright-report
