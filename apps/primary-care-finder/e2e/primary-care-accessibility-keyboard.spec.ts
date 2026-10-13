@@ -1,11 +1,10 @@
 // Import Playwright test utilities and shared TypeScript types
 import { test, expect, Page, Locator } from '@playwright/test'
+import { showTestNameOnPage } from '@repo/playwright-config'
+import { APP_URL } from './app-url'
 
 // Allow enough time for keyboard navigation and UI updates in the test environment
 test.setTimeout(120000)
-
-// Centralized app URL for easier maintenance across environments
-const APP_URL = 'https://test-primary-care.phila.gov/'
 
 // =====================================================
 // TYPES
@@ -169,38 +168,6 @@ const primaryCareAccessibilityApp = (page: Page) => ({
 // SHARED HELPERS
 // These helpers support keyboard-specific assertions and reduce repetition.
 // =====================================================
-
-// Displays the currently running test name in headed browser runs
-async function showTestNameOnPage(page: Page, testName: string) {
-  await page.evaluate<void, string>((name: string) => {
-    const existingBanner = document.getElementById('playwright-test-banner')
-
-    if (existingBanner) {
-      existingBanner.remove()
-    }
-
-    const banner = document.createElement('div')
-
-    banner.id = 'playwright-test-banner'
-    banner.textContent = `Running test: ${name}`
-
-    banner.style.position = 'fixed'
-    banner.style.top = '10px'
-    banner.style.left = '50%'
-    banner.style.transform = 'translateX(-50%)'
-    banner.style.zIndex = '999999'
-    banner.style.background = '#111827'
-    banner.style.color = 'white'
-    banner.style.padding = '10px 16px'
-    banner.style.borderRadius = '8px'
-    banner.style.fontSize = '24px'
-    banner.style.fontFamily = 'Arial, sans-serif'
-    banner.style.boxShadow = '0 4px 12px rgba(0,0,0,0.25)'
-    banner.style.pointerEvents = 'none'
-
-    document.body.appendChild(banner)
-  }, testName)
-}
 
 // Safely checks optional UI controls without failing the test
 async function isVisible(locator: Locator): Promise<boolean> {
@@ -448,20 +415,6 @@ async function activateFocusedElementWithEnter(page: Page): Promise<void> {
   const activeElementAfter = await getActiveElementSummary(page)
 
   console.log(`Focused element after Enter: ${activeElementAfter}`)
-}
-
-// Activates the currently focused element using Space
-async function activateFocusedElementWithSpace(page: Page): Promise<void> {
-  const activeElementBefore = await getActiveElementSummary(page)
-
-  console.log(`Focused element before Space: ${activeElementBefore}`)
-
-  await page.keyboard.press('Space')
-  await page.waitForTimeout(700)
-
-  const activeElementAfter = await getActiveElementSummary(page)
-
-  console.log(`Focused element after Space: ${activeElementAfter}`)
 }
 
 // Closes a modal/detail panel with Escape if the app supports it
