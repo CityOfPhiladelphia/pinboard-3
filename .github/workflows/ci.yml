@@ -79,3 +79,78 @@ jobs:
           VITE_311_API_BASE_URL: ${{ matrix.app.name == 'philly-311' && '/api' }}
           VITE_311_API_PROXY: ${{ matrix.app.name == 'philly-311' && ((env.branch == 'prod' && '/prod') || (env.branch == 'test' && '/test') || '/dev') }}
           VITE_311_AIS_BASE_URL: ${{ matrix.app.name == 'philly-311' && secrets.AIS_URL }}
+
+  smoke-test:
+    name: Smoke test ${{ matrix.app.name }}
+    runs-on: ubuntu-latest
+    # Runs only after every app has shipped; skipped if a ship failed.
+    needs: [detect-changes, ship-apps]
+    env:
+      branch: ${{ (github.ref == 'refs/heads/main' && 'prod') || (github.ref == 'refs/heads/test' && 'test') || 'dev' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.detect-changes.outputs.updated) }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      # Only apps with an apps/<name>/e2e package have smoke tests (e.g. not
+      # philly-311). Everything below is skipped for the rest.
+      - name: Check for smoke tests
+        id: target
+        shell: bash
+        env:
+          APP: ${{ matrix.app.name }}
+        run: |
+          if [ -d "apps/$APP/e2e" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No smoke tests for $APP"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: pnpm/setup@v2
+        if: steps.target.outputs.run == 'true'
+
+      - uses: actions/setup-node@v7
+        if: steps.target.outputs.run == 'true'
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # Install only this app's e2e package and what it depends on.
+      - name: Install test dependencies
+        if: steps.target.outputs.run == 'true'
+        shell: bash
+        run: pnpm install --frozen-lockfile --filter "@pinboard/${{ matrix.app.name }}-e2e..."
+
+      - name: Install Chromium
+        if: steps.target.outputs.run == 'true'
+        working-directory: ${{ format('apps/{0}/e2e', matrix.app.name) }}
+        shell: bash
+        run: pnpm exec playwright install --with-deps chromium
+
+      # TEST_ENV picks the app's test or prod URL (see packages/playwright-config).
+      - name: Run smoke tests against ${{ env.branch }}
+        if: steps.target.outputs.run == 'true'
+        working-directory: ${{ format('apps/{0}/e2e', matrix.app.name) }}
+        shell: bash
+        env:
+          CI: 'true'
+          TEST_ENV: ${{ env.branch }}
+        run: pnpm test:smoke
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() && steps.target.outputs.run == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-${{ matrix.app.name }}-${{ env.branch }}
+          path: |
+            apps/${{ matrix.app.name }}/e2e/playwright-report
+            apps/${{ matrix.app.name }}/e2e/test-results
+          if-no-files-found: ignore
+          retention-days: 14

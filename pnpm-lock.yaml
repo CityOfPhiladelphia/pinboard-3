@@ -93,6 +93,9 @@ catalogs:
     '@phila/phila-ui-tooltip':
       specifier: 0.2.0-beta.4
       version: 0.2.0-beta.4
+    '@playwright/test':
+      specifier: ^1.62.1
+      version: 1.64.0
     '@types/node':
       specifier: ^26.3.0
       version: 26.5.1
@@ -235,6 +238,24 @@ importers:
       ts-node:
         specifier: 'catalog:'
         version: 10.9.2(@types/node@26.5.1)(typescript@6.0.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
+  apps/oem-flood-finder/e2e:
+    devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.64.0
+      '@repo/playwright-config':
+        specifier: workspace:*
+        version: link:../../../packages/playwright-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../../packages/typescript-config
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.5.1
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -507,6 +528,24 @@ importers:
         specifier: 'catalog:'
         version: 6.0.3
 
+  apps/primary-care-finder/e2e:
+    devDependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.64.0
+      '@repo/playwright-config':
+        specifier: workspace:*
+        version: link:../../../packages/playwright-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../../packages/typescript-config
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.5.1
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
   apps/primary-care-finder/frontend:
     dependencies:
       '@phila/phila-ui-button':
@@ -613,6 +652,22 @@ importers:
       typescript-eslint:
         specifier: 'catalog:'
         version: 8.70.0(eslint@10.10.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
+
+  packages/playwright-config:
+    dependencies:
+      '@playwright/test':
+        specifier: 'catalog:'
+        version: 1.64.0
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.5.1
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   packages/typescript-config:
     devDependencies:
@@ -1484,6 +1539,11 @@ packages:
     peerDependencies:
       pinia: ^2.0.0
       vue: ^3.0.0
+
+  '@playwright/test@1.64.0':
+    resolution: {integrity: sha512-oTN9FNYuN6bqQMwiho6jJKLCG2/QOYCixGXuCjRmzOq23eODeukuY2XiAVoVpAECbuezMt1MHQjAiQxK8F+Y+g==}
+    engines: {node: '>=20'}
+    hasBin: true
 
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
@@ -2947,6 +3007,16 @@ packages:
   pkg-types@2.3.3:
     resolution: {integrity: sha512-j/lCFdcppV0JxWpCEITdbDltBxPP6cHT+yNJ6Go2OgoSA9518X847X9z0p6LtA4Nc16+eQzCZjRrWanTGvHJ5w==}
 
+  playwright-core@1.64.0:
+    resolution: {integrity: sha512-T9r+MZkTECl2+oUcZ26YgZzTrYidTsIhYYkJix+6iDOymOb1FB2RLLSOxRGnZGv5DStt+aduIVbt+E8WygXYpg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  playwright@1.64.0:
+    resolution: {integrity: sha512-kVzTnYFYEyQ9RGzBjNCd2+yEqWmVbxl3AHPynv3qQ6JTjv4a+kwRcnqQwIpuP3NnrnIrE/Q6wWAIAvMfIE2/Yg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   postcss-safe-parser@7.1.0:
     resolution: {integrity: sha512-1WzZxRLaAFwEh6Do+zyGpjWV3nGJNxxhuh7Ubu/q1ICImMgZJnLwhoaEpRbG4pJppp2Y1ncL9ffA2f+LhrefQg==}
     engines: {node: '>=18.0'}
@@ -4364,6 +4434,10 @@ snapshots:
       '@phila/sso-core': 0.2.0
       pinia: 3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3))
       vue: 3.5.42(typescript@6.0.3)
+
+  '@playwright/test@1.64.0':
+    dependencies:
+      playwright: 1.64.0
 
   '@polka/url@1.0.0-next.29': {}
 
@@ -5829,6 +5903,12 @@ snapshots:
       confbox: 0.3.1
       exsolve: 1.1.1
       pathe: 2.0.3
+
+  playwright-core@1.64.0: {}
+
+  playwright@1.64.0:
+    dependencies:
+      playwright-core: 1.64.0
 
   postcss-safe-parser@7.1.0(postcss@8.5.28):
     dependencies:
