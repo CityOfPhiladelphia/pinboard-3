@@ -106,7 +106,7 @@ defineExpose({ focusFirst })
         @click="userLocationState = 'acquiring'"
       />
     </span>
-    <slot />
+    <slot name="suggestion-card" />
     <ul ref="listRef" class="search-suggestions" role="listbox" @keydown="handleKeydown">
       <li v-if="heading" class="search-suggestions-heading" role="presentation" v-text="heading" />
       <li

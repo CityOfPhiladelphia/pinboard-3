@@ -13,6 +13,7 @@ import SearchSuggestions from './SearchSuggestions.vue'
 import SortPanel from './SortPanel.vue'
 import DrawingCanvas from './DrawingCanvas.vue'
 import LoadingCards from './LoadingCards.vue'
+export { default as LocationSearch } from './LocationSearch.vue'
 
 export {
   PinboardBody,

@@ -106,7 +106,7 @@ async function onSearch(query: string) {
         v-if="finder.reportById(location.id)"
         :report="finder.reportById(location.id)!"
       />
-      <p v-else>{{ location.name }}</p>
+      <p v-else v-text="location.name" />
     </template>
 
     <template #location-detail="{ location, onClose }">
@@ -150,7 +150,7 @@ async function onSearch(query: string) {
       <!-- Rounded zoom: clustering and pin sizing are integer-granular, and a
            fractional zoom prop would re-render every marker per animation frame. -->
       <ClusteredMarkers
-        :locations="finder.locations.value"
+        :locations="filteredLocations"
         :zoom="Math.round(zoom)"
         :map="map"
         :hovered-id="hoveredId"
