@@ -1,0 +1,23 @@
+{
+  "name": "@pinboard/oem-flood-finder-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "HEADLESS=false playwright test",
+    "test:headless": "HEADLESS=true playwright test",
+    "test:smoke": "playwright test smoke.spec.ts",
+    "test:report": "playwright show-report",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write . --ignore-path ../../../.gitignore --ignore-path ../../../.prettierignore",
+    "format:check": "prettier --check . --ignore-path ../../../.gitignore --ignore-path ../../../.prettierignore"
+  },
+  "devDependencies": {
+    "@playwright/test": "catalog:",
+    "@repo/playwright-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -10,10 +10,11 @@ This is a **pnpm workspace monorepo** with two top-level directories:
 
 Shared code that apps import. These are internal workspace packages, not published to npm.
 
-| Package                           | Description                                                                                                                                           |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`@pinboard/core`](packages/core) | Shared utilities and data logic                                                                                                                       |
-| [`@pinboard/ui`](packages/ui)     | Shared Vue component library — wraps PhilaUI components (`@phila/phila-ui-*`) and map-core (`@phila/phila-ui-map-core`) into a single import for apps |
+| Package                                                 | Description                                                                                                                                           |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`@pinboard/core`](packages/core)                       | Shared utilities and data logic                                                                                                                       |
+| [`@pinboard/ui`](packages/ui)                           | Shared Vue component library — wraps PhilaUI components (`@phila/phila-ui-*`) and map-core (`@phila/phila-ui-map-core`) into a single import for apps |
+| [`@repo/playwright-config`](packages/playwright-config) | Shared Playwright config, URL resolution, and post-deploy smoke checks used by each app's `e2e` package                                               |
 
 ### `apps/` — Deployable applications
 
@@ -72,8 +73,30 @@ On push to `test` or `main`, the pipeline:
 1. Lints, type-checks, and builds all packages
 2. Detects which apps changed (by file path — `apps/<name>/`, `packages/`, or `ci.yml`)
 3. Deploys only the affected apps to the appropriate environment using `city ship`
+4. Smoke-tests each deployed app that has an `apps/<name>/e2e` package against the environment it was just shipped to
 
 Deployments use AWS OIDC — no long-lived credentials. Each app/environment pair has its own IAM role scoped to its S3 bucket and CloudFront distribution.
+
+## End-to-end tests
+
+Each app keeps its Playwright tests in `apps/<name>/e2e`. Shared configuration and the smoke checks live in [`@repo/playwright-config`](packages/playwright-config).
+
+```bash
+# Install the browser once (and after Playwright upgrades)
+pnpm --filter @pinboard/primary-care-finder-e2e exec playwright install chromium
+
+# Run from an app's e2e directory, e.g. apps/primary-care-finder/e2e
+pnpm test:smoke    # the fast post-deploy checks (also what CI runs)
+pnpm test          # the full suite
+```
+
+| Variable              | Effect                                                                                     |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| `TEST_ENV=test\|prod` | Which deployed environment to test (default `test`)                                        |
+| `BASE_URL=<url>`      | Test an arbitrary URL instead (overrides `TEST_ENV`)                                       |
+| `HEADLESS=true`       | Run headless locally. Without it, local runs are headed with slow-motion; `CI` is headless |
+
+Smoke tests are strict: they fail if a search returns nothing. The functional suites are broader and more forgiving, so they are not run after deploys.
 
 ## Tooling
 
