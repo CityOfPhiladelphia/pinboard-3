@@ -126,7 +126,7 @@ watch(allFiltersOpen, (open) => {
     <Teleport to="#mobile-map-search-filter" :disabled="!isMobile">
       <LocationSearch
         v-model:search-string="searchString"
-        v-model:user-location-state="userLocationState"
+        :v-model:locating-user="userLocationState === 'acquiring'"
         :search-placeholder="searchPlaceholder"
         :is-mobile="isMobile"
         class="location-search"

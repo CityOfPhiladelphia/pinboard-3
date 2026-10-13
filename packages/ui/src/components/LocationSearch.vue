@@ -15,13 +15,10 @@ import { useSearchSuggestions } from '../composables/useSearchSuggestions'
 import { useRecentSearches } from '../composables/useRecentSearches'
 import { PINBOARD_CONFIG_KEY } from '../keys.ts'
 
-// type imports
-import type { UserLocationState } from '../types'
-
 // models
 const searchString = defineModel<string>('search-string', { default: '' })
-const userLocationState = defineModel<UserLocationState>('user-location-state', {
-  default: 'unknown',
+const locatingUser = defineModel<boolean>('locatingUser', {
+  default: false,
 })
 
 // props
@@ -170,7 +167,8 @@ function focusSearchInput() {
     <div class="search-suggestions-container" :style="cornerShape">
       <SearchSuggestions
         ref="suggestionsRef"
-        v-model:user-location-state="userLocationState"
+        v-model:locating-user="locatingUser"
+        :search-focused="searchFocused"
         :suggestions="dropdownSuggestions"
         :heading="showingRecents ? t('pinboard.recentSearches') : undefined"
         :show-geolocate="showGeolocate"

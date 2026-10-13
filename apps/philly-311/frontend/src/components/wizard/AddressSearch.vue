@@ -1,11 +1,9 @@
 <!-- ABOUTME: AIS-backed address search on phila-ui Search/SearchSuggestions. Typing fires
      /autocomplete (debounced); picking a suggestion fires /search and emits select(feature). -->
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { Search } from '@phila/phila-ui-search'
-import { SearchSuggestions } from '../../../../../../packages/ui/src/components/_index'
-import { PhilaButton } from '@phila/phila-ui-button'
 import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
 import {
   autocompleteAddresses,
@@ -13,12 +11,11 @@ import {
   searchAddress,
   type AisAutocompleteResult,
 } from '@/composables/useAis'
-import { IconLocationCrosshairs, IconLocationDot } from '@phila/phila-ui-core/icons'
 import type { AddressSource } from '@/pages/report/LocationStep.vue'
 import { getCurrentPosition } from '@/composables/useGeolocation'
 import type { AisFeature } from '@/types/wizard'
 import LocationImageCard from './LocationImageCard.vue'
-import { LocationSearch, type PinboardTypes } from '@pinboard/ui'
+import { LocationSearch } from '@pinboard/ui'
 
 const addressSource = defineModel<AddressSource | undefined>('addressSource', {
   default: undefined,
@@ -49,28 +46,13 @@ const { query, results, error } = useDebouncedSearch<AisAutocompleteResult[]>({
 const open = ref(false)
 
 const searchRef = ref<InstanceType<typeof Search> | null>(null)
-const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
 
-const userLocationState = ref<PinboardTypes.UserLocationState>('unknown')
+const locatingUser = ref<boolean>(false)
 
 const isOpen = computed(() => open.value && results.value.length > 0)
 
 const suggestions = computed(() => results.value.map((r) => r.address))
 
-function onQueryChange(value: string) {
-  query.value = value
-  open.value = true
-}
-
-function onKeydown(e: KeyboardEvent) {
-  const target = e.target as HTMLElement
-  if (e.key === 'ArrowDown' && isOpen.value && target.tagName === 'INPUT') {
-    e.preventDefault()
-    suggestionsRef.value?.focusFirst()
-  } else if (e.key === 'Escape') {
-    open.value = false
-  }
-}
 
 function onFocusOut(e: FocusEvent) {
   const related = e.relatedTarget as HTMLElement | null
@@ -111,6 +93,7 @@ async function handleSearch() {
 }
 
 async function useMyLocation() {
+  open.value = true
   currentSearch.value = 'geoLocation'
   locationError.value = ''
   try {
@@ -128,6 +111,7 @@ async function useMyLocation() {
     locationError.value = "We couldn't resolve your location to an address."
   } finally {
     currentSearch.value = null
+    locatingUser.value = false
   }
 }
 
@@ -139,12 +123,16 @@ function setLocToImage() {
   store.setLocation(store.photo.location)
   addressSource.value = 'image'
 }
+
+watch(locatingUser, (locating) => {
+  if (locating) useMyLocation()
+})
 </script>
 
 <template>
   <LocationSearch
     v-model:search-string="query"
-    v-model:user-location-state="userLocationState"
+    v-model:locating-user="locatingUser"
     :search-placeholder="
       store.location?.streetAddress ?? 'Enter an address, intersection, or zipcode'
     "
@@ -154,7 +142,7 @@ function setLocToImage() {
     @search="handleSearch"
   >
     <template #suggestion-card>
-      <div v-if="store.photo.location && !suggestions.length" class="image_location">
+      <div v-if="store.photo.location?.streetAddress && !suggestions.length" class="image_location">
         <button class="image_location__button" @click="setLocToImage">
           <LocationImageCard
             :popup-text="'Possible address based on photo'"
@@ -175,15 +163,6 @@ function setLocToImage() {
   box-shadow: var(--elevation-light-2);
   border-radius: 2.4rem 2.4rem 2.4rem 2.4rem;
   width: 100%;
-}
-
-.geolocate_button {
-  width: 100%;
-  padding: var(--spacing-m, 1rem) var(--spacing-m, 1rem) var(--spacing-m, 1rem) 1rem;
-
-  & > button > :is(.phila-button__stack) > :is(.phila-button__content) > :is(.phila-icon-core) {
-    font-size: var(--Icon-Solid-Small-font-icon-solid-small-size, 1.125rem);
-  }
 }
 
 .image_location {

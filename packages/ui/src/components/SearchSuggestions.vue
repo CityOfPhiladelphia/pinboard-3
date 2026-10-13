@@ -3,14 +3,14 @@ import { ref, watch } from 'vue'
 import { Icon, type IconComponent } from '@phila/phila-ui-core'
 import { IconLocationCrosshairs } from '@phila/phila-ui-core/icons'
 import { CloseButton, PhilaButton } from '@phila/phila-ui-button'
-import type { UserLocationState } from '../types'
 
-const userLocationState = defineModel<UserLocationState>('user-location-state', {
-  default: 'unknown',
+const locatingUser = defineModel<boolean>('locatingUser', {
+  default: false,
 })
 
 const props = withDefaults(
   defineProps<{
+    searchFocused: boolean
     suggestions: string[]
     showGeolocate?: boolean
     heading?: string
@@ -101,14 +101,14 @@ defineExpose({ focusFirst })
 </script>
 
 <template>
-  <div v-if="suggestions.length" class="search-suggestions-panel">
+  <div v-if="searchFocused || suggestions.length" class="search-suggestions-panel">
     <span v-if="showGeolocate" class="geolocate_button">
       <PhilaButton
         text="Use my current location"
         size="extra-small"
         :icon="IconLocationCrosshairs"
-        :loading="userLocationState === 'acquiring'"
-        @click="userLocationState = 'acquiring'"
+        :loading="locatingUser"
+        @click="locatingUser = true"
       />
     </span>
     <template v-if="slots['suggestion-card']">
