@@ -5,8 +5,10 @@ import { waitForDeployment } from './wait-for-deploy'
 // load-dependent assertions get more than Playwright's 5s default.
 const LOAD_TIMEOUT = 15000
 
-// How long to wait for a just-shipped bundle to start being served.
-const DEPLOY_TIMEOUT = 5 * 60 * 1000
+// How long to wait for a just-shipped bundle to start being served. A CloudFront
+// invalidation normally lands within a couple of minutes; anything longer is a
+// real problem worth failing fast on.
+const DEPLOY_TIMEOUT = 2 * 60 * 1000
 
 export interface SmokeOptions {
   // Used in the describe title

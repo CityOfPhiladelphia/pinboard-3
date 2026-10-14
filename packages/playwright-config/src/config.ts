@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test'
+import { USER_AGENT } from './user-agent'
 
 // Base Playwright config shared by every app's e2e package.
 export function createConfig() {
@@ -42,6 +43,8 @@ export function createConfig() {
         // Maximize browser window for headed desktop runs.
         args: localHeadless ? [] : ['--start-maximized'],
       },
+
+      userAgent: USER_AGENT,
 
       permissions: ['geolocation'],
 
