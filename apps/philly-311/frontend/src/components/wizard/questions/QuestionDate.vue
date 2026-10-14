@@ -6,13 +6,13 @@ import type { IQuestionField } from '@/types/api'
 
 const fieldId = useId()
 
+const modelValue = defineModel<string | undefined>('model-value', { default: undefined })
+const error = defineModel<string>('error', { default: '' })
+
 const props = defineProps<{
   question: IQuestionField
   initialValue: string
 }>()
-
-const modelValue = defineModel<string | undefined>('model-value', { default: undefined })
-const error = defineModel<string>('error', { default: '' })
 
 const labelText = computed(() =>
   props.question.required ? `${props.question.label} *` : props.question.label,

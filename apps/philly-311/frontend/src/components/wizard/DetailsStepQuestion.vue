@@ -42,7 +42,7 @@ const initialValue = computed(() => {
           :initial-value="initialValue"
         />
         <QuestionRadio
-          v-else-if="current.type === 'picklist' || current.type === 'boolean'"
+          v-else-if="current.type === 'picklist'"
           v-model:model-value="response"
           v-model:error="error"
           :question="current"

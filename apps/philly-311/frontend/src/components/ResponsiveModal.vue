@@ -37,6 +37,11 @@ const props = withDefaults(
   }>(),
   {
     group: 'modals',
+    title: undefined,
+    actionLabel: undefined,
+    cancelLabel: undefined,
+    actionButtonProps: undefined,
+    cancelButtonProps: undefined,
     dismissible: false,
     cancellable: false,
     snapPoints: () => [90],

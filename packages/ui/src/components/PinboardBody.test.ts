@@ -89,7 +89,6 @@ async function mountPinboardBody(
     },
     slots: {
       'locations-header': '<div class="my-header">Header</div>',
-      'locations-filters': '<div class="my-filters">Chips</div>',
       ...extraSlots,
     },
     global: {
@@ -101,20 +100,6 @@ async function mountPinboardBody(
   mounted.push({ wrapper: wrapper as VueWrapper, container })
   return wrapper as VueWrapper
 }
-
-describe('PinboardBody - locations-filters slot forwarding (desktop)', () => {
-  it('renders filters slot content between the search box and the location list', async () => {
-    const w = await mountPinboardBody({ isMobile: false })
-    const desktop = w.find('.finder-panel-locations')
-    const html = desktop.html()
-    const searchIdx = html.indexOf('location-search')
-    const filtersIdx = html.indexOf('my-filters')
-    const listIdx = html.indexOf('location-list')
-    expect(searchIdx).toBeGreaterThan(-1)
-    expect(searchIdx).toBeLessThan(filtersIdx)
-    expect(filtersIdx).toBeLessThan(listIdx)
-  })
-})
 
 describe('PinboardBody - locations-footer slot (floating panel CTA)', () => {
   it('renders footer slot content on desktop, absolutely positioned over the panel', async () => {

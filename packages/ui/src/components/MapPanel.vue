@@ -160,7 +160,6 @@ const SlotRenderer = defineComponent({
   justify-content: center;
   gap: 1rem;
   background: rgba(255, 255, 255, 0.35);
-  z-index: 1;
 }
 
 .map-loading-spinner {

@@ -6,13 +6,13 @@ import type { IQuestionField } from '@/types/api'
 
 const fieldId = useId()
 
+const modelValue = defineModel<string | undefined>('model-value', { default: undefined })
+const error = defineModel<string>('error', { default: '' })
+
 const props = defineProps<{
   question: IQuestionField
   initialValue: string
 }>()
-
-const modelValue = defineModel<string | undefined>('model-value', { default: undefined })
-const error = defineModel<string>('error', { default: '' })
 
 const labelText = computed(() =>
   props.question.required ? `${props.question.label} *` : props.question.label,
@@ -30,8 +30,7 @@ function set(value: string) {
 <template>
   <!-- number / currency / double: TextField — forwards $attrs to the native <input>.
          label always renders the real text (TextField's dist build clobbers an explicit
-         aria-label attr with its own, empty-when-labeled fallback); hideLabel visually hides
-         the rendered <label> via the :deep() rule below instead. -->
+         aria-label attr with its own, empty-when-labeled fallback). -->
   <TextField
     :id="fieldId"
     :label="labelText"
