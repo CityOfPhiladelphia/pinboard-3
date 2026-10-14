@@ -101,7 +101,7 @@ defineExpose({ focusFirst })
 </script>
 
 <template>
-  <div v-if="searchFocused || suggestions.length" class="search-suggestions-panel">
+  <div v-if="true || suggestions.length" class="search-suggestions-panel">
     <span v-if="showGeolocate" class="geolocate_button">
       <PhilaButton
         text="Use my current location"
@@ -115,7 +115,7 @@ defineExpose({ focusFirst })
       <slot name="suggestion-card" />
     </template>
     <ul ref="listRef" class="search-suggestions" role="listbox" @keydown="handleKeydown">
-      <li v-if="heading" class="search-suggestions-heading" role="presentation" v-text="heading" />
+      <li v-if="heading" class="search-suggestions-heading has-text-label-default" role="presentation" v-text="heading" />
       <li
         v-for="(suggestion, index) in suggestions"
         :key="suggestion"
@@ -126,7 +126,7 @@ defineExpose({ focusFirst })
         @click="emit('select', suggestion)"
       >
         <Icon v-if="icon" :icon="icon" inline decorative />
-        <span class="search-suggestion-text has-text-label-default" v-text="suggestion" />
+        <span class="search-suggestion-text has-text-body-default" v-text="suggestion" />
         <CloseButton
           v-if="removable"
           :aria-label="removeLabel"
@@ -156,6 +156,10 @@ defineExpose({ focusFirst })
   height: 100%;
   overflow: auto;
   scrollbar-width: thin;
+
+  li {
+    margin: 0;
+  }
 }
 
 .search-suggestion {
@@ -181,10 +185,6 @@ defineExpose({ focusFirst })
 
 .search-suggestions-heading {
   padding: var(--spacing-2xs, 0.25rem) var(--spacing-xs, 0.5rem);
-  color: var(--Schemes-On-Surface-Variant, #555);
-  font-family: var(--Label-Default-font-label-default-family);
-  font-size: var(--Label-Default-font-label-default-size);
-  font-weight: 700;
 }
 
 .search-suggestion-text {
