@@ -141,6 +141,7 @@ function getMapCardProps(location: OemLocation): MapCardProps {
     v-model:user-location-state="userLocationState"
     v-model:location-search-mode="locationSearchMode"
     v-model:location-sort-mode="locationSortMode"
+    v-model:location-filter-mode="locationFilterMode"
     v-model:search-or-user-location="searchOrUserLocation"
     v-model:error-message="errorMessage"
     :locations="currentLocations"

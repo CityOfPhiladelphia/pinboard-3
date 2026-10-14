@@ -81,8 +81,8 @@ const userLocationState = defineModel<UserLocationState>('user-location-state', 
 const searchOrUserLocation = defineModel<LatLon | undefined>('search-or-user-location', {
   default: undefined,
 })
-const locationFilterMode = defineModel<string | undefined>('location-filter-mode', {
-  default: undefined,
+const locationFilterMode = defineModel<string>('location-filter-mode', {
+  default: 'all',
 })
 const locationSortMode = defineModel<SortMode>('location-sort-mode', { default: '' })
 const errorMessage = defineModel<string | null>('error-message', { default: null })

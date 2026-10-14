@@ -23,8 +23,8 @@ import type {
 import type { FilterProps, FilterValue } from '@phila/phila-ui-filter-chip'
 
 // models
-const locationFilterMode = defineModel<string | undefined>('location-filter-mode', {
-  default: undefined,
+const locationFilterMode = defineModel<string>('location-filter-mode', {
+  default: 'all',
 })
 const locationSortMode = defineModel<SortMode>('location-sort-mode', { default: '' })
 const searchString = defineModel<string>('search-string', { default: '' })

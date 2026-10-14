@@ -7,6 +7,7 @@ export function filterLocations(
   filterMode: Ref<Filters>,
 ) {
   locations = toValue(locations)
+  console.log('filterMode: ', filterMode.value)
   switch (filterMode.value) {
     case 'gauges': {
       return locations.filter((loc) => isGauge(loc))
