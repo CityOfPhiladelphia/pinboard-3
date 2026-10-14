@@ -122,7 +122,7 @@ watch(allFiltersOpen, (open) => {
 </script>
 
 <template>
-  <div class="location-search-filter-sort">
+  <div class="location-search-filter-sort" :class="{ mobile: isMobile }">
     <Teleport to="#mobile-map-search-filter" :disabled="!isMobile">
       <LocationSearch
         v-model:search-string="searchString"
@@ -183,7 +183,8 @@ watch(allFiltersOpen, (open) => {
   padding: var(--spacing-l, 1.5rem) var(--spacing-m, 1rem);
 }
 
-.location-search {
+.location-search-filter-sort.mobile {
+  padding: 0;
 }
 
 .location-filters {
