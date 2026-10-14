@@ -4,6 +4,9 @@ import { Icon, type IconComponent } from '@phila/phila-ui-core'
 import { IconLocationCrosshairs } from '@phila/phila-ui-core/icons'
 import { CloseButton, PhilaButton } from '@phila/phila-ui-button'
 
+const dropdownOpen = defineModel<boolean>('dropdownOpen', {
+  default: false,
+})
 const locatingUser = defineModel<boolean>('locatingUser', {
   default: false,
 })
@@ -12,16 +15,15 @@ const props = withDefaults(
   defineProps<{
     searchFocused: boolean
     suggestions: string[]
+    history: string[]
     showGeolocate?: boolean
     heading?: string
-    removable?: boolean
     removeLabel?: string
     icon?: IconComponent
   }>(),
   {
     showGeolocate: false,
     heading: undefined,
-    removable: true,
     removeLabel: undefined,
     icon: undefined,
   }
@@ -30,7 +32,6 @@ const props = withDefaults(
 const emit = defineEmits<{
   select: [suggestion: string]
   remove: [suggestion: string]
-  dismiss: []
 }>()
 
 // slots
@@ -40,11 +41,27 @@ const slots = defineSlots<{
 
 const activeIndex = ref(-1)
 const listRef = ref<HTMLUListElement | null>(null)
+const removable = ref(true)
+const dropdownSuggections = ref(props.history)
 
 watch(
   () => props.suggestions,
-  () => {
-    activeIndex.value = -1
+  (newSuggestions) => {
+    if (newSuggestions.length) {
+      removable.value = false
+      dropdownSuggections.value = newSuggestions
+      activeIndex.value = -1
+    } else {
+      removable.value = true
+      dropdownSuggections.value = props.history
+    }
+  }
+)
+
+watch(
+  () => props.history,
+  (updated) => {
+    dropdownSuggections.value = updated
   }
 )
 
@@ -73,7 +90,6 @@ function handleKeydown(event: KeyboardEvent) {
       event.preventDefault()
       if (activeIndex.value <= 0) {
         activeIndex.value = -1
-        emit('dismiss')
       } else {
         activeIndex.value -= 1
         focusItem(activeIndex.value)
@@ -89,11 +105,6 @@ function handleKeydown(event: KeyboardEvent) {
       }
       break
     }
-    case 'Escape': {
-      event.preventDefault()
-      emit('dismiss')
-      break
-    }
   }
 }
 
@@ -101,8 +112,8 @@ defineExpose({ focusFirst })
 </script>
 
 <template>
-  <div v-if="true || suggestions.length" class="search-suggestions-panel">
-    <span v-if="showGeolocate" class="geolocate_button">
+  <div v-if="dropdownOpen" class="search-suggestions-panel">
+    <span v-if="showGeolocate && !suggestions.length" class="geolocate_button">
       <PhilaButton
         text="Use my current location"
         size="extra-small"
@@ -111,13 +122,18 @@ defineExpose({ focusFirst })
         @click="locatingUser = true"
       />
     </span>
-    <template v-if="slots['suggestion-card']">
+    <template v-if="slots['suggestion-card'] && !suggestions.length">
       <slot name="suggestion-card" />
     </template>
     <ul ref="listRef" class="search-suggestions" role="listbox" @keydown="handleKeydown">
-      <li v-if="heading" class="search-suggestions-heading has-text-label-default" role="presentation" v-text="heading" />
       <li
-        v-for="(suggestion, index) in suggestions"
+        v-if="removable && history.length"
+        class="search-suggestions-heading has-text-label-default"
+        role="presentation"
+        v-text="heading"
+      />
+      <li
+        v-for="(suggestion, index) in dropdownSuggections"
         :key="suggestion"
         class="search-suggestion"
         :class="{ 'search-suggestion--active': index === activeIndex }"
@@ -157,6 +173,7 @@ defineExpose({ focusFirst })
   overflow: auto;
   scrollbar-width: thin;
 
+  &,
   li {
     margin: 0;
   }

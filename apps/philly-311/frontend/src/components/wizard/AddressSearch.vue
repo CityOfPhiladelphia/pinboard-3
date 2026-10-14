@@ -1,9 +1,8 @@
 <!-- ABOUTME: AIS-backed address search on phila-ui Search/SearchSuggestions. Typing fires
      /autocomplete (debounced); picking a suggestion fires /search and emits select(feature). -->
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
-import { Search } from '@phila/phila-ui-search'
 import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
 import {
   autocompleteAddresses,
@@ -44,31 +43,7 @@ const { query, results, error } = useDebouncedSearch<AisAutocompleteResult[]>({
 // Closed after a pick: echoing the resolved address into `query` re-fires the
 // debounced autocomplete, and the list must not reopen until the user types.
 const open = ref(false)
-
-const searchRef = ref<InstanceType<typeof Search> | null>(null)
-
 const locatingUser = ref<boolean>(false)
-
-const isOpen = computed(() => open.value && results.value.length > 0)
-
-const suggestions = computed(() => results.value.map((r) => r.address))
-
-
-function onFocusOut(e: FocusEvent) {
-  const related = e.relatedTarget as HTMLElement | null
-  if (!(e.currentTarget as HTMLElement).contains(related)) open.value = false
-}
-
-function onDismiss() {
-  open.value = false
-  searchRef.value?.focus()
-}
-
-async function onSelect(suggestion: string) {
-  if (!suggestion) return
-  query.value = suggestion
-  await handleSearch()
-}
 
 async function handleSearch() {
   open.value = false
@@ -115,13 +90,10 @@ async function useMyLocation() {
   }
 }
 
-function handleFocus() {
-  open.value = true
-}
-
 function setLocToImage() {
   store.setLocation(store.photo.location)
   addressSource.value = 'image'
+  open.value = false
 }
 
 watch(locatingUser, (locating) => {
@@ -132,6 +104,7 @@ watch(locatingUser, (locating) => {
 <template>
   <LocationSearch
     v-model:search-string="query"
+    v-model:dropdown-open="open"
     v-model:locating-user="locatingUser"
     :search-placeholder="
       store.location?.streetAddress ?? 'Enter an address, intersection, or zipcode'
@@ -142,7 +115,7 @@ watch(locatingUser, (locating) => {
     @search="handleSearch"
   >
     <template #suggestion-card>
-      <div v-if="store.photo.location?.streetAddress && !suggestions.length" class="image_location">
+      <div v-if="store.photo.location?.streetAddress" class="image_location">
         <button class="image_location__button" @click="setLocToImage">
           <LocationImageCard
             :popup-text="'Possible address based on photo'"

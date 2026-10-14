@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // vue imports
-import { ref, computed, inject } from 'vue'
+import { ref, computed, inject, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // 3rd party imports
@@ -17,6 +17,9 @@ import { PINBOARD_CONFIG_KEY } from '../keys.ts'
 
 // models
 const searchString = defineModel<string>('search-string', { default: '' })
+const dropdownOpen = defineModel<boolean>('dropdownOpen', {
+  default: false,
+})
 const locatingUser = defineModel<boolean>('locatingUser', {
   default: false,
 })
@@ -46,8 +49,7 @@ const { t } = useI18n()
 // refs
 const searchWrapperRef = ref<HTMLElement | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
-const { searchSuggestions, dismissSuggestions, hideSuggestions, refetchSuggestions } =
-  useSearchSuggestions(searchString)
+const { searchSuggestions, refetchSuggestions } = useSearchSuggestions(searchString)
 const {
   recentSearches,
   add: addRecentSearch,
@@ -56,12 +58,8 @@ const {
 const searchFocused = ref(false)
 
 // computed refs
-const showingRecents = computed(() => !searchString.value)
-
-const dropdownSuggestions = computed(() => {
-  // Empty field → recent searches; typing → AIS autocomplete.
-  if (!searchFocused.value) return []
-  return searchString.value ? searchSuggestions.value : recentSearches.value
+const hasAutofill = computed(() => {
+  return searchSuggestions.value.length + recentSearches.value.length > 0
 })
 
 const cornerShape = computed(() => {
@@ -70,8 +68,16 @@ const cornerShape = computed(() => {
       props.searchShape === 'pill'
         ? '0 0 2.4rem 2.4rem'
         : '0 0 var(--border-radius-s, 4px) var(--border-radius-s, 4px)',
-    'box-shadow': dropdownSuggestions.value.length ? 'var(--elevation-light-2)' : 'none',
+    'box-shadow': hasAutofill.value ? 'var(--elevation-light-2)' : 'none',
   }
+})
+
+watch(searchFocused, (isFocused) => {
+  dropdownOpen.value = isFocused || locatingUser.value
+})
+
+watch(locatingUser, (isLocating) => {
+  dropdownOpen.value = isLocating || searchFocused.value
 })
 
 // event handlers
@@ -98,10 +104,10 @@ function handleSearchSubmit() {
 }
 
 function handleSuggestionSelect(suggestion: string) {
-  dismissSuggestions()
   searchString.value = suggestion
   handleSearchSubmit()
   focusSearchInput()
+  dropdownOpen.value = false
 }
 
 function handleSuggestionRemove(term: string) {
@@ -112,21 +118,16 @@ function handleSuggestionRemove(term: string) {
 
 function handleSearchKeydown(event: KeyboardEvent) {
   const target = event.target as HTMLElement
-  if (event.key === 'ArrowDown' && dropdownSuggestions.value.length && target.tagName === 'INPUT') {
+  if (event.key === 'ArrowDown' && hasAutofill.value && target.tagName === 'INPUT') {
     event.preventDefault()
     suggestionsRef.value?.focusFirst()
   }
-}
-
-function handleSuggestionDismiss() {
-  focusSearchInput()
 }
 
 function handleSearchFocusOut(event: FocusEvent) {
   const relatedTarget = event.relatedTarget as HTMLElement | null
   if (!searchWrapperRef.value?.contains(relatedTarget)) {
     searchFocused.value = false
-    hideSuggestions()
   }
 }
 
@@ -162,20 +163,21 @@ function focusSearchInput() {
       :placeholder="searchPlaceholder"
       :elevated="isMobile"
       :shape="searchShape || (isMobile ? 'pill' : 'rectangle')"
+      autocomplete="off"
       @search="handleSearchSubmit"
     />
-    <div class="search-suggestions-container" :style="cornerShape">
+    <div v-if="dropdownOpen" class="search-suggestions-container" :style="cornerShape">
       <SearchSuggestions
         ref="suggestionsRef"
+        v-model:dropdown-open="dropdownOpen"
         v-model:locating-user="locatingUser"
         :search-focused="searchFocused"
-        :suggestions="dropdownSuggestions"
-        :heading="showingRecents ? t('pinboard.recentSearches') : undefined"
+        :suggestions="searchSuggestions"
+        :history="recentSearches"
+        :heading="t('pinboard.recentSearches')"
         :show-geolocate="showGeolocate"
-        :removable="showingRecents"
         :remove-label="t('pinboard.removeRecentSearch')"
         @select="handleSuggestionSelect"
-        @dismiss="handleSuggestionDismiss"
         @remove="handleSuggestionRemove"
       >
         <template v-if="slots['suggestion-card']" #suggestion-card>
