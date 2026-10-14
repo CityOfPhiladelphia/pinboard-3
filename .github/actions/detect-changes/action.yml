@@ -34,11 +34,7 @@ runs:
         fi
 
         if packages_changed || ci_changed || app_changed "primary-care-finder"; then
-          ROLE=AWS_ROLE_ARN_TEST_PCF
-          if [ $inputs.branch == "prod" ]; then
-            ROLE=AWS_ROLE_ARN_PROD_PCF
-          fi
-          UPDATED_APPS+=",{\"name\":\"primary-care-finder\",\"role\":\"$ROLE\"}"
+          UPDATED_APPS+=",{\"name\":\"primary-care-finder\",\"role\":\"AWS_ROLE_ARN_PROD_PCF\"}"
         fi
 
         if packages_changed || ci_changed || app_changed "philly-311"; then
