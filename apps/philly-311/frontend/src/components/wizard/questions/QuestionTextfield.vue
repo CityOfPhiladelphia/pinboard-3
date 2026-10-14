@@ -30,8 +30,7 @@ function set(value: string) {
 <template>
   <!-- number / currency / double: TextField — forwards $attrs to the native <input>.
          label always renders the real text (TextField's dist build clobbers an explicit
-         aria-label attr with its own, empty-when-labeled fallback); hideLabel visually hides
-         the rendered <label> via the :deep() rule below instead. -->
+         aria-label attr with its own, empty-when-labeled fallback). -->
   <TextField
     :id="fieldId"
     :label="labelText"
