@@ -167,15 +167,14 @@ defineExpose({ focusFirst })
 }
 
 .search-suggestions {
-  padding: 0 1.05rem;
+  padding: var(--spacing-none, 0) var(--spacing-m, 1rem);
   list-style: none;
-  height: 100%;
   overflow: auto;
   scrollbar-width: thin;
 
   &,
   li {
-    margin: 0;
+    margin: var(--spacing-none, 0);
   }
 }
 
@@ -183,7 +182,6 @@ defineExpose({ focusFirst })
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0;
   gap: var(--spacing-xs, 0.5rem);
   padding: var(--spacing-2xs, 0.25rem) var(--spacing-xs, 0.5rem);
   cursor: pointer;
@@ -206,7 +204,6 @@ defineExpose({ focusFirst })
 
 .search-suggestion-text {
   flex: 1;
-  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

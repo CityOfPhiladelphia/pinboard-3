@@ -122,8 +122,8 @@ watch(allFiltersOpen, (open) => {
 </script>
 
 <template>
-  <div class="location-search-filter-sort" :class="{ mobile: isMobile }">
-    <Teleport to="#mobile-map-search-filter" :disabled="!isMobile">
+  <Teleport to="#mobile-map-search-filter" :disabled="!isMobile">
+    <div class="location-search-filter-sort" :class="{ mobile: isMobile }">
       <LocationSearch
         v-model:search-string="searchString"
         :v-model:locating-user="userLocationState === 'acquiring'"
@@ -155,19 +155,19 @@ watch(allFiltersOpen, (open) => {
         :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'"
         @dropdown-close="recomputeChipOrder"
       />
-    </Teleport>
 
-    <Teleport to="#bottom-sheet-sort" :disabled="!isMobile">
-      <div v-if="sortOptions && !filterValues" class="location-sort">
-        <SortPanel
-          v-model:location-sort-mode="locationSortMode"
-          :sort-options="sortOptions"
-          :user-location-state="userLocationState"
-          :is-mobile="isMobile"
-        />
-      </div>
-    </Teleport>
-  </div>
+      <Teleport to="#bottom-sheet-sort" :disabled="!isMobile">
+        <div v-if="sortOptions && !filterValues" class="location-sort">
+          <SortPanel
+            v-model:location-sort-mode="locationSortMode"
+            :sort-options="sortOptions"
+            :user-location-state="userLocationState"
+            :is-mobile="isMobile"
+          />
+        </div>
+      </Teleport>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -184,18 +184,12 @@ watch(allFiltersOpen, (open) => {
 }
 
 .location-search-filter-sort.mobile {
-  padding: 0;
+  padding-block: var(--spacing-s, 0.75rem);
+  row-gap: var(--spacing-2xs, 0.25rem);
 }
 
 .location-filters {
   grid-area: filters;
-}
-
-/* 19px left inset aligns the filter chips with the search input on mobile. */
-.location-filters.mobile {
-  padding: 0.25rem 0 0;
-  padding-left: 19px;
-  gap: 0.25rem;
 }
 
 .location-sort {
@@ -210,6 +204,7 @@ watch(allFiltersOpen, (open) => {
 }
 
 .filter-chip-bar-mobile {
-  padding: 0.5rem 0;
+  padding: var(--spacing-xs, 0.5rem) var(--spacing-none, 0);
+  z-index: -1;
 }
 </style>

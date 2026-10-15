@@ -828,6 +828,5 @@ function selectedLocationValue(): PinboardLocation {
   top: 0;
   left: 0;
   right: 0;
-  padding: 10px 0;
 }
 </style>

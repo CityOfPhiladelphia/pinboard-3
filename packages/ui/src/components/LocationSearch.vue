@@ -151,7 +151,6 @@ function focusSearchInput() {
     v-if="searchPlaceholder"
     ref="searchWrapperRef"
     class="location-search-wrapper"
-    :class="{ mobile: isMobile }"
     @keydown="handleSearchKeydown"
     @focusout="handleSearchFocusOut"
     @focusin="handleSearchFocusIn"
@@ -159,7 +158,6 @@ function focusSearchInput() {
   >
     <Search
       v-model="searchString"
-      class="location-search-input"
       :placeholder="searchPlaceholder"
       :elevated="isMobile"
       :shape="searchShape || (isMobile ? 'pill' : 'rectangle')"
@@ -192,12 +190,6 @@ function focusSearchInput() {
 .location-search-wrapper {
   grid-area: search;
   position: relative;
-}
-
-/* Teleported onto the map (mobile): the container supplies the top inset, so
-   keep only the 1rem side inset that aligns the search bar with the chip row. */
-.location-search.mobile {
-  padding: 0 1rem;
 }
 
 .search-suggestions-container {
