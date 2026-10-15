@@ -3,7 +3,6 @@
 import { ref, computed, inject, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-// 3rd party imports
 // philly ui imports
 import { Search } from '@phila/phila-ui-search'
 
@@ -28,7 +27,7 @@ const locatingUser = defineModel<boolean>('locatingUser', {
 const props = defineProps<{
   searchPlaceholder: string | undefined
   searchShape?: 'rectangle' | 'pill'
-  isMobile: boolean
+  elevated: boolean
   showGeolocate?: boolean
 }>()
 
@@ -40,6 +39,7 @@ const emit = defineEmits<{
 
 // slots
 const slots = defineSlots<{
+  'no-results'?: unknown
   'suggestion-card'?: unknown
 }>()
 
@@ -58,17 +58,13 @@ const {
 const searchFocused = ref(false)
 
 // computed refs
-const hasAutofill = computed(() => {
-  return searchSuggestions.value.length + recentSearches.value.length > 0
-})
-
 const cornerShape = computed(() => {
   return {
     'border-radius':
       props.searchShape === 'pill'
         ? '0 0 2.4rem 2.4rem'
         : '0 0 var(--border-radius-s, 4px) var(--border-radius-s, 4px)',
-    'box-shadow': hasAutofill.value ? 'var(--elevation-light-2)' : 'none',
+    'box-shadow': dropdownOpen.value ? 'var(--elevation-light-2)' : 'none',
   }
 })
 
@@ -78,6 +74,10 @@ watch(searchFocused, (isFocused) => {
 
 watch(locatingUser, (isLocating) => {
   dropdownOpen.value = isLocating || searchFocused.value
+})
+
+watch(searchString, (newSearch) => {
+  dropdownOpen.value = newSearch.length > 0
 })
 
 // event handlers
@@ -118,7 +118,7 @@ function handleSuggestionRemove(term: string) {
 
 function handleSearchKeydown(event: KeyboardEvent) {
   const target = event.target as HTMLElement
-  if (event.key === 'ArrowDown' && hasAutofill.value && target.tagName === 'INPUT') {
+  if (event.key === 'ArrowDown' && dropdownOpen.value && target.tagName === 'INPUT') {
     event.preventDefault()
     suggestionsRef.value?.focusFirst()
   }
@@ -158,8 +158,8 @@ function focusSearchInput() {
     <Search
       v-model="searchString"
       :placeholder="searchPlaceholder"
-      :elevated="isMobile"
-      :shape="searchShape || (isMobile ? 'pill' : 'rectangle')"
+      :elevated="elevated"
+      :shape="searchShape || (elevated ? 'pill' : 'rectangle')"
       @search="handleSearchSubmit"
     />
 
@@ -181,6 +181,7 @@ function focusSearchInput() {
         <slot name="suggestion-card" />
       </template>
     </SearchSuggestions>
+    <slot name="no-results" />
   </div>
 </template>
 

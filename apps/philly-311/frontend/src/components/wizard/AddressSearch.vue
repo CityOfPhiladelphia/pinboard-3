@@ -2,8 +2,10 @@
      /autocomplete (debounced); picking a suggestion fires /search and emits select(feature). -->
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { LocationSearch } from '@pinboard/ui'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
+import { getCurrentPosition } from '@/composables/useGeolocation'
 import {
   autocompleteAddresses,
   reverseGeocode,
@@ -11,10 +13,8 @@ import {
   type AisAutocompleteResult,
 } from '@/composables/useAis'
 import type { AddressSource } from '@/pages/report/LocationStep.vue'
-import { getCurrentPosition } from '@/composables/useGeolocation'
-import type { AisFeature } from '@/types/wizard'
 import LocationImageCard from './LocationImageCard.vue'
-import { LocationSearch } from '@pinboard/ui'
+import NoAddressDropdown from '@/components/wizard/NoAddressDropdown.vue'
 
 const addressSource = defineModel<AddressSource | undefined>('addressSource', {
   default: undefined,
@@ -26,10 +26,6 @@ const locationError = defineModel<string>('locationError', {
   default: '',
 })
 
-const emit = defineEmits<{
-  select: [feature: AisFeature | null]
-}>()
-
 const RESOLVE_ERROR = "Couldn't resolve that address."
 
 const store = useReportSubmissionStore()
@@ -38,12 +34,21 @@ const { query, results, error } = useDebouncedSearch<AisAutocompleteResult[]>({
   fetcher: (q, signal) => autocompleteAddresses(q, signal),
 })
 
-// const imageInfo = store.photo.mediaUrl ? '' : null
-
-// Closed after a pick: echoing the resolved address into `query` re-fires the
-// debounced autocomplete, and the list must not reopen until the user types.
 const open = ref(false)
-const locatingUser = ref<boolean>(false)
+const locatingUser = ref(false)
+const searchReturnedNull = ref(false)
+
+watch(locatingUser, (locating) => {
+  if (locating) useMyLocation()
+})
+
+watch(query, () => {
+  if (searchReturnedNull.value) searchReturnedNull.value = false
+})
+
+watch(addressSource, (newSource) => {
+  if (!newSource) query.value = ''
+})
 
 async function handleSearch() {
   open.value = false
@@ -52,14 +57,15 @@ async function handleSearch() {
   try {
     const feature = await searchAddress(query.value)
     if (feature && currentSearch.value === 'search') {
-      emit('select', feature)
+      store.setLocation(feature)
+      searchReturnedNull.value = false
     } else {
       error.value = RESOLVE_ERROR
-      emit('select', null)
+      searchReturnedNull.value = true
     }
   } catch {
     error.value = RESOLVE_ERROR
-    emit('select', null)
+    searchReturnedNull.value = true
   } finally {
     currentSearch.value = null
     addressSource.value = 'search'
@@ -80,7 +86,7 @@ async function useMyLocation() {
     const feature = await reverseGeocode(pos.lat, pos.lng)
     if (feature && currentSearch.value === 'geoLocation') {
       addressSource.value = 'geoLocation'
-      emit('select', feature)
+      store.setLocation(feature)
     } else locationError.value = "We couldn't resolve your location to an address."
   } catch {
     locationError.value = "We couldn't resolve your location to an address."
@@ -96,9 +102,11 @@ function setLocToImage() {
   open.value = false
 }
 
-watch(locatingUser, (locating) => {
-  if (locating) useMyLocation()
-})
+function resetLocation() {
+  store.setLocation(undefined)
+  addressSource.value = undefined
+  searchReturnedNull.value = false
+}
 </script>
 
 <template>
@@ -107,9 +115,9 @@ watch(locatingUser, (locating) => {
     v-model:dropdown-open="open"
     v-model:locating-user="locatingUser"
     :search-placeholder="
-      store.location?.streetAddress ?? 'Enter an address, intersection, or zipcode'
+      store.location?.streetAddress || 'Enter an address, intersection, or zipcode'
     "
-    :is-mobile="true"
+    :elevated="true"
     :show-geolocate="true"
     @search="handleSearch"
   >
@@ -125,18 +133,13 @@ watch(locatingUser, (locating) => {
         </button>
       </div>
     </template>
+    <template v-if="searchReturnedNull" #no-results>
+      <NoAddressDropdown class="location-step__no-address" @reset="resetLocation" />
+    </template>
   </LocationSearch>
 </template>
 
 <style scoped>
-.address-search {
-  display: grid;
-  background-color: var(--colors-White);
-  box-shadow: var(--elevation-light-2);
-  border-radius: 2.4rem 2.4rem 2.4rem 2.4rem;
-  width: 100%;
-}
-
 .image_location {
   padding: 0 var(--spacing-l, 1.5rem) var(--spacing-l, 1.5rem) var(--spacing-l, 1.5rem);
 }

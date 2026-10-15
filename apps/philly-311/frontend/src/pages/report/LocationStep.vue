@@ -3,19 +3,17 @@
      browser geolocation. Stores a complete AisFeature; Next gated on in-Philly. -->
 <script setup lang="ts">
 import { computed, onBeforeMount, ref, watch } from 'vue'
-import { useReportSubmissionStore } from '@/stores/reportSubmission'
-import { reverseGeocode } from '@/composables/useAis'
-import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { isInPhilly } from '@/utils/bounds'
 import { Callout } from '@phila/phila-ui-callout'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { Tags } from '@phila/phila-ui-tags'
 import { IconRotateLeft, IconArrowsUpDownLeftRight } from '@phila/phila-ui-core/icons'
+import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import AddressSearch from '@/components/wizard/AddressSearch.vue'
 import LocationMap from '@/components/wizard/LocationMap.vue'
 import ReportStep from '@/components/wizard/ReportStep.vue'
-import type { AisFeature } from '@/types/wizard'
-import NoAddressDropdown from '@/components/wizard/NoAddressDropdown.vue'
+import { reverseGeocode } from '@/composables/useAis'
+import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 
 export type AddressSource = 'image' | 'search' | 'geoLocation' | 'mapPin'
 
@@ -23,32 +21,22 @@ const stepTitle = 'Confirm Location'
 const defaultError = 'Choose an address to continue'
 
 const store = useReportSubmissionStore()
+const wizardError = useWizardErrors()
 const errorMessage = ref('')
 const locationError = ref('')
 const currentSearch = ref<Exclude<AddressSource, 'image'> | null>(null)
 const addressSource = ref<AddressSource | undefined>('image')
-const searchReturnedNull = ref(false)
 
-const searchIsdNull = computed(() => {
-  return addressSource.value === 'search' && searchReturnedNull.value
-  // return true
+const isValidLocation = computed(() => {
+  return !!store.location && isInPhilly(store.location.lat, store.location.lng)
 })
-
-const isValidLocation = computed(
-  () => !!store.location && isInPhilly(store.location.lat, store.location.lng),
-)
 useWizardValidity(isValidLocation)
-const wizardError = useWizardErrors()
 
-watch([locationError, wizardError], ([newLocationError, newWizardError]) => {
-  errorMessage.value = (newWizardError ? defaultError : newLocationError) ?? ''
-})
-
-const mapLocation = computed(() =>
-  store.location?.lat && store.location.lng
+const mapLocation = computed(() => {
+  return store.location?.lat && store.location.lng
     ? { lat: store.location.lat, lng: store.location.lng }
-    : undefined,
-)
+    : undefined
+})
 
 const locationFrom = computed(() => {
   const messages: Record<AddressSource, string> = {
@@ -61,6 +49,17 @@ const locationFrom = computed(() => {
 })
 
 const hasLocation = computed(() => store.location?.lat && store.location.lng)
+
+watch([locationError, wizardError], ([newLocationError, newWizardError]) => {
+  errorMessage.value = (newWizardError ? defaultError : newLocationError) ?? ''
+})
+
+onBeforeMount(() => {
+  if (store.photo.location) {
+    store.setLocation(store.photo.location)
+    addressSource.value = 'image'
+  }
+})
 
 function onOutOfBounds() {
   locationError.value = '311 only handles requests in Philadelphia.'
@@ -92,22 +91,6 @@ function resetLocation() {
   store.setLocation(undefined)
   addressSource.value = undefined
 }
-
-function handleSearch(result: AisFeature | null) {
-  if (result) {
-    searchReturnedNull.value = false
-    store.setLocation(result)
-  } else {
-    searchReturnedNull.value = true
-  }
-}
-
-onBeforeMount(() => {
-  if (store.photo.location) {
-    store.setLocation(store.photo.location)
-    addressSource.value = 'image'
-  }
-})
 </script>
 
 <template>
@@ -138,17 +121,16 @@ onBeforeMount(() => {
           v-model:address-source="addressSource"
           v-model:location-error="locationError"
           class="location-step__search"
-          @select="handleSearch"
         />
         <PhilaButton
           v-if="hasLocation"
           variant="text"
+          text="Reset"
           :icon="IconRotateLeft"
           size="small"
           class="location-step__reset"
           @click="resetLocation"
-          >Reset</PhilaButton
-        >
+        />
         <div class="location-step__readonly">
           <Tags
             v-if="hasLocation"
@@ -158,12 +140,6 @@ onBeforeMount(() => {
             selected
           />
         </div>
-
-        <NoAddressDropdown
-          v-if="searchIsdNull"
-          class="location-step__no-address"
-          @reset="resetLocation"
-        />
       </div>
     </template>
   </ReportStep>
