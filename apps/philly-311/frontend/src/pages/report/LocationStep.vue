@@ -275,22 +275,6 @@ onBeforeMount(() => {
   max-width: 100%;
 }
 
-.location-step.is-mobile .location-step__search :deep(.phila-input) {
-  min-width: 0;
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.location-step.is-mobile .location-step__search :deep(.phila-input.phila-input input),
-.location-step.is-mobile .location-step__search :deep(.phila-input.phila-input .phila-text-field),
-.location-step.is-mobile .location-step__search :deep(.phila-input.phila-input .state-layer),
-.location-step.is-mobile .location-step__search :deep(.phila-input.phila-input .content),
-.location-step.is-mobile
-  .location-step__search
-  :deep(.phila-input.phila-input .input-text-container) {
-  min-width: 0;
-  max-width: 100%;
-}
-
 .location-step.is-mobile .location-step__reset {
   grid-column: inset-start / inset-end;
   grid-row: reset-row-start / reset-row-end;
