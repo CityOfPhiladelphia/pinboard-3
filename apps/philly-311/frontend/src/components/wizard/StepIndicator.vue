@@ -228,6 +228,21 @@ function handleMouseLeave(ev: MouseEvent) {
 
 .step-indicator.is-mobile .step-dash-right,
 .step-indicator.is-mobile .step-dash-left {
-  width: var(--spacing-xs, 0.5rem);
+  width: auto;
+}
+
+.step-indicator.is-mobile .step-dash-left {
+  grid-area: 1 / 1 / 2 / 3;
+  margin-right: var(--spacing-2xs, 0.25rem);
+}
+
+.step-indicator.is-mobile .step-dash-right {
+  grid-area: 1 / 4 / 2 / 6;
+  margin-left: var(--spacing-2xs, 0.25rem);
+}
+
+.step-indicator.is-mobile span.step-number,
+.step-indicator.is-mobile .step-button {
+  justify-self: center;
 }
 </style>
