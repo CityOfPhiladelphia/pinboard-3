@@ -221,6 +221,18 @@ function handleMouseLeave(ev: MouseEvent) {
   place-content: stretch;
 }
 
+.step-indicator.is-mobile li {
+  grid-template-columns: 1fr auto auto auto 1fr;
+}
+
+.step-indicator.is-mobile li:first-child {
+  grid-template-columns: 0 0 max-content auto 1fr;
+}
+
+.step-indicator.is-mobile li:last-child {
+  grid-template-columns: 1fr auto max-content 0 0;
+}
+
 .step-indicator.is-mobile .step-pad-right,
 .step-indicator.is-mobile .step-pad-left {
   width: var(--spacing-3xs, 0.25rem);
@@ -232,12 +244,10 @@ function handleMouseLeave(ev: MouseEvent) {
 }
 
 .step-indicator.is-mobile .step-dash-left {
-  grid-area: 1 / 1 / 2 / 3;
   margin-right: var(--spacing-2xs, 0.25rem);
 }
 
 .step-indicator.is-mobile .step-dash-right {
-  grid-area: 1 / 4 / 2 / 6;
   margin-left: var(--spacing-2xs, 0.25rem);
 }
 

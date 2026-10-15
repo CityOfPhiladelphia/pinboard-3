@@ -255,7 +255,7 @@ function discardAndExit() {
 .wizard.is-mobile .wizard__steps {
   grid-column: full-start / full-end;
   place-content: stretch;
-  padding: 0 var(--spacing-m, 1rem);
+  padding: 0 clamp(var(--spacing-m, 1rem), 6vw, var(--spacing-xl, 2rem));
 }
 
 .wizard.is-mobile .wizard__nav {
