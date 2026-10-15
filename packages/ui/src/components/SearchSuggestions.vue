@@ -152,7 +152,6 @@ defineExpose({ focusFirst })
 
 <style scoped>
 .search-suggestions-panel {
-  display: grid;
   position: absolute;
   top: 100%;
   left: 0;
@@ -160,7 +159,7 @@ defineExpose({ focusFirst })
   background-color: var(--Schemes-Background, #fff);
   border: 0px dotted var(--Schemes-Border-low, #ccc);
   clip-path: inset(0 -8px -8px -8px);
-  max-height: 40dvh;
+  max-height: 35dvh;
   overflow: auto;
   scrollbar-width: thin;
 }

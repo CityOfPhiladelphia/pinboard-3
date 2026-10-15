@@ -186,7 +186,6 @@ function focusSearchInput() {
 
 <style scoped>
 .location-search-wrapper {
-  grid-area: search;
   position: relative;
 }
 </style>
