@@ -1,9 +1,10 @@
 <!-- ABOUTME: Wizard step indicator with click-to-jump on completed steps.
      Marks the current step with aria-current="step" and labels via SR-only text. -->
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { Icon } from '@phila/phila-ui-core'
 import { IconCheck } from '@phila/phila-ui-core/icons'
+import { IS_MOBILE_KEY } from '@pinboard/ui'
 
 interface Step {
   title: string
@@ -15,6 +16,7 @@ const props = defineProps<{
   completedThrough: number
 }>()
 const emit = defineEmits<{ navigate: [path: string] }>()
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 const hovered = ref<Record<string, 'underline' | ''>>(
   Object.fromEntries(props.steps.map((step) => [step.title, ''])),
 )
@@ -42,7 +44,7 @@ function handleMouseLeave(ev: MouseEvent) {
 </script>
 
 <template>
-  <nav aria-label="Report progress" class="step-indicator">
+  <nav aria-label="Report progress" class="step-indicator" :class="{ 'is-mobile': isMobile }">
     <ol>
       <li v-for="step in indexed" :key="step.n" :data-state="step.state">
         <div v-if="step.n > 1" class="step-dash-left" />
@@ -210,5 +212,22 @@ function handleMouseLeave(ev: MouseEvent) {
 .step-indicator li[data-state='upcoming'] .step-number {
   border: var(--border-width-m, 0.125rem) dashed var(--Schemes-Border-low, rgb(204, 204, 204));
   color: var(--Schemes-Border-high, rgb(155, 155, 155));
+}
+
+.step-indicator.is-mobile ol {
+  width: 100%;
+  max-width: 32rem;
+  margin-inline: auto;
+  place-content: stretch;
+}
+
+.step-indicator.is-mobile .step-pad-right,
+.step-indicator.is-mobile .step-pad-left {
+  width: var(--spacing-3xs, 0.25rem);
+}
+
+.step-indicator.is-mobile .step-dash-right,
+.step-indicator.is-mobile .step-dash-left {
+  width: var(--spacing-xs, 0.5rem);
 }
 </style>

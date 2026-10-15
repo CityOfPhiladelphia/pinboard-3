@@ -2,7 +2,7 @@
      which stores the image (mediaUrl) and returns issue-type suggestions for step 2. Optional;
      Skip/Next both advance. -->
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, inject, ref, watch } from 'vue'
 import { Icon } from '@phila/phila-ui-core'
 import { IconClose, IconArrowUp } from '@phila/phila-ui-core/icons'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
@@ -10,9 +10,11 @@ import { useWizardValidity } from '@/composables/useWizardValidity'
 import ReportStep from '@/components/wizard/ReportStep.vue'
 import ImageUploadDialog from '@/components/wizard/ImageUploadDialog.vue'
 import { getImgLocationInfo } from '@pinboard/core'
+import { IS_MOBILE_KEY } from '@pinboard/ui'
 import { reverseGeocode } from '@/composables/useAis'
 
 const store = useReportSubmissionStore()
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 
 const uploadDialogOpen = ref(false)
 const fileUploadUrl = ref<string>(store.photo.previewUrl || store.photo.mediaUrl || '')
@@ -105,7 +107,7 @@ function getLocationFromImage(image: File) {
     :required="false"
   >
     <template #step-content>
-      <div id="imageStepId" class="image__step">
+      <div id="imageStepId" class="image__step" :class="{ 'is-mobile': isMobile }">
         <span class="image-step__count has-text-body-default" v-text="imageCount" />
         <label
           v-if="!markupComplete"
@@ -207,5 +209,10 @@ function getLocationFromImage(image: File) {
 .image-step__upload:focus-within {
   outline: var(--border-width-m, 0.125rem) solid var(--Schemes-Primary, rgb(16, 52, 244));
   outline-offset: calc(-1 * var(--border-width-m, 0.125rem));
+}
+
+.image__step.is-mobile .image-step__upload,
+.image__step.is-mobile .image-step__preview {
+  max-width: calc(100% - var(--spacing-m, 1rem));
 }
 </style>
