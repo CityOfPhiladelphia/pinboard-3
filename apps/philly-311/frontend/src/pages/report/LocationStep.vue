@@ -196,6 +196,7 @@ onBeforeMount(() => {
     [map-end];
   height: 100%;
   width: 100%;
+  isolation: isolate;
 }
 
 .location-step__error {
@@ -206,19 +207,15 @@ onBeforeMount(() => {
 .location-step__map {
   grid-column: full-start / full-end;
   grid-row: map-start / map-end;
+  z-index: -1;
 }
 
 .location-step__search {
-  isolation: isolate;
   grid-column: search-col-start / search-col-end;
   grid-row: search-row-start / search-row-end;
-  display: grid;
-  place-content: center;
-  width: 100%;
 }
 
 .location-step__reset {
-  isolation: isolate;
   grid-column: inset-start / readonly-col-start;
   grid-row: readonly-row-start / readonly-row-end;
   width: fit-content;
@@ -229,11 +226,9 @@ onBeforeMount(() => {
 }
 
 .location-step__readonly {
-  display: grid;
-  isolation: isolate;
   grid-column: readonly-col-start / readonly-col-end;
   grid-row: readonly-row-start / readonly-row-end;
-  justify-content: center;
+  justify-self: center;
 }
 
 .location-step__no-address {

@@ -148,7 +148,6 @@ function focusSearchInput() {
 
 <template>
   <div
-    v-if="searchPlaceholder"
     ref="searchWrapperRef"
     class="location-search-wrapper"
     @keydown="handleSearchKeydown"
@@ -161,28 +160,27 @@ function focusSearchInput() {
       :placeholder="searchPlaceholder"
       :elevated="isMobile"
       :shape="searchShape || (isMobile ? 'pill' : 'rectangle')"
-      autocomplete="off"
       @search="handleSearchSubmit"
     />
-    <div v-if="dropdownOpen" class="search-suggestions-container" :style="cornerShape">
-      <SearchSuggestions
-        ref="suggestionsRef"
-        v-model:dropdown-open="dropdownOpen"
-        v-model:locating-user="locatingUser"
-        :search-focused="searchFocused"
-        :suggestions="searchSuggestions"
-        :history="recentSearches"
-        :heading="t('pinboard.recentSearches')"
-        :show-geolocate="showGeolocate"
-        :remove-label="t('pinboard.removeRecentSearch')"
-        @select="handleSuggestionSelect"
-        @remove="handleSuggestionRemove"
-      >
-        <template v-if="slots['suggestion-card']" #suggestion-card>
-          <slot name="suggestion-card" />
-        </template>
-      </SearchSuggestions>
-    </div>
+
+    <SearchSuggestions
+      v-if="dropdownOpen"
+      ref="suggestionsRef"
+      v-model:locating-user="locatingUser"
+      :search-focused="searchFocused"
+      :suggestions="searchSuggestions"
+      :history="recentSearches"
+      :heading="t('pinboard.recentSearches')"
+      :show-geolocate="showGeolocate"
+      :remove-label="t('pinboard.removeRecentSearch')"
+      :style="cornerShape"
+      @select="handleSuggestionSelect"
+      @remove="handleSuggestionRemove"
+    >
+      <template v-if="slots['suggestion-card']" #suggestion-card>
+        <slot name="suggestion-card" />
+      </template>
+    </SearchSuggestions>
   </div>
 </template>
 
@@ -190,18 +188,5 @@ function focusSearchInput() {
 .location-search-wrapper {
   grid-area: search;
   position: relative;
-}
-
-.search-suggestions-container {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background-color: var(--Schemes-Background, #fff);
-  border: 0px dotted var(--Schemes-Border-low, #ccc);
-  clip-path: inset(0 -8px -8px -8px);
-  max-height: 15lh;
-  overflow: hidden;
-  scrollbar-width: thin;
 }
 </style>

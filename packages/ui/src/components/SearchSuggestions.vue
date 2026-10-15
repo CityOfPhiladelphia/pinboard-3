@@ -4,9 +4,6 @@ import { Icon, type IconComponent } from '@phila/phila-ui-core'
 import { IconLocationCrosshairs } from '@phila/phila-ui-core/icons'
 import { CloseButton, PhilaButton } from '@phila/phila-ui-button'
 
-const dropdownOpen = defineModel<boolean>('dropdownOpen', {
-  default: false,
-})
 const locatingUser = defineModel<boolean>('locatingUser', {
   default: false,
 })
@@ -112,7 +109,7 @@ defineExpose({ focusFirst })
 </script>
 
 <template>
-  <div v-if="dropdownOpen" class="search-suggestions-panel">
+  <div class="search-suggestions-panel">
     <span v-if="showGeolocate && !suggestions.length" class="geolocate_button">
       <PhilaButton
         text="Use my current location"
@@ -156,6 +153,16 @@ defineExpose({ focusFirst })
 <style scoped>
 .search-suggestions-panel {
   display: grid;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--Schemes-Background, #fff);
+  border: 0px dotted var(--Schemes-Border-low, #ccc);
+  clip-path: inset(0 -8px -8px -8px);
+  max-height: 40dvh;
+  overflow: auto;
+  scrollbar-width: thin;
 }
 
 .geolocate_button {
@@ -167,7 +174,7 @@ defineExpose({ focusFirst })
 }
 
 .search-suggestions {
-  padding: var(--spacing-none, 0) var(--spacing-m, 1rem);
+  padding: var(--spacing-xs, 0.5rem) var(--spacing-l, 1.5rem);
   list-style: none;
   overflow: auto;
   scrollbar-width: thin;
@@ -178,28 +185,25 @@ defineExpose({ focusFirst })
   }
 }
 
+.search-suggestions-heading {
+  padding-bottom: var(--spacing-xs, 0.5rem);
+}
+
 .search-suggestion {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-xs, 0.5rem);
-  padding: var(--spacing-2xs, 0.25rem) var(--spacing-xs, 0.5rem);
   cursor: pointer;
-  color: var(--Schemes-On-Surface, #000);
-  font-family: var(--Body-Large-font-body-large-family);
-  font-size: var(--Body-Large-font-body-large-size);
-  line-height: var(--Body-Large-font-body-large-lineheight);
   outline: transparent;
 }
 
-.search-suggestion:hover,
-.search-suggestion:focus,
-.search-suggestion--active {
-  background-color: var(--Schemes-Surface-Container-Low, #f5f5f5);
+.search-suggestion:not(:last-child) {
+  padding-bottom: var(--spacing-2xs, 0.25rem);
 }
 
-.search-suggestions-heading {
-  padding: var(--spacing-2xs, 0.25rem) var(--spacing-xs, 0.5rem);
+.search-suggestion:last-child {
+  padding-bottom: var(--spacing-3xs, 0.125rem);
 }
 
 .search-suggestion-text {
@@ -207,5 +211,11 @@ defineExpose({ focusFirst })
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.search-suggestion:hover,
+.search-suggestion:focus-visible,
+.search-suggestion--active {
+  background-color: var(--Schemes-Surface-Container-Low, #f5f5f5);
 }
 </style>

@@ -492,7 +492,10 @@ function selectedLocationValue(): PinboardLocation {
             @search="handleSearchSubmit"
           >
             <template #list-header>
-              <div v-if="!isMobile && !locationPanelCountNoun" class="location-list-header">
+              <div
+                v-if="!isMobile && !locationPanelCountNoun"
+                class="location-list-header has-text-label-default"
+              >
                 <span>{{ locationCountLabel }}</span>
               </div>
             </template>
@@ -511,7 +514,7 @@ function selectedLocationValue(): PinboardLocation {
         </div>
       </div>
 
-      <div :class="isMobile ? 'finder-panel-map' : ''">
+      <div :class="isMobile ? 'finder-panel-map-mobile' : ''">
         <MapPanel
           ref="mapPanelRef"
           :config="effectiveMapConfig"
@@ -574,7 +577,7 @@ function selectedLocationValue(): PinboardLocation {
       <div class="bottom-sheet-list-scroll" :class="{ 'is-hidden': selectedLocation }">
         <slot name="page-header" />
         <slot name="locations-header" />
-        <div class="location-sheet-header">
+        <div class="location-sheet-header has-text-label-default">
           <span>{{ locationCountLabel }}</span>
           <div id="bottom-sheet-sort" />
         </div>
@@ -631,14 +634,11 @@ function selectedLocationValue(): PinboardLocation {
 }
 
 .finder-panel {
-  width: 100%;
   height: 100%;
-  position: relative;
 }
 
 .finder-panel--with-page-header {
   height: auto;
-  min-height: 0;
   flex: 1 1 auto;
 }
 
@@ -659,6 +659,10 @@ function selectedLocationValue(): PinboardLocation {
   overflow: hidden;
 }
 
+.finder-panel-map-mobile {
+  height: 100%;
+}
+
 /* Overlays the bottom of the panel rather than sitting in flow — the list
    scrolls underneath it instead of the footer pushing the list up. It stops
    short of the list's scrollbar so the scrollbar stays visible and clickable. */
@@ -670,11 +674,6 @@ function selectedLocationValue(): PinboardLocation {
   z-index: 3;
 }
 
-.finder-panel-map {
-  width: 100%;
-  height: 100%;
-}
-
 .status-message--error {
   color: var(--Schemes-Error, #b3261e);
 }
@@ -684,8 +683,9 @@ function selectedLocationValue(): PinboardLocation {
   flex-direction: column;
   flex: 1;
   overflow-y: auto;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem 1rem 1rem;
+  gap: var(--spacing-s, 0.75rem);
+  padding: var(--spacing-xs, 0.5rem) var(--spacing-m, 1rem) var(--spacing-m, 1rem)
+    var(--spacing-m, 1rem);
   scrollbar-width: none;
 }
 
@@ -693,16 +693,12 @@ function selectedLocationValue(): PinboardLocation {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1rem;
-  font-family: var(--Body-Default-font-body-default-family);
-  font-weight: 700;
+  padding: var(--spacing-none, 0) var(--spacing-m, 1rem);
 }
 
 /* Desktop: item count above the locations list (mirrors the mobile sheet count). */
 .location-list-header {
-  padding: 0 1rem 0.5rem;
-  font-family: var(--Body-Default-font-body-default-family);
-  font-weight: 700;
+  padding: var(--spacing-none, 0) var(--spacing-m, 1rem) var(--spacing-xs, 0.5rem);
 }
 
 .detail-overlay {
@@ -713,7 +709,7 @@ function selectedLocationValue(): PinboardLocation {
   width: 40%;
   z-index: 10;
   background: var(--Schemes-Surface-Bright, white);
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--elevation-light-2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -727,7 +723,6 @@ function selectedLocationValue(): PinboardLocation {
   position: relative;
   height: 100%;
   width: 100%;
-  max-width: 100%;
   background: transparent;
 }
 
@@ -823,7 +818,6 @@ function selectedLocationValue(): PinboardLocation {
 }
 
 .mobile-map-search-filter {
-  display: block;
   position: absolute;
   top: 0;
   left: 0;

@@ -111,7 +111,6 @@ watch(locatingUser, (locating) => {
     "
     :is-mobile="true"
     :show-geolocate="true"
-    class="location-search"
     @search="handleSearch"
   >
     <template #suggestion-card>
@@ -139,9 +138,7 @@ watch(locatingUser, (locating) => {
 }
 
 .image_location {
-  place-content: center;
   padding: 0 var(--spacing-l, 1.5rem) var(--spacing-l, 1.5rem) var(--spacing-l, 1.5rem);
-  width: 100%;
 }
 
 .image_location__button {
