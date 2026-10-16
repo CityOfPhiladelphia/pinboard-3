@@ -24,12 +24,19 @@ const locatingUser = defineModel<boolean>('locatingUser', {
 })
 
 // props
-const props = defineProps<{
-  searchPlaceholder: string | undefined
-  searchShape?: 'rectangle' | 'pill'
-  elevated: boolean
-  showGeolocate?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    searchPlaceholder: string | undefined
+    elevated?: boolean
+    searchShape?: 'rectangle' | 'pill'
+    showGeolocate?: boolean
+  }>(),
+  {
+    elevated: false,
+    searchShape: 'rectangle',
+    showGeolocate: false,
+  }
+)
 
 // emits
 const emit = defineEmits<{
@@ -68,16 +75,8 @@ const cornerShape = computed(() => {
   }
 })
 
-watch(searchFocused, (isFocused) => {
-  dropdownOpen.value = isFocused || locatingUser.value
-})
-
-watch(locatingUser, (isLocating) => {
-  dropdownOpen.value = isLocating || searchFocused.value
-})
-
-watch(searchString, (newSearch) => {
-  dropdownOpen.value = newSearch.length > 0
+watch([searchFocused, locatingUser, searchString], ([isFocused, isLocating, newSearch]) => {
+  dropdownOpen.value = isFocused || isLocating || newSearch.length > 0
 })
 
 // event handlers

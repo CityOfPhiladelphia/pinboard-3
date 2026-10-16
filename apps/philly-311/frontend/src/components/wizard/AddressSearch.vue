@@ -141,7 +141,7 @@ function resetLocation() {
 
 <style scoped>
 .image_location {
-  padding: 0 var(--spacing-l, 1.5rem) var(--spacing-l, 1.5rem) var(--spacing-l, 1.5rem);
+  padding: 0 var(--spacing-l, 1.5rem) var(--spacing-s, 1.5rem) var(--spacing-l, 1.5rem);
 }
 
 .image_location__button {

@@ -110,7 +110,7 @@ defineExpose({ focusFirst })
 
 <template>
   <div class="search-suggestions-panel">
-    <span v-if="showGeolocate && !suggestions.length" class="geolocate_button">
+    <span v-if="showGeolocate && !suggestions.length" class="geolocate_button content-row">
       <PhilaButton
         text="Use my current location"
         size="extra-small"
@@ -120,9 +120,16 @@ defineExpose({ focusFirst })
       />
     </span>
     <template v-if="slots['suggestion-card'] && !suggestions.length">
-      <slot name="suggestion-card" />
+      <div class="content-row">
+        <slot name="suggestion-card" />
+      </div>
     </template>
-    <ul ref="listRef" class="search-suggestions" role="listbox" @keydown="handleKeydown">
+    <ul
+      ref="listRef"
+      class="search-suggestions content-row"
+      role="listbox"
+      @keydown="handleKeydown"
+    >
       <li
         v-if="removable && history.length"
         class="search-suggestions-heading has-text-label-default"
@@ -151,32 +158,40 @@ defineExpose({ focusFirst })
 </template>
 
 <style scoped>
+.content-row {
+  padding-top: var(--spacing-xs, 0.5rem);
+}
+
 .search-suggestions-panel {
   position: absolute;
+  display: grid;
   top: 100%;
   left: 0;
   right: 0;
+  padding-inline: var(--spacing-m, 1rem);
   background-color: var(--Schemes-Background, #fff);
   border: 0px dotted var(--Schemes-Border-low, #ccc);
   clip-path: inset(0 -8px -8px -8px);
   max-height: 35dvh;
   overflow: auto;
   scrollbar-width: thin;
-}
+  scrollbar-gutter: stable;
 
-.geolocate_button {
-  padding: var(--spacing-m, 1rem);
-
-  & > button > :is(.phila-button__stack) > :is(.phila-button__content) > :is(.phila-icon-core) {
-    font-size: var(--Icon-Solid-Small-font-icon-solid-small-size, 1.125rem);
+  ul {
+    padding-left: 0;
   }
 }
 
+.geolocate_button
+  > button
+  > :is(.phila-button__stack)
+  > :is(.phila-button__content)
+  > :is(.phila-icon-core) {
+  font-size: var(--Icon-Solid-Small-font-icon-solid-small-size, 1.125rem);
+}
+
 .search-suggestions {
-  padding: var(--spacing-xs, 0.5rem) var(--spacing-l, 1.5rem);
   list-style: none;
-  overflow: auto;
-  scrollbar-width: thin;
 
   &,
   li {

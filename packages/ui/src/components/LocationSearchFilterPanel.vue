@@ -128,7 +128,8 @@ watch(allFiltersOpen, (open) => {
         v-model:search-string="searchString"
         :v-model:locating-user="userLocationState === 'acquiring'"
         :search-placeholder="searchPlaceholder"
-        :is-mobile="isMobile"
+        :elevated="isMobile"
+        :search-shape="isMobile ? 'pill' : 'rectangle'"
         class="location-search"
         @search="emit('search')"
       />
