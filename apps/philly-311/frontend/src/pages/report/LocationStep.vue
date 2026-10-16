@@ -206,9 +206,4 @@ function resetLocation() {
   grid-row: readonly-row-start / readonly-row-end;
   justify-self: center;
 }
-
-.location-step__no-address {
-  grid-column: search-col-start / search-col-end;
-  grid-row: search-row-end / map-end;
-}
 </style>
