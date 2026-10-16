@@ -1,9 +1,8 @@
 <script setup lang="ts">
 // vue imports
-import { ref, computed, inject } from 'vue'
+import { ref, computed, inject, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-// 3rd party imports
 // philly ui imports
 import { Search } from '@phila/phila-ui-search'
 
@@ -11,29 +10,44 @@ import { Search } from '@phila/phila-ui-search'
 import SearchSuggestions from './SearchSuggestions.vue'
 
 // pinboard composables imports
-import { useSearchSuggestions } from '../composables/useSearchSuggestions'
-import { useRecentSearches } from '../composables/useRecentSearches'
+import { useSearchSuggestions } from '../composables/useSearchSuggestions.ts'
+import { useRecentSearches } from '../composables/useRecentSearches.ts'
 import { PINBOARD_CONFIG_KEY } from '../keys.ts'
-
-// type imports
-import type { UserLocationState } from '../types'
 
 // models
 const searchString = defineModel<string>('search-string', { default: '' })
-const userLocationState = defineModel<UserLocationState>('user-location-state', {
-  default: 'unknown',
+const dropdownOpen = defineModel<boolean>('dropdownOpen', {
+  default: false,
+})
+const locatingUser = defineModel<boolean>('locatingUser', {
+  default: false,
 })
 
 // props
-const props = defineProps<{
-  searchPlaceholder: string | undefined
-  searchShape?: 'rectangle' | 'pill'
-  isMobile: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    searchPlaceholder: string | undefined
+    elevated?: boolean
+    searchShape?: 'rectangle' | 'pill'
+    showGeolocate?: boolean
+  }>(),
+  {
+    elevated: false,
+    searchShape: 'rectangle',
+    showGeolocate: false,
+  }
+)
 
 // emits
 const emit = defineEmits<{
   search: []
+  geolocate: []
+}>()
+
+// slots
+const slots = defineSlots<{
+  'no-results'?: unknown
+  'suggestion-card'?: unknown
 }>()
 
 const config = inject(PINBOARD_CONFIG_KEY)
@@ -42,8 +56,7 @@ const { t } = useI18n()
 // refs
 const searchWrapperRef = ref<HTMLElement | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
-const { searchSuggestions, dismissSuggestions, hideSuggestions, refetchSuggestions } =
-  useSearchSuggestions(searchString)
+const { searchSuggestions, refetchSuggestions } = useSearchSuggestions(searchString)
 const {
   recentSearches,
   add: addRecentSearch,
@@ -52,27 +65,18 @@ const {
 const searchFocused = ref(false)
 
 // computed refs
-const showingRecents = computed(() => !searchString.value)
-
-const dropdownSuggestions = computed(() => {
-  // Empty field → recent searches; typing → AIS autocomplete.
-  if (!searchFocused.value) return []
-  return searchString.value ? searchSuggestions.value : recentSearches.value
-})
-
-const elevatedSearch = computed(() => {
-  // Elevate the floating search only when the cluster sits over the map (mobile + map placement).
-  return props.isMobile && config?.mobileFilterPlacement === 'map'
-})
-
 const cornerShape = computed(() => {
   return {
     'border-radius':
       props.searchShape === 'pill'
         ? '0 0 2.4rem 2.4rem'
         : '0 0 var(--border-radius-s, 4px) var(--border-radius-s, 4px)',
-    'box-shadow': dropdownSuggestions.value.length ? 'var(--elevation-light-2)' : 'none',
+    'box-shadow': dropdownOpen.value ? 'var(--elevation-light-2)' : 'none',
   }
+})
+
+watch([searchFocused, locatingUser, searchString], ([isFocused, isLocating, newSearch]) => {
+  dropdownOpen.value = isFocused || isLocating || newSearch.length > 0
 })
 
 // event handlers
@@ -99,10 +103,10 @@ function handleSearchSubmit() {
 }
 
 function handleSuggestionSelect(suggestion: string) {
-  dismissSuggestions()
   searchString.value = suggestion
   handleSearchSubmit()
   focusSearchInput()
+  dropdownOpen.value = false
 }
 
 function handleSuggestionRemove(term: string) {
@@ -113,21 +117,16 @@ function handleSuggestionRemove(term: string) {
 
 function handleSearchKeydown(event: KeyboardEvent) {
   const target = event.target as HTMLElement
-  if (event.key === 'ArrowDown' && dropdownSuggestions.value.length && target.tagName === 'INPUT') {
+  if (event.key === 'ArrowDown' && dropdownOpen.value && target.tagName === 'INPUT') {
     event.preventDefault()
     suggestionsRef.value?.focusFirst()
   }
-}
-
-function handleSuggestionDismiss() {
-  focusSearchInput()
 }
 
 function handleSearchFocusOut(event: FocusEvent) {
   const relatedTarget = event.relatedTarget as HTMLElement | null
   if (!searchWrapperRef.value?.contains(relatedTarget)) {
     searchFocused.value = false
-    hideSuggestions()
   }
 }
 
@@ -148,10 +147,8 @@ function focusSearchInput() {
 
 <template>
   <div
-    v-if="searchPlaceholder"
     ref="searchWrapperRef"
     class="location-search-wrapper"
-    :class="{ mobile: isMobile }"
     @keydown="handleSearchKeydown"
     @focusout="handleSearchFocusOut"
     @focusin="handleSearchFocusIn"
@@ -159,49 +156,36 @@ function focusSearchInput() {
   >
     <Search
       v-model="searchString"
-      class="location-search-input"
       :placeholder="searchPlaceholder"
-      :elevated="elevatedSearch"
+      :elevated="elevated"
+      :shape="searchShape || (elevated ? 'pill' : 'rectangle')"
       @search="handleSearchSubmit"
     />
-    <div class="search-suggestions-container" :style="cornerShape">
-      <SearchSuggestions
-        ref="suggestionsRef"
-        v-model:user-location-state="userLocationState"
-        :suggestions="dropdownSuggestions"
-        :heading="showingRecents ? t('pinboard.recentSearches') : undefined"
-        :removable="showingRecents"
-        :remove-label="t('pinboard.removeRecentSearch')"
-        @select="handleSuggestionSelect"
-        @dismiss="handleSuggestionDismiss"
-        @remove="handleSuggestionRemove"
-      />
-    </div>
+
+    <SearchSuggestions
+      v-if="dropdownOpen"
+      ref="suggestionsRef"
+      v-model:locating-user="locatingUser"
+      :search-focused="searchFocused"
+      :suggestions="searchSuggestions"
+      :history="recentSearches"
+      :heading="t('pinboard.recentSearches')"
+      :show-geolocate="showGeolocate"
+      :remove-label="t('pinboard.removeRecentSearch')"
+      :style="cornerShape"
+      @select="handleSuggestionSelect"
+      @remove="handleSuggestionRemove"
+    >
+      <template v-if="slots['suggestion-card']" #suggestion-card>
+        <slot name="suggestion-card" />
+      </template>
+    </SearchSuggestions>
+    <slot name="no-results" />
   </div>
 </template>
 
 <style scoped>
 .location-search-wrapper {
-  grid-area: search;
   position: relative;
-}
-
-/* Teleported onto the map (mobile): the container supplies the top inset, so
-   keep only the 1rem side inset that aligns the search bar with the chip row. */
-.location-search.mobile {
-  padding: 0 1rem;
-}
-
-.search-suggestions-container {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background-color: var(--Schemes-Background, #fff);
-  border: 0px dotted var(--Schemes-Border-low, #ccc);
-  clip-path: inset(0 -8px -8px -8px);
-  max-height: 15lh;
-  overflow: hidden;
-  scrollbar-width: thin;
 }
 </style>

@@ -1,8 +1,4 @@
-<!-- ABOUTME: Modal for editing report visibility and (when signed out) contact info
-     from the Review step. Draft state only commits to the store on Apply; Cancel
-     discards it. Matches the mobile apps' SubmitRequestSheet: contact info is
-     hidden entirely when signed in (the API derives it from the account instead),
-     and sharing it is off by default.
+<!-- ABOUTME: Modal for manually submitting an address when search fails.
 
      Chrome (desktop Modal vs. mobile BottomSheet, and everything that takes to
      make the latter behave like a dialog) is ResponsiveModal's concern, not
@@ -12,6 +8,8 @@ import { computed, ref, useId, useTemplateRef, type Ref } from 'vue'
 import { useReportSubmissionStore, type LocationField } from '@/stores/reportSubmission'
 import ResponsiveModal from '@/components/ResponsiveModal.vue'
 import { TextField } from '@phila/phila-ui-text-field'
+
+const srAddressFieldsDescription = 'Street address and optional unit number'
 
 const MODAL_ID = `manual-address-entry-${useId()}`
 
@@ -117,18 +115,21 @@ defineExpose({ open })
   >
     <div>
       <span v-text="'Complete details for the address before continuing'" />
-      <fieldset class="address-input-fields">
-        <TextField
-          v-model="draftAddress"
-          label="Street address"
-          :placeholder="draftAddress"
-          :error="addressError"
-        />
-        <TextField
-          v-model="draftUnit"
-          label="Apartment, suite, unit, etc."
-          placeholder="Apt, suite, unit, etc."
-        />
+      <form class="address-input-form form-grid">
+        <fieldset class="form-grid">
+          <legend class="screen-reader-only" v-text="srAddressFieldsDescription" />
+          <TextField
+            v-model="draftAddress"
+            label="Street address"
+            :placeholder="draftAddress"
+            :error="addressError"
+          />
+          <TextField
+            v-model="draftUnit"
+            label="Apartment, suite, unit, etc."
+            placeholder="Apt, suite, unit, etc."
+          />
+        </fieldset>
         <TextField
           v-model="draftCity"
           label="City/town"
@@ -142,16 +143,19 @@ defineExpose({ open })
           placeholder="Zipcode"
           :error="zipcodeError"
         />
-      </fieldset>
+      </form>
     </div>
   </ResponsiveModal>
 </template>
 
 <style scoped>
-.address-input-fields {
+.address-input-form {
+  padding: var(--spacing-2xl, 2.5rem) 0;
+}
+
+.form-grid {
   display: grid;
   border: none;
   row-gap: var(--spacing-2xl, 2.5rem);
-  padding: var(--spacing-2xl, 2.5rem) 0;
 }
 </style>

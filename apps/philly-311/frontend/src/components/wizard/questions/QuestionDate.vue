@@ -39,7 +39,7 @@ function clearError() {
   <!-- date: DateField — forwards $attrs through its inner TextField to the native <input>.
          label always renders the real text (TextField's aria-label fallback only applies when
          label is empty, and mergeProps in its dist build clobbers an explicit aria-label attr
-         anyway); hideLabel visually hides the rendered <label> via the :deep() rule below. -->
+         anyway); -->
   <DateField
     :id="fieldId"
     :label="labelText"

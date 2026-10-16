@@ -106,7 +106,7 @@ async function onSearch(query: string) {
         v-if="finder.reportById(location.id)"
         :report="finder.reportById(location.id)!"
       />
-      <p v-else>{{ location.name }}</p>
+      <p v-else v-text="location.name" />
     </template>
 
     <template #location-detail="{ location, onClose }">

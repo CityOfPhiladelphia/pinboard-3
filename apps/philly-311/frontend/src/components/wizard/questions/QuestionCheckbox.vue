@@ -44,7 +44,6 @@ watch(
 
 <template>
   <!-- multipicklist: CheckboxGroup -->
-  <!-- phila-ui gap: CheckboxGroup has no required prop and doesn't forward $attrs to its <input type="checkbox"> elements -->
   <CheckboxGroup
     v-model="checkboxValue"
     :label="question.label"

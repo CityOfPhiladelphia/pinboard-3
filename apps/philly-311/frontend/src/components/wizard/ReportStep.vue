@@ -55,7 +55,7 @@ const titleText = computed(() =>
     'title'
     'note'
     'content-slot';
-  grid-auto-rows: auto auto 1fr;
+  grid-template-rows: auto auto 1fr;
   row-gap: var(--spacing-xs, 0.5rem);
   color: var(--Schemes-On-Surface-High, #000);
 }

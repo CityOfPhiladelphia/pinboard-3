@@ -3,25 +3,24 @@ import { ref, watch } from 'vue'
 import { Icon, type IconComponent } from '@phila/phila-ui-core'
 import { IconLocationCrosshairs } from '@phila/phila-ui-core/icons'
 import { CloseButton, PhilaButton } from '@phila/phila-ui-button'
-import type { UserLocationState } from '../types'
 
-const userLocationState = defineModel<UserLocationState>('user-location-state', {
-  default: 'unknown',
+const locatingUser = defineModel<boolean>('locatingUser', {
+  default: false,
 })
 
 const props = withDefaults(
   defineProps<{
+    searchFocused: boolean
     suggestions: string[]
+    history: string[]
     showGeolocate?: boolean
     heading?: string
-    removable?: boolean
     removeLabel?: string
     icon?: IconComponent
   }>(),
   {
     showGeolocate: false,
     heading: undefined,
-    removable: true,
     removeLabel: undefined,
     icon: undefined,
   }
@@ -30,16 +29,36 @@ const props = withDefaults(
 const emit = defineEmits<{
   select: [suggestion: string]
   remove: [suggestion: string]
-  dismiss: []
+}>()
+
+// slots
+const slots = defineSlots<{
+  'suggestion-card'?: unknown
 }>()
 
 const activeIndex = ref(-1)
 const listRef = ref<HTMLUListElement | null>(null)
+const removable = ref(true)
+const dropdownSuggections = ref(props.history)
 
 watch(
   () => props.suggestions,
-  () => {
-    activeIndex.value = -1
+  (newSuggestions) => {
+    if (newSuggestions.length) {
+      removable.value = false
+      dropdownSuggections.value = newSuggestions
+      activeIndex.value = -1
+    } else {
+      removable.value = true
+      dropdownSuggections.value = props.history
+    }
+  }
+)
+
+watch(
+  () => props.history,
+  (updated) => {
+    dropdownSuggections.value = updated
   }
 )
 
@@ -68,7 +87,6 @@ function handleKeydown(event: KeyboardEvent) {
       event.preventDefault()
       if (activeIndex.value <= 0) {
         activeIndex.value = -1
-        emit('dismiss')
       } else {
         activeIndex.value -= 1
         focusItem(activeIndex.value)
@@ -84,11 +102,6 @@ function handleKeydown(event: KeyboardEvent) {
       }
       break
     }
-    case 'Escape': {
-      event.preventDefault()
-      emit('dismiss')
-      break
-    }
   }
 }
 
@@ -96,21 +109,35 @@ defineExpose({ focusFirst })
 </script>
 
 <template>
-  <div v-if="suggestions.length" class="search-suggestions-panel">
-    <span v-if="showGeolocate" class="geolocate_button">
+  <div class="search-suggestions-panel">
+    <span v-if="showGeolocate && !suggestions.length" class="geolocate_button content-row">
       <PhilaButton
         text="Use my current location"
         size="extra-small"
         :icon="IconLocationCrosshairs"
-        :loading="userLocationState === 'acquiring'"
-        @click="userLocationState = 'acquiring'"
+        :loading="locatingUser"
+        @click="locatingUser = true"
       />
     </span>
-    <slot />
-    <ul ref="listRef" class="search-suggestions" role="listbox" @keydown="handleKeydown">
-      <li v-if="heading" class="search-suggestions-heading" role="presentation" v-text="heading" />
+    <template v-if="slots['suggestion-card'] && !suggestions.length">
+      <div class="content-row">
+        <slot name="suggestion-card" />
+      </div>
+    </template>
+    <ul
+      ref="listRef"
+      class="search-suggestions content-row"
+      role="listbox"
+      @keydown="handleKeydown"
+    >
       <li
-        v-for="(suggestion, index) in suggestions"
+        v-if="removable && history.length"
+        class="search-suggestions-heading has-text-label-default"
+        role="presentation"
+        v-text="heading"
+      />
+      <li
+        v-for="(suggestion, index) in dropdownSuggections"
         :key="suggestion"
         class="search-suggestion"
         :class="{ 'search-suggestion--active': index === activeIndex }"
@@ -119,7 +146,7 @@ defineExpose({ focusFirst })
         @click="emit('select', suggestion)"
       >
         <Icon v-if="icon" :icon="icon" inline decorative />
-        <span class="search-suggestion-text has-text-label-default" v-text="suggestion" />
+        <span class="search-suggestion-text has-text-body-default" v-text="suggestion" />
         <CloseButton
           v-if="removable"
           :aria-label="removeLabel"
@@ -131,60 +158,78 @@ defineExpose({ focusFirst })
 </template>
 
 <style scoped>
-.search-suggestions-panel {
-  display: grid;
+.content-row {
+  padding-top: var(--spacing-xs, 0.5rem);
 }
 
-.geolocate_button {
-  padding: var(--spacing-m, 1rem);
+.search-suggestions-panel {
+  position: absolute;
+  display: grid;
+  top: 100%;
+  left: 0;
+  right: 0;
+  padding-inline: var(--spacing-m, 1rem);
+  background-color: var(--Schemes-Background, #fff);
+  border: 0px dotted var(--Schemes-Border-low, #ccc);
+  clip-path: inset(0 -8px -8px -8px);
+  max-height: 35dvh;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
 
-  & > button > :is(.phila-button__stack) > :is(.phila-button__content) > :is(.phila-icon-core) {
-    font-size: var(--Icon-Solid-Small-font-icon-solid-small-size, 1.125rem);
+  ul {
+    padding-left: 0;
   }
 }
 
+.geolocate_button
+  > button
+  > :is(.phila-button__stack)
+  > :is(.phila-button__content)
+  > :is(.phila-icon-core) {
+  font-size: var(--Icon-Solid-Small-font-icon-solid-small-size, 1.125rem);
+}
+
 .search-suggestions {
-  padding: 0 1.05rem;
   list-style: none;
-  height: 100%;
-  overflow: auto;
-  scrollbar-width: thin;
+
+  &,
+  li {
+    margin: var(--spacing-none, 0);
+  }
+}
+
+.search-suggestions-heading {
+  padding-bottom: var(--spacing-xs, 0.5rem);
 }
 
 .search-suggestion {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0;
   gap: var(--spacing-xs, 0.5rem);
-  padding: var(--spacing-2xs, 0.25rem) var(--spacing-xs, 0.5rem);
   cursor: pointer;
-  color: var(--Schemes-On-Surface, #000);
-  font-family: var(--Body-Large-font-body-large-family);
-  font-size: var(--Body-Large-font-body-large-size);
-  line-height: var(--Body-Large-font-body-large-lineheight);
   outline: transparent;
 }
 
-.search-suggestion:hover,
-.search-suggestion:focus,
-.search-suggestion--active {
-  background-color: var(--Schemes-Surface-Container-Low, #f5f5f5);
+.search-suggestion:not(:last-child) {
+  padding-bottom: var(--spacing-2xs, 0.25rem);
 }
 
-.search-suggestions-heading {
-  padding: var(--spacing-2xs, 0.25rem) var(--spacing-xs, 0.5rem);
-  color: var(--Schemes-On-Surface-Variant, #555);
-  font-family: var(--Label-Default-font-label-default-family);
-  font-size: var(--Label-Default-font-label-default-size);
-  font-weight: 700;
+.search-suggestion:last-child {
+  padding-bottom: var(--spacing-3xs, 0.125rem);
 }
 
 .search-suggestion-text {
   flex: 1;
-  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.search-suggestion:hover,
+.search-suggestion:focus-visible,
+.search-suggestion--active {
+  background-color: var(--Schemes-Surface-Container-Low, #f5f5f5);
 }
 </style>

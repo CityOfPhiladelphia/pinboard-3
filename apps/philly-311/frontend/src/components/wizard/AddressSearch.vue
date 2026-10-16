@@ -1,23 +1,20 @@
 <!-- ABOUTME: AIS-backed address search on phila-ui Search/SearchSuggestions. Typing fires
      /autocomplete (debounced); picking a suggestion fires /search and emits select(feature). -->
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref, watch } from 'vue'
+import { PinboardSearch } from '@pinboard/ui'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
-import { Search } from '@phila/phila-ui-search'
-import { SearchSuggestions } from '../../../../../../packages/ui/src/components/_index'
-import { PhilaButton } from '@phila/phila-ui-button'
 import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
+import { getCurrentPosition } from '@/composables/useGeolocation'
 import {
   autocompleteAddresses,
   reverseGeocode,
   searchAddress,
   type AisAutocompleteResult,
 } from '@/composables/useAis'
-import { IconLocationCrosshairs, IconLocationDot } from '@phila/phila-ui-core/icons'
 import type { AddressSource } from '@/pages/report/LocationStep.vue'
-import { getCurrentPosition } from '@/composables/useGeolocation'
-import type { AisFeature } from '@/types/wizard'
 import LocationImageCard from './LocationImageCard.vue'
+import NoAddressDropdown from '@/components/wizard/NoAddressDropdown.vue'
 
 const addressSource = defineModel<AddressSource | undefined>('addressSource', {
   default: undefined,
@@ -29,10 +26,6 @@ const locationError = defineModel<string>('locationError', {
   default: '',
 })
 
-const emit = defineEmits<{
-  select: [feature: AisFeature | null]
-}>()
-
 const RESOLVE_ERROR = "Couldn't resolve that address."
 
 const store = useReportSubmissionStore()
@@ -41,49 +34,21 @@ const { query, results, error } = useDebouncedSearch<AisAutocompleteResult[]>({
   fetcher: (q, signal) => autocompleteAddresses(q, signal),
 })
 
-// const imageInfo = store.photo.mediaUrl ? '' : null
-
-// Closed after a pick: echoing the resolved address into `query` re-fires the
-// debounced autocomplete, and the list must not reopen until the user types.
 const open = ref(false)
+const locatingUser = ref(false)
+const searchReturnedNull = ref(false)
 
-const searchRef = ref<InstanceType<typeof Search> | null>(null)
-const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
+watch(locatingUser, (locating) => {
+  if (locating) useMyLocation()
+})
 
-const isOpen = computed(() => open.value && results.value.length > 0)
+watch(query, () => {
+  if (searchReturnedNull.value) searchReturnedNull.value = false
+})
 
-const suggestions = computed(() => results.value.map((r) => r.address))
-
-function onQueryChange(value: string) {
-  query.value = value
-  open.value = true
-}
-
-function onKeydown(e: KeyboardEvent) {
-  const target = e.target as HTMLElement
-  if (e.key === 'ArrowDown' && isOpen.value && target.tagName === 'INPUT') {
-    e.preventDefault()
-    suggestionsRef.value?.focusFirst()
-  } else if (e.key === 'Escape') {
-    open.value = false
-  }
-}
-
-function onFocusOut(e: FocusEvent) {
-  const related = e.relatedTarget as HTMLElement | null
-  if (!(e.currentTarget as HTMLElement).contains(related)) open.value = false
-}
-
-function onDismiss() {
-  open.value = false
-  searchRef.value?.focus()
-}
-
-async function onSelect(suggestion: string) {
-  if (!suggestion) return
-  query.value = suggestion
-  await handleSearch()
-}
+watch(addressSource, (newSource) => {
+  if (!newSource) query.value = ''
+})
 
 async function handleSearch() {
   open.value = false
@@ -92,14 +57,15 @@ async function handleSearch() {
   try {
     const feature = await searchAddress(query.value)
     if (feature && currentSearch.value === 'search') {
-      emit('select', feature)
+      store.setLocation(feature)
+      searchReturnedNull.value = false
     } else {
       error.value = RESOLVE_ERROR
-      emit('select', null)
+      searchReturnedNull.value = true
     }
   } catch {
     error.value = RESOLVE_ERROR
-    emit('select', null)
+    searchReturnedNull.value = true
   } finally {
     currentSearch.value = null
     addressSource.value = 'search'
@@ -108,6 +74,7 @@ async function handleSearch() {
 }
 
 async function useMyLocation() {
+  open.value = true
   currentSearch.value = 'geoLocation'
   locationError.value = ''
   try {
@@ -119,96 +86,62 @@ async function useMyLocation() {
     const feature = await reverseGeocode(pos.lat, pos.lng)
     if (feature && currentSearch.value === 'geoLocation') {
       addressSource.value = 'geoLocation'
-      emit('select', feature)
+      store.setLocation(feature)
     } else locationError.value = "We couldn't resolve your location to an address."
   } catch {
     locationError.value = "We couldn't resolve your location to an address."
   } finally {
     currentSearch.value = null
+    locatingUser.value = false
   }
-}
-
-function handleFocus() {
-  open.value = true
 }
 
 function setLocToImage() {
   store.setLocation(store.photo.location)
   addressSource.value = 'image'
+  open.value = false
+}
+
+function resetLocation() {
+  store.setLocation(undefined)
+  addressSource.value = undefined
+  searchReturnedNull.value = false
 }
 </script>
 
 <template>
-  <div class="address-search" @keydown="onKeydown" @focusin="handleFocus" @focusout="onFocusOut">
-    <Search
-      ref="searchRef"
-      shape="pill"
-      :model-value="query"
-      :placeholder="store.location?.streetAddress ?? 'Enter an address, intersection, or zipcode'"
-      :leading-icon="IconLocationDot"
-      @update:model-value="onQueryChange"
-      @search="handleSearch"
-    />
-    <span class="geolocate_button" :style="{ display: open ? 'flex' : 'none' }">
-      <PhilaButton
-        text="Use my current location"
-        size="extra-small"
-        :icon="IconLocationCrosshairs"
-        :loading="currentSearch === 'geoLocation'"
-        @click="useMyLocation"
-      />
-    </span>
-    <div
-      v-if="
-        store.photo.location && !(store.location?.lat && store.location.lng) && !suggestions.length
-      "
-      class="image_location"
-      :style="{ display: open ? 'grid' : 'none' }"
-    >
-      <button class="image_location__button" @click="setLocToImage">
-        <LocationImageCard
-          :popup-text="'Possible address based on photo'"
-          :address="store.photo.location"
-          :img-src="store.photo.previewUrl ?? store.photo.mediaUrl"
-          show-city-zip
-        />
-      </button>
-    </div>
-
-    <SearchSuggestions
-      v-else
-      ref="suggestionsRef"
-      :suggestions="suggestions"
-      :icon="IconLocationDot"
-      :style="{ border: 'none' }"
-      @select="onSelect"
-      @dismiss="onDismiss"
-    />
-  </div>
+  <PinboardSearch
+    v-model:search-string="query"
+    v-model:dropdown-open="open"
+    v-model:locating-user="locatingUser"
+    :search-placeholder="
+      store.location?.streetAddress || 'Enter an address, intersection, or zipcode'
+    "
+    :elevated="true"
+    :show-geolocate="true"
+    @search="handleSearch"
+  >
+    <template #suggestion-card>
+      <div v-if="store.photo.location?.streetAddress" class="image_location">
+        <button class="image_location__button" @click="setLocToImage">
+          <LocationImageCard
+            :popup-text="'Possible address based on photo'"
+            :address="store.photo.location"
+            :img-src="store.photo.previewUrl ?? store.photo.mediaUrl"
+            show-city-zip
+          />
+        </button>
+      </div>
+    </template>
+    <template v-if="searchReturnedNull" #no-results>
+      <NoAddressDropdown class="location-step__no-address" @reset="resetLocation" />
+    </template>
+  </PinboardSearch>
 </template>
 
 <style scoped>
-.address-search {
-  display: grid;
-  background-color: var(--colors-White);
-  box-shadow: var(--elevation-light-2);
-  border-radius: 2.4rem 2.4rem 2.4rem 2.4rem;
-  width: 100%;
-}
-
-.geolocate_button {
-  width: 100%;
-  padding: var(--spacing-m, 1rem) var(--spacing-m, 1rem) var(--spacing-m, 1rem) 1rem;
-
-  & > button > :is(.phila-button__stack) > :is(.phila-button__content) > :is(.phila-icon-core) {
-    font-size: var(--Icon-Solid-Small-font-icon-solid-small-size, 1.125rem);
-  }
-}
-
 .image_location {
-  place-content: center;
-  padding: 0 var(--spacing-l, 1.5rem) var(--spacing-l, 1.5rem) var(--spacing-l, 1.5rem);
-  width: 100%;
+  padding: 0 var(--spacing-l, 1.5rem) var(--spacing-s, 1.5rem) var(--spacing-l, 1.5rem);
 }
 
 .image_location__button {
