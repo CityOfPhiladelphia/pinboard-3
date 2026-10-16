@@ -10,7 +10,7 @@ export {
   DrawingCanvas,
   LoadingCards,
   LocationThumbnail,
-  LocationSearch,
+  PinboardSearch,
 } from './components/_index'
 export * as PinboardComposables from './composables/_index'
 export * as PinboardUtilities from './utilities/_index'

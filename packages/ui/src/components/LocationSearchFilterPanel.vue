@@ -1,8 +1,8 @@
-<!-- LocationSearchFilterPanel -->
+<!-- PinboardSearchFilterPanel -->
 <!--
 Component for rendering the features search bar, filter buttons, and sort buttons inside of location panel.
 Because not all finders will use the exact some layout, search, filter and sort are all optional.
-Search, filter, and sort will only render if a prop for them is passed into LocationSearchFilterPanel
+Search, filter, and sort will only render if a prop for them is passed into PinboardSearchFilterPanel
 
 Features in component have minimal state and logic.
 They will emit current values, and the logic for handling those values will be done in the parent app.
@@ -25,7 +25,7 @@ import { FilterChipGroup } from '@phila/phila-ui-filter-chip'
 // pinboard component imports
 import LocationFilter from './LocationFilter.vue'
 import SortPanel from './SortPanel.vue'
-import LocationSearch from './LocationSearch.vue'
+import PinboardSearch from './PinboardSearch.vue'
 
 // type imports
 import type {
@@ -124,7 +124,7 @@ watch(allFiltersOpen, (open) => {
 <template>
   <Teleport to="#mobile-map-search-filter" :disabled="!isMobile">
     <div class="location-search-filter-sort" :class="{ mobile: isMobile }">
-      <LocationSearch
+      <PinboardSearch
         v-model:search-string="searchString"
         :v-model:locating-user="userLocationState === 'acquiring'"
         :search-placeholder="searchPlaceholder"

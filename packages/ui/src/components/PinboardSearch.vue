@@ -10,8 +10,8 @@ import { Search } from '@phila/phila-ui-search'
 import SearchSuggestions from './SearchSuggestions.vue'
 
 // pinboard composables imports
-import { useSearchSuggestions } from '../composables/useSearchSuggestions'
-import { useRecentSearches } from '../composables/useRecentSearches'
+import { useSearchSuggestions } from '../composables/useSearchSuggestions.ts'
+import { useRecentSearches } from '../composables/useRecentSearches.ts'
 import { PINBOARD_CONFIG_KEY } from '../keys.ts'
 
 // models

@@ -2,7 +2,7 @@
      /autocomplete (debounced); picking a suggestion fires /search and emits select(feature). -->
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { LocationSearch } from '@pinboard/ui'
+import { PinboardSearch } from '@pinboard/ui'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useDebouncedSearch } from '@/composables/useDebouncedSearch'
 import { getCurrentPosition } from '@/composables/useGeolocation'
@@ -110,7 +110,7 @@ function resetLocation() {
 </script>
 
 <template>
-  <LocationSearch
+  <PinboardSearch
     v-model:search-string="query"
     v-model:dropdown-open="open"
     v-model:locating-user="locatingUser"
@@ -136,7 +136,7 @@ function resetLocation() {
     <template v-if="searchReturnedNull" #no-results>
       <NoAddressDropdown class="location-step__no-address" @reset="resetLocation" />
     </template>
-  </LocationSearch>
+  </PinboardSearch>
 </template>
 
 <style scoped>
