@@ -119,6 +119,8 @@ jobs:
   smoke-test:
     name: Smoke test ${{ matrix.app.name }}
     runs-on: ubuntu-latest
+    # Temporarily disabled: WAF blocks the runners from reaching the deployed sites.
+    if: false
     # Runs only after every app has shipped; skipped if a ship failed.
     needs: [detect-changes, ship-apps]
     env:
