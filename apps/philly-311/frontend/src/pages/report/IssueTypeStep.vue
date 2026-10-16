@@ -2,12 +2,12 @@
      caseType-grouped directory). View derives from store.category; Next is gated on
      a category being chosen via useWizardValidity. -->
 <script setup lang="ts">
-import { computed, onBeforeMount, ref, useId, watch } from 'vue'
+import { computed, inject, onBeforeMount, ref, useId, watch } from 'vue'
 import { useServiceTypes } from '@/composables/useServiceTypes'
 import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { Search } from '@phila/phila-ui-search'
-import { LoadingCards } from '@pinboard/ui'
+import { LoadingCards, IS_MOBILE_KEY } from '@pinboard/ui'
 import { Callout } from '@phila/phila-ui-callout'
 import TypeSuggestions from '@/components/wizard/TypeSuggestions.vue'
 import TypeDirectory from '@/components/wizard/TypeDirectory.vue'
@@ -18,6 +18,7 @@ import type { ServiceType } from '@/types/api.ts'
 import type { Service } from '@/types/app'
 
 const issueStepId = useId()
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 const store = useReportSubmissionStore()
 const { list, isLoading, error, load } = useServiceTypes()
 
@@ -92,7 +93,11 @@ function handleSearchSubmit() {
 <template>
   <ReportStep :id="issueStepId" :error-active="false" :step-title="stepTitle" :required="true">
     <template #step-content>
-      <div :id="issueStepId" class="issue-step" :class="{ 'issue-step--no-photo': !hasPhoto }">
+      <div
+        :id="issueStepId"
+        class="issue-step"
+        :class="{ 'issue-step--no-photo': !hasPhoto, 'is-mobile': isMobile }"
+      >
         <template v-if="hasPhoto">
           <ImageAnalysis
             v-if="!store.photoSuggestions.length"
@@ -200,5 +205,34 @@ function handleSearchSubmit() {
 .issue-step__issue-types {
   grid-area: issueTypes;
   overflow: auto;
+}
+
+.issue-step.is-mobile {
+  grid-template-areas:
+    'uploadedImage'
+    'search'
+    'issueTypes';
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  grid-auto-rows: auto;
+}
+
+.issue-step.is-mobile.issue-step--no-photo {
+  grid-template-areas:
+    'search'
+    'issueTypes';
+}
+
+.issue-step.is-mobile .issue-step__photo-container,
+.issue-step.is-mobile .issue-step__analysis {
+  height: clamp(10rem, 28vh, 16rem);
+}
+
+.issue-step.is-mobile .issue-step__analysis {
+  padding: var(--spacing-m, 1rem);
+}
+
+.issue-step.is-mobile .issue-step__issue-types {
+  overflow: visible;
 }
 </style>

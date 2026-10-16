@@ -2,7 +2,7 @@
      map shows the chosen point with a draggable pin; "Use my current location" uses
      browser geolocation. Stores a complete AisFeature; Next gated on in-Philly. -->
 <script setup lang="ts">
-import { computed, onBeforeMount, ref, watch } from 'vue'
+import { computed, inject, onBeforeMount, ref, watch } from 'vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { reverseGeocode } from '@/composables/useAis'
 import { useWizardValidity, useWizardErrors } from '@/composables/useWizardValidity'
@@ -10,6 +10,7 @@ import { isInPhilly } from '@/utils/bounds'
 import { Callout } from '@phila/phila-ui-callout'
 import { PhilaButton } from '@phila/phila-ui-button'
 import { Tags } from '@phila/phila-ui-tags'
+import { IS_MOBILE_KEY } from '@pinboard/ui'
 import { IconRotateLeft, IconArrowsUpDownLeftRight } from '@phila/phila-ui-core/icons'
 import AddressSearch from '@/components/wizard/AddressSearch.vue'
 import LocationMap from '@/components/wizard/LocationMap.vue'
@@ -21,6 +22,8 @@ export type AddressSource = 'image' | 'search' | 'geoLocation' | 'mapPin'
 
 const stepTitle = 'Confirm Location'
 const defaultError = 'Choose an address to continue'
+
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 
 const store = useReportSubmissionStore()
 const errorMessage = ref('')
@@ -115,6 +118,7 @@ onBeforeMount(() => {
     <template #step-content>
       <div
         class="location-step"
+        :class="{ 'is-mobile': isMobile }"
         :style="{ 'row-gap': errorMessage ? 'var(--spacing-xs, 0.5rem)' : '0' }"
       >
         <div
@@ -239,5 +243,41 @@ onBeforeMount(() => {
 .location-step__no-address {
   grid-column: search-col-start / search-col-end;
   grid-row: search-row-end / map-end;
+}
+
+.location-step.is-mobile {
+  grid-template-columns:
+    [full-start] var(--spacing-s, 0.75rem)
+    [inset-start search-col-start readonly-col-start] minmax(0, 1fr)
+    [readonly-col-end search-col-end inset-end] var(--spacing-s, 0.75rem)
+    [full-end];
+  grid-template-rows:
+    [error-row]
+    auto
+    [map-start]
+    var(--spacing-s, 0.75rem)
+    [search-row-start]
+    auto
+    [search-row-end]
+    1fr
+    [readonly-row-start]
+    auto
+    [readonly-row-end reset-row-start]
+    auto
+    [reset-row-end]
+    var(--spacing-s, 0.75rem)
+    [map-end];
+}
+
+.location-step.is-mobile .location-step__search,
+.location-step.is-mobile .location-step__readonly {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.location-step.is-mobile .location-step__reset {
+  grid-column: inset-start / inset-end;
+  grid-row: reset-row-start / reset-row-end;
+  justify-self: center;
 }
 </style>

@@ -2,9 +2,9 @@
      Philly default view until a location exists, then a draggable marker that
      emits move({lat,lng}) on dragend; emits outOfBounds for non-Philly points. -->
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { Map as PhilaMap, MapMarker, MapPopup } from '@phila/phila-ui-map-core'
-import { MapIconTextPin } from '@pinboard/ui'
+import { MapIconTextPin, IS_MOBILE_KEY } from '@pinboard/ui'
 import { useMapBounds, type MapVMComponent } from '@/composables/useMapBounds'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import { serviceTypeColor } from '@/utils/serviceTypeMeta'
@@ -26,6 +26,8 @@ const emit = defineEmits<{
   move: [point: { lat: number; lng: number }]
   outOfBounds: []
 }>()
+
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 
 const showPopup = ref(true)
 const draggingPin = ref(false)
@@ -75,9 +77,9 @@ function togglePopup() {
         :lng-lat="[location.lng, location.lat]"
         :close-on-click="false"
         :close-button="false"
-        :anchor="'left'"
-        :offset="[30, -34]"
-        max-width="21.25rem"
+        :anchor="isMobile ? 'top' : 'left'"
+        :offset="isMobile ? [0, 12] : [30, -34]"
+        :max-width="isMobile ? 'min(21.25rem, calc(100vw - 3rem))' : '21.25rem'"
       >
         <LocationImageCard
           v-if="popupText && address"

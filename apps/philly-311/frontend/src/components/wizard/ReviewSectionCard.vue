@@ -2,7 +2,9 @@
      with an icon + label and an Edit button, a divider, then the section's own
      content in the default slot. -->
 <script setup lang="ts">
+import { inject, ref } from 'vue'
 import { Icon, type IconComponent } from '@phila/phila-ui-core'
+import { IS_MOBILE_KEY } from '@pinboard/ui'
 import { IconCheck, IconPencil } from '@phila/phila-ui-core/icons'
 import { PhilaButton } from '@phila/phila-ui-button'
 import type { RouteLocationRaw } from 'vue-router'
@@ -16,10 +18,11 @@ defineProps<{
   editLabel: string
 }>()
 defineEmits<{ edit: [] }>()
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 </script>
 
 <template>
-  <section class="review-section-card">
+  <section class="review-section-card" :class="{ 'is-mobile': isMobile }">
     <header class="review-section-card__header">
       <div class="review-section-card__title">
         <span class="review-section-card__check" aria-hidden="true">
@@ -97,5 +100,18 @@ defineEmits<{ edit: [] }>()
   padding: var(--spacing-l, 1.5rem);
   width: 100%;
   box-sizing: border-box;
+}
+
+.review-section-card.is-mobile .review-section-card__header {
+  padding: var(--spacing-xs, 0.5rem) var(--spacing-m, 1rem);
+  gap: var(--spacing-xs, 0.5rem);
+}
+
+.review-section-card.is-mobile .review-section-card__title {
+  gap: var(--spacing-xs, 0.5rem);
+}
+
+.review-section-card.is-mobile .review-section-card__content {
+  padding: var(--spacing-m, 1rem);
 }
 </style>

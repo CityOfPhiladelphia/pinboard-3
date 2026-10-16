@@ -1,17 +1,18 @@
 <!-- ABOUTME: Wizard exit confirmation dialog — offers saving the in-progress
      report as a draft or discarding it; cancelling keeps the user in the wizard. -->
 <script setup lang="ts">
-import { ref, onMounted, useTemplateRef } from 'vue'
+import { inject, ref, onMounted, useTemplateRef } from 'vue'
 import { PhilaButton, CloseButton } from '@phila/phila-ui-button'
 import { Tags } from '@phila/phila-ui-tags'
 import { Icon } from '@phila/phila-ui-core'
 import { IconPencil, IconBackwardStep, IconForwardStep } from '@phila/phila-ui-core/icons'
-import { DrawingCanvas, PinboardUtilities } from '@pinboard/ui'
+import { DrawingCanvas, PinboardUtilities, IS_MOBILE_KEY } from '@pinboard/ui'
 import type { PinboardTypes } from '@pinboard/ui'
 import { blobToDataURL, JPEG_QUALITY, resizeImageToMax } from '@/utils/photo'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 
 const store = useReportSubmissionStore()
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 
 const open = defineModel<boolean>('open')
 const complete = defineModel<boolean>('complete')
@@ -49,11 +50,28 @@ onMounted(() => {
 
   getImageDimensions(file.value).then((imageDimensions) => {
     imageDim.value = resizeImageToMax(imageDimensions)
-    const scales = PinboardUtilities.scaleImageAndContainer(imageDimensions, canvasContainerRef)
+    const scales = isMobile.value
+      ? containScales(imageDimensions)
+      : PinboardUtilities.scaleImageAndContainer(imageDimensions, canvasContainerRef)
     canvasDimentions.value = scales.container
     store.setPhotoDimensions(scales.image)
   })
 })
+
+// scaleImageAndContainer sizes from the container's height whenever it is wider
+// than tall — always the case on a phone — which makes a landscape photo wider
+// than its container and pushes the whole dialog sideways. Fit inside instead.
+function containScales(image: PinboardTypes.Dimensions) {
+  const el = canvasContainerRef.value
+  const fit = (box: PinboardTypes.Dimensions) => {
+    const scale = Math.min(box.width / image.width, box.height / image.height)
+    return { height: image.height * scale, width: image.width * scale }
+  }
+  return {
+    image: fit({ height: 1, width: 1 }),
+    container: fit({ height: el?.clientHeight ?? 0, width: el?.clientWidth ?? 0 }),
+  }
+}
 
 function handleClose() {
   open.value = false
@@ -142,6 +160,7 @@ function getImageDimensions(dataURL: string): Promise<PinboardTypes.Dimensions> 
   <dialog
     ref="dialog"
     class="image-dialog"
+    :class="{ 'is-mobile': isMobile }"
     aria-labelledby="image-dialog-title"
     @close="handleClose"
     @cancel="handleClose"
@@ -276,5 +295,28 @@ dialog:not([open]) {
   display: flex;
   margin-left: auto;
   gap: var(--spacing-xs, 0.5rem);
+}
+
+.image-dialog.is-mobile {
+  grid-template-rows:
+    auto auto var(--spacing-s, 0.75rem) auto var(--spacing-s, 0.75rem) 1fr
+    var(--spacing-s, 0.75rem) auto var(--spacing-m, 1rem) auto;
+  width: min(calc(100dvw - 2rem), 32rem);
+  height: min(calc(100dvh - 2rem), 44rem);
+  padding: var(--spacing-m, 1rem);
+  overflow: auto;
+}
+
+.image-dialog.is-mobile .image-dialog-title {
+  font-size: var(--Subtitle-Subtitle-2-font-subtitle-2-size, 1.125rem);
+  line-height: var(--Subtitle-Subtitle-2-font-subtitle-2-lineheight, 1.75rem);
+}
+
+.image-dialog.is-mobile .image-dialog-callout {
+  padding: var(--spacing-s, 0.75rem);
+}
+
+.image-dialog.is-mobile .image-dialog-canvas {
+  min-height: 14rem;
 }
 </style>

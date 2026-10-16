@@ -29,9 +29,11 @@ onMounted(() => {
   if (!drawingCanvas.value) {
     throw new Error(`Failed to locate canvas element`)
   }
-  drawingCanvas.value.addEventListener('mousedown', startDrawing)
-  drawingCanvas.value.addEventListener('mouseup', stopDrawing)
-  drawingCanvas.value.addEventListener('mousemove', drawLine)
+  // Pointer events cover mouse, touch and pen; mouse-only events never fire
+  // for a finger.
+  drawingCanvas.value.addEventListener('pointerdown', startDrawing)
+  drawingCanvas.value.addEventListener('pointerup', stopDrawing)
+  drawingCanvas.value.addEventListener('pointermove', drawLine)
 
   context.value = drawingCanvas.value.getContext('2d') ?? undefined
   if (!context.value) {
@@ -44,12 +46,12 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  drawingCanvas.value?.removeEventListener('mousedown', startDrawing)
-  drawingCanvas.value?.removeEventListener('mouseup', stopDrawing)
-  drawingCanvas.value?.removeEventListener('mousemove', drawLine)
+  drawingCanvas.value?.removeEventListener('pointerdown', startDrawing)
+  drawingCanvas.value?.removeEventListener('pointerup', stopDrawing)
+  drawingCanvas.value?.removeEventListener('pointermove', drawLine)
 })
 
-function getPosition(event: MouseEvent) {
+function getPosition(event: PointerEvent) {
   if (!drawingCanvas.value) {
     throw new Error(`getPosition failed on canvas element`)
   }
@@ -60,7 +62,7 @@ function getPosition(event: MouseEvent) {
   }
 }
 
-function startDrawing(event: MouseEvent) {
+function startDrawing(event: PointerEvent) {
   if (drawingComplete.value || !context.value) return
   isDrawing = true
   getPosition(event)
@@ -77,7 +79,7 @@ function stopDrawing() {
   drawingComplete.value = true
 }
 
-function drawLine(event: MouseEvent) {
+function drawLine(event: PointerEvent) {
   if (!isDrawing || !context.value) return
   getPosition(event)
   context.value.lineTo(pointerLoc.x, pointerLoc.y)
@@ -105,12 +107,16 @@ function redoLine() {
     :height="dimensions.height"
     :width="dimensions.width"
     class="drawing-canvas"
-    @mouseleave="stopDrawing"
+    @pointerleave="stopDrawing"
+    @pointercancel="stopDrawing"
   ></canvas>
 </template>
 
 <style scoped>
 .drawing-canvas {
+  /* Without this the browser claims the touch to scroll or pan, and fires
+   * pointercancel instead of letting the stroke continue. */
+  touch-action: none;
   cursor:
     url('../assets/pencil.svg') 0 30,
     crosshair;
