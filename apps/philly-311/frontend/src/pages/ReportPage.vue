@@ -180,7 +180,7 @@ function discardAndExit() {
   grid-template-columns:
     [full-start] var(--scale-800, 4rem)
     [wizard-start] 1fr
-    [steps-start] auto [steps-end]
+    [steps-start] min(32rem, 100%) [steps-end]
     1fr [wizard-end]
     var(--scale-800, 4rem) [full-end];
   grid-template-rows:
