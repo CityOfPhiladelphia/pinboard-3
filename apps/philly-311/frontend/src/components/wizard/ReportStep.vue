@@ -1,6 +1,7 @@
 <!-- ABOUTME: Template for report pages. Standardizes step headings -->
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject, ref } from 'vue'
+import { IS_MOBILE_KEY } from '@pinboard/ui'
 
 // props
 const props = withDefaults(
@@ -16,6 +17,8 @@ const props = withDefaults(
   },
 )
 
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
+
 // slots
 defineSlots<{
   'step-content': unknown
@@ -29,7 +32,7 @@ const titleText = computed(() =>
 
 <template>
   <div class="report__step">
-    <span class="report-step__title">
+    <span class="report-step__title" :class="{ 'is-mobile': isMobile }">
       <h5 :class="['report-step__text', errorActive ? 'error' : '']" v-text="titleText" />
       <h5
         v-if="!hideRequired"
@@ -90,5 +93,10 @@ const titleText = computed(() =>
 
 .error {
   color: var(--Schemes-Error, #cc3000);
+}
+
+.report-step__title.is-mobile {
+  display: flex;
+  flex-wrap: wrap;
 }
 </style>

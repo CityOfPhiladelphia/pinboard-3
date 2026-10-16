@@ -81,11 +81,10 @@ function handleMouseLeave(ev: MouseEvent) {
 .step-indicator ol {
   counter-reset: step-counter;
   display: grid;
-  place-content: center;
+  place-content: stretch;
   padding: 0;
-  margin: 0;
-  max-width: 32rem;
-  grid-template-columns: auto auto auto auto auto;
+  margin: auto;
+  grid-template-columns: 2fr 3fr 3fr 3fr 2fr;
 }
 
 .step-indicator li {
@@ -96,6 +95,15 @@ function handleMouseLeave(ev: MouseEvent) {
   grid-template-areas:
     'dash_l pad_l number pad_r dash_r'
     'label label label label label';
+  grid-template-columns: 1fr auto auto auto 1fr;
+}
+
+li:first-child {
+  grid-template-columns: 0 0 auto auto 1fr;
+}
+
+li:last-child {
+  grid-template-columns: 1fr auto auto 0 0;
 }
 
 .step-pad-right {
@@ -126,7 +134,7 @@ function handleMouseLeave(ev: MouseEvent) {
   height: 0px;
   border: var(--border-width-s, 0.0625rem) solid var(--Schemes-Border-low, rgb(204, 204, 204));
   margin: var(--spacing-m, 1rem) 0;
-  width: clamp(var(--spacing-s, 0.75rem), 3vw, var(--scale-450, 2.25rem));
+  width: 1fr;
 }
 
 .step-button {
@@ -147,7 +155,8 @@ function handleMouseLeave(ev: MouseEvent) {
   font-family: var(--Label-Small-font-label-small-family, Montserrat);
   font-size: var(--Label-Small-font-label-small-size, 1rem);
   font-style: normal;
-  line-height: var(--Label-Small-font-label-small-lineheight, 1.25rem); /* 142.857% */
+  line-height: var(--Label-Small-font-label-small-lineheight, 1.25rem);
+  /* 142.857% */
   font-weight: 600;
 }
 
@@ -163,11 +172,14 @@ function handleMouseLeave(ev: MouseEvent) {
 
 .step-label {
   grid-area: label;
+  display: grid;
+  text-align: center;
   margin: 0 auto;
   font-family: var(--Body-ExtraSmall-font-body-xs-family, Montserrat);
   font-size: var(--Body-ExtraSmall-font-body-xs-size, 0.75rem);
   font-style: normal;
-  line-height: var(--Body-ExtraSmall-font-body-xs-lineheight, 1rem); /* 133.333% */
+  line-height: var(--Body-ExtraSmall-font-body-xs-lineheight, 1rem);
+  /* 133.333% */
   font-weight: 400;
 }
 

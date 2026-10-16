@@ -3,13 +3,13 @@
      in ReviewSectionCard chrome. The first four Edit to the step that owns them;
      visibility & contact instead opens VisibilityContactModal. -->
 <script setup lang="ts">
-import { computed, onMounted, useTemplateRef } from 'vue'
+import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import { useAuth } from '@phila/sso-vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useServiceTypes } from '@/composables/useServiceTypes'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import { serviceTypeColor } from '@/utils/serviceTypeMeta'
-import { LocationThumbnail } from '@pinboard/ui'
+import { LocationThumbnail, IS_MOBILE_KEY } from '@pinboard/ui'
 import ReviewSectionCard from './ReviewSectionCard.vue'
 import VisibilityContactModal from './VisibilityContactModal.vue'
 import {
@@ -24,6 +24,7 @@ const CITY_STATE = 'Philadelphia, PA'
 
 const store = useReportSubmissionStore()
 const auth = useAuth()
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 const { list, load } = useServiceTypes()
 onMounted(() => {
   load()
@@ -93,7 +94,7 @@ const locationLines = computed(() => {
 </script>
 
 <template>
-  <div class="review-summary">
+  <div class="review-summary" :class="{ 'is-mobile': isMobile }">
     <ReviewSectionCard :icon="IconImage" label="Images" edit-to="/report" edit-label="Edit photo">
       <img
         v-if="photoSrc"
@@ -216,23 +217,15 @@ const locationLines = computed(() => {
   min-width: 0;
 }
 
-/* The map's fixed 222px width + flex-shrink:0 never gives up room to the
- * address text, so on a narrow phone the row either overflows or squeezes
- * the text illegibly thin. Stacking the map above the text avoids both. */
-@media (max-width: 768px) {
-  .review-summary__location {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .review-summary__map {
-    width: 100%;
-  }
-  /* Stacked, the text has nothing to its left (the map sits above it, not
-   * beside it) or below (it's the last element) — desktop needs neither,
-   * since the map and the card's own edge fill those roles instead. */
-  .review-summary__location-text {
-    padding: 0 0 var(--spacing-m, 1rem) var(--spacing-m, 1rem);
-  }
+.review-summary.is-mobile .review-summary__location {
+  flex-direction: column;
+  align-items: stretch;
+}
+.review-summary.is-mobile .review-summary__map {
+  width: 100%;
+}
+.review-summary.is-mobile .review-summary__location-text {
+  padding: 0 0 var(--spacing-m, 1rem) var(--spacing-m, 1rem);
 }
 .review-summary__location-street {
   font-weight: 600;

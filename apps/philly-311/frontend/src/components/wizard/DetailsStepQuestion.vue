@@ -8,13 +8,15 @@ import QuestionTextfield from '@/components/wizard/questions/QuestionTextfield.v
 import ReportStep from './ReportStep.vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import type { IQuestionField } from '@/types/api.ts'
-import { computed } from 'vue'
+import { computed, inject, ref } from 'vue'
+import { IS_MOBILE_KEY } from '@pinboard/ui'
 
 const props = defineProps<{ current: IQuestionField }>()
 const response = defineModel<string | undefined>('response', { default: undefined })
 const error = defineModel<string>('error', { default: '' })
 
 const store = useReportSubmissionStore()
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 
 const initialValue = computed(() => {
   return store.customFields?.[props.current.field] ?? ''
@@ -31,7 +33,7 @@ const initialValue = computed(() => {
     <template #step-content>
       <div
         class="question-field"
-        :class="{ 'question-field__error': !!error }"
+        :class="{ 'question-field__error': !!error, 'is-mobile': isMobile }"
         :data-type="current.type"
       >
         <QuestionBoolean
@@ -84,5 +86,31 @@ const initialValue = computed(() => {
   border-radius: 12px;
   color: var(--Schemes-On-Error-Container, #992100);
   background: var(--Schemes-Error-Container, #f8c9bd);
+}
+
+.question-field.is-mobile {
+  max-width: 100%;
+}
+
+.question-field.is-mobile :deep(.phila-input) {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.question-field.is-mobile:not(
+    [data-type='boolean'],
+    [data-type='picklist'],
+    [data-type='multipicklist']
+  ) {
+  width: 100%;
+}
+
+.question-field.is-mobile :deep(.phila-input.phila-input input),
+.question-field.is-mobile :deep(.phila-input.phila-input .phila-text-field),
+.question-field.is-mobile :deep(.phila-input.phila-input .state-layer),
+.question-field.is-mobile :deep(.phila-input.phila-input .content),
+.question-field.is-mobile :deep(.phila-input.phila-input .input-text-container) {
+  min-width: 0;
+  max-width: 100%;
 }
 </style>

@@ -19,6 +19,9 @@ vi.mock('@/composables/useServiceTypes', () => ({
 // a real MapLibre/WebGL context jsdom doesn't provide — stub it. Its own
 // coordinate/icon handling is covered by packages/ui's LocationThumbnail.test.ts.
 vi.mock('@pinboard/ui', () => ({
+  // ReviewSectionCard injects this to pick its mobile styling; unprovided it
+  // falls back to the desktop layout.
+  IS_MOBILE_KEY: Symbol('is-mobile'),
   LocationThumbnail: defineComponent({
     name: 'LocationThumbnail',
     props: ['latitude', 'longitude', 'icon', 'color'],

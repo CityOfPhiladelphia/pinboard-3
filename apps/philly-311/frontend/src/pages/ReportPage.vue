@@ -7,11 +7,12 @@
      Submit action that replaces Next entirely. Exit opens ExitDialog, which
      either saves the in-progress report as a draft or discards it. -->
 <script setup lang="ts">
-import { provide, ref, computed, watch } from 'vue'
+import { inject, provide, ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import StepIndicator from '@/components/wizard/StepIndicator.vue'
 import ExitDialog from '@/components/wizard/ExitDialog.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
+import { IS_MOBILE_KEY } from '@pinboard/ui'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useMyCasesStore } from '@/stores/myCases'
 import { WIZARD_CAN_ADVANCE_KEY, WIZARD_SHOW_ERRORS_KEY } from '@/composables/useWizardValidity'
@@ -25,6 +26,8 @@ const STEPS = [
   { title: 'Details', path: '/report/details' },
   { title: 'Review', path: '/report/review' },
 ]
+
+const isMobile = inject(IS_MOBILE_KEY, ref(false))
 
 const router = useRouter()
 const route = useRoute()
@@ -115,7 +118,7 @@ function discardAndExit() {
 </script>
 
 <template>
-  <div ref="wizardEl" class="wizard">
+  <div ref="wizardEl" class="wizard" :class="{ 'is-mobile': isMobile }">
     <StepIndicator
       :steps="STEPS"
       :current-step="currentStep"
@@ -177,7 +180,7 @@ function discardAndExit() {
   grid-template-columns:
     [full-start] var(--scale-800, 4rem)
     [wizard-start] 1fr
-    [steps-start] auto [steps-end]
+    [steps-start] min(32rem, 100%) [steps-end]
     1fr [wizard-end]
     var(--scale-800, 4rem) [full-end];
   grid-template-rows:
@@ -228,5 +231,40 @@ function discardAndExit() {
 
 .wizard__exit {
   text-decoration: underline;
+}
+
+.wizard.is-mobile {
+  grid-template-columns:
+    [full-start] var(--spacing-m, 1rem)
+    [wizard-start] 1fr
+    [steps-start] auto [steps-end]
+    1fr [wizard-end]
+    var(--spacing-m, 1rem) [full-end];
+  grid-template-rows:
+    var(--spacing-m, 1rem)
+    [steps-row] auto
+    var(--spacing-m, 1rem)
+    [wizard-row] 1fr
+    var(--spacing-m, 1rem)
+    [footer-border] 0
+    var(--spacing-m, 1rem)
+    [wizard-footer] auto
+    calc(var(--spacing-m, 1rem) + env(safe-area-inset-bottom, 0px));
+}
+
+.wizard.is-mobile .wizard__steps {
+  grid-column: full-start / full-end;
+  place-content: stretch;
+  padding: 0 clamp(var(--spacing-m, 1rem), 6vw, var(--spacing-xl, 2rem));
+}
+
+.wizard.is-mobile .wizard__nav {
+  flex-wrap: wrap;
+  row-gap: var(--spacing-xs, 0.5rem);
+}
+
+.wizard.is-mobile .wizard__nav-right {
+  column-gap: var(--spacing-s, 0.75rem);
+  margin-left: auto;
 }
 </style>
