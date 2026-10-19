@@ -3,13 +3,13 @@
 // ABOUTME: ReportLocation list the Pinboard view binds.
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import type { FilterProps, LatLon } from '@pinboard/ui'
 import { useOpenIssuesStore } from '@/stores/openIssues'
 import { getCurrentPosition } from '@/composables/useGeolocation'
 import { calcLocationDistance, reportToLocation } from '@/utils/reportCard'
 import { DEFAULT_CENTER } from '@/utils/geoDefaults'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import { serviceTypeColor } from '@/utils/serviceTypeMeta'
+import type { FilterProps, LatLon } from '@pinboard/ui'
 import type { ReportLocation } from '@/types/app'
 
 export interface UseReportFinder {
@@ -41,15 +41,13 @@ export function useReportFinder(): UseReportFinder {
   const errorMessage = computed(() => error.value?.message ?? '')
 
   const reportLocations = computed<ReportLocation[]>(() => {
-    console.log(reports.value)
     return reports.value.map((report) => reportToLocation(report))
   })
 
   const locationsDistances = computed<ReportLocation[]>(() => {
-    if (!hasAnchor.value) return reportLocations.value
-    return calcLocationDistance(reportLocations, searchOrUserLocation.value).value.sort(
-      (a, b) => Number(a.distance) - Number(b.distance),
-    )
+    return hasAnchor.value
+      ? calcLocationDistance(reportLocations, searchOrUserLocation.value).value
+      : reportLocations.value
   })
 
   const locations = computed<ReportLocation[]>(() => {
@@ -58,12 +56,15 @@ export function useReportFinder(): UseReportFinder {
         ? locationsDistances.value
         : locationsDistances.value.filter((r) => r.serviceType === filter.value)
 
-    if (!hasAnchor.value) return list
-    return list.sort((a, b) => Number(a.distance) - Number(b.distance))
+    const sorted = hasAnchor.value
+      ? list.sort((a, b) => Number(a.distance) - Number(b.distance))
+      : list
+    // filter sorted from keyword search results
+    return sorted
   })
 
   const filterOptions = computed<FilterProps[]>(() => {
-    return [...new Set(reports.value.map((report) => report.serviceType))]
+    return [...new Set(reportLocations.value.map((report) => report.serviceType))]
       .filter(Boolean)
       .sort()
       .map((serviceType) => ({
@@ -75,7 +76,7 @@ export function useReportFinder(): UseReportFinder {
   })
 
   function setCenter(loc: LatLon): void {
-    searchOrUserLocation.value = { latitude: loc.latitude, longitude: loc.longitude }
+    searchOrUserLocation.value = loc
     hasAnchor.value = true
   }
 

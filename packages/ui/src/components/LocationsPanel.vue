@@ -1,15 +1,12 @@
 <script setup lang="ts" generic="PinboardLocation extends BasicLocation">
 // vue imports
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { onBeforeUnmount, ref, watch } from 'vue'
 
 // philly ui imports
 import { MapCard } from '@phila/phila-ui-cards'
 
 // pinboard component imports
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
-
-// pinboard utilities imports
-import { locationCountLabel } from '../utilities/locationCountLabel'
 
 // type imports
 import type {
@@ -46,7 +43,6 @@ const props = defineProps<{
   locationFilter: LocationFilterOption[] | undefined
   locationSort: SortLocationsOptions | undefined
   filters?: FilterProps[]
-  countNoun?: string
 }>()
 
 // emits
@@ -62,10 +58,6 @@ const emit = defineEmits<{
 // refs
 const pendingKeydown = ref(false)
 const listRef = ref<HTMLElement | null>(null)
-// computed refs
-const countLabel = computed(() =>
-  props.countNoun ? locationCountLabel(props.locations.length, props.countNoun) : null
-)
 
 // Width of the list's scrollbar gutter (0 for overlay scrollbars), exposed so a
 // parent overlaying the list can stop short of the scrollbar and leave it clickable.
@@ -139,8 +131,6 @@ defineExpose({ scrollToCard, scrollbarWidth })
     :is-mobile="isMobile"
     @search="emit('search')"
   />
-
-  <div v-if="countLabel" class="location-count" v-text="countLabel" />
 
   <slot name="list-header" />
 

@@ -49,7 +49,7 @@ export interface Report {
 /** Mirrors the API's Issue shape (GET /issues/:id, POST /submit, POST /issues/:id/upvote).
  *  Fields are optional here because callers may build a partial Issue from lighter-weight
  *  data (e.g. a nearby-issues Report) before the full record has loaded. */
-export interface Issue extends Partial<Omit<Report, 'id' | 'lat' | 'lng'>> {
+export interface Issue extends Omit<Partial<Report>, 'id' | 'lat' | 'lng'> {
   id: string
   caseNumber?: string
   private?: boolean

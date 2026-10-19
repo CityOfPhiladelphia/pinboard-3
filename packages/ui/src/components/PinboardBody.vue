@@ -485,18 +485,14 @@ function selectedLocationValue(): PinboardLocation {
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"
             :is-mobile="isMobile"
-            :count-noun="isMobile ? undefined : locationPanelCountNoun"
             @select="handleSelect"
             @hover="handleHover"
             @hover-end="handleHoverEnd"
             @search="handleSearchSubmit"
           >
             <template #list-header>
-              <div
-                v-if="!isMobile && !locationPanelCountNoun"
-                class="location-list-header has-text-label-default"
-              >
-                <span>{{ locationCountLabel }}</span>
+              <div v-if="!isMobile" class="location-list-header">
+                <p class="has-text-body-default" v-text="locationCountLabel" />
               </div>
             </template>
             <template v-if="$slots['location-card']" #location-card="{ location }">
@@ -575,10 +571,8 @@ function selectedLocationValue(): PinboardLocation {
   >
     <div class="bottom-sheet-stack">
       <div class="bottom-sheet-list-scroll" :class="{ 'is-hidden': selectedLocation }">
-        <slot name="page-header" />
-        <slot name="locations-header" />
-        <div class="location-sheet-header has-text-label-default">
-          <span>{{ locationCountLabel }}</span>
+        <div class="location-sheet-header">
+          <p class="has-text-body-default" v-text="locationCountLabel" />
           <div id="bottom-sheet-sort" />
         </div>
         <div id="locations-panel-mobile" ref="locationsPanelMobileTarget" />

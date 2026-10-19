@@ -44,8 +44,7 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
     anchor: { lat: number; lng: number },
   ): Promise<number> {
     const { reports: rows, lastOffset } = await fetch({
-      lat: anchor.lat,
-      lng: anchor.lng,
+      ...anchor,
       radius: CITYWIDE_RADIUS,
       limit: 1,
       offset: 0,
@@ -74,8 +73,7 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
     let page1: PageResult
     try {
       page1 = await fetch({
-        lat: anchor.lat,
-        lng: anchor.lng,
+        ...anchor,
         radius: CITYWIDE_RADIUS,
         limit: PAGE_LIMIT,
         offset: 0,
@@ -103,8 +101,7 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
       const requestedOffset = next
       try {
         const page = await fetch({
-          lat: anchor.lat,
-          lng: anchor.lng,
+          ...anchor,
           radius: CITYWIDE_RADIUS,
           limit: PAGE_LIMIT,
           offset: requestedOffset,

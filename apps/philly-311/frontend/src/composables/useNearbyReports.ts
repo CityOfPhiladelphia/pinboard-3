@@ -1,11 +1,10 @@
 // ABOUTME: Nearby issues fetched from /private/key/nearby-issues, one page per call
 // ABOUTME: with Link-header offsets. Anonymous-ok route, so no auth handle is passed.
-import { api311Fetch } from './api311'
+import { api311Fetch, type QueryParams } from './api311'
 import { parseError } from './useApiError'
-import type { Service } from '@/types/app'
-import type { Report } from '@/types/api'
+import type { Issue, Report } from '@/types/api'
 
-export interface PageParams {
+export interface PageParams extends QueryParams {
   lat: number
   lng: number
   radius: number
@@ -19,37 +18,26 @@ export interface PageResult {
   lastOffset: number | null
 }
 
-export interface ApiNearbyIssue {
-  id: string
-  caseNumber: string
-  serviceType: Service
-  department: string | null
-  status: string
-  address: string
-  description: string
-  mediaUrl: string | null
-  latitude: number
-  longitude: number
-  createdAt: string
-  updatedAt: string
-  slaDate?: string | null
-  childCount: number
-}
+export function toReport(issues: Issue[]): Report[] {
+  const goodIssues = issues.filter(
+    (issue) =>
+      issue.id &&
+      issue.serviceType &&
+      issue.latitude &&
+      issue.longitude &&
+      issue.status &&
+      issue.address,
+  ) as Required<
+    Pick<Issue, 'id' | 'serviceType' | 'latitude' | 'longitude' | 'status' | 'address'>
+  >[]
 
-export function toReport(i: ApiNearbyIssue): Report {
-  return {
-    id: i.id,
-    lat: i.latitude,
-    lng: i.longitude,
-    serviceType: i.serviceType,
-    status: i.status,
-    address: i.address,
-    mediaUrl: i.mediaUrl ?? undefined,
-    description: i.description,
-    createdAt: i.createdAt,
-    slaDate: i.slaDate ?? undefined,
-    department: i.department ?? undefined,
-  }
+  return goodIssues.map((report) => {
+    return {
+      lat: report.latitude,
+      lng: report.longitude,
+      ...report,
+    }
+  })
 }
 
 /**
@@ -84,23 +72,13 @@ export function parseLinkHeader(header: string | null): {
 }
 
 export async function fetchPage(params: PageParams): Promise<PageResult> {
-  const query: Record<string, string | number | undefined> = {
-    lat: params.lat,
-    lng: params.lng,
-    radius: params.radius,
-    limit: params.limit,
-  }
-  if (params.offset !== undefined) query.offset = params.offset
+  const res = await api311Fetch({ path: '/private/key/nearby-issues', query: params })
 
-  const res = await api311Fetch({ path: '/private/key/nearby-issues', query })
-
-  if (!res.ok) {
-    throw await parseError(res)
-  }
+  if (!res.ok) throw await parseError(res)
 
   const link = res.headers.get('Link')
   const { next, last } = parseLinkHeader(link)
-  const body = (await res.json()) as { issues?: ApiNearbyIssue[] }
-  const reports = (body.issues ?? []).map(toReport)
+  const body = (await res.json()) as { issues?: Issue[] }
+  const reports = toReport(body.issues ?? [])
   return { reports, nextOffset: next, lastOffset: last }
 }

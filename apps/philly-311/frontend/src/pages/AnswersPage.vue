@@ -126,7 +126,6 @@ onMounted(loadPage)
           :choices="SORT_CHOICES"
           :multiple="false"
           :model-value="sortModelValue"
-          data-test="answers-sort"
           @update:model-value="onSortChange"
         />
       </div>

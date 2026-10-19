@@ -15,13 +15,25 @@ import ReportListingCard from '@/components/ReportListingCard.vue'
 import ReportDetail from '@/components/ReportDetail.vue'
 import ClusteredMarkers from '@/components/ClusteredMarkers.vue'
 import MapConstraints from '@/components/MapConstraints.vue'
+import type { Report } from '@/types/api'
 import type { ReportLocation } from '@/types/app'
 
 const auth = useAuth()
 const cases = useMyCases(auth)
 const isMobile = inject(IS_MOBILE_KEY, ref(true))
 
-const locations = computed(() => cases.reports.value.map(reportToLocation))
+const locations = computed(() => {
+  const goodReports = cases.reports.value.filter(
+    (report) =>
+      report.serviceType &&
+      report.id &&
+      report.lat &&
+      report.lng &&
+      report.status &&
+      report.address,
+  ) as Report[]
+  return goodReports.map(reportToLocation)
+})
 // Required by Pinboard; without a location-search-mode the map never pans to it.
 const searchOrUserLocation: PinboardTypes.LatLon = {
   latitude: DEFAULT_CENTER.lat,
@@ -29,12 +41,12 @@ const searchOrUserLocation: PinboardTypes.LatLon = {
 }
 
 const counts = computed(() => {
-  const c = { open: 0, onHold: 0, closed: 0 }
-  for (const r of cases.reports.value) {
-    const bucket = statusBucket(r.status)
-    if (bucket) c[bucket]++
+  const counts = { open: 0, onHold: 0, closed: 0 }
+  for (const report of cases.reports.value) {
+    const bucket = statusBucket(report.status)
+    if (bucket) counts[bucket]++
   }
-  return c
+  return counts
 })
 
 function getMapCardProps(location: ReportLocation): MapCardProps {
