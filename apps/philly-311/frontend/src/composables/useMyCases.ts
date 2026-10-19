@@ -3,7 +3,8 @@
 import { ref } from 'vue'
 import { api311Fetch, type Auth } from './api311'
 import { parseError } from './useApiError'
-import { parseLinkHeader, toReport, type ApiNearbyIssue, type Report } from './useNearbyReports'
+import { parseLinkHeader, toReport, type ApiNearbyIssue } from './useNearbyReports'
+import type { Report } from '@/types/api'
 
 const PAGE_LIMIT = 200
 

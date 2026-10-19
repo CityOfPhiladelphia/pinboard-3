@@ -2,7 +2,6 @@
 // ABOUTME: throttled re-indexing on point changes, and expansionZoom correctness.
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { ref } from 'vue'
-import type { PinboardTypes } from '@pinboard/ui'
 import { useClusters } from '../useClusters'
 
 afterEach(() => {
@@ -10,7 +9,7 @@ afterEach(() => {
 })
 
 // Seven points packed tightly — supercluster will cluster them at low zoom.
-const TIGHT_GROUP: PinboardTypes.BasicLocation[] = Array.from({ length: 7 }, (_, i) => ({
+const TIGHT_GROUP: ReportLocation[] = Array.from({ length: 7 }, (_, i) => ({
   id: `loc-${i}`,
   name: 'Pothole Repair',
   latitude: 39.95 + i * 0.0001,
@@ -18,7 +17,7 @@ const TIGHT_GROUP: PinboardTypes.BasicLocation[] = Array.from({ length: 7 }, (_,
 }))
 
 // Two points spread far apart — they stay as singles even at moderate zoom.
-const FAR_APART: PinboardTypes.BasicLocation[] = [
+const FAR_APART: ReportLocation[] = [
   { id: 'a', name: 'Pothole Repair', latitude: 39.95, longitude: -75.16 },
   { id: 'b', name: 'Graffiti Removal', latitude: 40.7, longitude: -74.0 },
 ]

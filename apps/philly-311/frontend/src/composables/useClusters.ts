@@ -3,7 +3,7 @@
 import { ref, computed, watch, onScopeDispose } from 'vue'
 import type { Ref, ComputedRef } from 'vue'
 import Supercluster from 'supercluster'
-import type { PinboardTypes } from '@pinboard/ui'
+import type { ReportLocation } from '@/types/app'
 
 export type ClusterItem =
   | { type: 'cluster'; id: number; lng: number; lat: number; count: number }
@@ -11,7 +11,7 @@ export type ClusterItem =
 
 type PointProperties = { id: string }
 
-function toFeature(loc: PinboardTypes.BasicLocation): Supercluster.PointFeature<PointProperties> {
+function toFeature(loc: ReportLocation): Supercluster.PointFeature<PointProperties> {
   return {
     type: 'Feature',
     properties: { id: loc.id },
@@ -20,7 +20,7 @@ function toFeature(loc: PinboardTypes.BasicLocation): Supercluster.PointFeature<
 }
 
 export function useClusters(
-  points: Ref<PinboardTypes.BasicLocation[]>,
+  points: Ref<ReportLocation[]>,
   zoom: Ref<number>,
 ): { clusters: ComputedRef<ClusterItem[]>; expansionZoom: (clusterId: number) => number } {
   const index = new Supercluster<PointProperties>({ radius: 50, maxZoom: 16 })

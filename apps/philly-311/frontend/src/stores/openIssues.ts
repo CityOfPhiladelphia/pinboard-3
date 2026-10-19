@@ -4,10 +4,10 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import {
   fetchPage as defaultFetchPage,
-  type Report,
   type PageParams,
   type PageResult,
 } from '@/composables/useNearbyReports'
+import type { Report } from '../types/api'
 import { CITYWIDE_RADIUS } from '@/utils/geoDefaults'
 
 const TTL_MS = 5 * 60_000

@@ -1,6 +1,5 @@
 // ABOUTME: API response types for the 311 service request API.
 // ABOUTME: These mirror the shapes returned by /private/key/service-types and related endpoints.
-
 import type { Service } from './app'
 
 export interface IQuestionField {
@@ -32,24 +31,31 @@ export interface CustomFieldValue {
   options?: string[]
 }
 
+export interface Report {
+  /** 8-digit Salesforce CaseNumber. */
+  id: string
+  lat: number
+  lng: number
+  serviceType: Service
+  status: string
+  address: string
+  mediaUrl?: string
+  description?: string
+  createdAt?: string
+  slaDate?: string
+  department?: string
+}
+
 /** Mirrors the API's Issue shape (GET /issues/:id, POST /submit, POST /issues/:id/upvote).
  *  Fields are optional here because callers may build a partial Issue from lighter-weight
  *  data (e.g. a nearby-issues Report) before the full record has loaded. */
-export interface Issue {
+export interface Issue extends Partial<Omit<Report, 'id' | 'lat' | 'lng'>> {
   id: string
   caseNumber?: string
-  status?: string
-  serviceType?: Service
-  department?: string
   private?: boolean
-  address?: string
-  description?: string
-  mediaUrl?: string
   latitude?: number
   longitude?: number
-  createdAt?: string
   updatedAt?: string
-  slaDate?: string
   slaDays?: number
   childCount?: number
   customFields?: CustomFieldValue[]

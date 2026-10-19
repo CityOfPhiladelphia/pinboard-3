@@ -1,23 +1,9 @@
 // ABOUTME: Nearby issues fetched from /private/key/nearby-issues, one page per call
 // ABOUTME: with Link-header offsets. Anonymous-ok route, so no auth handle is passed.
-import type { Service } from '@/types/app'
 import { api311Fetch } from './api311'
 import { parseError } from './useApiError'
-
-export interface Report {
-  /** 8-digit Salesforce CaseNumber. */
-  id: string
-  lat: number
-  lng: number
-  serviceType: Service
-  status: string
-  address: string
-  mediaUrl?: string
-  description?: string
-  createdAt?: string
-  slaDate?: string
-  department?: string
-}
+import type { Service } from '@/types/app'
+import type { Report } from '@/types/api'
 
 export interface PageParams {
   lat: number

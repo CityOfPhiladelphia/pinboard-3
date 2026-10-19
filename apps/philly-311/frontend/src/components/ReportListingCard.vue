@@ -5,7 +5,6 @@ import { computed } from 'vue'
 import { Report311 } from '@phila/phila-ui-cards'
 import type { Report311Props } from '@phila/phila-ui-cards'
 import { Icon } from '@phila/phila-ui-core'
-import type { Report } from '@/composables/useNearbyReports'
 import {
   statusBucket,
   statusTagColor,
@@ -15,8 +14,9 @@ import {
 import { serviceTypeTintStyle } from '@/utils/serviceTypeMeta'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import { formatCardTimestamp } from '@/utils/datetime'
+import type { ReportLocation } from '@/types/app'
 
-const props = defineProps<{ report: Report }>()
+const props = defineProps<{ report: ReportLocation }>()
 
 const timestamp = computed(() => formatCardTimestamp(props.report.createdAt) ?? undefined)
 const bucket = computed(() => statusBucket(props.report.status))
