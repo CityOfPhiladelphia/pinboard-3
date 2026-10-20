@@ -1,37 +1,36 @@
 // ABOUTME: Finder state for the reports landing — seeds city-wide data (geolocation
 // ABOUTME: or default, loaded once), owns the service-type filter, and derives the
-// ABOUTME: BasicLocation list + reportById lookup the Pinboard view binds.
+// ABOUTME: ReportLocation list the Pinboard view binds.
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import type { FilterProps, PinboardTypes } from '@pinboard/ui'
-import type { Report } from '@/composables/useNearbyReports'
 import { useOpenIssuesStore } from '@/stores/openIssues'
 import { getCurrentPosition } from '@/composables/useGeolocation'
-import { reportToLocation } from '@/utils/reportCard'
+import { calcLocationDistance, reportToLocation } from '@/utils/reportCard'
 import { DEFAULT_CENTER } from '@/utils/geoDefaults'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import { serviceTypeColor } from '@/utils/serviceTypeMeta'
+import type { FilterProps, LatLon } from '@pinboard/ui'
+import type { ReportLocation } from '@/types/app'
 
 export interface UseReportFinder {
-  locations: ComputedRef<PinboardTypes.BasicLocation[]>
+  locations: ComputedRef<ReportLocation[]>
   filterOptions: ComputedRef<FilterProps[]>
-  searchOrUserLocation: Ref<PinboardTypes.LatLon>
+  searchOrUserLocation: Ref<LatLon>
   isLoading: Ref<boolean>
   errorMessage: ComputedRef<string | null>
   filter: Ref<string>
   init: () => Promise<void>
-  setCenter: (loc: PinboardTypes.LatLon) => void
+  setCenter: (loc: LatLon) => void
   setFilter: (value: string) => void
-  reportById: (id: string) => Report | undefined
 }
 
 export function useReportFinder(): UseReportFinder {
   const store = useOpenIssuesStore()
-  const { reports, isLoading, error, byId } = storeToRefs(store)
+  const { reports, isLoading, error } = storeToRefs(store)
 
   const filter = ref('all')
 
-  const searchOrUserLocation = ref<PinboardTypes.LatLon>({
+  const searchOrUserLocation = ref<LatLon>({
     latitude: DEFAULT_CENTER.lat,
     longitude: DEFAULT_CENTER.lng,
   })
@@ -41,29 +40,31 @@ export function useReportFinder(): UseReportFinder {
 
   const errorMessage = computed(() => error.value?.message ?? '')
 
-  // Ranking-only squared distance: equirectangular approximation is monotonic
-  // with great-circle distance at city scale, so ordering is exact for Philly.
-  function rankingDistance(loc: PinboardTypes.BasicLocation, from: PinboardTypes.LatLon): number {
-    const dLat = loc.latitude - from.latitude
-    const dLng = (loc.longitude - from.longitude) * Math.cos(from.latitude * (Math.PI / 180))
-    return dLat * dLat + dLng * dLng
-  }
+  const reportLocations = computed<ReportLocation[]>(() => {
+    return reports.value.map((report) => reportToLocation(report))
+  })
 
-  const locations = computed<PinboardTypes.BasicLocation[]>(() => {
+  const locationsDistances = computed<ReportLocation[]>(() => {
+    return hasAnchor.value
+      ? calcLocationDistance(reportLocations, searchOrUserLocation.value).value
+      : reportLocations.value
+  })
+
+  const locations = computed<ReportLocation[]>(() => {
     const list =
       filter.value === 'all'
-        ? reports.value
-        : reports.value.filter((r) => r.serviceType === filter.value)
+        ? locationsDistances.value
+        : locationsDistances.value.filter((r) => r.serviceType === filter.value)
 
-    const mapped = list.map(reportToLocation)
-    if (!hasAnchor.value) return mapped
-
-    const from = searchOrUserLocation.value
-    return mapped.sort((a, b) => rankingDistance(a, from) - rankingDistance(b, from))
+    const sorted = hasAnchor.value
+      ? list.sort((a, b) => Number(a.distance) - Number(b.distance))
+      : list
+    // filter sorted from keyword search results
+    return sorted
   })
 
   const filterOptions = computed<FilterProps[]>(() => {
-    return [...new Set(reports.value.map((report) => report.serviceType))]
+    return [...new Set(reportLocations.value.map((report) => report.serviceType))]
       .filter(Boolean)
       .sort()
       .map((serviceType) => ({
@@ -74,12 +75,8 @@ export function useReportFinder(): UseReportFinder {
       }))
   })
 
-  function reportById(id: string): Report | undefined {
-    return byId.value.get(id)
-  }
-
-  function setCenter(loc: PinboardTypes.LatLon): void {
-    searchOrUserLocation.value = { latitude: loc.latitude, longitude: loc.longitude }
+  function setCenter(loc: LatLon): void {
+    searchOrUserLocation.value = loc
     hasAnchor.value = true
   }
 
@@ -105,6 +102,5 @@ export function useReportFinder(): UseReportFinder {
     init,
     setCenter,
     setFilter,
-    reportById,
   }
 }

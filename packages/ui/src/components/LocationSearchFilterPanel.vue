@@ -153,7 +153,9 @@ watch(allFiltersOpen, (open) => {
         :filter-button-text="t('pinboard.filters')"
         :reset-text="t('pinboard.reset')"
         :elevated="isMobile"
-        :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'"
+        :hide-title="true"
+        class="filter-chip-bar"
+        :class="{ mobile: isMobile }"
         @dropdown-close="recomputeChipOrder"
       />
 
@@ -181,7 +183,7 @@ watch(allFiltersOpen, (open) => {
   grid-template-columns: 1fr auto;
   grid-template-rows: auto auto;
   row-gap: var(--spacing-m, 1rem);
-  padding: var(--spacing-l, 1.5rem) var(--spacing-m, 1rem);
+  padding: var(--spacing-l, 1.5rem) var(--spacing-m, 1rem) var(--spacing-s, 0.75rem);
 }
 
 .location-search-filter-sort.mobile {
@@ -200,12 +202,10 @@ watch(allFiltersOpen, (open) => {
 
 .filter-chip-bar {
   grid-area: filters;
-  height: fit-content;
   z-index: -1;
 }
 
-.filter-chip-bar-mobile {
+.filter-chip-bar.mobile {
   padding: var(--spacing-xs, 0.5rem) var(--spacing-none, 0);
-  z-index: -1;
 }
 </style>

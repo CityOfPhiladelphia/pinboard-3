@@ -13,8 +13,11 @@ export {
   PinboardSearch,
 } from './components/_index'
 export * as PinboardComposables from './composables/_index'
+export * from './composables/_index'
 export * as PinboardUtilities from './utilities/_index'
+export * from './utilities/_index'
 export type * as PinboardTypes from './types'
+export type * from './types'
 export type * from './composables/datafilters/types'
 export { getBufferSize, applyFilters } from './composables/datafilters/functions'
 export {

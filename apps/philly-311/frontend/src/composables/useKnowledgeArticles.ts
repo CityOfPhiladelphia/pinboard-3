@@ -8,37 +8,13 @@ import { parseLinkHeader } from './useNearbyReports'
 export interface Article {
   id: string
   title: string
-  /** HTML body — must be sanitized before render. */
-  body?: string
   lastPublishedAt?: string
   url?: string
+  content?: string /** HTML body — must be sanitized before render. */
 }
 
 interface ListResponse {
-  articles: Array<{
-    id: string
-    title: string
-    lastPublishedAt: string
-    url: string
-  }>
-}
-
-interface DetailResponse {
-  id: string
-  title: string
-  lastPublishedAt: string
-  url: string
-  content: string
-}
-
-function mapDetailToArticle(r: DetailResponse): Article {
-  return {
-    id: r.id,
-    title: r.title,
-    body: r.content,
-    lastPublishedAt: r.lastPublishedAt,
-    url: r.url,
-  }
+  articles: Article[]
 }
 
 export function useKnowledgeArticles() {
@@ -72,18 +48,10 @@ export function useKnowledgeArticles() {
       auth,
     })
 
-    if (!response.ok) {
-      throw await parseError(response)
-    }
+    if (!response.ok) throw await parseError(response)
 
     const body = (await response.json()) as ListResponse
-    const items: Article[] = body.articles.map((a) => ({
-      id: a.id,
-      title: a.title,
-      lastPublishedAt: a.lastPublishedAt,
-      url: a.url,
-    }))
-
+    const items = body.articles
     const { next } = parseLinkHeader(response.headers.get('Link'))
     return { items, nextPageToken: next === null ? undefined : String(next) }
   }
@@ -95,13 +63,10 @@ export function useKnowledgeArticles() {
     })
 
     if (response.status === 404) return null
+    if (!response.ok) throw await parseError(response)
 
-    if (!response.ok) {
-      throw await parseError(response)
-    }
-
-    const body = (await response.json()) as DetailResponse
-    return mapDetailToArticle(body)
+    const body = (await response.json()) as Article
+    return body
   }
 
   return { loadArticles, loadArticle }

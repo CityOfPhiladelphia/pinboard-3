@@ -9,7 +9,7 @@ import {
   MapMarker,
   GeolocationButton,
   BasemapToggle,
-  PinboardComposables,
+  useUserAndSearchLocations,
   PinboardUtilities,
   Callout,
   applyFilters,
@@ -84,9 +84,9 @@ const {
   locationSearchMode,
   searchOrUserLocation,
   handleSearchSubmit,
-  handleGeolocate,
-  handleGeolocateError,
-} = PinboardComposables.useUserAndSearchLocations(locations)
+  handleMapGeolocate,
+  handleMapGeolocateError,
+} = useUserAndSearchLocations(locations)
 const filterState = ref<PrimaryCareFilters>(defaultFilterState)
 
 const { filterLogicalValue, filterLogic } = useFilterLogic(locations, languages, filterState)
@@ -257,8 +257,8 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
         :position="isMobile ? 'top-right' : 'bottom-right'"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
         :show-location-marker="false"
-        @located="handleGeolocate"
-        @error="handleGeolocateError"
+        @located="handleMapGeolocate"
+        @error="handleMapGeolocateError"
       />
 
       <CircleLayer
@@ -309,7 +309,8 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
 
 <style scoped>
 .locations-callout {
-  padding: 1.5rem 1rem 0 1rem;
+  padding: var(--spacing-l, 1.5rem) var(--spacing-m, 1rem) var(--spacing-none, 0)
+    var(--spacing-m, 1rem);
 }
 
 .locations-callout :deep(.callout-title) {
