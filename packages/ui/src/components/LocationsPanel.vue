@@ -7,6 +7,7 @@ import { MapCard } from '@phila/phila-ui-cards'
 
 // pinboard component imports
 import LocationSearchFilterPanel from './LocationSearchFilterPanel.vue'
+import LoadingCards from './LoadingCards.vue'
 
 // type imports
 import type {
@@ -140,12 +141,7 @@ defineExpose({ scrollToCard, scrollbarWidth })
     class="location-list"
     :class="{ mobile: isMobile }"
   >
-    <MapCard
-      v-for="n in 5"
-      :key="n"
-      :is-loading="true"
-      :style="{ display: isMobile ? 'none' : 'block' }"
-    />
+    <LoadingCards />
   </div>
 
   <div v-else ref="listRef" class="location-list">
@@ -194,7 +190,7 @@ defineExpose({ scrollToCard, scrollbarWidth })
 
 <style scoped>
 .location-count {
-  padding: 0 1rem;
+  padding: var(--spacing-none, 0) var(--spacing-m, 1rem);
   font-family: var(--Body-Default-font-body-default-family);
   font-size: var(--Body-Default-font-body-default-size, 1rem);
   color: var(--Schemes-On-Surface-Variant, #888);
@@ -205,11 +201,12 @@ defineExpose({ scrollToCard, scrollbarWidth })
   flex-direction: column;
   flex: 1;
   overflow-y: auto;
-  gap: 0.75rem;
+  gap: var(--spacing-s, 0.75rem);
   /* Left inset stays 1rem. The right inset is 0.5rem padding + the reserved
      scrollbar gutter (~0.5rem for a thin bar), so the scrollbar sits *inside* a
      right gap that visually matches the 1rem on the left. */
-  padding: 0.5rem 0.5rem calc(1rem + var(--locations-footer-clearance, 0px)) 1rem;
+  padding: var(--spacing-none, 0) var(--spacing-xs, 0.5rem)
+    calc(1rem + var(--locations-footer-clearance, 0px)) var(--spacing-s, 0.75rem);
   scrollbar-width: thin;
   scrollbar-gutter: stable;
 }

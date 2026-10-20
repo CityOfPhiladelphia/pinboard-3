@@ -71,8 +71,8 @@ export function useUserAndSearchLocations<PinboardLocation extends BasicLocation
 
   watch(
     () => searchOrUserLocation.value,
-    () => {
-      if (hasLocationData(searchOrUserLocation.value)) {
+    (newLoc) => {
+      if (hasLocationData(newLoc)) {
         findLocationDistances()
       }
     },
