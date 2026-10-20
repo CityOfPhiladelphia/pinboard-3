@@ -9,16 +9,16 @@ export interface AisAutocompleteResult {
   searchAddress: string
 }
 
-const autocompleteBase = () => import.meta.env.VITE_311_AIS_BASE_URL ?? ''
-const searchBase = () => import.meta.env.VITE_311_AIS_BASE_URL ?? ''
-const gatekeeperKey = () => import.meta.env.VITE_311_AIS_GATEKEEPER_KEY ?? ''
+const autocompleteBase = import.meta.env.VITE_311_AIS_BASE_URL ?? ''
+const searchBase = import.meta.env.VITE_311_AIS_BASE_URL ?? ''
+const gatekeeperKey = import.meta.env.VITE_311_AIS_GATEKEEPER_KEY ?? ''
 
 export async function autocompleteAddresses(
   q: string,
   signal?: AbortSignal,
 ): Promise<AisAutocompleteResult[]> {
   if (!q.trim()) return []
-  const url = buildUrl(autocompleteBase(), '/autocomplete', { q, client_id: gatekeeperKey() })
+  const url = buildUrl(autocompleteBase, '/autocomplete', { q, client_id: gatekeeperKey })
   const res = await fetch(url, { signal })
   if (!res.ok) throw new Error(`AIS autocomplete failed: ${res.status}`)
   const data = await res.json()
@@ -30,8 +30,8 @@ export async function autocompleteAddresses(
 }
 
 async function searchByPath(path: string, signal?: AbortSignal): Promise<AisFeature | null> {
-  const url = buildUrl(searchBase(), `/search/${encodeURIComponent(path)}`, {
-    client_id: gatekeeperKey(),
+  const url = buildUrl(searchBase, `/search/${encodeURIComponent(path)}`, {
+    client_id: gatekeeperKey,
   })
   const res = await fetch(url, { signal })
   if (!res.ok) return null

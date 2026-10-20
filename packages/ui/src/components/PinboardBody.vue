@@ -12,6 +12,7 @@ import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
 import '../styles/print.css'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
+import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
 // import pinboard config
 import { PINBOARD_CONFIG_KEY } from '../keys'
@@ -19,8 +20,7 @@ import { PINBOARD_CONFIG_KEY } from '../keys'
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
-
-import { FilterPanel } from '@phila/phila-ui-filter-panel'
+import LoadingCards from './LoadingCards.vue'
 
 // pinboard composables and utilities imports
 import { hasLocationData } from '../utilities/hasLocationData'
@@ -40,7 +40,6 @@ import type {
   UserLocationState,
 } from '../types'
 import type { FilterProps, FilterValue } from '@phila/phila-ui-filter-chip'
-import LoadingCards from './LoadingCards.vue'
 
 // slots
 const slots = defineSlots<{
@@ -434,7 +433,7 @@ function selectedLocationValue(): PinboardLocation {
         { 'finder-panel--with-page-header': !!slots['page-header'] && !isMobile },
       ]"
     >
-      <div
+      <aside
         class="finder-panel-locations"
         :style="{
           '--locations-footer-clearance': `${footerHeight}px`,
@@ -485,6 +484,7 @@ function selectedLocationValue(): PinboardLocation {
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"
             :is-mobile="isMobile"
+            :is-loading="isLoading"
             @select="handleSelect"
             @hover="handleHover"
             @hover-end="handleHoverEnd"
@@ -508,7 +508,7 @@ function selectedLocationValue(): PinboardLocation {
         >
           <slot name="locations-footer" />
         </div>
-      </div>
+      </aside>
 
       <div :class="isMobile ? 'finder-panel-map-mobile' : ''">
         <MapPanel
@@ -621,6 +621,10 @@ function selectedLocationValue(): PinboardLocation {
 </template>
 
 <style scoped>
+* {
+  --side-panel-width: max(480px, 33%);
+}
+
 .finder-body {
   display: flex;
   flex-direction: column;
@@ -638,7 +642,7 @@ function selectedLocationValue(): PinboardLocation {
 
 .finder-panel-desktop {
   display: grid;
-  grid-template-columns: max(480px, 33%) 1fr;
+  grid-template-columns: var(--side-panel-width) 1fr;
 }
 
 .finder-panel-mobile {
@@ -693,6 +697,10 @@ function selectedLocationValue(): PinboardLocation {
 /* Desktop: item count above the locations list (mirrors the mobile sheet count). */
 .location-list-header {
   padding: var(--spacing-none, 0) var(--spacing-m, 1rem) var(--spacing-xs, 0.5rem);
+
+  p:is(.has-text-body-default) {
+    margin-bottom: 0;
+  }
 }
 
 .detail-overlay {
@@ -700,7 +708,7 @@ function selectedLocationValue(): PinboardLocation {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 40%;
+  width: var(--side-panel-width);
   z-index: 10;
   background: var(--Schemes-Surface-Bright, white);
   box-shadow: var(--elevation-light-2);

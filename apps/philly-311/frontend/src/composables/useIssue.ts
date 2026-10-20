@@ -27,7 +27,6 @@ export function useIssue() {
       const res = await api311Fetch({ path: `/private/key/issues/${id}`, auth })
       if (!res.ok) throw await parseError(res)
       issue.value = (await res.json()) as Issue
-      console.log(issue.value)
     } catch (e) {
       errorMessage.value = e instanceof Error ? e.message : GENERIC_LOAD_ERROR
     } finally {
