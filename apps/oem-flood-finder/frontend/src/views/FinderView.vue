@@ -64,7 +64,7 @@ const {
   handleGeolocate,
   handleGeolocateError,
 } = PinboardComposables.useUserAndSearchLocations(oemLocations, {
-  aisClientId: import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD,
+  aisClientId: aisClientId,
   promptOnPageLoad: true,
   watchLocation: true,
 })
