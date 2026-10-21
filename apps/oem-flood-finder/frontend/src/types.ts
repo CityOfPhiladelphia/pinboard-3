@@ -66,6 +66,8 @@ export interface AwareReadingDTO extends UsgsReadingDTO {
   waterTemperature: number
 }
 
+export type OemApiResponse = AwareReadingDTO[] | UsgsReadingDTO[]
+
 export type ReadingState =
   | { kind: 'Loading' }
   | { kind: 'Loaded'; gaugeType: 'Aware'; data: AwareReadingDTO[] }
