@@ -1,11 +1,19 @@
 [
   {
-    "relation": [
-      "delegate_permission/common.handle_all_urls"
-    ],
+    "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
       "package_name": "gov.phila.philly311",
+      "sha256_cert_fingerprints": [
+        "80:5B:00:E5:43:27:4B:53:98:F7:BC:71:E0:37:56:C2:BD:7E:AD:ED:BC:72:43:6C:59:01:5D:55:AD:B0:CF:F0"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.publicstuff.philadelphia",
       "sha256_cert_fingerprints": [
         "80:5B:00:E5:43:27:4B:53:98:F7:BC:71:E0:37:56:C2:BD:7E:AD:ED:BC:72:43:6C:59:01:5D:55:AD:B0:CF:F0"
       ]
