@@ -76,7 +76,9 @@ const cornerShape = computed(() => {
 })
 
 watch([searchFocused, locatingUser, searchString], ([isFocused, isLocating, newSearch]) => {
-  dropdownOpen.value = isFocused || isLocating || newSearch.length > 0
+  dropdownOpen.value =
+    (isFocused || isLocating || newSearch.length > 0) &&
+    searchSuggestions.value.length + recentSearches.value.length > 0
 })
 
 // event handlers
@@ -86,9 +88,7 @@ function handleSearchInput(event: InputEvent) {
   // closed, and the suggestions never fetched. Read the value off the DOM instead.
   // Vue skips writing back to the input while composing, so the IME is unaffected.
   const target = event.target as HTMLInputElement
-  if (target.tagName === 'INPUT') {
-    searchString.value = target.value
-  }
+  if (target.tagName === 'INPUT') searchString.value = target.value
 }
 
 function handleSearchSubmit() {

@@ -484,7 +484,6 @@ function selectedLocationValue(): PinboardLocation {
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"
             :is-mobile="isMobile"
-            :is-loading="isLoading"
             @select="handleSelect"
             @hover="handleHover"
             @hover-end="handleHoverEnd"
@@ -691,7 +690,7 @@ function selectedLocationValue(): PinboardLocation {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-none, 0) var(--spacing-m, 1rem);
+  padding: var(--spacing-m, 1rem);
 }
 
 /* Desktop: item count above the locations list (mirrors the mobile sheet count). */
