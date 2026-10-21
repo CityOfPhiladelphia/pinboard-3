@@ -1,8 +1,21 @@
 import { ref, watch } from 'vue'
-import type { LatLon, LocationPermissionState, UserLocationState } from '../types'
+import type {
+  LatLon,
+  LocationPermissionState,
+  UserLocationState,
+  UseUserLocationParams,
+} from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
-export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation: boolean = false) {
+export function useUserLocation(options?: UseUserLocationParams) {
+  const promptOnPageLoad = options?.promptOnPageLoad ?? false
+  const watchLocation = options?.watchLocation ?? false
+  const geolocationOptions = {
+    enableHighAccuracy: options?.enableHighAccuracy ?? false,
+    timeout: options?.timeout ?? Infinity,
+    maximumAge: options?.maximumAge ?? 0,
+  }
+
   const userLocation = ref<LatLon>({
     latitude: NaN,
     longitude: NaN,
@@ -11,7 +24,6 @@ export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation
   const userLocationState = ref<UserLocationState>('unknown')
   const gotInitialLocation = ref<boolean>(false)
   const watchId = ref<number | null>(null)
-  const geolocationOptions = { timeout: Infinity, maximumAge: 0, enableHighAccuracy: false }
 
   try {
     navigator.permissions

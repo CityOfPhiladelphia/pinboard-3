@@ -1,7 +1,7 @@
 import { type Ref, ref, toValue, watchEffect } from 'vue'
 import type { LatLon } from '../types'
 
-export function useSearchAddress(address: string | Ref<string>) {
+export function useSearchAddress(address: string | Ref<string>, clientId?: string) {
   const addressCoordinates = ref<LatLon>({
     latitude: NaN,
     longitude: NaN,
@@ -23,7 +23,7 @@ export function useSearchAddress(address: string | Ref<string>) {
     }
 
     try {
-      const url = `https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/addresslocation/${encodeURIComponent(addressDeref)}${import.meta.env.DEV ? `?client_id=${import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD}` : ''}`
+      const url = `https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/addresslocation/${encodeURIComponent(addressDeref)}${import.meta.env.DEV ? `?client_id=${clientId}` : ''}`
       const response = await fetch(url)
       if (!response.ok) {
         clearAddress()

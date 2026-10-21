@@ -100,6 +100,7 @@ const props = withDefaults(
     filters?: FilterProps[]
     locationPanelCountNoun?: string
     initialBottomSheetSnapIndex?: number
+    aisClientId?: string
   }>(),
   {
     waitForUserLocation: false,
@@ -110,6 +111,7 @@ const props = withDefaults(
     filters: undefined,
     locationPanelCountNoun: undefined,
     initialBottomSheetSnapIndex: undefined,
+    aisClientId: undefined,
   }
 )
 
@@ -484,6 +486,8 @@ function selectedLocationValue(): PinboardLocation {
             :hovered-id="hoveredLocationId"
             :selected-id="selectedLocationId"
             :is-mobile="isMobile"
+            :count-noun="isMobile ? undefined : locationPanelCountNoun"
+            :ais-client-id="aisClientId"
             @select="handleSelect"
             @hover="handleHover"
             @hover-end="handleHoverEnd"

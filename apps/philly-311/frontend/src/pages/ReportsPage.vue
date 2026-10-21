@@ -18,6 +18,8 @@ import MapConstraints from '@/components/MapConstraints.vue'
 import type { Report } from '@/types/api'
 import type { ReportLocation } from '@/types/app'
 
+const aisClientId: string | undefined = import.meta.env.VITE_311_AIS_GATEKEEPER_KEY || undefined
+
 const auth = useAuth()
 const cases = useMyCases(auth)
 const isMobile = inject(IS_MOBILE_KEY, ref(true))
@@ -71,6 +73,7 @@ onMounted(() => {
     :is-mobile="isMobile"
     location-panel-count-noun="request"
     :initial-bottom-sheet-snap-index="1"
+    :ais-client-id="aisClientId"
   >
     <template #page-header>
       <div class="reports-page-header" :class="{ 'is-mobile': isMobile }">

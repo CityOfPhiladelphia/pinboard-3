@@ -39,6 +39,18 @@ export interface CustomSort<T> extends Partial<Record<SortMode, SortFunction<T>>
   default: SortFunction<T>
 }
 
+export interface UseUserLocationParams {
+  promptOnPageLoad?: boolean
+  watchLocation?: boolean
+  enableHighAccuracy?: boolean
+  timeout?: number
+  maximumAge?: number
+}
+
+export interface UseUserAndSearchLocationsParams extends UseUserLocationParams {
+  aisClientId?: string
+}
+
 export type LocationPermissionState = 'granted' | 'prompt' | 'denied'
 
 export type UserLocationState = 'unknown' | 'acquiring' | 'located' | 'watching'
