@@ -22,13 +22,13 @@ const awareKeys: string[] = [
   ...(usgsKeys as (keyof UsgsReadingDTO)[]),
 ] satisfies (keyof AwareReadingDTO)[]
 
-export function isAwareReadingDTO(data: OemApiResponse): data is AwareReadingDTO[] {
+export function isAwareReadingDTO(data: OemApiResponse | undefined): data is AwareReadingDTO[] {
   if (!Array.isArray(data) || !data.length) return false
   const responseKeys = Object.keys(data[0])
   return responseKeys.every((key) => awareKeys.includes(key))
 }
 
-export function isUsgsReadingDTO(data: OemApiResponse): data is UsgsReadingDTO[] {
+export function isUsgsReadingDTO(data: OemApiResponse | undefined): data is UsgsReadingDTO[] {
   if (!Array.isArray(data) || !data.length) return false
   const responseKeys = Object.keys(data[0])
   return responseKeys.every(

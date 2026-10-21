@@ -24,11 +24,11 @@ export function useLocationDetail(
       : await getGaugeReadingsProxy(gaugeId, deviceType, abortController)
 
     switch (true) {
-      case data && isAwareReadingDTO(data): {
+      case isAwareReadingDTO(data): {
         readingState.value = { kind: 'Loaded', gaugeType: 'Aware', data: data }
         return
       }
-      case data && isUsgsReadingDTO(data): {
+      case isUsgsReadingDTO(data): {
         readingState.value = { kind: 'Loaded', gaugeType: 'Usgs', data: data }
         return
       }
