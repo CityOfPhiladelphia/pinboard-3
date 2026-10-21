@@ -1,5 +1,6 @@
 import { ref, toValue, watchEffect, type MaybeRefOrGetter, type Ref } from 'vue'
-import type { AwareReadingDTO, ReadingState } from '@/types'
+import type { OemApiResponse, ReadingState } from '@/types'
+import { isAwareReadingDTO, isUsgsReadingDTO } from '@/utilities/_index'
 
 export function useLocationDetail(
   gaugeId: MaybeRefOrGetter<string>,
@@ -18,14 +19,24 @@ export function useLocationDetail(
     }
 
     readingState.value = { kind: 'Loading' }
-    const data: AwareReadingDTO[] = import.meta.env.DEV
-      ? await getGaugeReadingsDev(gaugeId, deviceType, readingState, abortController)
-      : await getGaugeReadingsProxy(gaugeId, deviceType, readingState, abortController)
+    const data: OemApiResponse | undefined = import.meta.env.DEV
+      ? await getGaugeReadingsDev(gaugeId, deviceType, abortController)
+      : await getGaugeReadingsProxy(gaugeId, deviceType, abortController)
 
-    readingState.value =
-      toValue(deviceType) === 'Aware'
-        ? { kind: 'Loaded', gaugeType: 'Aware', data: data }
-        : (readingState.value = { kind: 'Loaded', gaugeType: 'Usgs', data: data })
+    switch (true) {
+      case data && isAwareReadingDTO(data): {
+        readingState.value = { kind: 'Loaded', gaugeType: 'Aware', data: data }
+        return
+      }
+      case data && isUsgsReadingDTO(data): {
+        readingState.value = { kind: 'Loaded', gaugeType: 'Usgs', data: data }
+        return
+      }
+      default: {
+        readingState.value = { kind: 'Error', message: 'Readings API response error' }
+        return
+      }
+    }
   })
 
   return readingState
@@ -34,9 +45,8 @@ export function useLocationDetail(
 async function getGaugeReadingsProxy(
   id: MaybeRefOrGetter<string>,
   deviceType: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
-  readingStateRef: Ref,
   abortController: AbortController,
-) {
+): Promise<OemApiResponse | undefined> {
   const params = new URLSearchParams({
     kind: toValue(deviceType).toLowerCase(),
     gaugeId: toValue(id),
@@ -47,19 +57,15 @@ async function getGaugeReadingsProxy(
       signal: abortController.signal,
     },
   )
-
-  if (!response.ok) {
-    readingStateRef.value = { kind: 'Error', message: 'Readings API response error' }
-    return
-  }
-
-  return await response.json()
+  if (!response.ok) return
+  const data = (await response.json()) as OemApiResponse
+  if (!data.length) return
+  return data
 }
 
 async function getGaugeReadingsDev(
   id: MaybeRefOrGetter<string>,
   deviceType: MaybeRefOrGetter<'Aware' | 'Usgs' | 'Camera'>,
-  readingStateRef: Ref,
   abortController: AbortController,
 ) {
   const myHeaders = new Headers()
@@ -74,10 +80,8 @@ async function getGaugeReadingsDev(
     },
   )
 
-  if (!response.ok) {
-    readingStateRef.value = { kind: 'Error', message: 'Readings API response error' }
-    return
-  }
-
-  return await response.json()
+  if (!response.ok) return
+  const data = (await response.json()) as OemApiResponse
+  if (!data.length) return
+  return data
 }
