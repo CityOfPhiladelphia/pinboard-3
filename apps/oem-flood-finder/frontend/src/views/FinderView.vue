@@ -64,7 +64,7 @@ const {
   handleGeolocate,
   handleGeolocateError,
 } = PinboardComposables.useUserAndSearchLocations(oemLocations, {
-  aisClientId: aisClientId,
+  aisClientId,
   promptOnPageLoad: true,
   watchLocation: true,
 })
