@@ -1,7 +1,7 @@
 import { type Ref, ref, toValue, watch } from 'vue'
 import type { ProxyAutocompleteResult } from '../types'
 
-export function useSearchSuggestions(search: string | Ref<string>) {
+export function useSearchSuggestions(search: string | Ref<string>, clientId?: string) {
   const searchSuggestions = ref<string[]>([])
   const searchSuggestionsError = ref<unknown>(null)
   let skipNextFetch = false
@@ -13,7 +13,7 @@ export function useSearchSuggestions(search: string | Ref<string>) {
     }
     try {
       const response = await fetch(
-        `https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/autocomplete?q=${encodeURIComponent(stringValue)}&simple=true${import.meta.env.DEV ? `&client_id=${import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD}` : ''}`
+        `https://haydr3k097.execute-api.us-east-1.amazonaws.com/queryAis/autocomplete?q=${encodeURIComponent(stringValue)}&simple=true${import.meta.env.DEV ? `&client_id=${clientId}` : ''}`
       )
       if (!response.ok) {
         searchSuggestionsError.value = { status: response.status, message: response.body }

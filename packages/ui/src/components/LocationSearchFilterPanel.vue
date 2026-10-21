@@ -53,8 +53,9 @@ const props = defineProps<{
   searchPlaceholder: string | undefined
   filterOptions: LocationFilterOption[] | undefined
   sortOptions: SortLocationsOptions | undefined
-  filters?: FilterProps[]
+  filters: FilterProps[] | undefined
   isMobile: boolean
+  aisClientId: string | undefined
 }>()
 
 // emits
@@ -130,6 +131,7 @@ watch(allFiltersOpen, (open) => {
         :search-placeholder="searchPlaceholder"
         :elevated="isMobile"
         :search-shape="isMobile ? 'pill' : 'rectangle'"
+        :ais-client-id="aisClientId"
         class="location-search"
         @search="emit('search')"
       />

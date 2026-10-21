@@ -31,6 +31,7 @@ import type {
 } from '@/types'
 import { sortLocations } from '@/utilities/sortLocations'
 
+const aisClientId: string | undefined = import.meta.env.VITE_AIS_CLIENTID_PRICARE || undefined
 const defaultFilterState: PrimaryCareFilters = {
   sort: {
     distance: false,
@@ -86,7 +87,7 @@ const {
   handleSearchSubmit,
   handleGeolocate,
   handleGeolocateError,
-} = PinboardComposables.useUserAndSearchLocations(locations)
+} = PinboardComposables.useUserAndSearchLocations(locations, { aisClientId })
 const filterState = ref<PrimaryCareFilters>(defaultFilterState)
 
 const { filterLogicalValue, filterLogic } = useFilterLogic(locations, languages, filterState)
@@ -213,6 +214,7 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
     :geojson="filteredGeojson"
     :is-mobile="isMobile"
     :filters="filterChipDefinitions"
+    :ais-client-id="aisClientId"
     @search="handleSearchSubmit"
   >
     <template #locations-header>
