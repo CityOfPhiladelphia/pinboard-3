@@ -30,11 +30,13 @@ const props = withDefaults(
     elevated?: boolean
     searchShape?: 'rectangle' | 'pill'
     showGeolocate?: boolean
+    aisClientId?: string
   }>(),
   {
     elevated: false,
     searchShape: 'rectangle',
     showGeolocate: false,
+    aisClientId: undefined,
   }
 )
 
@@ -56,7 +58,10 @@ const { t } = useI18n()
 // refs
 const searchWrapperRef = ref<HTMLElement | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
-const { searchSuggestions, refetchSuggestions } = useSearchSuggestions(searchString)
+const { searchSuggestions, refetchSuggestions } = useSearchSuggestions(
+  searchString,
+  props.aisClientId
+)
 const {
   recentSearches,
   add: addRecentSearch,

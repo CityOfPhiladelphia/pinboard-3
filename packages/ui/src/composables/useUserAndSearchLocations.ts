@@ -1,6 +1,6 @@
 import { ref, toValue, watch, type Ref } from 'vue'
 import { hasLocationData } from '../utilities/hasLocationData'
-import type { BasicLocation, LatLon, SearchMode } from '../types'
+import type { BasicLocation, LatLon, SearchMode, UseUserAndSearchLocationsParams } from '../types'
 import { useSearchAddress, useSearchZipcode, useUserLocation } from './_index'
 import {
   getHaversineDistance,
@@ -11,13 +11,16 @@ import {
 
 export function useUserAndSearchLocations<PinboardLocation extends BasicLocation>(
   locations: Ref<PinboardLocation[]>,
-  promptLocationOnPageLoad: boolean = false,
-  watchLocation: boolean = false
+  options: UseUserAndSearchLocationsParams = {}
 ) {
+  const { aisClientId, ...userLocationParams } = options
   const { userLocation, userLocationState, endWatch, handleGeolocate, handleGeolocateError } =
-    useUserLocation(promptLocationOnPageLoad, watchLocation)
+    useUserLocation(userLocationParams)
   const addressForSearch = ref<string>('')
-  const { addressCoordinates, finishedAddressFetch } = useSearchAddress(addressForSearch)
+  const { addressCoordinates, finishedAddressFetch } = useSearchAddress(
+    addressForSearch,
+    aisClientId
+  )
   const zipcodeForSearch = ref<string>('')
   const { zipcodePolygon, finishedZipFetch } = useSearchZipcode(zipcodeForSearch)
   const keywordsForSearch = ref<string>('')
@@ -72,9 +75,7 @@ export function useUserAndSearchLocations<PinboardLocation extends BasicLocation
   watch(
     () => searchOrUserLocation.value,
     () => {
-      if (hasLocationData(searchOrUserLocation.value)) {
-        findLocationDistances()
-      }
+      findLocationDistances()
     },
     { deep: 1 }
   )
@@ -82,13 +83,14 @@ export function useUserAndSearchLocations<PinboardLocation extends BasicLocation
   watch(
     () => locations.value.length,
     (newLength) => {
-      if (newLength && hasLocationData(searchOrUserLocation.value)) {
+      if (newLength) {
         findLocationDistances()
       }
     }
   )
 
   function findLocationDistances() {
+    if (!hasLocationData(searchOrUserLocation.value)) return
     const locsWithDistance = toValue(locations)
     locsWithDistance.forEach((location) => {
       location.distance = `${getHaversineDistance(

@@ -38,6 +38,7 @@ import { useLocations } from '@/composables/useLocations'
 import type { Filters, OemLocation } from '@/types'
 
 // app variables
+const aisClientId: string | undefined = import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD || undefined
 const searchPlaceholderText = 'Search by address, zipcode, or keyword...'
 const filterOptions: PinboardTypes.LocationFilterOption[] = [
   { value: 'all' satisfies Filters, label: 'All' },
@@ -62,7 +63,11 @@ const {
   handleSearchSubmit,
   handleGeolocate,
   handleGeolocateError,
-} = PinboardComposables.useUserAndSearchLocations(oemLocations, true, true)
+} = PinboardComposables.useUserAndSearchLocations(oemLocations, {
+  aisClientId: import.meta.env.VITE_AIS_CLIENTID_OEMFLOOD,
+  promptOnPageLoad: true,
+  watchLocation: true,
+})
 const locationSortMode = ref<PinboardTypes.SortMode>(
   ['located', 'watching'].includes(userLocationState.value) ? 'DistAsc' : '',
 )
@@ -78,7 +83,6 @@ const currentLocations = computed(() => {
     ? searchLocations(filteredLocations, keywordsForSearch)
     : filteredLocations
   const gotSearchMatches = typeof searchedLocations !== 'string'
-  if (!gotSearchMatches) console.log(searchedLocations)
   return gotSearchMatches
     ? PinboardUtilities.sortLocations(searchedLocations, searchOrUserLocation, locationSortMode)
     : []
@@ -151,6 +155,7 @@ function getMapCardProps(location: OemLocation): MapCardProps {
     :location-panel-sort="sortLocationsOptions"
     :wait-for-user-location="false"
     :is-mobile="isMobile"
+    :ais-client-id="aisClientId"
     @search="handleSearchSubmit"
     @deselect="handleDeselect"
   >
