@@ -47,23 +47,26 @@ watch(id, load, { immediate: true })
   <main class="answer-detail">
     <nav class="answer-detail__crumb" aria-label="Breadcrumb">
       <RouterLink to="/">Home</RouterLink> / <RouterLink to="/answers">Answers</RouterLink> /
-      <span>{{ article?.title ?? 'Article' }}</span>
+      <span v-text="`${article?.title ?? 'Article'}`" />
     </nav>
 
     <p v-if="isLoading" class="answer-detail__status">Loading article&hellip;</p>
 
     <div v-else-if="notFound">
-      <h1>Article not found</h1>
+      <h1 v-text="'Article not found'" />
       <RouterLink to="/answers">Back to answers</RouterLink>
     </div>
 
-    <p v-else-if="error" role="alert" class="answer-detail__status">
-      Couldn't load this article. {{ error.message }}
-    </p>
+    <p
+      v-else-if="error"
+      role="alert"
+      class="answer-detail__status"
+      v-text="`Couldn't load this article. ${error.message}`"
+    />
 
     <article v-else-if="article">
-      <h1>{{ article.title }}</h1>
-      <ArticleBody v-if="article.body" :html="article.body" />
+      <h1 v-text="article.title" />
+      <ArticleBody v-if="article.content" :html="article.content" />
       <p v-else class="answer-detail__status">
         This article doesn't have any content yet.
         <RouterLink to="/answers">Browse other answers</RouterLink>.

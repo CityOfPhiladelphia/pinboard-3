@@ -9,3 +9,5 @@ export {
   FLOOD_LEGEND_ITEMS,
   type FloodLayerId,
 } from './floodLayers'
+
+export { isAwareReadingDTO, isUsgsReadingDTO } from './validateApiResponse'

@@ -9,7 +9,7 @@ import {
   MapMarker,
   GeolocationButton,
   BasemapToggle,
-  PinboardComposables,
+  useUserAndSearchLocations,
   PinboardUtilities,
   Callout,
   applyFilters,
@@ -31,6 +31,7 @@ import type {
 } from '@/types'
 import { sortLocations } from '@/utilities/sortLocations'
 
+const aisClientId: string | undefined = import.meta.env.VITE_AIS_CLIENTID_PRICARE || undefined
 const defaultFilterState: PrimaryCareFilters = {
   sort: {
     distance: false,
@@ -84,9 +85,10 @@ const {
   locationSearchMode,
   searchOrUserLocation,
   handleSearchSubmit,
-  handleGeolocate,
-  handleGeolocateError,
-} = PinboardComposables.useUserAndSearchLocations(locations)
+  handleMapGeolocate,
+  handleMapGeolocateError,
+  getLocationsWithDistance,
+} = useUserAndSearchLocations({ aisClientId })
 const filterState = ref<PrimaryCareFilters>(defaultFilterState)
 
 const { filterLogicalValue, filterLogic } = useFilterLogic(locations, languages, filterState)
@@ -172,7 +174,9 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
     })
   }
 
-  return filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
+  return getLocationsWithDistance(
+    filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
+  ).value
 })
 
 function mapFilterTextToFilterLogic(
@@ -213,6 +217,7 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
     :geojson="filteredGeojson"
     :is-mobile="isMobile"
     :filters="filterChipDefinitions"
+    :ais-client-id="aisClientId"
     @search="handleSearchSubmit"
   >
     <template #locations-header>
@@ -257,8 +262,8 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
         :position="isMobile ? 'top-right' : 'bottom-right'"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
         :show-location-marker="false"
-        @located="handleGeolocate"
-        @error="handleGeolocateError"
+        @located="handleMapGeolocate"
+        @error="handleMapGeolocateError"
       />
 
       <CircleLayer
@@ -309,7 +314,8 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
 
 <style scoped>
 .locations-callout {
-  padding: 1.5rem 1rem 0 1rem;
+  padding: var(--spacing-l, 1.5rem) var(--spacing-m, 1rem) var(--spacing-none, 0)
+    var(--spacing-m, 1rem);
 }
 
 .locations-callout :deep(.callout-title) {

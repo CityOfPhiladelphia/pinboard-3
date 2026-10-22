@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="PinboardLocation extends BasicLocation">
 // vue imports
-import { inject, ref, computed, watch, toRef, nextTick, onBeforeUnmount } from 'vue'
+import { inject, ref, computed, watch, toRef, nextTick, onBeforeUnmount, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -12,6 +12,7 @@ import '@phila/phila-ui-core/styles/template-light.css'
 import '@phila/phila-ui-bottom-sheet/dist/phila-ui-bottom-sheet.css'
 import '../styles/print.css'
 import { BottomSheet } from '@phila/phila-ui-bottom-sheet'
+import { FilterPanel } from '@phila/phila-ui-filter-panel'
 
 // import pinboard config
 import { PINBOARD_CONFIG_KEY } from '../keys'
@@ -19,8 +20,7 @@ import { PINBOARD_CONFIG_KEY } from '../keys'
 // pinboard component imports
 import MapPanel from './MapPanel.vue'
 import LocationsPanel from './LocationsPanel.vue'
-
-import { FilterPanel } from '@phila/phila-ui-filter-panel'
+import LoadingCards from './LoadingCards.vue'
 
 // pinboard composables and utilities imports
 import { hasLocationData } from '../utilities/hasLocationData'
@@ -40,7 +40,6 @@ import type {
   UserLocationState,
 } from '../types'
 import type { FilterProps, FilterValue } from '@phila/phila-ui-filter-chip'
-import LoadingCards from './LoadingCards.vue'
 
 // slots
 const slots = defineSlots<{
@@ -101,6 +100,7 @@ const props = withDefaults(
     filters?: FilterProps[]
     locationPanelCountNoun?: string
     initialBottomSheetSnapIndex?: number
+    aisClientId?: string
   }>(),
   {
     waitForUserLocation: false,
@@ -111,6 +111,7 @@ const props = withDefaults(
     filters: undefined,
     locationPanelCountNoun: undefined,
     initialBottomSheetSnapIndex: undefined,
+    aisClientId: undefined,
   }
 )
 
@@ -278,14 +279,35 @@ watch(selectedLocation, (loc, prev) => {
   }
 })
 
+watch([() => route.query.location, () => props.locations], resolveLocationFromRoute, {
+  immediate: true,
+})
+
+watch(searchOrUserLocation, (newLocation) => {
+  if (
+    newLocation &&
+    hasLocationData(newLocation) &&
+    locationSearchMode.value &&
+    ['address', 'zipcode'].includes(locationSearchMode.value)
+  ) {
+    mapPanelRef.value?.panTo(newLocation)
+  }
+})
+
+watch(searchString, () => {
+  if (!searchString.value) {
+    emit('search', '')
+  }
+})
+
 // Defensive: enforce the "one left panel at a time" invariant in state. Not
 // reachable in the current UI (an open detail overlay covers the Filters
 // button), but keeps the invariant if the structural cleanup (bead
 // pinboard-3-nag) later makes filters reachable with a detail open. Desktop
 // only: on mobile the filter panel is full-screen and leaving the detail in
 // state returns the user to it when the filters close.
-watch(allFiltersOpen, (open) => {
-  if (open && !props.isMobile) {
+watchEffect(() => {
+  if (allFiltersOpen.value && !props.isMobile) {
     handleCloseLocationDetail()
   }
 })
@@ -293,50 +315,13 @@ watch(allFiltersOpen, (open) => {
 // Reflect the selected location in the URL as ?location=<id>. push (not replace) so Back walks
 // the selection history. Guarded so it never re-pushes a value the URL already has — that guard
 // is also what stops it looping with the route → selection watcher below.
-watch(selectedLocationId, (id) => {
-  const desired = id ?? undefined
+watchEffect(() => {
+  const desired = selectedLocationId.value ?? undefined
   if (route.query.location === desired) return
   const query = { ...route.query }
   if (desired === undefined) delete query.location
   else query.location = desired
   router.push({ query })
-})
-
-// The URL is the source of truth for selection. Resolve ?location= against the loaded locations:
-// on initial mount (immediate), when the data finishes loading, and on Back/Forward. An absent or
-// unknown id clears the selection (graceful). Direct set (not selectLocation) so it doesn't re-push;
-// it also intentionally skips the deselect/visited-tracking emit — URL-driven nav doesn't mark visited.
-function resolveLocationFromRoute() {
-  const param = route.query.location
-  const id = typeof param === 'string' ? param : undefined
-  if (id === selectedLocationId.value) return
-  const match = id ? props.locations.find((loc) => loc.id === id) : undefined
-  selectedLocation.value = match ?? undefined
-  if (match) mapPanelRef.value?.panTo(match)
-}
-watch([() => route.query.location, () => props.locations], resolveLocationFromRoute, {
-  immediate: true,
-})
-
-watch(
-  () => searchOrUserLocation.value,
-  (newLocation) => {
-    if (
-      newLocation &&
-      hasLocationData(newLocation) &&
-      locationSearchMode.value &&
-      ['address', 'zipcode'].includes(locationSearchMode.value)
-    ) {
-      mapPanelRef.value?.panTo(newLocation)
-    }
-  },
-  { deep: 1 }
-)
-
-watch(searchString, () => {
-  if (!searchString.value) {
-    emit('search', '')
-  }
 })
 
 // event handlers
@@ -419,6 +404,19 @@ function selectedLocationValue(): PinboardLocation {
   if (selectedLocation.value) return selectedLocation.value
   throw new Error('selectedLocationValue() called without a selection')
 }
+
+// The URL is the source of truth for selection. Resolve ?location= against the loaded locations:
+// on initial mount (immediate), when the data finishes loading, and on Back/Forward. An absent or
+// unknown id clears the selection (graceful). Direct set (not selectLocation) so it doesn't re-push;
+// it also intentionally skips the deselect/visited-tracking emit — URL-driven nav doesn't mark visited.
+function resolveLocationFromRoute() {
+  const param = route.query.location
+  const id = typeof param === 'string' ? param : undefined
+  if (id === selectedLocationId.value) return
+  const match = id ? props.locations.find((loc) => loc.id === id) : undefined
+  selectedLocation.value = match ?? undefined
+  if (match) mapPanelRef.value?.panTo(match)
+}
 </script>
 
 <template>
@@ -434,7 +432,7 @@ function selectedLocationValue(): PinboardLocation {
         { 'finder-panel--with-page-header': !!slots['page-header'] && !isMobile },
       ]"
     >
-      <div
+      <aside
         class="finder-panel-locations"
         :style="{
           '--locations-footer-clearance': `${footerHeight}px`,
@@ -486,17 +484,15 @@ function selectedLocationValue(): PinboardLocation {
             :selected-id="selectedLocationId"
             :is-mobile="isMobile"
             :count-noun="isMobile ? undefined : locationPanelCountNoun"
+            :ais-client-id="aisClientId"
             @select="handleSelect"
             @hover="handleHover"
             @hover-end="handleHoverEnd"
             @search="handleSearchSubmit"
           >
             <template #list-header>
-              <div
-                v-if="!isMobile && !locationPanelCountNoun"
-                class="location-list-header has-text-label-default"
-              >
-                <span>{{ locationCountLabel }}</span>
+              <div v-if="!isMobile" class="location-list-header">
+                <p class="has-text-body-default" v-text="locationCountLabel" />
               </div>
             </template>
             <template v-if="$slots['location-card']" #location-card="{ location }">
@@ -512,7 +508,7 @@ function selectedLocationValue(): PinboardLocation {
         >
           <slot name="locations-footer" />
         </div>
-      </div>
+      </aside>
 
       <div :class="isMobile ? 'finder-panel-map-mobile' : ''">
         <MapPanel
@@ -575,10 +571,8 @@ function selectedLocationValue(): PinboardLocation {
   >
     <div class="bottom-sheet-stack">
       <div class="bottom-sheet-list-scroll" :class="{ 'is-hidden': selectedLocation }">
-        <slot name="page-header" />
-        <slot name="locations-header" />
-        <div class="location-sheet-header has-text-label-default">
-          <span>{{ locationCountLabel }}</span>
+        <div class="location-sheet-header">
+          <p class="has-text-body-default" v-text="locationCountLabel" />
           <div id="bottom-sheet-sort" />
         </div>
         <div id="locations-panel-mobile" ref="locationsPanelMobileTarget" />
@@ -627,6 +621,10 @@ function selectedLocationValue(): PinboardLocation {
 </template>
 
 <style scoped>
+* {
+  --side-panel-width: max(480px, 33%);
+}
+
 .finder-body {
   display: flex;
   flex-direction: column;
@@ -644,7 +642,7 @@ function selectedLocationValue(): PinboardLocation {
 
 .finder-panel-desktop {
   display: grid;
-  grid-template-columns: max(480px, 33%) 1fr;
+  grid-template-columns: var(--side-panel-width) 1fr;
 }
 
 .finder-panel-mobile {
@@ -693,12 +691,16 @@ function selectedLocationValue(): PinboardLocation {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-none, 0) var(--spacing-m, 1rem);
+  padding: var(--spacing-m, 1rem);
 }
 
 /* Desktop: item count above the locations list (mirrors the mobile sheet count). */
 .location-list-header {
   padding: var(--spacing-none, 0) var(--spacing-m, 1rem) var(--spacing-xs, 0.5rem);
+
+  p:is(.has-text-body-default) {
+    margin-bottom: 0;
+  }
 }
 
 .detail-overlay {
@@ -706,7 +708,7 @@ function selectedLocationValue(): PinboardLocation {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 40%;
+  width: var(--side-panel-width);
   z-index: 10;
   background: var(--Schemes-Surface-Bright, white);
   box-shadow: var(--elevation-light-2);
