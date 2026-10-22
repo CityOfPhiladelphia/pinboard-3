@@ -37,7 +37,9 @@ export function useUserAndSearchLocations(options: UseUserAndSearchLocationsPara
 
     const useUserLocation =
       (!locationSearchMode.value || locationSearchMode.value === 'keyword') &&
-      hasLocationData(userLocation)
+      finishedAddressFetch.value &&
+      finishedZipFetch.value
+    hasLocationData(userLocation)
 
     switch (true) {
       case useAddressSearch: {
