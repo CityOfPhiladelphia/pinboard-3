@@ -6,11 +6,13 @@ export function useSearchAddress(address: string | Ref<string>, clientId?: strin
     latitude: NaN,
     longitude: NaN,
   })
-  const finishedAddressFetch = ref<boolean>(false)
+  const finishedAddressFetch = ref<boolean>(true)
 
   function clearAddress() {
-    addressCoordinates.value.longitude = NaN
-    addressCoordinates.value.latitude = NaN
+    addressCoordinates.value = {
+      latitude: NaN,
+      longitude: NaN,
+    }
   }
 
   async function getAddressCoordinatesFromAIS() {
@@ -30,13 +32,11 @@ export function useSearchAddress(address: string | Ref<string>, clientId?: strin
         console.error({ status: response.status, message: response.body })
         return
       }
-      const result: LatLon = await response.json()
-      addressCoordinates.value.longitude = result?.longitude ?? NaN
-      addressCoordinates.value.latitude = result?.latitude ?? NaN
-      finishedAddressFetch.value = true
+      addressCoordinates.value = await response.json()
     } catch (err) {
       console.error('Failed to get response from AIS: ', err)
       clearAddress()
+    } finally {
       finishedAddressFetch.value = true
     }
   }

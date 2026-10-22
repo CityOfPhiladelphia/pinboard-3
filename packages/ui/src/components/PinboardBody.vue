@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="PinboardLocation extends BasicLocation">
 // vue imports
-import { inject, ref, computed, watch, toRef, nextTick, onBeforeUnmount } from 'vue'
+import { inject, ref, computed, watch, toRef, nextTick, onBeforeUnmount, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -279,14 +279,35 @@ watch(selectedLocation, (loc, prev) => {
   }
 })
 
+watch([() => route.query.location, () => props.locations], resolveLocationFromRoute, {
+  immediate: true,
+})
+
+watch(searchOrUserLocation, (newLocation) => {
+  if (
+    newLocation &&
+    hasLocationData(newLocation) &&
+    locationSearchMode.value &&
+    ['address', 'zipcode'].includes(locationSearchMode.value)
+  ) {
+    mapPanelRef.value?.panTo(newLocation)
+  }
+})
+
+watch(searchString, () => {
+  if (!searchString.value) {
+    emit('search', '')
+  }
+})
+
 // Defensive: enforce the "one left panel at a time" invariant in state. Not
 // reachable in the current UI (an open detail overlay covers the Filters
 // button), but keeps the invariant if the structural cleanup (bead
 // pinboard-3-nag) later makes filters reachable with a detail open. Desktop
 // only: on mobile the filter panel is full-screen and leaving the detail in
 // state returns the user to it when the filters close.
-watch(allFiltersOpen, (open) => {
-  if (open && !props.isMobile) {
+watchEffect(() => {
+  if (allFiltersOpen.value && !props.isMobile) {
     handleCloseLocationDetail()
   }
 })
@@ -294,50 +315,13 @@ watch(allFiltersOpen, (open) => {
 // Reflect the selected location in the URL as ?location=<id>. push (not replace) so Back walks
 // the selection history. Guarded so it never re-pushes a value the URL already has — that guard
 // is also what stops it looping with the route → selection watcher below.
-watch(selectedLocationId, (id) => {
-  const desired = id ?? undefined
+watchEffect(() => {
+  const desired = selectedLocationId.value ?? undefined
   if (route.query.location === desired) return
   const query = { ...route.query }
   if (desired === undefined) delete query.location
   else query.location = desired
   router.push({ query })
-})
-
-// The URL is the source of truth for selection. Resolve ?location= against the loaded locations:
-// on initial mount (immediate), when the data finishes loading, and on Back/Forward. An absent or
-// unknown id clears the selection (graceful). Direct set (not selectLocation) so it doesn't re-push;
-// it also intentionally skips the deselect/visited-tracking emit — URL-driven nav doesn't mark visited.
-function resolveLocationFromRoute() {
-  const param = route.query.location
-  const id = typeof param === 'string' ? param : undefined
-  if (id === selectedLocationId.value) return
-  const match = id ? props.locations.find((loc) => loc.id === id) : undefined
-  selectedLocation.value = match ?? undefined
-  if (match) mapPanelRef.value?.panTo(match)
-}
-watch([() => route.query.location, () => props.locations], resolveLocationFromRoute, {
-  immediate: true,
-})
-
-watch(
-  () => searchOrUserLocation.value,
-  (newLocation) => {
-    if (
-      newLocation &&
-      hasLocationData(newLocation) &&
-      locationSearchMode.value &&
-      ['address', 'zipcode'].includes(locationSearchMode.value)
-    ) {
-      mapPanelRef.value?.panTo(newLocation)
-    }
-  },
-  { deep: 1 }
-)
-
-watch(searchString, () => {
-  if (!searchString.value) {
-    emit('search', '')
-  }
 })
 
 // event handlers
@@ -419,6 +403,19 @@ function selectedLocationValue(): PinboardLocation {
   if (byId) return byId
   if (selectedLocation.value) return selectedLocation.value
   throw new Error('selectedLocationValue() called without a selection')
+}
+
+// The URL is the source of truth for selection. Resolve ?location= against the loaded locations:
+// on initial mount (immediate), when the data finishes loading, and on Back/Forward. An absent or
+// unknown id clears the selection (graceful). Direct set (not selectLocation) so it doesn't re-push;
+// it also intentionally skips the deselect/visited-tracking emit — URL-driven nav doesn't mark visited.
+function resolveLocationFromRoute() {
+  const param = route.query.location
+  const id = typeof param === 'string' ? param : undefined
+  if (id === selectedLocationId.value) return
+  const match = id ? props.locations.find((loc) => loc.id === id) : undefined
+  selectedLocation.value = match ?? undefined
+  if (match) mapPanelRef.value?.panTo(match)
 }
 </script>
 

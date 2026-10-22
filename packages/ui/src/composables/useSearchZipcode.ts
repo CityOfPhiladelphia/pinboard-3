@@ -9,12 +9,16 @@ export function useSearchZipcode(zipcode: string | Ref<string>) {
     },
     nodes: [],
   })
-  const finishedZipFetch = ref<boolean>(false)
+  const finishedZipFetch = ref<boolean>(true)
 
   function clearZipcode() {
-    zipcodePolygon.value.centroid.longitude = NaN
-    zipcodePolygon.value.centroid.latitude = NaN
-    zipcodePolygon.value.nodes = []
+    zipcodePolygon.value = {
+      centroid: {
+        latitude: NaN,
+        longitude: NaN,
+      },
+      nodes: [],
+    }
   }
 
   async function getZipcodeCentroidAndPolygon() {
@@ -40,17 +44,21 @@ export function useSearchZipcode(zipcode: string | Ref<string>) {
       if (!response.ok) {
         console.error({ status: response.status, message: response.body })
         clearZipcode()
-        finishedZipFetch.value = true
         return
       }
       const data = await response.json()
-      zipcodePolygon.value.centroid.longitude = data.features[0].centroid.x
-      zipcodePolygon.value.centroid.latitude = data.features[0].centroid.y
-      zipcodePolygon.value.nodes = data.features[0].geometry.rings
-      finishedZipFetch.value = true
+      const newLocation: ZipcodePolygon = {
+        centroid: {
+          longitude: data.features[0].centroid.x,
+          latitude: data.features[0].centroid.y,
+        },
+        nodes: data.features[0].geometry.rings,
+      }
+      zipcodePolygon.value = newLocation
     } catch (err) {
       console.error('Failed to get response from ArcGIS: ', err)
       clearZipcode()
+    } finally {
       finishedZipFetch.value = true
     }
   }

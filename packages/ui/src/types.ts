@@ -12,6 +12,7 @@ export type LongitudeLatitude = [number, number]
 export interface LatLon {
   latitude: number
   longitude: number
+  accuracy?: number
 }
 
 export interface ZipcodePolygon {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // vue imports
-import { computed, inject, markRaw, ref, watch } from 'vue'
+import { computed, inject, markRaw, ref } from 'vue'
 
 // 3rd party imports
 import { IconGauge, IconCamera, IconLocationDot, IconWater } from '@phila/phila-ui-core/icons'
@@ -16,11 +16,11 @@ import {
   GeolocationButton,
   FillLayer,
   MapCheckboxLegend,
+  PinboardComposables,
   PinboardUtilities,
   type PinboardTypes,
   type MapCardProps,
   IS_MOBILE_KEY,
-  useUserAndSearchLocations,
 } from '@pinboard/ui'
 import {
   filterLocations,
@@ -63,7 +63,8 @@ const {
   handleSearchSubmit,
   handleMapGeolocate,
   handleMapGeolocateError,
-} = useUserAndSearchLocations(oemLocations, {
+  getLocationsWithDistance,
+} = PinboardComposables.useUserAndSearchLocations({
   aisClientId,
   promptOnPageLoad: true,
   watchLocation: true,
@@ -74,6 +75,23 @@ const locationSortMode = ref<PinboardTypes.SortMode>(
 const isMobile = inject(IS_MOBILE_KEY, ref(true))
 
 // computed refs
+const currentSort = computed(() => {
+  const newLocHasLoc = PinboardUtilities.hasLocationData(searchOrUserLocation.value)
+  switch (true) {
+    case newLocHasLoc && !locationSortMode.value: {
+      // if new location matches type of LatLon and no sort mode has been selected, set sort mode to distance-ascending
+      return 'DistAsc'
+    }
+    case !newLocHasLoc && locationSortMode.value === 'DistAsc': {
+      // if new location does not match type LatLon and a distance sort is selected, set sort mode to default sort
+      return ''
+    }
+    default: {
+      return locationSortMode.value
+    }
+  }
+})
+
 const currentLocations = computed(() => {
   if (isLoading.value || errorMessage.value) {
     return []
@@ -83,31 +101,11 @@ const currentLocations = computed(() => {
     ? searchLocations(filteredLocations, keywordsForSearch)
     : filteredLocations
   const gotSearchMatches = typeof searchedLocations !== 'string'
-  return gotSearchMatches
-    ? PinboardUtilities.sortLocations(searchedLocations, searchOrUserLocation, locationSortMode)
+  const sorted = gotSearchMatches
+    ? PinboardUtilities.sortLocations(searchedLocations, searchOrUserLocation, currentSort)
     : []
+  return getLocationsWithDistance(sorted).value
 })
-
-// watchers
-watch(
-  () => searchOrUserLocation.value,
-  (newLocation) => {
-    // watch for changes in searchOrUserLocation to handle changes to sort mode
-    const newLocHasLoc = PinboardUtilities.hasLocationData(newLocation)
-    switch (true) {
-      case newLocHasLoc && !locationSortMode.value: {
-        // if new location matches type of LatLon and no sort mode has been selected, set sort mode to distance-ascending
-        locationSortMode.value = 'DistAsc'
-        break
-      }
-      case !newLocHasLoc && locationSortMode.value === 'DistAsc': {
-        // if new location does not match type LatLon and a distance sort is selected, set sort mode to default sort
-        locationSortMode.value = ''
-        break
-      }
-    }
-  },
-)
 
 // event handlers
 function handleSelect(loc: OemLocation, onSelect: (loc: OemLocation) => void) {
@@ -135,7 +133,7 @@ function getMapCardProps(location: OemLocation): MapCardProps {
     subheader: location.distance,
     tags: getLocationTags(location),
     src: location.thumbnailUrl,
-  } satisfies MapCardProps
+  }
 }
 </script>
 

@@ -87,7 +87,8 @@ const {
   handleSearchSubmit,
   handleMapGeolocate,
   handleMapGeolocateError,
-} = useUserAndSearchLocations(locations, { aisClientId })
+  getLocationsWithDistance,
+} = useUserAndSearchLocations({ aisClientId })
 const filterState = ref<PrimaryCareFilters>(defaultFilterState)
 
 const { filterLogicalValue, filterLogic } = useFilterLogic(locations, languages, filterState)
@@ -173,7 +174,9 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
     })
   }
 
-  return filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
+  return getLocationsWithDistance(
+    filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
+  ).value
 })
 
 function mapFilterTextToFilterLogic(
