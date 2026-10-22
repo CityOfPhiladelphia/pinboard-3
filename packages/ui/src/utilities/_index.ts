@@ -3,11 +3,12 @@ Central file to simplify importing functions into app projects.
 Contains references to exported functions and useful constants and regular expressions
 */
 
-import { sortLocations } from './sortLocations'
-import { getHaversineDistance } from './getHaversineDistance'
-import { hasLocationData } from './hasLocationData'
-import { isLocationInBounds } from './isLocationInBounds'
-import { slugify } from './slugify'
+export { searchLocations } from './searchLocations'
+export { sortLocations } from './sortLocations'
+export { getHaversineDistance } from './getHaversineDistance'
+export { hasLocationData } from './hasLocationData'
+export { isLocationInBounds } from './isLocationInBounds'
+export { slugify } from './slugify'
 export * from './scaleImagesContainers'
 
 // A house number (optional range and unit-letter suffix) followed by at least
@@ -21,13 +22,4 @@ const StreetIntersection: Readonly<RegExp> =
 
 const Zipcode: Readonly<RegExp> = /^\d{5}(?:-\d{4})?$/
 
-export {
-  sortLocations,
-  getHaversineDistance,
-  hasLocationData,
-  isLocationInBounds,
-  slugify,
-  StreetAddress,
-  StreetIntersection,
-  Zipcode,
-}
+export { StreetAddress, StreetIntersection, Zipcode }

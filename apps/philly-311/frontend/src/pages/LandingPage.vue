@@ -1,20 +1,22 @@
 <!-- ABOUTME: The 311 reports finder — Pinboard map + list of nearby reports with
      service-type filter chips, geolocation-seeded load, and inline report detail. -->
 <script setup lang="ts">
-import { computed, inject, onMounted, ref, watch } from 'vue'
+import { computed, inject, onMounted, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   PinboardBody,
   MapNavigationControl,
   GeolocationButton,
   BasemapToggle,
-  PinboardComposables,
+  MapIconTextPin,
+  MapMarker,
   IS_MOBILE_KEY,
+  hasLocationData,
+  useMapBoundsFilter,
 } from '@pinboard/ui'
-import type { MapCardProps, FilterValue, SearchMode } from '@pinboard/ui'
+import type { MapCardProps, FilterValue } from '@pinboard/ui'
 import { useReportFinder } from '@/composables/useReportFinder'
 import ReportDetail from '@/components/ReportDetail.vue'
-import { searchAddress } from '@/composables/useAis'
 import ReportCallout from '@/components/ReportCallout.vue'
 import ReportCta from '@/components/ReportCta.vue'
 import ReportListingCard from '@/components/ReportListingCard.vue'
@@ -22,8 +24,7 @@ import MapConstraints from '@/components/MapConstraints.vue'
 import ClusteredMarkers from '@/components/ClusteredMarkers.vue'
 import LocationAccuracyCircle from '@/components/LocationAccuracyCircle.vue'
 import type { ReportLocation } from '@/types/app'
-
-const aisClientId: string | undefined = import.meta.env.VITE_311_AIS_GATEKEEPER_KEY || undefined
+import { IconLocationDot } from '@phila/phila-ui-core/icons'
 
 const finder = useReportFinder()
 const isMobile = inject(IS_MOBILE_KEY, ref(true))
@@ -33,10 +34,28 @@ const route = useRoute()
 const selectedReportId = computed(() =>
   typeof route.query.location === 'string' ? route.query.location : undefined,
 )
-const { visibleLocations, setMapBounds } = PinboardComposables.useMapBoundsFilter(
-  finder.locations,
-  { alwaysInclude: selectedReportId },
-)
+const { visibleLocations, setMapBounds } = useMapBoundsFilter(finder.locations, {
+  alwaysInclude: selectedReportId,
+})
+
+const filterValues = ref<FilterValue>({ toggles: {} })
+
+const canShowAccuracy = computed(() => {
+  return (
+    Object.keys(finder.searchOrUserLocation.value).includes('accuracy') &&
+    (!finder.locationSearchMode.value || finder.locationSearchMode.value === 'keyword') &&
+    hasLocationData(finder.searchOrUserLocation)
+  )
+})
+
+watchEffect(() => {
+  const iOfTrue = Object.values(filterValues.value.toggles).indexOf(true)
+  finder.setFilter(iOfTrue >= 0 ? Object.keys(filterValues.value?.toggles)[iOfTrue] : 'all')
+})
+
+onMounted(() => {
+  finder.init()
+})
 
 function getMapCardProps(location: ReportLocation): MapCardProps {
   return {
@@ -44,46 +63,12 @@ function getMapCardProps(location: ReportLocation): MapCardProps {
     body: location.address,
   }
 }
-// 'address' after a successful geocode — Pinboard pans the map to
-// searchOrUserLocation only while an address/zipcode search mode is set.
-const locationSearchMode = ref<SearchMode>(undefined)
-
-const locatedFix = ref<{ latitude: number; longitude: number; accuracy: number } | null>(null)
-
-const filterValues = ref<FilterValue>({ toggles: {} })
-
-watch(
-  () => filterValues.value.toggles,
-  (newValues) => {
-    const iOfTrue = Object.values(newValues).indexOf(true)
-    finder.setFilter(iOfTrue >= 0 ? Object.keys(filterValues.value?.toggles)[iOfTrue] : 'all')
-  },
-  {
-    deep: 1,
-  },
-)
-
-onMounted(() => {
-  finder.init()
-})
-
-function onLocated(data: { longitude: number; latitude: number; accuracy: number }) {
-  locatedFix.value = data
-}
-
-async function onSearch(query: string) {
-  const feature = await searchAddress(query)
-  if (feature) {
-    locationSearchMode.value = 'address'
-    finder.setCenter({ latitude: feature.lat, longitude: feature.lng })
-  }
-}
 </script>
 
 <template>
   <PinboardBody
     v-model:filter-values="filterValues"
-    v-model:location-search-mode="locationSearchMode"
+    v-model:location-search-mode="finder.locationSearchMode.value"
     v-model:search-or-user-location="finder.searchOrUserLocation.value"
     v-model:error-message="finder.errorMessage.value"
     :locations="visibleLocations"
@@ -94,8 +79,8 @@ async function onSearch(query: string) {
     :location-panel-search="searchPlaceholder"
     location-panel-count-noun="report"
     :initial-bottom-sheet-snap-index="1"
-    :ais-client-id="aisClientId"
-    @search="onSearch"
+    :ais-client-id="finder.aisClientId"
+    @search="finder.handleSearchSubmit"
     @bounds-change="setMapBounds"
   >
     <template #locations-header>
@@ -135,13 +120,14 @@ async function onSearch(query: string) {
       <GeolocationButton
         :position="isMobile ? 'top-right' : 'bottom-right'"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
-        @located="onLocated"
+        @located="finder.handleMapGeolocate"
+        @error="finder.handleMapGeolocateError"
       />
       <LocationAccuracyCircle
-        v-if="locatedFix"
-        :latitude="locatedFix.latitude"
-        :longitude="locatedFix.longitude"
-        :accuracy="locatedFix.accuracy"
+        v-if="canShowAccuracy"
+        :latitude="finder.searchOrUserLocation.value.latitude"
+        :longitude="finder.searchOrUserLocation.value.longitude"
+        :accuracy="finder.searchOrUserLocation.value.accuracy!"
         :zoom="zoom"
       />
       <!-- Rounded zoom: clustering and pin sizing are integer-granular, and a
@@ -156,6 +142,17 @@ async function onSearch(query: string) {
         @hover-end="onHoverEnd"
         @select="onSelect"
       />
+
+      <MapMarker
+        v-if="hasLocationData(finder.searchOrUserLocation)"
+        key="searchOrUserLocation"
+        :lng-lat="[
+          finder.searchOrUserLocation.value.longitude,
+          finder.searchOrUserLocation.value.latitude,
+        ]"
+      >
+        <MapIconTextPin :zoom="zoom" :icon="IconLocationDot" color-theme="light-tertiary" />
+      </MapMarker>
     </template>
   </PinboardBody>
 </template>
