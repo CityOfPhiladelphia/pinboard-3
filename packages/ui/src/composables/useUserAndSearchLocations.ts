@@ -25,7 +25,6 @@ export function useUserAndSearchLocations(options: UseUserAndSearchLocationsPara
   const searchOrUserLocation = ref<LatLon>(userLocation.value)
 
   watchEffect(() => {
-    console.log('watchEffect ran...')
     const useAddressSearch =
       locationSearchMode.value === 'address' &&
       finishedAddressFetch.value &&
@@ -63,6 +62,7 @@ export function useUserAndSearchLocations(options: UseUserAndSearchLocationsPara
   })
 
   watchEffect(() => {
+    // additional watchEffect because app's geolocate button on map can set the userLocation in a way the other watchEffect cannot see
     if (finishedAddressFetch.value && finishedZipFetch.value && hasLocationData(userLocation.value))
       searchOrUserLocation.value = userLocation.value
   })
