@@ -80,11 +80,14 @@ const cornerShape = computed(() => {
   }
 })
 
-watch([searchFocused, locatingUser, searchString], ([isFocused, isLocating, newSearch]) => {
-  dropdownOpen.value =
-    (isFocused || isLocating || newSearch.length > 0) &&
-    searchSuggestions.value.length + recentSearches.value.length > 0
-})
+watch(
+  [searchFocused, locatingUser, searchString, searchSuggestions, recentSearches],
+  ([isFocused, isLocating, newSearch, newSuggestions, newRecent]) => {
+    dropdownOpen.value =
+      (isFocused || isLocating || newSearch.length > 0) &&
+      (newSuggestions.length > 0 || newRecent.length > 0)
+  }
+)
 
 // event handlers
 function handleSearchInput(event: InputEvent) {
@@ -126,6 +129,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
     event.preventDefault()
     suggestionsRef.value?.focusFirst()
   }
+  if (event.key === 'Escape') dropdownOpen.value = false
 }
 
 function handleSearchFocusOut(event: FocusEvent) {
