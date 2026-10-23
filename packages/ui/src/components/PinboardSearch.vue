@@ -15,7 +15,7 @@ import { useRecentSearches } from '../composables/useRecentSearches.ts'
 import { PINBOARD_CONFIG_KEY } from '../keys.ts'
 
 // models
-const searchString = defineModel<string>('search-string', { default: '' })
+const searchString = defineModel<string>('searchString', { default: '' })
 const dropdownOpen = defineModel<boolean>('dropdownOpen', {
   default: false,
 })
@@ -125,11 +125,19 @@ function handleSuggestionRemove(term: string) {
 
 function handleSearchKeydown(event: KeyboardEvent) {
   const target = event.target as HTMLElement
-  if (event.key === 'ArrowDown' && dropdownOpen.value && target.tagName === 'INPUT') {
-    event.preventDefault()
-    suggestionsRef.value?.focusFirst()
+  switch (event.key) {
+    case 'ArrowDown': {
+      if (dropdownOpen.value && target.tagName === 'INPUT') {
+        event.preventDefault()
+        suggestionsRef.value?.focusFirst()
+      }
+      break
+    }
+    case 'Escape': {
+      dropdownOpen.value = false
+      break
+    }
   }
-  if (event.key === 'Escape') dropdownOpen.value = false
 }
 
 function handleSearchFocusOut(event: FocusEvent) {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Icon, type IconComponent } from '@phila/phila-ui-core'
 import { IconLocationCrosshairs, IconLocationDot } from '@phila/phila-ui-core/icons'
 import { CloseButton, PhilaButton } from '@phila/phila-ui-button'
@@ -41,6 +41,10 @@ const listRef = ref<HTMLUListElement | null>(null)
 const removable = ref(true)
 const dropdownSuggections = ref(props.history)
 
+const numSuggestions = computed(
+  () => (removable.value ? props.history.length : props.suggestions.length) - 1
+)
+
 watch(
   () => props.suggestions,
   (newSuggestions) => {
@@ -68,7 +72,7 @@ function focusItem(index: number) {
 }
 
 function focusFirst() {
-  if (props.suggestions.length) {
+  if (props.suggestions.length || props.history.length) {
     activeIndex.value = 0
     focusItem(0)
   }
@@ -78,7 +82,7 @@ function handleKeydown(event: KeyboardEvent) {
   switch (event.key) {
     case 'ArrowDown': {
       event.preventDefault()
-      const next = Math.min(activeIndex.value + 1, props.suggestions.length - 1)
+      const next = Math.min(activeIndex.value + 1, numSuggestions.value)
       activeIndex.value = next
       focusItem(next)
       break
@@ -98,7 +102,10 @@ function handleKeydown(event: KeyboardEvent) {
       if (target.closest('.search-suggestion-remove')) break
       event.preventDefault()
       if (activeIndex.value >= 0) {
-        emit('select', props.suggestions[activeIndex.value])
+        emit(
+          'select',
+          removable.value ? props.history[activeIndex.value] : props.suggestions[activeIndex.value]
+        )
       }
       break
     }
@@ -177,10 +184,6 @@ defineExpose({ focusFirst })
   overflow: auto;
   scrollbar-width: thin;
   scrollbar-gutter: stable;
-
-  ul {
-    padding-left: 0;
-  }
 }
 
 .geolocate_button
@@ -193,11 +196,6 @@ defineExpose({ focusFirst })
 
 .search-suggestions {
   list-style: none;
-
-  &,
-  li {
-    margin: var(--spacing-none, 0);
-  }
 }
 
 .search-suggestions-heading {
