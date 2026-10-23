@@ -11,10 +11,13 @@ import { serviceTypeColor } from '@/utils/serviceTypeMeta'
 import {
   hasLocationData,
   searchLocations,
+  useMapBoundsFilter,
   useUserAndSearchLocations,
   type FilterProps,
+  type MapBounds,
 } from '@pinboard/ui'
 import type { ReportLocation } from '@/types/app'
+import { useRoute } from 'vue-router'
 
 export interface UseReportFinder extends Pick<
   ReturnType<typeof useUserAndSearchLocations>,
@@ -33,6 +36,7 @@ export interface UseReportFinder extends Pick<
   filter: Ref<string>
   init: () => Promise<void>
   setFilter: (value: string) => void
+  setMapBounds: (bounds: MapBounds) => void
 }
 
 export function useReportFinder(): UseReportFinder {
@@ -52,6 +56,11 @@ export function useReportFinder(): UseReportFinder {
   } = useUserAndSearchLocations({ aisClientId, timeout: 10_000 })
 
   const filter = ref('all')
+
+  const route = useRoute()
+  const selectedReportId = computed(() =>
+    typeof route.query.location === 'string' ? route.query.location : undefined,
+  )
 
   const isLoading = computed(() => {
     return store.isLoading || userLocationState.value === 'acquiring'
@@ -75,13 +84,21 @@ export function useReportFinder(): UseReportFinder {
       : filteredLocations.value
   })
 
-  const locations = computed<ReportLocation[]>(() => {
+  const locationsWithDist = computed<ReportLocation[]>(() => {
     return hasLocationData(searchOrUserLocation)
-      ? getLocationsWithDistance(searchedLocations).sort(
+      ? getLocationsWithDistance(filteredLocations).sort(
           (a, b) => Number(a.distance) - Number(b.distance),
         )
       : searchedLocations.value
   })
+
+  const { visibleLocations, setMapBounds } = useMapBoundsFilter(locationsWithDist, {
+    alwaysInclude: selectedReportId,
+  })
+
+  const locations = computed(() => [
+    ...new Set([...searchedLocations.value, ...visibleLocations.value]),
+  ])
 
   const filterOptions = computed<FilterProps[]>(() => {
     return [...new Set(reports.value.map((report) => report.serviceType))]
@@ -121,5 +138,6 @@ export function useReportFinder(): UseReportFinder {
     filter,
     init,
     setFilter,
+    setMapBounds,
   }
 }

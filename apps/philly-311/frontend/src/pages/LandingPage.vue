@@ -2,7 +2,6 @@
      service-type filter chips, geolocation-seeded load, and inline report detail. -->
 <script setup lang="ts">
 import { computed, inject, onBeforeMount, ref, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
 import {
   PinboardBody,
   MapNavigationControl,
@@ -12,7 +11,6 @@ import {
   MapMarker,
   IS_MOBILE_KEY,
   hasLocationData,
-  useMapBoundsFilter,
 } from '@pinboard/ui'
 import type { MapCardProps, FilterValue } from '@pinboard/ui'
 import { useReportFinder } from '@/composables/useReportFinder'
@@ -29,14 +27,6 @@ import { IconLocationDot } from '@phila/phila-ui-core/icons'
 const finder = useReportFinder()
 const isMobile = inject(IS_MOBILE_KEY, ref(true))
 const searchPlaceholder = 'Search by address or ZIP'
-
-const route = useRoute()
-const selectedReportId = computed(() =>
-  typeof route.query.location === 'string' ? route.query.location : undefined,
-)
-const { visibleLocations, setMapBounds } = useMapBoundsFilter(finder.locations, {
-  alwaysInclude: selectedReportId,
-})
 
 const filterValues = ref<FilterValue>({ toggles: {} })
 
@@ -71,7 +61,7 @@ function getMapCardProps(location: ReportLocation): MapCardProps {
     v-model:location-search-mode="finder.locationSearchMode.value"
     v-model:search-or-user-location="finder.searchOrUserLocation.value"
     v-model:error-message="finder.errorMessage.value"
-    :locations="visibleLocations"
+    :locations="finder.locations.value"
     :filters="finder.filterOptions.value"
     :is-loading="finder.isLoading.value ? 'Loading reports…' : false"
     :get-map-card-props="getMapCardProps"
@@ -83,7 +73,7 @@ function getMapCardProps(location: ReportLocation): MapCardProps {
     :user-location-state="finder.userLocationState.value"
     :wait-for-user-location="true"
     @search="finder.handleSearchSubmit"
-    @bounds-change="setMapBounds"
+    @bounds-change="finder.setMapBounds"
   >
     <template #locations-header>
       <ReportCallout />
@@ -136,7 +126,7 @@ function getMapCardProps(location: ReportLocation): MapCardProps {
       <!-- Rounded zoom: clustering and pin sizing are integer-granular, and a
            fractional zoom prop would re-render every marker per animation frame. -->
       <ClusteredMarkers
-        :locations="visibleLocations"
+        :locations="finder.locations.value"
         :zoom="Math.round(zoom)"
         :map="map"
         :hovered-id="hoveredId"
