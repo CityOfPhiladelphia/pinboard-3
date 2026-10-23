@@ -182,6 +182,7 @@ function focusSearchInput() {
       :show-geolocate="showGeolocate"
       :remove-label="t('pinboard.removeRecentSearch')"
       :style="cornerShape"
+      :aria-expanded="dropdownOpen"
       @select="handleSuggestionSelect"
       @remove="handleSuggestionRemove"
     >
