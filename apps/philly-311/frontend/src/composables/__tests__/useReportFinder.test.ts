@@ -1,5 +1,5 @@
 // ABOUTME: Tests for useReportFinder — geolocation seed, city-wide store integration,
-// ABOUTME: filter state, and derived locations/filterOptions/reportById.
+// ABOUTME: filter state, and derived locations/filterOptions.
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import type { Report } from '@/composables/useNearbyReports'
@@ -113,13 +113,6 @@ describe('useReportFinder', () => {
     ])
   })
 
-  it('looks up a report by id', async () => {
-    getCurrentPosition.mockResolvedValue(null)
-    const f = useReportFinder()
-    await f.init()
-    expect(f.reportById('2')?.serviceType).toBe('Illegal Dumping')
-  })
-
   it('exposes the load error message', async () => {
     const store = useOpenIssuesStore()
     store.$patch({ error: new Error('boom') })
@@ -127,16 +120,6 @@ describe('useReportFinder', () => {
     const f = useReportFinder()
     await f.init()
     expect(f.errorMessage.value).toBe('boom')
-  })
-
-  it('setCenter updates the view center and does not refetch', async () => {
-    getCurrentPosition.mockResolvedValue(null)
-    const f = useReportFinder()
-    await f.init()
-    ensureLoaded.mockClear()
-    await f.setCenter({ latitude: 40.1, longitude: -75.2 })
-    expect(f.searchOrUserLocation.value).toEqual({ latitude: 40.1, longitude: -75.2 })
-    expect(ensureLoaded).not.toHaveBeenCalled()
   })
 
   describe('distance sorting', () => {

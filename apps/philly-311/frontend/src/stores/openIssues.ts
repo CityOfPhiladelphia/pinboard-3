@@ -4,11 +4,12 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import {
   fetchPage as defaultFetchPage,
-  type Report,
   type PageParams,
   type PageResult,
 } from '@/composables/useNearbyReports'
+import type { Report } from '../types/api'
 import { CITYWIDE_RADIUS } from '@/utils/geoDefaults'
+import type { LatLon } from '@pinboard/ui'
 
 const TTL_MS = 5 * 60_000
 const PAGE_LIMIT = 200
@@ -41,11 +42,11 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
   /** Fetches a single row and derives total from the Link `last` offset. */
   async function _probeTotal(
     fetch: (params: PageParams) => Promise<PageResult>,
-    anchor: { lat: number; lng: number },
+    anchor: LatLon,
   ): Promise<number> {
     const { reports: rows, lastOffset } = await fetch({
-      lat: anchor.lat,
-      lng: anchor.lng,
+      lat: anchor.latitude,
+      lng: anchor.longitude,
       radius: CITYWIDE_RADIUS,
       limit: 1,
       offset: 0,
@@ -54,7 +55,7 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
   }
 
   async function _fullLoad(
-    anchor: { lat: number; lng: number },
+    anchor: LatLon,
     fetch: (params: PageParams) => Promise<PageResult>,
     now: () => number,
   ): Promise<void> {
@@ -74,8 +75,8 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
     let page1: PageResult
     try {
       page1 = await fetch({
-        lat: anchor.lat,
-        lng: anchor.lng,
+        lat: anchor.latitude,
+        lng: anchor.longitude,
         radius: CITYWIDE_RADIUS,
         limit: PAGE_LIMIT,
         offset: 0,
@@ -103,8 +104,8 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
       const requestedOffset = next
       try {
         const page = await fetch({
-          lat: anchor.lat,
-          lng: anchor.lng,
+          lat: anchor.latitude,
+          lng: anchor.longitude,
           radius: CITYWIDE_RADIUS,
           limit: PAGE_LIMIT,
           offset: requestedOffset,
@@ -127,10 +128,7 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
     isLoading.value = false
   }
 
-  async function _run(
-    anchor: { lat: number; lng: number },
-    opts?: EnsureLoadedOpts,
-  ): Promise<void> {
+  async function _run(anchor: LatLon, opts?: EnsureLoadedOpts): Promise<void> {
     const now = opts?.now ?? (() => Date.now())
     const fetch = opts?.fetchPage ?? defaultFetchPage
 
@@ -162,10 +160,7 @@ export const useOpenIssuesStore = defineStore('openIssues', () => {
     await _fullLoad(anchor, fetch, now)
   }
 
-  function ensureLoaded(
-    newSeed: { lat: number; lng: number },
-    opts?: EnsureLoadedOpts,
-  ): Promise<void> {
+  function ensureLoaded(newSeed: LatLon, opts?: EnsureLoadedOpts): Promise<void> {
     // CITYWIDE_RADIUS covers the full city from any in-bounds seed, so a seed change
     // mid-flight doesn't affect the completeness of the dataset being loaded.
     if (_inFlight) return _inFlight

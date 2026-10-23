@@ -10,7 +10,7 @@ const safe = computed(() => sanitize(props.html))
 
 <template>
   <!-- eslint-disable-next-line vue/no-v-html -- content is allow-list sanitized in utils/sanitize -->
-  <div class="article-body" v-html="safe"></div>
+  <div class="article-body" v-html="safe" />
 </template>
 
 <style scoped>

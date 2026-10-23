@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Icon, type IconComponent } from '@phila/phila-ui-core'
-import { IconLocationCrosshairs } from '@phila/phila-ui-core/icons'
+import { IconLocationCrosshairs, IconLocationDot } from '@phila/phila-ui-core/icons'
 import { CloseButton, PhilaButton } from '@phila/phila-ui-button'
 
 const locatingUser = defineModel<boolean>('locatingUser', {
@@ -41,6 +41,10 @@ const listRef = ref<HTMLUListElement | null>(null)
 const removable = ref(true)
 const dropdownSuggections = ref(props.history)
 
+const numSuggestions = computed(
+  () => (removable.value ? props.history.length : props.suggestions.length) - 1
+)
+
 watch(
   () => props.suggestions,
   (newSuggestions) => {
@@ -68,7 +72,7 @@ function focusItem(index: number) {
 }
 
 function focusFirst() {
-  if (props.suggestions.length) {
+  if (props.suggestions.length || props.history.length) {
     activeIndex.value = 0
     focusItem(0)
   }
@@ -78,7 +82,7 @@ function handleKeydown(event: KeyboardEvent) {
   switch (event.key) {
     case 'ArrowDown': {
       event.preventDefault()
-      const next = Math.min(activeIndex.value + 1, props.suggestions.length - 1)
+      const next = Math.min(activeIndex.value + 1, numSuggestions.value)
       activeIndex.value = next
       focusItem(next)
       break
@@ -98,7 +102,10 @@ function handleKeydown(event: KeyboardEvent) {
       if (target.closest('.search-suggestion-remove')) break
       event.preventDefault()
       if (activeIndex.value >= 0) {
-        emit('select', props.suggestions[activeIndex.value])
+        emit(
+          'select',
+          removable.value ? props.history[activeIndex.value] : props.suggestions[activeIndex.value]
+        )
       }
       break
     }
@@ -124,18 +131,18 @@ defineExpose({ focusFirst })
         <slot name="suggestion-card" />
       </div>
     </template>
-    <ul
+    <span
+      v-if="removable && history.length"
+      class="search-suggestions-heading has-text-label-default"
+      role="presentation"
+      v-text="heading"
+    />
+    <menu
       ref="listRef"
       class="search-suggestions content-row"
       role="listbox"
       @keydown="handleKeydown"
     >
-      <li
-        v-if="removable && history.length"
-        class="search-suggestions-heading has-text-label-default"
-        role="presentation"
-        v-text="heading"
-      />
       <li
         v-for="(suggestion, index) in dropdownSuggections"
         :key="suggestion"
@@ -145,7 +152,7 @@ defineExpose({ focusFirst })
         tabindex="0"
         @click="emit('select', suggestion)"
       >
-        <Icon v-if="icon" :icon="icon" inline decorative />
+        <Icon v-if="!removable" :icon="icon || IconLocationDot" inline decorative />
         <span class="search-suggestion-text has-text-body-default" v-text="suggestion" />
         <CloseButton
           v-if="removable"
@@ -153,13 +160,13 @@ defineExpose({ focusFirst })
           @click.stop="emit('remove', suggestion)"
         />
       </li>
-    </ul>
+    </menu>
   </div>
 </template>
 
 <style scoped>
 .content-row {
-  padding-top: var(--spacing-xs, 0.5rem);
+  padding-block: var(--spacing-2xs, 0.25rem);
 }
 
 .search-suggestions-panel {
@@ -168,6 +175,7 @@ defineExpose({ focusFirst })
   top: 100%;
   left: 0;
   right: 0;
+  padding-top: var(--spacing-2xs, 0.25rem);
   padding-inline: var(--spacing-m, 1rem);
   background-color: var(--Schemes-Background, #fff);
   border: 0px dotted var(--Schemes-Border-low, #ccc);
@@ -176,10 +184,6 @@ defineExpose({ focusFirst })
   overflow: auto;
   scrollbar-width: thin;
   scrollbar-gutter: stable;
-
-  ul {
-    padding-left: 0;
-  }
 }
 
 .geolocate_button
@@ -192,36 +196,29 @@ defineExpose({ focusFirst })
 
 .search-suggestions {
   list-style: none;
-
-  &,
-  li {
-    margin: var(--spacing-none, 0);
-  }
 }
 
 .search-suggestions-heading {
-  padding-bottom: var(--spacing-xs, 0.5rem);
+  padding-top: var(--spacing-2xs, 0.25rem);
+  height: 1lh;
 }
 
 .search-suggestion {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
   gap: var(--spacing-xs, 0.5rem);
   cursor: pointer;
   outline: transparent;
+  padding-block: var(--spacing-xs, 0.5rem);
 }
 
 .search-suggestion:not(:last-child) {
-  padding-bottom: var(--spacing-2xs, 0.25rem);
-}
-
-.search-suggestion:last-child {
-  padding-bottom: var(--spacing-3xs, 0.125rem);
+  border-bottom: 1px solid var(--Schemes-Border-low, #ccc);
 }
 
 .search-suggestion-text {
-  flex: 1;
+  grid-column: 2;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

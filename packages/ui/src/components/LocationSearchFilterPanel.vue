@@ -53,8 +53,9 @@ const props = defineProps<{
   searchPlaceholder: string | undefined
   filterOptions: LocationFilterOption[] | undefined
   sortOptions: SortLocationsOptions | undefined
-  filters?: FilterProps[]
+  filters: FilterProps[] | undefined
   isMobile: boolean
+  aisClientId: string | undefined
 }>()
 
 // emits
@@ -123,13 +124,14 @@ watch(allFiltersOpen, (open) => {
 
 <template>
   <Teleport to="#mobile-map-search-filter" :disabled="!isMobile">
-    <div class="location-search-filter-sort" :class="{ mobile: isMobile }">
+    <div class="location-search-filter-sort" :class="{ mobile: isMobile }" role="search">
       <PinboardSearch
         v-model:search-string="searchString"
         :v-model:locating-user="userLocationState === 'acquiring'"
         :search-placeholder="searchPlaceholder"
         :elevated="isMobile"
         :search-shape="isMobile ? 'pill' : 'rectangle'"
+        :ais-client-id="aisClientId"
         class="location-search"
         @search="emit('search')"
       />
@@ -153,7 +155,8 @@ watch(allFiltersOpen, (open) => {
         :filter-button-text="t('pinboard.filters')"
         :reset-text="t('pinboard.reset')"
         :elevated="isMobile"
-        :class="isMobile ? 'filter-chip-bar-mobile' : 'filter-chip-bar'"
+        :hide-title="true"
+        class="filter-chip-bar"
         @dropdown-close="recomputeChipOrder"
       />
 
@@ -180,17 +183,34 @@ watch(allFiltersOpen, (open) => {
     'filters sort';
   grid-template-columns: 1fr auto;
   grid-template-rows: auto auto;
-  row-gap: var(--spacing-m, 1rem);
-  padding: var(--spacing-l, 1.5rem) var(--spacing-m, 1rem);
+  row-gap: var(--spacing-xs, 0.5rem);
+  padding: var(--spacing-l, 1.5rem) var(--spacing-m, 1rem) var(--spacing-s, 0.75rem);
+
+  & :is(.group-description) {
+    height: 0;
+  }
+
+  & :is(.phila-filter-chip-group__row) {
+    padding: var(--spacing-xs, 0.5rem);
+    scroll-padding-inline: var(--spacing-xs, 0.5rem);
+  }
 }
 
 .location-search-filter-sort.mobile {
   padding-block: var(--spacing-s, 0.75rem);
-  row-gap: var(--spacing-2xs, 0.25rem);
+  row-gap: 0;
+}
+
+.location-search {
+  grid-area: search;
 }
 
 .location-filters {
   grid-area: filters;
+}
+
+.location-filters.mobile {
+  padding: var(--spacing-xs, 0.5rem) 0 0 var(--spacing-m, 1rem);
 }
 
 .location-sort {
@@ -200,12 +220,6 @@ watch(allFiltersOpen, (open) => {
 
 .filter-chip-bar {
   grid-area: filters;
-  height: fit-content;
-  z-index: -1;
-}
-
-.filter-chip-bar-mobile {
-  padding: var(--spacing-xs, 0.5rem) var(--spacing-none, 0);
   z-index: -1;
 }
 </style>

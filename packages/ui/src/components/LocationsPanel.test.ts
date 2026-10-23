@@ -47,6 +47,9 @@ const baseProps = {
   locationSearch: undefined,
   locationFilter: undefined,
   locationSort: undefined,
+  filters: undefined,
+  countNoun: undefined,
+  aisClientId: undefined,
 }
 
 function mountDefault(extra: Record<string, unknown> = {}) {

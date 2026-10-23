@@ -15,7 +15,7 @@ import { useRecentSearches } from '../composables/useRecentSearches.ts'
 import { PINBOARD_CONFIG_KEY } from '../keys.ts'
 
 // models
-const searchString = defineModel<string>('search-string', { default: '' })
+const searchString = defineModel<string>('searchString', { default: '' })
 const dropdownOpen = defineModel<boolean>('dropdownOpen', {
   default: false,
 })
@@ -30,11 +30,13 @@ const props = withDefaults(
     elevated?: boolean
     searchShape?: 'rectangle' | 'pill'
     showGeolocate?: boolean
+    aisClientId?: string
   }>(),
   {
     elevated: false,
     searchShape: 'rectangle',
     showGeolocate: false,
+    aisClientId: undefined,
   }
 )
 
@@ -56,7 +58,10 @@ const { t } = useI18n()
 // refs
 const searchWrapperRef = ref<HTMLElement | null>(null)
 const suggestionsRef = ref<InstanceType<typeof SearchSuggestions> | null>(null)
-const { searchSuggestions, refetchSuggestions } = useSearchSuggestions(searchString)
+const { searchSuggestions, refetchSuggestions } = useSearchSuggestions(
+  searchString,
+  props.aisClientId
+)
 const {
   recentSearches,
   add: addRecentSearch,
@@ -75,9 +80,14 @@ const cornerShape = computed(() => {
   }
 })
 
-watch([searchFocused, locatingUser, searchString], ([isFocused, isLocating, newSearch]) => {
-  dropdownOpen.value = isFocused || isLocating || newSearch.length > 0
-})
+watch(
+  [searchFocused, locatingUser, searchString, searchSuggestions, recentSearches],
+  ([isFocused, isLocating, newSearch, newSuggestions, newRecent]) => {
+    dropdownOpen.value =
+      (isFocused || isLocating || newSearch.length > 0) &&
+      (newSuggestions.length > 0 || newRecent.length > 0)
+  }
+)
 
 // event handlers
 function handleSearchInput(event: InputEvent) {
@@ -86,9 +96,7 @@ function handleSearchInput(event: InputEvent) {
   // closed, and the suggestions never fetched. Read the value off the DOM instead.
   // Vue skips writing back to the input while composing, so the IME is unaffected.
   const target = event.target as HTMLInputElement
-  if (target.tagName === 'INPUT') {
-    searchString.value = target.value
-  }
+  if (target.tagName === 'INPUT') searchString.value = target.value
 }
 
 function handleSearchSubmit() {
@@ -117,9 +125,18 @@ function handleSuggestionRemove(term: string) {
 
 function handleSearchKeydown(event: KeyboardEvent) {
   const target = event.target as HTMLElement
-  if (event.key === 'ArrowDown' && dropdownOpen.value && target.tagName === 'INPUT') {
-    event.preventDefault()
-    suggestionsRef.value?.focusFirst()
+  switch (event.key) {
+    case 'ArrowDown': {
+      if (dropdownOpen.value && target.tagName === 'INPUT') {
+        event.preventDefault()
+        suggestionsRef.value?.focusFirst()
+      }
+      break
+    }
+    case 'Escape': {
+      dropdownOpen.value = false
+      break
+    }
   }
 }
 
@@ -173,6 +190,7 @@ function focusSearchInput() {
       :show-geolocate="showGeolocate"
       :remove-label="t('pinboard.removeRecentSearch')"
       :style="cornerShape"
+      :aria-expanded="dropdownOpen"
       @select="handleSuggestionSelect"
       @remove="handleSuggestionRemove"
     >

@@ -32,6 +32,7 @@ const store = useReportSubmissionStore()
 const { query, results, error } = useDebouncedSearch<AisAutocompleteResult[]>({
   initial: [],
   fetcher: (q, signal) => autocompleteAddresses(q, signal),
+  timeout: 1,
 })
 
 const open = ref(false)
