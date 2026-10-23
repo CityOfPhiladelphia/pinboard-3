@@ -1,4 +1,4 @@
-import { computed, ref, toValue, watchEffect, type MaybeRef } from 'vue'
+import { ref, toValue, watchEffect, type MaybeRef } from 'vue'
 import { hasLocationData } from '../utilities/hasLocationData'
 import type { BasicLocation, LatLon, SearchMode, UseUserAndSearchLocationsParams } from '../types'
 import { useSearchAddress, useSearchZipcode, useUserLocation } from './_index'
@@ -11,8 +11,14 @@ import {
 
 export function useUserAndSearchLocations(options: UseUserAndSearchLocationsParams = {}) {
   const { aisClientId, ...userLocationParams } = options
-  const { userLocation, userLocationState, endWatch, handleMapGeolocate, handleMapGeolocateError } =
-    useUserLocation(userLocationParams)
+  const {
+    userLocation,
+    userLocationState,
+    getUserLocation,
+    endWatch,
+    handleMapGeolocate,
+    handleMapGeolocateError,
+  } = useUserLocation(userLocationParams)
   const addressForSearch = ref<string>('')
   const { addressCoordinates, finishedAddressFetch } = useSearchAddress(
     addressForSearch,
@@ -55,7 +61,7 @@ export function useUserAndSearchLocations(options: UseUserAndSearchLocationsPara
         break
       }
       default: {
-        searchOrUserLocation.value = {
+        searchOrUserLocation.value = options?.defaultLocation ?? {
           latitude: NaN,
           longitude: NaN,
         }
@@ -70,24 +76,21 @@ export function useUserAndSearchLocations(options: UseUserAndSearchLocationsPara
   })
 
   function getLocationsWithDistance<PinboardLocation extends BasicLocation>(
-    locations: PinboardLocation[] | MaybeRef<PinboardLocation[]>
+    locations: MaybeRef<PinboardLocation[]>,
+    precision: number = 1
   ) {
     const locsWithDistance = toValue(locations)
-    const locationsWithDistance = computed(() => {
-      if (!hasLocationData(searchOrUserLocation.value)) return locsWithDistance
+    if (hasLocationData(searchOrUserLocation)) {
       locsWithDistance.forEach((location) => {
-        location.distance = `${getHaversineDistance(
+        const dist = getHaversineDistance(
           { latitude: location.latitude, longitude: location.longitude },
-          {
-            latitude: searchOrUserLocation.value.latitude,
-            longitude: searchOrUserLocation.value.longitude,
-          },
-          1
-        )} mi`
+          searchOrUserLocation,
+          precision
+        )
+        location.distance = `${dist} mi`
       })
-      return locsWithDistance
-    })
-    return locationsWithDistance
+    }
+    return locsWithDistance
   }
 
   function handleSearchSubmit(locationSearchString: string) {
@@ -138,5 +141,6 @@ export function useUserAndSearchLocations(options: UseUserAndSearchLocationsPara
     handleMapGeolocate,
     handleMapGeolocateError,
     getLocationsWithDistance,
+    getUserLocation,
   }
 }

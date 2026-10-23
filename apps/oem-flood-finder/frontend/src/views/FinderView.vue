@@ -104,7 +104,7 @@ const currentLocations = computed(() => {
     ? searchLocations(filteredLocations, keywordsForSearch)
     : filteredLocations
   const sorted = sortLocations(searchedLocations, searchOrUserLocation, currentSort)
-  return getLocationsWithDistance(sorted).value
+  return getLocationsWithDistance(sorted)
 })
 
 // event handlers

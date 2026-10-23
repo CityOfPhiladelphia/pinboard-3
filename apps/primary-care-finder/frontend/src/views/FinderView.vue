@@ -176,7 +176,7 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
 
   return getLocationsWithDistance(
     filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
-  ).value
+  )
 })
 
 function mapFilterTextToFilterLogic(

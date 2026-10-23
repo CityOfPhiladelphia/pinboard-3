@@ -1,7 +1,7 @@
 <!-- ABOUTME: The 311 reports finder — Pinboard map + list of nearby reports with
      service-type filter chips, geolocation-seeded load, and inline report detail. -->
 <script setup lang="ts">
-import { computed, inject, onMounted, ref, watchEffect } from 'vue'
+import { computed, inject, onBeforeMount, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   PinboardBody,
@@ -53,8 +53,8 @@ watchEffect(() => {
   finder.setFilter(iOfTrue >= 0 ? Object.keys(filterValues.value?.toggles)[iOfTrue] : 'all')
 })
 
-onMounted(() => {
-  finder.init()
+onBeforeMount(async () => {
+  await finder.init()
 })
 
 function getMapCardProps(location: ReportLocation): MapCardProps {
@@ -80,6 +80,8 @@ function getMapCardProps(location: ReportLocation): MapCardProps {
     location-panel-count-noun="report"
     :initial-bottom-sheet-snap-index="1"
     :ais-client-id="finder.aisClientId"
+    :user-location-state="finder.userLocationState.value"
+    :wait-for-user-location="true"
     @search="finder.handleSearchSubmit"
     @bounds-change="setMapBounds"
   >
@@ -120,6 +122,7 @@ function getMapCardProps(location: ReportLocation): MapCardProps {
       <GeolocationButton
         :position="isMobile ? 'top-right' : 'bottom-right'"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
+        :show-location-marker="false"
         @located="finder.handleMapGeolocate"
         @error="finder.handleMapGeolocateError"
       />
