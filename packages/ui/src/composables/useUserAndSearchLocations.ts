@@ -1,6 +1,6 @@
-import { ref, toValue, watch, type Ref } from 'vue'
+import { ref, toValue, watchEffect, type MaybeRef } from 'vue'
 import { hasLocationData } from '../utilities/hasLocationData'
-import type { BasicLocation, LatLon, SearchMode } from '../types'
+import type { BasicLocation, LatLon, SearchMode, UseUserAndSearchLocationsParams } from '../types'
 import { useSearchAddress, useSearchZipcode, useUserLocation } from './_index'
 import {
   getHaversineDistance,
@@ -9,98 +9,88 @@ import {
   Zipcode,
 } from '../utilities/_index'
 
-export function useUserAndSearchLocations<PinboardLocation extends BasicLocation>(
-  locations: Ref<PinboardLocation[]>,
-  promptLocationOnPageLoad: boolean = false,
-  watchLocation: boolean = false
-) {
-  const { userLocation, userLocationState, endWatch, handleGeolocate, handleGeolocateError } =
-    useUserLocation(promptLocationOnPageLoad, watchLocation)
+export function useUserAndSearchLocations(options: UseUserAndSearchLocationsParams = {}) {
+  const { aisClientId, ...userLocationParams } = options
+  const {
+    userLocation,
+    userLocationState,
+    getUserLocation,
+    endWatch,
+    handleMapGeolocate,
+    handleMapGeolocateError,
+  } = useUserLocation(userLocationParams)
   const addressForSearch = ref<string>('')
-  const { addressCoordinates, finishedAddressFetch } = useSearchAddress(addressForSearch)
+  const { addressCoordinates, finishedAddressFetch } = useSearchAddress(
+    addressForSearch,
+    aisClientId
+  )
   const zipcodeForSearch = ref<string>('')
   const { zipcodePolygon, finishedZipFetch } = useSearchZipcode(zipcodeForSearch)
   const keywordsForSearch = ref<string>('')
   const locationSearchMode = ref<SearchMode>(undefined)
   const searchOrUserLocation = ref<LatLon>(userLocation.value)
 
-  watch(
-    () => userLocation.value,
-    (newLoc) => {
-      if (
-        hasLocationData(newLoc) &&
-        !(
-          hasLocationData(zipcodePolygon.value.centroid) ||
-          hasLocationData(addressCoordinates.value)
-        )
-      ) {
-        searchOrUserLocation.value = userLocation.value
-      }
-    }
-  )
+  watchEffect(() => {
+    const useAddressSearch =
+      locationSearchMode.value === 'address' &&
+      finishedAddressFetch.value &&
+      hasLocationData(addressCoordinates)
 
-  watch(zipcodePolygon.value.centroid, (newLoc) => {
-    if (!hasLocationData(newLoc)) {
-      searchOrUserLocation.value = userLocation.value
-    }
-  })
+    const useZipcodeSearch =
+      locationSearchMode.value === 'zipcode' &&
+      finishedZipFetch.value &&
+      hasLocationData(zipcodePolygon.value.centroid)
 
-  watch(addressCoordinates.value, (newLoc) => {
-    if (!hasLocationData(newLoc)) {
-      searchOrUserLocation.value = userLocation.value
-    }
-  })
+    const useUserLocation =
+      (!locationSearchMode.value || locationSearchMode.value === 'keyword') &&
+      finishedAddressFetch.value &&
+      finishedZipFetch.value &&
+      hasLocationData(userLocation)
 
-  watch(
-    () => finishedAddressFetch.value,
-    (newState) => {
-      if (newState && hasLocationData(addressCoordinates.value)) {
+    switch (true) {
+      case useAddressSearch: {
         searchOrUserLocation.value = addressCoordinates.value
+        return
       }
-    }
-  )
-
-  watch(
-    () => finishedZipFetch.value,
-    (newState) => {
-      if (newState && hasLocationData(zipcodePolygon.value.centroid)) {
+      case useZipcodeSearch: {
         searchOrUserLocation.value = zipcodePolygon.value.centroid
+        return
+      }
+      case useUserLocation: {
+        searchOrUserLocation.value = userLocation.value
+        break
+      }
+      default: {
+        searchOrUserLocation.value = options?.defaultLocation ?? {
+          latitude: NaN,
+          longitude: NaN,
+        }
       }
     }
-  )
+  })
 
-  watch(
-    () => searchOrUserLocation.value,
-    () => {
-      if (hasLocationData(searchOrUserLocation.value)) {
-        findLocationDistances()
-      }
-    },
-    { deep: 1 }
-  )
+  watchEffect(() => {
+    // additional watchEffect because app's geolocate button on map can set the userLocation in a way the other watchEffect cannot see
+    if (finishedAddressFetch.value && finishedZipFetch.value && hasLocationData(userLocation.value))
+      searchOrUserLocation.value = userLocation.value
+  })
 
-  watch(
-    () => locations.value.length,
-    (newLength) => {
-      if (newLength && hasLocationData(searchOrUserLocation.value)) {
-        findLocationDistances()
-      }
-    }
-  )
-
-  function findLocationDistances() {
+  function getLocationsWithDistance<PinboardLocation extends BasicLocation>(
+    locations: MaybeRef<PinboardLocation[]>,
+    precision: number = 1
+  ) {
     const locsWithDistance = toValue(locations)
-    locsWithDistance.forEach((location) => {
-      location.distance = `${getHaversineDistance(
-        { latitude: location.latitude, longitude: location.longitude },
-        {
-          latitude: searchOrUserLocation.value.latitude,
-          longitude: searchOrUserLocation.value.longitude,
-        },
-        1
-      )} mi`
-    })
-    locations.value = locsWithDistance
+    if (hasLocationData(searchOrUserLocation)) {
+      locsWithDistance.forEach((location) => {
+        const dist = getHaversineDistance(
+          { latitude: location.latitude, longitude: location.longitude },
+          searchOrUserLocation,
+          precision
+        )
+        location.distance = `${dist} mi`
+      })
+    }
+    return locsWithDistance
   }
 
   function handleSearchSubmit(locationSearchString: string) {
@@ -109,29 +99,27 @@ export function useUserAndSearchLocations<PinboardLocation extends BasicLocation
       case StreetIntersection.test(locationSearchString): {
         locationSearchMode.value = 'address'
         addressForSearch.value = locationSearchString
-        zipcodeForSearch.value = ''
-        keywordsForSearch.value = ''
+        zipcodeForSearch.value = keywordsForSearch.value = ''
         break
       }
       case Zipcode.test(locationSearchString): {
         locationSearchMode.value = 'zipcode'
         zipcodeForSearch.value = locationSearchString
-        addressForSearch.value = ''
-        keywordsForSearch.value = ''
+        addressForSearch.value = keywordsForSearch.value = ''
         break
       }
       case locationSearchString !== '': {
         locationSearchMode.value = 'keyword'
         keywordsForSearch.value = locationSearchString
-        addressForSearch.value = ''
-        zipcodeForSearch.value = ''
+        addressForSearch.value = zipcodeForSearch.value = ''
         break
       }
       default: {
         locationSearchMode.value = undefined
-        addressForSearch.value = locationSearchString
-        zipcodeForSearch.value = locationSearchString
-        keywordsForSearch.value = locationSearchString
+        addressForSearch.value =
+          zipcodeForSearch.value =
+          keywordsForSearch.value =
+            locationSearchString
       }
     }
   }
@@ -150,7 +138,9 @@ export function useUserAndSearchLocations<PinboardLocation extends BasicLocation
     searchOrUserLocation,
     handleSearchSubmit,
     endWatch,
-    handleGeolocate,
-    handleGeolocateError,
+    handleMapGeolocate,
+    handleMapGeolocateError,
+    getLocationsWithDistance,
+    getUserLocation,
   }
 }

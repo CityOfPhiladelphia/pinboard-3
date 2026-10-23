@@ -20,6 +20,7 @@ interface Options<T> {
    * search term is set).
    */
   onEmpty?: () => Promise<T> | T
+  timeout?: number
 }
 
 export interface UseDebouncedSearch<T> {
@@ -37,19 +38,14 @@ export function useDebouncedSearch<T>(opts: Options<T>): UseDebouncedSearch<T> {
   const loading = ref(false)
   const error = ref<string | undefined>(undefined)
 
-  let timer: ReturnType<typeof setTimeout> | null = null
   let abort: AbortController | null = null
 
   function cancel() {
-    if (timer) {
-      clearTimeout(timer)
-      timer = null
-    }
     abort?.abort()
     abort = null
   }
 
-  watch(query, (q) => {
+  watch(query, async (q) => {
     cancel()
     error.value = undefined
     const trimmed = q.trim()
@@ -61,19 +57,21 @@ export function useDebouncedSearch<T>(opts: Options<T>): UseDebouncedSearch<T> {
       return
     }
     loading.value = true
-    timer = setTimeout(async () => {
-      const ctl = new AbortController()
-      abort = ctl
-      try {
-        const value = await opts.fetcher(trimmed, ctl.signal)
-        if (!ctl.signal.aborted) results.value = value
-      } catch (err) {
-        if ((err as Error).name === 'AbortError' || ctl.signal.aborted) return
-        error.value = (err as Error).message ?? String(err)
-      } finally {
-        if (!ctl.signal.aborted) loading.value = false
-      }
-    }, DEBOUNCE_MS)
+
+    abort = new AbortController()
+    const timeoutSignal = AbortSignal.timeout(opts.timeout ?? DEBOUNCE_MS)
+    const signal = AbortSignal.any([abort.signal, timeoutSignal])
+
+    try {
+      const value = await opts.fetcher(trimmed, signal)
+      if (!abort.signal.aborted) results.value = value
+    } catch (err) {
+      console.error(err)
+      if ((err as Error).name === 'AbortError' || abort.signal.aborted) return
+      error.value = (err as Error).message ?? String(err)
+    } finally {
+      if (!abort.signal.aborted) loading.value = false
+    }
   })
 
   onBeforeUnmount(cancel)

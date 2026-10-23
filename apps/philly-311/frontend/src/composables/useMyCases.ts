@@ -3,7 +3,8 @@
 import { ref } from 'vue'
 import { api311Fetch, type Auth } from './api311'
 import { parseError } from './useApiError'
-import { parseLinkHeader, toReport, type ApiNearbyIssue, type Report } from './useNearbyReports'
+import { parseLinkHeader, toReport } from './useNearbyReports'
+import type { Report, Issue } from '@/types/api'
 
 const PAGE_LIMIT = 200
 
@@ -25,8 +26,8 @@ export function useMyCases(auth: Auth) {
         const res = await api311Fetch({ path: '/private/key/me/issues', auth, query })
         if (!res.ok) throw await parseError(res)
         const { next } = parseLinkHeader(res.headers.get('Link'))
-        const body = (await res.json()) as { issues?: ApiNearbyIssue[] }
-        all.push(...(body.issues ?? []).map(toReport))
+        const body = (await res.json()) as { issues?: Issue[] }
+        all.push(...toReport(body.issues ?? []))
         // Follow next only while it advances, so a server-side Link bug can't loop forever.
         offset = next !== null && next > (offset ?? 0) ? next : undefined
       } while (offset !== undefined)

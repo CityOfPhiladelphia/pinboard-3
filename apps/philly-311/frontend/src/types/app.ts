@@ -1,3 +1,6 @@
+import type { BasicLocation } from '@pinboard/ui'
+import type { Report } from './api'
+
 export type Service =
   | 'Abandoned Vehicle'
   | 'Abandoned Bike'
@@ -53,3 +56,7 @@ export type Service =
   | 'Short Term Rental Complaint'
   | 'Plastic Bag Complaint'
   | 'Needle Collection'
+
+export interface ReportLocation extends BasicLocation, Omit<Report, 'lat' | 'lng'> {
+  caseNumber: string
+}

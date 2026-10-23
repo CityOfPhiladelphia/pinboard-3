@@ -15,33 +15,43 @@ import ReportListingCard from '@/components/ReportListingCard.vue'
 import ReportDetail from '@/components/ReportDetail.vue'
 import ClusteredMarkers from '@/components/ClusteredMarkers.vue'
 import MapConstraints from '@/components/MapConstraints.vue'
+import type { Report } from '@/types/api'
+import type { ReportLocation } from '@/types/app'
+
+const aisClientId: string | undefined = import.meta.env.VITE_311_AIS_GATEKEEPER_KEY || undefined
 
 const auth = useAuth()
 const cases = useMyCases(auth)
 const isMobile = inject(IS_MOBILE_KEY, ref(true))
 
-const locations = computed(() => cases.reports.value.map(reportToLocation))
+const locations = computed(() => {
+  const goodReports = cases.reports.value.filter(
+    (report) =>
+      report.serviceType &&
+      report.id &&
+      report.lat &&
+      report.lng &&
+      report.status &&
+      report.address,
+  ) as Report[]
+  return goodReports.map(reportToLocation)
+})
 // Required by Pinboard; without a location-search-mode the map never pans to it.
-const searchOrUserLocation: PinboardTypes.LatLon = {
-  latitude: DEFAULT_CENTER.lat,
-  longitude: DEFAULT_CENTER.lng,
-}
-const reportById = (id: string) => cases.reports.value.find((r) => r.id === id)
+const searchOrUserLocation: PinboardTypes.LatLon = DEFAULT_CENTER
 
 const counts = computed(() => {
-  const c = { open: 0, onHold: 0, closed: 0 }
-  for (const r of cases.reports.value) {
-    const bucket = statusBucket(r.status)
-    if (bucket) c[bucket]++
+  const counts = { open: 0, onHold: 0, closed: 0 }
+  for (const report of cases.reports.value) {
+    const bucket = statusBucket(report.status)
+    if (bucket) counts[bucket]++
   }
-  return c
+  return counts
 })
 
-function getMapCardProps(location: PinboardTypes.BasicLocation): MapCardProps {
-  const report = reportById(location.id)
+function getMapCardProps(location: ReportLocation): MapCardProps {
   return {
     heading: location.name,
-    body: report?.address ?? '',
+    body: location?.address ?? '',
   } satisfies MapCardProps
 }
 
@@ -60,6 +70,7 @@ onMounted(() => {
     :is-mobile="isMobile"
     location-panel-count-noun="request"
     :initial-bottom-sheet-snap-index="1"
+    :ais-client-id="aisClientId"
   >
     <template #page-header>
       <div class="reports-page-header" :class="{ 'is-mobile': isMobile }">
@@ -85,14 +96,14 @@ onMounted(() => {
     </template>
 
     <template #location-card="{ location }">
-      <ReportListingCard v-if="reportById(location.id)" :report="reportById(location.id)!" />
-      <p v-else>{{ location.name }}</p>
+      <ReportListingCard v-if="location.id" :report="location" />
+      <p v-else v-text="location.name" />
     </template>
 
     <template #location-detail="{ location, onClose }">
       <ReportDetail
-        v-if="reportById(location.id)"
-        :report="reportById(location.id)!"
+        v-if="location.id"
+        :report="location"
         :on-close="onClose"
         :show-upvote="false"
       />
