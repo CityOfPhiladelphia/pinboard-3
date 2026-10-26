@@ -81,11 +81,10 @@ const cornerShape = computed(() => {
 })
 
 watch(
-  [searchFocused, locatingUser, searchString, searchSuggestions, recentSearches],
-  ([isFocused, isLocating, newSearch, newSuggestions, newRecent]) => {
+  [searchFocused, locatingUser, searchSuggestions, recentSearches],
+  ([isFocused, isLocating, newSuggestions, newRecent]) => {
     dropdownOpen.value =
-      (isFocused || isLocating || newSearch.length > 0) &&
-      (newSuggestions.length > 0 || newRecent.length > 0)
+      (isFocused || isLocating) && (newSuggestions.length > 0 || newRecent.length > 0)
   }
 )
 

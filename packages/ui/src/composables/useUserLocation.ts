@@ -1,13 +1,15 @@
-import { ref, watch } from 'vue'
+import { type MaybeRef, ref, toValue, watch } from 'vue'
 import type {
   LatLon,
   LocationPermissionState,
+  SearchMode,
   UserLocationState,
   UseUserLocationParams,
 } from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
 export function useUserLocation(options?: UseUserLocationParams) {
+  const locationSearchMode = ref<SearchMode>(undefined)
   const unknownLocation = {
     latitude: NaN,
     longitude: NaN,
@@ -112,9 +114,10 @@ export function useUserLocation(options?: UseUserLocationParams) {
 
   function locationSuccess(position: GeolocationPosition) {
     // only show location on map if user is in or near Philly
-    const newLocation = {
+    const newLocation: LatLon = {
       latitude: checkLatitudeInRange(position.coords.latitude) ? position.coords.latitude : NaN,
       longitude: checkLongitudeInRange(position.coords.longitude) ? position.coords.longitude : NaN,
+      accuracy: position.coords.accuracy,
     }
     const newLocIsValid = hasLocationData(newLocation)
     userLocation.value = newLocIsValid ? newLocation : defaultLocation
@@ -152,19 +155,29 @@ export function useUserLocation(options?: UseUserLocationParams) {
       longitude: locationData.longitude,
       accuracy: locationData.accuracy,
     }
+    locationSearchMode.value = undefined
   }
 
   function handleMapGeolocateError(error: Error | GeolocationPositionError) {
     console.error(error)
   }
 
+  function locationNotDefault(location: MaybeRef<LatLon>) {
+    const locVal = toValue(location)
+    return (
+      locVal.latitude !== defaultLocation.latitude || locVal.longitude !== defaultLocation.longitude
+    )
+  }
+
   return {
     userLocation,
     userLocationState,
+    locationSearchMode,
     getUserLocation,
     endWatch,
     handleMapGeolocate,
     handleMapGeolocateError,
+    locationNotDefault,
   }
 }
 

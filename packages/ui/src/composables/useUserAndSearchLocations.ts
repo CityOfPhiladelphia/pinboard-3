@@ -1,6 +1,6 @@
 import { ref, toValue, watchEffect, type MaybeRef } from 'vue'
 import { hasLocationData } from '../utilities/hasLocationData'
-import type { BasicLocation, LatLon, SearchMode, UseUserAndSearchLocationsParams } from '../types'
+import type { BasicLocation, LatLon, UseUserAndSearchLocationsParams } from '../types'
 import { useSearchAddress, useSearchZipcode, useUserLocation } from './_index'
 import {
   getHaversineDistance,
@@ -14,10 +14,12 @@ export function useUserAndSearchLocations(options: UseUserAndSearchLocationsPara
   const {
     userLocation,
     userLocationState,
+    locationSearchMode,
     getUserLocation,
     endWatch,
     handleMapGeolocate,
     handleMapGeolocateError,
+    locationNotDefault,
   } = useUserLocation(userLocationParams)
   const addressForSearch = ref<string>('')
   const { addressCoordinates, finishedAddressFetch } = useSearchAddress(
@@ -27,34 +29,33 @@ export function useUserAndSearchLocations(options: UseUserAndSearchLocationsPara
   const zipcodeForSearch = ref<string>('')
   const { zipcodePolygon, finishedZipFetch } = useSearchZipcode(zipcodeForSearch)
   const keywordsForSearch = ref<string>('')
-  const locationSearchMode = ref<SearchMode>(undefined)
   const searchOrUserLocation = ref<LatLon>(userLocation.value)
 
   watchEffect(() => {
     const useAddressSearch =
       locationSearchMode.value === 'address' &&
       finishedAddressFetch.value &&
-      hasLocationData(addressCoordinates)
+      locationNotDefault(addressCoordinates)
 
     const useZipcodeSearch =
       locationSearchMode.value === 'zipcode' &&
       finishedZipFetch.value &&
-      hasLocationData(zipcodePolygon.value.centroid)
+      locationNotDefault(zipcodePolygon.value.centroid)
 
     const useUserLocation =
       (!locationSearchMode.value || locationSearchMode.value === 'keyword') &&
       finishedAddressFetch.value &&
       finishedZipFetch.value &&
-      hasLocationData(userLocation)
+      locationNotDefault(userLocation)
 
     switch (true) {
       case useAddressSearch: {
         searchOrUserLocation.value = addressCoordinates.value
-        return
+        break
       }
       case useZipcodeSearch: {
         searchOrUserLocation.value = zipcodePolygon.value.centroid
-        return
+        break
       }
       case useUserLocation: {
         searchOrUserLocation.value = userLocation.value
@@ -67,12 +68,6 @@ export function useUserAndSearchLocations(options: UseUserAndSearchLocationsPara
         }
       }
     }
-  })
-
-  watchEffect(() => {
-    // additional watchEffect because app's geolocate button on map can set the userLocation in a way the other watchEffect cannot see
-    if (finishedAddressFetch.value && finishedZipFetch.value && hasLocationData(userLocation.value))
-      searchOrUserLocation.value = userLocation.value
   })
 
   function getLocationsWithDistance<PinboardLocation extends BasicLocation>(
@@ -142,5 +137,6 @@ export function useUserAndSearchLocations(options: UseUserAndSearchLocationsPara
     handleMapGeolocateError,
     getLocationsWithDistance,
     getUserLocation,
+    locationNotDefault,
   }
 }

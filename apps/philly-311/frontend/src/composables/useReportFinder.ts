@@ -53,7 +53,7 @@ export function useReportFinder(): UseReportFinder {
     handleMapGeolocateError,
     getLocationsWithDistance,
     getUserLocation,
-  } = useUserAndSearchLocations({ aisClientId, timeout: 10_000 })
+  } = useUserAndSearchLocations({ aisClientId, timeout: 10_000, defaultLocation: DEFAULT_CENTER })
 
   const filter = ref('all')
 
@@ -114,9 +114,7 @@ export function useReportFinder(): UseReportFinder {
 
   async function init(): Promise<void> {
     await getUserLocation()
-    await store.ensureLoaded(
-      hasLocationData(searchOrUserLocation) ? searchOrUserLocation.value : DEFAULT_CENTER,
-    )
+    await store.ensureLoaded(searchOrUserLocation.value)
   }
 
   function setFilter(value: string) {

@@ -33,7 +33,6 @@ const filterValues = ref<FilterValue>({ toggles: {} })
 const canShowAccuracy = computed(() => {
   return (
     Object.keys(finder.searchOrUserLocation.value).includes('accuracy') &&
-    (!finder.locationSearchMode.value || finder.locationSearchMode.value === 'keyword') &&
     hasLocationData(finder.searchOrUserLocation)
   )
 })
