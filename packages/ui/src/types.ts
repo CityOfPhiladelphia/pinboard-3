@@ -12,6 +12,7 @@ export type LongitudeLatitude = [number, number]
 export interface LatLon {
   latitude: number
   longitude: number
+  accuracy?: number
 }
 
 export interface ZipcodePolygon {
@@ -37,6 +38,18 @@ export interface CustomSort<T> extends Partial<Record<SortMode, SortFunction<T>>
   DistAsc: SortFunction<T>
   DistDesc: SortFunction<T>
   default: SortFunction<T>
+}
+
+export interface UseUserLocationParams {
+  promptOnPageLoad?: boolean
+  watchLocation?: boolean
+  enableHighAccuracy?: boolean
+  timeout?: number
+  maximumAge?: number
+}
+
+export interface UseUserAndSearchLocationsParams extends UseUserLocationParams {
+  aisClientId?: string
 }
 
 export type LocationPermissionState = 'granted' | 'prompt' | 'denied'

@@ -43,7 +43,9 @@ const props = defineProps<{
   locationSearch: string | undefined
   locationFilter: LocationFilterOption[] | undefined
   locationSort: SortLocationsOptions | undefined
-  filters?: FilterProps[]
+  filters: FilterProps[] | undefined
+  countNoun: string | undefined
+  aisClientId: string | undefined
 }>()
 
 // emits
@@ -130,6 +132,7 @@ defineExpose({ scrollToCard, scrollbarWidth })
     :filters="filters"
     :sort-options="locationSort"
     :is-mobile="isMobile"
+    :ais-client-id="aisClientId"
     @search="emit('search')"
   />
 

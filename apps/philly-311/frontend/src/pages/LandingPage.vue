@@ -23,6 +23,8 @@ import ClusteredMarkers from '@/components/ClusteredMarkers.vue'
 import LocationAccuracyCircle from '@/components/LocationAccuracyCircle.vue'
 import type { ReportLocation } from '@/types/app'
 
+const aisClientId: string | undefined = import.meta.env.VITE_311_AIS_GATEKEEPER_KEY || undefined
+
 const finder = useReportFinder()
 const isMobile = inject(IS_MOBILE_KEY, ref(true))
 const searchPlaceholder = 'Search by address or ZIP'
@@ -92,6 +94,7 @@ async function onSearch(query: string) {
     :location-panel-search="searchPlaceholder"
     location-panel-count-noun="report"
     :initial-bottom-sheet-snap-index="1"
+    :ais-client-id="aisClientId"
     @search="onSearch"
     @bounds-change="setMapBounds"
   >

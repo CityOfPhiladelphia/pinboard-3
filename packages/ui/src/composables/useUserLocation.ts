@@ -1,17 +1,31 @@
 import { ref, watch } from 'vue'
-import type { LatLon, LocationPermissionState, UserLocationState } from '../types'
+import type {
+  LatLon,
+  LocationPermissionState,
+  UserLocationState,
+  UseUserLocationParams,
+} from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
-export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation: boolean = false) {
-  const userLocation = ref<LatLon>({
+export function useUserLocation(options?: UseUserLocationParams) {
+  const promptOnPageLoad = options?.promptOnPageLoad ?? false
+  const watchLocation = options?.watchLocation ?? false
+  const geolocationOptions = {
+    enableHighAccuracy: options?.enableHighAccuracy ?? false,
+    timeout: options?.timeout ?? Infinity,
+    maximumAge: options?.maximumAge ?? 0,
+  }
+
+  const unknownLocation = {
     latitude: NaN,
     longitude: NaN,
-  })
+  }
+
+  const userLocation = ref<LatLon>(unknownLocation)
   const userLocationPermissionState = ref<LocationPermissionState>('prompt')
   const userLocationState = ref<UserLocationState>('unknown')
   const gotInitialLocation = ref<boolean>(false)
   const watchId = ref<number | null>(null)
-  const geolocationOptions = { timeout: Infinity, maximumAge: 0, enableHighAccuracy: false }
 
   try {
     navigator.permissions
@@ -88,17 +102,14 @@ export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation
 
   function locationSuccess(position: GeolocationPosition) {
     // only show location on map if user is in or near Philly
-    userLocation.value.latitude = checkLatitudeInRange(position.coords.latitude)
-      ? position.coords.latitude
-      : NaN
-    userLocation.value.longitude = checkLongitudeInRange(position.coords.longitude)
-      ? position.coords.longitude
-      : NaN
-    if (!hasLocationData(userLocation)) {
-      console.error(`Location not in range`)
-      userLocation.value.latitude = NaN
-      userLocation.value.longitude = NaN
+    const newLocation = {
+      latitude: checkLatitudeInRange(position.coords.latitude) ? position.coords.latitude : NaN,
+      longitude: checkLongitudeInRange(position.coords.longitude) ? position.coords.longitude : NaN,
     }
+
+    const newLocIsValid = hasLocationData(newLocation)
+    userLocation.value = newLocIsValid ? newLocation : unknownLocation
+    if (!newLocIsValid) console.error(`Location not in range`)
 
     if (!gotInitialLocation.value) {
       // if navigator.permissions is 'prompt' or 'granted' resolve both to 'granted' if user allows location services
@@ -119,8 +130,7 @@ export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation
   function clearUserLocation() {
     watchId.value = null
     gotInitialLocation.value = false
-    userLocation.value.latitude = NaN
-    userLocation.value.longitude = NaN
+    userLocation.value = unknownLocation
     userLocationState.value = 'unknown'
   }
 
@@ -131,15 +141,11 @@ export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation
     clearUserLocation()
   }
 
-  function handleMapGeolocate(locationData: {
-    latitude: number
-    longitude: number
-    accuracy: number
-  }) {
-    console.log('Geolocation Accuracy: ', locationData.accuracy)
+  function handleMapGeolocate(locationData: Required<LatLon>) {
     userLocation.value = {
       latitude: locationData.latitude,
       longitude: locationData.longitude,
+      accuracy: locationData.accuracy,
     }
   }
 

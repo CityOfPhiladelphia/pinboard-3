@@ -31,6 +31,7 @@ import type {
 } from '@/types'
 import { sortLocations } from '@/utilities/sortLocations'
 
+const aisClientId: string | undefined = import.meta.env.VITE_AIS_CLIENTID_PRICARE || undefined
 const defaultFilterState: PrimaryCareFilters = {
   sort: {
     distance: false,
@@ -86,7 +87,8 @@ const {
   handleSearchSubmit,
   handleMapGeolocate,
   handleMapGeolocateError,
-} = useUserAndSearchLocations(locations)
+  getLocationsWithDistance,
+} = useUserAndSearchLocations({ aisClientId })
 const filterState = ref<PrimaryCareFilters>(defaultFilterState)
 
 const { filterLogicalValue, filterLogic } = useFilterLogic(locations, languages, filterState)
@@ -172,7 +174,9 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
     })
   }
 
-  return filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
+  return getLocationsWithDistance(
+    filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
+  ).value
 })
 
 function mapFilterTextToFilterLogic(
@@ -213,6 +217,7 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
     :geojson="filteredGeojson"
     :is-mobile="isMobile"
     :filters="filterChipDefinitions"
+    :ais-client-id="aisClientId"
     @search="handleSearchSubmit"
   >
     <template #locations-header>
