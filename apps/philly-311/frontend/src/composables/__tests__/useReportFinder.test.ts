@@ -1,5 +1,5 @@
 // ABOUTME: Tests for useReportFinder — geolocation seed, city-wide store integration,
-// ABOUTME: filter state, and derived locations/filterOptions/reportById.
+// ABOUTME: filter state, and derived locations/filterOptions.
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import type { Report } from '@/composables/useNearbyReports'
@@ -111,13 +111,6 @@ describe('useReportFinder', () => {
       'Abandoned Vehicle',
       'Tree Maintenance',
     ])
-  })
-
-  it('looks up a report by id', async () => {
-    getCurrentPosition.mockResolvedValue(null)
-    const f = useReportFinder()
-    await f.init()
-    expect(f.reportById('2')?.serviceType).toBe('Illegal Dumping')
   })
 
   it('exposes the load error message', async () => {

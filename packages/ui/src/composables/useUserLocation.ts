@@ -1,11 +1,5 @@
 import { ref, watch } from 'vue'
-import type {
-  Latitude,
-  LatLon,
-  LocationPermissionState,
-  Longitude,
-  UserLocationState,
-} from '../types'
+import type { LatLon, LocationPermissionState, UserLocationState } from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
 export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation: boolean = false) {
@@ -137,7 +131,7 @@ export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation
     clearUserLocation()
   }
 
-  function handleGeolocate(locationData: {
+  function handleMapGeolocate(locationData: {
     latitude: number
     longitude: number
     accuracy: number
@@ -149,7 +143,7 @@ export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation
     }
   }
 
-  function handleGeolocateError(error: Error | GeolocationPositionError) {
+  function handleMapGeolocateError(error: Error | GeolocationPositionError) {
     console.error(error)
   }
 
@@ -158,15 +152,15 @@ export function useUserLocation(promptOnPageLoad: boolean = false, watchLocation
     userLocationState,
     getUserLocation,
     endWatch,
-    handleGeolocate,
-    handleGeolocateError,
+    handleMapGeolocate,
+    handleMapGeolocateError,
   }
 }
 
 // verify location is in or near enough to Philadelphia
-function checkLongitudeInRange(longitude: Longitude) {
+function checkLongitudeInRange(longitude: number) {
   return -75.35227 < longitude && longitude < -74.91583
 }
-function checkLatitudeInRange(latitude: Latitude) {
+function checkLatitudeInRange(latitude: number) {
   return 39.84911 < latitude && latitude < 40.175
 }

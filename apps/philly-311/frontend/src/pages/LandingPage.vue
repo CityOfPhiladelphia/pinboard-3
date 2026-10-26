@@ -1,7 +1,7 @@
 <!-- ABOUTME: The 311 reports finder — Pinboard map + list of nearby reports with
      service-type filter chips, geolocation-seeded load, and inline report detail. -->
 <script setup lang="ts">
-import { computed, inject, onMounted, ref } from 'vue'
+import { computed, inject, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   PinboardBody,
@@ -11,7 +11,7 @@ import {
   PinboardComposables,
   IS_MOBILE_KEY,
 } from '@pinboard/ui'
-import type { PinboardTypes, MapCardProps, FilterValue } from '@pinboard/ui'
+import type { MapCardProps, FilterValue, SearchMode } from '@pinboard/ui'
 import { useReportFinder } from '@/composables/useReportFinder'
 import ReportDetail from '@/components/ReportDetail.vue'
 import { searchAddress } from '@/composables/useAis'
@@ -21,6 +21,7 @@ import ReportListingCard from '@/components/ReportListingCard.vue'
 import MapConstraints from '@/components/MapConstraints.vue'
 import ClusteredMarkers from '@/components/ClusteredMarkers.vue'
 import LocationAccuracyCircle from '@/components/LocationAccuracyCircle.vue'
+import type { ReportLocation } from '@/types/app'
 
 const finder = useReportFinder()
 const isMobile = inject(IS_MOBILE_KEY, ref(true))
@@ -35,37 +36,38 @@ const { visibleLocations, setMapBounds } = PinboardComposables.useMapBoundsFilte
   { alwaysInclude: selectedReportId },
 )
 
-function getMapCardProps(location: PinboardTypes.BasicLocation): MapCardProps {
-  const report = finder.reportById(location.id)
+function getMapCardProps(location: ReportLocation): MapCardProps {
   return {
     heading: location.name,
-    body: report?.address ?? '',
-  } satisfies MapCardProps
+    body: location.address,
+  }
 }
 // 'address' after a successful geocode — Pinboard pans the map to
 // searchOrUserLocation only while an address/zipcode search mode is set.
-const locationSearchMode = ref<PinboardTypes.SearchMode>(undefined)
+const locationSearchMode = ref<SearchMode>(undefined)
 
 const locatedFix = ref<{ latitude: number; longitude: number; accuracy: number } | null>(null)
 
 const filterValues = ref<FilterValue>({ toggles: {} })
 
-const filteredLocations = computed(() => {
-  const iOfTrue = Object.values(filterValues.value?.toggles).indexOf(true)
-  const selectedService =
-    iOfTrue >= 0 ? Object.keys(filterValues.value?.toggles)[iOfTrue] : undefined
-  return selectedService
-    ? visibleLocations.value.filter((location) => location.name === selectedService)
-    : visibleLocations.value
+watch(
+  () => filterValues.value.toggles,
+  (newValues) => {
+    const iOfTrue = Object.values(newValues).indexOf(true)
+    finder.setFilter(iOfTrue >= 0 ? Object.keys(filterValues.value?.toggles)[iOfTrue] : 'all')
+  },
+  {
+    deep: 1,
+  },
+)
+
+onMounted(() => {
+  finder.init()
 })
 
 function onLocated(data: { longitude: number; latitude: number; accuracy: number }) {
   locatedFix.value = data
 }
-
-onMounted(() => {
-  finder.init()
-})
 
 async function onSearch(query: string) {
   const feature = await searchAddress(query)
@@ -82,7 +84,7 @@ async function onSearch(query: string) {
     v-model:location-search-mode="locationSearchMode"
     v-model:search-or-user-location="finder.searchOrUserLocation.value"
     v-model:error-message="finder.errorMessage.value"
-    :locations="filteredLocations"
+    :locations="visibleLocations"
     :filters="finder.filterOptions.value"
     :is-loading="finder.isLoading.value ? 'Loading reports…' : false"
     :get-map-card-props="getMapCardProps"
@@ -102,19 +104,11 @@ async function onSearch(query: string) {
     </template>
 
     <template #location-card="{ location }">
-      <ReportListingCard
-        v-if="finder.reportById(location.id)"
-        :report="finder.reportById(location.id)!"
-      />
-      <p v-else v-text="location.name" />
+      <ReportListingCard :report="location" />
     </template>
 
     <template #location-detail="{ location, onClose }">
-      <ReportDetail
-        v-if="finder.reportById(location.id)"
-        :report="finder.reportById(location.id)!"
-        :on-close="onClose"
-      />
+      <ReportDetail :report="location" :on-close="onClose" />
     </template>
 
     <template
@@ -150,7 +144,7 @@ async function onSearch(query: string) {
       <!-- Rounded zoom: clustering and pin sizing are integer-granular, and a
            fractional zoom prop would re-render every marker per animation frame. -->
       <ClusteredMarkers
-        :locations="filteredLocations"
+        :locations="visibleLocations"
         :zoom="Math.round(zoom)"
         :map="map"
         :hovered-id="hoveredId"

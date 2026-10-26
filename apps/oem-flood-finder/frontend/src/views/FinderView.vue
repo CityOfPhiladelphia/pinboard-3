@@ -60,8 +60,8 @@ const {
   locationSearchMode,
   searchOrUserLocation,
   handleSearchSubmit,
-  handleGeolocate,
-  handleGeolocateError,
+  handleMapGeolocate,
+  handleMapGeolocateError,
 } = PinboardComposables.useUserAndSearchLocations(oemLocations, true, true)
 const locationSortMode = ref<PinboardTypes.SortMode>(
   ['located', 'watching'].includes(userLocationState.value) ? 'DistAsc' : '',
@@ -179,8 +179,8 @@ function getMapCardProps(location: OemLocation): MapCardProps {
         :position="isMobile ? 'top-right' : 'bottom-right'"
         :teleport-to="isMobile ? mobileControlsTarget : undefined"
         :show-location-marker="false"
-        @located="handleGeolocate"
-        @error="handleGeolocateError"
+        @located="handleMapGeolocate"
+        @error="handleMapGeolocateError"
       />
 
       <FillLayer

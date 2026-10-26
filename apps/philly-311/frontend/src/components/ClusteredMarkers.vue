@@ -3,15 +3,14 @@
 <script setup lang="ts">
 import { computed, watch, ref, toRef } from 'vue'
 import { MapMarker, MapIconTextPin } from '@pinboard/ui'
-import type { PinboardTypes } from '@pinboard/ui'
 import { useClusters } from '@/composables/useClusters'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import { serviceTypeColor } from '@/utils/serviceTypeMeta'
 import ClusterBadge from '@/components/ClusterBadge.vue'
-import type { Service } from '@/types/app'
+import type { ReportLocation, Service } from '@/types/app'
 
 const props = defineProps<{
-  locations: PinboardTypes.BasicLocation[]
+  locations: ReportLocation[]
   zoom: number
   map: unknown
   hoveredId: string | null
@@ -21,7 +20,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   hover: [id: string]
   'hover-end': []
-  select: [loc: PinboardTypes.BasicLocation]
+  select: [loc: ReportLocation]
 }>()
 
 const { clusters, expansionZoom } = useClusters(toRef(props, 'locations'), toRef(props, 'zoom'))
@@ -37,7 +36,7 @@ watch(clusters, () => {
 })
 
 const locationById = computed(() => {
-  const m = new Map<string, PinboardTypes.BasicLocation>()
+  const m = new Map<string, ReportLocation>()
   for (const loc of props.locations) m.set(loc.id, loc)
   return m
 })

@@ -14,7 +14,7 @@ export function useUserAndSearchLocations<PinboardLocation extends BasicLocation
   promptLocationOnPageLoad: boolean = false,
   watchLocation: boolean = false
 ) {
-  const { userLocation, userLocationState, endWatch, handleGeolocate, handleGeolocateError } =
+  const { userLocation, userLocationState, endWatch, handleMapGeolocate, handleMapGeolocateError } =
     useUserLocation(promptLocationOnPageLoad, watchLocation)
   const addressForSearch = ref<string>('')
   const { addressCoordinates, finishedAddressFetch } = useSearchAddress(addressForSearch)
@@ -71,8 +71,8 @@ export function useUserAndSearchLocations<PinboardLocation extends BasicLocation
 
   watch(
     () => searchOrUserLocation.value,
-    () => {
-      if (hasLocationData(searchOrUserLocation.value)) {
+    (newLoc) => {
+      if (hasLocationData(newLoc)) {
         findLocationDistances()
       }
     },
@@ -150,7 +150,7 @@ export function useUserAndSearchLocations<PinboardLocation extends BasicLocation
     searchOrUserLocation,
     handleSearchSubmit,
     endWatch,
-    handleGeolocate,
-    handleGeolocateError,
+    handleMapGeolocate,
+    handleMapGeolocateError,
   }
 }

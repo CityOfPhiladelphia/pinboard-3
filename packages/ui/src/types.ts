@@ -7,14 +7,11 @@ export interface Dimensions {
   width: number
 }
 
-export type Latitude = number
-export type Longitude = number
-
-export type LongitudeLatitude = [Longitude, Latitude]
+export type LongitudeLatitude = [number, number]
 
 export interface LatLon {
-  latitude: Latitude
-  longitude: Longitude
+  latitude: number
+  longitude: number
 }
 
 export interface ZipcodePolygon {
