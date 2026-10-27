@@ -124,7 +124,7 @@ watch(allFiltersOpen, (open) => {
 
 <template>
   <Teleport to="#mobile-map-search-filter" :disabled="!isMobile">
-    <div class="location-search-filter-sort" :class="{ mobile: isMobile }">
+    <div class="location-search-filter-sort" :class="{ mobile: isMobile }" role="search">
       <PinboardSearch
         v-model:search-string="searchString"
         :v-model:locating-user="userLocationState === 'acquiring'"

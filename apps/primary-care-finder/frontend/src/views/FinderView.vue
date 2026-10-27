@@ -10,10 +10,10 @@ import {
   GeolocationButton,
   BasemapToggle,
   useUserAndSearchLocations,
-  PinboardUtilities,
   Callout,
   applyFilters,
   IS_MOBILE_KEY,
+  hasLocationData,
 } from '@pinboard/ui'
 import type { FilterChoiceBitfieldGroup, MapCardProps } from '@pinboard/ui'
 import { useLocations } from '@/composables/useLocations'
@@ -176,7 +176,7 @@ const filteredLocations = computed<PrimaryCareLocation[]>(() => {
 
   return getLocationsWithDistance(
     filterState.value.sort ? sortLocations(result, searchOrUserLocation, sortMode) : result
-  ).value
+  )
 })
 
 function mapFilterTextToFilterLogic(
@@ -302,7 +302,7 @@ function getMapCardProps(location: PrimaryCareLocation): MapCardProps {
         "
       />
       <MapMarker
-        v-if="PinboardUtilities.hasLocationData(searchOrUserLocation)"
+        v-if="hasLocationData(searchOrUserLocation)"
         key="searchOrUserLocation"
         :lng-lat="[searchOrUserLocation.longitude, searchOrUserLocation.latitude]"
       >

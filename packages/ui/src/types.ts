@@ -41,6 +41,7 @@ export interface CustomSort<T> extends Partial<Record<SortMode, SortFunction<T>>
 }
 
 export interface UseUserLocationParams {
+  defaultLocation?: LatLon
   promptOnPageLoad?: boolean
   watchLocation?: boolean
   enableHighAccuracy?: boolean

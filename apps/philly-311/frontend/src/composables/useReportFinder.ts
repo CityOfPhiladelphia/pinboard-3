@@ -4,39 +4,67 @@
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useOpenIssuesStore } from '@/stores/openIssues'
-import { getCurrentPosition } from '@/composables/useGeolocation'
-import { calcLocationDistance, reportToLocation } from '@/utils/reportCard'
+import { reportToLocation } from '@/utils/reportCard'
 import { DEFAULT_CENTER } from '@/utils/geoDefaults'
 import { serviceTypeIconComponent } from '@/utils/reportIcon'
 import { serviceTypeColor } from '@/utils/serviceTypeMeta'
-import type { FilterProps, LatLon } from '@pinboard/ui'
+import {
+  hasLocationData,
+  searchLocations,
+  useMapBoundsFilter,
+  useUserAndSearchLocations,
+  type FilterProps,
+  type MapBounds,
+} from '@pinboard/ui'
 import type { ReportLocation } from '@/types/app'
+import { useRoute } from 'vue-router'
 
-export interface UseReportFinder {
+export interface UseReportFinder extends Pick<
+  ReturnType<typeof useUserAndSearchLocations>,
+  | 'userLocationState'
+  | 'locationSearchMode'
+  | 'searchOrUserLocation'
+  | 'handleSearchSubmit'
+  | 'handleMapGeolocate'
+  | 'handleMapGeolocateError'
+> {
+  aisClientId: string | undefined
   locations: ComputedRef<ReportLocation[]>
   filterOptions: ComputedRef<FilterProps[]>
-  searchOrUserLocation: Ref<LatLon>
   isLoading: Ref<boolean>
   errorMessage: ComputedRef<string | null>
   filter: Ref<string>
   init: () => Promise<void>
-  setCenter: (loc: LatLon) => void
   setFilter: (value: string) => void
+  setMapBounds: (bounds: MapBounds) => void
 }
 
 export function useReportFinder(): UseReportFinder {
+  const aisClientId: string | undefined = import.meta.env.VITE_311_AIS_GATEKEEPER_KEY || undefined
   const store = useOpenIssuesStore()
-  const { reports, isLoading, error } = storeToRefs(store)
+  const { reports, error } = storeToRefs(store)
+  const {
+    keywordsForSearch,
+    userLocationState,
+    locationSearchMode,
+    searchOrUserLocation,
+    handleSearchSubmit,
+    handleMapGeolocate,
+    handleMapGeolocateError,
+    getLocationsWithDistance,
+    getUserLocation,
+  } = useUserAndSearchLocations({ aisClientId, timeout: 10_000, defaultLocation: DEFAULT_CENTER })
 
   const filter = ref('all')
 
-  const searchOrUserLocation = ref<LatLon>({
-    latitude: DEFAULT_CENTER.lat,
-    longitude: DEFAULT_CENTER.lng,
+  const route = useRoute()
+  const selectedReportId = computed(() =>
+    typeof route.query.location === 'string' ? route.query.location : undefined,
+  )
+
+  const isLoading = computed(() => {
+    return store.isLoading || userLocationState.value === 'acquiring'
   })
-  // True once the center is a real user anchor (geolocation fix or searched
-  // address) rather than the default city center; gates distance sorting.
-  const hasAnchor = ref(false)
 
   const errorMessage = computed(() => error.value?.message ?? '')
 
@@ -44,27 +72,34 @@ export function useReportFinder(): UseReportFinder {
     return reports.value.map((report) => reportToLocation(report))
   })
 
-  const locationsDistances = computed<ReportLocation[]>(() => {
-    return hasAnchor.value
-      ? calcLocationDistance(reportLocations, searchOrUserLocation.value).value
-      : reportLocations.value
+  const filteredLocations = computed<ReportLocation[]>(() => {
+    return filter.value === 'all'
+      ? reportLocations.value
+      : reportLocations.value.filter((r) => r.serviceType === filter.value)
+  })
+
+  const searchedLocations = computed<ReportLocation[]>(() => {
+    return keywordsForSearch.value
+      ? searchLocations(filteredLocations, keywordsForSearch)
+      : filteredLocations.value
+  })
+
+  const { visibleLocations, setMapBounds } = useMapBoundsFilter(reportLocations, {
+    alwaysInclude: selectedReportId,
   })
 
   const locations = computed<ReportLocation[]>(() => {
-    const list =
-      filter.value === 'all'
-        ? locationsDistances.value
-        : locationsDistances.value.filter((r) => r.serviceType === filter.value)
-
-    const sorted = hasAnchor.value
-      ? list.sort((a, b) => Number(a.distance) - Number(b.distance))
-      : list
-    // filter sorted from keyword search results
-    return sorted
+    const locs =
+      keywordsForSearch.value || filter.value !== 'all'
+        ? searchedLocations.value
+        : visibleLocations.value
+    return hasLocationData(searchOrUserLocation)
+      ? getLocationsWithDistance(locs).sort((a, b) => Number(a.distance) - Number(b.distance))
+      : locs
   })
 
   const filterOptions = computed<FilterProps[]>(() => {
-    return [...new Set(reportLocations.value.map((report) => report.serviceType))]
+    return [...new Set(reports.value.map((report) => report.serviceType))]
       .filter(Boolean)
       .sort()
       .map((serviceType) => ({
@@ -75,17 +110,11 @@ export function useReportFinder(): UseReportFinder {
       }))
   })
 
-  function setCenter(loc: LatLon): void {
-    searchOrUserLocation.value = loc
-    hasAnchor.value = true
-  }
-
   async function init(): Promise<void> {
-    const pos = await getCurrentPosition()
-    const center = pos ?? DEFAULT_CENTER
-    searchOrUserLocation.value = { latitude: center.lat, longitude: center.lng }
-    hasAnchor.value = pos !== null
-    await store.ensureLoaded({ lat: center.lat, lng: center.lng })
+    await getUserLocation()
+    await store.ensureLoaded(
+      hasLocationData(searchOrUserLocation) ? searchOrUserLocation.value : DEFAULT_CENTER,
+    )
   }
 
   function setFilter(value: string) {
@@ -93,14 +122,20 @@ export function useReportFinder(): UseReportFinder {
   }
 
   return {
+    aisClientId,
+    userLocationState,
+    locationSearchMode,
+    searchOrUserLocation,
+    handleSearchSubmit,
+    handleMapGeolocate,
+    handleMapGeolocateError,
     locations,
     filterOptions,
-    searchOrUserLocation,
     isLoading,
     errorMessage,
     filter,
     init,
-    setCenter,
     setFilter,
+    setMapBounds,
   }
 }
