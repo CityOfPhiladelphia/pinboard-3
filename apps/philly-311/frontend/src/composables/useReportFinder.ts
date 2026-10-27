@@ -79,26 +79,24 @@ export function useReportFinder(): UseReportFinder {
   })
 
   const searchedLocations = computed<ReportLocation[]>(() => {
-    return keywordsForSearch
+    return keywordsForSearch.value
       ? searchLocations(filteredLocations, keywordsForSearch)
       : filteredLocations.value
   })
 
-  const locationsWithDist = computed<ReportLocation[]>(() => {
-    return hasLocationData(searchOrUserLocation)
-      ? getLocationsWithDistance(filteredLocations).sort(
-          (a, b) => Number(a.distance) - Number(b.distance),
-        )
-      : searchedLocations.value
-  })
-
-  const { visibleLocations, setMapBounds } = useMapBoundsFilter(locationsWithDist, {
+  const { visibleLocations, setMapBounds } = useMapBoundsFilter(reportLocations, {
     alwaysInclude: selectedReportId,
   })
 
-  const locations = computed(() => [
-    ...new Set([...searchedLocations.value, ...visibleLocations.value]),
-  ])
+  const locations = computed<ReportLocation[]>(() => {
+    const locs =
+      keywordsForSearch.value || filter.value !== 'all'
+        ? searchedLocations.value
+        : visibleLocations.value
+    return hasLocationData(searchOrUserLocation)
+      ? getLocationsWithDistance(locs).sort((a, b) => Number(a.distance) - Number(b.distance))
+      : locs
+  })
 
   const filterOptions = computed<FilterProps[]>(() => {
     return [...new Set(reports.value.map((report) => report.serviceType))]
@@ -114,7 +112,9 @@ export function useReportFinder(): UseReportFinder {
 
   async function init(): Promise<void> {
     await getUserLocation()
-    await store.ensureLoaded(searchOrUserLocation.value)
+    await store.ensureLoaded(
+      hasLocationData(searchOrUserLocation) ? searchOrUserLocation.value : DEFAULT_CENTER,
+    )
   }
 
   function setFilter(value: string) {
