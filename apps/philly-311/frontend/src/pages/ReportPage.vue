@@ -7,27 +7,27 @@
      Submit action that replaces Next entirely. Exit opens ExitDialog, which
      either saves the in-progress report as a draft or discards it. -->
 <script setup lang="ts">
-import { inject, provide, ref, computed, watch } from 'vue'
+import { provide, ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import StepIndicator from '@/components/wizard/StepIndicator.vue'
 import ExitDialog from '@/components/wizard/ExitDialog.vue'
 import { PhilaButton } from '@phila/phila-ui-button'
-import { IS_MOBILE_KEY } from '@pinboard/ui'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
 import { useMyCasesStore } from '@/stores/myCases'
 import { WIZARD_CAN_ADVANCE_KEY, WIZARD_SHOW_ERRORS_KEY } from '@/composables/useWizardValidity'
 import { WIZARD_NAV_KEY, type WizardNavHandlers } from '@/composables/useWizardNav'
 import { WIZARD_SUBMIT_KEY, type WizardSubmitHandler } from '@/composables/useWizardSubmit'
+import type { Step } from '@/components/wizard/StepIndicator.vue'
 
-const STEPS = [
-  { title: 'Image', path: '/report' },
-  { title: 'Issue type', path: '/report/issue-type' },
-  { title: 'Location', path: '/report/location' },
-  { title: 'Details', path: '/report/details' },
-  { title: 'Review', path: '/report/review' },
+const ariaLabelStepIndicator = 'Report progress'
+
+const STEPS: Step[] = [
+  { label: 'Image', path: '/report' },
+  { label: 'Issue type', path: '/report/issue-type' },
+  { label: 'Location', path: '/report/location' },
+  { label: 'Details', path: '/report/details' },
+  { label: 'Review', path: '/report/review' },
 ]
-
-const isMobile = inject(IS_MOBILE_KEY, ref(false))
 
 const router = useRouter()
 const route = useRoute()
@@ -74,7 +74,6 @@ const currentStep = computed(() => {
   const idx = STEPS.findIndex((s) => s.path === route.path)
   return idx === -1 ? 1 : idx + 1
 })
-const completedThrough = computed(() => currentStep.value - 1)
 const isImageStep = computed(() => currentStep.value === 1)
 const isLast = computed(() => currentStep.value === STEPS.length)
 const prevPath = computed(() => STEPS[currentStep.value - 2]?.path ?? null)
@@ -118,11 +117,11 @@ function discardAndExit() {
 </script>
 
 <template>
-  <div ref="wizardEl" class="wizard" :class="{ 'is-mobile': isMobile }">
+  <div ref="wizardEl" class="wizard">
     <StepIndicator
       :steps="STEPS"
       :current-step="currentStep"
-      :completed-through="completedThrough"
+      :component-aria-label="ariaLabelStepIndicator"
       class="wizard__steps"
       @navigate="(path: string) => router.push(path)"
     />
@@ -176,25 +175,33 @@ function discardAndExit() {
 
 <style scoped>
 .wizard {
+  /* Set bounds for reactive padding on the sides of the Report Page */
+  --min-spacing: var(--spacing-m, 1rem);
+  --std-side-padding: 5dvw;
+  --max-side-padding: min(var(--std-side-padding), var(--scale-800, 4rem));
+  --min-side-padding: max(var(--std-side-padding), var(--min-spacing));
+  --side-padding: clamp(var(--min-side-padding), var(--std-side-padding), var(--max-side-padding));
+  /* Set bounds for reactive row gap on the sides of the Report Page */
+  --row-gap: clamp(var(--min-spacing), calc(0.3 * var(--side-padding)), var(--spacing-l, 1.5rem));
   display: grid;
   grid-template-columns:
-    [full-start] var(--scale-800, 4rem)
-    [wizard-start] 1fr
-    [steps-start] min(32rem, 100%) [steps-end]
-    1fr [wizard-end]
-    var(--scale-800, 4rem) [full-end];
+    [full-start] var(--side-padding) [wizard-start]
+    1fr
+    [steps-start] min(32rem, calc(100dvw - 2 * var(--side-padding))) [steps-end]
+    1fr
+    [wizard-end] var(--side-padding) [full-end];
   grid-template-rows:
-    var(--spacing-l, 1.5rem)
+    var(--row-gap)
     [steps-row] auto
-    var(--spacing-l, 1.5rem)
+    var(--row-gap)
     [wizard-row] 1fr
-    var(--spacing-l, 1.5rem)
+    var(--row-gap)
     [footer-border] 0
-    var(--spacing-m, 1rem)
+    var(--min-spacing)
     [wizard-footer] auto
-    var(--spacing-m, 1rem);
+    calc(var(--min-spacing) + env(safe-area-inset-bottom, 0px));
   height: 100%;
-  width: 100%;
+  width: 100dvw;
 }
 
 .wizard__steps {
@@ -226,45 +233,10 @@ function discardAndExit() {
 
 .wizard__nav-right {
   display: flex;
-  column-gap: var(--spacing-m, 1rem);
+  column-gap: clamp(var(--spacing-s, 0.75rem), 2dvw, var(--spacing-m, 1rem));
 }
 
 .wizard__exit {
   text-decoration: underline;
-}
-
-.wizard.is-mobile {
-  grid-template-columns:
-    [full-start] var(--spacing-m, 1rem)
-    [wizard-start] 1fr
-    [steps-start] auto [steps-end]
-    1fr [wizard-end]
-    var(--spacing-m, 1rem) [full-end];
-  grid-template-rows:
-    var(--spacing-m, 1rem)
-    [steps-row] auto
-    var(--spacing-m, 1rem)
-    [wizard-row] 1fr
-    var(--spacing-m, 1rem)
-    [footer-border] 0
-    var(--spacing-m, 1rem)
-    [wizard-footer] auto
-    calc(var(--spacing-m, 1rem) + env(safe-area-inset-bottom, 0px));
-}
-
-.wizard.is-mobile .wizard__steps {
-  grid-column: full-start / full-end;
-  place-content: stretch;
-  padding: 0 clamp(var(--spacing-m, 1rem), 6vw, var(--spacing-xl, 2rem));
-}
-
-.wizard.is-mobile .wizard__nav {
-  flex-wrap: wrap;
-  row-gap: var(--spacing-xs, 0.5rem);
-}
-
-.wizard.is-mobile .wizard__nav-right {
-  column-gap: var(--spacing-s, 0.75rem);
-  margin-left: auto;
 }
 </style>
