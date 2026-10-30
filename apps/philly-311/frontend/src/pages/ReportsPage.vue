@@ -37,10 +37,7 @@ const locations = computed(() => {
   return goodReports.map(reportToLocation)
 })
 // Required by Pinboard; without a location-search-mode the map never pans to it.
-const searchOrUserLocation: PinboardTypes.LatLon = {
-  latitude: DEFAULT_CENTER.lat,
-  longitude: DEFAULT_CENTER.lng,
-}
+const searchOrUserLocation: PinboardTypes.LatLon = DEFAULT_CENTER
 
 const counts = computed(() => {
   const counts = { open: 0, onHold: 0, closed: 0 }

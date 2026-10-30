@@ -3,9 +3,10 @@
 import { computed, inject, markRaw, ref } from 'vue'
 
 // 3rd party imports
-import { IconGauge, IconCamera, IconLocationDot, IconWater } from '@phila/phila-ui-core/icons'
 
 // philly ui imports
+import { IconGauge, IconCamera, IconLocationDot, IconWater } from '@phila/phila-ui-core/icons'
+
 // pinboard imports
 import {
   PinboardBody,
@@ -16,16 +17,15 @@ import {
   GeolocationButton,
   FillLayer,
   MapCheckboxLegend,
-  PinboardComposables,
-  PinboardUtilities,
-  type PinboardTypes,
-  type MapCardProps,
+  searchLocations,
   IS_MOBILE_KEY,
+  hasLocationData,
+  sortLocations,
+  useUserAndSearchLocations,
 } from '@pinboard/ui'
 import {
   filterLocations,
   isGauge,
-  searchLocations,
   FLOOD_LAYER_IDS,
   FLOOD_LAYER_CONFIG,
   FLOOD_LEGEND_ITEMS,
@@ -35,6 +35,9 @@ import {
 // app imports
 import LocationDetail from '@/components/LocationDetail.vue'
 import { useLocations } from '@/composables/useLocations'
+
+// type imports
+import type { PinboardTypes, MapCardProps } from '@pinboard/ui'
 import type { Filters, OemLocation } from '@/types'
 
 // app variables
@@ -64,7 +67,7 @@ const {
   handleMapGeolocate,
   handleMapGeolocateError,
   getLocationsWithDistance,
-} = PinboardComposables.useUserAndSearchLocations({
+} = useUserAndSearchLocations({
   aisClientId,
   promptOnPageLoad: true,
   watchLocation: true,
@@ -76,7 +79,7 @@ const isMobile = inject(IS_MOBILE_KEY, ref(true))
 
 // computed refs
 const currentSort = computed(() => {
-  const newLocHasLoc = PinboardUtilities.hasLocationData(searchOrUserLocation.value)
+  const newLocHasLoc = hasLocationData(searchOrUserLocation.value)
   switch (true) {
     case newLocHasLoc && !locationSortMode.value: {
       // if new location matches type of LatLon and no sort mode has been selected, set sort mode to distance-ascending
@@ -100,11 +103,8 @@ const currentLocations = computed(() => {
   const searchedLocations = keywordsForSearch.value
     ? searchLocations(filteredLocations, keywordsForSearch)
     : filteredLocations
-  const gotSearchMatches = typeof searchedLocations !== 'string'
-  const sorted = gotSearchMatches
-    ? PinboardUtilities.sortLocations(searchedLocations, searchOrUserLocation, currentSort)
-    : []
-  return getLocationsWithDistance(sorted).value
+  const sorted = sortLocations(searchedLocations, searchOrUserLocation, currentSort)
+  return getLocationsWithDistance(sorted)
 })
 
 // event handlers
@@ -227,7 +227,7 @@ function getMapCardProps(location: OemLocation): MapCardProps {
           />
         </MapMarker>
         <MapMarker
-          v-if="PinboardUtilities.hasLocationData(searchOrUserLocation)"
+          v-if="hasLocationData(searchOrUserLocation)"
           key="searchOrUserLocation"
           :lng-lat="[searchOrUserLocation.longitude, searchOrUserLocation.latitude]"
         >

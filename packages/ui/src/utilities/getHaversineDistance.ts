@@ -8,7 +8,7 @@ export function getHaversineDistance(
 ) {
   const unrefA = toValue(locA)
   const unrefB = toValue(locB)
-  const decimalPrecisionFloor = Math.floor(Math.abs(decimalPrecision))
+  const decimalPrecisionFloor = Math.min(Math.floor(Math.abs(decimalPrecision)), 20)
   const R = 6371 // Earth's mean radius in kilometers
 
   const dLat = (unrefA.latitude - unrefB.latitude) * (Math.PI / 180)
@@ -23,9 +23,7 @@ export function getHaversineDistance(
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
-  const haversineDistance = (R * c * 0.621371).toFixed(
-    decimalPrecisionFloor <= 20 ? decimalPrecisionFloor : 20
-  ) // convert to miles
+  const haversineDistance = R * c * 0.621371 // convert to miles
 
-  return haversineDistance
+  return haversineDistance.toFixed(decimalPrecisionFloor)
 }

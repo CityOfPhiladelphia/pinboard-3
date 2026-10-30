@@ -1,111 +1,158 @@
 <!-- ABOUTME: Wizard step indicator with click-to-jump on completed steps.
      Marks the current step with aria-current="step" and labels via SR-only text. -->
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { Icon } from '@phila/phila-ui-core'
 import { IconCheck } from '@phila/phila-ui-core/icons'
 
-interface Step {
-  title: string
+export interface Step {
+  label: string
   path: string
 }
-const props = defineProps<{
-  steps: Step[]
-  currentStep: number
-  completedThrough: number
-}>()
-const emit = defineEmits<{ navigate: [path: string] }>()
-const hovered = ref<Record<string, 'underline' | ''>>(
-  Object.fromEntries(props.steps.map((step) => [step.title, ''])),
+
+interface IndexedStep extends Step {
+  number: number
+  state: 'done' | 'current' | 'upcoming'
+}
+
+const props = withDefaults(
+  defineProps<{
+    steps: Step[]
+    componentAriaLabel: string
+    currentStep?: number
+  }>(),
+  {
+    currentStep: 1,
+  },
 )
 
-const indexed = computed(() => {
-  return props.steps.map((s, i) => ({
-    ...s,
-    n: i + 1,
-    state:
-      i + 1 < props.currentStep ? 'done' : i + 1 === props.currentStep ? 'current' : 'upcoming',
-    clickable: i + 1 <= props.completedThrough && i + 1 !== props.currentStep,
-  }))
+const emit = defineEmits<{ navigate: [path: string] }>()
+
+const currentStepSafe = computed(() => {
+  const currentStepisValid = isValidStepNumber(props.currentStep, props.steps)
+  if (!currentStepisValid)
+    console.warn(`${props.currentStep} is not a positive interger greater than 0. Defaulting to 1.`)
+  return currentStepisValid ? props.currentStep : 1
 })
 
-function handleMouseEnter(ev: MouseEvent) {
-  const target = ev.target as HTMLElement
-  const buttonId = target.id
-  hovered.value[buttonId] = 'underline'
+const gridWidths = computed(() => {
+  if (props.steps.length < 2)
+    throw new Error(`Number of steps must be at least 2. Got array of length ${props.steps.length}`)
+  let widths = '2fr'
+  let n = props.steps.length - 2
+  while (n--) widths += ' 3fr'
+  return { 'grid-template-columns': widths.concat(' 2fr') }
+})
+
+const indexed = computed<IndexedStep[]>(() => {
+  return props.steps.map((step, i) => {
+    const stepNumber = i + 1
+    return {
+      ...step,
+      number: stepNumber,
+      state:
+        stepNumber < currentStepSafe.value
+          ? 'done'
+          : stepNumber > currentStepSafe.value
+            ? 'upcoming'
+            : 'current',
+    }
+  })
+})
+
+function ariaLabelForStep(stepNumber: number, totalSteps: number) {
+  return `Step ${stepNumber} of ${totalSteps}`
 }
-function handleMouseLeave(ev: MouseEvent) {
-  const target = ev.target as HTMLElement
-  const buttonId = target.id
-  hovered.value[buttonId] = ''
+
+function isValidStepNumber(num: number, steps: Step[]) {
+  return num > 0 && num <= steps.length && Number.isInteger(num)
 }
 </script>
 
 <template>
-  <nav aria-label="Report progress" class="step-indicator">
-    <ol>
-      <li v-for="step in indexed" :key="step.n" :data-state="step.state">
-        <div v-if="step.n > 1" class="step-dash-left" />
-        <div v-if="step.n > 1" class="step-pad-left" />
+  <nav :aria-label="componentAriaLabel" class="step-indicator">
+    <ol class="steps" :style="gridWidths">
+      <li
+        v-for="step in indexed"
+        :key="step.number"
+        class="step"
+        :data-state="step.state"
+        :aria-label="ariaLabelForStep(step.number, steps.length)"
+      >
+        <div class="step-dash-left" />
+        <div class="step-pad-left" />
 
-        <span v-if="step.n >= currentStep" class="step-number" v-text="step.n" />
-        <button
-          v-else
-          :id="step.title"
-          :type="step.clickable ? 'button' : undefined"
-          class="step-button"
-          @mouseenter="handleMouseEnter"
-          @mouseleave="handleMouseLeave"
-          @click="step.clickable ? emit('navigate', step.path) : null"
-        >
+        <span
+          v-if="step.number >= currentStepSafe"
+          class="step-number has-text-label-small"
+          v-text="step.number"
+        />
+        <button v-else class="step-button" @click="emit('navigate', step.path)">
           <Icon :icon="IconCheck" size="extra-small" class="step-number" />
         </button>
-
-        <span class="sr-only" :v-text="`Step ${step.n} of ${steps.length}`" />
         <span
-          :type="step.clickable ? 'button' : ''"
-          class="step-label"
-          :style="{ 'text-decoration': hovered[step.title] }"
-          @click="step.clickable ? emit('navigate', step.path) : null"
-          v-text="step.title"
+          v-if="step.number >= currentStepSafe"
+          :class="[
+            'step-label',
+            step.number === currentStepSafe ? 'has-text-label-small' : 'has-text-body-extra-small',
+          ]"
+          v-text="step.label"
+        />
+        <button
+          v-else
+          class="step-label has-text-body-extra-small"
+          @click="emit('navigate', step.path)"
+          v-text="step.label"
         />
 
-        <div v-if="step.n < steps.length" class="step-pad-right" />
-        <div v-if="step.n < steps.length" class="step-dash-right" />
+        <div class="step-pad-right" />
+        <div class="step-dash-right" />
       </li>
     </ol>
   </nav>
 </template>
 
 <style scoped>
-.step-indicator ol {
-  counter-reset: step-counter;
+.steps {
   display: grid;
-  place-content: stretch;
   padding: 0;
-  margin: auto;
-  grid-template-columns: 2fr 3fr 3fr 3fr 2fr;
+  margin: 0;
 }
 
-.step-indicator li {
-  counter-increment: step-counter;
-  margin-bottom: 0;
-  padding-left: 0;
+.step {
   display: grid;
+  grid-row: 1 / 3;
   grid-template-areas:
     'dash_l pad_l number pad_r dash_r'
     'label label label label label';
   grid-template-columns: 1fr auto auto auto 1fr;
+  grid-template-rows: subgrid;
+  row-gap: var(--spacing-xs, 0.5rem);
+  align-items: center;
+  padding: 0;
+  margin: 0;
 }
 
-li:first-child {
+.step:first-child {
   grid-template-columns: 0 0 auto auto 1fr;
+  .step-dash-left {
+    border: none;
+  }
 }
 
-li:last-child {
+.step:last-child {
   grid-template-columns: 1fr auto auto 0 0;
+  .step-dash-right {
+    border: none;
+  }
 }
 
+.step-label:focus-visible,
+.step:has(.step-button:hover, .step-button:focus-visible) > .step-label {
+  text-decoration: underline;
+}
+
+/* Gap between step indicator and lines */
 .step-pad-right {
   grid-area: pad_r;
 }
@@ -132,7 +179,6 @@ li:last-child {
 .step-dash-left {
   height: 0px;
   border: var(--border-width-s, 0.0625rem) solid var(--Schemes-Border-low, rgb(204, 204, 204));
-  margin: var(--spacing-m, 1rem) 0;
 }
 
 .step-button {
@@ -144,80 +190,72 @@ li:last-child {
   grid-area: number;
   display: grid;
   place-content: center;
-  margin: 0 0 var(--spacing-xs, 0.5rem) 0;
+  margin: 0;
   width: var(--scale-400, 2rem);
   height: var(--scale-400, 2rem);
   aspect-ratio: 1/1;
   background: transparent;
   border-radius: var(--border-radius-2xl, 2rem);
-  font-family: var(--Label-Small-font-label-small-family, Montserrat);
-  font-size: var(--Label-Small-font-label-small-size, 1rem);
-  font-style: normal;
-  line-height: var(--Label-Small-font-label-small-lineheight, 1.25rem);
-  /* 142.857% */
-  font-weight: 600;
 }
 
-.step-indicator li:first-child .step-number,
-.step-indicator li:first-child .step-label {
-  margin-left: 0;
+.step-indicator .step:first-child .step-number,
+.step-indicator .step:first-child .step-label {
+  margin-inline-start: 0;
 }
 
-.step-indicator li:last-child .step-number,
-.step-indicator li:last-child .step-label {
-  margin-right: 0;
+.step-indicator .step:last-child .step-number,
+.step-indicator .step:last-child .step-label {
+  margin-inline-end: 0;
 }
 
 .step-label {
   grid-area: label;
   display: grid;
-  text-align: center;
-  margin: 0 auto;
-  font-family: var(--Body-ExtraSmall-font-body-xs-family, Montserrat);
-  font-size: var(--Body-ExtraSmall-font-body-xs-size, 0.75rem);
-  font-style: normal;
-  line-height: var(--Body-ExtraSmall-font-body-xs-lineheight, 1rem);
-  /* 133.333% */
-  font-weight: 400;
+  margin-inline: auto;
+  background: transparent;
+  border: none;
 }
 
 /* Done: clickable button styling */
-.step-indicator li[data-state='done'] .step-number {
+.step-indicator .step[data-state='done'] .step-number {
   width: 1.7rem;
   height: 1.7rem;
   border: var(--border-width-m, 0.125rem) solid var(--Schemes-Primary, rgb(16, 52, 244));
   color: var(--Schemes-Primary, rgb(16, 52, 244));
 }
 
-.step-indicator li[data-state='done'] .step-label:hover,
-.step-indicator li[data-state='done'] .step-button:hover {
+.step-indicator .step[data-state='done'] .step-label:hover,
+.step-indicator .step[data-state='done'] .step-button:hover {
   cursor: pointer;
   text-decoration: underline;
 }
 
-.step-indicator li[data-state='done'] .step-dash-right,
-.step-indicator li[data-state='done'] .step-dash-left,
-.step-indicator li[data-state='current'] .step-dash-left {
+.step-indicator
+  .step[data-state='done']
+  :where(.step-button:focus-visible, .step-label:focus-visible) {
+  outline-color: var(--Schemes-Primary, rgb(16, 52, 244));
+  outline-offset: var(--spacing-2xs);
+}
+
+.step-indicator .step[data-state='done'] .step-dash-right,
+.step-indicator .step[data-state='done'] .step-dash-left,
+.step-indicator .step[data-state='current'] .step-dash-left {
   border: var(--border-width-s, 0.0625rem) solid var(--Schemes-Primary, rgb(16, 52, 244));
 }
 
 /* Current: filled primary circle with number */
-.step-indicator li[data-state='current'] .step-number {
+.step-indicator .step[data-state='current'] .step-number {
   background: var(--Schemes-Primary, rgb(16, 52, 244));
   color: var(--Schemes-On-Primary, #fff);
 }
 
-.step-indicator li[data-state='current'] .step-label {
-  font-weight: 600;
-}
-
-.step-indicator li[data-state='current'] .step-label,
-.step-indicator li[data-state='upcoming'] .step-label {
+.step-indicator .step[data-state='current'] .step-label,
+.step-indicator .step[data-state='upcoming'] .step-label {
   color: var(--Schemes-On-Background, #000);
 }
 
 /* Upcoming: outlined circle with number */
-.step-indicator li[data-state='upcoming'] .step-number {
+.step-indicator .step[data-state='upcoming'] .step-number {
   border: var(--border-width-m, 0.125rem) dashed var(--Schemes-Border-low, rgb(204, 204, 204));
   color: var(--Schemes-Border-high, rgb(155, 155, 155));
 }

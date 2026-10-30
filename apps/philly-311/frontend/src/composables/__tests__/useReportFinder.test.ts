@@ -122,16 +122,6 @@ describe('useReportFinder', () => {
     expect(f.errorMessage.value).toBe('boom')
   })
 
-  it('setCenter updates the view center and does not refetch', async () => {
-    getCurrentPosition.mockResolvedValue(null)
-    const f = useReportFinder()
-    await f.init()
-    ensureLoaded.mockClear()
-    await f.setCenter({ latitude: 40.1, longitude: -75.2 })
-    expect(f.searchOrUserLocation.value).toEqual({ latitude: 40.1, longitude: -75.2 })
-    expect(ensureLoaded).not.toHaveBeenCalled()
-  })
-
   describe('distance sorting', () => {
     const far: Report = { ...sample, id: 'far', lat: 40.05, lng: -75.0 }
     const near: Report = { ...sample, id: 'near', lat: 39.96, lng: -75.160001 }

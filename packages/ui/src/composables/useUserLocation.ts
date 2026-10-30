@@ -1,13 +1,20 @@
-import { ref, watch } from 'vue'
+import { type MaybeRef, ref, toValue, watch } from 'vue'
 import type {
   LatLon,
   LocationPermissionState,
+  SearchMode,
   UserLocationState,
   UseUserLocationParams,
 } from '../types'
 import { hasLocationData } from '../utilities/hasLocationData'
 
 export function useUserLocation(options?: UseUserLocationParams) {
+  const locationSearchMode = ref<SearchMode>(undefined)
+  const unknownLocation = {
+    latitude: NaN,
+    longitude: NaN,
+  }
+  const defaultLocation = options?.defaultLocation ?? unknownLocation
   const promptOnPageLoad = options?.promptOnPageLoad ?? false
   const watchLocation = options?.watchLocation ?? false
   const geolocationOptions = {
@@ -16,12 +23,7 @@ export function useUserLocation(options?: UseUserLocationParams) {
     maximumAge: options?.maximumAge ?? 0,
   }
 
-  const unknownLocation = {
-    latitude: NaN,
-    longitude: NaN,
-  }
-
-  const userLocation = ref<LatLon>(unknownLocation)
+  const userLocation = ref<LatLon>(defaultLocation)
   const userLocationPermissionState = ref<LocationPermissionState>('prompt')
   const userLocationState = ref<UserLocationState>('unknown')
   const gotInitialLocation = ref<boolean>(false)
@@ -71,12 +73,12 @@ export function useUserLocation(options?: UseUserLocationParams) {
 
   watch(
     userLocationPermissionState,
-    (newPermissionState, oldPermissionState) => {
+    async (newPermissionState, oldPermissionState) => {
       switch (newPermissionState) {
         case 'granted':
         case 'prompt': {
           if (!gotInitialLocation.value) {
-            getUserLocation()
+            await getUserLocation()
           }
           break
         }
@@ -95,29 +97,37 @@ export function useUserLocation(options?: UseUserLocationParams) {
     { immediate: promptOnPageLoad }
   )
 
-  function getUserLocation() {
+  function getUserLocation(): Promise<void> {
     userLocationState.value = 'acquiring'
-    navigator.geolocation.getCurrentPosition(locationSuccess, locationError, geolocationOptions)
+    return new Promise((resolve) => {
+      if (typeof navigator === 'undefined' || !navigator.geolocation) {
+        resolve(locationError(new GeolocationPositionError()))
+        return
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve(locationSuccess(pos)),
+        (error) => resolve(locationError(error)),
+        geolocationOptions
+      )
+    })
   }
 
   function locationSuccess(position: GeolocationPosition) {
     // only show location on map if user is in or near Philly
-    const newLocation = {
+    const newLocation: LatLon = {
       latitude: checkLatitudeInRange(position.coords.latitude) ? position.coords.latitude : NaN,
       longitude: checkLongitudeInRange(position.coords.longitude) ? position.coords.longitude : NaN,
+      accuracy: position.coords.accuracy,
     }
-
     const newLocIsValid = hasLocationData(newLocation)
-    userLocation.value = newLocIsValid ? newLocation : unknownLocation
+    userLocation.value = newLocIsValid ? newLocation : defaultLocation
     if (!newLocIsValid) console.error(`Location not in range`)
 
     if (!gotInitialLocation.value) {
       // if navigator.permissions is 'prompt' or 'granted' resolve both to 'granted' if user allows location services
       userLocationPermissionState.value = 'granted'
-      userLocationState.value = 'located'
+      userLocationState.value = gotInitialLocation.value ? 'watching' : 'located'
       gotInitialLocation.value = true
-    } else {
-      userLocationState.value = 'watching'
     }
   }
 
@@ -130,14 +140,12 @@ export function useUserLocation(options?: UseUserLocationParams) {
   function clearUserLocation() {
     watchId.value = null
     gotInitialLocation.value = false
-    userLocation.value = unknownLocation
+    userLocation.value = defaultLocation
     userLocationState.value = 'unknown'
   }
 
   function endWatch() {
-    if (watchId.value) {
-      navigator.geolocation.clearWatch(watchId.value)
-    }
+    if (watchId.value) navigator.geolocation.clearWatch(watchId.value)
     clearUserLocation()
   }
 
@@ -147,19 +155,29 @@ export function useUserLocation(options?: UseUserLocationParams) {
       longitude: locationData.longitude,
       accuracy: locationData.accuracy,
     }
+    locationSearchMode.value = undefined
   }
 
   function handleMapGeolocateError(error: Error | GeolocationPositionError) {
     console.error(error)
   }
 
+  function locationNotDefault(location: MaybeRef<LatLon>) {
+    const locVal = toValue(location)
+    return (
+      locVal.latitude !== defaultLocation.latitude || locVal.longitude !== defaultLocation.longitude
+    )
+  }
+
   return {
     userLocation,
     userLocationState,
+    locationSearchMode,
     getUserLocation,
     endWatch,
     handleMapGeolocate,
     handleMapGeolocateError,
+    locationNotDefault,
   }
 }
 

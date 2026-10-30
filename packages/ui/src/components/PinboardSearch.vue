@@ -15,7 +15,7 @@ import { useRecentSearches } from '../composables/useRecentSearches.ts'
 import { PINBOARD_CONFIG_KEY } from '../keys.ts'
 
 // models
-const searchString = defineModel<string>('search-string', { default: '' })
+const searchString = defineModel<string>('searchString', { default: '' })
 const dropdownOpen = defineModel<boolean>('dropdownOpen', {
   default: false,
 })
@@ -80,11 +80,13 @@ const cornerShape = computed(() => {
   }
 })
 
-watch([searchFocused, locatingUser, searchString], ([isFocused, isLocating, newSearch]) => {
-  dropdownOpen.value =
-    (isFocused || isLocating || newSearch.length > 0) &&
-    searchSuggestions.value.length + recentSearches.value.length > 0
-})
+watch(
+  [searchFocused, locatingUser, searchSuggestions, recentSearches],
+  ([isFocused, isLocating, newSuggestions, newRecent]) => {
+    dropdownOpen.value =
+      (isFocused || isLocating) && (newSuggestions.length > 0 || newRecent.length > 0)
+  }
+)
 
 // event handlers
 function handleSearchInput(event: InputEvent) {
@@ -122,9 +124,18 @@ function handleSuggestionRemove(term: string) {
 
 function handleSearchKeydown(event: KeyboardEvent) {
   const target = event.target as HTMLElement
-  if (event.key === 'ArrowDown' && dropdownOpen.value && target.tagName === 'INPUT') {
-    event.preventDefault()
-    suggestionsRef.value?.focusFirst()
+  switch (event.key) {
+    case 'ArrowDown': {
+      if (dropdownOpen.value && target.tagName === 'INPUT') {
+        event.preventDefault()
+        suggestionsRef.value?.focusFirst()
+      }
+      break
+    }
+    case 'Escape': {
+      dropdownOpen.value = false
+      break
+    }
   }
 }
 
@@ -178,6 +189,7 @@ function focusSearchInput() {
       :show-geolocate="showGeolocate"
       :remove-label="t('pinboard.removeRecentSearch')"
       :style="cornerShape"
+      :aria-expanded="dropdownOpen"
       @select="handleSuggestionSelect"
       @remove="handleSuggestionRemove"
     >
