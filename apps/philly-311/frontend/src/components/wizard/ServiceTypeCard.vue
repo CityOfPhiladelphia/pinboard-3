@@ -1,40 +1,57 @@
 <!-- ABOUTME: A single selectable service type row in the issue-type step's directory/search
      results — a colored disc (matching the map pins and report cards) plus name/description. -->
 <script setup lang="ts">
+import { computed, ref, watch } from 'vue'
 import { Icon } from '@phila/phila-ui-core'
 import { IconCheck } from '@phila/phila-ui-core/icons'
 import ServiceTypeIcon from '@/components/ServiceTypeIcon.vue'
 import { useReportSubmissionStore } from '@/stores/reportSubmission'
-import { computed } from 'vue'
 import type { Service } from '@/types/app'
 
 const props = defineProps<{ serviceType: Service; description: string }>()
 const selected = defineModel<Service | undefined>('selected', { default: undefined })
+const open = defineModel<boolean>('open', { default: false })
+
+const stayOpen = ref(false)
 
 const store = useReportSubmissionStore()
 
 const currentlySelected = computed(() => store.category === props.serviceType)
 
+watch(currentlySelected, (nowSelected) => stayOpen.value = !nowSelected)
+
 function select() {
   selected.value = props.serviceType
+  open.value = stayOpen.value || !open.value
+  stayOpen.value = false
 }
 </script>
 
 <template>
-  <details :open="false" :class="{ selected: currentlySelected }" @click="select">
-    <summary @click.prevent>
+  <details
+    :open="open"
+    :class="[{ selected: currentlySelected }, 'service-type-card']"
+    role="treeitem"
+    :aria-selected="currentlySelected"
+    @click.prevent="select"
+  >
+    <summary class="service-type-card-summary has-text-label-default">
       <ServiceTypeIcon :service-type="serviceType" :size="24" />
       {{ serviceType }}
-      <span v-if="currentlySelected" class="selected-check">
-        <Icon :icon="IconCheck" decorative size="small" />
-      </span>
+      <Icon
+        v-if="currentlySelected"
+        :icon="IconCheck"
+        class="selected-check"
+        decorative
+        size="small"
+      />
     </summary>
-    {{ description }}
+    <p v-text="description" />
   </details>
 </template>
 
 <style scoped>
-details {
+.service-type-card {
   padding: var(--spacing-m, 1rem);
   border-radius: var(--border-radius-s, 0.5rem);
   border: var(--border-width-s, 1px) solid var(--Schemes-Border-low, #ccc);
@@ -42,26 +59,27 @@ details {
   cursor: pointer;
 }
 
-details:hover {
+.service-type-card:not(:last-child) {
+  margin-block-end: var(--spacing-m, 1rem)
+}
+
+.service-type-card:hover {
   background: var(--Schemes-Surface-Container-Surface-Container-Low, #f3f3f3);
 }
 
-summary {
+.service-type-card[open]::details-content {
+  padding-block-start: var(--spacing-s, 0.75rem);
+}
+
+.service-type-card-summary {
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: var(--spacing-xs, 0.5rem);
   color: var(--Schemes-On-Surface-High, #000);
-
-  /* Label/Default */
-  font-family: var(--Label-Default-font-label-default-family, Montserrat);
-  font-size: var(--Label-Default-font-label-default-size, 1rem);
-  font-style: normal;
-  font-weight: 600;
-  line-height: var(--Label-Default-font-label-default-lineheight, 1.5rem); /* 150% */
 }
 
-summary::marker {
+.service-type-card-summary::marker {
   content: '';
 }
 

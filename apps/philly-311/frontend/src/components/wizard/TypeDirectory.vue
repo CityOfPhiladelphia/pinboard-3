@@ -9,6 +9,8 @@ import CaseTypeCard from './CaseTypeCard.vue'
 import ServiceTypeCard from './ServiceTypeCard.vue'
 import type { Service } from '@/types/app.ts'
 
+const noSearchMatch = 'No issue types match your search.'
+
 const props = defineProps<{ catalog: ServiceType[] }>()
 const selected = defineModel<Service | undefined>('selected', { default: undefined })
 const query = ref('')
@@ -40,11 +42,9 @@ const groups = computed(() => {
 </script>
 
 <template>
-  <div class="type-directory">
-    <h5 class="type-directory__header" v-text="'All issue types'" />
-    <p v-if="!groups.length" class="type-directory__empty" role="status">
-      {{ 'No issue types match your search.' }}
-    </p>
+  <div class="type-directory" role="tree" :aria-required="true">
+    <h5 class="type-directory__header has-text-heading-h5" v-text="'All issue types'" />
+    <p v-if="!groups.length" class="type-directory__empty" role="status" v-text="noSearchMatch" />
 
     <div v-for="caseType in groups" :key="caseType.caseType" class="type-directory__cards">
       <CaseTypeCard
@@ -52,12 +52,14 @@ const groups = computed(() => {
         v-model:selected="selected"
         :case-type="caseType.caseType"
         :service-types="caseType.items"
+        class="case-type-card"
       />
       <ServiceTypeCard
         v-else
         v-model:selected="selected"
         :service-type="caseType.items[0].serviceType"
         :description="caseType.items[0].description"
+        class="service-type-card"
       />
     </div>
   </div>
@@ -70,17 +72,14 @@ const groups = computed(() => {
 
 .type-directory__header {
   color: #374151;
-  padding: var(--spacing-s, 0.75rem) 0;
-
-  /* Heading/H5 */
-  font-family: var(--Heading-H5-font-heading-5-family, Montserrat);
-  font-size: var(--Heading-H5-font-heading-5-size, 1.25rem);
-  font-style: normal;
-  font-weight: 600;
-  line-height: var(--Heading-H5-font-heading-5-lineheight, 1.75rem); /* 140% */
+  padding-block: var(--spacing-xs, 0.5rem);
 }
 
-.type-directory__cards:not(:last-child) {
-  margin-bottom: var(--spacing-s, 0.75rem);
+.type-directory__cards:not(:last-child) > .case-type-card {
+  margin-block-start: var(--spacing-xl, 2rem);
+}
+
+.type-directory__cards:not(:last-child) > .service-type-card {
+  margin-block-start: var(--spacing-m, 1rem);
 }
 </style>

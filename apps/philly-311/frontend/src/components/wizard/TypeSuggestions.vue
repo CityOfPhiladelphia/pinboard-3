@@ -8,10 +8,10 @@ import type { PhotoSuggestion } from '@/types/wizard'
 import ServiceTypeCard from './ServiceTypeCard.vue'
 import type { Service } from '@/types/app.ts'
 
+const calloutText = 'AI generated recommendations based on photo'
+
 const props = defineProps<{ suggestions: PhotoSuggestion[]; catalog: ServiceType[] }>()
 const selected = defineModel<Service | undefined>('selected', { default: undefined })
-
-const calloutText = 'AI generated recommendations based on photo'
 
 const top = computed(() => {
   const byName = new Map(props.catalog.map((s) => [s.serviceType, s]))

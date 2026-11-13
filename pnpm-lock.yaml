@@ -12,6 +12,9 @@ catalogs:
     '@phila/constructs':
       specifier: ^0.11.4
       version: 0.11.5
+    '@phila/phila-ui-accordion':
+      specifier: 1.0.3-beta.5
+      version: 1.0.3-beta.5
     '@phila/phila-ui-app-footer':
       specifier: 1.2.7-beta.4
       version: 1.2.7-beta.4
@@ -366,6 +369,9 @@ importers:
 
   apps/philly-311/frontend:
     dependencies:
+      '@phila/phila-ui-accordion':
+        specifier: 'catalog:'
+        version: 1.0.3-beta.5(vue-router@5.3.1(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.5.1))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
       '@phila/phila-ui-app-header':
         specifier: 'catalog:'
         version: 3.1.0-beta.4(vue-router@5.3.1(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.5.1))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
@@ -1379,6 +1385,11 @@ packages:
     peerDependencies:
       vue: ^3.0.0
 
+  '@phila/phila-ui-accordion@1.0.3-beta.5':
+    resolution: {integrity: sha512-84/rdliWxWvyBKTp5uSZFdWaSBcFqSFhEIgzxdQj++CMSJ7CYM3Dy8cpdFMDdd5BYQkF2Z0NcMmN36BwBDJdZQ==}
+    peerDependencies:
+      vue: ^3.0.0
+
   '@phila/phila-ui-app-footer@1.2.7-beta.4':
     resolution: {integrity: sha512-+qiW03Fs4B6Apl7cziBPAwcQi5PqCrEC7mvbv4EpTdbsE6kYpSLBrc4FDOjtFZQ7C1w0Zs9SvqHwEq5gM34+ZQ==}
     peerDependencies:
@@ -1441,6 +1452,15 @@ packages:
 
   '@phila/phila-ui-core@3.3.0-beta.4':
     resolution: {integrity: sha512-bCiaC0RUG1D1dqFRL3JeMT244XSC56vK+sDcqAr8J4W53GD0Ud0qC1daBTcONQCub3nW/517WClf4JjtYkB5Rg==}
+    peerDependencies:
+      vue: ^3.5.34
+      vue-router: ^5.0.0
+    peerDependenciesMeta:
+      vue-router:
+        optional: true
+
+  '@phila/phila-ui-core@3.3.0-beta.5':
+    resolution: {integrity: sha512-EYJ4w1X6JcH8vjk7hEDFlB018m4ETxYeam8fitk9zybeUmlv/4TKbQT9SU9hbqZ9JV16/EpuU9wA5a4jF/rv5A==}
     peerDependencies:
       vue: ^3.5.34
       vue-router: ^5.0.0
@@ -4176,6 +4196,13 @@ snapshots:
     transitivePeerDependencies:
       - vue-router
 
+  '@phila/phila-ui-accordion@1.0.3-beta.5(vue-router@5.3.1(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.5.1))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+    dependencies:
+      '@phila/phila-ui-core': 3.3.0-beta.5(vue-router@5.3.1(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.5.1))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
+      vue: 3.5.42(typescript@6.0.3)
+    transitivePeerDependencies:
+      - vue-router
+
   '@phila/phila-ui-app-footer@1.2.7-beta.4(vue-router@5.3.1(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.5.1))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
       '@phila/phila-ui-core': 3.3.0-beta.4(vue-router@5.3.1(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.5.1))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))
@@ -4285,6 +4312,14 @@ snapshots:
       - vue-router
 
   '@phila/phila-ui-core@3.3.0-beta.4(vue-router@5.3.1(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.5.1))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
+    dependencies:
+      clsx: 2.1.1
+      date-fns: 4.4.0
+      vue: 3.5.42(typescript@6.0.3)
+    optionalDependencies:
+      vue-router: 5.3.1(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.5.1))(vue@3.5.42(typescript@6.0.3))
+
+  '@phila/phila-ui-core@3.3.0-beta.5(vue-router@5.3.1(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(pinia@3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3)))(rollup@4.63.1)(vite@7.3.6(@types/node@26.5.1))(vue@3.5.42(typescript@6.0.3)))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
       clsx: 2.1.1
       date-fns: 4.4.0

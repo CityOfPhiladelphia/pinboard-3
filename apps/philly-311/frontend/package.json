@@ -17,6 +17,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@phila/phila-ui-accordion": "catalog:",
     "@phila/phila-ui-app-header": "catalog:",
     "@phila/phila-ui-bottom-sheet": "catalog:",
     "@phila/phila-ui-breadcrumbs": "catalog:",

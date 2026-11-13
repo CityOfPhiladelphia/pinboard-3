@@ -51,15 +51,11 @@ useWizardValidity(computed(() => !!store.category && !error.value))
 const showErrors = useWizardErrors()
 
 onBeforeMount(() => {
-  if (!list.value.length) {
-    load()
-  } else {
-    searchMatchedIssueTypes.value = [...list.value]
-  }
+  if (!list.value.length) load()
+  else searchMatchedIssueTypes.value = [...list.value]
 })
 
 watch(selectedServiceType, (selectedService) => {
-  console.log(selectedService)
   store.setCategory(selectedService)
 })
 

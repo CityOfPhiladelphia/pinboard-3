@@ -16,6 +16,7 @@ catalog:
   # so the whole set moves together: a mixed set resolves two copies of core, and the
   # module-scoped registries inside it (useVisibility) stop seeing each other.
   # Pinned exactly for the same reason - a range could drift one package off the set.
+  '@phila/phila-ui-accordion': '1.0.3-beta.5'
   '@phila/phila-ui-app-footer': '1.2.7-beta.4'
   '@phila/phila-ui-app-header': '3.1.0-beta.4'
   '@phila/phila-ui-bottom-sheet': '0.1.4-beta.4'
