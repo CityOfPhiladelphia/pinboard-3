@@ -43,3 +43,22 @@ runs:
       working-directory: ${{ format('apps/{0}', inputs.app-name) }}
       shell: bash
       run: city ship ${{ inputs.environment-name }} --web
+
+    - name: Serve the iOS association file as JSON
+      if: inputs.app-name == 'philly-311'
+      working-directory: apps/philly-311
+      shell: bash
+      env:
+        DEPLOY_ENVIRONMENT: ${{ inputs.environment-name }}
+      run: |
+        # The extensionless association file has no MIME type for the S3 sync to infer.
+        association_file=.well-known/apple-app-site-association
+        bucket="${DEPLOY_ENVIRONMENT}-philly-311-s3-static-site"
+        aws s3 cp "frontend/dist/$association_file" "s3://$bucket/$association_file" \
+          --content-type application/json --only-show-errors
+
+        distribution_id="$(aws ssm get-parameter \
+          --name "/$DEPLOY_ENVIRONMENT/philly-311/static-site/distribution-id" \
+          --query Parameter.Value --output text)"
+        aws cloudfront create-invalidation --distribution-id "$distribution_id" \
+          --paths "/$association_file" --no-cli-pager

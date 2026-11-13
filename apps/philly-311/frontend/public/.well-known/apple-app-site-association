@@ -1,0 +1,20 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "AMQ22DDELM.gov.phila.phila311-native",
+          "AMQ22DDELM.com.publicstuff.philadelphia"
+        ],
+        "components": [
+          {
+            "/": "/",
+            "?": {
+              "location": "$(digit)$(digit)$(digit)$(digit)$(digit)$(digit)$(digit)$(digit)"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
